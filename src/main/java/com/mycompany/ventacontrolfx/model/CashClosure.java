@@ -9,5 +9,5 @@ package com.mycompany.ventacontrolfx.model;
  * @author PracticasSoftware1
  */
 public class CashClosure {
-    
+
 }

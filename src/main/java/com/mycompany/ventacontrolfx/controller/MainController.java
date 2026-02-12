@@ -12,10 +12,21 @@ import javafx.scene.image.Image;
 import javafx.geometry.Pos;
 import javafx.geometry.Insets;
 
+import com.mycompany.ventacontrolfx.util.RippleEffect;
 import java.util.ArrayList;
 import java.util.List;
+import javafx.animation.PauseTransition;
+import javafx.util.Duration;
+
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Node;
+import java.io.IOException;
 
 public class MainController {
+
+    @FXML
+    private ScrollPane mainContent;
 
     @FXML
     private TilePane productsPane;
@@ -39,6 +50,134 @@ public class MainController {
     private double subtotal = 0.0;
     private int itemCount = 0;
 
+    private Node productsView;
+    private Node categoriesView;
+
+    @FXML
+    private VBox cartPanel;
+
+    @FXML
+    private VBox productsSubmenu;
+
+    @FXML
+    private Button btnSell;
+    @FXML
+    private Button btnProducts;
+    @FXML
+    private Button btnProductsList;
+    @FXML
+    private Button btnCategories;
+
+    // Other Sidebar Buttons
+    @FXML
+    private Button btnPanel;
+    @FXML
+    private Button btnHistory;
+
+    @FXML
+    private Button btnClients;
+
+    @FXML
+    private Button btnUsers;
+    @FXML
+    private Button btnConfig;
+
+    @FXML
+    private Label lblProductsArrow;
+    @FXML
+    private VBox loadingOverlay;
+
+    @FXML
+    private void showSellView() {
+        simulateLoading(() -> {
+            mainContent.setContent(productsPane);
+            cartPanel.setVisible(true);
+            cartPanel.setManaged(true);
+            setActiveButton(btnSell);
+        });
+    }
+
+    @FXML
+    private void toggleProductsMenu() {
+        boolean isVisible = productsSubmenu.isVisible();
+        productsSubmenu.setVisible(!isVisible);
+        productsSubmenu.setManaged(!isVisible);
+
+        // Update arrow
+        if (!isVisible) {
+            lblProductsArrow.setText("▼"); // Expanded (Open)
+        } else {
+            lblProductsArrow.setText("<"); // Collapsed (Closed)
+        }
+
+        setActiveButton(btnProducts);
+    }
+
+    @FXML
+    private void showProductsView() {
+        simulateLoading(() -> {
+            try {
+                if (productsView == null) {
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/products.fxml"));
+                    productsView = loader.load();
+                }
+                mainContent.setContent(productsView);
+                cartPanel.setVisible(false);
+                cartPanel.setManaged(false);
+                setActiveButton(btnProductsList);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+    }
+
+    @FXML
+    private void showCategoriesView() {
+        simulateLoading(() -> {
+            try {
+                if (categoriesView == null) {
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/categories.fxml"));
+                    categoriesView = loader.load();
+                }
+                mainContent.setContent(categoriesView);
+                cartPanel.setVisible(false);
+                cartPanel.setManaged(false);
+                setActiveButton(btnCategories);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+    }
+
+    private void simulateLoading(Runnable action) {
+        loadingOverlay.setVisible(true);
+        PauseTransition pause = new PauseTransition(Duration.millis(300));
+        pause.setOnFinished(e -> {
+            action.run();
+            loadingOverlay.setVisible(false);
+        });
+        pause.play();
+    }
+
+    private void setActiveButton(Button activeButton) {
+        // Remove active class from all known buttons
+        if (btnSell != null)
+            btnSell.getStyleClass().remove("active-sidebar-button");
+        if (btnProducts != null)
+            btnProducts.getStyleClass().remove("active-sidebar-button");
+        if (btnProductsList != null)
+            btnProductsList.getStyleClass().remove("active-sidebar-button");
+        if (btnCategories != null)
+            btnCategories.getStyleClass().remove("active-sidebar-button");
+
+        // Add to the target button
+        if (activeButton != null) {
+            if (!activeButton.getStyleClass().contains("active-sidebar-button")) {
+                activeButton.getStyleClass().add("active-sidebar-button");
+            }
+        }
+    }
+
     public static class Product {
         String name;
         double price;
@@ -53,6 +192,28 @@ public class MainController {
 
     @FXML
     public void initialize() {
+        // Apply Ripple Effect to Sidebar Buttons
+        if (btnPanel != null)
+            RippleEffect.applyTo(btnPanel);
+        if (btnSell != null)
+            RippleEffect.applyTo(btnSell);
+        if (btnProducts != null)
+            RippleEffect.applyTo(btnProducts);
+
+        if (btnProductsList != null)
+            RippleEffect.applyTo(btnProductsList);
+        if (btnCategories != null)
+            RippleEffect.applyTo(btnCategories);
+        if (btnHistory != null)
+            RippleEffect.applyTo(btnHistory);
+        if (btnClients != null)
+            RippleEffect.applyTo(btnClients);
+
+        if (btnUsers != null)
+            RippleEffect.applyTo(btnUsers);
+        if (btnConfig != null)
+            RippleEffect.applyTo(btnConfig);
+
         // Load sample data
         List<Product> sampleProducts = new ArrayList<>();
         sampleProducts.add(new Product("Vela", 3.99, ""));

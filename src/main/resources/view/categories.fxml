@@ -12,7 +12,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane id="AnchorPane" prefHeight="600.0" prefWidth="900.0" style="-fx-background-color: #f4f6f9;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mycompany.ventacontrolfx.controller.ProductController">
+<AnchorPane id="AnchorPane" prefHeight="600.0" prefWidth="900.0" style="-fx-background-color: #f4f6f9;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mycompany.ventacontrolfx.controller.CategoryController">
    <children>
       <VBox spacing="15.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <padding>
@@ -22,7 +22,7 @@
             <!-- Header Section -->
             <HBox alignment="CENTER_LEFT" spacing="10.0">
                <children>
-                  <Label text="Productos" textFill="#1e88e5">
+                  <Label text="Categorías" textFill="#1e88e5">
                      <font>
                         <Font name="System Bold" size="24.0" />
                      </font>
@@ -31,7 +31,7 @@
                   <Button mnemonicParsing="false" style="-fx-background-color: white; -fx-text-fill: #1e88e5; -fx-border-color: #1e88e5; -fx-border-radius: 4; -fx-background-radius: 4;" text="Excel" />
                   <Button mnemonicParsing="false" style="-fx-background-color: white; -fx-text-fill: #e53935; -fx-border-color: #e53935; -fx-border-radius: 4; -fx-background-radius: 4;" text="PDF" />
                   <Button mnemonicParsing="false" style="-fx-background-color: #00897b; -fx-text-fill: white; -fx-background-radius: 4;" text="Importar" />
-                  <Button fx:id="btnAdd" onAction="#handleAddProduct" style="-fx-background-color: #1e88e5; -fx-text-fill: white; -fx-background-radius: 4; -fx-font-weight: bold;" text="+ Añadir Producto" />
+                  <Button fx:id="btnAdd" onAction="#handleAddCategory" style="-fx-background-color: #1e88e5; -fx-text-fill: white; -fx-background-radius: 4; -fx-font-weight: bold;" text="+ Añadir Categoría" />
                </children>
             </HBox>
 
@@ -46,19 +46,16 @@
                   <Label text="registros" textFill="#666666" />
                   <Region HBox.hgrow="ALWAYS" />
                   <Label text="Filtrar" textFill="#1e88e5" />
-                  <TextField fx:id="searchField" promptText="Buscar..." style="-fx-background-radius: 4; -fx-border-color: #e0e0e0; -fx-border-radius: 4;" />
+                  <TextField fx:id="searchField" promptText="Buscar categoría..." style="-fx-background-radius: 4; -fx-border-color: #e0e0e0; -fx-border-radius: 4;" />
                   <Button mnemonicParsing="false" style="-fx-background-color: #1e88e5; -fx-text-fill: white;" text="🔍" />
                </children>
             </HBox>
 
             <!-- Table Section -->
-            <TableView fx:id="productsTable" VBox.vgrow="ALWAYS" style="-fx-background-color: white; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 5, 0, 0, 1);">
+            <TableView fx:id="categoriesTable" VBox.vgrow="ALWAYS" style="-fx-background-color: white; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 5, 0, 0, 1);">
               <columns>
-                <TableColumn fx:id="colName" prefWidth="250.0" text="Nombre" />
-                <TableColumn fx:id="colCategoryId" prefWidth="150.0" text="Categoría" />
-                  <TableColumn fx:id="colPrice" prefWidth="100.0" text="Precio" />
-                  <TableColumn fx:id="colFavorite" prefWidth="80.0" text="Favorito" />
-                  <TableColumn fx:id="colId" prefWidth="80.0" text="Cod" />
+                  <TableColumn fx:id="colId" prefWidth="100.0" text="Cod" />
+                  <TableColumn fx:id="colName" prefWidth="400.0" text="Nombre Categoría" />
               </columns>
                <columnResizePolicy>
                   <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />

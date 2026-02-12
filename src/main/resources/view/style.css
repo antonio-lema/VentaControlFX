@@ -110,6 +110,23 @@
     -fx-text-fill: white;
 }
 
+.sidebar-button:pressed {
+    -fx-background-color: #cfd8dc;
+    -fx-effect: inner-shadow(gaussian, rgba(0, 0, 0, 0.2), 5, 0, 0, 2);
+    -fx-scale-x: 0.98;
+    -fx-scale-y: 0.98;
+}
+
+.active-sidebar-button:pressed {
+    -fx-background-color: #1e88e5;
+    /* Keep active blue */
+    -fx-text-fill: white;
+}
+
+.sidebar-button .label {
+    -fx-text-fill: inherit;
+}
+
 .sidebar-icon-only {
     -fx-background-color: transparent;
     -fx-text-fill: #999;

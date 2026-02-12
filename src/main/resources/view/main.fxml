@@ -66,18 +66,30 @@
                 <Insets top="20" right="10" bottom="20" left="10"/>
             </padding>
             
-            <Button text="🕓 Panel" styleClass="sidebar-button"/>
-            <Button text="🛒 Vender" styleClass="sidebar-button, active-sidebar-button"/>
-            <Button text="🛒 Comprar" styleClass="sidebar-button"/>
-            <Button text="🏷 Productos &lt;" styleClass="sidebar-button"/>
-            <Button text="🕓 Historial &lt;" styleClass="sidebar-button"/>
-            <Button text="👥 Clientes &lt;" styleClass="sidebar-button"/>
-            <Button text="🌍 Web &lt;" styleClass="sidebar-button"/>
-            <Button text="💳 Pagos &lt;" styleClass="sidebar-button"/>
-            <Button text="🚚 Envios &lt;" styleClass="sidebar-button"/>
-            <Button text="✉ Correo &lt;" styleClass="sidebar-button"/>
-            <Button text="👤 Usuarios &lt;" styleClass="sidebar-button"/>
-            <Button text="⚙ Configuración &lt;" styleClass="sidebar-button"/>
+            <Button fx:id="btnPanel" text="🕓 Panel" styleClass="sidebar-button"/>
+            <Button fx:id="btnSell" text="🛒 Vender" styleClass="sidebar-button, active-sidebar-button" onAction="#showSellView"/>
+
+            <!-- Products Dropdown -->
+            <!-- Products Dropdown -->
+            <Button fx:id="btnProducts" styleClass="sidebar-button" onAction="#toggleProductsMenu" contentDisplay="GRAPHIC_ONLY" maxWidth="Infinity">
+                <graphic>
+                   <HBox alignment="CENTER_LEFT" maxWidth="Infinity">
+                       <Label text="🏷 Productos" style="-fx-font-size: 16px;"/> 
+                       <Region HBox.hgrow="ALWAYS"/>
+                       <Label fx:id="lblProductsArrow" text="&lt;" style="-fx-font-size: 12px; -fx-font-weight: bold;"/>
+                   </HBox>
+                </graphic>
+            </Button>
+            <VBox fx:id="productsSubmenu" managed="false" visible="false" spacing="0">
+                <padding><Insets left="20"/></padding>
+                <Button fx:id="btnProductsList" text="Lista de Productos" styleClass="sidebar-button" onAction="#showProductsView"/>
+                <Button fx:id="btnCategories" text="Categorías" styleClass="sidebar-button" onAction="#showCategoriesView"/>
+            </VBox>
+            <Button fx:id="btnHistory" text="🕓 Historial &lt;" styleClass="sidebar-button"/>
+            <Button fx:id="btnClients" text="👥 Clientes &lt;" styleClass="sidebar-button"/>
+
+            <Button fx:id="btnUsers" text="👤 Usuarios &lt;" styleClass="sidebar-button"/>
+            <Button fx:id="btnConfig" text="⚙ Configuración &lt;" styleClass="sidebar-button"/>
             
             <Region VBox.vgrow="ALWAYS"/>
             <HBox spacing="15" alignment="CENTER">
@@ -91,16 +103,24 @@
 
     <!-- CENTER CONTENT (Start with Products) -->
     <center>
-        <ScrollPane fitToWidth="true" style="-fx-background: #f4f6f9; -fx-background-color: transparent;">
-            <TilePane fx:id="productsPane" hgap="15" vgap="15" prefColumns="4" style="-fx-padding: 20;">
-                <!-- Products will be added here dynamically -->
-            </TilePane>
-        </ScrollPane>
+        <StackPane>
+            <ScrollPane fx:id="mainContent" fitToWidth="true" style="-fx-background: #f4f6f9; -fx-background-color: transparent;">
+                <TilePane fx:id="productsPane" hgap="15" vgap="15" prefColumns="4" style="-fx-padding: 20;">
+                    <!-- Products will be added here dynamically -->
+                </TilePane>
+            </ScrollPane>
+            
+            <!-- Loading Overlay -->
+            <VBox fx:id="loadingOverlay" visible="false" alignment="CENTER" style="-fx-background-color: rgba(244, 246, 249, 0.7);">
+                <ProgressIndicator />
+                <Label text="Cargando..." style="-fx-text-fill: #666; -fx-padding: 10 0 0 0;"/>
+            </VBox>
+        </StackPane>
     </center>
 
     <!-- RIGHT PANEL (Cart) -->
     <right>
-        <VBox spacing="0" styleClass="cart-panel" prefWidth="380">
+        <VBox fx:id="cartPanel" spacing="0" styleClass="cart-panel" prefWidth="380">
             
             <!-- Customer Selection -->
             <HBox alignment="CENTER_LEFT" styleClass="cart-header">
