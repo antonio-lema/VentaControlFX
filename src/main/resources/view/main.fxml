@@ -103,19 +103,32 @@
 
     <!-- CENTER CONTENT (Start with Products) -->
     <center>
-        <StackPane>
-            <ScrollPane fx:id="mainContent" fitToWidth="true" style="-fx-background: #f4f6f9; -fx-background-color: transparent;">
-                <TilePane fx:id="productsPane" hgap="15" vgap="15" prefColumns="4" style="-fx-padding: 20;">
-                    <!-- Products will be added here dynamically -->
-                </TilePane>
-            </ScrollPane>
-            
-            <!-- Loading Overlay -->
-            <VBox fx:id="loadingOverlay" visible="false" alignment="CENTER" style="-fx-background-color: rgba(244, 246, 249, 0.7);">
-                <ProgressIndicator />
-                <Label text="Cargando..." style="-fx-text-fill: #666; -fx-padding: 10 0 0 0;"/>
-            </VBox>
-        </StackPane>
+        <BorderPane>
+            <center>
+                <StackPane>
+                    <ScrollPane fx:id="mainContent" fitToWidth="true" style="-fx-background: #f4f6f9; -fx-background-color: transparent;">
+                        <TilePane fx:id="productsPane" hgap="15" vgap="15" prefColumns="4" style="-fx-padding: 20;">
+                            <!-- Products will be added here dynamically -->
+                        </TilePane>
+                    </ScrollPane>
+                    
+                    <!-- Loading Overlay -->
+                    <VBox fx:id="loadingOverlay" visible="false" alignment="CENTER" style="-fx-background-color: rgba(244, 246, 249, 0.7);">
+                        <ProgressIndicator />
+                        <Label text="Cargando..." style="-fx-text-fill: #666; -fx-padding: 10 0 0 0;"/>
+                    </VBox>
+                </StackPane>
+            </center>
+            <bottom>
+                <ScrollPane vbarPolicy="NEVER" hbarPolicy="AS_NEEDED" fitToHeight="true" style="-fx-background-color: transparent; -fx-padding: 10;">
+                    <content>
+                        <HBox fx:id="favoriteCategoriesBox" spacing="10" alignment="CENTER_LEFT" style="-fx-padding: 5;">
+                            <!-- Favorite Categories will be added here -->
+                        </HBox>
+                    </content>
+                </ScrollPane>
+            </bottom>
+        </BorderPane>
     </center>
 
     <!-- RIGHT PANEL (Cart) -->
