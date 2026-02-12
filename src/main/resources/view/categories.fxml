@@ -42,7 +42,7 @@
                </padding>
                <children>
                   <Label text="Mostrar" textFill="#666666" />
-                  <TextField prefWidth="50.0" text="10" />
+                  <TextField fx:id="rowsPerPageField" prefWidth="50.0" text="10" />
                   <Label text="registros" textFill="#666666" />
                   <Region HBox.hgrow="ALWAYS" />
                   <Label text="Filtrar" textFill="#1e88e5" />
@@ -54,7 +54,6 @@
             <!-- Table Section -->
             <TableView fx:id="categoriesTable" VBox.vgrow="ALWAYS" style="-fx-background-color: white; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 5, 0, 0, 1);">
               <columns>
-                  <TableColumn fx:id="colId" prefWidth="100.0" text="Cod" />
                   <TableColumn fx:id="colName" prefWidth="248.0" text="Nombre" />
                   <TableColumn fx:id="colVisible" prefWidth="75.0" text="Visible" />
                   <TableColumn fx:id="colFavorite" prefWidth="75.0" text="Favorito" />

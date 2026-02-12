@@ -35,8 +35,6 @@ public class CategoryController {
     @FXML
     private TableView<Category> categoriesTable;
     @FXML
-    private TableColumn<Category, Integer> colId;
-    @FXML
     private TableColumn<Category, String> colName;
     @FXML
     private TableColumn<Category, Boolean> colVisible;
@@ -48,6 +46,8 @@ public class CategoryController {
     private TextField searchField;
     @FXML
     private Button btnAdd;
+    @FXML
+    private TextField rowsPerPageField;
 
     private CategoryService categoryService;
     private ObservableList<Category> categoryList;
@@ -61,12 +61,16 @@ public class CategoryController {
 
         // Search functionality
         searchField.textProperty().addListener((observable, oldValue, newValue) -> {
-            filterCategories(newValue);
+            filterCategories(newValue, rowsPerPageField.getText());
+        });
+
+        // Rows per page functionality
+        rowsPerPageField.textProperty().addListener((observable, oldValue, newValue) -> {
+            filterCategories(searchField.getText(), newValue);
         });
     }
 
     private void setupColumns() {
-        colId.setCellValueFactory(new PropertyValueFactory<>("id"));
         colName.setCellValueFactory(new PropertyValueFactory<>("name"));
 
         // Visible Column
@@ -198,25 +202,50 @@ public class CategoryController {
         try {
             List<Category> categories = categoryService.getAllCategories();
             categoryList.setAll(categories);
-            categoriesTable.setItems(categoryList);
+
+            // Initial filter to respect default limit
+            filterCategories(searchField.getText(), rowsPerPageField.getText());
         } catch (SQLException e) {
             e.printStackTrace();
             showAlert("Error", "No se pudieron cargar las categorías: " + e.getMessage());
         }
     }
 
-    private void filterCategories(String query) {
-        if (query == null || query.isEmpty()) {
-            categoriesTable.setItems(categoryList);
-        } else {
-            ObservableList<Category> filtered = FXCollections.observableArrayList();
-            for (Category c : categoryList) {
-                if (c.getName().toLowerCase().contains(query.toLowerCase())) {
-                    filtered.add(c);
+    private void filterCategories(String query, String limitStr) {
+        int limit = Integer.MAX_VALUE;
+        try {
+            if (limitStr != null && !limitStr.trim().isEmpty()) {
+                limit = Integer.parseInt(limitStr.trim());
+            }
+        } catch (NumberFormatException e) {
+            // Ignore invalid input, use default (all)
+        }
+
+        ObservableList<Category> filtered = FXCollections.observableArrayList();
+        String lowerCaseQuery = (query != null) ? query.toLowerCase() : "";
+
+        for (Category c : categoryList) {
+            if (filtered.size() >= limit) {
+                break;
+            }
+
+            boolean matches = false;
+            // Search by Name or ID
+            if (lowerCaseQuery.isEmpty()) {
+                matches = true;
+            } else {
+                if (c.getName().toLowerCase().contains(lowerCaseQuery)) {
+                    matches = true;
+                } else if (String.valueOf(c.getId()).contains(lowerCaseQuery)) {
+                    matches = true;
                 }
             }
-            categoriesTable.setItems(filtered);
+
+            if (matches) {
+                filtered.add(c);
+            }
         }
+        categoriesTable.setItems(filtered);
     }
 
     @FXML

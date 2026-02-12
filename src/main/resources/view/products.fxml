@@ -42,7 +42,7 @@
                </padding>
                <children>
                   <Label text="Mostrar" textFill="#666666" />
-                  <TextField prefWidth="50.0" text="10" />
+                  <TextField fx:id="rowsPerPageField" prefWidth="50.0" text="10" />
                   <Label text="registros" textFill="#666666" />
                   <Region HBox.hgrow="ALWAYS" />
                   <Label text="Filtrar" textFill="#1e88e5" />

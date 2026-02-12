@@ -57,6 +57,8 @@ public class ProductController {
     private TextField searchField;
     @FXML
     private Button btnAdd;
+    @FXML
+    private TextField rowsPerPageField;
 
     private ProductService productService;
     private ObservableList<Product> productList;
@@ -71,8 +73,15 @@ public class ProductController {
         });
 
         // Search functionality
+
+        // Search functionality
         searchField.textProperty().addListener((observable, oldValue, newValue) -> {
-            filterProducts(newValue);
+            filterProducts(newValue, rowsPerPageField.getText());
+        });
+
+        // Rows per page functionality
+        rowsPerPageField.textProperty().addListener((observable, oldValue, newValue) -> {
+            filterProducts(searchField.getText(), newValue);
         });
     }
 
@@ -236,25 +245,51 @@ public class ProductController {
         try {
             List<Product> products = productService.getAllProducts();
             productList.setAll(products);
-            productsTable.setItems(productList);
+            // Initial filter to respect default limit
+            filterProducts(searchField.getText(), rowsPerPageField.getText());
         } catch (SQLException e) {
             e.printStackTrace();
             showAlert("Error", "No se pudieron cargar los productos: " + e.getMessage());
         }
     }
 
-    private void filterProducts(String query) {
-        if (query == null || query.isEmpty()) {
-            productsTable.setItems(productList);
-        } else {
-            ObservableList<Product> filtered = FXCollections.observableArrayList();
-            for (Product p : productList) {
-                if (p.getName().toLowerCase().contains(query.toLowerCase())) {
-                    filtered.add(p);
+    private void filterProducts(String query, String limitStr) {
+        int limit = Integer.MAX_VALUE;
+        try {
+            if (limitStr != null && !limitStr.trim().isEmpty()) {
+                limit = Integer.parseInt(limitStr.trim());
+            }
+        } catch (NumberFormatException e) {
+            // Ignore invalid input, use default (all)
+        }
+
+        ObservableList<Product> filtered = FXCollections.observableArrayList();
+        String lowerCaseQuery = (query != null) ? query.toLowerCase() : "";
+
+        for (Product p : productList) {
+            if (filtered.size() >= limit) {
+                break;
+            }
+
+            boolean matches = false;
+            // If query is empty, everything matches (subject to limit)
+            if (lowerCaseQuery.isEmpty()) {
+                matches = true;
+            } else {
+                if (p.getName().toLowerCase().contains(lowerCaseQuery)) {
+                    matches = true;
+                } else if (String.valueOf(p.getId()).contains(lowerCaseQuery)) {
+                    matches = true;
+                } else if (p.getCategoryName() != null && p.getCategoryName().toLowerCase().contains(lowerCaseQuery)) {
+                    matches = true;
                 }
             }
-            productsTable.setItems(filtered);
+
+            if (matches) {
+                filtered.add(p);
+            }
         }
+        productsTable.setItems(filtered);
     }
 
     @FXML
