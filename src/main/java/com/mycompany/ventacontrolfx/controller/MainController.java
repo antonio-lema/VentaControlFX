@@ -15,6 +15,7 @@ import javafx.geometry.Insets;
 import com.mycompany.ventacontrolfx.util.RippleEffect;
 import com.mycompany.ventacontrolfx.model.Product;
 import com.mycompany.ventacontrolfx.model.Category;
+import com.mycompany.ventacontrolfx.model.CartItem;
 import com.mycompany.ventacontrolfx.service.ProductService;
 import com.mycompany.ventacontrolfx.service.CategoryService;
 import java.sql.SQLException;
@@ -56,10 +57,23 @@ public class MainController {
     @FXML
     private HBox favoriteCategoriesBox;
 
+    @FXML
+    private HBox searchBarContainer;
+
+    @FXML
+    private HBox filterDisplayContainer;
+
+    @FXML
+    private Label filterLabel;
+
+    @FXML
+    private TextField searchField;
+
     private ProductService productService;
     private CategoryService categoryService;
     private List<Product> products = new ArrayList<>();
     private List<Product> allProducts = new ArrayList<>();
+    private List<CartItem> cartItems = new ArrayList<>();
     private double subtotal = 0.0;
     private int itemCount = 0;
     private Object selectedCategory = null; // Can be Category, String ("FAVORITES"), or null ("Todos")
@@ -107,15 +121,52 @@ public class MainController {
 
     @FXML
     private void showSellView() {
+        System.out.println("=== showSellView() called ===");
+        System.out.println("searchField is null? " + (searchField == null));
+
         simulateLoading(() -> {
             mainContent.setContent(productsPane);
             cartPanel.setVisible(true);
             cartPanel.setManaged(true);
+            // Show category bar, search, and filter only in sales view
+            if (favoriteCategoriesBox != null) {
+                favoriteCategoriesBox.setVisible(true);
+                favoriteCategoriesBox.setManaged(true);
+            }
+            if (searchBarContainer != null) {
+                searchBarContainer.setVisible(true);
+                searchBarContainer.setManaged(true);
+            }
+            if (filterDisplayContainer != null) {
+                filterDisplayContainer.setVisible(true);
+                filterDisplayContainer.setManaged(true);
+            }
             setActiveButton(btnSell);
             // Reload products and categories to ensure fresh data
             loadProductsFromDB();
             loadFavoriteCategories();
         });
+
+        // Setup search functionality with retry logic
+        new Thread(() -> {
+            for (int i = 0; i < 10; i++) {
+                try {
+                    Thread.sleep(200); // Wait 200ms between attempts
+                    System.out.println("Attempt " + (i + 1) + ": searchField is null? " + (searchField == null));
+                    if (searchField != null) {
+                        Platform.runLater(() -> {
+                            setupSearchListener();
+                        });
+                        break;
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            if (searchField == null) {
+                System.out.println("ERROR: searchField is still null after 10 attempts!");
+            }
+        }).start();
     }
 
     @FXML
@@ -145,6 +196,19 @@ public class MainController {
                 mainContent.setContent(productsView);
                 cartPanel.setVisible(false);
                 cartPanel.setManaged(false);
+                // Hide category bar, search, and filter in products view
+                if (favoriteCategoriesBox != null) {
+                    favoriteCategoriesBox.setVisible(false);
+                    favoriteCategoriesBox.setManaged(false);
+                }
+                if (searchBarContainer != null) {
+                    searchBarContainer.setVisible(false);
+                    searchBarContainer.setManaged(false);
+                }
+                if (filterDisplayContainer != null) {
+                    filterDisplayContainer.setVisible(false);
+                    filterDisplayContainer.setManaged(false);
+                }
                 setActiveButton(btnProductsList);
             } catch (IOException e) {
                 e.printStackTrace();
@@ -163,6 +227,19 @@ public class MainController {
                 mainContent.setContent(categoriesView);
                 cartPanel.setVisible(false);
                 cartPanel.setManaged(false);
+                // Hide category bar, search, and filter in categories view
+                if (favoriteCategoriesBox != null) {
+                    favoriteCategoriesBox.setVisible(false);
+                    favoriteCategoriesBox.setManaged(false);
+                }
+                if (searchBarContainer != null) {
+                    searchBarContainer.setVisible(false);
+                    searchBarContainer.setManaged(false);
+                }
+                if (filterDisplayContainer != null) {
+                    filterDisplayContainer.setVisible(false);
+                    filterDisplayContainer.setManaged(false);
+                }
                 setActiveButton(btnCategories);
             } catch (IOException e) {
                 e.printStackTrace();
@@ -227,11 +304,32 @@ public class MainController {
             RippleEffect.applyTo(btnConfig);
 
         // Load data from DB
-        // Load data from DB
         loadProductsFromDB();
         loadFavoriteCategories();
 
         updateCartState();
+
+        // Setup search listener with a delay to ensure all components are loaded
+        new Thread(() -> {
+            for (int i = 0; i < 10; i++) {
+                try {
+                    Thread.sleep(200);
+                    System.out.println(
+                            "Initialize attempt " + (i + 1) + ": searchField is null? " + (searchField == null));
+                    if (searchField != null) {
+                        Platform.runLater(() -> {
+                            setupSearchListener();
+                        });
+                        break;
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            if (searchField == null) {
+                System.out.println("WARNING: searchField is still null after initialize attempts");
+            }
+        }).start();
     }
 
     private void loadProductsFromDB() {
@@ -345,6 +443,13 @@ public class MainController {
         selectedCategory = category;
         updateCategoryButtonStyles();
 
+        // Update filter label
+        if (category == null) {
+            filterLabel.setText("Todos los productos 📦");
+        } else {
+            filterLabel.setText(category.getName() + " 🏷️");
+        }
+
         List<Product> filtered = new ArrayList<>();
         if (category == null) {
             // When "Todos" button is clicked, show all visible products
@@ -364,6 +469,9 @@ public class MainController {
         selectedCategory = "FAVORITES";
         updateCategoryButtonStyles();
 
+        // Update filter label
+        filterLabel.setText("Favoritos ⭐");
+
         List<Product> favorites = new ArrayList<>();
         for (Product p : allProducts) {
             if (p.isFavorite()) {
@@ -371,6 +479,81 @@ public class MainController {
             }
         }
         loadProducts(favorites);
+    }
+
+    private void setupSearchListener() {
+        // Avoid adding multiple listeners
+        if (searchField == null) {
+            System.out.println("ERROR: searchField is null!");
+            return;
+        }
+
+        if (searchField.getProperties().get("listenerAdded") != null) {
+            System.out.println("Search listener already added");
+            return;
+        }
+
+        System.out.println("Setting up search listener...");
+        searchField.textProperty().addListener((observable, oldValue, newValue) -> {
+            System.out.println("Search text changed: '" + newValue + "'");
+            performSearch(newValue);
+        });
+
+        searchField.getProperties().put("listenerAdded", true);
+        System.out.println("Search listener configured successfully");
+    }
+
+    private void performSearch(String searchText) {
+        System.out.println("performSearch called with: '" + searchText + "'");
+        System.out.println("allProducts size: " + allProducts.size());
+
+        if (searchText == null || searchText.trim().isEmpty()) {
+            System.out.println("Search text is empty, restoring filter");
+            // If search is empty, restore current filter (favorites, category, or all)
+            if ("FAVORITES".equals(selectedCategory)) {
+                filterFavoriteProducts();
+            } else if (selectedCategory == null) {
+                filterProducts(null); // Show all
+            } else if (selectedCategory instanceof Category) {
+                filterProducts((Category) selectedCategory);
+            }
+            return;
+        }
+
+        List<Product> searchResults = new ArrayList<>();
+        String query = searchText.toLowerCase();
+
+        for (Product p : allProducts) {
+            boolean matches = false;
+
+            // Search by Name
+            if (p.getName() != null && p.getName().toLowerCase().contains(query)) {
+                matches = true;
+                System.out.println("Match found by name: " + p.getName());
+            }
+            // Search by ID (Code)
+            else if (String.valueOf(p.getId()).contains(query)) {
+                matches = true;
+                System.out.println("Match found by ID: " + p.getId());
+            }
+            // Search by Category Name
+            else if (p.getCategoryName() != null && p.getCategoryName().toLowerCase().contains(query)) {
+                matches = true;
+                System.out.println("Match found by category: " + p.getCategoryName());
+            }
+
+            if (matches) {
+                searchResults.add(p);
+            }
+        }
+
+        System.out.println("Search results: " + searchResults.size() + " products found");
+
+        // Update filter label
+        filterLabel.setText("Búsqueda: \"" + searchText + "\" 🔍");
+
+        // Load search results
+        loadProducts(searchResults);
     }
 
     public void loadProducts(List<Product> newProducts) {
@@ -458,76 +641,197 @@ public class MainController {
     }
 
     private void addToCart(Product product) {
-        // Add to logic list and view
-        subtotal += product.getPrice();
-        itemCount++;
+        // Check if product is already in cart
+        boolean found = false;
+        for (Node node : cartItemsContainer.getChildren()) {
+            if (node.getUserData() instanceof Object[]) {
+                Object[] data = (Object[]) node.getUserData();
+                if (data.length >= 2 && data[0] instanceof Product && data[1] instanceof int[]) {
+                    Product existingProduct = (Product) data[0];
+                    if (existingProduct.getId() == product.getId()) {
+                        // Increment quantity
+                        int[] quantity = (int[]) data[1];
+                        quantity[0]++;
 
-        createCartItemRow(product);
-        updateCartState();
+                        // Update UI label
+                        if (node instanceof HBox) {
+                            HBox row = (HBox) node;
+                            // Find quantity label (it's inside the second child, which is a VBox)
+                            if (row.getChildren().size() > 1 && row.getChildren().get(1) instanceof VBox) {
+                                VBox infoBox = (VBox) row.getChildren().get(1);
+                                if (infoBox.getChildren().size() > 1 && infoBox.getChildren().get(1) instanceof HBox) {
+                                    HBox sensitiveBox = (HBox) infoBox.getChildren().get(1); // Quantity box
+                                    if (sensitiveBox.getChildren().size() > 1
+                                            && sensitiveBox.getChildren().get(1) instanceof Label) {
+                                        Label quantityLabel = (Label) sensitiveBox.getChildren().get(1);
+                                        quantityLabel.setText(String.valueOf(quantity[0]));
+                                    }
+                                }
+                            }
+                        }
+                        found = true;
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (!found) {
+            createCartItemRow(product);
+        }
+
+        updateCartTotals();
     }
 
     private void createCartItemRow(Product product) {
-        HBox row = new HBox(15);
-        row.getStyleClass().add("cart-item");
-        row.getStyleClass().add("cart-item-selected"); // Default style
-        row.setAlignment(Pos.CENTER_LEFT);
-        row.setPadding(new Insets(10, 10, 10, 0));
+        // Main container - Increased padding for bigger feel
+        HBox mainRow = new HBox();
+        mainRow.getStyleClass().add("cart-item");
+        mainRow.setAlignment(Pos.CENTER_LEFT);
+        mainRow.setPadding(new Insets(15)); // Increased from 10
+        mainRow.setSpacing(15); // Add spacing between elements
 
-        // 1. Indicator
-        Rectangle indicator = new Rectangle(4, 40, Color.web("#039be5"));
-
-        // 2. Image (Thumbnail)
+        // 1. Circular Product Image (BIGGER)
         Node imageNode;
         if (product.getImagePath() != null && !product.getImagePath().isEmpty()) {
             File file = new File(product.getImagePath());
             if (file.exists()) {
                 ImageView iv = new ImageView(new Image(file.toURI().toString()));
-                iv.setFitHeight(40);
-                iv.setFitWidth(40);
-                iv.setPreserveRatio(true);
+                iv.setFitHeight(70); // Increased from 50
+                iv.setFitWidth(70); // Increased from 50
+                iv.setPreserveRatio(false);
+
+                // Create circular clip
+                Circle clip = new Circle(35, 35, 35); // Increased radius to 35
+                iv.setClip(clip);
+                iv.getStyleClass().add("cart-product-image");
                 imageNode = iv;
             } else {
-                imageNode = new Circle(20, Color.LIGHTGRAY);
+                Circle placeholder = new Circle(35, Color.LIGHTGRAY); // Increased radius to 35
+                placeholder.getStyleClass().add("cart-product-image");
+                imageNode = placeholder;
             }
         } else {
-            imageNode = new Circle(20, Color.LIGHTGRAY);
+            Circle placeholder = new Circle(35, Color.LIGHTGRAY); // Increased radius to 35
+            placeholder.getStyleClass().add("cart-product-image");
+            imageNode = placeholder;
         }
 
-        // 3. Name
-        Label nameLabel = new Label(product.getName());
-        nameLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #333;");
+        // 2. Product Info (Name + Quantity Controls)
+        VBox infoBox = new VBox(8); // Increased spacing
+        infoBox.setAlignment(Pos.CENTER_LEFT);
 
-        // 4. Spacer
+        Label nameLabel = new Label(product.getName());
+        nameLabel.getStyleClass().add("cart-product-name");
+        nameLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;"); // Directly increase font size
+
+        // Quantity controls - CENTERED
+        HBox quantityBox = new HBox(12); // Increased spacing
+        quantityBox.setAlignment(Pos.CENTER_LEFT);
+
+        Button decreaseBtn = new Button("-");
+        decreaseBtn.getStyleClass().add("quantity-btn");
+        decreaseBtn.setStyle("-fx-min-width: 30px; -fx-min-height: 30px; -fx-font-size: 14px;"); // Bigger buttons
+
+        Label quantityLabel = new Label("1");
+        quantityLabel.getStyleClass().add("quantity-label");
+        quantityLabel
+                .setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-min-width: 20px; -fx-alignment: center;"); // Bigger
+                                                                                                                      // label
+
+        Button increaseBtn = new Button("+");
+        increaseBtn.getStyleClass().add("quantity-btn");
+        increaseBtn.setStyle("-fx-min-width: 30px; -fx-min-height: 30px; -fx-font-size: 14px;"); // Bigger buttons
+
+        // Quantity button actions
+        final int[] quantity = { 1 };
+        decreaseBtn.setOnAction(e -> {
+            if (quantity[0] > 1) {
+                quantity[0]--;
+                quantityLabel.setText(String.valueOf(quantity[0]));
+                updateCartTotals();
+            }
+        });
+
+        increaseBtn.setOnAction(e -> {
+            quantity[0]++;
+            quantityLabel.setText(String.valueOf(quantity[0]));
+            updateCartTotals();
+        });
+
+        quantityBox.getChildren().addAll(decreaseBtn, quantityLabel, increaseBtn);
+        infoBox.getChildren().addAll(nameLabel, quantityBox);
+
+        // 3. Spacer
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
-        // 5. Price
+        // 4. Right side with price and delete button (this part moves)
+        StackPane rightSide = new StackPane();
+        rightSide.setMinWidth(120); // Increased width
+
+        // Price label (will slide left on hover)
         Label priceLabel = new Label(String.format("%.2f €", product.getPrice()));
-        priceLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #555;");
+        priceLabel.getStyleClass().add("cart-product-price");
+        priceLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;"); // Bigger price
+        StackPane.setAlignment(priceLabel, Pos.CENTER_RIGHT);
 
-        // 6. Delete Button (Trash Can) - Initially Hidden
+        // Delete Button (hidden behind price)
         Button deleteBtn = new Button("🗑");
-        deleteBtn.setStyle(
-                "-fx-text-fill: #ff5274; -fx-font-size: 14px; -fx-cursor: hand; -fx-background-color: transparent; -fx-font-weight: bold;");
-        deleteBtn.setVisible(false);
+        deleteBtn.getStyleClass().add("cart-delete-btn");
+        deleteBtn.setStyle("-fx-font-size: 16px; -fx-padding: 8 12;"); // Bigger delete button
+        StackPane.setAlignment(deleteBtn, Pos.CENTER_RIGHT);
+        deleteBtn.setOpacity(0);
 
-        // Logic to remove item
+        // Delete action
         deleteBtn.setOnAction(e -> {
-            cartItemsContainer.getChildren().remove(row);
-            subtotal -= product.getPrice();
-            itemCount--;
-            if (subtotal < 0)
-                subtotal = 0; // Precision safety
-            updateCartState();
+            mainRow.setVisible(false);
+            mainRow.setManaged(false);
+            cartItemsContainer.getChildren().remove(mainRow);
+            updateCartTotals();
         });
 
-        // Hover listeners
-        row.setOnMouseEntered(e -> deleteBtn.setVisible(true));
-        row.setOnMouseExited(e -> deleteBtn.setVisible(false));
+        rightSide.getChildren().addAll(deleteBtn, priceLabel);
 
-        row.getChildren().addAll(indicator, imageNode, nameLabel, spacer, priceLabel, deleteBtn);
+        // Add all elements to main row
+        mainRow.getChildren().addAll(imageNode, infoBox, spacer, rightSide);
 
-        cartItemsContainer.getChildren().add(row);
+        // Hover effect: only move price label to reveal delete button
+        mainRow.setOnMouseEntered(e -> {
+            priceLabel.setTranslateX(-50);
+            deleteBtn.setOpacity(1);
+        });
+
+        mainRow.setOnMouseExited(e -> {
+            priceLabel.setTranslateX(0);
+            deleteBtn.setOpacity(0);
+        });
+
+        // Store product and quantity for total calculation
+        mainRow.setUserData(new Object[] { product, quantity });
+
+        cartItemsContainer.getChildren().add(mainRow);
+    }
+
+    private void updateCartTotals() {
+        // Recalculate totals from all cart items
+        subtotal = 0;
+        itemCount = 0;
+
+        for (Node node : cartItemsContainer.getChildren()) {
+            if (node.getUserData() instanceof Object[]) {
+                Object[] data = (Object[]) node.getUserData();
+                if (data.length >= 2 && data[0] instanceof Product && data[1] instanceof int[]) {
+                    Product product = (Product) data[0];
+                    int[] quantity = (int[]) data[1];
+
+                    subtotal += product.getPrice() * quantity[0];
+                    itemCount += quantity[0];
+                }
+            }
+        }
+
+        updateCartState();
     }
 
     private void updateCartState() {

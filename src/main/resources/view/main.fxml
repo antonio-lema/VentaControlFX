@@ -21,39 +21,31 @@
             <!-- Logo area -->
             <Label text="TPV" styleClass="logo-text"/>
             <Label text="GestionTPV" styleClass="brand-text"/>
-            
-            <Separator orientation="VERTICAL"/>
-
-            <!-- Store Selector -->
-            <HBox spacing="5" alignment="CENTER_LEFT">
-                 <Label text="Tienda 1" style="-fx-text-fill: white; -fx-font-weight: bold;"/>
-                 <!-- Arrow icon placeholder -->
-                 <Label text="▼" style="-fx-text-fill: white; -fx-font-size: 10px;"/>
-            </HBox>
 
             <Region HBox.hgrow="ALWAYS"/>
 
             <!-- Search Bar -->
-            <HBox alignment="CENTER_LEFT" styleClass="search-bar">
+            <HBox fx:id="searchBarContainer" alignment="CENTER_LEFT" styleClass="search-bar">
                 <Label text="🔍" style="-fx-text-fill: #aaa; -fx-padding: 0 5 0 10;"/>
-                <TextField promptText="Código, ref o nombre" styleClass="search-field"/>
-                <Button text="+" styleClass="search-button"/>
+                <TextField fx:id="searchField" promptText="Código, ref o nombre" styleClass="search-field"/>
             </HBox>
 
             <Region HBox.hgrow="ALWAYS"/>
 
-            <!-- Right Icons -->
-            <HBox spacing="15" alignment="CENTER_LEFT">
-                <Button text="🛒" styleClass="icon-button"/>
-                <Button text="✉" styleClass="icon-button"/>
-                <Button text="📄 Ticket ▼" styleClass="action-icon-button"/>
-                <Button text="Is Aparcados" styleClass="text-icon-button"/>
-                <Button text="P  Aparcar" styleClass="text-icon-button"/>
-                <Button text="🗑 Cancelar" styleClass="text-icon-button"/>
+            <!-- Admin Panel with Dropdown Menu -->
+            <HBox spacing="10" alignment="CENTER_RIGHT">
+                <!-- Three dots menu button -->
+                <MenuButton text="⋮" styleClass="menu-button">
+                    <items>
+                        <MenuItem text="Cerrar caja"/>
+                        <MenuItem text="Usuario"/>
+                    </items>
+                </MenuButton>
                 
+                <!-- Admin Profile -->
                 <HBox spacing="5" alignment="CENTER_LEFT" styleClass="user-profile">
                      <Circle radius="15" fill="white"/>
-                     <Label text="Admin ▼" style="-fx-text-fill: white;"/>
+                     <Label text="Admin" style="-fx-text-fill: white; -fx-font-weight: bold;"/>
                 </HBox>
             </HBox>
         </HBox>
@@ -105,19 +97,28 @@
     <center>
         <BorderPane>
             <center>
-                <StackPane>
-                    <ScrollPane fx:id="mainContent" fitToWidth="true" style="-fx-background: #f4f6f9; -fx-background-color: transparent;">
-                        <TilePane fx:id="productsPane" hgap="15" vgap="15" prefColumns="4" style="-fx-padding: 20;">
-                            <!-- Products will be added here dynamically -->
-                        </TilePane>
-                    </ScrollPane>
+                <VBox>
+                    <!-- Filter Display Label -->
+                    <HBox fx:id="filterDisplayContainer" alignment="CENTER_LEFT" style="-fx-background-color: linear-gradient(to right, #f8f9fa, #ffffff); -fx-padding: 15 25; -fx-border-color: #e3f2fd; -fx-border-width: 0 0 2 0; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 5, 0, 0, 2);">
+                        <Label text="Mostrando:" style="-fx-font-size: 14px; -fx-text-fill: #666; -fx-font-weight: 500;"/>
+                        <Label fx:id="filterLabel" text="Favoritos ⭐" style="-fx-font-size: 20px; -fx-text-fill: #1e88e5; -fx-font-weight: bold; -fx-padding: 0 0 0 10;"/>
+                    </HBox>
                     
-                    <!-- Loading Overlay -->
-                    <VBox fx:id="loadingOverlay" visible="false" alignment="CENTER" style="-fx-background-color: rgba(244, 246, 249, 0.7);">
-                        <ProgressIndicator />
-                        <Label text="Cargando..." style="-fx-text-fill: #666; -fx-padding: 10 0 0 0;"/>
-                    </VBox>
-                </StackPane>
+                    <!-- Products Area -->
+                    <StackPane VBox.vgrow="ALWAYS">
+                        <ScrollPane fx:id="mainContent" fitToWidth="true" style="-fx-background: #f4f6f9; -fx-background-color: transparent;">
+                            <TilePane fx:id="productsPane" hgap="15" vgap="15" prefColumns="4" style="-fx-padding: 20;">
+                                <!-- Products will be added here dynamically -->
+                            </TilePane>
+                        </ScrollPane>
+                        
+                        <!-- Loading Overlay -->
+                        <VBox fx:id="loadingOverlay" visible="false" alignment="CENTER" style="-fx-background-color: rgba(244, 246, 249, 0.7);">
+                            <ProgressIndicator />
+                            <Label text="Cargando..." style="-fx-text-fill: #666; -fx-padding: 10 0 0 0;"/>
+                        </VBox>
+                    </StackPane>
+                </VBox>
             </center>
             <bottom>
                 <ScrollPane vbarPolicy="NEVER" hbarPolicy="AS_NEEDED" fitToHeight="true" style="-fx-background-color: transparent; -fx-padding: 10;">
@@ -133,7 +134,7 @@
 
     <!-- RIGHT PANEL (Cart) -->
     <right>
-        <VBox fx:id="cartPanel" spacing="0" styleClass="cart-panel" prefWidth="380">
+        <VBox fx:id="cartPanel" spacing="0" styleClass="cart-panel" prefWidth="450">
             
             <!-- Customer Selection -->
             <HBox alignment="CENTER_LEFT" styleClass="cart-header">
@@ -154,16 +155,7 @@
             </StackPane>
             
             <!-- Bottom Actions -->
-            <VBox spacing="0" style="-fx-background-color: white;">
-                
-                <!-- Action Bar (Cyan) -->
-                <HBox spacing="10" alignment="CENTER_LEFT" styleClass="cart-action-bar">
-                    <Button text="Añadir" styleClass="action-text-btn" style="-fx-font-weight: bold; -fx-text-fill: #006064;"/>
-                    <Region HBox.hgrow="ALWAYS" />
-                    <Button text="🏷 Descuento" styleClass="action-text-btn"/>
-                    <Button text="📄 Nota" styleClass="action-text-btn"/>
-                    <Button text="🖩" styleClass="action-icon-btn"/>
-                </HBox>
+            <VBox spacing="0" style="-fx-background-color: white;" minHeight="-Infinity">
                 
                 <!-- Subtotal -->
                 <HBox alignment="CENTER_LEFT" style="-fx-padding: 15;">
