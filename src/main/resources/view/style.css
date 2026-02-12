@@ -1,0 +1,243 @@
+/* Global */
+.root {
+    -fx-font-family: "Segoe UI", "Roboto", "Helvetica", "Arial", sans-serif;
+}
+
+/* ===== TOP BAR ===== */
+.top-bar {
+    -fx-background-color: #1e88e5;
+    /* Primary Blue */
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.1), 5, 0, 0, 2);
+}
+
+.logo-text {
+    -fx-text-fill: white;
+    -fx-font-size: 20px;
+    -fx-font-style: italic;
+    -fx-font-weight: bold;
+}
+
+.brand-text {
+    -fx-text-fill: white;
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+}
+
+/* Search Bar */
+.search-bar {
+    -fx-background-color: rgba(255, 255, 255, 0.2);
+    -fx-background-radius: 20;
+    -fx-padding: 5;
+    /* Increased padding */
+}
+
+.search-field {
+    -fx-background-color: transparent;
+    -fx-text-fill: white;
+    -fx-prompt-text-fill: rgba(255, 255, 255, 0.7);
+    -fx-pref-width: 250;
+    -fx-font-size: 14px;
+    /* Increased text */
+}
+
+.search-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: white;
+    -fx-font-size: 20px;
+    /* Increased from 16px */
+    -fx-cursor: hand;
+}
+
+/* Top Icons */
+.icon-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: white;
+    -fx-font-size: 22px;
+    /* Increased from 16px */
+    -fx-cursor: hand;
+}
+
+.action-icon-button {
+    -fx-background-color: rgba(255, 255, 255, 0.2);
+    -fx-text-fill: white;
+    -fx-background-radius: 5;
+    -fx-cursor: hand;
+    -fx-font-size: 14px;
+    /* Explicit size */
+}
+
+.text-icon-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: white;
+    -fx-cursor: hand;
+    -fx-font-size: 14px;
+    /* Explicit size */
+}
+
+/* ===== SIDEBAR ===== */
+.sidebar {
+    -fx-background-color: white;
+    -fx-pref-width: 220;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.05), 5, 0, 2, 0);
+}
+
+.sidebar-button {
+    -fx-background-color: transparent;
+    -fx-alignment: CENTER_LEFT;
+    -fx-padding: 12 15;
+    /* Increased padding */
+    -fx-text-fill: #777;
+    -fx-font-size: 16px;
+    /* Increased from 14px */
+    -fx-cursor: hand;
+    -fx-pref-width: 200;
+}
+
+.sidebar-button:hover {
+    -fx-background-color: #f5f5f5;
+    -fx-text-fill: #333;
+}
+
+.active-sidebar-button {
+    -fx-background-color: #1e88e5;
+    -fx-text-fill: white;
+    -fx-background-radius: 5;
+    -fx-effect: dropshadow(three-pass-box, rgba(30, 136, 229, 0.3), 5, 0, 0, 2);
+}
+
+.active-sidebar-button:hover {
+    -fx-background-color: #1976d2;
+    -fx-text-fill: white;
+}
+
+.sidebar-icon-only {
+    -fx-background-color: transparent;
+    -fx-text-fill: #999;
+    -fx-font-size: 22px;
+    /* Increased from 16px */
+    -fx-cursor: hand;
+}
+
+/* ===== PRODUCTS GRID ===== */
+.product-box {
+    -fx-background-color: white;
+    -fx-background-radius: 8;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.05), 5, 0, 0, 2);
+    -fx-alignment: TOP_LEFT;
+    -fx-padding: 0;
+    -fx-cursor: hand;
+}
+
+.product-box:hover {
+    -fx-translate-y: -2;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.1), 8, 0, 0, 4);
+}
+
+.product-image-container {
+    -fx-background-color: #f9f9f9;
+    -fx-background-radius: 8 8 0 0;
+    -fx-alignment: CENTER;
+}
+
+.product-info {
+    -fx-padding: 10;
+}
+
+.product-name {
+    -fx-font-size: 13px;
+    -fx-text-fill: #333;
+}
+
+.product-price {
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #666;
+}
+
+/* ===== CART PANEL ===== */
+.cart-panel {
+    -fx-background-color: white;
+    -fx-border-color: #eee;
+    -fx-border-width: 0 0 0 1;
+}
+
+.cart-header {
+    -fx-padding: 15;
+    -fx-border-color: #eee;
+    -fx-border-width: 0 0 1 0;
+}
+
+/* ===== NEW CART DESIGN ===== */
+
+/* Action Bar (Cyan) */
+.cart-action-bar {
+    -fx-background-color: #e0f7fa;
+    /* Light Cyan */
+    -fx-background-radius: 5;
+    -fx-padding: 10;
+}
+
+.action-text-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: #006064;
+    /* Darker Cyan/Teal */
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+    -fx-cursor: hand;
+    -fx-padding: 5 10;
+}
+
+.action-text-btn:hover {
+    -fx-background-color: rgba(0, 96, 100, 0.1);
+    -fx-background-radius: 4;
+}
+
+.action-icon-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: #008fa1;
+    -fx-cursor: hand;
+    -fx-font-size: 14px;
+}
+
+/* Pay Button (Pink/Red) */
+.pay-button {
+    -fx-background-color: #ff4081;
+    /* Pink/Red */
+    -fx-text-fill: white;
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+    -fx-background-radius: 5;
+}
+
+.pay-button:hover {
+    -fx-background-color: #f50057;
+}
+
+/* Cart Items */
+.cart-list-container {
+    -fx-background-color: white;
+}
+
+.cart-item {
+    -fx-background-color: #f8f9fa;
+    -fx-padding: 10 0;
+    -fx-border-color: #eee;
+    -fx-border-width: 0 0 1 0;
+}
+
+.cart-item-selected {
+    -fx-background-color: #f5f9ff;
+    /* Border logic handled in controller via Rectangle or explicit border styling on HBox not ideal, using separate node */
+}
+
+.cart-item-name {
+    -fx-font-size: 14px;
+    -fx-text-fill: #333;
+}
+
+.cart-item-price {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #666;
+}

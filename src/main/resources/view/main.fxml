@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.text.*?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.mycompany.ventacontrolfx.controller.MainController"
+            prefWidth="1200" prefHeight="800"
+            style="-fx-background-color: #f4f6f9;">
+
+    <!-- TOP HEADER -->
+    <top>
+        <HBox spacing="20" alignment="CENTER_LEFT" styleClass="top-bar">
+            <padding>
+                <Insets top="10" right="20" bottom="10" left="20"/>
+            </padding>
+            
+            <!-- Logo area -->
+            <Label text="TPV" styleClass="logo-text"/>
+            <Label text="GestionTPV" styleClass="brand-text"/>
+            
+            <Separator orientation="VERTICAL"/>
+
+            <!-- Store Selector -->
+            <HBox spacing="5" alignment="CENTER_LEFT">
+                 <Label text="Tienda 1" style="-fx-text-fill: white; -fx-font-weight: bold;"/>
+                 <!-- Arrow icon placeholder -->
+                 <Label text="▼" style="-fx-text-fill: white; -fx-font-size: 10px;"/>
+            </HBox>
+
+            <Region HBox.hgrow="ALWAYS"/>
+
+            <!-- Search Bar -->
+            <HBox alignment="CENTER_LEFT" styleClass="search-bar">
+                <Label text="🔍" style="-fx-text-fill: #aaa; -fx-padding: 0 5 0 10;"/>
+                <TextField promptText="Código, ref o nombre" styleClass="search-field"/>
+                <Button text="+" styleClass="search-button"/>
+            </HBox>
+
+            <Region HBox.hgrow="ALWAYS"/>
+
+            <!-- Right Icons -->
+            <HBox spacing="15" alignment="CENTER_LEFT">
+                <Button text="🛒" styleClass="icon-button"/>
+                <Button text="✉" styleClass="icon-button"/>
+                <Button text="📄 Ticket ▼" styleClass="action-icon-button"/>
+                <Button text="Is Aparcados" styleClass="text-icon-button"/>
+                <Button text="P  Aparcar" styleClass="text-icon-button"/>
+                <Button text="🗑 Cancelar" styleClass="text-icon-button"/>
+                
+                <HBox spacing="5" alignment="CENTER_LEFT" styleClass="user-profile">
+                     <Circle radius="15" fill="white"/>
+                     <Label text="Admin ▼" style="-fx-text-fill: white;"/>
+                </HBox>
+            </HBox>
+        </HBox>
+    </top>
+
+    <!-- LEFT SIDEBAR -->
+    <left>
+        <VBox spacing="5" styleClass="sidebar">
+            <padding>
+                <Insets top="20" right="10" bottom="20" left="10"/>
+            </padding>
+            
+            <Button text="🕓 Panel" styleClass="sidebar-button"/>
+            <Button text="🛒 Vender" styleClass="sidebar-button, active-sidebar-button"/>
+            <Button text="🛒 Comprar" styleClass="sidebar-button"/>
+            <Button text="🏷 Productos &lt;" styleClass="sidebar-button"/>
+            <Button text="🕓 Historial &lt;" styleClass="sidebar-button"/>
+            <Button text="👥 Clientes &lt;" styleClass="sidebar-button"/>
+            <Button text="🌍 Web &lt;" styleClass="sidebar-button"/>
+            <Button text="💳 Pagos &lt;" styleClass="sidebar-button"/>
+            <Button text="🚚 Envios &lt;" styleClass="sidebar-button"/>
+            <Button text="✉ Correo &lt;" styleClass="sidebar-button"/>
+            <Button text="👤 Usuarios &lt;" styleClass="sidebar-button"/>
+            <Button text="⚙ Configuración &lt;" styleClass="sidebar-button"/>
+            
+            <Region VBox.vgrow="ALWAYS"/>
+            <HBox spacing="15" alignment="CENTER">
+                 <Button text="⚙" styleClass="sidebar-icon-only"/>
+                 <Button text="✉" styleClass="sidebar-icon-only"/>
+                 <Button text="⏻" styleClass="sidebar-icon-only"/>
+            </HBox>
+        </VBox>
+    </left>
+
+
+    <!-- CENTER CONTENT (Start with Products) -->
+    <center>
+        <ScrollPane fitToWidth="true" style="-fx-background: #f4f6f9; -fx-background-color: transparent;">
+            <TilePane fx:id="productsPane" hgap="15" vgap="15" prefColumns="4" style="-fx-padding: 20;">
+                <!-- Products will be added here dynamically -->
+            </TilePane>
+        </ScrollPane>
+    </center>
+
+    <!-- RIGHT PANEL (Cart) -->
+    <right>
+        <VBox spacing="0" styleClass="cart-panel" prefWidth="380">
+            
+            <!-- Customer Selection -->
+            <HBox alignment="CENTER_LEFT" styleClass="cart-header">
+                <Label text="👤 Añadir proveedor" style="-fx-text-fill: #888; -fx-font-size: 14px;"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button text="⊕" style="-fx-background-color: transparent; -fx-text-fill: #999; -fx-font-size: 14px;"/>
+            </HBox>
+            
+            <!-- Cart Items (Use ScrollPane + VBox for custom rows) -->
+            <StackPane VBox.vgrow="ALWAYS" style="-fx-background-color: white;">
+                <VBox fx:id="emptyCartView" alignment="CENTER" spacing="10">
+                    <Label text="🛒" style="-fx-font-size: 60px; -fx-text-fill: #eee;"/>
+                </VBox>
+                
+                <ScrollPane fitToWidth="true" style="-fx-background-color: transparent; -fx-background: transparent;" hbarPolicy="NEVER">
+                    <VBox fx:id="cartItemsContainer" spacing="0" styleClass="cart-list-container"/>
+                </ScrollPane>
+            </StackPane>
+            
+            <!-- Bottom Actions -->
+            <VBox spacing="0" style="-fx-background-color: white;">
+                
+                <!-- Action Bar (Cyan) -->
+                <HBox spacing="10" alignment="CENTER_LEFT" styleClass="cart-action-bar">
+                    <Button text="Añadir" styleClass="action-text-btn" style="-fx-font-weight: bold; -fx-text-fill: #006064;"/>
+                    <Region HBox.hgrow="ALWAYS" />
+                    <Button text="🏷 Descuento" styleClass="action-text-btn"/>
+                    <Button text="📄 Nota" styleClass="action-text-btn"/>
+                    <Button text="🖩" styleClass="action-icon-btn"/>
+                </HBox>
+                
+                <!-- Subtotal -->
+                <HBox alignment="CENTER_LEFT" style="-fx-padding: 15;">
+                    <Label fx:id="itemsCountLabel" text="Subtotal (0 item)" style="-fx-text-fill: #666; -fx-font-size: 14px;"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Label fx:id="subtotalLabel" text="0,00 €" style="-fx-font-weight: bold; -fx-font-size: 14px;"/>
+                </HBox>
+                
+                <!-- Pay Button (Pink) -->
+                <StackPane style="-fx-padding: 0 15 15 15;">
+                     <Button fx:id="payButton" text="Pagar" 
+                             styleClass="pay-button" 
+                             maxWidth="Infinity" 
+                             prefHeight="55" alignment="CENTER_LEFT">
+                        <padding>
+                            <Insets left="20"/>
+                        </padding>
+                     </Button>
+                     <Label fx:id="totalButtonLabel" text="0,00 €" mouseTransparent="true"
+                            style="-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 18px;" 
+                            StackPane.alignment="CENTER_RIGHT">
+                        <padding>
+                            <Insets right="20"/>
+                        </padding>
+                     </Label>
+                </StackPane>
+                
+            </VBox>
+
+        </VBox>
+    </right>
+
+</BorderPane>

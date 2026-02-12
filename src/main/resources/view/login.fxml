@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mycompany.ventacontrolfx.controller.LoginController" spacing="10" alignment="CENTER">
+    <TextField fx:id="txtUsername" promptText="Usuario"/>
+    <PasswordField fx:id="txtPassword" promptText="Contraseña"/>
+    <Button fx:id="btnLogin" onAction="#handleLogin" text="Login" />
+    <Label fx:id="lblMessage" layoutX="50" layoutY="150" text="" />
+
+</VBox>
+
