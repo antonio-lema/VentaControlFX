@@ -14,23 +14,65 @@ public class Product {
     private String name;
     private double price;
     private boolean isFavorite;
+    private String imagePath;
+    private boolean visible;
+    private String categoryName;
 
     public Product() {
+        this.visible = true;
     }
 
-    public Product(int id, int categoryId, String name, double price, boolean isFavorite) {
+    // Modified constructor to include categoryName
+    public Product(int id, int categoryId, String name, double price, boolean isFavorite, boolean visible,
+            String imagePath, String categoryName) {
         this.id = id;
         this.categoryId = categoryId;
         this.name = name;
         this.price = price;
         this.isFavorite = isFavorite;
+        this.visible = visible;
+        this.imagePath = imagePath;
+        this.categoryName = categoryName;
     }
 
-    public Product(int categoryId, String name, double price, boolean isFavorite) {
+    // Kept for backward compatibility
+    public Product(int id, int categoryId, String name, double price, boolean isFavorite, boolean visible,
+            String imagePath) {
+        this(id, categoryId, name, price, isFavorite, visible, imagePath, null);
+    }
+
+    // Keep existing constructor for backward compatibility or refactor usage
+    public Product(int id, int categoryId, String name, double price, boolean isFavorite) {
+        this(id, categoryId, name, price, isFavorite, true, null);
+    }
+
+    public Product(int categoryId, String name, double price, boolean isFavorite, boolean visible, String imagePath) {
         this.categoryId = categoryId;
         this.name = name;
         this.price = price;
         this.isFavorite = isFavorite;
+        this.visible = visible;
+        this.imagePath = imagePath;
+    }
+
+    public Product(int categoryId, String name, double price, boolean isFavorite) {
+        this(categoryId, name, price, isFavorite, true, null);
+    }
+
+    public String getImagePath() {
+        return imagePath;
+    }
+
+    public void setImagePath(String imagePath) {
+        this.imagePath = imagePath;
+    }
+
+    public boolean isVisible() {
+        return visible;
+    }
+
+    public void setVisible(boolean visible) {
+        this.visible = visible;
     }
 
     public int getId() {
@@ -65,12 +107,20 @@ public class Product {
         this.price = price;
     }
 
-    public boolean isIsFavorite() {
+    public boolean isFavorite() {
         return isFavorite;
     }
 
-    public void setIsFavorite(boolean isFavorite) {
+    public void setFavorite(boolean isFavorite) {
         this.isFavorite = isFavorite;
+    }
+
+    public String getCategoryName() {
+        return categoryName;
+    }
+
+    public void setCategoryName(String categoryName) {
+        this.categoryName = categoryName;
     }
 
     @Override
