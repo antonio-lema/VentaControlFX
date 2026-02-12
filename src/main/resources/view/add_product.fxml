@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.StackPane?>
+
+<VBox spacing="20" alignment="TOP_CENTER" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" 
+      fx:controller="com.mycompany.ventacontrolfx.controller.AddProductController"
+      style="-fx-background-color: white; -fx-padding: 30;">
+
+    <Label text="Nuevo Producto" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #1e88e5;"/>
+
+    <VBox spacing="10" alignment="CENTER_LEFT" maxWidth="400">
+        
+        <!-- Name -->
+        <Label text="Nombre del Producto" style="-fx-text-fill: #666;"/>
+        <TextField fx:id="txtName" promptText="Ej: Camiseta" styleClass="text-field-flat"/>
+
+        <!-- Price -->
+        <Label text="Precio (€)" style="-fx-text-fill: #666;"/>
+        <TextField fx:id="txtPrice" promptText="0.00" styleClass="text-field-flat"/>
+
+        <!-- Category -->
+        <Label text="Categoría" style="-fx-text-fill: #666;"/>
+        <ComboBox fx:id="cbCategory" promptText="Seleccionar Categoría" maxWidth="Infinity" styleClass="combo-box-flat"/>
+
+        <!-- Favorite -->
+        <CheckBox fx:id="chkFavorite" text="Marcar como Favorito" style="-fx-text-fill: #666;"/>
+
+        <!-- Image Selection -->
+        <Label text="Imagen" style="-fx-text-fill: #666;"/>
+        <HBox spacing="10" alignment="CENTER_LEFT">
+             <Button text="Seleccionar Imagen" onAction="#selectImage" styleClass="btn-secondary"/>
+             <Label fx:id="lblImageName" text="Ninguna seleccionada" style="-fx-text-fill: #999; -fx-font-style: italic;"/>
+        </HBox>
+        <StackPane style="-fx-border-color: #eee; -fx-border-radius: 5; -fx-background-color: #f9f9f9;" prefHeight="150" prefWidth="150">
+             <ImageView fx:id="imgPreview" fitHeight="140" fitWidth="140" preserveRatio="true"/>
+             <Label fx:id="lblPreviewPlaceholder" text="Vista previa" style="-fx-text-fill: #ccc;"/>
+        </StackPane>
+
+    </VBox>
+
+    <HBox spacing="15" alignment="CENTER_RIGHT" maxWidth="400">
+        <Button text="Cancelar" onAction="#cancel" styleClass="btn-cancel" style="-fx-background-color: #eee; -fx-text-fill: #555;"/>
+        <Button text="Guardar" onAction="#saveProduct" styleClass="btn-primary" style="-fx-background-color: #1e88e5; -fx-text-fill: white; -fx-font-weight: bold;"/>
+    </HBox>
+
+</VBox>

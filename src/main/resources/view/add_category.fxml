@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox spacing="20" alignment="TOP_CENTER" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" 
+      fx:controller="com.mycompany.ventacontrolfx.controller.AddCategoryController"
+      style="-fx-background-color: white; -fx-padding: 30;">
+
+    <Label text="Nueva Categoría" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #1e88e5;"/>
+
+    <VBox spacing="10" alignment="CENTER_LEFT" maxWidth="300">
+        <!-- Name -->
+        <Label text="Nombre de la Categoría" style="-fx-text-fill: #666;"/>
+        <TextField fx:id="txtName" promptText="Ej: Bebidas" styleClass="text-field-flat"/>
+    </VBox>
+
+    <HBox spacing="15" alignment="CENTER_RIGHT" maxWidth="300">
+        <Button text="Cancelar" onAction="#cancel" styleClass="btn-cancel" style="-fx-background-color: #eee; -fx-text-fill: #555;"/>
+        <Button text="Guardar" onAction="#saveCategory" styleClass="btn-primary" style="-fx-background-color: #1e88e5; -fx-text-fill: white; -fx-font-weight: bold;"/>
+    </HBox>
+
+</VBox>
