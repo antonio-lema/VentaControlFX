@@ -16,6 +16,20 @@ public class CategoryService {
         }
     }
 
+    public List<Category> getAllVisibleCategories() throws SQLException {
+        try (Connection conn = DBConnection.getConnection()) {
+            CategoryDAO categoryDAO = new CategoryDAO(conn);
+            return categoryDAO.getAllVisibleCategories();
+        }
+    }
+
+    public List<Category> getFavoriteCategories() throws SQLException {
+        try (Connection conn = DBConnection.getConnection()) {
+            CategoryDAO categoryDAO = new CategoryDAO(conn);
+            return categoryDAO.getFavoriteCategories();
+        }
+    }
+
     public void addCategory(Category category) throws SQLException {
         try (Connection conn = DBConnection.getConnection()) {
             CategoryDAO categoryDAO = new CategoryDAO(conn);
