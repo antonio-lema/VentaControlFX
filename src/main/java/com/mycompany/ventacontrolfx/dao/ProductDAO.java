@@ -19,7 +19,7 @@ public class ProductDAO {
 
     public List<Product> getAllProducts() throws SQLException {
         List<Product> products = new ArrayList<>();
-        String sql = "SELECT * FROM products";
+        String sql = "SELECT p.*, c.name AS category_name FROM products p LEFT JOIN categories c ON p.category_id = c.category_id";
         try (Statement stmt = connection.createStatement();
                 ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
@@ -28,7 +28,10 @@ public class ProductDAO {
                         rs.getInt("category_id"),
                         rs.getString("name"),
                         rs.getDouble("price"),
-                        rs.getBoolean("is_favorite"));
+                        rs.getBoolean("is_favorite"),
+                        rs.getBoolean("visible"),
+                        rs.getString("image_path"),
+                        rs.getString("category_name"));
                 products.add(product);
             }
         }
@@ -36,12 +39,14 @@ public class ProductDAO {
     }
 
     public void addProduct(Product product) throws SQLException {
-        String sql = "INSERT INTO products (category_id, name, price, is_favorite) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO products (category_id, name, price, is_favorite, image_path, visible) VALUES (?, ?, ?, ?, ?, ?)";
         try (PreparedStatement pstmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             pstmt.setInt(1, product.getCategoryId());
             pstmt.setString(2, product.getName());
             pstmt.setDouble(3, product.getPrice());
-            pstmt.setBoolean(4, product.isIsFavorite());
+            pstmt.setBoolean(4, product.isFavorite());
+            pstmt.setString(5, product.getImagePath());
+            pstmt.setBoolean(6, product.isVisible());
             pstmt.executeUpdate();
 
             try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
@@ -53,15 +58,38 @@ public class ProductDAO {
     }
 
     public void updateProduct(Product product) throws SQLException {
-        String sql = "UPDATE products SET category_id = ?, name = ?, price = ?, is_favorite = ? WHERE product_id = ?";
+        String sql = "UPDATE products SET category_id = ?, name = ?, price = ?, is_favorite = ?, image_path = ?, visible = ? WHERE product_id = ?";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setInt(1, product.getCategoryId());
             pstmt.setString(2, product.getName());
             pstmt.setDouble(3, product.getPrice());
-            pstmt.setBoolean(4, product.isIsFavorite());
-            pstmt.setInt(5, product.getId());
+            pstmt.setBoolean(4, product.isFavorite());
+            pstmt.setString(5, product.getImagePath());
+            pstmt.setBoolean(6, product.isVisible());
+            pstmt.setInt(7, product.getId());
             pstmt.executeUpdate();
         }
+    }
+
+    public List<Product> getAllVisibleProducts() throws SQLException {
+        List<Product> products = new ArrayList<>();
+        String sql = "SELECT p.*, c.name AS category_name FROM products p LEFT JOIN categories c ON p.category_id = c.category_id WHERE p.visible = TRUE";
+        try (Statement stmt = connection.createStatement();
+                ResultSet rs = stmt.executeQuery(sql)) {
+            while (rs.next()) {
+                Product product = new Product(
+                        rs.getInt("product_id"),
+                        rs.getInt("category_id"),
+                        rs.getString("name"),
+                        rs.getDouble("price"),
+                        rs.getBoolean("is_favorite"),
+                        rs.getBoolean("visible"),
+                        rs.getString("image_path"),
+                        rs.getString("category_name"));
+                products.add(product);
+            }
+        }
+        return products;
     }
 
     public void deleteProduct(int productId) throws SQLException {
@@ -70,5 +98,26 @@ public class ProductDAO {
             pstmt.setInt(1, productId);
             pstmt.executeUpdate();
         }
+    }
+
+    public List<Product> getFavoriteVisibleProducts() throws SQLException {
+        List<Product> products = new ArrayList<>();
+        String sql = "SELECT p.*, c.name AS category_name FROM products p LEFT JOIN categories c ON p.category_id = c.category_id WHERE p.visible = TRUE AND p.is_favorite = TRUE";
+        try (Statement stmt = connection.createStatement();
+                ResultSet rs = stmt.executeQuery(sql)) {
+            while (rs.next()) {
+                Product product = new Product(
+                        rs.getInt("product_id"),
+                        rs.getInt("category_id"),
+                        rs.getString("name"),
+                        rs.getDouble("price"),
+                        rs.getBoolean("is_favorite"),
+                        rs.getBoolean("visible"),
+                        rs.getString("image_path"),
+                        rs.getString("category_name"));
+                products.add(product);
+            }
+        }
+        return products;
     }
 }

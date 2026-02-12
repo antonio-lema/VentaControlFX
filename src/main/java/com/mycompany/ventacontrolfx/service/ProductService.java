@@ -24,6 +24,13 @@ public class ProductService {
         }
     }
 
+    public List<Product> getAllVisibleProducts() throws SQLException {
+        try (Connection conn = DBConnection.getConnection()) {
+            ProductDAO productDAO = new ProductDAO(conn);
+            return productDAO.getAllVisibleProducts();
+        }
+    }
+
     public void addProduct(Product product) throws SQLException {
         try (Connection conn = DBConnection.getConnection()) {
             ProductDAO productDAO = new ProductDAO(conn);
@@ -42,6 +49,13 @@ public class ProductService {
         try (Connection conn = DBConnection.getConnection()) {
             ProductDAO productDAO = new ProductDAO(conn);
             productDAO.deleteProduct(productId);
+        }
+    }
+
+    public List<Product> getFavoriteVisibleProducts() throws SQLException {
+        try (Connection conn = DBConnection.getConnection()) {
+            ProductDAO productDAO = new ProductDAO(conn);
+            return productDAO.getFavoriteVisibleProducts();
         }
     }
 }
