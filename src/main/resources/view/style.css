@@ -586,3 +586,44 @@
     -fx-pref-height: 0;
     -fx-opacity: 0;
 }
+
+/* Sidebar SVG Icons */
+.sidebar-icon {
+    -fx-fill: #909090;
+    /* Default gray - lighter to match text */
+    -fx-content-display: LEFT;
+}
+
+.sidebar-button {
+    -fx-content-display: LEFT;
+    -fx-alignment: BASELINE_LEFT;
+    /* BASELINE_LEFT often aligns text better with icons */
+    -fx-graphic-text-gap: 20px;
+    -fx-padding: 10 15 10 15;
+    /* Top Right Bottom Left */
+}
+
+.sidebar-button:hover .sidebar-icon {
+    -fx-fill: #333;
+    /* Darker on hover */
+}
+
+.active-sidebar-button .sidebar-icon {
+    -fx-fill: white;
+    /* White when active */
+}
+
+.active-sidebar-button:hover .sidebar-icon {
+    -fx-fill: white;
+}
+
+/* Icon Container - ensures scaling and no overlap */
+.icon-container {
+    -fx-min-width: 24px;
+    -fx-min-height: 24px;
+    -fx-max-width: 24px;
+    -fx-max-height: 24px;
+    -fx-pref-width: 24px;
+    -fx-pref-height: 24px;
+    -fx-alignment: CENTER;
+}
