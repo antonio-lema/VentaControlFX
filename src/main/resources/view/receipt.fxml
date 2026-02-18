@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.layout.Region?>
+
+<HBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="900.0" spacing="0.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mycompany.ventacontrolfx.controller.ReceiptController">
+   <children>
+      <!-- LEFT SIDE: The Receipt Preview -->
+      <VBox prefWidth="380.0" style="-fx-background-color: #f4f4f4; -fx-padding: 20;">
+         <children>
+            <ScrollPane fitToWidth="true" style="-fx-background-color: transparent; -fx-background: transparent;" VBox.vgrow="ALWAYS">
+               <content>
+                   <VBox fx:id="receiptContent" spacing="10.0" style="-fx-background-color: white; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 0); -fx-padding: 30; -fx-border-color: #ddd; -fx-border-width: 1;">
+                      <children>
+                                <!-- Header -->
+                                <VBox alignment="TOP_CENTER" spacing="5.0">
+                                   <!-- Logo/Brand -->
+                                    <HBox alignment="CENTER" spacing="5">
+                                        <Label style="-fx-text-fill: #2196F3; -fx-font-size: 24; -fx-font-weight: bold;" text="☁" />
+                                        <Label style="-fx-font-weight: bold; -fx-font-size: 22; -fx-text-fill: #2196F3;" text="GestionTPV" />
+                                    </HBox>
+                                    
+                                   <Label style="-fx-font-size: 11; -fx-font-weight: bold; -fx-text-fill: black;" text="Gestion TPV Demo," />
+                                   <Label style="-fx-font-size: 10; -fx-text-fill: black;" text="c/ demo 10, 28020 Madrid" />
+                                   <Label style="-fx-font-size: 10; -fx-text-fill: black;" text="Teléfono: 915555555" />
+                                   <Label style="-fx-font-size: 10; -fx-text-fill: black;" text="CIF: B-55555555" />
+                                </VBox>
+                                
+                                <Separator style="-fx-background-color: black; -fx-opacity: 0.1;" />
+                                
+                                <!-- Ticket Info -->
+                                <VBox alignment="CENTER_LEFT" spacing="2.0">
+                                    <Label fx:id="lblGiftIndicator" style="-fx-font-weight: bold; -fx-font-size: 16; -fx-text-fill: #1a73e8; -fx-padding: 0 0 5 0;" text="TICKET REGALO" managed="false" visible="false" />
+                                    <Label fx:id="lblTicketTitle" style="-fx-font-weight: bold; -fx-font-size: 11; -fx-text-fill: black;" text="Factura simplificada Nº: 01/4246" />
+                                    <Label fx:id="lblDate" style="-fx-font-size: 10; -fx-text-fill: black;" text="Fecha: 18 Feb, 2026 Hora: 12:20:38 Caja: 01" />
+                                </VBox>
+                                
+                                <Separator style="-fx-background-color: black; -fx-opacity: 0.1;" />
+                                
+                                <!-- Items Header -->
+                                <HBox spacing="10.0" style="-fx-padding: 0 0 2 0;">
+                                   <children>
+                                      <Label maxWidth="Infinity" style="-fx-font-weight: bold; -fx-font-size: 10; -fx-text-fill: black;" text="Descripción" HBox.hgrow="ALWAYS" />
+                                      <Label alignment="CENTER_RIGHT" prefWidth="30.0" style="-fx-font-weight: bold; -fx-font-size: 10; -fx-text-fill: black;" text="Cant." />
+                                      <Label alignment="CENTER_RIGHT" prefWidth="55.0" style="-fx-font-weight: bold; -fx-font-size: 10; -fx-text-fill: black;" fx:id="lblPVPHeader" text="PVP" />
+                                      <Label alignment="CENTER_RIGHT" prefWidth="55.0" style="-fx-font-weight: bold; -fx-font-size: 10; -fx-text-fill: black;" fx:id="lblTotalHeader" text="Total" />
+                                   </children>
+                                </HBox>
+                                
+                                <!-- Items Container -->
+                                <VBox fx:id="itemsContainer" spacing="5.0" minHeight="50" />
+                                
+                                <Separator style="-fx-background-color: black; -fx-opacity: 0.1;" />
+                                
+                                <!-- Totals -->
+                                <VBox fx:id="totalsContainer" spacing="3.0">
+                                    <HBox>
+                                       <Label maxWidth="Infinity" style="-fx-font-size: 10; -fx-text-fill: black;" text="Subtotal" HBox.hgrow="ALWAYS" />
+                                       <Label fx:id="lblSubtotal" style="-fx-font-size: 10; -fx-alignment: CENTER_RIGHT; -fx-text-fill: black;" text="0,00 €" />
+                                    </HBox>
+                                    <HBox>
+                                       <Label maxWidth="Infinity" style="-fx-font-size: 10; -fx-text-fill: black;" text="IVA 21%" HBox.hgrow="ALWAYS" />
+                                       <Label fx:id="lblVat" style="-fx-font-size: 10; -fx-text-fill: black;" text="0,00 €" />
+                                    </HBox>
+                                    <HBox style="-fx-padding: 5 0 0 0;">
+                                       <Label maxWidth="Infinity" style="-fx-font-weight: bold; -fx-font-size: 14; -fx-text-fill: black;" text="TOTAL" HBox.hgrow="ALWAYS" />
+                                       <Label fx:id="lblTotal" style="-fx-font-weight: bold; -fx-font-size: 14; -fx-text-fill: black;" text="0,00 €" />
+                                    </HBox>
+                                </VBox>
+                                
+                                <Separator style="-fx-background-color: black; -fx-opacity: 0.1;" />
+                                
+                                <!-- Payment Info -->
+                                <VBox fx:id="paymentInfoContainer" spacing="2.0">
+                                    <HBox>
+                                        <Label maxWidth="Infinity" style="-fx-font-size: 10; -fx-text-fill: black;" text="Forma de pago" HBox.hgrow="ALWAYS" />
+                                        <Label fx:id="lblPaymentMethod" style="-fx-font-size: 10; -fx-text-fill: black;" text="Efectivo" />
+                                    </HBox>
+                                     <HBox>
+                                        <Label maxWidth="Infinity" style="-fx-font-size: 10; -fx-text-fill: black;" text="Entregado" HBox.hgrow="ALWAYS" />
+                                        <Label fx:id="lblPaid" style="-fx-font-size: 10; -fx-text-fill: black;" text="0,00 €" />
+                                    </HBox>
+                                     <HBox>
+                                        <Label maxWidth="Infinity" style="-fx-font-size: 10; -fx-text-fill: black;" text="Cambio" HBox.hgrow="ALWAYS" />
+                                        <Label fx:id="lblChange" style="-fx-font-size: 10; -fx-text-fill: black;" text="0,00 €" />
+                                    </HBox>
+                                </VBox>
+                                
+                                <!-- Footer -->
+                                <VBox alignment="CENTER" spacing="5.0" style="-fx-padding: 20 0 0 0;">
+                                    <Label style="-fx-text-fill: grey; -fx-font-size: 9;" text="Le ha atendido Admin" />
+                                    <Label style="-fx-font-weight: bold; -fx-font-size: 10; -fx-text-fill: black;" text="GRACIAS POR SU VISITA" />
+                                    <Label style="-fx-font-size: 8; -fx-text-fill: grey;" text="www.gestiontpv.com" />
+                                </VBox>
+                                
+                                <!-- Barcode (Gift Ticket) -->
+                                <VBox fx:id="barcodeSection" alignment="CENTER" spacing="5" managed="false" visible="false">
+                                    <HBox fx:id="barcodeContainer" alignment="CENTER" spacing="1" style="-fx-padding: 10 0;" />
+                                    <Label fx:id="lblBarcodeValue" style="-fx-font-size: 8; -fx-text-fill: black;" text="0123456789" />
+                                </VBox>
+                        
+                     </children>
+                  </VBox>
+               </content>
+            </ScrollPane>
+         </children>
+      </VBox>
+      
+      <!-- RIGHT SIDE: Status and Actions -->
+      <VBox HBox.hgrow="ALWAYS" style="-fx-background-color: white; -fx-padding: 30;" spacing="20.0" alignment="TOP_CENTER">
+         <children>
+            <!-- Success Icon/Message -->
+            <VBox alignment="CENTER" spacing="10.0">
+               <Label text="✔" style="-fx-font-size: 60; -fx-text-fill: #4CAF50;" /> <!-- Placeholder for Check Icon -->
+               <Label text="¡Ticket creado con éxito!" style="-fx-font-size: 24; -fx-text-fill: #333;" />
+               
+               <HBox alignment="CENTER" spacing="20.0" style="-fx-padding: 10;">
+                  <VBox alignment="CENTER">
+                      <Label fx:id="lblTotalRight" text="19,99 €" style="-fx-font-size: 24; -fx-font-weight: bold; -fx-text-fill: #333;" />
+                      <Label text="Total cobrado" style="-fx-text-fill: grey;" />
+                  </VBox>
+                  <Separator orientation="VERTICAL" />
+                  <VBox alignment="CENTER">
+                      <Label fx:id="lblChangeRight" text="30,01 €" style="-fx-font-size: 24; -fx-font-weight: bold; -fx-text-fill: #E91E63;" />
+                      <Label text="Cambio" style="-fx-text-fill: #E91E63;" />
+                  </VBox>
+               </HBox>
+            </VBox>
+            
+            <Separator />
+            
+            <!-- Printing Options -->
+            <VBox spacing="10.0">
+               <Label style="-fx-font-weight: bold; -fx-font-size: 14; -fx-text-fill: black;" text="Imprimir" />
+                <HBox alignment="CENTER_LEFT" spacing="10.0">
+                  <Button graphicTextGap="10" onAction="#handlePrint" style="-fx-background-color: #1a73e8; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 8 20; -fx-background-radius: 25; -fx-cursor: hand;" text="Imprimir">
+                      <graphic>
+                          <Label style="-fx-text-fill: white; -fx-font-size: 16;" text="⎙" />
+                      </graphic>
+                  </Button>
+                  <Button fx:id="btnGiftTicket" onAction="#handleGiftTicket" style="-fx-background-color: white; -fx-text-fill: #1a73e8; -fx-border-color: #1a73e8; -fx-border-radius: 25; -fx-border-width: 1; -fx-font-weight: bold; -fx-padding: 8 20; -fx-background-radius: 25; -fx-cursor: hand;" text="Ticket regalo">
+                      <graphic>
+                          <Label fx:id="lblGiftIcon" style="-fx-font-size: 16; -fx-text-fill: #1a73e8;" text="🎁" />
+                      </graphic>
+                  </Button>
+               </HBox>
+            </VBox>
+            
+            <Region VBox.vgrow="ALWAYS" />
+            
+            <Separator style="-fx-padding: 10 0;" />
+            
+            <!-- Bottom Buttons -->
+            <HBox alignment="CENTER" spacing="15.0">
+               <Button onAction="#handleBack" style="-fx-background-color: #ea4335; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 30; -fx-background-radius: 25; -fx-cursor: hand;" text="Volver" />
+               <Button onAction="#handleNewSale" style="-fx-background-color: #1a73e8; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 30; -fx-background-radius: 25; -fx-cursor: hand;" text="Nueva Venta" />
+            </HBox>
+            
+         </children>
+      </VBox>
+   </children>
+</HBox>
