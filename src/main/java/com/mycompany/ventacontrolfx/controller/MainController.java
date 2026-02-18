@@ -25,20 +25,24 @@ import com.mycompany.ventacontrolfx.service.CategoryService;
 import com.mycompany.ventacontrolfx.service.ProductFilterService;
 import com.mycompany.ventacontrolfx.service.ProductFilterService.FilterType;
 import java.sql.SQLException;
-import java.io.File;
+import java.io.IOException;
+import java.util.Optional;
 import java.util.ArrayList;
 import java.util.List;
+import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
 import java.util.function.Consumer;
+import javafx.beans.value.ChangeListener;
 import javafx.collections.ListChangeListener;
 import javafx.animation.PauseTransition;
-import javafx.beans.binding.Bindings;
-import javafx.util.Duration;
-
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Node;
-import java.io.IOException;
-import javafx.application.Platform;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
+import javafx.stage.Modality;
+
+import javafx.stage.Stage;
 
 public class MainController {
 
@@ -58,13 +62,13 @@ public class MainController {
     private Label subtotalLabel;
 
     @FXML
+    private Label taxLabel;
+
+    @FXML
     private Label itemsCountLabel;
 
     @FXML
     private Label totalButtonLabel;
-
-    @FXML
-    private HBox favoriteCategoriesBox;
 
     @FXML
     private HBox searchBarContainer;
@@ -97,6 +101,9 @@ public class MainController {
     private VBox productsSubmenu;
 
     @FXML
+    private MenuButton menuButton;
+
+    @FXML
     private Button btnSell;
     @FXML
     private Button btnProducts;
@@ -104,6 +111,9 @@ public class MainController {
     private Button btnProductsList;
     @FXML
     private Button btnCategories;
+
+    @FXML
+    private Button payButton;
 
     // Other Sidebar Buttons
     @FXML
@@ -125,6 +135,13 @@ public class MainController {
     private VBox loadingOverlay;
 
     @FXML
+    private ScrollPane categoriesScrollPane;
+    @FXML
+    private FlowPane categoriesFlowPane;
+    @FXML
+    private Button btnExpandCategories;
+
+    @FXML
     private void showSellView() {
         navigationService.showSellView(() -> {
             loadProductsFromDB();
@@ -140,6 +157,81 @@ public class MainController {
                 System.out.println("Warning: searchField is null in showSellView");
             }
         });
+    }
+
+    @FXML
+    private void handlePayButton() {
+        // Button should be disabled if empty, but good to keep a check just in case,
+        // OR simply rely on disable state. The user asked for disable, so we can
+        // probably remove the alert
+        // or just keep it as a fallback if binding fails (unlikely).
+        // For cleaner UX, if disabled, this event shouldn't fire.
+
+        if (cartService.getItemCount() == 0) {
+            return;
+        }
+
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/payment.fxml"));
+            Parent root = loader.load();
+
+            PaymentController controller = loader.getController();
+            controller.setTotalAmount(cartService.getGrandTotal(), (paid, change, method) -> {
+                // On success, show receipt
+                // Capture current cart items before clearing
+                List<CartItem> items = new ArrayList<>(cartService.getCartItems());
+                double total = cartService.getGrandTotal();
+
+                showReceipt(items, total, paid, change, method,
+                        () -> {
+                            // After receipt is closed or new sale requested
+                            cartService.clear();
+                        },
+                        () -> {
+                            // On Back requested - reopen payment screen
+                            Platform.runLater(this::handlePayButton);
+                        });
+            });
+
+            Stage stage = new Stage();
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.initStyle(javafx.stage.StageStyle.UNDECORATED); // Modern look without default OS chrome
+            stage.setScene(new Scene(root));
+
+            // Center on screen
+            stage.centerOnScreen();
+
+            stage.showAndWait();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText("Error al abrir pantalla de pago");
+            alert.setContentText(e.getMessage());
+            alert.showAndWait();
+        }
+    }
+
+    private void showReceipt(List<CartItem> items, double total, double paid, double change, String method,
+            Runnable onNewSale, Runnable onBack) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/receipt.fxml"));
+            Parent root = loader.load();
+
+            ReceiptController controller = loader.getController();
+            controller.setReceiptData(items, total, paid, change, method, onNewSale, onBack);
+
+            Stage stage = new Stage();
+            stage.initModality(Modality.APPLICATION_MODAL);
+            // stage.initStyle(javafx.stage.StageStyle.UNDECORATED);
+            stage.setTitle("Factura simplificada");
+            stage.setScene(new Scene(root));
+            stage.showAndWait();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @FXML
@@ -165,7 +257,7 @@ public class MainController {
         filterService = new ProductFilterService();
         initCartListener();
         navigationService = new NavigationService(
-                mainContent, loadingOverlay, cartPanel, favoriteCategoriesBox,
+                mainContent, loadingOverlay, cartPanel, categoriesFlowPane,
                 searchBarContainer, filterDisplayContainer, productsPane,
                 productsSubmenu, lblProductsArrow,
                 btnSell, btnProducts, btnProductsList, btnCategories);
@@ -202,12 +294,21 @@ public class MainController {
         emptyCartView.visibleProperty().bind(cartService.itemCountProperty().isEqualTo(0));
         emptyCartView.managedProperty().bind(emptyCartView.visibleProperty());
 
-        subtotalLabel.textProperty().bind(cartService.totalProperty().asString("%.2f €"));
-        totalButtonLabel.textProperty().bind(Bindings.format("Total: %.2f €", cartService.totalProperty()));
+        // Disable Pay Button if Cart is Empty
+        if (payButton != null) {
+            payButton.disableProperty().bind(cartService.itemCountProperty().isEqualTo(0));
+        }
+
+        subtotalLabel.textProperty().bind(cartService.subtotalProperty().asString("%.2f €"));
+        taxLabel.textProperty().bind(cartService.taxProperty().asString("%.2f €"));
+        totalButtonLabel.textProperty().bind(Bindings.format("Total: %.2f €", cartService.grandTotalProperty()));
         itemsCountLabel.textProperty().bind(Bindings.createStringBinding(
                 () -> String.format("Subtotal (%d item%s)", cartService.getItemCount(),
                         cartService.getItemCount() != 1 ? "s" : ""),
                 cartService.itemCountProperty()));
+
+        // Setup menu button hover behavior
+        setupMenuButtonHover();
 
         // Setup search listener with a delay to ensure all components are loaded
         Platform.runLater(() -> {
@@ -217,6 +318,7 @@ public class MainController {
                 System.out.println("Warning: searchField is null in initialize");
             }
         });
+
     }
 
     private void loadProductsFromDB() {
@@ -245,41 +347,53 @@ public class MainController {
     private void loadFavoriteCategories() {
         try {
             List<Category> favorites = categoryService.getFavoriteCategories();
-            favoriteCategoriesBox.getChildren().clear();
+            categoriesFlowPane.getChildren().clear();
 
-            // "Favoritos" Button - shows only favorite products (default selected)
+            // "Favoritos" Button - shows only favorite products
             Button btnFavorites = new Button("Favoritos");
             btnFavorites.getStyleClass().add("action-text-btn");
-            btnFavorites.setUserData("FAVORITES"); // Special marker for favorites
+            btnFavorites.setUserData("FAVORITES");
             btnFavorites.setOnAction(e -> filterFavoriteProducts());
             setupCategoryButton(btnFavorites);
-            favoriteCategoriesBox.getChildren().add(btnFavorites);
+            categoriesFlowPane.getChildren().add(btnFavorites);
 
-            // "All" Button
+            // "Todos" (All) Button
             Button btnAll = new Button("Todos");
             btnAll.getStyleClass().add("action-text-btn");
-            btnAll.setUserData(null); // userData null represents "All"
+            btnAll.setUserData(null);
             btnAll.setOnAction(e -> filterProducts(null));
             setupCategoryButton(btnAll);
-            favoriteCategoriesBox.getChildren().add(btnAll);
+            categoriesFlowPane.getChildren().add(btnAll);
 
             for (Category cat : favorites) {
-                Button btn = new Button(cat.getName());
-                btn.getStyleClass().add("action-text-btn");
-                btn.setUserData(cat);
-                btn.setOnAction(e -> filterProducts(cat));
-                setupCategoryButton(btn);
-                favoriteCategoriesBox.getChildren().add(btn);
-            }
+                if (cat.isVisible()) {
+                    Button btn = new Button(cat.getName());
+                    btn.getStyleClass().add("action-text-btn");
+                    btn.setUserData(cat);
+                    btn.setOnAction(e -> filterProducts(cat));
+                    setupCategoryButton(btn);
+                    categoriesFlowPane.getChildren().add(btn);
 
-            // Set "Favoritos" as the default selected button
-            // Logic moved to loadProductsFromDB or defaults?
-            // Actually, loadProductsFromDB sets filterFavorites.
+                }
+            }
 
             updateCategoryButtonStyles();
 
         } catch (SQLException e) {
             e.printStackTrace();
+        }
+    }
+
+    @FXML
+    private void handleExpandCategories() {
+        if (categoriesScrollPane.getPrefHeight() == 85) {
+            // Expand - Bind to content height so ALL content is shown
+            categoriesScrollPane.prefHeightProperty().bind(categoriesFlowPane.heightProperty().add(20));
+            categoriesScrollPane.setMaxHeight(Double.MAX_VALUE);
+            btnExpandCategories.setText("▲");
+        } else {
+            // Collapse
+            collapseCategories();
         }
     }
 
@@ -293,26 +407,49 @@ public class MainController {
             FilterType type = filterService.getCurrentType();
             Object criteria = filterService.getCurrentCriteria();
 
-            if (type == FilterType.ALL && btnData == null) {
-                isActive = true;
-            } else if (type == FilterType.FAVORITES && "FAVORITES".equals(btnData)) {
-                isActive = true;
-            } else if (type == FilterType.CATEGORY && criteria != null && criteria.equals(btnData)) {
-                isActive = true;
+            if (btnData instanceof String && "FAVORITES".equals(btnData)) {
+                if (type == FilterType.FAVORITES)
+                    isActive = true;
+            } else if (btnData == null) {
+                if (type == FilterType.ALL)
+                    isActive = true;
+            } else if (btnData instanceof Category) {
+                if (type == FilterType.CATEGORY && criteria != null && criteria.equals(btnData))
+                    isActive = true;
             }
 
             if (!isActive) {
-                btn.setStyle(HOVER_CAT_STYLE);
+                btnHelperSetStyle(btn, HOVER_CAT_STYLE);
             }
         });
         btn.setOnMouseExited(ev -> {
-            // Re-apply correct style (Active or Inactive) based on state
             updateCategoryButtonStyles();
         });
     }
 
+    private void collapseCategories() {
+        // Always unbind first to allow setting prefHeight manually again
+        categoriesScrollPane.prefHeightProperty().unbind();
+
+        if (categoriesScrollPane.getPrefHeight() != 85) {
+            categoriesScrollPane.setPrefHeight(85);
+            categoriesScrollPane.setMaxHeight(85);
+            categoriesScrollPane.setVvalue(0); // Scroll to top
+            btnExpandCategories.setText("▼");
+        }
+    }
+
+    // Helper to safely set style if btn is not null
+    private void btnHelperSetStyle(Button btn, String style) {
+        if (btn != null)
+            btn.setStyle(style);
+    }
+
     private void updateCategoryButtonStyles() {
-        for (Node node : favoriteCategoriesBox.getChildren()) {
+        if (categoriesFlowPane == null)
+            return;
+
+        for (Node node : categoriesFlowPane.getChildren()) {
             if (node instanceof Button) {
                 Button btn = (Button) node;
                 Object btnData = btn.getUserData();
@@ -322,12 +459,17 @@ public class MainController {
                 FilterType type = filterService.getCurrentType();
                 Object criteria = filterService.getCurrentCriteria();
 
-                if (type == FilterType.ALL && btnData == null) {
-                    isActive = true;
-                } else if (type == FilterType.FAVORITES && "FAVORITES".equals(btnData)) {
-                    isActive = true;
-                } else if (type == FilterType.CATEGORY && criteria != null && criteria.equals(btnData)) {
-                    isActive = true;
+                if (btnData instanceof String && "FAVORITES".equals(btnData)) {
+                    if (type == FilterType.FAVORITES)
+                        isActive = true;
+                } else if (btnData == null) {
+                    if (type == FilterType.ALL)
+                        isActive = true;
+                } else if (btnData instanceof Category) {
+                    // Check equality by ID or object? Assuming equals() works or compare IDs
+                    // Previous code used equals(btnData), so we stick to that.
+                    if (type == FilterType.CATEGORY && criteria != null && criteria.equals(btnData))
+                        isActive = true;
                 }
 
                 if (isActive) {
@@ -347,12 +489,14 @@ public class MainController {
             filterService.setFilterCategory(category);
             filterLabel.setText(category.getName() + " 🏷️");
         }
+        collapseCategories(); // Auto-collapse
         updateCategoryButtonStyles();
         loadProducts(filterService.filter(allProducts));
     }
 
     private void filterFavoriteProducts() {
         filterService.setFilterFavorites();
+        collapseCategories(); // Auto-collapse
         updateCategoryButtonStyles();
         filterLabel.setText("Favoritos ⭐");
         loadProducts(filterService.filter(allProducts));
@@ -421,7 +565,8 @@ public class MainController {
                                 item,
                                 () -> cartService.incrementQuantity(item.getProduct()),
                                 () -> cartService.decrementQuantity(item.getProduct()),
-                                () -> cartService.removeItem(item.getProduct()));
+                                () -> cartService.removeItem(item.getProduct()),
+                                (newQty) -> cartService.setQuantity(item.getProduct(), newQty));
                         cartItemsContainer.getChildren().add(row);
                     }
                 }
@@ -440,5 +585,21 @@ public class MainController {
 
     private void addToCart(Product product) {
         cartService.addItem(product);
+    }
+
+    private void setupMenuButtonHover() {
+        if (menuButton != null) {
+            // Open menu on hover - menu will close on click (default behavior)
+            menuButton.setOnMouseEntered(e -> {
+                if (!menuButton.isShowing()) {
+                    menuButton.show();
+                }
+            });
+        }
+    }
+
+    @FXML
+    private void clearCart() {
+        cartService.clear();
     }
 }

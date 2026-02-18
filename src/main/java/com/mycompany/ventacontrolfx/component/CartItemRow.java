@@ -10,8 +10,10 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import java.util.function.Consumer;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -22,7 +24,8 @@ public class CartItemRow extends HBox {
 
     private final CartItem cartItem;
 
-    public CartItemRow(CartItem cartItem, Runnable onIncrement, Runnable onDecrement, Runnable onDelete) {
+    public CartItemRow(CartItem cartItem, Runnable onIncrement, Runnable onDecrement, Runnable onDelete,
+            Consumer<Integer> onSetQuantity) {
         this.cartItem = cartItem;
         Product product = cartItem.getProduct();
 
@@ -43,7 +46,7 @@ public class CartItemRow extends HBox {
         nameLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
 
         // Quantity Controls
-        HBox quantityBox = new HBox(12);
+        HBox quantityBox = new HBox(5); // Reduce spacing
         quantityBox.setAlignment(Pos.CENTER_LEFT);
 
         Button decreaseBtn = new Button("-");
@@ -51,20 +54,46 @@ public class CartItemRow extends HBox {
         decreaseBtn.setStyle("-fx-min-width: 30px; -fx-min-height: 30px; -fx-font-size: 14px;");
         decreaseBtn.setOnAction(e -> onDecrement.run());
 
-        Label quantityLabel = new Label();
-        quantityLabel.getStyleClass().add("quantity-label");
-        quantityLabel
-                .setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-min-width: 20px; -fx-alignment: center;");
+        TextField quantityField = new TextField();
+        quantityField.getStyleClass().add("quantity-field");
+        quantityField.setStyle(
+                "-fx-font-size: 14px; -fx-font-weight: bold; -fx-alignment: center; -fx-pref-width: 50px; -fx-min-width: 40px;");
 
-        // BINDING
-        quantityLabel.textProperty().bind(cartItem.quantityProperty().asString());
+        // Validation: Only numbers
+        quantityField.textProperty().addListener((obs, oldVal, newVal) -> {
+            if (!newVal.matches("\\d*")) {
+                quantityField.setText(newVal.replaceAll("[^\\d]", ""));
+            }
+        });
+
+        // Initialize value
+        quantityField.setText(String.valueOf(cartItem.getQuantity()));
+
+        // Listener: Update Cart when User changes text (and commits via Focus Loss or
+        // Enter)
+        quantityField.focusedProperty().addListener((obs, wasFocused, isNowFocused) -> {
+            if (!isNowFocused) {
+                commitQuantity(quantityField, onSetQuantity);
+            }
+        });
+        quantityField.setOnAction(e -> {
+            commitQuantity(quantityField, onSetQuantity);
+            quantityField.getParent().requestFocus(); // Remove focus
+        });
+
+        // Listener: Update Text when Cart changes (e.g. via buttons)
+        cartItem.quantityProperty().addListener((obs, oldVal, newVal) -> {
+            if (!quantityField.isFocused()) {
+                quantityField.setText(String.valueOf(newVal));
+            }
+        });
 
         Button increaseBtn = new Button("+");
         increaseBtn.getStyleClass().add("quantity-btn");
         increaseBtn.setStyle("-fx-min-width: 30px; -fx-min-height: 30px; -fx-font-size: 14px;");
         increaseBtn.setOnAction(e -> onIncrement.run());
 
-        quantityBox.getChildren().addAll(decreaseBtn, quantityLabel, increaseBtn);
+        quantityBox.getChildren().addAll(decreaseBtn, quantityField, increaseBtn);
         infoBox.getChildren().addAll(nameLabel, quantityBox);
 
         // 3. Spacer
@@ -124,5 +153,25 @@ public class CartItemRow extends HBox {
 
     public CartItem getCartItem() {
         return cartItem;
+    }
+
+    private void commitQuantity(TextField field, Consumer<Integer> onSetQuantity) {
+        try {
+            String text = field.getText();
+            if (text == null || text.trim().isEmpty()) {
+                // Revert to current quantity if empty
+                field.setText(String.valueOf(cartItem.getQuantity()));
+                return;
+            }
+            int newQty = Integer.parseInt(text);
+            if (newQty < 1) {
+                newQty = 1;
+                field.setText("1");
+            }
+            onSetQuantity.accept(newQty);
+        } catch (NumberFormatException e) {
+            // Revert on error
+            field.setText(String.valueOf(cartItem.getQuantity()));
+        }
     }
 }
