@@ -8,10 +8,12 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
+import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.HBox;
 
+import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
@@ -21,7 +23,7 @@ public class NavigationService {
     private final ScrollPane mainContent;
     private final VBox loadingOverlay;
     private final VBox cartPanel;
-    private final HBox favoriteCategoriesBox;
+    private final Node favoriteCategoriesBox;
     private final HBox searchBarContainer;
     private final HBox filterDisplayContainer;
     private final TilePane productsPane;
@@ -44,7 +46,7 @@ public class NavigationService {
             ScrollPane mainContent,
             VBox loadingOverlay,
             VBox cartPanel,
-            HBox favoriteCategoriesBox,
+            Node favoriteCategoriesBox,
             HBox searchBarContainer,
             HBox filterDisplayContainer,
             TilePane productsPane,

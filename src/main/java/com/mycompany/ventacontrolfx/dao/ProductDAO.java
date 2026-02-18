@@ -120,4 +120,13 @@ public class ProductDAO {
         }
         return products;
     }
+
+    public void updateVisibilityByCategory(int categoryId, boolean visible) throws SQLException {
+        String sql = "UPDATE products SET visible = ? WHERE category_id = ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setBoolean(1, visible);
+            pstmt.setInt(2, categoryId);
+            pstmt.executeUpdate();
+        }
+    }
 }

@@ -41,6 +41,11 @@ public class CategoryService {
         try (Connection conn = DBConnection.getConnection()) {
             CategoryDAO categoryDAO = new CategoryDAO(conn);
             categoryDAO.updateCategory(category);
+
+            // Update product visibility to match category visibility
+            com.mycompany.ventacontrolfx.dao.ProductDAO productDAO = new com.mycompany.ventacontrolfx.dao.ProductDAO(
+                    conn);
+            productDAO.updateVisibilityByCategory(category.getId(), category.isVisible());
         }
     }
 
