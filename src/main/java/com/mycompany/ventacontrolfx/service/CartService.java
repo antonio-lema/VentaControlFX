@@ -17,8 +17,12 @@ import java.util.List;
 public class CartService {
 
     private final ObservableList<CartItem> cartItems;
-    private final DoubleProperty total = new SimpleDoubleProperty(0.0);
+    private final DoubleProperty subtotal = new SimpleDoubleProperty(0.0);
+    private final DoubleProperty tax = new SimpleDoubleProperty(0.0);
+    private final DoubleProperty grandTotal = new SimpleDoubleProperty(0.0);
     private final IntegerProperty itemCount = new SimpleIntegerProperty(0);
+
+    private static final double TAX_RATE = 0.21;
 
     public CartService() {
         this.cartItems = FXCollections
@@ -27,12 +31,27 @@ public class CartService {
     }
 
     private void updateTotals() {
-        total.set(cartItems.stream().mapToDouble(CartItem::getTotal).sum());
+        double totalInclusive = cartItems.stream().mapToDouble(CartItem::getTotal).sum();
+        double baseAmount = totalInclusive / (1 + TAX_RATE);
+        double taxAmount = totalInclusive - baseAmount;
+
+        subtotal.set(baseAmount);
+        tax.set(taxAmount);
+        grandTotal.set(totalInclusive);
+
         itemCount.set(cartItems.stream().mapToInt(CartItem::getQuantity).sum());
     }
 
-    public DoubleProperty totalProperty() {
-        return total;
+    public DoubleProperty subtotalProperty() {
+        return subtotal;
+    }
+
+    public DoubleProperty taxProperty() {
+        return tax;
+    }
+
+    public DoubleProperty grandTotalProperty() {
+        return grandTotal;
     }
 
     public IntegerProperty itemCountProperty() {
@@ -80,16 +99,37 @@ public class CartService {
         }
     }
 
-    public double getTotal() {
-        return cartItems.stream()
-                .mapToDouble(CartItem::getTotal)
-                .sum();
+    public double getSubtotal() {
+        return subtotal.get();
+    }
+
+    public double getTax() {
+        return tax.get();
+    }
+
+    public double getGrandTotal() {
+        return grandTotal.get();
     }
 
     public int getItemCount() {
         return cartItems.stream()
                 .mapToInt(CartItem::getQuantity)
                 .sum();
+    }
+
+    public void setQuantity(Product product, int quantity) {
+        if (quantity < 1) {
+            return;
+        }
+        Optional<CartItem> existingItem = cartItems.stream()
+                .filter(item -> item.getProduct().getId() == product.getId())
+                .findFirst();
+
+        if (existingItem.isPresent()) {
+            existingItem.get().setQuantity(quantity);
+        } else {
+            cartItems.add(new CartItem(product, quantity));
+        }
     }
 
     public void clear() {
