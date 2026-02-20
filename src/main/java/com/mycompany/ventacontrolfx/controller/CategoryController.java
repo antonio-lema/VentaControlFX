@@ -89,7 +89,6 @@ public class CategoryController {
                         categoryService.updateCategory(category);
                     } catch (SQLException e) {
                         e.printStackTrace();
-                        // Revert if failed
                         toggle.setSwitchedOn(!newState);
                         category.setVisible(!newState);
                         showAlert("Error", "No se pudo actualizar la visibilidad: " + e.getMessage());
@@ -105,6 +104,7 @@ public class CategoryController {
                 } else {
                     toggle.setState(item);
                     setGraphic(toggle);
+                    setAlignment(Pos.CENTER);
                 }
             }
         });
@@ -125,7 +125,6 @@ public class CategoryController {
                         categoryService.updateCategory(category);
                     } catch (SQLException e) {
                         e.printStackTrace();
-                        // Revert if failed
                         toggle.setSwitchedOn(!newState);
                         category.setFavorite(!newState);
                         showAlert("Error", "No se pudo actualizar favorito: " + e.getMessage());
@@ -141,6 +140,7 @@ public class CategoryController {
                 } else {
                     toggle.setState(item);
                     setGraphic(toggle);
+                    setAlignment(Pos.CENTER);
                 }
             }
         });
@@ -149,30 +149,31 @@ public class CategoryController {
         colActions.setCellFactory(param -> new TableCell<Category, Void>() {
             private final Button btnEdit = new Button();
             private final Button btnDelete = new Button();
-            private final HBox pane = new HBox(5, btnEdit, btnDelete);
+            private final HBox pane = new HBox(8, btnEdit, btnDelete);
 
             {
                 pane.setAlignment(Pos.CENTER);
 
-                // Edit Icon (Pencil)
-                SVGPath editIcon = new SVGPath();
-                editIcon.setContent(
-                        "M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z");
-                editIcon.getStyleClass().add("svg-path");
+                // Edit Icon
+                de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView editIcon = new de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView(
+                        de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon.PENCIL);
+                editIcon.setSize("16");
+                editIcon.setFill(javafx.scene.paint.Color.web("#1e88e5"));
 
                 btnEdit.setGraphic(editIcon);
                 btnEdit.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
-                btnEdit.getStyleClass().addAll("btn-icon", "btn-edit");
+                btnEdit.setStyle("-fx-background-color: transparent; -fx-cursor: hand; -fx-padding: 5;");
                 btnEdit.setTooltip(new javafx.scene.control.Tooltip("Editar Categoría"));
 
-                // Delete Icon (Trash)
-                SVGPath deleteIcon = new SVGPath();
-                deleteIcon.setContent("M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z");
-                deleteIcon.getStyleClass().add("svg-path");
+                // Delete Icon
+                de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView deleteIcon = new de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView(
+                        de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon.TRASH);
+                deleteIcon.setSize("16");
+                deleteIcon.setFill(javafx.scene.paint.Color.web("#e53935"));
 
                 btnDelete.setGraphic(deleteIcon);
                 btnDelete.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
-                btnDelete.getStyleClass().addAll("btn-icon", "btn-delete");
+                btnDelete.setStyle("-fx-background-color: transparent; -fx-cursor: hand; -fx-padding: 5;");
                 btnDelete.setTooltip(new javafx.scene.control.Tooltip("Eliminar Categoría"));
 
                 btnEdit.setOnAction(event -> {
@@ -184,6 +185,12 @@ public class CategoryController {
                     Category category = getTableView().getItems().get(getIndex());
                     handleDeleteCategory(category);
                 });
+
+                // Hover effects
+                btnEdit.setOnMouseEntered(e -> editIcon.setFill(javafx.scene.paint.Color.web("#1565c0")));
+                btnEdit.setOnMouseExited(e -> editIcon.setFill(javafx.scene.paint.Color.web("#1e88e5")));
+                btnDelete.setOnMouseEntered(e -> deleteIcon.setFill(javafx.scene.paint.Color.web("#c62828")));
+                btnDelete.setOnMouseExited(e -> deleteIcon.setFill(javafx.scene.paint.Color.web("#e53935")));
             }
 
             @Override
@@ -255,18 +262,20 @@ public class CategoryController {
             Parent root = loader.load();
 
             Stage stage = new Stage();
-            stage.setTitle("Añadir Categoría");
-            stage.setScene(new Scene(root));
-            stage.initModality(Modality.APPLICATION_MODAL);
-            stage.setResizable(false);
+            stage.initStyle(javafx.stage.StageStyle.TRANSPARENT);
+            stage.initModality(javafx.stage.Modality.APPLICATION_MODAL);
 
+            Scene scene = new Scene(root);
+            scene.setFill(null);
+            scene.getStylesheets().add(getClass().getResource("/view/style.css").toExternalForm());
+
+            stage.setScene(scene);
             stage.showAndWait();
-
-            // Refresh table
             loadCategories();
-        } catch (IOException e) {
+
+        } catch (Exception e) {
             e.printStackTrace();
-            showAlert("Error", "No se pudo abrir el diálogo: " + e.getMessage());
+            showAlert("Error", "No se pudo abrir la ventana de añadir categoría: " + e.getMessage());
         }
     }
 
@@ -275,21 +284,24 @@ public class CategoryController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/add_category.fxml"));
             Parent root = loader.load();
 
-            // Access controller to pass data
             AddCategoryController controller = loader.getController();
             controller.setCategory(category);
 
             Stage stage = new Stage();
-            stage.setTitle("Editar Categoría");
-            stage.setScene(new Scene(root));
-            stage.initModality(Modality.APPLICATION_MODAL);
-            stage.setResizable(false);
-            stage.showAndWait();
+            stage.initStyle(javafx.stage.StageStyle.TRANSPARENT);
+            stage.initModality(javafx.stage.Modality.APPLICATION_MODAL);
 
+            Scene scene = new Scene(root);
+            scene.setFill(null);
+            scene.getStylesheets().add(getClass().getResource("/view/style.css").toExternalForm());
+
+            stage.setScene(scene);
+            stage.showAndWait();
             loadCategories();
-        } catch (IOException e) {
+
+        } catch (Exception e) {
             e.printStackTrace();
-            showAlert("Error", "No se pudo abrir el diálogo de edición: " + e.getMessage());
+            showAlert("Error", "No se pudo abrir la ventana de editar categoría: " + e.getMessage());
         }
     }
 

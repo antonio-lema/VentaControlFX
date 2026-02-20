@@ -24,6 +24,11 @@ public class UserService {
         return userDAO.findByUsername(username);
     }
 
+    // Buscar usuario por email
+    public User findByEmail(String email) throws SQLException {
+        return userDAO.findByEmail(email);
+    }
+
     // Verificar credenciales para login
     public boolean validateLogin(String username, String password) throws SQLException {
         User user = userDAO.findByUsername(username);
@@ -33,5 +38,20 @@ public class UserService {
     // Crear un nuevo usuario
     public boolean createUser(User user) throws SQLException {
         return userDAO.insert(user);
+    }
+
+    // Actualizar contraseña
+    public boolean updatePassword(int userId, String newPassword) throws SQLException {
+        return userDAO.updatePassword(userId, newPassword);
+    }
+
+    // Actualizar usuario (nombre, rol, email)
+    public boolean updateUser(User user) throws SQLException {
+        return userDAO.update(user);
+    }
+
+    // Eliminar usuario
+    public boolean deleteUser(int userId) throws SQLException {
+        return userDAO.delete(userId);
     }
 }

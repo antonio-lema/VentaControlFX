@@ -8,48 +8,80 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
 
-<VBox spacing="20" alignment="TOP_CENTER" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" 
-      fx:controller="com.mycompany.ventacontrolfx.controller.AddProductController"
-      style="-fx-background-color: white; -fx-padding: 30;">
-
-    <Label text="Nuevo Producto" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #1e88e5;"/>
-
-    <VBox spacing="10" alignment="CENTER_LEFT" maxWidth="400">
+<StackPane fx:id="rootStackPane" styleClass="register-popup-background" onMousePressed="#handleMousePressed" onMouseDragged="#handleMouseDragged" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mycompany.ventacontrolfx.controller.AddProductController">
+    <VBox maxWidth="500" spacing="0" alignment="CENTER" styleClass="modern-register-card">
+        <padding>
+            <Insets top="40" right="40" bottom="40" left="40"/>
+        </padding>
+        <!-- Header -->
+        <VBox styleClass="modern-register-header" alignment="CENTER_LEFT">
+            <Label fx:id="lblTitle" text="Producto" styleClass="modern-register-title"/>
+            <Label fx:id="lblSubtitle" text="Introduce los datos del producto" styleClass="modern-register-subtitle"/>
+        </VBox>
         
-        <!-- Name -->
-        <Label text="Nombre del Producto" style="-fx-text-fill: #666;"/>
-        <TextField fx:id="txtName" promptText="Ej: Camiseta" styleClass="text-field-flat"/>
+        <VBox spacing="15">
+            <!-- Name -->
+            <VBox styleClass="modern-input-group">
+                <HBox styleClass="modern-input-container" alignment="CENTER_LEFT">
+                    <FontAwesomeIconView glyphName="TAG" size="18" fill="#b0b0b0">
+                        <HBox.margin>
+                            <Insets right="10"/>
+                        </HBox.margin>
+                    </FontAwesomeIconView> 
+                    <TextField fx:id="txtName" promptText="Nombre del producto" styleClass="modern-input-field" HBox.hgrow="ALWAYS"/>
+                </HBox>
+            </VBox>
+            
+            <!-- Price -->
+             <VBox styleClass="modern-input-group">
+                <HBox styleClass="modern-input-container" alignment="CENTER_LEFT">
+                    <FontAwesomeIconView glyphName="MONEY" size="18" fill="#b0b0b0">
+                         <HBox.margin>
+                            <Insets right="10"/>
+                        </HBox.margin>
+                    </FontAwesomeIconView> 
+                    <TextField fx:id="txtPrice" promptText="Precio" styleClass="modern-input-field" HBox.hgrow="ALWAYS"/>
+                </HBox>
+            </VBox>
+            
+            <!-- Category -->
+             <VBox styleClass="modern-input-group">
+                <HBox styleClass="modern-input-container" alignment="CENTER_LEFT">
+                    <FontAwesomeIconView glyphName="FOLDER_OPEN" size="18" fill="#b0b0b0">
+                        <HBox.margin>
+                            <Insets right="10"/>
+                        </HBox.margin>
+                    </FontAwesomeIconView> 
+                    <ComboBox fx:id="cmbCategory" promptText="Categoría" styleClass="modern-input-field" maxWidth="Infinity" HBox.hgrow="ALWAYS" style="-fx-background-color: transparent;"/>
+                </HBox>
+            </VBox>
+            
+            <!-- Image & Favorite Row -->
+            <HBox spacing="15" alignment="CENTER_LEFT">
+                <CheckBox fx:id="chkFavorite" text="Favorito" styleClass="modern-checkbox"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                 <Button fx:id="btnSelectImage" text="Imagen" onAction="#handleSelectImage" styleClass="modern-btn-secondary">
+                    <graphic>
+                         <FontAwesomeIconView glyphName="IMAGE" size="14" fill="#7f8c8d"/>
+                    </graphic>
+                 </Button>
+            </HBox>
+             <!-- Image Preview -->
+            <HBox alignment="CENTER" style="-fx-padding: 10; -fx-background-color: #f8fafc; -fx-background-radius: 8;">
+                 <ImageView fx:id="ivProductImage" fitWidth="100" fitHeight="100" preserveRatio="true"/>
+            </HBox>
 
-        <!-- Price -->
-        <Label text="Precio (€)" style="-fx-text-fill: #666;"/>
-        <TextField fx:id="txtPrice" promptText="0.00" styleClass="text-field-flat"/>
-
-        <!-- Category -->
-        <Label text="Categoría" style="-fx-text-fill: #666;"/>
-        <ComboBox fx:id="cbCategory" promptText="Seleccionar Categoría" maxWidth="Infinity" styleClass="combo-box-flat"/>
-
-        <!-- Favorite -->
-        <CheckBox fx:id="chkFavorite" text="Marcar como Favorito" style="-fx-text-fill: #666;"/>
-
-        <!-- Image Selection -->
-        <Label text="Imagen" style="-fx-text-fill: #666;"/>
-        <HBox spacing="10" alignment="CENTER_LEFT">
-             <Button text="Seleccionar Imagen" onAction="#selectImage" styleClass="btn-secondary"/>
-             <Label fx:id="lblImageName" text="Ninguna seleccionada" style="-fx-text-fill: #999; -fx-font-style: italic;"/>
+        </VBox>
+        
+        <!-- Actions -->
+        <HBox spacing="15" alignment="CENTER_RIGHT" style="-fx-padding: 30 0 0 0;">
+            <Button text="Cancelar" onAction="#handleCancel" styleClass="modern-btn-secondary"/>
+            <Button text="Guardar" onAction="#handleSave" styleClass="modern-btn-primary"/>
         </HBox>
-        <StackPane style="-fx-border-color: #eee; -fx-border-radius: 5; -fx-background-color: #f9f9f9;" prefHeight="150" prefWidth="150">
-             <ImageView fx:id="imgPreview" fitHeight="140" fitWidth="140" preserveRatio="true"/>
-             <Label fx:id="lblPreviewPlaceholder" text="Vista previa" style="-fx-text-fill: #ccc;"/>
-        </StackPane>
-
     </VBox>
-
-    <HBox spacing="15" alignment="CENTER_RIGHT" maxWidth="400">
-        <Button text="Cancelar" onAction="#cancel" styleClass="btn-cancel" style="-fx-background-color: #eee; -fx-text-fill: #555;"/>
-        <Button text="Guardar" onAction="#saveProduct" styleClass="btn-primary" style="-fx-background-color: #1e88e5; -fx-text-fill: white; -fx-font-weight: bold;"/>
-    </HBox>
-
-</VBox>
+</StackPane>

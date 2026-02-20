@@ -19,6 +19,8 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 
 public class CartItemRow extends HBox {
 
@@ -38,59 +40,57 @@ public class CartItemRow extends HBox {
         Node imageNode = createProductImage(product);
 
         // 2. Info
-        VBox infoBox = new VBox(8);
+        VBox infoBox = new VBox(4);
         infoBox.setAlignment(Pos.CENTER_LEFT);
 
         Label nameLabel = new Label(product.getName());
         nameLabel.getStyleClass().add("cart-product-name");
-        nameLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
 
         // Quantity Controls
-        HBox quantityBox = new HBox(5); // Reduce spacing
+        HBox quantityBox = new HBox(5);
         quantityBox.setAlignment(Pos.CENTER_LEFT);
 
-        Button decreaseBtn = new Button("-");
+        Button decreaseBtn = new Button();
         decreaseBtn.getStyleClass().add("quantity-btn");
-        decreaseBtn.setStyle("-fx-min-width: 30px; -fx-min-height: 30px; -fx-font-size: 14px;");
-        decreaseBtn.setOnAction(e -> onDecrement.run());
+        FontAwesomeIconView minusIcon = new FontAwesomeIconView(FontAwesomeIcon.MINUS);
+        minusIcon.setSize("10");
+        minusIcon.setFill(Color.web("#7f8c8d"));
+        decreaseBtn.setGraphic(minusIcon);
+        decreaseBtn.setOnAction(e -> {
+            if (cartItem.getQuantity() > 1) {
+                onDecrement.run();
+            } else {
+                onDelete.run();
+            }
+        });
 
         TextField quantityField = new TextField();
-        quantityField.getStyleClass().add("quantity-field");
-        quantityField.setStyle(
-                "-fx-font-size: 14px; -fx-font-weight: bold; -fx-alignment: center; -fx-pref-width: 50px; -fx-min-width: 40px;");
-
-        // Validation: Only numbers
-        quantityField.textProperty().addListener((obs, oldVal, newVal) -> {
-            if (!newVal.matches("\\d*")) {
-                quantityField.setText(newVal.replaceAll("[^\\d]", ""));
-            }
-        });
-
-        // Initialize value
+        quantityField.getStyleClass().add("quantity-field-modern");
         quantityField.setText(String.valueOf(cartItem.getQuantity()));
 
-        // Listener: Update Cart when User changes text (and commits via Focus Loss or
-        // Enter)
-        quantityField.focusedProperty().addListener((obs, wasFocused, isNowFocused) -> {
-            if (!isNowFocused) {
-                commitQuantity(quantityField, onSetQuantity);
+        // COMMIT logic: when user presses Enter or focus leaves
+        quantityField.setOnAction(e -> commitQuantity(quantityField, onSetQuantity, onDelete));
+        quantityField.focusedProperty().addListener((obs, oldVal, newVal) -> {
+            if (!newVal) { // Focus lost
+                commitQuantity(quantityField, onSetQuantity, onDelete);
+            } else {
+                javafx.application.Platform.runLater(quantityField::selectAll);
             }
         });
-        quantityField.setOnAction(e -> {
-            commitQuantity(quantityField, onSetQuantity);
-            quantityField.getParent().requestFocus(); // Remove focus
-        });
 
-        // Listener: Update Text when Cart changes (e.g. via buttons)
+        // Sync field if quantity changed from elsewhere
         cartItem.quantityProperty().addListener((obs, oldVal, newVal) -> {
             if (!quantityField.isFocused()) {
                 quantityField.setText(String.valueOf(newVal));
             }
         });
 
-        Button increaseBtn = new Button("+");
+        Button increaseBtn = new Button();
         increaseBtn.getStyleClass().add("quantity-btn");
-        increaseBtn.setStyle("-fx-min-width: 30px; -fx-min-height: 30px; -fx-font-size: 14px;");
+        FontAwesomeIconView plusIcon = new FontAwesomeIconView(FontAwesomeIcon.PLUS);
+        plusIcon.setSize("10");
+        plusIcon.setFill(Color.web("#1e88e5"));
+        increaseBtn.setGraphic(plusIcon);
         increaseBtn.setOnAction(e -> onIncrement.run());
 
         quantityBox.getChildren().addAll(decreaseBtn, quantityField, increaseBtn);
@@ -102,19 +102,27 @@ public class CartItemRow extends HBox {
 
         // 4. Right side
         StackPane rightSide = new StackPane();
-        rightSide.setMinWidth(120);
+        rightSide.setMinWidth(100);
 
-        Label priceLabel = new Label(String.format("%.2f €", product.getPrice()));
+        Label priceLabel = new Label(String.format("%.2f €", product.getPrice() * cartItem.getQuantity()));
         priceLabel.getStyleClass().add("cart-product-price");
-        priceLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
         StackPane.setAlignment(priceLabel, Pos.CENTER_RIGHT);
 
-        Button deleteBtn = new Button("🗑");
-        deleteBtn.getStyleClass().add("cart-delete-btn");
-        deleteBtn.setStyle("-fx-font-size: 16px; -fx-padding: 8 12;");
+        Button deleteBtn = new Button();
+        deleteBtn.getStyleClass().add("cart-delete-btn-reveal");
+        FontAwesomeIconView trashIcon = new FontAwesomeIconView(FontAwesomeIcon.TRASH);
+        trashIcon.setSize("14");
+        trashIcon.setFill(Color.WHITE);
+        deleteBtn.setGraphic(trashIcon);
         StackPane.setAlignment(deleteBtn, Pos.CENTER_RIGHT);
         deleteBtn.setOpacity(0);
+        deleteBtn.setTranslateX(20); // Start slightly outside
         deleteBtn.setOnAction(e -> onDelete.run());
+
+        // Update price label when quantity changes
+        cartItem.quantityProperty().addListener((obs, oldVal, newVal) -> {
+            priceLabel.setText(String.format("%.2f €", product.getPrice() * newVal.intValue()));
+        });
 
         rightSide.getChildren().addAll(deleteBtn, priceLabel);
 
@@ -122,13 +130,17 @@ public class CartItemRow extends HBox {
 
         // Hover effects
         this.setOnMouseEntered(e -> {
-            priceLabel.setTranslateX(-50);
+            priceLabel.setTranslateX(-45);
+            priceLabel.setOpacity(0.5);
             deleteBtn.setOpacity(1);
+            deleteBtn.setTranslateX(0);
         });
 
         this.setOnMouseExited(e -> {
             priceLabel.setTranslateX(0);
+            priceLabel.setOpacity(1.0);
             deleteBtn.setOpacity(0);
+            deleteBtn.setTranslateX(20);
         });
     }
 
@@ -155,22 +167,21 @@ public class CartItemRow extends HBox {
         return cartItem;
     }
 
-    private void commitQuantity(TextField field, Consumer<Integer> onSetQuantity) {
+    private void commitQuantity(TextField field, Consumer<Integer> onSetQuantity, Runnable onDelete) {
         try {
             String text = field.getText();
             if (text == null || text.trim().isEmpty()) {
-                // Revert to current quantity if empty
                 field.setText(String.valueOf(cartItem.getQuantity()));
                 return;
             }
             int newQty = Integer.parseInt(text);
-            if (newQty < 1) {
-                newQty = 1;
-                field.setText("1");
+            if (newQty <= 0) {
+                onDelete.run();
+            } else {
+                onSetQuantity.accept(newQty);
+                field.setText(String.valueOf(newQty));
             }
-            onSetQuantity.accept(newQty);
         } catch (NumberFormatException e) {
-            // Revert on error
             field.setText(String.valueOf(cartItem.getQuantity()));
         }
     }

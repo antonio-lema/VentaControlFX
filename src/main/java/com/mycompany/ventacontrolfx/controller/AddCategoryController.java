@@ -12,9 +12,38 @@ public class AddCategoryController {
 
     @FXML
     private TextField txtName;
+    @FXML
+    private javafx.scene.control.Label lblTitle;
+    @FXML
+    private javafx.scene.control.Label lblSubtitle;
 
     private CategoryService categoryService;
     private Category categoryToEdit;
+
+    @FXML
+    private javafx.scene.layout.StackPane rootStackPane;
+
+    private double xOffset = 0;
+    private double yOffset = 0;
+
+    @FXML
+    private void handleMousePressed(javafx.scene.input.MouseEvent event) {
+        xOffset = event.getSceneX();
+        yOffset = event.getSceneY();
+    }
+
+    @FXML
+    private void handleMouseDragged(javafx.scene.input.MouseEvent event) {
+        Stage stage = (Stage) rootStackPane.getScene().getWindow();
+        stage.setX(event.getScreenX() - xOffset);
+        stage.setY(event.getScreenY() - yOffset);
+    }
+
+    @FXML
+    private void handleCancel() {
+        Stage stage = (Stage) rootStackPane.getScene().getWindow();
+        stage.close();
+    }
 
     public void initialize() {
         categoryService = new CategoryService();
@@ -23,12 +52,17 @@ public class AddCategoryController {
     public void setCategory(Category category) {
         this.categoryToEdit = category;
         if (category != null) {
+            lblTitle.setText("Editar Categoría");
+            lblSubtitle.setText("Modifica el nombre de la categoría");
             txtName.setText(category.getName());
+        } else {
+            lblTitle.setText("Nueva Categoría");
+            lblSubtitle.setText("Introduce el nombre de la categoría");
         }
     }
 
     @FXML
-    private void saveCategory() {
+    private void handleSave() {
         String name = txtName.getText();
 
         // Validation
@@ -45,21 +79,11 @@ public class AddCategoryController {
                 categoryToEdit.setName(name);
                 categoryService.updateCategory(categoryToEdit);
             }
-            closeDialog();
+            handleCancel(); // Close dialog using the existing handleCancel method
         } catch (SQLException e) {
             e.printStackTrace();
             showAlert("Error", "No se pudo guardar la categoría: " + e.getMessage());
         }
-    }
-
-    @FXML
-    private void cancel() {
-        closeDialog();
-    }
-
-    private void closeDialog() {
-        Stage stage = (Stage) txtName.getScene().getWindow();
-        stage.close();
     }
 
     private void showAlert(String title, String content) {

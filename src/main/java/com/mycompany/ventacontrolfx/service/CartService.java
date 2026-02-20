@@ -2,6 +2,7 @@ package com.mycompany.ventacontrolfx.service;
 
 import com.mycompany.ventacontrolfx.model.CartItem;
 import com.mycompany.ventacontrolfx.model.Product;
+import com.mycompany.ventacontrolfx.model.Client;
 import java.util.Optional;
 import javafx.collections.ObservableList;
 import javafx.collections.FXCollections;
@@ -10,6 +11,8 @@ import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ListChangeListener;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,6 +24,7 @@ public class CartService {
     private final DoubleProperty tax = new SimpleDoubleProperty(0.0);
     private final DoubleProperty grandTotal = new SimpleDoubleProperty(0.0);
     private final IntegerProperty itemCount = new SimpleIntegerProperty(0);
+    private final ObjectProperty<Client> selectedClient = new SimpleObjectProperty<>(null);
 
     private static final double TAX_RATE = 0.21;
 
@@ -60,6 +64,18 @@ public class CartService {
 
     public ObservableList<CartItem> getCartItems() {
         return cartItems;
+    }
+
+    public ObjectProperty<Client> selectedClientProperty() {
+        return selectedClient;
+    }
+
+    public Client getSelectedClient() {
+        return selectedClient.get();
+    }
+
+    public void setSelectedClient(Client client) {
+        this.selectedClient.set(client);
     }
 
     public void addItem(Product product) {
@@ -134,5 +150,6 @@ public class CartService {
 
     public void clear() {
         cartItems.clear();
+        selectedClient.set(null);
     }
 }

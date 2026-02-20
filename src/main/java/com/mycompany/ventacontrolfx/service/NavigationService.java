@@ -36,11 +36,13 @@ public class NavigationService {
     private final Button btnProductsList;
     private final Button btnCategories;
 
-    private final List<Button> sidebarButtons;
+    private final Button btnHistory;
+    private final Button btnUsers;
+    private final Button btnClients; // Added btnClients
+    private final Button btnConfig; // Added btnConfig
 
-    // Cache views to avoid reloading? (Optional, based on original code always
-    // reloading)
-    // Original code reloaded each time. We'll stick to that for now or improve.
+    private final List<Button> sidebarButtons;
+    private final CartService cartService; // Added CartService
 
     public NavigationService(
             ScrollPane mainContent,
@@ -55,7 +57,12 @@ public class NavigationService {
             Button btnSell,
             Button btnProducts,
             Button btnProductsList,
-            Button btnCategories) {
+            Button btnCategories,
+            Button btnHistory,
+            Button btnUsers,
+            Button btnClients, // Added btnClients
+            Button btnConfig, // Added btnConfig
+            CartService cartService) { // Added CartService
         this.mainContent = mainContent;
         this.loadingOverlay = loadingOverlay;
         this.cartPanel = cartPanel;
@@ -70,8 +77,14 @@ public class NavigationService {
         this.btnProducts = btnProducts;
         this.btnProductsList = btnProductsList;
         this.btnCategories = btnCategories;
+        this.btnHistory = btnHistory;
+        this.btnUsers = btnUsers;
+        this.btnClients = btnClients;
+        this.btnConfig = btnConfig;
+        this.cartService = cartService;
 
-        this.sidebarButtons = Arrays.asList(btnSell, btnProducts, btnProductsList, btnCategories);
+        this.sidebarButtons = Arrays.asList(btnSell, btnProducts, btnProductsList, btnCategories, btnHistory, btnUsers,
+                btnClients, btnConfig);
     }
 
     public void showSellView(Runnable dataLoadAction) {
@@ -118,6 +131,82 @@ public class NavigationService {
 
                 setSalesComponentsVisible(false);
                 setActiveButton(btnCategories);
+
+                if (dataLoadAction != null)
+                    dataLoadAction.run();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+    }
+
+    public void showHistoryView(Runnable dataLoadAction) {
+        simulateLoading(() -> {
+            try {
+                Parent view = FXMLLoader.load(getClass().getResource("/view/sales.fxml"));
+                mainContent.setContent(view);
+
+                setSalesComponentsVisible(false);
+                setActiveButton(btnHistory);
+
+                if (dataLoadAction != null)
+                    dataLoadAction.run();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+    }
+
+    public void showUsersView(Runnable dataLoadAction) {
+        simulateLoading(() -> {
+            try {
+                Parent view = FXMLLoader.load(getClass().getResource("/view/manage_users.fxml"));
+                mainContent.setContent(view);
+
+                setSalesComponentsVisible(false); // Hide optional sales components
+                setActiveButton(btnUsers);
+
+                if (dataLoadAction != null)
+                    dataLoadAction.run();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+    }
+
+    public void showConfigView(Runnable dataLoadAction) {
+        simulateLoading(() -> {
+            try {
+                Parent view = FXMLLoader.load(getClass().getResource("/view/sale_config.fxml"));
+                mainContent.setContent(view);
+
+                setSalesComponentsVisible(false);
+                setActiveButton(btnConfig);
+
+                if (dataLoadAction != null)
+                    dataLoadAction.run();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+    }
+
+    public void showClientsView(Runnable dataLoadAction) {
+        simulateLoading(() -> {
+            try {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/clients.fxml"));
+                Parent view = loader.load();
+
+                // Initialize controller
+                com.mycompany.ventacontrolfx.controller.ClientsController controller = loader.getController();
+                if (controller != null) {
+                    controller.init(cartService, () -> showSellView(null));
+                }
+
+                mainContent.setContent(view);
+
+                setSalesComponentsVisible(false); // Hide optional sales components
+                setActiveButton(btnClients);
 
                 if (dataLoadAction != null)
                     dataLoadAction.run();

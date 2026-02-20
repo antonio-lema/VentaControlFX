@@ -27,13 +27,15 @@ public class AddProductController {
     @FXML
     private TextField txtPrice;
     @FXML
-    private ComboBox<Category> cbCategory;
+    private ComboBox<Category> cmbCategory;
     @FXML
     private CheckBox chkFavorite;
     @FXML
-    private Label lblImageName;
+    private ImageView ivProductImage;
     @FXML
-    private ImageView imgPreview;
+    private javafx.scene.control.Label lblTitle;
+    @FXML
+    private javafx.scene.control.Label lblSubtitle;
 
     private CategoryService categoryService;
     private ProductService productService;
@@ -42,13 +44,38 @@ public class AddProductController {
     private Product productToEdit;
 
     @FXML
+    private javafx.scene.layout.StackPane rootStackPane;
+
+    private double xOffset = 0;
+    private double yOffset = 0;
+
+    @FXML
+    private void handleMousePressed(javafx.scene.input.MouseEvent event) {
+        xOffset = event.getSceneX();
+        yOffset = event.getSceneY();
+    }
+
+    @FXML
+    private void handleMouseDragged(javafx.scene.input.MouseEvent event) {
+        Stage stage = (Stage) rootStackPane.getScene().getWindow();
+        stage.setX(event.getScreenX() - xOffset);
+        stage.setY(event.getScreenY() - yOffset);
+    }
+
+    @FXML
+    private void handleCancel() {
+        Stage stage = (Stage) rootStackPane.getScene().getWindow();
+        stage.close();
+    }
+
+    @FXML
     public void initialize() {
         categoryService = new CategoryService();
         productService = new ProductService();
         loadCategories();
 
         // Setup StringConverter for ComboBox to display Category names
-        cbCategory.setConverter(new StringConverter<Category>() {
+        cmbCategory.setConverter(new StringConverter<Category>() {
             @Override
             public String toString(Category category) {
                 return category != null ? category.getName() : "";
@@ -64,60 +91,62 @@ public class AddProductController {
     public void setProduct(Product product) {
         this.productToEdit = product;
         if (product != null) {
+            lblTitle.setText("Editar Producto");
+            lblSubtitle.setText("Modifica los datos del producto");
             txtName.setText(product.getName());
             txtPrice.setText(String.valueOf(product.getPrice()));
-            chkFavorite.setSelected(product.isFavorite());
-
             // Set category
-            for (Category category : cbCategory.getItems()) {
+            for (Category category : cmbCategory.getItems()) {
                 if (category.getId() == product.getCategoryId()) {
-                    cbCategory.setValue(category);
+                    cmbCategory.setValue(category);
                     break;
                 }
             }
+            chkFavorite.setSelected(product.isFavorite());
 
             // Set image if exists
             if (product.getImagePath() != null && !product.getImagePath().isEmpty()) {
                 File file = new File(product.getImagePath());
                 if (file.exists()) {
                     selectedImageFile = file;
-                    lblImageName.setText(file.getName());
                     Image image = new Image(file.toURI().toString());
-                    imgPreview.setImage(image);
+                    ivProductImage.setImage(image);
                 }
             }
+        } else {
+            lblTitle.setText("Nuevo Producto");
+            lblSubtitle.setText("Introduce los datos del nuevo producto");
         }
     }
 
     private void loadCategories() {
         try {
             List<Category> categories = categoryService.getAllCategories();
-            cbCategory.setItems(FXCollections.observableArrayList(categories));
+            cmbCategory.setItems(FXCollections.observableArrayList(categories));
         } catch (SQLException e) {
             showAlert("Error", "No se pudieron cargar las categorías: " + e.getMessage());
         }
     }
 
     @FXML
-    private void selectImage() {
+    private void handleSelectImage() {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Seleccionar Imagen del Producto");
         fileChooser.getExtensionFilters().addAll(
                 new FileChooser.ExtensionFilter("Imágenes", "*.png", "*.jpg", "*.jpeg", "*.gif"));
-        File file = fileChooser.showOpenDialog(txtName.getScene().getWindow());
+        File file = fileChooser.showOpenDialog(rootStackPane.getScene().getWindow());
         if (file != null) {
             selectedImageFile = file;
-            lblImageName.setText(file.getName());
             Image image = new Image(file.toURI().toString());
-            imgPreview.setImage(image);
+            ivProductImage.setImage(image);
         }
     }
 
     @FXML
-    private void saveProduct() {
+    private void handleSave() {
         String name = txtName.getText();
         String priceText = txtPrice.getText();
-        Category selectedCategory = cbCategory.getValue();
+        Category selectedCategory = cmbCategory.getValue();
         boolean isFavorite = chkFavorite.isSelected();
 
         // Validation
@@ -144,37 +173,32 @@ public class AddProductController {
 
         // Create/Update Product
         try {
+            Product product;
             if (productToEdit == null) {
-                Product product = new Product(selectedCategory.getId(), name, price, isFavorite);
-                if (selectedImageFile != null) {
-                    product.setImagePath(selectedImageFile.getAbsolutePath());
-                }
+                product = new Product(selectedCategory.getId(), name, price, isFavorite);
+            } else {
+                product = productToEdit;
+                product.setName(name);
+                product.setPrice(price);
+                product.setCategoryId(selectedCategory.getId());
+                product.setFavorite(isFavorite);
+            }
+
+            if (selectedImageFile != null) {
+                product.setImagePath(selectedImageFile.getAbsolutePath());
+            }
+
+            if (productToEdit == null) {
                 productService.addProduct(product);
             } else {
-                productToEdit.setName(name);
-                productToEdit.setPrice(price);
-                productToEdit.setCategoryId(selectedCategory.getId());
-                productToEdit.setFavorite(isFavorite);
-                if (selectedImageFile != null) {
-                    productToEdit.setImagePath(selectedImageFile.getAbsolutePath());
-                }
-                productService.updateProduct(productToEdit);
+                productService.updateProduct(product);
             }
-            closeDialog();
+
+            handleCancel(); // Close dialog
         } catch (SQLException e) {
             e.printStackTrace();
             showAlert("Error", "No se pudo guardar el producto: " + e.getMessage());
         }
-    }
-
-    @FXML
-    private void cancel() {
-        closeDialog();
-    }
-
-    private void closeDialog() {
-        Stage stage = (Stage) txtName.getScene().getWindow();
-        stage.close();
     }
 
     private void showAlert(String title, String content) {

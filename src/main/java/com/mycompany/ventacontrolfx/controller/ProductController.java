@@ -69,7 +69,7 @@ public class ProductController {
 
         setupColumns();
         Platform.runLater(() -> {
-            loadProducers();
+            loadAllProducts();
         });
 
         // Search functionality
@@ -94,6 +94,7 @@ public class ProductController {
         colImage.setCellValueFactory(new PropertyValueFactory<>("imagePath"));
         colImage.setCellFactory(column -> new TableCell<Product, String>() {
             private final ImageView imageView = new ImageView();
+            private final javafx.scene.shape.Circle clip = new javafx.scene.shape.Circle(20, 20, 20);
 
             @Override
             protected void updateItem(String imagePath, boolean empty) {
@@ -105,12 +106,26 @@ public class ProductController {
                     if (file.exists()) {
                         Image image = new Image(file.toURI().toString());
                         imageView.setImage(image);
-                        imageView.setFitHeight(50);
-                        imageView.setFitWidth(50);
-                        imageView.setPreserveRatio(true);
-                        setGraphic(imageView);
+                        imageView.setFitHeight(40);
+                        imageView.setFitWidth(40);
+                        imageView.setPreserveRatio(false); // Force square for perfect circle
+                        imageView.setClip(clip);
+
+                        // Wrap in a container to add a border/effect if needed
+                        HBox container = new HBox(imageView);
+                        container.setAlignment(Pos.CENTER);
+                        container.setStyle(
+                                "-fx-padding: 2; -fx-border-color: #e0e6ed; -fx-border-radius: 50%; -fx-border-width: 1;");
+
+                        setGraphic(container);
                     } else {
-                        setGraphic(null); // Or a placeholder icon
+                        // Placeholder icon
+                        de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView placeholder = new de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView(
+                                de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon.IMAGE);
+                        placeholder.setSize("24");
+                        placeholder.setFill(javafx.scene.paint.Color.rgb(189, 189, 189));
+                        setGraphic(placeholder);
+                        setAlignment(Pos.CENTER);
                     }
                 }
             }
@@ -132,7 +147,6 @@ public class ProductController {
                         productService.updateProduct(product);
                     } catch (SQLException e) {
                         e.printStackTrace();
-                        // Revert if failed
                         toggle.setSwitchedOn(!newState);
                         product.setFavorite(!newState);
                         showAlert("Error", "No se pudo actualizar favorito: " + e.getMessage());
@@ -148,6 +162,7 @@ public class ProductController {
                 } else {
                     toggle.setState(item);
                     setGraphic(toggle);
+                    setAlignment(Pos.CENTER);
                 }
             }
         });
@@ -168,7 +183,6 @@ public class ProductController {
                         productService.updateProduct(product);
                     } catch (SQLException e) {
                         e.printStackTrace();
-                        // Revert if failed
                         toggle.setSwitchedOn(!newState);
                         product.setVisible(!newState);
                         showAlert("Error", "No se pudo actualizar visibilidad: " + e.getMessage());
@@ -184,6 +198,7 @@ public class ProductController {
                 } else {
                     toggle.setState(item);
                     setGraphic(toggle);
+                    setAlignment(Pos.CENTER);
                 }
             }
         });
@@ -192,30 +207,31 @@ public class ProductController {
         colActions.setCellFactory(param -> new TableCell<Product, Void>() {
             private final Button btnEdit = new Button();
             private final Button btnDelete = new Button();
-            private final HBox pane = new HBox(5, btnEdit, btnDelete);
+            private final HBox pane = new HBox(8, btnEdit, btnDelete);
 
             {
                 pane.setAlignment(Pos.CENTER);
 
-                // Edit Icon (Pencil)
-                SVGPath editIcon = new SVGPath();
-                editIcon.setContent(
-                        "M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z");
-                editIcon.getStyleClass().add("svg-path");
+                // Edit Icon
+                de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView editIcon = new de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView(
+                        de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon.PENCIL);
+                editIcon.setSize("16");
+                editIcon.setFill(javafx.scene.paint.Color.web("#1e88e5"));
 
                 btnEdit.setGraphic(editIcon);
                 btnEdit.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
-                btnEdit.getStyleClass().addAll("btn-icon", "btn-edit");
+                btnEdit.setStyle("-fx-background-color: transparent; -fx-cursor: hand; -fx-padding: 5;");
                 btnEdit.setTooltip(new javafx.scene.control.Tooltip("Editar Producto"));
 
-                // Delete Icon (Trash)
-                SVGPath deleteIcon = new SVGPath();
-                deleteIcon.setContent("M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z");
-                deleteIcon.getStyleClass().add("svg-path");
+                // Delete Icon
+                de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView deleteIcon = new de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView(
+                        de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon.TRASH);
+                deleteIcon.setSize("16");
+                deleteIcon.setFill(javafx.scene.paint.Color.web("#e53935"));
 
                 btnDelete.setGraphic(deleteIcon);
                 btnDelete.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
-                btnDelete.getStyleClass().addAll("btn-icon", "btn-delete");
+                btnDelete.setStyle("-fx-background-color: transparent; -fx-cursor: hand; -fx-padding: 5;");
                 btnDelete.setTooltip(new javafx.scene.control.Tooltip("Eliminar Producto"));
 
                 btnEdit.setOnAction(event -> {
@@ -227,6 +243,12 @@ public class ProductController {
                     Product product = getTableView().getItems().get(getIndex());
                     handleDeleteProduct(product);
                 });
+
+                // Hover effects
+                btnEdit.setOnMouseEntered(e -> editIcon.setFill(javafx.scene.paint.Color.web("#1565c0")));
+                btnEdit.setOnMouseExited(e -> editIcon.setFill(javafx.scene.paint.Color.web("#1e88e5")));
+                btnDelete.setOnMouseEntered(e -> deleteIcon.setFill(javafx.scene.paint.Color.web("#c62828")));
+                btnDelete.setOnMouseExited(e -> deleteIcon.setFill(javafx.scene.paint.Color.web("#e53935")));
             }
 
             @Override
@@ -241,7 +263,7 @@ public class ProductController {
         });
     }
 
-    private void loadProducers() {
+    private void loadAllProducts() {
         try {
             List<Product> products = productService.getAllProducts();
             productList.setAll(products);
@@ -299,20 +321,20 @@ public class ProductController {
             Parent root = loader.load();
 
             Stage stage = new Stage();
-            stage.setTitle("Añadir Producto");
-            stage.setScene(new Scene(root));
+            stage.initStyle(javafx.stage.StageStyle.TRANSPARENT);
             stage.initModality(javafx.stage.Modality.APPLICATION_MODAL);
-            stage.setResizable(false);
 
+            Scene scene = new Scene(root);
+            scene.setFill(null);
+            scene.getStylesheets().add(getClass().getResource("/view/style.css").toExternalForm());
+
+            stage.setScene(scene);
             stage.showAndWait();
+            loadAllProducts();
 
-            // Refresh table after dialog closes
-            loadProducers(); // Note: Method name in existing code is 'loadProducers' (typo? implies loading
-                             // products). I'll keep it as is or fix typo if I can. File view showed
-                             // 'loadProducers'.
-        } catch (java.io.IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
-            showAlert("Error", "No se pudo abrir el diálogo: " + e.getMessage());
+            showAlert("Error", "No se pudo abrir la ventana de añadir producto: " + e.getMessage());
         }
     }
 
@@ -321,22 +343,24 @@ public class ProductController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/add_product.fxml"));
             Parent root = loader.load();
 
-            // Access the controller to pass data
             AddProductController controller = loader.getController();
-            controller.setProduct(product); // Need to implement this in
-            // AddProductController
+            controller.setProduct(product);
 
             Stage stage = new Stage();
-            stage.setTitle("Editar Producto");
-            stage.setScene(new Scene(root));
-            stage.initModality(Modality.APPLICATION_MODAL);
-            stage.setResizable(false);
-            stage.showAndWait();
+            stage.initStyle(javafx.stage.StageStyle.TRANSPARENT);
+            stage.initModality(javafx.stage.Modality.APPLICATION_MODAL);
 
-            loadProducers();
-        } catch (IOException e) {
+            Scene scene = new Scene(root);
+            scene.setFill(null);
+            scene.getStylesheets().add(getClass().getResource("/view/style.css").toExternalForm());
+
+            stage.setScene(scene);
+            stage.showAndWait();
+            loadAllProducts();
+
+        } catch (Exception e) {
             e.printStackTrace();
-            showAlert("Error", "No se pudo abrir el diálogo de edición: " + e.getMessage());
+            showAlert("Error", "No se pudo abrir la ventana de editar producto: " + e.getMessage());
         }
     }
 
@@ -355,7 +379,7 @@ public class ProductController {
         if (result.isPresent() && result.get() == ButtonType.OK) {
             try {
                 productService.deleteProduct(product.getId());
-                loadProducers();
+                loadAllProducts();
             } catch (SQLException e) {
                 e.printStackTrace();
                 showAlert("Error", "No se pudo eliminar el producto: " + e.getMessage());

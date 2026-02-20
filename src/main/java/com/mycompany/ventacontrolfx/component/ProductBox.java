@@ -7,6 +7,9 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -49,19 +52,27 @@ public class ProductBox extends VBox {
         }
 
         // Info Container
-        VBox infoBox = new VBox(2);
+        VBox infoBox = new VBox(5);
         infoBox.getStyleClass().add("product-info");
 
         Label nameLabel = new Label(product.getName());
         nameLabel.getStyleClass().add("product-name");
         nameLabel.setWrapText(true);
+        nameLabel.setMinHeight(40);
         nameLabel.setMaxHeight(40);
-        nameLabel.setAlignment(Pos.TOP_LEFT);
+
+        HBox priceBox = new HBox(10);
+        priceBox.setAlignment(Pos.CENTER_LEFT);
 
         Label priceLabel = new Label(String.format("%.2f €", product.getPrice()));
-        priceLabel.getStyleClass().add("product-price");
+        priceLabel.getStyleClass().add("product-price-badge");
 
-        infoBox.getChildren().addAll(nameLabel, priceLabel);
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+
+        priceBox.getChildren().addAll(priceLabel, spacer);
+
+        infoBox.getChildren().addAll(nameLabel, priceBox);
 
         this.getChildren().addAll(imageContainer, infoBox);
 
