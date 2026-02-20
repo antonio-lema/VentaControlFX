@@ -2,6 +2,7 @@ package com.mycompany.ventacontrolfx.controller;
 
 import com.mycompany.ventacontrolfx.model.User;
 import com.mycompany.ventacontrolfx.service.UserService;
+import com.mycompany.ventacontrolfx.util.UserSession;
 import java.sql.SQLException;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -39,9 +40,31 @@ public class LoginController {
             User user = userService.findByUsername(username);
 
             if (user != null && user.getPassword().equals(password)) {
+                // TODO: Password hashing check should be here instead of plain text equality
+                UserSession.getInstance().setCurrentUser(user);
                 lblMessage.setText("Login correcto 👍");
-                // Aquí podrías abrir la siguiente pantalla (main.fxml)
-                // por ejemplo: SceneNavigator.changeScene("main.fxml", ...)
+
+                // Switch to Main View
+                try {
+                    javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(
+                            getClass().getResource("/view/main.fxml"));
+                    javafx.scene.Parent root = loader.load();
+
+                    javafx.stage.Stage stage = (javafx.stage.Stage) btnLogin.getScene().getWindow();
+                    javafx.scene.Scene scene = new javafx.scene.Scene(root);
+                    scene.getStylesheets().add(getClass().getResource("/view/style.css").toExternalForm());
+
+                    stage.setScene(scene);
+                    stage.setTitle("TPV Bazar Electrónico");
+                    stage.centerOnScreen();
+                    stage.setMaximized(true); // Open main window maximized
+                    stage.show();
+
+                } catch (java.io.IOException e) {
+                    e.printStackTrace();
+                    lblMessage.setText("Error al cargar la aplicación principal: " + e.getMessage());
+                }
+
             } else {
                 lblMessage.setText("Usuario o contraseña incorrectos ❌");
             }
@@ -49,6 +72,39 @@ public class LoginController {
         } catch (SQLException ex) {
             ex.printStackTrace();
             lblMessage.setText("Error de base de datos 💥");
+        }
+    }
+
+    @FXML
+    private void handleForgotPassword() {
+        try {
+            java.net.URL fxmlUrl = getClass().getResource("/view/password_recovery.fxml");
+            System.out.println("DEBUG FXML URL: " + fxmlUrl);
+
+            if (fxmlUrl == null) {
+                lblMessage.setText("Error: No se encuentra el archivo FXML.");
+                return;
+            }
+
+            javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(fxmlUrl);
+            javafx.scene.Parent root = loader.load();
+
+            javafx.stage.Stage stage = (javafx.stage.Stage) btnLogin.getScene().getWindow();
+            javafx.scene.Scene scene = new javafx.scene.Scene(root, 900, 600);
+
+            java.net.URL cssUrl = getClass().getResource("/view/style.css");
+            if (cssUrl != null) {
+                scene.getStylesheets().add(cssUrl.toExternalForm());
+            }
+
+            stage.setScene(scene);
+            stage.setTitle("Recuperar Contraseña - TPV Bazar Electrónico");
+            stage.centerOnScreen();
+            stage.show();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            lblMessage.setText("Error: " + e.getMessage());
         }
     }
 }

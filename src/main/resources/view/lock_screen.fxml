@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.shape.Circle?>
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
+
+<StackPane styleClass="lock-screen-root" style="-fx-background-color: white;" stylesheets="@style.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mycompany.ventacontrolfx.controller.LockScreenController">
+    <VBox alignment="CENTER" spacing="20" styleClass="lock-screen-glass" maxWidth="380" maxHeight="-Infinity">
+        <padding>
+            <Insets bottom="40" left="40" right="40" top="40" />
+        </padding>
+
+        <!-- User Avatar -->
+        <StackPane>
+            <Circle radius="45" styleClass="user-avatar-circle" fill="#f5f5f5"/>
+            <FontAwesomeIconView glyphName="USER" size="35" fill="#909090"/>
+            <!-- Lock Icon Badge -->
+             <StackPane alignment="CENTER" maxWidth="28" maxHeight="28" translateX="30" translateY="30" style="-fx-background-color: #fff; -fx-background-radius: 50%; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 2, 0, 0, 1);">
+                 <FontAwesomeIconView glyphName="LOCK" size="14" fill="#666"/>
+             </StackPane>
+        </StackPane>
+
+        <VBox alignment="CENTER" spacing="5">
+            <Label text="Sesión Bloqueada" styleClass="lock-title"/>
+            <Label fx:id="lblUsername" text="Usuario" styleClass="lock-username"/>
+        </VBox>
+
+        <VBox spacing="8" maxWidth="300" alignment="CENTER_LEFT" style="-fx-padding: 20 0 10 0;">
+            <Label text="Contraseña" styleClass="lock-input-label"/>
+            <PasswordField fx:id="passwordField" promptText="Introduce tu contraseña" styleClass="lock-field" onAction="#handleUnlock"/>
+        </VBox>
+
+        <Button text="DESBLOQUEAR" onAction="#handleUnlock" styleClass="btn-unlock" maxWidth="300" prefHeight="45"/>
+        
+        <Button text="Cambiar de usuario" onAction="#handleChangeUser" styleClass="btn-change-user" maxWidth="200"/>
+
+    </VBox>
+</StackPane>

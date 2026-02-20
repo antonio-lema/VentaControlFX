@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.text.Font?>
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
+
+<VBox spacing="20" style="-fx-padding: 25 25 10 25; -fx-background-color: #f4f6f9;" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mycompany.ventacontrolfx.controller.ManageUsersController">
+
+    <!-- Header Section -->
+    <HBox alignment="CENTER_LEFT" spacing="15.0">
+       <children>
+          <VBox>
+             <children>
+                <Label text="Gestión de Usuarios" textFill="#2c3e50">
+                   <font>
+                      <Font name="System Bold" size="26.0" />
+                   </font>
+                </Label>
+                <Label text="Administra los accesos y roles del sistema" textFill="#7f8c8d" />
+             </children>
+          </VBox>
+          <Region HBox.hgrow="ALWAYS" />
+          <HBox spacing="10.0" alignment="CENTER_RIGHT">
+             <children>
+                <Button onAction="#handleNewUser" styleClass="modern-btn-primary" style="-fx-background-color: #1e88e5; -fx-text-fill: white; -fx-background-radius: 25; -fx-padding: 10 25; -fx-font-weight: bold; -fx-cursor: hand;">
+                   <graphic><FontAwesomeIconView glyphName="PLUS" size="14" fill="white" /></graphic>
+                   <text> Nuevo Usuario</text>
+                </Button>
+             </children>
+          </HBox>
+       </children>
+    </HBox>
+
+    <!-- Filter Section -->
+    <HBox alignment="CENTER_LEFT" styleClass="modern-filter-bar" style="-fx-margin: 0 0 20 0;">
+        <children>
+            <Label text="Buscar Usuario:" textFill="#7f8c8d" />
+            <HBox alignment="CENTER_LEFT" styleClass="search-input-modern" HBox.hgrow="ALWAYS" maxWidth="400">
+                <children>
+                    <FontAwesomeIconView glyphName="SEARCH" size="14" fill="#95a5a6" />
+                    <TextField fx:id="txtSearch" promptText="Nombre, usuario o email..." style="-fx-background-color: transparent; -fx-padding: 0 0 0 10;" HBox.hgrow="ALWAYS" />
+                </children>
+            </HBox>
+            <Region HBox.hgrow="ALWAYS" />
+        </children>
+    </HBox>
+
+    <!-- Cards Section -->
+    <ScrollPane fitToWidth="true" style="-fx-background-color: transparent; -fx-background: transparent;" VBox.vgrow="ALWAYS" hbarPolicy="NEVER">
+        <content>
+            <FlowPane fx:id="userCardsPane" hgap="20" vgap="20" style="-fx-padding: 10;">
+                <!-- Cards will be populated here -->
+            </FlowPane>
+        </content>
+    </ScrollPane>
+
+</VBox>
