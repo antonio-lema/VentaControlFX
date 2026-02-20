@@ -1,6 +1,8 @@
 package com.mycompany.ventacontrolfx.controller;
 
 import com.mycompany.ventacontrolfx.model.CartItem;
+import com.mycompany.ventacontrolfx.model.SaleConfig;
+import com.mycompany.ventacontrolfx.service.SaleConfigService;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -63,9 +65,39 @@ public class ReceiptController {
     @FXML
     private Label lblGiftIcon;
 
+    @FXML
+    private VBox clientInfoSection;
+    @FXML
+    private Label lblClientName;
+    @FXML
+    private Label lblClientTaxId;
+    @FXML
+    private Label lblClientAddress;
+
+    // Labels de cabecera empresa (rellenados desde SaleConfig)
+    @FXML
+    private Label lblCompanyIcon;
+    @FXML
+    private javafx.scene.image.ImageView imgCompanyLogo;
+    @FXML
+    private Label lblCompanyBrand;
+    @FXML
+    private Label lblCompanyName;
+    @FXML
+    private Label lblCompanyAddress;
+    @FXML
+    private Label lblCompanyPhone;
+    @FXML
+    private Label lblCompanyCif;
+    @FXML
+    private Label lblFooterMessage;
+
     private Runnable onNewSale;
     private Runnable onBack;
     private boolean isGiftMode = false;
+
+    private final SaleConfigService configService = new SaleConfigService();
+    private SaleConfig cfg;
 
     @FXML
     private void handlePrint() {
@@ -86,6 +118,9 @@ public class ReceiptController {
             if (this.currentItems != null) {
                 controller.setReceiptData(this.currentItems, this.currentTotal, this.currentPaid,
                         this.currentPaymentMethod, this.isGiftMode);
+                if (this.currentClient != null) {
+                    controller.setClientInfo(this.currentClient);
+                }
             }
 
             Stage stage = new Stage();
@@ -103,6 +138,7 @@ public class ReceiptController {
     private double currentTotal;
     private double currentPaid;
     private String currentPaymentMethod;
+    private com.mycompany.ventacontrolfx.model.Client currentClient;
 
     public void setReceiptData(List<CartItem> items, double total, double paid, double change, String paymentMethod,
             Runnable onNewSale, Runnable onBack) {
@@ -111,34 +147,37 @@ public class ReceiptController {
         this.currentPaid = paid;
         this.currentPaymentMethod = paymentMethod;
 
+        this.cfg = configService.load();
         this.onNewSale = onNewSale;
         this.onBack = onBack;
 
-        // ... existing code ...
+        String sym = cfg.getCurrencySymbol();
+        String fmt = "%." + cfg.getDecimalCount() + "f " + sym;
 
-        // Date and Time
+        // Fecha
         LocalDateTime now = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMM, yyyy 'Hora:' HH:mm:ss");
         lblDate.setText("Fecha: " + now.format(formatter) + " Caja: 01");
 
-        // Random Ticket Number (for demo)
+        // Número de ticket
         int randomNum = 1000 + (int) (Math.random() * 9000);
         String prefix = isGiftMode ? "Ticket regalo Nº: 01/" : "Factura simplificada Nº: 01/";
         lblTicketTitle.setText(prefix + randomNum);
 
-        // Items
+        // Cabecera empresa en el ticket (si el label existe en el FXML)
+        applyCompanyHeader();
+
+        // Artículos
         itemsContainer.getChildren().clear();
         for (CartItem item : items) {
-            addItemRow(item);
+            addItemRow(item, sym);
         }
 
-        // Totals Visibility
+        // Visibilidad de bloques
         totalsContainer.setVisible(!isGiftMode);
         totalsContainer.setManaged(!isGiftMode);
         barcodeSection.setVisible(false);
         barcodeSection.setManaged(false);
-
-        // Indicator & Headers Visibility
         lblGiftIndicator.setVisible(isGiftMode);
         lblGiftIndicator.setManaged(isGiftMode);
         lblPVPHeader.setVisible(!isGiftMode);
@@ -148,7 +187,7 @@ public class ReceiptController {
         paymentInfoContainer.setVisible(!isGiftMode);
         paymentInfoContainer.setManaged(!isGiftMode);
 
-        // Sidebar Button Styling
+        // Estilo botón regalo
         if (isGiftMode) {
             btnGiftTicket.setStyle(
                     "-fx-background-color: #1a73e8; -fx-text-fill: white; -fx-background-radius: 25; -fx-font-weight: bold; -fx-padding: 8 20; -fx-cursor: hand;");
@@ -159,44 +198,136 @@ public class ReceiptController {
             lblGiftIcon.setStyle("-fx-font-size: 16; -fx-text-fill: #1a73e8;");
         }
 
-        // Totals calculations
-        double subtotal = total / 1.21;
+        // Totales con IVA real
+        double taxDiv = cfg.getTaxDivisor();
+        double subtotal = total / taxDiv;
         double vat = total - subtotal;
 
-        lblSubtotal.setText(String.format("%.2f €", subtotal));
-        lblVat.setText(String.format("%.2f €", vat));
-        lblTotal.setText(String.format("%.2f €", total));
-
-        lblPaid.setText(String.format("%.2f €", paid));
-        lblChange.setText(String.format("%.2f €", change));
+        lblSubtotal.setText(String.format(fmt, subtotal));
+        lblVat.setText("(" + cfg.getTaxRate() + "%) " + String.format(fmt, vat));
+        lblTotal.setText(String.format(fmt, total));
+        lblPaid.setText(String.format(fmt, paid));
+        lblChange.setText(String.format(fmt, change));
         lblPaymentMethod.setText(paymentMethod);
+        lblTotalRight.setText(String.format(fmt, total));
+        lblChangeRight.setText(String.format(fmt, change));
+    }
 
-        // Right Side
-        lblTotalRight.setText(String.format("%.2f €", total));
-        lblChangeRight.setText(String.format("%.2f €", change));
+    /** Rellena la cabecera de empresa del ticket con los datos de SaleConfig */
+    private void applyCompanyHeader() {
+        if (cfg == null)
+            return;
+
+        // Logo
+        if (cfg.isShowLogo()) {
+            String logoPath = cfg.getLogoPath();
+            if (logoPath != null && !logoPath.trim().isEmpty()) {
+                java.io.File file = new java.io.File(logoPath);
+                if (file.exists()) {
+                    javafx.scene.image.Image image = new javafx.scene.image.Image(file.toURI().toString());
+                    if (imgCompanyLogo != null) {
+                        imgCompanyLogo.setImage(image);
+                        imgCompanyLogo.setVisible(true);
+                        imgCompanyLogo.setManaged(true);
+                    }
+                    if (lblCompanyIcon != null) {
+                        lblCompanyIcon.setVisible(false);
+                        lblCompanyIcon.setManaged(false);
+                    }
+                } else {
+                    showDefaultIcon();
+                }
+            } else {
+                showDefaultIcon();
+            }
+        } else {
+            if (imgCompanyLogo != null) {
+                imgCompanyLogo.setVisible(false);
+                imgCompanyLogo.setManaged(false);
+            }
+            if (lblCompanyIcon != null) {
+                lblCompanyIcon.setVisible(false);
+                lblCompanyIcon.setManaged(false);
+            }
+        }
+
+        String name = cfg.getCompanyName();
+        // Brand (texto azul grande): mostrar nombre de empresa si existe
+        if (lblCompanyBrand != null && name != null && !name.isEmpty()) {
+            lblCompanyBrand.setText(name);
+        }
+        setLabelText(lblCompanyName, name);
+        setLabelText(lblCompanyAddress, cfg.isShowAddress() ? cfg.getAddress() : "");
+        setLabelText(lblCompanyPhone, cfg.isShowPhone() ? "Tel: " + cfg.getPhone() : "");
+        setLabelText(lblCompanyCif, cfg.isShowCif() ? "CIF: " + cfg.getCif() : "");
+        String footer = cfg.getFooterMessage();
+        setLabelText(lblFooterMessage, (footer != null && !footer.isEmpty()) ? footer : "GRACIAS POR SU VISITA");
+    }
+
+    private void showDefaultIcon() {
+        if (imgCompanyLogo != null) {
+            imgCompanyLogo.setVisible(false);
+            imgCompanyLogo.setManaged(false);
+        }
+        if (lblCompanyIcon != null) {
+            lblCompanyIcon.setVisible(true);
+            lblCompanyIcon.setManaged(true);
+        }
+    }
+
+    private void setLabelText(Label lbl, String text) {
+        if (lbl == null)
+            return;
+        boolean hasText = text != null && !text.isEmpty();
+        lbl.setText(hasText ? text : "");
+        lbl.setVisible(hasText);
+        lbl.setManaged(hasText);
+    }
+
+    public void setClientInfo(com.mycompany.ventacontrolfx.model.Client client) {
+        this.currentClient = client;
+        if (client != null) {
+            if (clientInfoSection != null) {
+                clientInfoSection.setVisible(true);
+                clientInfoSection.setManaged(true);
+            }
+            if (lblClientName != null) {
+                lblClientName.setText(client.getName());
+            }
+            if (lblClientTaxId != null) {
+                lblClientTaxId.setText("CIF: " + client.getTaxId());
+            }
+
+            String fullAddress = client.getAddress();
+            if (client.getPostalCode() != null && !client.getPostalCode().isEmpty()) {
+                fullAddress += "\n" + client.getPostalCode() + " " + client.getCity() + " (" + client.getProvince()
+                        + ")";
+            }
+            if (client.getCountry() != null && !client.getCountry().equalsIgnoreCase("España")) {
+                fullAddress += "\n" + client.getCountry();
+            }
+            if (lblClientAddress != null) {
+                lblClientAddress.setText(fullAddress);
+            }
+
+            // Upgrade title from simplified to full invoice
+            if (!isGiftMode && lblTicketTitle != null) {
+                String currentTitle = lblTicketTitle.getText();
+                lblTicketTitle.setText(currentTitle.replace("Factura simplificada", "Factura"));
+            }
+        }
     }
 
     @FXML
     private void handleGiftTicket() {
         this.isGiftMode = !this.isGiftMode;
         setReceiptData(currentItems, currentTotal, currentPaid,
-                Double.parseDouble(lblChange.getText().replace(" €", "").replace(",", ".")), currentPaymentMethod,
-                onNewSale, onBack);
+                Double.parseDouble(lblChange.getText()
+                        .replaceAll("[^0-9.,]", "").replace(",", ".")),
+                currentPaymentMethod, onNewSale, onBack);
     }
 
-    private void generateBarcode(String code) {
-        barcodeContainer.getChildren().clear();
-        lblBarcodeValue.setText("01/" + code);
-        for (int i = 0; i < 40; i++) {
-            Rectangle rect = new Rectangle();
-            rect.setHeight(40);
-            rect.setWidth(1 + (int) (Math.random() * 3));
-            rect.setFill(Color.BLACK);
-            barcodeContainer.getChildren().add(rect);
-        }
-    }
-
-    private void addItemRow(CartItem item) {
+    private void addItemRow(CartItem item, String sym) {
         HBox row = new HBox(5);
         row.setStyle("-fx-border-color: transparent transparent #eee transparent; -fx-padding: 2 0 2 0;");
 
@@ -212,11 +343,15 @@ public class ReceiptController {
         row.getChildren().addAll(lblDesc, lblQty);
 
         if (!isGiftMode) {
-            Label lblPrice = new Label(String.format("%.2f", item.getProduct().getPrice()));
+            int dec = cfg != null ? cfg.getDecimalCount() : 2;
+            String priceFmt = "%." + dec + "f";
+            String totalFmt = "%." + dec + "f " + sym;
+
+            Label lblPrice = new Label(String.format(priceFmt, item.getProduct().getPrice()));
             lblPrice.setPrefWidth(55);
             lblPrice.setStyle("-fx-alignment: CENTER-RIGHT; -fx-font-size: 10px; -fx-text-fill: black;");
 
-            Label lblTotal = new Label(String.format("%.2f €", item.getTotal()));
+            Label lblTotal = new Label(String.format(totalFmt, item.getTotal()));
             lblTotal.setPrefWidth(55);
             lblTotal.setStyle("-fx-alignment: CENTER-RIGHT; -fx-font-size: 10px; -fx-text-fill: black;");
 
