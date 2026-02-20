@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
+
+<AnchorPane id="AnchorPane" prefHeight="750.0" prefWidth="1100.0" style="-fx-background-color: #f4f6f9;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mycompany.ventacontrolfx.controller.HistoryController">
+   <children>
+      <VBox spacing="20.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <padding>
+            <Insets bottom="10.0" left="25.0" right="25.0" top="25.0" />
+         </padding>
+         <children>
+            <!-- Header Section -->
+            <HBox alignment="CENTER_LEFT" spacing="20.0">
+               <children>
+                  <VBox>
+                     <children>
+                        <Label text="Historial de Ventas" textFill="#1e88e5">
+                           <font>
+                              <Font name="System Bold" size="28.0" />
+                           </font>
+                        </Label>
+                        <Label text="Consulta y filtra las ventas por rango de fechas" textFill="#7f8c8d" />
+                     </children>
+                  </VBox>
+                  <Region HBox.hgrow="ALWAYS" />
+                  
+                  <!-- Advanced Range Filter -->
+                  <HBox alignment="CENTER_LEFT" spacing="10.0" style="-fx-background-color: white; -fx-padding: 10 20; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 10, 0, 0, 2);">
+                     <children>
+                        <VBox spacing="2">
+                           <children>
+                              <Label text="DESDE" textFill="#95a5a6" style="-fx-font-size: 9px; -fx-font-weight: bold;" />
+                              <DatePicker fx:id="datePickerStart" onAction="#loadSales" prefWidth="130.0" style="-fx-background-color: transparent;" />
+                           </children>
+                        </VBox>
+                        <Separator orientation="VERTICAL" prefHeight="30" />
+                        <VBox spacing="2">
+                           <children>
+                              <Label text="HASTA" textFill="#95a5a6" style="-fx-font-size: 9px; -fx-font-weight: bold;" />
+                              <DatePicker fx:id="datePickerEnd" onAction="#loadSales" prefWidth="130.0" style="-fx-background-color: transparent;" />
+                           </children>
+                        </VBox>
+                        <Separator orientation="VERTICAL" prefHeight="30" />
+                        <VBox spacing="2">
+                           <children>
+                              <Label text="BUSCAR TICKET" textFill="#95a5a6" style="-fx-font-size: 9px; -fx-font-weight: bold;" />
+                              <TextField fx:id="txtSearchId" promptText="Nº Ticket..." onAction="#handleSearch" prefWidth="100.0" style="-fx-background-color: transparent; -fx-border-color: transparent;" />
+                           </children>
+                        </VBox>
+                         <Button onAction="#loadSales" style="-fx-background-color: #1e88e5; -fx-text-fill: white; -fx-background-radius: 8; -fx-cursor: hand; -fx-padding: 8 15;" text="Filtrar">
+                            <graphic><FontAwesomeIconView glyphName="SEARCH" fill="white" /></graphic>
+                        </Button>
+                        <Button onAction="#handleClearFilters" style="-fx-background-color: #ecf0f1; -fx-text-fill: #7f8c8d; -fx-background-radius: 8; -fx-cursor: hand; -fx-padding: 8 15;" text="Limpiar">
+                            <graphic><FontAwesomeIconView glyphName="ERASER" fill="#7f8c8d" /></graphic>
+                        </Button>
+                     </children>
+                  </HBox>
+               </children>
+            </HBox>
+
+            <!-- Quick Filters Toolbar -->
+            <HBox spacing="10.0" alignment="CENTER_LEFT">
+               <children>
+                  <Label text="Accesos rápidos:" textFill="#7f8c8d" style="-fx-font-weight: bold; -fx-font-size: 13px;" />
+                  <Button fx:id="btnQuickToday" onAction="#filterToday" styleClass="quick-filter-btn" text="Hoy" style="-fx-background-color: white; -fx-border-color: #ddd; -fx-border-radius: 20; -fx-background-radius: 20; -fx-padding: 5 15; -fx-cursor: hand;" />
+                  <Button fx:id="btnQuickWeek" onAction="#filterLast7Days" styleClass="quick-filter-btn" text="Últimos 7 días" style="-fx-background-color: white; -fx-border-color: #ddd; -fx-border-radius: 20; -fx-background-radius: 20; -fx-padding: 5 15; -fx-cursor: hand;" />
+                  <Button fx:id="btnQuickMonth" onAction="#filterThisMonth" styleClass="quick-filter-btn" text="Este mes" style="-fx-background-color: white; -fx-border-color: #ddd; -fx-border-radius: 20; -fx-background-radius: 20; -fx-padding: 5 15; -fx-cursor: hand;" />
+               </children>
+            </HBox>
+
+            <!-- Summary Cards -->
+            <HBox spacing="20.0">
+               <children>
+                  <VBox alignment="CENTER_LEFT" prefWidth="200.0" spacing="5.0" style="-fx-background-color: white; -fx-padding: 15; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 10, 0, 0, 0);" HBox.hgrow="ALWAYS">
+                     <children>
+                        <HBox alignment="CENTER_LEFT" spacing="10.0">
+                           <children>
+                              <StackPane style="-fx-background-color: #e3f2fd; -fx-background-radius: 8; -fx-padding: 10;">
+                                 <children><FontAwesomeIconView glyphName="SHOPPING_CART" size="22" fill="#1e88e5" /></children>
+                              </StackPane>
+                              <Label text="Tickets" textFill="#95a5a6" style="-fx-font-weight: bold; -fx-font-size: 12px;" />
+                           </children>
+                        </HBox>
+                        <Label fx:id="lblTotalSalesCount" text="0" textFill="#2c3e50" style="-fx-font-weight: bold; -fx-font-size: 26px;" />
+                     </children>
+                  </VBox>
+                  <VBox alignment="CENTER_LEFT" prefWidth="200.0" spacing="5.0" style="-fx-background-color: white; -fx-padding: 15; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 10, 0, 0, 0);" HBox.hgrow="ALWAYS">
+                     <children>
+                        <HBox alignment="CENTER_LEFT" spacing="10.0">
+                           <children>
+                              <StackPane style="-fx-background-color: #e8f5e9; -fx-background-radius: 8; -fx-padding: 10;">
+                                 <children><FontAwesomeIconView glyphName="EURO" size="22" fill="#2e7d32" /></children>
+                              </StackPane>
+                              <Label text="Total Recaudado" textFill="#95a5a6" style="-fx-font-weight: bold; -fx-font-size: 12px;" />
+                           </children>
+                        </HBox>
+                        <Label fx:id="lblTotalAmount" text="0,00 €" textFill="#2c3e50" style="-fx-font-weight: bold; -fx-font-size: 26px;" />
+                     </children>
+                  </VBox>
+                  <VBox alignment="CENTER_LEFT" prefWidth="200.0" spacing="5.0" style="-fx-background-color: white; -fx-padding: 15; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 10, 0, 0, 0);" HBox.hgrow="ALWAYS">
+                     <children>
+                        <HBox alignment="CENTER_LEFT" spacing="10.0">
+                           <children>
+                              <StackPane style="-fx-background-color: #fff3e0; -fx-background-radius: 8; -fx-padding: 10;">
+                                 <children><FontAwesomeIconView glyphName="MONEY" size="22" fill="#ef6c00" /></children>
+                              </StackPane>
+                              <Label text="Efectivo" textFill="#95a5a6" style="-fx-font-weight: bold; -fx-font-size: 12px;" />
+                           </children>
+                        </HBox>
+                        <Label fx:id="lblTotalCash" text="0,00 €" textFill="#2c3e50" style="-fx-font-weight: bold; -fx-font-size: 26px;" />
+                     </children>
+                  </VBox>
+                  <VBox alignment="CENTER_LEFT" prefWidth="200.0" spacing="5.0" style="-fx-background-color: white; -fx-padding: 15; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 10, 0, 0, 0);" HBox.hgrow="ALWAYS">
+                     <children>
+                        <HBox alignment="CENTER_LEFT" spacing="10.0">
+                           <children>
+                              <StackPane style="-fx-background-color: #f3e5f5; -fx-background-radius: 8; -fx-padding: 10;">
+                                 <children><FontAwesomeIconView glyphName="CREDIT_CARD" size="22" fill="#7b1fa2" /></children>
+                              </StackPane>
+                              <Label text="Tarjeta" textFill="#95a5a6" style="-fx-font-weight: bold; -fx-font-size: 12px;" />
+                           </children>
+                        </HBox>
+                        <Label fx:id="lblTotalCard" text="0,00 €" textFill="#2c3e50" style="-fx-font-weight: bold; -fx-font-size: 26px;" />
+                     </children>
+                  </VBox>
+               </children>
+            </HBox>
+
+            <HBox spacing="20.0" VBox.vgrow="ALWAYS">
+               <children>
+                  <!-- Sales Table -->
+                  <VBox spacing="0" styleClass="table-card" HBox.hgrow="ALWAYS">
+                     <children>
+                        <TableView fx:id="salesTable" styleClass="modern-table-view" VBox.vgrow="ALWAYS">
+                          <columns>
+                            <TableColumn fx:id="colId" prefWidth="100.0" text="Nº TICKET" />
+                            <TableColumn fx:id="colUser" prefWidth="180.0" text="ATENDIDO POR" />
+                            <TableColumn fx:id="colDate" prefWidth="150.0" text="FECHA Y HORA" />
+                            <TableColumn fx:id="colTotal" prefWidth="120.0" text="IMPORTE TOTAL" />
+                            <TableColumn fx:id="colMethod" prefWidth="150.0" text="MÉTODO DE PAGO" />
+                          </columns>
+                           <columnResizePolicy>
+                              <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                           </columnResizePolicy>
+                        </TableView>
+                     </children>
+                  </VBox>
+
+                  <!-- Receipt Side Panel -->
+                  <VBox fx:id="detailsPanel" prefWidth="380.0" visible="false" style="-fx-background-color: white; -fx-background-radius: 12; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 20, 0, 0, 5); -fx-border-color: #e0e0e0; -fx-border-width: 1; -fx-border-radius: 12; -fx-overflow: hidden;">
+                     <children>
+                        <HBox prefHeight="8.0" style="-fx-background-color: #1e88e5; -fx-background-radius: 12 12 0 0;" />
+                        <VBox spacing="15.0" style="-fx-padding: 30;">
+                           <children>
+                              <VBox alignment="CENTER" spacing="5">
+                                 <children>
+                                    <Label text="DETALLE DE TRANSACCIÓN" textFill="#bdc3c7" style="-fx-font-weight: bold; -fx-font-size: 11px; -fx-letter-spacing: 1px;" />
+                                    <HBox spacing="10" alignment="CENTER">
+                                        <children>
+                                            <Label fx:id="lblSaleId" text="Ticket #0000" textFill="#2c3e50">
+                                               <font><Font name="System Bold" size="24.0" /></font>
+                                            </Label>
+                                            <Label fx:id="lblReturnBadge" text="DEVUELTO" visible="false" style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-size: 10px; -fx-font-weight: bold; -fx-padding: 2 6; -fx-background-radius: 4;" />
+                                        </children>
+                                     </HBox>
+                                    <Label fx:id="lblSaleFullDate" text="18/02/2026 15:30" textFill="#95a5a6" style="-fx-font-size: 13px;" />
+                                 </children>
+                              </VBox>
+                              
+                              <Separator  style="-fx-padding: 10 0;"/>
+                              
+                              <Label text="PRODUCTOS" textFill="#7f8c8d" style="-fx-font-weight: bold; -fx-font-size: 11px;" />
+                              <ScrollPane fitToWidth="true" style="-fx-background-color: transparent; -fx-background: transparent; -fx-padding: 0;" prefHeight="350.0">
+                                 <content>
+                                    <VBox fx:id="detailsItemsContainer" spacing="12.0" style="-fx-background-color: white;" />
+                                 </content>
+                              </ScrollPane>
+                              
+                              <Separator  style="-fx-padding: 10 0;"/>
+                              
+                              <VBox spacing="8.0">
+                                 <children>
+                                    <HBox alignment="CENTER_LEFT">
+                                       <children>
+                                          <Label text="Método de pago" textFill="#7f8c8d" style="-fx-font-size: 13px;" />
+                                          <Region HBox.hgrow="ALWAYS" />
+                                          <HBox spacing="5" alignment="CENTER_LEFT">
+                                              <children>
+                                                  <Label fx:id="lblPaymentMethod" text="Efectivo" style="-fx-font-weight: bold; -fx-font-size: 13px;" />
+                                              </children>
+                                          </HBox>
+                                       </children>
+                                    </HBox>
+                                    <HBox alignment="CENTER_LEFT" style="-fx-padding: 10 0 0 0;">
+                                       <children>
+                                          <Label text="TOTAL TICKET" textFill="#2c3e50" style="-fx-font-weight: bold; -fx-font-size: 18px;" />
+                                          <Region HBox.hgrow="ALWAYS" />
+                                          <Label fx:id="lblTotalAmountDetail" text="0,00 €" textFill="#1e88e5" style="-fx-font-weight: bold; -fx-font-size: 24px;" />
+                                       </children>
+                                    </HBox>
+                                 </children>
+                              </VBox>
+                              
+                               <HBox spacing="10">
+                                  <children>
+                                      <Button fx:id="btnPrint" onAction="#handlePrintTicket" HBox.hgrow="ALWAYS" maxWidth="Infinity" style="-fx-background-color: #1e88e5; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 14; -fx-background-radius: 10; -fx-cursor: hand;">
+                                         <graphic>
+                                            <FontAwesomeIconView glyphName="PRINT" fill="white" size="18" />
+                                         </graphic>
+                                         <text> IMPRIMIR </text>
+                                      </Button>
+                                      <Button fx:id="btnReturn" onAction="#handleRegisterReturn" HBox.hgrow="ALWAYS" maxWidth="Infinity" style="-fx-background-color: #f39c12; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 14; -fx-background-radius: 10; -fx-cursor: hand;">
+                                         <graphic>
+                                            <FontAwesomeIconView glyphName="REPLY" fill="white" size="18" />
+                                         </graphic>
+                                         <text> DEVOLVER </text>
+                                      </Button>
+                                  </children>
+                               </HBox>
+                           </children>
+                        </VBox>
+                     </children>
+                  </VBox>
+               </children>
+            </HBox>
+         </children>
+      </VBox>
+   </children>
+</AnchorPane>

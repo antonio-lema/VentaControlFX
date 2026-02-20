@@ -27,28 +27,28 @@
 
             <!-- Search Bar -->
             <HBox fx:id="searchBarContainer" alignment="CENTER_LEFT" styleClass="search-bar">
-                <Label text="🔍" style="-fx-text-fill: #aaa; -fx-padding: 0 5 0 10;"/>
-                <TextField fx:id="searchField" promptText="Código, ref o nombre" styleClass="search-field"/>
+                <FontAwesomeIconView glyphName="SEARCH" size="16" fill="#7f8c8d"/>
+                <TextField fx:id="searchField" promptText="Buscar por código o nombre..." styleClass="search-field" HBox.hgrow="ALWAYS"/>
             </HBox>
 
             <Region HBox.hgrow="ALWAYS"/>
 
-            <!-- Admin Panel with Dropdown Menu -->
-            <HBox spacing="10" alignment="CENTER_RIGHT">
-                <!-- Three dots menu button -->
-                <MenuButton fx:id="menuButton" text="⋮" styleClass="menu-button" style="-fx-padding: 2 8; -fx-font-size: 20px;">
-                    <items>
-                        <MenuItem text="Cerrar caja"/>
-                        <MenuItem text="Usuario"/>
-                    </items>
-                </MenuButton>
-                
-                <!-- Admin Profile -->
-                <HBox spacing="5" alignment="CENTER_LEFT" styleClass="user-profile">
-                     <Circle radius="15" fill="white"/>
-                     <Label text="Admin" style="-fx-text-fill: white; -fx-font-weight: bold;"/>
-                </HBox>
-            </HBox>
+            <!-- User Profile Menu -->
+            <MenuButton fx:id="userMenuButton" styleClass="user-menu-button" style="-fx-background-color: transparent; -fx-cursor: hand; -fx-padding: 0;">
+                <graphic>
+                    <HBox spacing="10" alignment="CENTER_LEFT">
+                         <Circle radius="15" fill="white" style="-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 3, 0, 0, 1);"/>
+                         <Label text="Admin" style="-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 14px;"/>
+                         <Label text="▼" style="-fx-text-fill: rgba(255,255,255,0.7); -fx-font-size: 10px;"/>
+                    </HBox>
+                </graphic>
+                <items>
+
+                    <MenuItem text="Cerrar caja" onAction="#handleCashClosure"/>
+                    <SeparatorMenuItem />
+                    <MenuItem text="Cerrar sesión" onAction="#handleLogout" style="-fx-text-fill: red;"/>
+                </items>
+            </MenuButton>
         </HBox>
     </top>
 
@@ -59,16 +59,7 @@
                 <Insets top="20" right="10" bottom="20" left="10"/>
             </padding>
             
-            <Button fx:id="btnPanel" styleClass="sidebar-button" contentDisplay="GRAPHIC_ONLY" maxWidth="Infinity">
-                <graphic>
-                    <HBox alignment="CENTER_LEFT" spacing="15">
-                        <StackPane styleClass="icon-container">
-                            <FontAwesomeIconView glyphName="DASHBOARD" size="20" styleClass="sidebar-icon"/>
-                        </StackPane>
-                        <Label text="Panel" styleClass="sidebar-button-label"/>
-                    </HBox>
-                </graphic>
-            </Button>
+
             <Button fx:id="btnSell" styleClass="sidebar-button, active-sidebar-button" onAction="#showSellView" contentDisplay="GRAPHIC_ONLY" maxWidth="Infinity">
                 <graphic>
                     <HBox alignment="CENTER_LEFT" spacing="15">
@@ -99,7 +90,7 @@
                 <Button fx:id="btnProductsList" text="Lista de Productos" styleClass="sidebar-button" onAction="#showProductsView"/>
                 <Button fx:id="btnCategories" text="Categorías" styleClass="sidebar-button" onAction="#showCategoriesView"/>
             </VBox>
-            <Button fx:id="btnHistory" styleClass="sidebar-button" contentDisplay="GRAPHIC_ONLY" maxWidth="Infinity">
+            <Button fx:id="btnHistory" styleClass="sidebar-button" onAction="#showHistoryView" contentDisplay="GRAPHIC_ONLY" maxWidth="Infinity">
                  <graphic>
                     <HBox alignment="CENTER_LEFT" spacing="15">
                         <StackPane styleClass="icon-container">
@@ -109,18 +100,18 @@
                     </HBox>
                 </graphic>
             </Button>
-            <Button fx:id="btnClients" styleClass="sidebar-button" contentDisplay="GRAPHIC_ONLY" maxWidth="Infinity">
+            <Button fx:id="btnClients" styleClass="sidebar-button" contentDisplay="GRAPHIC_ONLY" maxWidth="Infinity" onAction="#showAddClientDialog">
                 <graphic>
                     <HBox alignment="CENTER_LEFT" spacing="15">
                         <StackPane styleClass="icon-container">
                             <FontAwesomeIconView glyphName="USERS" size="20" styleClass="sidebar-icon"/>
                         </StackPane>
-                        <Label text="Clientes" styleClass="sidebar-button-label"/>
+                        <Label text="Empresas" styleClass="sidebar-button-label"/>
                     </HBox>
                 </graphic>
             </Button>
 
-            <Button fx:id="btnUsers" styleClass="sidebar-button" contentDisplay="GRAPHIC_ONLY" maxWidth="Infinity">
+            <Button fx:id="btnUsers" styleClass="sidebar-button" contentDisplay="GRAPHIC_ONLY" maxWidth="Infinity" onAction="#handleShowUsers">
                 <graphic>
                     <HBox alignment="CENTER_LEFT" spacing="15">
                         <StackPane styleClass="icon-container">
@@ -130,7 +121,7 @@
                     </HBox>
                 </graphic>
             </Button>
-            <Button fx:id="btnConfig" styleClass="sidebar-button" contentDisplay="GRAPHIC_ONLY" maxWidth="Infinity">
+            <Button fx:id="btnConfig" styleClass="sidebar-button" contentDisplay="GRAPHIC_ONLY" maxWidth="Infinity" onAction="#handleShowConfig">
                 <graphic>
                     <HBox alignment="CENTER_LEFT" spacing="15">
                         <StackPane styleClass="icon-container">
@@ -142,11 +133,16 @@
             </Button>
             
             <Region VBox.vgrow="ALWAYS"/>
-            <HBox spacing="15" alignment="CENTER">
-                 <Button text="⚙" styleClass="sidebar-icon-only"/>
-                 <Button text="✉" styleClass="sidebar-icon-only"/>
-                 <Button text="⏻" styleClass="sidebar-icon-only"/>
-            </HBox>
+            <Button fx:id="btnLock" styleClass="sidebar-button" contentDisplay="GRAPHIC_ONLY" maxWidth="Infinity" onAction="#handleLockApp">
+                <graphic>
+                    <HBox alignment="CENTER_LEFT" spacing="15">
+                        <StackPane styleClass="icon-container">
+                            <FontAwesomeIconView glyphName="LOCK" size="20" styleClass="sidebar-icon"/>
+                        </StackPane>
+                        <Label text="Bloquear" styleClass="sidebar-button-label"/>
+                    </HBox>
+                </graphic>
+            </Button>
         </VBox>
     </left>
 
@@ -157,14 +153,19 @@
             <center>
                 <VBox>
                     <!-- Filter Display Label -->
-                    <HBox fx:id="filterDisplayContainer" alignment="CENTER_LEFT" style="-fx-background-color: linear-gradient(to right, #f8f9fa, #ffffff); -fx-padding: 15 25; -fx-border-color: #e3f2fd; -fx-border-width: 0 0 2 0; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 5, 0, 0, 2);">
-                        <Label text="Mostrando:" style="-fx-font-size: 14px; -fx-text-fill: #666; -fx-font-weight: 500;"/>
-                        <Label fx:id="filterLabel" text="Favoritos ⭐" style="-fx-font-size: 20px; -fx-text-fill: #1e88e5; -fx-font-weight: bold; -fx-padding: 0 0 0 10;"/>
+                    <HBox fx:id="filterDisplayContainer" alignment="CENTER_LEFT" styleClass="modern-filter-bar">
+                        <StackPane style="-fx-background-color: #e3f2fd; -fx-background-radius: 10; -fx-padding: 10;">
+                             <FontAwesomeIconView glyphName="FILTER" size="18" fill="#1e88e5"/>
+                        </StackPane>
+                        <VBox alignment="CENTER_LEFT">
+                             <Label text="Mostrando en este momento:" styleClass="filter-label-helper"/>
+                             <Label fx:id="filterLabel" text="Todos los productos" styleClass="filter-label-value"/>
+                        </VBox>
                     </HBox>
                     
                     <!-- Products Area -->
                     <StackPane VBox.vgrow="ALWAYS">
-                        <ScrollPane fx:id="mainContent" fitToWidth="true" style="-fx-background: #f4f6f9; -fx-background-color: transparent;">
+                        <ScrollPane fx:id="mainContent" fitToHeight="true" fitToWidth="true" style="-fx-background: #f4f6f9; -fx-background-color: transparent;">
                             <TilePane fx:id="productsPane" hgap="15" vgap="15" prefColumns="4" style="-fx-padding: 20;">
                                 <!-- Products will be added here dynamically -->
                             </TilePane>
@@ -179,11 +180,15 @@
                 </VBox>
             </center>
             <bottom>
-                <HBox alignment="TOP_LEFT" spacing="10" style="-fx-padding: 10;">
-                    <ScrollPane fx:id="categoriesScrollPane" hbarPolicy="NEVER" vbarPolicy="NEVER" fitToWidth="true" style="-fx-background-color: transparent; -fx-background: transparent;" prefHeight="85" maxHeight="85" HBox.hgrow="ALWAYS">
-                        <FlowPane fx:id="categoriesFlowPane" hgap="10" vgap="10" style="-fx-background-color: transparent;" />
+                <HBox fx:id="favoriteCategoriesBox" alignment="CENTER_LEFT" spacing="15" style="-fx-padding: 15 20; -fx-background-color: white; -fx-border-color: #f0f0f0; -fx-border-width: 1 0 0 0;">
+                    <ScrollPane fx:id="categoriesScrollPane" hbarPolicy="NEVER" vbarPolicy="NEVER" fitToWidth="true" style="-fx-background-color: transparent; -fx-background: transparent;" prefHeight="100" maxHeight="100" HBox.hgrow="ALWAYS">
+                        <FlowPane fx:id="categoriesFlowPane" hgap="12" vgap="12" style="-fx-background-color: transparent;" />
                     </ScrollPane>
-                    <Button fx:id="btnExpandCategories" text="▼" styleClass="action-btn" onAction="#handleExpandCategories" />
+                    <Button fx:id="btnExpandCategories" styleClass="expand-categories-btn" onAction="#handleExpandCategories">
+                        <graphic>
+                            <FontAwesomeIconView fx:id="expandIcon" glyphName="CHEVRON_DOWN" size="14" fill="#1e88e5"/>
+                        </graphic>
+                    </Button>
                 </HBox>
             </bottom>
         </BorderPane>
@@ -194,17 +199,51 @@
         <VBox fx:id="cartPanel" spacing="0" styleClass="cart-panel" prefWidth="450">
             
             <!-- Customer Selection -->
-            <HBox alignment="CENTER_LEFT" styleClass="cart-header">
-                <Label text="👤 Añadir empresa" style="-fx-text-fill: #888; -fx-font-size: 20px;"/>
+            <HBox alignment="CENTER_LEFT" styleClass="cart-customer-header">
+                <HBox spacing="10" alignment="CENTER_LEFT">
+                    <StackPane styleClass="icon-container-small-blue">
+                        <FontAwesomeIconView glyphName="USER_PLUS" size="14" fill="#1e88e5"/>
+                    </StackPane>
+                    <Label fx:id="lblSelectedClient" text="Añadir empresa" styleClass="cart-customer-title"/>
+                </HBox>
                 <Region HBox.hgrow="ALWAYS"/>
-                <Button text="+" style="-fx-background-color: transparent; -fx-text-fill: #999; -fx-font-size: 30px;"/>
+                <HBox spacing="5" alignment="CENTER_RIGHT">
+                    <Button fx:id="btnRemoveClient" onAction="#handleRemoveSelectedClient" visible="false" managed="false" styleClass="btn-remove-client" style="-fx-background-color: #fff5f5; -fx-padding: 5; -fx-background-radius: 5; -fx-cursor: hand;">
+                        <graphic>
+                            <FontAwesomeIconView glyphName="TRASH" size="12" fill="#e53935"/>
+                        </graphic>
+                    </Button>
+                    <Button onAction="#showAddClientDialog" styleClass="btn-add-customer">
+                        <tooltip>
+                            <Tooltip text="Añadir nueva empresa"/>
+                        </tooltip>
+                        <graphic>
+                            <FontAwesomeIconView glyphName="PLUS" size="14" fill="#1e88e5"/>
+                        </graphic>
+                    </Button>
+                </HBox>
             </HBox>
             
             <!-- Cart Items Header -->
-            <HBox alignment="CENTER_LEFT" style="-fx-padding: 10 15; -fx-border-color: #eee; -fx-border-width: 0 0 1 0;">
-                <Label text="Artículos" style="-fx-font-weight: bold; -fx-text-fill: #555;"/>
+            <HBox alignment="CENTER_LEFT" styleClass="cart-items-header">
+                <HBox spacing="10" alignment="CENTER_LEFT">
+                    <StackPane styleClass="icon-container-small">
+                        <FontAwesomeIconView glyphName="LIST_UL" size="14" fill="#555"/>
+                    </StackPane>
+                    <Label text="Artículos" styleClass="cart-section-title"/>
+                </HBox>
                 <Region HBox.hgrow="ALWAYS"/>
-                <Button fx:id="btnClearCart" onAction="#clearCart" style="-fx-background-color: transparent; -fx-text-fill: #e53935; -fx-cursor: hand; -fx-font-size: 13px; -fx-font-weight: bold;" text="Vaciar 🗑"/>
+                <Button fx:id="btnClearCart" onAction="#clearCart" styleClass="btn-clear-cart">
+                    <tooltip>
+                        <Tooltip text="Vaciar carrito"/>
+                    </tooltip>
+                    <graphic>
+                        <HBox spacing="8" alignment="CENTER">
+                            <Label text="Vaciar carrito" styleClass="btn-clear-cart-text"/>
+                            <FontAwesomeIconView glyphName="TRASH" size="14" fill="#e53935"/>
+                        </HBox>
+                    </graphic>
+                </Button>
             </HBox>
 
             <!-- Cart Items (Use ScrollPane + VBox for custom rows) -->
@@ -219,41 +258,36 @@
             </StackPane>
             
             <!-- Bottom Actions -->
-            <VBox spacing="0" style="-fx-background-color: white;" minHeight="-Infinity">
+            <VBox styleClass="checkout-summary">
                 
                 <!-- Subtotal -->
-                <HBox alignment="CENTER_LEFT" style="-fx-padding: 15 15 5 15;">
-                    <Label fx:id="itemsCountLabel" text="Subtotal (0 item)" style="-fx-text-fill: #666; -fx-font-size: 14px;"/>
+                <HBox alignment="CENTER_LEFT">
+                    <Label fx:id="itemsCountLabel" text="Subtotal (0 item)" styleClass="summary-label"/>
                     <Region HBox.hgrow="ALWAYS"/>
-                    <Label fx:id="subtotalLabel" text="0,00 €" style="-fx-font-weight: bold; -fx-font-size: 14px;"/>
+                    <Label fx:id="subtotalLabel" text="0,00 €" styleClass="summary-value"/>
                 </HBox>
 
                 <!-- Tax (Impuestos) -->
-                <HBox alignment="CENTER_LEFT" style="-fx-padding: 5 15 15 15;">
-                    <Label text="Impuestos (21%)" style="-fx-text-fill: #666; -fx-font-size: 14px;"/>
+                <HBox alignment="CENTER_LEFT">
+                    <Label text="Impuestos (21%)" styleClass="summary-label"/>
                     <Region HBox.hgrow="ALWAYS"/>
-                    <Label fx:id="taxLabel" text="0,00 €" style="-fx-font-weight: bold; -fx-font-size: 14px;"/>
+                    <Label fx:id="taxLabel" text="0,00 €" styleClass="summary-value"/>
                 </HBox>
                 
-                <!-- Pay Button (Pink) -->
-                <StackPane style="-fx-padding: 0 15 15 15;">
-                     <Button fx:id="payButton" text="Pagar" 
-                             onAction="#handlePayButton"
-                             styleClass="pay-button" 
-                             maxWidth="Infinity" 
-                             prefHeight="55" alignment="CENTER_LEFT">
-                        <padding>
-                            <Insets left="20"/>
-                        </padding>
-                     </Button>
-                     <Label fx:id="totalButtonLabel" text="0,00 €" mouseTransparent="true"
-                            style="-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 18px;" 
-                            StackPane.alignment="CENTER_RIGHT">
-                        <padding>
-                            <Insets right="20"/>
-                        </padding>
-                     </Label>
-                </StackPane>
+                <Separator/>
+
+                <!-- Total -->
+                <HBox alignment="CENTER_LEFT">
+                    <Label text="TOTAL COBRAR" styleClass="total-label"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Label fx:id="totalButtonLabel" text="0,00 €" styleClass="total-value"/>
+                </HBox>
+
+                <!-- Pay Button (Modern) -->
+                <Button fx:id="payButton" text="REALIZAR PAGO" 
+                        onAction="#handlePayButton"
+                        styleClass="btn-pay" 
+                        maxWidth="Infinity"/>
                 
             </VBox>
 

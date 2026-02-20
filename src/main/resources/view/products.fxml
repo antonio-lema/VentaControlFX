@@ -11,61 +11,89 @@
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
 
 <AnchorPane id="AnchorPane" prefHeight="600.0" prefWidth="900.0" style="-fx-background-color: #f4f6f9;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mycompany.ventacontrolfx.controller.ProductController">
    <children>
-      <VBox spacing="15.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <VBox spacing="20.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <padding>
-            <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+            <Insets bottom="10.0" left="25.0" right="25.0" top="25.0" />
          </padding>
          <children>
             <!-- Header Section -->
-            <HBox alignment="CENTER_LEFT" spacing="10.0">
+            <HBox alignment="CENTER_LEFT" spacing="15.0">
                <children>
-                  <Label text="Productos" textFill="#1e88e5">
-                     <font>
-                        <Font name="System Bold" size="24.0" />
-                     </font>
-                  </Label>
+                  <VBox>
+                     <children>
+                        <Label text="Gestión de Productos" textFill="#2c3e50">
+                           <font>
+                              <Font name="System Bold" size="26.0" />
+                           </font>
+                        </Label>
+                        <Label text="Administra el inventario de tu negocio" textFill="#7f8c8d" />
+                     </children>
+                  </VBox>
                   <Region HBox.hgrow="ALWAYS" />
-                  <Button mnemonicParsing="false" style="-fx-background-color: white; -fx-text-fill: #1e88e5; -fx-border-color: #1e88e5; -fx-border-radius: 4; -fx-background-radius: 4;" text="Excel" />
-                  <Button mnemonicParsing="false" style="-fx-background-color: white; -fx-text-fill: #e53935; -fx-border-color: #e53935; -fx-border-radius: 4; -fx-background-radius: 4;" text="PDF" />
-                  <Button mnemonicParsing="false" style="-fx-background-color: #00897b; -fx-text-fill: white; -fx-background-radius: 4;" text="Importar" />
-                  <Button fx:id="btnAdd" onAction="#handleAddProduct" style="-fx-background-color: #1e88e5; -fx-text-fill: white; -fx-background-radius: 4; -fx-font-weight: bold;" text="+ Añadir Producto" />
+                  <HBox spacing="10.0" alignment="CENTER_RIGHT">
+                     <children>
+                        <Button mnemonicParsing="false" styleClass="action-icon-button" style="-fx-background-color: white; -fx-text-fill: #1e88e5; -fx-border-color: #e0e6ed; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 8 15;">
+                           <graphic><FontAwesomeIconView glyphName="FILE_EXCEL_ALT" size="14" fill="#1e88e5"/></graphic>
+                           <text> Excel</text>
+                        </Button>
+                        <Button mnemonicParsing="false" styleClass="action-icon-button" style="-fx-background-color: white; -fx-text-fill: #e53935; -fx-border-color: #e0e6ed; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 8 15;">
+                           <graphic><FontAwesomeIconView glyphName="FILE_PDF_ALT" size="14" fill="#e53935"/></graphic>
+                           <text> PDF</text>
+                        </Button>
+                        <Button fx:id="btnAdd" onAction="#handleAddProduct" styleClass="modern-btn-primary" style="-fx-background-color: #1e88e5; -fx-text-fill: white; -fx-background-radius: 25; -fx-padding: 10 25; -fx-font-weight: bold; -fx-cursor: hand;">
+                           <graphic><FontAwesomeIconView glyphName="PLUS" size="14" fill="white"/></graphic>
+                           <text> Nuevo Producto</text>
+                        </Button>
+                     </children>
+                  </HBox>
                </children>
             </HBox>
 
-            <!-- Filter Section -->
-            <HBox alignment="CENTER_LEFT" spacing="10.0" style="-fx-background-color: white; -fx-background-radius: 5; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 5, 0, 0, 1);">
-               <padding>
-                  <Insets bottom="10.0" left="15.0" right="15.0" top="10.0" />
-               </padding>
+            <!-- Table Card -->
+            <VBox spacing="0" styleClass="table-card" VBox.vgrow="ALWAYS">
                <children>
-                  <Label text="Mostrar" textFill="#666666" />
-                  <TextField fx:id="rowsPerPageField" prefWidth="50.0" text="10" />
-                  <Label text="registros" textFill="#666666" />
-                  <Region HBox.hgrow="ALWAYS" />
-                  <Label text="Filtrar" textFill="#1e88e5" />
-                  <TextField fx:id="searchField" promptText="Buscar..." style="-fx-background-radius: 4; -fx-border-color: #e0e0e0; -fx-border-radius: 4;" />
-                  <Button mnemonicParsing="false" style="-fx-background-color: #1e88e5; -fx-text-fill: white;" text="🔍" />
-               </children>
-            </HBox>
+                  <!-- Filter Section -->
+                  <HBox alignment="CENTER_LEFT" styleClass="modern-filter-bar">
+                     <children>
+                        <Label text="Filtrar por nombre o código:" textFill="#7f8c8d" />
+                        <HBox alignment="CENTER_LEFT" styleClass="search-input-modern" HBox.hgrow="ALWAYS" maxWidth="400">
+                           <children>
+                              <FontAwesomeIconView glyphName="SEARCH" size="14" fill="#95a5a6" />
+                              <TextField fx:id="searchField" promptText="Buscar producto..." style="-fx-background-color: transparent; -fx-padding: 0 0 0 10;" HBox.hgrow="ALWAYS" />
+                           </children>
+                        </HBox>
+                        <Region HBox.hgrow="ALWAYS" />
+                        <HBox alignment="CENTER_LEFT" spacing="10">
+                           <children>
+                              <Label text="Ver" textFill="#7f8c8d" />
+                              <TextField fx:id="rowsPerPageField" prefWidth="45.0" text="10" style="-fx-background-color: #f4f6f9; -fx-background-radius: 5; -fx-alignment: center;" />
+                              <Label text="filas" textFill="#7f8c8d" />
+                           </children>
+                        </HBox>
+                     </children>
+                  </HBox>
 
-            <!-- Table Section -->
-            <TableView fx:id="productsTable" VBox.vgrow="ALWAYS" style="-fx-background-color: white; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 5, 0, 0, 1);">
-              <columns>
-                <TableColumn fx:id="colImage" prefWidth="80.0" text="Imagen" />
-                <TableColumn fx:id="colName" prefWidth="250.0" text="Nombre" />
-                <TableColumn fx:id="colCategoryName" prefWidth="150.0" text="Categoría" />
-                  <TableColumn fx:id="colPrice" prefWidth="75.0" text="Precio" />
-                <TableColumn fx:id="colFavorite" prefWidth="75.0" text="Favorito" />
-                <TableColumn fx:id="colVisible" prefWidth="75.0" text="Visible" />
-                <TableColumn fx:id="colActions" prefWidth="160.0" text="Acciones" />
-              </columns>
-               <columnResizePolicy>
-                  <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
-               </columnResizePolicy>
-            </TableView>
+                  <!-- Table View -->
+                  <TableView fx:id="productsTable" styleClass="modern-table-view" VBox.vgrow="ALWAYS">
+                    <columns>
+                      <TableColumn fx:id="colImage" prefWidth="100.0" text="IMAGEN" />
+                      <TableColumn fx:id="colName" prefWidth="280.0" text="PRODUCTO" />
+                      <TableColumn fx:id="colCategoryName" prefWidth="180.0" text="CATEGORÍA" />
+                      <TableColumn fx:id="colPrice" prefWidth="120.0" text="PRECIO" />
+                      <TableColumn fx:id="colFavorite" prefWidth="100.0" text="FAVORITO" />
+                      <TableColumn fx:id="colVisible" prefWidth="100.0" text="ESTADO" />
+                      <TableColumn fx:id="colActions" prefWidth="180.0" text="ACCIONES" />
+                    </columns>
+                     <columnResizePolicy>
+                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                     </columnResizePolicy>
+                  </TableView>
+               </children>
+            </VBox>
          </children>
       </VBox>
    </children>
