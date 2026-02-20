@@ -1,0 +1,14 @@
+    private void setupMenuButtonHover() {
+        if (menuButton != null) {
+            menuButton.setOnMouseEntered(e -> {
+                if (!menuButton.isShowing()) {
+                    menuButton.show();
+                }
+            });
+        }
+    }
+
+    private void updateCartBadge() {
+        // Este método se puede usar para actualizar un badge visual del carrito
+        // Por ahora no hace nada, pero está listo para futuras mejoras
+    }
