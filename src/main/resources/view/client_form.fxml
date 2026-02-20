@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
+
+<StackPane fx:id="rootStackPane" styleClass="register-popup-background" onMousePressed="#handleMousePressed" onMouseDragged="#handleMouseDragged" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mycompany.ventacontrolfx.controller.ClientFormController">
+    <VBox maxWidth="500" spacing="0" alignment="CENTER" styleClass="modern-register-card">
+        <padding>
+            <Insets top="40" right="40" bottom="40" left="40"/>
+        </padding>
+        
+        <!-- Header -->
+        <VBox styleClass="modern-register-header" alignment="CENTER_LEFT">
+             <Label fx:id="lblTitle" text="Nueva Empresa" styleClass="modern-register-title"/>
+             <Label text="Introduce los datos de la empresa o cliente" styleClass="modern-register-subtitle"/>
+        </VBox>
+
+        <!-- Form Fields -->
+        <VBox spacing="15">
+            
+            <!-- Name -->
+            <VBox styleClass="modern-input-group">
+                <HBox styleClass="modern-input-container" alignment="CENTER_LEFT">
+                    <FontAwesomeIconView glyphName="BUILDING" size="18" fill="#b0b0b0">
+                        <HBox.margin>
+                            <Insets right="10"/>
+                        </HBox.margin>
+                    </FontAwesomeIconView>
+                    <TextField fx:id="txtName" promptText="Nombre de la empresa" styleClass="modern-input-field" HBox.hgrow="ALWAYS"/>
+                </HBox>
+            </VBox>
+            
+            <HBox spacing="15">
+                <!-- Tax ID -->
+                <VBox HBox.hgrow="ALWAYS" styleClass="modern-input-group">
+                     <HBox styleClass="modern-input-container" alignment="CENTER_LEFT">
+                        <FontAwesomeIconView glyphName="ID_CARD" size="18" fill="#b0b0b0">
+                            <HBox.margin>
+                                <Insets right="10"/>
+                            </HBox.margin>
+                        </FontAwesomeIconView>
+                        <TextField fx:id="txtTaxId" promptText="CIF / NIF" styleClass="modern-input-field" HBox.hgrow="ALWAYS"/>
+                     </HBox>
+                </VBox>
+                <!-- Phone -->
+                <VBox HBox.hgrow="ALWAYS" styleClass="modern-input-group">
+                     <HBox styleClass="modern-input-container" alignment="CENTER_LEFT">
+                        <FontAwesomeIconView glyphName="PHONE" size="18" fill="#b0b0b0">
+                            <HBox.margin>
+                                <Insets right="10"/>
+                            </HBox.margin>
+                        </FontAwesomeIconView>
+                        <TextField fx:id="txtPhone" promptText="Teléfono" styleClass="modern-input-field" HBox.hgrow="ALWAYS"/>
+                     </HBox>
+                </VBox>
+            </HBox>
+
+            <!-- Email -->
+            <VBox styleClass="modern-input-group">
+                <HBox styleClass="modern-input-container" alignment="CENTER_LEFT">
+                    <FontAwesomeIconView glyphName="ENVELOPE" size="18" fill="#b0b0b0">
+                        <HBox.margin>
+                            <Insets right="10"/>
+                        </HBox.margin>
+                    </FontAwesomeIconView>
+                    <TextField fx:id="txtEmail" promptText="Email" styleClass="modern-input-field" HBox.hgrow="ALWAYS"/>
+                </HBox>
+            </VBox>
+
+            <!-- Address -->
+            <VBox styleClass="modern-input-group">
+                <HBox styleClass="modern-input-container" alignment="CENTER_LEFT">
+                    <FontAwesomeIconView glyphName="MAP_MARKER" size="18" fill="#b0b0b0">
+                        <HBox.margin>
+                            <Insets right="10"/>
+                        </HBox.margin>
+                    </FontAwesomeIconView>
+                    <TextField fx:id="txtAddress" promptText="Dirección completa" styleClass="modern-input-field" HBox.hgrow="ALWAYS"/>
+                </HBox>
+            </VBox>
+
+            <HBox spacing="15">
+                 <VBox HBox.hgrow="ALWAYS" styleClass="modern-input-group" maxWidth="120">
+                     <HBox styleClass="modern-input-container" alignment="CENTER_LEFT">
+                        <TextField fx:id="txtPostalCode" promptText="C.P." styleClass="modern-input-field" HBox.hgrow="ALWAYS"/>
+                     </HBox>
+                </VBox>
+                <VBox HBox.hgrow="ALWAYS" styleClass="modern-input-group">
+                     <HBox styleClass="modern-input-container" alignment="CENTER_LEFT">
+                        <TextField fx:id="txtCity" promptText="Ciudad" styleClass="modern-input-field" HBox.hgrow="ALWAYS"/>
+                     </HBox>
+                </VBox>
+            </HBox>
+            
+            <HBox spacing="15">
+                 <VBox HBox.hgrow="ALWAYS" styleClass="modern-input-group">
+                     <HBox styleClass="modern-input-container" alignment="CENTER_LEFT">
+                        <TextField fx:id="txtProvince" promptText="Provincia" styleClass="modern-input-field" HBox.hgrow="ALWAYS"/>
+                     </HBox>
+                </VBox>
+                <VBox HBox.hgrow="ALWAYS" styleClass="modern-input-group">
+                     <HBox styleClass="modern-input-container" alignment="CENTER_LEFT">
+                        <TextField fx:id="txtCountry" promptText="País" styleClass="modern-input-field" HBox.hgrow="ALWAYS"/>
+                     </HBox>
+                </VBox>
+            </HBox>
+
+        </VBox>
+
+        <!-- Actions -->
+        <HBox spacing="15" alignment="CENTER_RIGHT" style="-fx-padding: 30 0 0 0;">
+             <Button text="Cancelar" onAction="#handleCancel" styleClass="modern-btn-secondary"/>
+             <Button text="Guardar" onAction="#handleSave" styleClass="modern-btn-primary"/>
+        </HBox>
+
+    </VBox>
+</StackPane>
