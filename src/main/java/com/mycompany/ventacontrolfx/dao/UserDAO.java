@@ -40,14 +40,7 @@ public class UserDAO {
             ResultSet rs = pstmt.executeQuery();
 
             if (rs.next()) {
-                User user = new User();
-                user.setUserId(rs.getInt("user_id"));
-                user.setUsername(rs.getString("username"));
-                user.setPassword(rs.getString("password_hash"));
-                user.setFullName(rs.getString("full_name"));
-                user.setRole(rs.getString("role"));
-                user.setEmail(rs.getString("email"));
-                return user;
+                return mapUser(rs);
             }
         }
         return null;
@@ -64,14 +57,7 @@ public class UserDAO {
             ResultSet rs = pstmt.executeQuery();
 
             if (rs.next()) {
-                User user = new User();
-                user.setUserId(rs.getInt("user_id"));
-                user.setUsername(rs.getString("username"));
-                user.setPassword(rs.getString("password_hash"));
-                user.setFullName(rs.getString("full_name"));
-                user.setRole(rs.getString("role"));
-                user.setEmail(rs.getString("email"));
-                return user;
+                return mapUser(rs);
             }
         }
         return null;
@@ -87,16 +73,21 @@ public class UserDAO {
                 ResultSet rs = pstmt.executeQuery()) {
 
             while (rs.next()) {
-                User user = new User();
-                user.setUserId(rs.getInt("user_id"));
-                user.setUsername(rs.getString("username"));
-                user.setFullName(rs.getString("full_name"));
-                user.setRole(rs.getString("role"));
-                user.setEmail(rs.getString("email"));
-                users.add(user);
+                users.add(mapUser(rs));
             }
         }
         return users;
+    }
+
+    private User mapUser(ResultSet rs) throws SQLException {
+        User user = new User();
+        user.setUserId(rs.getInt("user_id"));
+        user.setUsername(rs.getString("username"));
+        user.setPassword(rs.getString("password_hash"));
+        user.setFullName(rs.getString("full_name"));
+        user.setRole(rs.getString("role"));
+        user.setEmail(rs.getString("email"));
+        return user;
     }
 
     // Método para verificar login
