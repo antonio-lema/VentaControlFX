@@ -76,6 +76,9 @@
                 <version>0.0.8</version>
                 <configuration>
                     <mainClass>com.mycompany.ventacontrolfx.App</mainClass>
+                    <options>
+                        <option>--enable-native-access=javafx.graphics</option>
+                    </options>
                 </configuration>
             </plugin>
 
