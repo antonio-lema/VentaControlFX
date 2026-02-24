@@ -8,6 +8,7 @@
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.FlowPane?>
 <?import javafx.scene.layout.HBox?>
@@ -290,6 +291,60 @@
                             </HBox>
                         </VBox>
                     </VBox>
+
+                    <!-- Tarjeta: Configuración de Correo (SMTP) -->
+                    <VBox styleClass="config-card" HBox.hgrow="ALWAYS">
+                        <HBox styleClass="config-card-header" alignment="CENTER_LEFT" spacing="10">
+                            <StackPane styleClass="config-card-icon-wrap config-icon-blue">
+                                <FontAwesomeIconView glyphName="ENVELOPE" size="16" fill="#1e88e5"/>
+                            </StackPane>
+                            <Label text="Servidor de Correo (SMTP)" styleClass="config-card-title"/>
+                        </HBox>
+                        <Separator styleClass="config-card-separator"/>
+
+                        <VBox spacing="14" styleClass="config-card-body">
+                            <!-- SMTP Host -->
+                            <VBox styleClass="config-field-group">
+                                <Label text="Servidor SMTP" styleClass="config-field-label"/>
+                                <HBox styleClass="config-input-container">
+                                    <FontAwesomeIconView glyphName="SERVER" size="14" fill="#b0b0b0"/>
+                                    <TextField fx:id="txtSmtpHost" promptText="Ej: smtp.gmail.com"
+                                               HBox.hgrow="ALWAYS" styleClass="modern-input-field"/>
+                                </HBox>
+                            </VBox>
+
+                            <!-- SMTP Port -->
+                            <VBox styleClass="config-field-group">
+                                <Label text="Puerto" styleClass="config-field-label"/>
+                                <HBox styleClass="config-input-container">
+                                    <FontAwesomeIconView glyphName="PLUG" size="14" fill="#b0b0b0"/>
+                                    <TextField fx:id="txtSmtpPort" promptText="Ej: 587"
+                                               HBox.hgrow="ALWAYS" styleClass="modern-input-field"/>
+                                </HBox>
+                            </VBox>
+
+                            <!-- Email From -->
+                            <VBox styleClass="config-field-group">
+                                <Label text="Correo emisor" styleClass="config-field-label"/>
+                                <HBox styleClass="config-input-container">
+                                    <FontAwesomeIconView glyphName="AT" size="14" fill="#b0b0b0"/>
+                                    <TextField fx:id="txtEmailFrom" promptText="Ej: mitienda@gmail.com"
+                                               HBox.hgrow="ALWAYS" styleClass="modern-input-field"/>
+                                </HBox>
+                            </VBox>
+
+                            <!-- Email Password -->
+                            <VBox styleClass="config-field-group">
+                                <Label text="Contraseña de aplicación" styleClass="config-field-label"/>
+                                <HBox styleClass="config-input-container">
+                                    <FontAwesomeIconView glyphName="KEY" size="14" fill="#b0b0b0"/>
+                                    <PasswordField fx:id="txtEmailPassword" promptText="Contraseña"
+                                               HBox.hgrow="ALWAYS" styleClass="modern-input-field"/>
+                                </HBox>
+                            </VBox>
+                        </VBox>
+                    </VBox>
+
                 </HBox>
 
 

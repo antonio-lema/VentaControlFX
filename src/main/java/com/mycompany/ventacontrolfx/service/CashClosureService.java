@@ -9,6 +9,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import com.mycompany.ventacontrolfx.dao.DatabaseInitializer;
+import java.util.List;
 import java.util.Map;
 
 public class CashClosureService {
@@ -19,8 +20,9 @@ public class CashClosureService {
             SaleDAO saleDAO = new SaleDAO(conn);
             com.mycompany.ventacontrolfx.dao.ReturnDAO returnDAO = new com.mycompany.ventacontrolfx.dao.ReturnDAO(conn);
 
-            Map<String, Double> salesTotals = saleDAO.getTotalsByDate(LocalDate.now());
-            Map<String, Double> returnTotals = returnDAO.getReturnTotalsByDate(LocalDate.now());
+            // Fetch only pending sales and returns
+            Map<String, Double> salesTotals = saleDAO.getPendingTotals();
+            Map<String, Double> returnTotals = returnDAO.getPendingReturnTotals();
 
             // Subtract returns from sales totals
             for (Map.Entry<String, Double> entry : returnTotals.entrySet()) {
@@ -30,8 +32,6 @@ public class CashClosureService {
                 if (salesTotals.containsKey(method)) {
                     salesTotals.put(method, salesTotals.get(method) - returnedAmount);
                 } else {
-                    // Should theoretically exist if initialized properly or if sale exists,
-                    // but if not, we record negative (money out)
                     salesTotals.put(method, -returnedAmount);
                 }
             }
@@ -43,7 +43,7 @@ public class CashClosureService {
     public int getTodaySalesCount() throws SQLException {
         try (Connection conn = DBConnection.getConnection()) {
             SaleDAO saleDAO = new SaleDAO(conn);
-            return saleDAO.getTransactionCountByDate(LocalDate.now());
+            return saleDAO.getPendingTransactionCount();
         }
     }
 
@@ -72,6 +72,33 @@ public class CashClosureService {
             closure.setTotalAll(totalCash + totalCard);
 
             closureDAO.save(closure);
+        }
+    }
+
+    public List<CashClosure> getClosureHistory(LocalDate start, LocalDate end) throws SQLException {
+        try (Connection conn = DBConnection.getConnection()) {
+            CashClosureDAO closureDAO = new CashClosureDAO(conn);
+            return closureDAO.getAllClosures(start, end);
+        }
+    }
+
+    public List<com.mycompany.ventacontrolfx.model.ProductSummary> getProductSummary(int closureId)
+            throws SQLException {
+        try (Connection conn = DBConnection.getConnection()) {
+            return new CashClosureDAO(conn).getProductSummary(closureId);
+        }
+    }
+
+    public List<com.mycompany.ventacontrolfx.model.ProductSummary> getPendingProductSummary() throws SQLException {
+        try (Connection conn = DBConnection.getConnection()) {
+            return new CashClosureDAO(conn).getPendingProductSummary();
+        }
+    }
+
+    public int getCount() throws SQLException {
+        try (Connection conn = DBConnection.getConnection()) {
+            CashClosureDAO closureDAO = new CashClosureDAO(conn);
+            return closureDAO.getCount();
         }
     }
 }

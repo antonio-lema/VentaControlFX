@@ -104,4 +104,15 @@ public class ClientDAO {
                 rs.getString("email"),
                 rs.getString("phone"));
     }
+
+    public int getCount() throws SQLException {
+        String sql = "SELECT COUNT(*) FROM clients";
+        try (Statement stmt = conn.createStatement();
+                ResultSet rs = stmt.executeQuery(sql)) {
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        }
+        return 0;
+    }
 }

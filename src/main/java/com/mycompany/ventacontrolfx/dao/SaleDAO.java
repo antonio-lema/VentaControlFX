@@ -31,10 +31,39 @@ public class SaleDAO {
         return totals;
     }
 
+    public Map<String, Double> getPendingTotals() throws SQLException {
+        Map<String, Double> totals = new HashMap<>();
+        totals.put("Efectivo", 0.0);
+        totals.put("Tarjeta", 0.0);
+
+        String sql = "SELECT payment_method, SUM(total) as semi_total FROM sales WHERE closure_id IS NULL GROUP BY payment_method";
+
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    totals.put(rs.getString("payment_method"), rs.getDouble("semi_total"));
+                }
+            }
+        }
+        return totals;
+    }
+
     public int getTransactionCountByDate(LocalDate date) throws SQLException {
         String sql = "SELECT COUNT(*) FROM sales WHERE DATE(created_at) = ?";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setDate(1, Date.valueOf(date));
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        }
+        return 0;
+    }
+
+    public int getPendingTransactionCount() throws SQLException {
+        String sql = "SELECT COUNT(*) FROM sales WHERE closure_id IS NULL";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
                     return rs.getInt(1);
@@ -115,5 +144,16 @@ public class SaleDAO {
             pstmt.setInt(2, saleId);
             pstmt.executeUpdate();
         }
+    }
+
+    public int getTotalCount() throws SQLException {
+        String sql = "SELECT COUNT(*) FROM sales";
+        try (Statement stmt = connection.createStatement();
+                ResultSet rs = stmt.executeQuery(sql)) {
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        }
+        return 0;
     }
 }

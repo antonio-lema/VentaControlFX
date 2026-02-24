@@ -88,6 +88,24 @@ public class ReturnDAO {
         return totals;
     }
 
+    public java.util.Map<String, Double> getPendingReturnTotals() throws SQLException {
+        java.util.Map<String, Double> totals = new java.util.HashMap<>();
+        String sql = "SELECT s.payment_method, SUM(r.total_refunded) as total_refunded " +
+                "FROM returns r " +
+                "JOIN sales s ON r.sale_id = s.sale_id " +
+                "WHERE s.closure_id IS NULL " +
+                "GROUP BY s.payment_method";
+
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    totals.put(rs.getString("payment_method"), rs.getDouble("total_refunded"));
+                }
+            }
+        }
+        return totals;
+    }
+
     public List<Return> getReturnsBySaleId(int saleId) throws SQLException {
         List<Return> returns = new ArrayList<>();
         String sql = "SELECT * FROM returns WHERE sale_id = ? ORDER BY return_datetime DESC";

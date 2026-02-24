@@ -4,11 +4,8 @@ import com.mycompany.ventacontrolfx.model.User;
 import com.mycompany.ventacontrolfx.service.UserService;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
+import com.mycompany.ventacontrolfx.util.AlertUtil;
 import javafx.stage.Stage;
 
 import java.sql.SQLException;
@@ -186,11 +183,7 @@ public class RegisterUserController {
     }
 
     private void showSuccess(String message) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Éxito");
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
+        AlertUtil.showInfo("Éxito", message);
     }
 
     @FXML

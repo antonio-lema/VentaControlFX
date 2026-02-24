@@ -40,7 +40,6 @@ public class LoginController {
             User user = userService.findByUsername(username);
 
             if (user != null && user.getPassword().equals(password)) {
-                // TODO: Password hashing check should be here instead of plain text equality
                 UserSession.getInstance().setCurrentUser(user);
                 lblMessage.setText("Login correcto 👍");
 
@@ -79,7 +78,6 @@ public class LoginController {
     private void handleForgotPassword() {
         try {
             java.net.URL fxmlUrl = getClass().getResource("/view/password_recovery.fxml");
-            System.out.println("DEBUG FXML URL: " + fxmlUrl);
 
             if (fxmlUrl == null) {
                 lblMessage.setText("Error: No se encuentra el archivo FXML.");

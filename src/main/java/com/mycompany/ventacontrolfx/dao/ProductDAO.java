@@ -129,4 +129,15 @@ public class ProductDAO {
             pstmt.executeUpdate();
         }
     }
+
+    public int getCount() throws SQLException {
+        String sql = "SELECT COUNT(*) FROM products";
+        try (Statement stmt = connection.createStatement();
+                ResultSet rs = stmt.executeQuery(sql)) {
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        }
+        return 0;
+    }
 }

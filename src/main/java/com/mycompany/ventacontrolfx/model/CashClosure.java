@@ -11,6 +11,7 @@ public class CashClosure {
     private double totalCard;
     private double totalAll;
     private LocalDateTime createdAt;
+    private String username; // Added for display in UI
 
     public CashClosure() {
     }
@@ -81,5 +82,13 @@ public class CashClosure {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 }

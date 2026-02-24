@@ -124,7 +124,6 @@ public class PaymentController {
 
     @FXML
     private void handleCardPayment() {
-        System.out.println("Card Payment Selected: " + totalAmount);
         // Simulate card processing...
 
         // Success
@@ -143,18 +142,15 @@ public class PaymentController {
             if (given >= totalAmount) {
                 // Success
                 double change = given - totalAmount;
-                System.out.println("Payment Successful. Change: " + change);
                 if (callback != null) {
                     callback.onSuccess(given, change, "Efectivo");
                 }
                 handleClose();
             } else {
                 // Show error or shake
-                System.out.println("Insufficient amount");
                 txtGivenAmount.setStyle("-fx-border-color: red;");
             }
         } catch (NumberFormatException e) {
-            System.out.println("Invalid amount");
             txtGivenAmount.setStyle("-fx-border-color: red;");
         }
     }

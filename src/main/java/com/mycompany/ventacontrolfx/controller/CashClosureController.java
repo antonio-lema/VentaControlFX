@@ -1,16 +1,23 @@
 package com.mycompany.ventacontrolfx.controller;
 
+import com.mycompany.ventacontrolfx.model.ProductSummary;
 import com.mycompany.ventacontrolfx.model.User;
 import com.mycompany.ventacontrolfx.service.CashClosureService;
 import com.mycompany.ventacontrolfx.util.UserSession;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Map;
+import com.mycompany.ventacontrolfx.util.AlertUtil;
+import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.TableCell;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 
 public class CashClosureController {
@@ -32,6 +39,15 @@ public class CashClosureController {
     @FXML
     private Button btnPerformClosure;
 
+    @FXML
+    private TableView<ProductSummary> tableProductSummary;
+    @FXML
+    private TableColumn<ProductSummary, String> colProdName;
+    @FXML
+    private TableColumn<ProductSummary, Integer> colProdQty;
+    @FXML
+    private TableColumn<ProductSummary, Double> colProdTotal;
+
     private final CashClosureService closureService = new CashClosureService();
     private double currentCash = 0;
     private double currentCard = 0;
@@ -45,7 +61,60 @@ public class CashClosureController {
             lblCurrentUser.setText(user.getUsername());
         }
 
+        setupTable();
         loadTodayData();
+    }
+
+    private void setupTable() {
+        colProdName.setCellValueFactory(new PropertyValueFactory<>("name"));
+        colProdQty.setCellValueFactory(new PropertyValueFactory<>("quantity"));
+        colProdTotal.setCellValueFactory(new PropertyValueFactory<>("totalAmount"));
+
+        // Estilo para nombre
+        colProdName.setCellFactory(col -> new TableCell<>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                    setStyle("");
+                } else {
+                    setText(item);
+                    setStyle("-fx-alignment: CENTER-LEFT; -fx-padding: 0 0 0 15;");
+                }
+            }
+        });
+
+        // Alinhamento e estilo para quantidade
+        colProdQty.setCellFactory(col -> new TableCell<>() {
+            @Override
+            protected void updateItem(Integer item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                    setStyle("");
+                } else {
+                    setText(String.valueOf(item));
+                    setStyle("-fx-alignment: CENTER-RIGHT; -fx-font-weight: bold; -fx-padding: 0 15 0 0;");
+                }
+            }
+        });
+
+        // Alinhamento e estilo para total
+        colProdTotal.setCellFactory(col -> new TableCell<>() {
+            @Override
+            protected void updateItem(Double item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                    setStyle("");
+                } else {
+                    setText(String.format("%.2f €", item));
+                    setStyle(
+                            "-fx-alignment: CENTER-RIGHT; -fx-font-weight: bold; -fx-text-fill: #2c3e50; -fx-padding: 0 15 0 0;");
+                }
+            }
+        });
     }
 
     private void loadTodayData() {
@@ -61,6 +130,10 @@ public class CashClosureController {
 
             int count = closureService.getTodaySalesCount();
             lblSalesCount.setText(String.valueOf(count));
+
+            // Load product summary
+            List<ProductSummary> summary = closureService.getPendingProductSummary();
+            tableProductSummary.setItems(FXCollections.observableArrayList(summary));
 
             if (closureService.isClosureDoneToday()) {
                 markAsClosed();
@@ -86,11 +159,7 @@ public class CashClosureController {
             closureService.performClosure(currentCash, currentCard);
             markAsClosed();
 
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("Cierre Exitoso");
-            alert.setHeaderText("Cierre de caja guardado con éxito");
-            alert.setContentText("Se han registrado " + lblTotalAll.getText() + " en ventas totales.");
-            alert.showAndWait();
+            AlertUtil.showInfo("Cierre Exitoso", "Se han registrado " + lblTotalAll.getText() + " en ventas totales.");
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -105,9 +174,6 @@ public class CashClosureController {
     }
 
     private void showError(String message) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle("Error");
-        alert.setContentText(message);
-        alert.showAndWait();
+        AlertUtil.showError("Error", message);
     }
 }

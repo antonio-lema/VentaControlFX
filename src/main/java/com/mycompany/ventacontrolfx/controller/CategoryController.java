@@ -10,7 +10,7 @@ import javafx.fxml.FXML;
 import javafx.scene.shape.SVGPath;
 import javafx.scene.control.ContentDisplay;
 
-import javafx.scene.control.Alert;
+import com.mycompany.ventacontrolfx.util.AlertUtil;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -24,9 +24,6 @@ import javafx.stage.Modality;
 import java.io.IOException;
 import javafx.geometry.Pos;
 import javafx.scene.layout.HBox;
-import java.util.Optional;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.ButtonType;
 import javafx.scene.control.TableCell;
 import com.mycompany.ventacontrolfx.control.ToggleSwitch;
 
@@ -306,18 +303,10 @@ public class CategoryController {
     }
 
     private void handleDeleteCategory(Category category) {
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Confirmar Eliminación");
-        alert.setHeaderText("Eliminar Categoría");
-        alert.setContentText("¿Está seguro de que desea eliminar la categoría '" + category.getName() + "'?");
-
-        // Add styling to dialog
-        javafx.scene.control.DialogPane dialogPane = alert.getDialogPane();
-        dialogPane.getStylesheets().add(getClass().getResource("/view/style.css").toExternalForm());
-        dialogPane.getStyleClass().add("custom-alert");
-
-        Optional<ButtonType> result = alert.showAndWait();
-        if (result.isPresent() && result.get() == ButtonType.OK) {
+        boolean confirmed = AlertUtil.showConfirmation("Confirmar Eliminación",
+                "¿Está seguro de que desea eliminar la categoría '" + category.getName() + "'?",
+                "Esta acción no se puede deshacer.");
+        if (confirmed) {
             try {
                 categoryService.deleteCategory(category.getId());
                 loadCategories();
@@ -329,10 +318,6 @@ public class CategoryController {
     }
 
     private void showAlert(String title, String content) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(content);
-        alert.showAndWait();
+        AlertUtil.showInfo(title, content);
     }
 }

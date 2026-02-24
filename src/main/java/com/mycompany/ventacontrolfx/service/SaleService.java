@@ -70,7 +70,6 @@ public class SaleService {
                     try (ResultSet rs = pstmt.getGeneratedKeys()) {
                         if (rs.next()) {
                             saleId = rs.getInt(1);
-                            System.out.println("Venta guardada con ID: " + saleId);
                         } else {
                             throw new SQLException("Error al crear la venta, no se obtuvo el ID generado.");
                         }
@@ -89,13 +88,10 @@ public class SaleService {
                         pstmt.addBatch();
                     }
                     pstmt.executeBatch();
-                    System.out.println("Detalles de la venta guardados.");
                 }
 
                 conn.commit();
-                System.out.println("Transacción de venta completada exitosamente.");
             } catch (SQLException e) {
-                System.err.println("Error en saveSale: " + e.getMessage());
                 conn.rollback();
                 throw e;
             }
@@ -302,6 +298,13 @@ public class SaleService {
                 conn.rollback();
                 throw e;
             }
+        }
+    }
+
+    public int getTotalCount() throws SQLException {
+        try (Connection conn = DBConnection.getConnection()) {
+            SaleDAO saleDAO = new SaleDAO(conn);
+            return saleDAO.getTotalCount();
         }
     }
 }

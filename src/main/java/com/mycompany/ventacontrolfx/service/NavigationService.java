@@ -40,9 +40,19 @@ public class NavigationService {
     private final Button btnUsers;
     private final Button btnClients; // Added btnClients
     private final Button btnConfig; // Added btnConfig
+    private final Button btnClosures; // Added btnClosures
 
     private final List<Button> sidebarButtons;
     private final CartService cartService; // Added CartService
+
+    // Summary Cards
+    private final HBox cardCountProducts;
+    private final HBox cardCountCategories;
+    private final HBox cardCountHistory;
+    private final HBox cardCountClosures;
+    private final HBox cardCountClients;
+    private final HBox cardCountUsers;
+    private final List<HBox> summaryCards;
 
     public NavigationService(
             ScrollPane mainContent,
@@ -62,7 +72,14 @@ public class NavigationService {
             Button btnUsers,
             Button btnClients, // Added btnClients
             Button btnConfig, // Added btnConfig
-            CartService cartService) { // Added CartService
+            Button btnClosures, // Added btnClosures
+            CartService cartService,
+            HBox cardCountProducts,
+            HBox cardCountCategories,
+            HBox cardCountHistory,
+            HBox cardCountClosures,
+            HBox cardCountClients,
+            HBox cardCountUsers) { // Added CartService
         this.mainContent = mainContent;
         this.loadingOverlay = loadingOverlay;
         this.cartPanel = cartPanel;
@@ -81,16 +98,28 @@ public class NavigationService {
         this.btnUsers = btnUsers;
         this.btnClients = btnClients;
         this.btnConfig = btnConfig;
+        this.btnClosures = btnClosures;
         this.cartService = cartService;
 
         this.sidebarButtons = Arrays.asList(btnSell, btnProducts, btnProductsList, btnCategories, btnHistory, btnUsers,
-                btnClients, btnConfig);
+                btnClients, btnConfig, btnClosures);
+
+        this.cardCountProducts = cardCountProducts;
+        this.cardCountCategories = cardCountCategories;
+        this.cardCountHistory = cardCountHistory;
+        this.cardCountClosures = cardCountClosures;
+        this.cardCountClients = cardCountClients;
+        this.cardCountUsers = cardCountUsers;
+
+        this.summaryCards = Arrays.asList(cardCountProducts, cardCountCategories, cardCountHistory,
+                cardCountClosures, cardCountClients, cardCountUsers);
     }
 
     public void showSellView(Runnable dataLoadAction) {
         simulateLoading(() -> {
             mainContent.setContent(productsPane);
             setSalesComponentsVisible(true);
+            showOnlyCard(cardCountProducts); // For selling, show products count
             setActiveButton(btnSell);
             if (dataLoadAction != null)
                 dataLoadAction.run();
@@ -100,19 +129,11 @@ public class NavigationService {
     public void showProductsView(Runnable dataLoadAction) {
         simulateLoading(() -> {
             try {
-                FXMLLoader loader = new FXMLLoader(
-                        getClass().getResource("/com/mycompany/ventacontrolfx/view/products.fxml"));
-                // Note: Original path was "/view/products.fxml". Adjusting to possible absolute
-                // path if needed.
-                // Assuming standard Maven structure: src/main/resources/view/products.fxml ->
-                // "/view/products.fxml"
-                // Checking MainController usage: "/view/products.fxml" (Step 3068 line 187).
-                // I should use exactly what MainController used.
-
                 Parent view = FXMLLoader.load(getClass().getResource("/view/products.fxml"));
                 mainContent.setContent(view);
 
                 setSalesComponentsVisible(false);
+                showOnlyCard(cardCountProducts);
                 setActiveButton(btnProductsList);
 
                 if (dataLoadAction != null)
@@ -130,6 +151,7 @@ public class NavigationService {
                 mainContent.setContent(view);
 
                 setSalesComponentsVisible(false);
+                showOnlyCard(cardCountCategories);
                 setActiveButton(btnCategories);
 
                 if (dataLoadAction != null)
@@ -147,7 +169,26 @@ public class NavigationService {
                 mainContent.setContent(view);
 
                 setSalesComponentsVisible(false);
+                showOnlyCard(cardCountHistory);
                 setActiveButton(btnHistory);
+
+                if (dataLoadAction != null)
+                    dataLoadAction.run();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+    }
+
+    public void showClosureHistoryView(Runnable dataLoadAction) {
+        simulateLoading(() -> {
+            try {
+                Parent view = FXMLLoader.load(getClass().getResource("/view/closure_history.fxml"));
+                mainContent.setContent(view);
+
+                setSalesComponentsVisible(false);
+                showOnlyCard(cardCountClosures);
+                setActiveButton(btnClosures);
 
                 if (dataLoadAction != null)
                     dataLoadAction.run();
@@ -164,6 +205,7 @@ public class NavigationService {
                 mainContent.setContent(view);
 
                 setSalesComponentsVisible(false); // Hide optional sales components
+                showOnlyCard(cardCountUsers);
                 setActiveButton(btnUsers);
 
                 if (dataLoadAction != null)
@@ -181,6 +223,7 @@ public class NavigationService {
                 mainContent.setContent(view);
 
                 setSalesComponentsVisible(false);
+                showOnlyCard(null); // No card for config
                 setActiveButton(btnConfig);
 
                 if (dataLoadAction != null)
@@ -206,6 +249,7 @@ public class NavigationService {
                 mainContent.setContent(view);
 
                 setSalesComponentsVisible(false); // Hide optional sales components
+                showOnlyCard(cardCountClients);
                 setActiveButton(btnClients);
 
                 if (dataLoadAction != null)
@@ -260,6 +304,18 @@ public class NavigationService {
             pause.play();
         } else {
             action.run();
+        }
+    }
+
+    private void showOnlyCard(HBox cardToShow) {
+        if (summaryCards == null)
+            return;
+        for (HBox card : summaryCards) {
+            if (card != null) {
+                boolean isThisCard = (card == cardToShow);
+                card.setVisible(isThisCard);
+                card.setManaged(isThisCard);
+            }
         }
     }
 

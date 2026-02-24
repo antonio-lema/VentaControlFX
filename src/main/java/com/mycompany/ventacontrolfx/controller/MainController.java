@@ -13,6 +13,7 @@ import javafx.geometry.Pos;
 import javafx.geometry.Insets;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 
+import com.mycompany.ventacontrolfx.util.AlertUtil;
 import com.mycompany.ventacontrolfx.util.RippleEffect;
 import com.mycompany.ventacontrolfx.model.Product;
 import com.mycompany.ventacontrolfx.model.Category;
@@ -44,6 +45,9 @@ import javafx.stage.Stage;
 import javafx.stage.Modality;
 import javafx.stage.StageStyle;
 import com.mycompany.ventacontrolfx.service.SaleService;
+import com.mycompany.ventacontrolfx.service.UserService;
+import com.mycompany.ventacontrolfx.service.CashClosureService;
+import com.mycompany.ventacontrolfx.service.ClientService;
 
 public class MainController {
 
@@ -53,6 +57,9 @@ public class MainController {
     private ProductFilterService filterService;
     private SaleService saleService;
     private NavigationService navigationService;
+    private UserService userService;
+    private CashClosureService closureService;
+    private ClientService clientService;
     private FilterType currentFilterType = FilterType.ALL;
 
     @FXML
@@ -99,6 +106,32 @@ public class MainController {
     @FXML
     private Button btnRemoveClient;
 
+    @FXML
+    private Label labelCountProducts;
+    @FXML
+    private Label labelCountCategories;
+    @FXML
+    private Label labelCountHistory;
+    @FXML
+    private Label labelCountClosures;
+    @FXML
+    private Label labelCountClients;
+    @FXML
+    private Label labelCountUsers;
+
+    @FXML
+    private HBox cardCountProducts;
+    @FXML
+    private HBox cardCountCategories;
+    @FXML
+    private HBox cardCountHistory;
+    @FXML
+    private HBox cardCountClosures;
+    @FXML
+    private HBox cardCountClients;
+    @FXML
+    private HBox cardCountUsers;
+
     private List<Product> products = new ArrayList<>();
     private List<Product> allProducts = new ArrayList<>();
 
@@ -140,6 +173,9 @@ public class MainController {
     private Button btnLock;
 
     @FXML
+    private Button btnClosures;
+
+    @FXML
     private Label lblProductsArrow;
     @FXML
     private VBox loadingOverlay;
@@ -165,8 +201,6 @@ public class MainController {
         Platform.runLater(() -> {
             if (searchField != null) {
                 setupSearchListener();
-            } else {
-                System.out.println("Warning: searchField is null in showSellView");
             }
         });
     }
@@ -174,6 +208,11 @@ public class MainController {
     @FXML
     private void showHistoryView() {
         navigationService.showHistoryView(null);
+    }
+
+    @FXML
+    private void handleShowClosures() {
+        navigationService.showClosureHistoryView(null);
     }
 
     @FXML
@@ -211,12 +250,8 @@ public class MainController {
                                 Platform.runLater(this::handlePayButton);
                             });
                 } catch (SQLException e) {
-                    e.printStackTrace();
-                    Alert alert = new Alert(Alert.AlertType.ERROR);
-                    alert.setTitle("Error de Base de Datos");
-                    alert.setHeaderText("No se pudo guardar la venta");
-                    alert.setContentText("Ocurrió un error al guardar la venta en la base de datos: " + e.getMessage());
-                    alert.showAndWait();
+                    AlertUtil.showError("No se pudo guardar la venta",
+                            "Ocurrió un error al guardar la venta en la base de datos: " + e.getMessage());
                 }
             });
 
@@ -231,12 +266,7 @@ public class MainController {
             stage.showAndWait();
 
         } catch (IOException e) {
-            e.printStackTrace();
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Error");
-            alert.setHeaderText("Error al abrir pantalla de pago");
-            alert.setContentText(e.getMessage());
-            alert.showAndWait();
+            AlertUtil.showError("Error al abrir pantalla de pago", e.getMessage());
         }
     }
 
@@ -290,14 +320,21 @@ public class MainController {
         cartService = new CartService();
         filterService = new ProductFilterService();
         saleService = new SaleService();
+        userService = new UserService();
+        closureService = new CashClosureService();
+        clientService = new ClientService();
         initCartListener();
         initClientSelectionListener();
+        refreshCounts();
         navigationService = new NavigationService(
                 mainContent, loadingOverlay, cartPanel, favoriteCategoriesBox,
                 searchBarContainer, filterDisplayContainer, productsPane,
                 productsSubmenu, lblProductsArrow,
                 btnSell, btnProducts, btnProductsList, btnCategories, btnHistory, btnUsers, btnClients, btnConfig,
-                cartService);
+                btnClosures,
+                cartService,
+                cardCountProducts, cardCountCategories, cardCountHistory,
+                cardCountClosures, cardCountClients, cardCountUsers);
 
         // Apply Ripple Effect to Sidebar Buttons
 
@@ -319,6 +356,8 @@ public class MainController {
             RippleEffect.applyTo(btnUsers);
         if (btnConfig != null)
             RippleEffect.applyTo(btnConfig);
+        if (btnClosures != null)
+            RippleEffect.applyTo(btnClosures);
         if (btnLock != null)
             RippleEffect.applyTo(btnLock);
 
@@ -353,8 +392,6 @@ public class MainController {
         Platform.runLater(() -> {
             if (searchField != null) {
                 setupSearchListener();
-            } else {
-                System.out.println("Warning: searchField is null in initialize");
             }
         });
 
@@ -378,10 +415,7 @@ public class MainController {
             // So setting filterService state here is correct.
         } catch (SQLException e) {
             e.printStackTrace();
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Error");
-            alert.setContentText("Error al cargar productos: " + e.getMessage());
-            alert.show();
+            AlertUtil.showError("Error", "Error al cargar productos: " + e.getMessage());
         }
     }
 
@@ -431,7 +465,7 @@ public class MainController {
             categoriesScrollPane.prefHeightProperty().bind(categoriesFlowPane.heightProperty().add(20));
             categoriesScrollPane.setMaxHeight(Double.MAX_VALUE);
             if (expandIcon != null)
-                expandIcon.setGlyphName("CHEVRON_UP");
+                expandIcon.setGlyphName("CHEVRON_DOWN");
         } else {
             // Collapse
             collapseCategories();
@@ -443,7 +477,7 @@ public class MainController {
         categoriesScrollPane.setPrefHeight(100);
         categoriesScrollPane.setMaxHeight(100);
         if (expandIcon != null)
-            expandIcon.setGlyphName("CHEVRON_DOWN");
+            expandIcon.setGlyphName("CHEVRON_UP");
     }
 
     private void setupCategoryButton(Button btn) {
@@ -510,29 +544,18 @@ public class MainController {
     }
 
     private void setupSearchListener() {
-        // Avoid adding multiple listeners
-        if (searchField == null) {
-            System.out.println("ERROR: searchField is null!");
+        if (searchField == null || searchField.getProperties().get("listenerAdded") != null) {
             return;
         }
 
-        if (searchField.getProperties().get("listenerAdded") != null) {
-            System.out.println("Search listener already added");
-            return;
-        }
-
-        System.out.println("Setting up search listener...");
         searchField.textProperty().addListener((observable, oldValue, newValue) -> {
-            System.out.println("Search text changed: '" + newValue + "'");
             performSearch(newValue);
         });
 
         searchField.getProperties().put("listenerAdded", true);
-        System.out.println("Search listener configured successfully");
     }
 
     private void performSearch(String searchText) {
-        System.out.println("performSearch called with: '" + searchText + "'");
 
         filterService.setFilterSearch(searchText);
 
@@ -661,34 +684,21 @@ public class MainController {
 
     @FXML
     private void handleLogout() {
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Cerrar Sesión");
-        alert.setHeaderText("¿Estás seguro de que quieres salir?");
-        alert.setContentText("Se cerrará la sesión actual.");
+        boolean result = AlertUtil.showConfirmation("Cerrar Sesión", "¿Estás seguro de que quieres salir?",
+                "Se cerrará la sesión actual.");
+        if (result) {
+            // Clear session
+            com.mycompany.ventacontrolfx.util.UserSession.getInstance().logout();
 
-        Optional<ButtonType> result = alert.showAndWait();
-        if (result.isPresent() && result.get() == ButtonType.OK) {
-            try {
-                // Clear session
-                com.mycompany.ventacontrolfx.util.UserSession.getInstance().logout();
-
-                // Switch to Login View
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/login.fxml"));
-                Parent root = loader.load();
-
-                Stage stage = (Stage) mainContent.getScene().getWindow();
-                Scene scene = new Scene(root, 900, 600); // 900x600 for login
-                scene.getStylesheets().add(getClass().getResource("/view/style.css").toExternalForm());
-
-                stage.setScene(scene);
-                stage.setTitle("Login - TPV Bazar Electrónico");
-                stage.centerOnScreen();
-                stage.setMaximized(false); // Login window shouldn't be maximized usually
-                stage.show();
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            // Switch to Login View using SceneNavigator
+            Stage stage = (Stage) mainContent.getScene().getWindow();
+            com.mycompany.ventacontrolfx.util.SceneNavigator.loadScene(
+                    stage,
+                    "/view/login.fxml",
+                    "Login - TPV Bazar Electrónico",
+                    900,
+                    600);
+            stage.setMaximized(false); // Login window shouldn't be maximized usually
         }
     }
 
@@ -705,10 +715,7 @@ public class MainController {
         com.mycompany.ventacontrolfx.model.User currentUser = com.mycompany.ventacontrolfx.util.UserSession
                 .getInstance().getCurrentUser();
         if (currentUser == null || !"admin".equalsIgnoreCase(currentUser.getRole())) {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Acceso Denegado");
-            alert.setHeaderText("No tienes permisos para acceder a esta sección.");
-            alert.showAndWait();
+            AlertUtil.showError("Acceso Denegado", "No tienes permisos para acceder a esta sección.");
             return;
         }
 
@@ -775,11 +782,7 @@ public class MainController {
 
         } catch (IOException e) {
             e.printStackTrace();
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Error");
-            alert.setHeaderText("Error al bloquear la sesión");
-            alert.setContentText(e.getMessage());
-            alert.showAndWait();
+            AlertUtil.showError("Error al bloquear la sesión", e.getMessage());
         }
     }
 
@@ -799,4 +802,26 @@ public class MainController {
             }
         }
     }
+
+    private void refreshCounts() {
+        Platform.runLater(() -> {
+            try {
+                if (labelCountProducts != null)
+                    labelCountProducts.setText(String.valueOf(productService.getCount()));
+                if (labelCountCategories != null)
+                    labelCountCategories.setText(String.valueOf(categoryService.getCount()));
+                if (labelCountHistory != null)
+                    labelCountHistory.setText(String.valueOf(saleService.getTotalCount()));
+                if (labelCountClosures != null)
+                    labelCountClosures.setText(String.valueOf(closureService.getCount()));
+                if (labelCountClients != null)
+                    labelCountClients.setText(String.valueOf(clientService.getCount()));
+                if (labelCountUsers != null)
+                    labelCountUsers.setText(String.valueOf(userService.getCount()));
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        });
+    }
+
 }

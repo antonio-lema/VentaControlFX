@@ -12,6 +12,7 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import com.mycompany.ventacontrolfx.util.AlertUtil;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -196,13 +197,7 @@ public class PasswordRecoveryController {
             boolean updated = userService.updatePassword(targetUser.getUserId(), pass1);
             if (updated) {
                 // Success! Redirect to login.
-                javafx.scene.control.Alert alert = new javafx.scene.control.Alert(
-                        javafx.scene.control.Alert.AlertType.INFORMATION);
-                alert.setTitle("Éxito");
-                alert.setHeaderText(null);
-                alert.setContentText("Contraseña actualizada con éxito. Por favor, inicia sesión.");
-                alert.showAndWait();
-
+                AlertUtil.showInfo("Éxito", "Contraseña actualizada con éxito. Por favor, inicia sesión.");
                 handleBack();
             } else {
                 lblError.setText("No se pudo actualizar la contraseña.");
@@ -229,14 +224,7 @@ public class PasswordRecoveryController {
 
             if (user != null) {
                 emailService.sendUsernameReminder(email, user.getUsername());
-
-                javafx.scene.control.Alert alert = new javafx.scene.control.Alert(
-                        javafx.scene.control.Alert.AlertType.INFORMATION);
-                alert.setTitle("Usuario Enviado");
-                alert.setHeaderText(null);
-                alert.setContentText("Se ha enviado el nombre de usuario a su correo.");
-                alert.showAndWait();
-
+                AlertUtil.showInfo("Usuario Enviado", "Se ha enviado el nombre de usuario a su correo.");
                 handleBack();
             } else {
                 lblError.setText("No existe ninguna cuenta asociada a este correo.");

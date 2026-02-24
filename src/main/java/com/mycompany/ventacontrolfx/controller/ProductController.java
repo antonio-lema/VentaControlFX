@@ -4,10 +4,10 @@ import com.mycompany.ventacontrolfx.model.Product;
 import com.mycompany.ventacontrolfx.service.ProductService;
 import java.sql.SQLException;
 import java.util.List;
+import com.mycompany.ventacontrolfx.util.AlertUtil;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.TableCell;
@@ -29,11 +29,9 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.stage.Modality;
-import java.io.IOException;
 import javafx.geometry.Pos;
 import javafx.scene.layout.HBox;
-import java.util.Optional;
-import javafx.scene.control.ButtonType;
+import javafx.scene.control.TableCell;
 
 public class ProductController {
 
@@ -365,18 +363,10 @@ public class ProductController {
     }
 
     private void handleDeleteProduct(Product product) {
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Confirmar Eliminación");
-        alert.setHeaderText("Eliminar Producto");
-        alert.setContentText("¿Está seguro de que desea eliminar el producto '" + product.getName() + "'?");
-
-        // Add styling to dialog
-        javafx.scene.control.DialogPane dialogPane = alert.getDialogPane();
-        dialogPane.getStylesheets().add(getClass().getResource("/view/style.css").toExternalForm());
-        dialogPane.getStyleClass().add("custom-alert");
-
-        Optional<ButtonType> result = alert.showAndWait();
-        if (result.isPresent() && result.get() == ButtonType.OK) {
+        boolean confirmed = AlertUtil.showConfirmation("Confirmar Eliminación",
+                "¿Está seguro de que desea eliminar el producto '" + product.getName() + "'?",
+                "Esta acción no se puede deshacer.");
+        if (confirmed) {
             try {
                 productService.deleteProduct(product.getId());
                 loadAllProducts();
@@ -388,10 +378,6 @@ public class ProductController {
     }
 
     private void showAlert(String title, String content) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(content);
-        alert.showAndWait();
+        AlertUtil.showInfo(title, content);
     }
 }

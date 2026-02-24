@@ -4,9 +4,9 @@ import com.mycompany.ventacontrolfx.model.Category;
 import com.mycompany.ventacontrolfx.service.CategoryService;
 import java.sql.SQLException;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import com.mycompany.ventacontrolfx.util.AlertUtil;
 
 public class AddCategoryController {
 
@@ -87,10 +87,6 @@ public class AddCategoryController {
     }
 
     private void showAlert(String title, String content) {
-        Alert alert = new Alert(Alert.AlertType.WARNING);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(content);
-        alert.showAndWait();
+        AlertUtil.showWarning(title, content);
     }
 }

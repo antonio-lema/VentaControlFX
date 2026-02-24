@@ -15,6 +15,7 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import com.mycompany.ventacontrolfx.util.AlertUtil;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -75,7 +76,7 @@ public class ClientsController {
 
         } catch (IOException e) {
             e.printStackTrace();
-            showAlert("Error", "No se pudo abrir el formulario", Alert.AlertType.ERROR);
+            AlertUtil.showError("Error", "No se pudo abrir el formulario");
         }
     }
 
@@ -85,7 +86,7 @@ public class ClientsController {
             displayClients(clients);
         } catch (SQLException e) {
             e.printStackTrace();
-            showAlert("Error", "No se pudieron cargar las empresas", Alert.AlertType.ERROR);
+            AlertUtil.showError("Error", "No se pudieron cargar las empresas");
         }
     }
 
@@ -202,19 +203,17 @@ public class ClientsController {
     }
 
     private void handleDelete(Client client) {
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "¿Estás seguro de eliminar a " + client.getName() + "?",
-                ButtonType.YES, ButtonType.NO);
-        alert.showAndWait().ifPresent(response -> {
-            if (response == ButtonType.YES) {
-                try {
-                    clientService.deleteClient(client.getId());
-                    loadClients();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                    showAlert("Error", "No se pudo eliminar la empresa", Alert.AlertType.ERROR);
-                }
+        boolean confirmed = AlertUtil.showConfirmation("Eliminar Empresa",
+                "¿Estás seguro de eliminar a " + client.getName() + "?", "Esta acción no se puede deshacer.");
+        if (confirmed) {
+            try {
+                clientService.deleteClient(client.getId());
+                loadClients();
+            } catch (SQLException e) {
+                e.printStackTrace();
+                AlertUtil.showError("Error", "No se pudo eliminar la empresa");
             }
-        });
+        }
     }
 
     @FXML
@@ -230,9 +229,19 @@ public class ClientsController {
     }
 
     private void showAlert(String title, String content, Alert.AlertType type) {
-        Alert alert = new Alert(type);
-        alert.setTitle(title);
-        alert.setContentText(content);
-        alert.showAndWait();
+        switch (type) {
+            case ERROR:
+                AlertUtil.showError(title, content);
+                break;
+            case WARNING:
+                AlertUtil.showWarning(title, content);
+                break;
+            case CONFIRMATION:
+                AlertUtil.showConfirmation(title, content, "");
+                break;
+            default:
+                AlertUtil.showInfo(title, content);
+                break;
+        }
     }
 }

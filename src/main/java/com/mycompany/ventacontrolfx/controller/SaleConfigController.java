@@ -13,6 +13,8 @@ import javafx.stage.FileChooser;
 
 import com.mycompany.ventacontrolfx.service.SaleConfigService;
 import com.mycompany.ventacontrolfx.model.SaleConfig;
+import com.mycompany.ventacontrolfx.dao.ConfigDAO;
+import javafx.scene.control.PasswordField;
 
 public class SaleConfigController {
 
@@ -29,6 +31,16 @@ public class SaleConfigController {
     private TextField txtEmail;
     @FXML
     private TextField txtLogoPath;
+
+    // ── Email / SMTP ──────────────────────────────────────────────────
+    @FXML
+    private TextField txtSmtpHost;
+    @FXML
+    private TextField txtSmtpPort;
+    @FXML
+    private TextField txtEmailFrom;
+    @FXML
+    private PasswordField txtEmailPassword;
 
     // ── Fiscal ────────────────────────────────────────────────────────
     @FXML
@@ -63,6 +75,7 @@ public class SaleConfigController {
     private HBox bannerSaved;
 
     private final SaleConfigService configService = new SaleConfigService();
+    private final ConfigDAO configDAO = new ConfigDAO();
 
     // ─────────────────────────────────────────────────────────────────
     @FXML
@@ -100,7 +113,11 @@ public class SaleConfigController {
         setComboValue(cmbTicketCopies, cfg.getTicketCopies());
         chkAutoPrint.setSelected(cfg.isAutoPrint());
 
-        // Métodos de pago y opciones generales: secciones eliminadas
+        // SMTP
+        txtSmtpHost.setText(configDAO.getValue("smtp_host"));
+        txtSmtpPort.setText(configDAO.getValue("smtp_port"));
+        txtEmailFrom.setText(configDAO.getValue("email_from"));
+        txtEmailPassword.setText(configDAO.getValue("email_password"));
     }
 
     // ─────────────────────────────────────────────────────────────────
@@ -108,6 +125,14 @@ public class SaleConfigController {
     private void handleSave() {
         SaleConfig cfg = buildConfig();
         configService.save(cfg);
+
+        // Save SMTP
+        configDAO.setValue("smtp_host", txtSmtpHost.getText() != null ? txtSmtpHost.getText().trim() : "");
+        configDAO.setValue("smtp_port", txtSmtpPort.getText() != null ? txtSmtpPort.getText().trim() : "");
+        configDAO.setValue("email_from", txtEmailFrom.getText() != null ? txtEmailFrom.getText().trim() : "");
+        configDAO.setValue("email_password",
+                txtEmailPassword.getText() != null ? txtEmailPassword.getText().trim() : "");
+
         showBanner();
     }
 

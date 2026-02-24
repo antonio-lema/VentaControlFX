@@ -151,10 +151,10 @@
                   </VBox>
 
                   <!-- Receipt Side Panel -->
-                  <VBox fx:id="detailsPanel" prefWidth="380.0" visible="false" style="-fx-background-color: white; -fx-background-radius: 12; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 20, 0, 0, 5); -fx-border-color: #e0e0e0; -fx-border-width: 1; -fx-border-radius: 12; -fx-overflow: hidden;">
+                  <VBox fx:id="detailsPanel" prefWidth="380.0" visible="false" managed="false" style="-fx-background-color: white; -fx-background-radius: 12; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 20, 0, 0, 5); -fx-border-color: #e0e0e0; -fx-border-width: 1; -fx-border-radius: 12; -fx-overflow: hidden;">
                      <children>
                         <HBox prefHeight="8.0" style="-fx-background-color: #1e88e5; -fx-background-radius: 12 12 0 0;" />
-                        <VBox spacing="15.0" style="-fx-padding: 30;">
+                        <VBox spacing="15.0" style="-fx-padding: 30;" VBox.vgrow="ALWAYS">
                            <children>
                               <VBox alignment="CENTER" spacing="5">
                                  <children>
@@ -174,7 +174,7 @@
                               <Separator  style="-fx-padding: 10 0;"/>
                               
                               <Label text="PRODUCTOS" textFill="#7f8c8d" style="-fx-font-weight: bold; -fx-font-size: 11px;" />
-                              <ScrollPane fitToWidth="true" style="-fx-background-color: transparent; -fx-background: transparent; -fx-padding: 0;" prefHeight="350.0">
+                              <ScrollPane fitToWidth="true" style="-fx-background-color: transparent; -fx-background: transparent; -fx-padding: 0;" prefHeight="300.0">
                                  <content>
                                     <VBox fx:id="detailsItemsContainer" spacing="12.0" style="-fx-background-color: white;" />
                                  </content>
@@ -221,6 +221,9 @@
                                       </Button>
                                   </children>
                                </HBox>
+                               
+                               <Region VBox.vgrow="ALWAYS" />
+                               <Button onAction="#handleCloseDetails" maxWidth="Infinity" style="-fx-background-color: #ecf0f1; -fx-text-fill: #7f8c8d; -fx-font-weight: bold; -fx-padding: 12; -fx-background-radius: 10; -fx-cursor: hand;" text="CERRAR DETALLES" />
                            </children>
                         </VBox>
                      </children>

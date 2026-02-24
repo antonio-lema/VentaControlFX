@@ -58,4 +58,11 @@ public class ProductService {
             return productDAO.getFavoriteVisibleProducts();
         }
     }
+
+    public int getCount() throws SQLException {
+        try (Connection conn = DBConnection.getConnection()) {
+            ProductDAO productDAO = new ProductDAO(conn);
+            return productDAO.getCount();
+        }
+    }
 }

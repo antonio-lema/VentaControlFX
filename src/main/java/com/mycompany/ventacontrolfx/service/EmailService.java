@@ -2,7 +2,7 @@ package com.mycompany.ventacontrolfx.service;
 
 import com.mycompany.ventacontrolfx.dao.ConfigDAO;
 import javafx.application.Platform;
-import javafx.scene.control.Alert;
+import com.mycompany.ventacontrolfx.util.AlertUtil;
 
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
@@ -29,12 +29,8 @@ public class EmailService {
             // Validar que exista la configuración
             if (smtpHost == null || smtpPort == null || emailFrom == null || emailPassword == null) {
                 Platform.runLater(() -> {
-                    Alert alert = new Alert(Alert.AlertType.ERROR);
-                    alert.setTitle("Error de Configuración");
-                    alert.setHeaderText("Faltan datos de correo");
-                    alert.setContentText(
+                    AlertUtil.showError("Error de Configuración",
                             "No se pudo enviar el correo porque faltan configuraciones en la base de datos (system_config).");
-                    alert.showAndWait();
                 });
                 return;
             }
@@ -61,26 +57,16 @@ public class EmailService {
 
                 Transport.send(message);
 
-                System.out.println("Correo enviado exitosamente a: " + to);
-
                 // Notificar éxito en la UI
                 Platform.runLater(() -> {
-                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                    alert.setTitle("Correo Enviado");
-                    alert.setHeaderText(null);
-                    alert.setContentText("Se ha enviado un correo a: " + to + "\nRevisa tu bandeja de entrada.");
-                    alert.showAndWait();
+                    AlertUtil.showInfo("Correo Enviado",
+                            "Se ha enviado un correo a: " + to + "\nRevisa tu bandeja de entrada.");
                 });
 
             } catch (MessagingException e) {
-                e.printStackTrace();
                 // Notificar error en la UI
                 Platform.runLater(() -> {
-                    Alert alert = new Alert(Alert.AlertType.ERROR);
-                    alert.setTitle("Error de Envío");
-                    alert.setHeaderText("No se pudo enviar el correo");
-                    alert.setContentText("Error: " + e.getMessage());
-                    alert.showAndWait();
+                    AlertUtil.showError("Error de Envío", "No se pudo enviar el correo: " + e.getMessage());
                 });
             }
         }).start();

@@ -21,14 +21,14 @@ public class ClientService {
         }
     }
 
-    public int saveClient(Client client) throws SQLException {
+    public void saveClient(Client client) throws SQLException {
         try (Connection conn = DBConnection.getConnection()) {
             ClientDAO dao = new ClientDAO(conn);
             if (client.getId() > 0) {
                 dao.updateClient(client);
-                return client.getId();
             } else {
-                return dao.createClient(client);
+                int id = dao.createClient(client);
+                client.setId(id);
             }
         }
     }
@@ -36,6 +36,12 @@ public class ClientService {
     public void deleteClient(int clientId) throws SQLException {
         try (Connection conn = DBConnection.getConnection()) {
             new ClientDAO(conn).deleteClient(clientId);
+        }
+    }
+
+    public int getCount() throws SQLException {
+        try (Connection conn = DBConnection.getConnection()) {
+            return new ClientDAO(conn).getCount();
         }
     }
 }

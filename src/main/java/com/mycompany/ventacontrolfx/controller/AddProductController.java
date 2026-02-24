@@ -7,9 +7,9 @@ import com.mycompany.ventacontrolfx.service.ProductService;
 import java.io.File;
 import java.sql.SQLException;
 import java.util.List;
-import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
+import com.mycompany.ventacontrolfx.util.AlertUtil;
+import javafx.collections.FXCollections;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
@@ -202,10 +202,6 @@ public class AddProductController {
     }
 
     private void showAlert(String title, String content) {
-        Alert alert = new Alert(Alert.AlertType.WARNING);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(content);
-        alert.showAndWait();
+        AlertUtil.showWarning(title, content);
     }
 }

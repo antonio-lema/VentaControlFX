@@ -12,6 +12,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import com.mycompany.ventacontrolfx.util.AlertUtil;
 import javafx.scene.Node;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
@@ -62,7 +63,7 @@ public class ManageUsersController {
             renderUserCards(userList);
         } catch (SQLException e) {
             e.printStackTrace();
-            showAlert("Error", "No se pudieron cargar los usuarios: " + e.getMessage(), Alert.AlertType.ERROR);
+            AlertUtil.showError("Error", "No se pudieron cargar los usuarios: " + e.getMessage());
         }
     }
 
@@ -175,7 +176,7 @@ public class ManageUsersController {
 
         } catch (IOException e) {
             e.printStackTrace();
-            showAlert("Error", "No se pudo abrir la ventana de registro", Alert.AlertType.ERROR);
+            AlertUtil.showError("Error", "No se pudo abrir la ventana de registro");
         }
     }
 
@@ -205,28 +206,24 @@ public class ManageUsersController {
 
         } catch (IOException e) {
             e.printStackTrace();
-            showAlert("Error", "No se pudo abrir la ventana de edición: " + e.getMessage(), Alert.AlertType.ERROR);
+            AlertUtil.showError("Error", "No se pudo abrir la ventana de edición: " + e.getMessage());
         }
     }
 
     private void handleDeleteSingleUser(User user) {
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Eliminar Usuario");
-        alert.setHeaderText("¿Eliminar a " + user.getUsername() + "?");
-        alert.setContentText("Esta acción es irreversible.");
-
-        Optional<ButtonType> result = alert.showAndWait();
-        if (result.isPresent() && result.get() == ButtonType.OK) {
+        boolean confirmed = AlertUtil.showConfirmation("Eliminar Usuario", "¿Eliminar a " + user.getUsername() + "?",
+                "Esta acción es irreversible.");
+        if (confirmed) {
             try {
                 boolean deleted = userService.deleteUser(user.getUserId());
                 if (deleted) {
                     loadUsers();
                 } else {
-                    showAlert("Error", "No se pudo eliminar el usuario", Alert.AlertType.ERROR);
+                    AlertUtil.showError("Error", "No se pudo eliminar el usuario");
                 }
             } catch (SQLException e) {
                 e.printStackTrace();
-                showAlert("Error", "Error al eliminar usuario: " + e.getMessage(), Alert.AlertType.ERROR);
+                AlertUtil.showError("Error", "Error al eliminar usuario: " + e.getMessage());
             }
         }
     }
@@ -240,10 +237,19 @@ public class ManageUsersController {
     }
 
     private void showAlert(String title, String content, Alert.AlertType type) {
-        Alert alert = new Alert(type);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(content);
-        alert.showAndWait();
+        switch (type) {
+            case ERROR:
+                AlertUtil.showError(title, content);
+                break;
+            case WARNING:
+                AlertUtil.showWarning(title, content);
+                break;
+            case CONFIRMATION:
+                AlertUtil.showConfirmation(title, content, "");
+                break;
+            default:
+                AlertUtil.showInfo(title, content);
+                break;
+        }
     }
 }

@@ -5,6 +5,7 @@ import com.mycompany.ventacontrolfx.service.ClientService;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
+import com.mycompany.ventacontrolfx.util.AlertUtil;
 import java.sql.SQLException;
 
 public class ClientFormController {
@@ -108,9 +109,19 @@ public class ClientFormController {
     }
 
     private void showAlert(String title, String content, Alert.AlertType type) {
-        Alert alert = new Alert(type);
-        alert.setTitle(title);
-        alert.setContentText(content);
-        alert.showAndWait();
+        switch (type) {
+            case ERROR:
+                AlertUtil.showError(title, content);
+                break;
+            case WARNING:
+                AlertUtil.showWarning(title, content);
+                break;
+            case CONFIRMATION:
+                AlertUtil.showConfirmation(title, content, "");
+                break;
+            default:
+                AlertUtil.showInfo(title, content);
+                break;
+        }
     }
 }

@@ -55,4 +55,11 @@ public class CategoryService {
             categoryDAO.deleteCategory(categoryId);
         }
     }
+
+    public int getCount() throws SQLException {
+        try (Connection conn = DBConnection.getConnection()) {
+            CategoryDAO categoryDAO = new CategoryDAO(conn);
+            return categoryDAO.getCount();
+        }
+    }
 }

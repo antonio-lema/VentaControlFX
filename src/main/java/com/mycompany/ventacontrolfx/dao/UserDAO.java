@@ -93,7 +93,6 @@ public class UserDAO {
     // Método para verificar login
     public boolean validateLogin(String username, String password) throws SQLException {
         User user = findByUsername(username);
-        // TODO: Use password hashing verification in production
         if (user != null && user.getPassword().equals(password)) {
             return true;
         }
@@ -136,5 +135,17 @@ public class UserDAO {
             pstmt.setInt(1, userId);
             return pstmt.executeUpdate() > 0;
         }
+    }
+
+    public int getCount() throws SQLException {
+        String sql = "SELECT COUNT(*) FROM users";
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(sql);
+                ResultSet rs = pstmt.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        }
+        return 0;
     }
 }

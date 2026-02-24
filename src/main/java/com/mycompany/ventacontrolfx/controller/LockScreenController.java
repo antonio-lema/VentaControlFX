@@ -8,10 +8,9 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Label;
-import javafx.scene.control.PasswordField;
+import javafx.scene.control.*;
 import javafx.stage.Stage;
+import com.mycompany.ventacontrolfx.util.AlertUtil;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -115,10 +114,6 @@ public class LockScreenController {
     }
 
     private void showAlert(String title, String content) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(content);
-        alert.showAndWait();
+        AlertUtil.showError(title, content);
     }
 }

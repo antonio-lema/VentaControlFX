@@ -24,22 +24,16 @@ public class App extends Application {
         try (java.sql.Connection conn = com.mycompany.ventacontrolfx.dao.DBConnection.getConnection()) {
             com.mycompany.ventacontrolfx.dao.DatabaseInitializer.initialize(conn);
         } catch (Exception e) {
-            e.printStackTrace();
+            System.err.println("Error initializing database: " + e.getMessage());
         }
 
-        var url = getClass().getResource("/view/login.fxml");
-        System.out.println("FXML URL = " + url);
-
-        Parent root = FXMLLoader.load(url);
-        Scene scene = new Scene(root, 900, 600); // Set a reasonable size for login
-
-        // 👇 AÑADE ESTA LÍNEA
-        scene.getStylesheets().add(
-                getClass().getResource("/view/style.css").toExternalForm());
-
-        primaryStage.setTitle("Login - TPV Bazar Electrónico");
-        primaryStage.setScene(scene);
-        primaryStage.show();
+        // Use SceneNavigator to load the Login screen
+        com.mycompany.ventacontrolfx.util.SceneNavigator.loadScene(
+                primaryStage,
+                "/view/login.fxml",
+                "Login - TPV Bazar Electrónico",
+                900,
+                600);
     }
 
     public static void main(String[] args) {

@@ -115,4 +115,15 @@ public class CategoryDAO {
             pstmt.executeUpdate();
         }
     }
+
+    public int getCount() throws SQLException {
+        String sql = "SELECT COUNT(*) FROM categories";
+        try (Statement stmt = connection.createStatement();
+                ResultSet rs = stmt.executeQuery(sql)) {
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        }
+        return 0;
+    }
 }

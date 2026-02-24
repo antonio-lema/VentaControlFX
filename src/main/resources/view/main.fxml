@@ -27,7 +27,7 @@
 
             <!-- Search Bar -->
             <HBox fx:id="searchBarContainer" alignment="CENTER_LEFT" styleClass="search-bar">
-                <FontAwesomeIconView glyphName="SEARCH" size="16" fill="#7f8c8d"/>
+                <FontAwesomeIconView glyphName="SEARCH" size="16" fill="#1e88e5"/>
                 <TextField fx:id="searchField" promptText="Buscar por código o nombre..." styleClass="search-field" HBox.hgrow="ALWAYS"/>
             </HBox>
 
@@ -37,9 +37,9 @@
             <MenuButton fx:id="userMenuButton" styleClass="user-menu-button" style="-fx-background-color: transparent; -fx-cursor: hand; -fx-padding: 0;">
                 <graphic>
                     <HBox spacing="10" alignment="CENTER_LEFT">
-                         <Circle radius="15" fill="white" style="-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 3, 0, 0, 1);"/>
-                         <Label text="Admin" style="-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 14px;"/>
-                         <Label text="▼" style="-fx-text-fill: rgba(255,255,255,0.7); -fx-font-size: 10px;"/>
+                         <Circle radius="18" fill="#1e88e5" style="-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 3, 0, 0, 1);"/>
+                         <Label text="Admin" style="-fx-text-fill: #2c3e50; -fx-font-weight: bold; -fx-font-size: 15px;"/>
+                         <Label text="▼" style="-fx-text-fill: #7f8c8d; -fx-font-size: 10px;"/>
                     </HBox>
                 </graphic>
                 <items>
@@ -100,6 +100,16 @@
                     </HBox>
                 </graphic>
             </Button>
+            <Button fx:id="btnClosures" styleClass="sidebar-button" onAction="#handleShowClosures" contentDisplay="GRAPHIC_ONLY" maxWidth="Infinity">
+                 <graphic>
+                    <HBox alignment="CENTER_LEFT" spacing="15">
+                        <StackPane styleClass="icon-container">
+                            <FontAwesomeIconView glyphName="ARCHIVE" size="20" styleClass="sidebar-icon"/>
+                        </StackPane>
+                        <Label text="Cierres" styleClass="sidebar-button-label"/>
+                    </HBox>
+                </graphic>
+            </Button>
             <Button fx:id="btnClients" styleClass="sidebar-button" contentDisplay="GRAPHIC_ONLY" maxWidth="Infinity" onAction="#showAddClientDialog">
                 <graphic>
                     <HBox alignment="CENTER_LEFT" spacing="15">
@@ -151,7 +161,7 @@
     <center>
         <BorderPane>
             <center>
-                <VBox>
+                <VBox spacing="0">
                     <!-- Filter Display Label -->
                     <HBox fx:id="filterDisplayContainer" alignment="CENTER_LEFT" styleClass="modern-filter-bar">
                         <StackPane style="-fx-background-color: #e3f2fd; -fx-background-radius: 10; -fx-padding: 10;">
@@ -186,7 +196,7 @@
                     </ScrollPane>
                     <Button fx:id="btnExpandCategories" styleClass="expand-categories-btn" onAction="#handleExpandCategories">
                         <graphic>
-                            <FontAwesomeIconView fx:id="expandIcon" glyphName="CHEVRON_DOWN" size="14" fill="#1e88e5"/>
+                            <FontAwesomeIconView fx:id="expandIcon" glyphName="CHEVRON_UP" size="14" fill="#1e88e5"/>
                         </graphic>
                     </Button>
                 </HBox>
@@ -294,4 +304,61 @@
         </VBox>
     </right>
 
+    <bottom>
+        <HBox spacing="15" alignment="CENTER_RIGHT" styleClass="status-bar">
+            <padding>
+                <Insets top="5" right="20" bottom="5" left="20"/>
+            </padding>
+            <Label text="VentaControlFX v1.0" style="-fx-text-fill: #bdc3c7; -fx-font-size: 11px;"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            
+            <HBox fx:id="cardCountProducts" styleClass="status-badge" managed="false" visible="false">
+                <StackPane styleClass="status-icon-bg-blue">
+                    <FontAwesomeIconView glyphName="TAGS" size="10" fill="white"/>
+                </StackPane>
+                <Label text="Productos:" styleClass="status-badge-label"/>
+                <Label fx:id="labelCountProducts" text="0" styleClass="status-badge-value"/>
+            </HBox>
+            
+            <HBox fx:id="cardCountCategories" styleClass="status-badge" managed="false" visible="false">
+                <StackPane styleClass="status-icon-bg-purple">
+                    <FontAwesomeIconView glyphName="LIST" size="10" fill="white"/>
+                </StackPane>
+                <Label text="Categorías:" styleClass="status-badge-label"/>
+                <Label fx:id="labelCountCategories" text="0" styleClass="status-badge-value"/>
+            </HBox>
+            
+            <HBox fx:id="cardCountHistory" styleClass="status-badge" managed="false" visible="false">
+                <StackPane styleClass="status-icon-bg-orange">
+                    <FontAwesomeIconView glyphName="HISTORY" size="10" fill="white"/>
+                </StackPane>
+                <Label text="Ventas hoy:" styleClass="status-badge-label"/>
+                <Label fx:id="labelCountHistory" text="0" styleClass="status-badge-value"/>
+            </HBox>
+            
+            <HBox fx:id="cardCountClients" styleClass="status-badge" managed="false" visible="false">
+                <StackPane styleClass="status-icon-bg-green">
+                    <FontAwesomeIconView glyphName="USERS" size="10" fill="white"/>
+                </StackPane>
+                <Label text="Empresas:" styleClass="status-badge-label"/>
+                <Label fx:id="labelCountClients" text="0" styleClass="status-badge-value"/>
+            </HBox>
+            
+            <HBox fx:id="cardCountUsers" styleClass="status-badge" managed="false" visible="false">
+                <StackPane styleClass="status-icon-bg-red">
+                    <FontAwesomeIconView glyphName="USER_CIRCLE" size="10" fill="white"/>
+                </StackPane>
+                <Label text="Usuarios:" styleClass="status-badge-label"/>
+                <Label fx:id="labelCountUsers" text="0" styleClass="status-badge-value"/>
+            </HBox>
+            
+            <HBox fx:id="cardCountClosures" styleClass="status-badge" managed="false" visible="false">
+                <StackPane styleClass="status-icon-bg-teal">
+                    <FontAwesomeIconView glyphName="ARCHIVE" size="10" fill="white"/>
+                </StackPane>
+                <Label text="Cierres:" styleClass="status-badge-label"/>
+                <Label fx:id="labelCountClosures" text="0" styleClass="status-badge-value"/>
+            </HBox>
+        </HBox>
+    </bottom>
 </BorderPane>

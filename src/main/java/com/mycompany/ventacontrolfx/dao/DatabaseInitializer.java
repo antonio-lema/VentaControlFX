@@ -130,6 +130,15 @@ public class DatabaseInitializer {
             }
 
             try {
+                stmt.execute("ALTER TABLE sales ADD COLUMN closure_id INT DEFAULT NULL");
+            } catch (SQLException e) {
+            }
+            try {
+                stmt.execute("ALTER TABLE sales MODIFY COLUMN closure_id INT DEFAULT NULL");
+            } catch (SQLException e) {
+            }
+
+            try {
                 stmt.execute("ALTER TABLE sales ADD COLUMN created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP");
             } catch (SQLException e) {
             }
@@ -245,20 +254,6 @@ public class DatabaseInitializer {
                     "config_key VARCHAR(50) PRIMARY KEY, " +
                     "config_value VARCHAR(255))");
 
-            // Insert default email configuration if not exists
-            // We use INSERT IGNORE or checking existence to avoid overwriting user changes
-            // later
-            try {
-                stmt.execute("INSERT IGNORE INTO system_config (config_key, config_value) VALUES " +
-                        "('smtp_host', 'smtp.gmail.com'), " +
-                        "('smtp_port', '587'), " +
-                        "('email_from', 'tpvbazar2@gmail.com'), " +
-                        "('email_password', 'fhpuqqxqmgyqkhya')");
-            } catch (SQLException e) {
-                // In some DBs INSERT IGNORE syntax might differ or fail, but for MySQL/MariaDB
-                // it's standard.
-                // If it fails, we assume keys might exist.
-            }
         }
     }
 }
