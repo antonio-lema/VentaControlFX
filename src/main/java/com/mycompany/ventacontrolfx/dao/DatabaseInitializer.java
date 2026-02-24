@@ -231,7 +231,13 @@ public class DatabaseInitializer {
                     "return_datetime DATETIME, " +
                     "total_refunded DECIMAL(10,2) NOT NULL DEFAULT 0, " +
                     "reason TEXT, " +
+                    "closure_id INT DEFAULT NULL, " +
                     "FOREIGN KEY (sale_id) REFERENCES sales(sale_id))");
+
+            try {
+                stmt.execute("ALTER TABLE returns ADD COLUMN closure_id INT DEFAULT NULL");
+            } catch (SQLException e) {
+            }
 
             // 5. Return Details Table
             stmt.execute("CREATE TABLE IF NOT EXISTS return_details (" +

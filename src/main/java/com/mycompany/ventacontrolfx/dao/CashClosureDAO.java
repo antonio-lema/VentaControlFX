@@ -31,16 +31,22 @@ public class CashClosureDAO {
                 if (generatedKeys.next()) {
                     int closureId = generatedKeys.getInt(1);
                     closure.setClosureId(closureId);
-                    // Link all pending sales to this closure
-                    linkSalesToClosure(closureId);
+                    // Link all pending sales and returns to this closure
+                    linkTransactionsToClosure(closureId);
                 }
             }
         }
     }
 
-    private void linkSalesToClosure(int closureId) throws SQLException {
-        String sql = "UPDATE sales SET closure_id = ? WHERE closure_id IS NULL";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+    private void linkTransactionsToClosure(int closureId) throws SQLException {
+        String sqlSales = "UPDATE sales SET closure_id = ? WHERE closure_id IS NULL";
+        try (PreparedStatement pstmt = connection.prepareStatement(sqlSales)) {
+            pstmt.setInt(1, closureId);
+            pstmt.executeUpdate();
+        }
+
+        String sqlReturns = "UPDATE returns SET closure_id = ? WHERE closure_id IS NULL";
+        try (PreparedStatement pstmt = connection.prepareStatement(sqlReturns)) {
             pstmt.setInt(1, closureId);
             pstmt.executeUpdate();
         }
@@ -49,15 +55,22 @@ public class CashClosureDAO {
     public List<com.mycompany.ventacontrolfx.model.ProductSummary> getProductSummary(int closureId)
             throws SQLException {
         List<com.mycompany.ventacontrolfx.model.ProductSummary> summary = new ArrayList<>();
-        String sql = "SELECT p.name, SUM(sd.quantity) as total_qty, SUM(sd.line_total) as total_amount " +
-                "FROM sale_details sd " +
-                "JOIN sales s ON sd.sale_id = s.sale_id " +
-                "JOIN products p ON sd.product_id = p.product_id " +
-                "WHERE s.closure_id = ? " +
-                "GROUP BY p.name " +
-                "ORDER BY total_qty DESC";
+        String sql = "SELECT name, SUM(quantity) as total_qty, SUM(amount) as total_amount FROM (" +
+                "  SELECT p.name, sd.quantity, sd.line_total as amount " +
+                "  FROM sale_details sd " +
+                "  JOIN sales s ON sd.sale_id = s.sale_id " +
+                "  JOIN products p ON sd.product_id = p.product_id " +
+                "  WHERE s.closure_id = ? " +
+                "  UNION ALL " +
+                "  SELECT p.name, -rd.quantity, -rd.subtotal as amount " +
+                "  FROM return_details rd " +
+                "  JOIN returns r ON rd.return_id = r.return_id " +
+                "  JOIN products p ON rd.product_id = p.product_id " +
+                "  WHERE r.closure_id = ?" +
+                ") as combined GROUP BY name HAVING total_qty <> 0 OR total_amount <> 0 ORDER BY total_qty DESC";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setInt(1, closureId);
+            pstmt.setInt(2, closureId);
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
                     summary.add(new com.mycompany.ventacontrolfx.model.ProductSummary(
@@ -73,13 +86,19 @@ public class CashClosureDAO {
     public List<com.mycompany.ventacontrolfx.model.ProductSummary> getPendingProductSummary()
             throws SQLException {
         List<com.mycompany.ventacontrolfx.model.ProductSummary> summary = new ArrayList<>();
-        String sql = "SELECT p.name, SUM(sd.quantity) as total_qty, SUM(sd.line_total) as total_amount " +
-                "FROM sale_details sd " +
-                "JOIN sales s ON sd.sale_id = s.sale_id " +
-                "JOIN products p ON sd.product_id = p.product_id " +
-                "WHERE s.closure_id IS NULL " +
-                "GROUP BY p.name " +
-                "ORDER BY total_qty DESC";
+        String sql = "SELECT name, SUM(quantity) as total_qty, SUM(amount) as total_amount FROM (" +
+                "  SELECT p.name, sd.quantity, sd.line_total as amount " +
+                "  FROM sale_details sd " +
+                "  JOIN sales s ON sd.sale_id = s.sale_id " +
+                "  JOIN products p ON sd.product_id = p.product_id " +
+                "  WHERE s.closure_id IS NULL " +
+                "  UNION ALL " +
+                "  SELECT p.name, -rd.quantity, -rd.subtotal as amount " +
+                "  FROM return_details rd " +
+                "  JOIN returns r ON rd.return_id = r.return_id " +
+                "  JOIN products p ON rd.product_id = p.product_id " +
+                "  WHERE r.closure_id IS NULL" +
+                ") as combined GROUP BY name HAVING total_qty <> 0 OR total_amount <> 0 ORDER BY total_qty DESC";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {

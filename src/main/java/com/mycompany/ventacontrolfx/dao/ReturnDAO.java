@@ -93,7 +93,7 @@ public class ReturnDAO {
         String sql = "SELECT s.payment_method, SUM(r.total_refunded) as total_refunded " +
                 "FROM returns r " +
                 "JOIN sales s ON r.sale_id = s.sale_id " +
-                "WHERE s.closure_id IS NULL " +
+                "WHERE r.closure_id IS NULL " +
                 "GROUP BY s.payment_method";
 
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
