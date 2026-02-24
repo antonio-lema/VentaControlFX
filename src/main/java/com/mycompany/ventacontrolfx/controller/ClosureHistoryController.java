@@ -140,9 +140,11 @@ public class ClosureHistoryController {
                 super.updateItem(item, empty);
                 if (empty || item == null) {
                     setText(null);
+                    setStyle("");
                 } else {
                     setText(String.format("%.2f €", item));
-                    setStyle("-fx-alignment: CENTER-RIGHT; -fx-font-weight: bold;");
+                    String color = item >= 0 ? "#2e7d32" : "#e53935";
+                    setStyle("-fx-alignment: CENTER-RIGHT; -fx-font-weight: bold; -fx-text-fill: " + color + ";");
                 }
             }
         });
@@ -155,9 +157,11 @@ public class ClosureHistoryController {
                 super.updateItem(item, empty);
                 if (empty || item == null) {
                     setText(null);
+                    setStyle("");
                 } else {
                     setText(String.format("%.2f €", item));
-                    setStyle("-fx-alignment: CENTER-RIGHT; -fx-font-weight: bold;");
+                    String color = item >= 0 ? "#2e7d32" : "#e53935";
+                    setStyle("-fx-alignment: CENTER-RIGHT; -fx-font-weight: bold; -fx-text-fill: " + color + ";");
                 }
             }
         });
@@ -220,9 +224,19 @@ public class ClosureHistoryController {
         }
 
         lblTotalClosures.setText(String.valueOf(closures.size()));
+
         lblTotalCash.setText(String.format("%.2f €", cash));
+        lblTotalCash.setStyle("-fx-font-weight: bold; -fx-font-size: 26px; -fx-text-fill: "
+                + (cash >= 0 ? "#2e7d32" : "#e53935") + ";");
+
         lblTotalCard.setText(String.format("%.2f €", card));
+        lblTotalCard.setStyle("-fx-font-weight: bold; -fx-font-size: 26px; -fx-text-fill: "
+                + (card >= 0 ? "#2e7d32" : "#e53935") + ";");
+
         lblTotalRevenue.setText(String.format("%.2f €", total));
+        // We don't change textFill for revenue if it's the blue card unless requested,
+        // but let's keep it white as the background is blue.
+        // If the background was white, we would color it.
     }
 
     @FXML
