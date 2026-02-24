@@ -10,23 +10,26 @@ import java.util.List;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
+import com.mycompany.ventacontrolfx.util.AlertUtil;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
-import javafx.scene.control.ButtonBar;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.Dialog;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
+import javafx.scene.paint.Color;
+import javafx.fxml.FXMLLoader;
+import java.io.IOException;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.GridPane;
 import javafx.util.Pair;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Collections;
 
 public class HistoryController {
@@ -189,7 +192,7 @@ public class HistoryController {
             salesTable.setItems(FXCollections.observableArrayList(sales));
 
             updateSummaries(sales);
-            detailsPanel.setVisible(false);
+            handleCloseDetails();
         } catch (SQLException e) {
             e.printStackTrace();
             showAlert("Error", "No se pudieron cargar las ventas: " + e.getMessage());
@@ -244,7 +247,7 @@ public class HistoryController {
             List<Sale> sales = saleService.getSalesHistory(start, end);
             salesTable.setItems(FXCollections.observableArrayList(sales));
             updateSummaries(sales);
-            detailsPanel.setVisible(false);
+            handleCloseDetails();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -318,6 +321,7 @@ public class HistoryController {
 
     private void showDetails(Sale sale) {
         detailsPanel.setVisible(true);
+        detailsPanel.setManaged(true);
         lblSaleId.setText("Ticket #" + String.format("%04d", sale.getSaleId()));
 
         boolean hasReturnable = false;
@@ -395,10 +399,18 @@ public class HistoryController {
     }
 
     @FXML
+    private void handleCloseDetails() {
+        detailsPanel.setVisible(false);
+        detailsPanel.setManaged(false);
+        salesTable.getSelectionModel().clearSelection();
+    }
+
+    @FXML
     private void handlePrintTicket() {
         Sale selected = salesTable.getSelectionModel().getSelectedItem();
         if (selected != null) {
-            showAlert("Impresión", "Enviando copia del ticket #" + selected.getSaleId() + " a la impresora...");
+            AlertUtil.showInfo("Impresión",
+                    "Enviando copia del ticket #" + selected.getSaleId() + " a la impresora...");
         }
     }
 
@@ -408,142 +420,56 @@ public class HistoryController {
         if (selected == null)
             return;
 
-        // Create Custom Dialog
-        Dialog<Pair<String, Map<Integer, Integer>>> dialog = new Dialog<>();
-        dialog.setTitle("Devolución de Productos");
-        dialog.setHeaderText("Seleccione los productos a devolver del ticket #" + selected.getSaleId());
-
-        ButtonType confirmButtonType = new ButtonType("Confirmar Devolución", ButtonBar.ButtonData.OK_DONE);
-        dialog.getDialogPane().getButtonTypes().addAll(confirmButtonType, ButtonType.CANCEL);
-
-        GridPane grid = new GridPane();
-        grid.setHgap(10);
-        grid.setVgap(10);
-        grid.setPadding(new javafx.geometry.Insets(20, 150, 10, 10));
-
-        List<SaleDetail> details = selected.getDetails();
-        int row = 0;
-
-        Map<Integer, Spinner<Integer>> spinners = new HashMap<>();
-        Map<Integer, CheckBox> checkBoxes = new HashMap<>();
-
-        // Headers
-        grid.add(new Label("Devolver"), 0, row);
-        grid.add(new Label("Producto"), 1, row);
-        grid.add(new Label("Vendidos"), 2, row);
-        grid.add(new Label("Devueltos"), 3, row);
-        grid.add(new Label("Cant. a Devolver"), 4, row);
-        row++;
-
-        boolean hasReturnableItems = false;
-
-        for (SaleDetail detail : details) {
-            int availableToReturn = detail.getQuantity() - detail.getReturnedQuantity();
-
-            CheckBox cb = new CheckBox();
-            cb.setDisable(availableToReturn <= 0);
-
-            Label name = new Label(detail.getProductName());
-            Label sold = new Label(String.valueOf(detail.getQuantity()));
-            Label returned = new Label(String.valueOf(detail.getReturnedQuantity()));
-
-            // Spinner for quantity
-            Spinner<Integer> spinner = new Spinner<>(1, Math.max(1, availableToReturn), 1);
-            spinner.setDisable(true); // Disable until checked
-
-            cb.selectedProperty().addListener((obs, oldVal, newVal) -> {
-                spinner.setDisable(!newVal);
-            });
-
-            if (availableToReturn > 0) {
-                hasReturnableItems = true;
-            } else {
-                name.setStyle("-fx-text-fill: red; -fx-strikethrough: true;");
-            }
-
-            checkBoxes.put(detail.getDetailId(), cb);
-            spinners.put(detail.getDetailId(), spinner);
-
-            grid.add(cb, 0, row);
-            grid.add(name, 1, row);
-            grid.add(sold, 2, row);
-            grid.add(returned, 3, row);
-            grid.add(spinner, 4, row);
-            row++;
-        }
-
-        // Reason input
-        TextArea reasonArea = new TextArea();
-        reasonArea.setPromptText("Motivo de la devolución...");
-        reasonArea.setPrefHeight(60);
-        grid.add(new Label("Motivo:"), 0, row);
-        grid.add(reasonArea, 1, row, 4, 1);
-
-        dialog.getDialogPane().setContent(grid);
-
-        // Convert result
-        dialog.setResultConverter(dialogButton -> {
-            if (dialogButton == confirmButtonType) {
-                Map<Integer, Integer> resultItems = new HashMap<>();
-                for (Map.Entry<Integer, CheckBox> entry : checkBoxes.entrySet()) {
-                    if (entry.getValue().isSelected()) {
-                        int detailId = entry.getKey();
-                        int qty = spinners.get(detailId).getValue();
-                        resultItems.put(detailId, qty);
-                    }
-                }
-                return new Pair<>(reasonArea.getText(), resultItems);
-            }
-            return null;
-        });
+        // Check if there are items left to return
+        boolean hasReturnableItems = selected.getDetails().stream()
+                .anyMatch(d -> (d.getQuantity() - d.getReturnedQuantity()) > 0);
 
         if (!hasReturnableItems) {
-            showAlert("Información", "Todos los productos de esta venta ya han sido devueltos.");
+            AlertUtil.showInfo("Información", "Todos los productos de esta venta ya han sido devueltos.");
             return;
         }
 
-        java.util.Optional<Pair<String, Map<Integer, Integer>>> result = dialog.showAndWait();
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/return_dialog.fxml"));
+            Parent root = loader.load();
+            ReturnDialogController controller = loader.getController();
+            controller.init(selected);
 
-        result.ifPresent(request -> {
-            String reason = request.getKey();
-            Map<Integer, Integer> items = request.getValue();
+            Stage stage = new Stage();
+            stage.initStyle(StageStyle.TRANSPARENT);
+            stage.initModality(javafx.stage.Modality.APPLICATION_MODAL);
 
-            if (items.isEmpty()) {
-                showAlert("Aviso", "No se seleccionó ningún producto para devolver.");
-                return;
-            }
+            Scene scene = new Scene(root);
+            scene.setFill(Color.TRANSPARENT);
+            stage.setScene(scene);
 
-            if (reason == null || reason.trim().isEmpty()) {
-                showAlert("Aviso", "Debe ingresar un motivo para la devolución.");
-                return;
-            }
+            stage.showAndWait();
 
-            try {
+            if (controller.isConfirmClicked()) {
+                Pair<String, Map<Integer, Integer>> request = controller.getResult();
+                String reason = request.getKey();
+                Map<Integer, Integer> items = request.getValue();
+
                 saleService.registerPartialReturn(selected.getSaleId(), items, reason);
 
                 // Refresh data
-                // Reload current filter to update table
                 loadSales();
 
-                // Show updated details of the selected sale (fetch again)
+                // Show updated details
                 Sale updatedSale = saleService.getSaleById(selected.getSaleId());
                 if (updatedSale != null) {
                     showDetails(updatedSale);
                 }
 
-                showAlert("Éxito", "La devolución parcial se ha registrado correctamente.");
-            } catch (SQLException e) {
-                e.printStackTrace();
-                showAlert("Error", "No se pudo procesar la devolución: " + e.getMessage());
+                AlertUtil.showInfo("Éxito", "La devolución parcial se ha registrado correctamente.");
             }
-        });
+        } catch (IOException | SQLException e) {
+            e.printStackTrace();
+            AlertUtil.showError("Error", "No se pudo procesar la devolución: " + e.getMessage());
+        }
     }
 
     private void showAlert(String title, String content) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(content);
-        alert.showAndWait();
+        AlertUtil.showInfo(title, content);
     }
 }
