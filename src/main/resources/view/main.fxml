@@ -6,6 +6,7 @@
 <?import javafx.scene.shape.*?>
 <?import javafx.scene.text.*?>
 <?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
+<?import javafx.scene.image.ImageView?>
 
 <BorderPane xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="com.mycompany.ventacontrolfx.controller.MainController"
@@ -14,41 +15,56 @@
 
     <!-- TOP HEADER -->
     <top>
-        <HBox spacing="20" alignment="CENTER_LEFT" styleClass="top-bar">
+        <HBox spacing="0" alignment="CENTER_LEFT" styleClass="top-bar">
             <padding>
-                <Insets top="10" right="20" bottom="10" left="20"/>
+                <Insets top="0" right="25" bottom="0" left="25"/>
             </padding>
             
             <!-- Logo area -->
-            <Label text="TPV" styleClass="logo-text"/>
-            <Label text="GestionTPV" styleClass="brand-text"/>
+            <HBox alignment="CENTER_LEFT" styleClass="logo-container">
+                <StackPane>
+                    <ImageView fx:id="imgLogo" fitHeight="32" preserveRatio="true" />
+                    <HBox fx:id="logoTextContainer" spacing="4" alignment="CENTER_LEFT">
+                        <Label fx:id="lblAppPrefix" text="TPV" styleClass="logo-text"/>
+                        <Label fx:id="lblAppName" text="Pro" styleClass="brand-text"/>
+                    </HBox>
+                </StackPane>
+            </HBox>
 
             <Region HBox.hgrow="ALWAYS"/>
 
             <!-- Search Bar -->
             <HBox fx:id="searchBarContainer" alignment="CENTER_LEFT" styleClass="search-bar">
-                <FontAwesomeIconView glyphName="SEARCH" size="16" fill="#1e88e5"/>
-                <TextField fx:id="searchField" promptText="Buscar por código o nombre..." styleClass="search-field" HBox.hgrow="ALWAYS"/>
+                <FontAwesomeIconView glyphName="SEARCH" size="16" fill="#adb5bd"/>
+                <TextField fx:id="searchField" promptText="Buscar productos, clientes o códigos..." styleClass="search-field" HBox.hgrow="ALWAYS"/>
+                <Label text="⌘K" style="-fx-text-fill: #adb5bd; -fx-font-size: 11px; -fx-padding: 0 5;"/>
             </HBox>
 
             <Region HBox.hgrow="ALWAYS"/>
 
-            <!-- User Profile Menu -->
-            <MenuButton fx:id="userMenuButton" styleClass="user-menu-button" style="-fx-background-color: transparent; -fx-cursor: hand; -fx-padding: 0;">
-                <graphic>
-                    <HBox spacing="10" alignment="CENTER_LEFT">
-                         <Circle radius="18" fill="#1e88e5" style="-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 3, 0, 0, 1);"/>
-                         <Label text="Admin" style="-fx-text-fill: #2c3e50; -fx-font-weight: bold; -fx-font-size: 15px;"/>
-                         <Label text="▼" style="-fx-text-fill: #7f8c8d; -fx-font-size: 10px;"/>
-                    </HBox>
-                </graphic>
-                <items>
-
-                    <MenuItem text="Cerrar caja" onAction="#handleCashClosure"/>
-                    <SeparatorMenuItem />
-                    <MenuItem text="Cerrar sesión" onAction="#handleLogout" style="-fx-text-fill: red;"/>
-                </items>
-            </MenuButton>
+            <!-- Header Actions & Profile -->
+            <HBox spacing="15" alignment="CENTER_LEFT">
+                 <MenuButton fx:id="userMenuButton" styleClass="user-menu-button">
+                    <graphic>
+                        <HBox spacing="12" alignment="CENTER_LEFT">
+                             <Label text="Administrador" style="-fx-text-fill: #2c3e50; -fx-font-weight: 600; -fx-font-size: 14px;"/>
+                             <Circle radius="16" fill="#1e88e5" style="-fx-effect: dropshadow(three-pass-box, rgba(30, 136, 229, 0.2), 5, 0, 0, 0);"/>
+                        </HBox>
+                    </graphic>
+                    <items>
+                        <MenuItem text="Mi Perfil">
+                            <graphic><FontAwesomeIconView glyphName="USER" size="14"/></graphic>
+                        </MenuItem>
+                        <MenuItem text="Cerrar caja" onAction="#handleCashClosure">
+                            <graphic><FontAwesomeIconView glyphName="MONEY" size="14"/></graphic>
+                        </MenuItem>
+                        <SeparatorMenuItem />
+                        <MenuItem text="Cerrar sesión" onAction="#handleLogout" style="-fx-text-fill: -color-danger;">
+                            <graphic><FontAwesomeIconView glyphName="SIGN_OUT" size="14" fill="#e53935"/></graphic>
+                        </MenuItem>
+                    </items>
+                </MenuButton>
+            </HBox>
         </HBox>
     </top>
 
@@ -228,7 +244,7 @@
                             <Tooltip text="Añadir nueva empresa"/>
                         </tooltip>
                         <graphic>
-                            <FontAwesomeIconView glyphName="PLUS" size="14" fill="#1e88e5"/>
+                            <FontAwesomeIconView glyphName="PLUS" size="14" styleClass="add-customer-icon"/>
                         </graphic>
                     </Button>
                 </HBox>

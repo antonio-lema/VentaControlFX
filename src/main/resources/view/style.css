@@ -97,51 +97,59 @@
 /* ===== 3. TOP BAR Y SEARCH ===== */
 .top-bar {
     -fx-background-color: white;
-    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.05), 8, 0, 0, 2);
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.08), 15, 0, 0, 4);
     -fx-border-color: #f0f0f0;
     -fx-border-width: 0 0 1 0;
+    -fx-min-height: 70px;
+    -fx-max-height: 70px;
+}
+
+.logo-container {
+    -fx-padding: 5 15;
+    -fx-background-color: -color-primary-bg;
+    -fx-background-radius: 12;
+    -fx-alignment: CENTER_LEFT;
 }
 
 .logo-text {
     -fx-text-fill: -color-primary;
-    -fx-font-size: 24px;
+    -fx-font-size: 20px;
     -fx-font-family: 'Segoe UI Black', sans-serif;
 }
 
 .brand-text {
     -fx-text-fill: -color-text-dark;
-    -fx-font-size: 24px;
+    -fx-font-size: 20px;
     -fx-font-weight: bold;
 }
 
 .search-bar {
-    -fx-background-color: #f4f6f9;
-    -fx-background-radius: 8;
-    -fx-padding: 8 15;
-    -fx-min-width: 350px;
-    -fx-border-color: transparent;
-    -fx-border-width: 1;
-    -fx-border-radius: 8;
+    -fx-background-color: #f8f9fb;
+    -fx-background-radius: 25;
+    -fx-padding: 0 15;
+    -fx-min-width: 450px;
+    -fx-max-width: 450px;
+    -fx-min-height: 44px;
+    -fx-max-height: 44px;
+    -fx-border-color: #eef1f5;
+    -fx-border-width: 1.5;
+    -fx-border-radius: 25;
+    -fx-transition: all 0.3s;
 }
 
 .search-bar:focus-within {
     -fx-background-color: white;
-    -fx-border-color: -color-primary-light;
-    -fx-effect: dropshadow(three-pass-box, rgba(66, 165, 245, 0.2), 5, 0, 0, 0);
+    -fx-border-color: -color-primary;
+    -fx-effect: dropshadow(three-pass-box, rgba(30, 136, 229, 0.15), 10, 0, 0, 0);
 }
 
 .search-field {
     -fx-background-color: transparent;
     -fx-text-fill: -color-text-dark;
-    -fx-prompt-text-fill: -color-text-muted;
-    -fx-pref-width: 300;
+    -fx-prompt-text-fill: #adb5bd;
     -fx-font-size: 14px;
     -fx-border-width: 0;
-}
-
-.search-field:focused {
-    -fx-border-width: 0;
-    -fx-background-color: transparent;
+    -fx-padding: 0 10;
 }
 
 /* Botones de la top bar */
@@ -224,20 +232,23 @@
 
 /* Botón de usuario */
 .user-menu-button {
-    -fx-background-color: transparent;
-    -fx-padding: 6 12;
-    -fx-background-radius: 8;
+    -fx-background-color: white;
+    -fx-padding: 4 4 4 15;
+    -fx-background-radius: 30;
     -fx-cursor: hand;
-    -fx-border-color: #f0f0f0;
-    -fx-border-radius: 8;
+    -fx-border-color: #eef1f5;
+    -fx-border-width: 1.5;
+    -fx-border-radius: 30;
 }
 
 .user-menu-button:hover {
     -fx-background-color: #f8f9fa;
+    -fx-border-color: -color-primary-light;
 }
 
 .user-menu-button:showing {
     -fx-background-color: #f1f3f5;
+    -fx-border-color: -color-primary;
 }
 
 .user-menu-button>.arrow-button,
@@ -509,7 +520,11 @@
     -fx-border-color: -color-primary;
 }
 
-.btn-add-customer:hover .font-awesome {
+.add-customer-icon {
+    -fx-fill: -color-primary;
+}
+
+.btn-add-customer:hover .add-customer-icon {
     -fx-fill: white;
 }
 
