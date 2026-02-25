@@ -31,7 +31,7 @@ public class App extends Application {
         com.mycompany.ventacontrolfx.util.SceneNavigator.loadScene(
                 primaryStage,
                 "/view/login.fxml",
-                "Login - TPV Bazar Electrónico",
+                "Login",
                 900,
                 600);
     }
