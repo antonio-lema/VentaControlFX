@@ -26,19 +26,19 @@ import java.util.Map;
 
 public class SaleService {
 
-    public void saveSale(List<CartItem> items, double total, String paymentMethod) throws SQLException {
-        saveSale(items, total, paymentMethod, null);
+    public int saveSale(List<CartItem> items, double total, String paymentMethod) throws SQLException {
+        return saveSale(items, total, paymentMethod, null);
     }
 
-    public void saveSale(List<CartItem> items, double total, String paymentMethod, Integer clientId)
+    public int saveSale(List<CartItem> items, double total, String paymentMethod, Integer clientId)
             throws SQLException {
+        int generatedSaleId = -1;
         try (Connection conn = DBConnection.getConnection()) {
             DatabaseInitializer.initialize(conn);
             conn.setAutoCommit(false);
             try {
                 // 1. Save Sale
                 String saleSql = "INSERT INTO sales (sale_datetime, user_id, client_id, total, payment_method, iva, is_return, return_reason) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-                int saleId = -1;
 
                 int userId = 1; // Default
                 if (UserSession.getInstance().getCurrentUser() != null) {
@@ -69,7 +69,7 @@ public class SaleService {
 
                     try (ResultSet rs = pstmt.getGeneratedKeys()) {
                         if (rs.next()) {
-                            saleId = rs.getInt(1);
+                            generatedSaleId = rs.getInt(1);
                         } else {
                             throw new SQLException("Error al crear la venta, no se obtuvo el ID generado.");
                         }
@@ -80,7 +80,7 @@ public class SaleService {
                 String detailSql = "INSERT INTO sale_details (sale_id, product_id, quantity, unit_price, line_total) VALUES (?, ?, ?, ?, ?)";
                 try (PreparedStatement pstmt = conn.prepareStatement(detailSql)) {
                     for (CartItem item : items) {
-                        pstmt.setInt(1, saleId);
+                        pstmt.setInt(1, generatedSaleId);
                         pstmt.setInt(2, item.getProduct().getId());
                         pstmt.setInt(3, item.getQuantity());
                         pstmt.setDouble(4, item.getProduct().getPrice());
@@ -96,6 +96,7 @@ public class SaleService {
                 throw e;
             }
         }
+        return generatedSaleId;
     }
 
     public List<Sale> getSalesHistory(LocalDate startDate, LocalDate endDate) throws SQLException {
