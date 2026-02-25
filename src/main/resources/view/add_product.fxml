@@ -80,8 +80,8 @@
         
         <!-- Actions -->
         <HBox spacing="15" alignment="CENTER_RIGHT" style="-fx-padding: 30 0 0 0;">
-            <Button text="Cancelar" onAction="#handleCancel" styleClass="modern-btn-secondary"/>
-            <Button text="Guardar" onAction="#handleSave" styleClass="modern-btn-primary"/>
+            <Button text="Cancelar" onAction="#handleCancel" styleClass="modern-btn-secondary" cancelButton="true"/>
+            <Button text="Guardar" onAction="#handleSave" styleClass="modern-btn-primary" defaultButton="true"/>
         </HBox>
     </VBox>
 </StackPane>

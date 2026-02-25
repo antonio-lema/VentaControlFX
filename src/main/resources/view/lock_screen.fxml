@@ -36,7 +36,7 @@
             <PasswordField fx:id="passwordField" promptText="Introduce tu contraseña" styleClass="lock-field" onAction="#handleUnlock"/>
         </VBox>
 
-        <Button text="DESBLOQUEAR" onAction="#handleUnlock" styleClass="btn-unlock" maxWidth="300" prefHeight="45"/>
+        <Button text="DESBLOQUEAR" onAction="#handleUnlock" styleClass="btn-unlock" maxWidth="300" prefHeight="45" defaultButton="true"/>
         
         <Button text="Cambiar de usuario" onAction="#handleChangeUser" styleClass="btn-change-user" maxWidth="200"/>
 

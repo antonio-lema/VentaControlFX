@@ -36,7 +36,7 @@
                 </VBox>
                 <Region HBox.hgrow="ALWAYS"/>
                 <!-- Botón Guardar (cabecera) -->
-                <Button fx:id="btnSaveTop" text="Guardar Cambios" onAction="#handleSave" styleClass="config-btn-save">
+                <Button fx:id="btnSaveTop" text="Guardar Cambios" onAction="#handleSave" styleClass="config-btn-save" defaultButton="true">
                     <graphic>
                         <HBox spacing="8" alignment="CENTER">
                             <FontAwesomeIconView glyphName="SAVE" size="14" fill="white"/>
@@ -119,12 +119,33 @@
 
                             <!-- Logo de la empresa -->
                             <VBox styleClass="config-field-group">
-                                <Label text="Logo de la empresa" styleClass="config-field-label"/>
+                                <Label text="Logo de la empresa (Tickets)" styleClass="config-field-label"/>
                                 <HBox styleClass="config-input-container" spacing="10">
                                     <FontAwesomeIconView glyphName="IMAGE" size="14" fill="#b0b0b0"/>
-                                    <TextField fx:id="txtLogoPath" promptText="Ruta de la imagen (PNG, JPG)"
+                                    <TextField fx:id="txtLogoPath" promptText="Ruta del logo para los tickets"
                                                HBox.hgrow="ALWAYS" styleClass="modern-input-field" editable="false"/>
                                     <Button text="Examinar..." onAction="#handleBrowseLogo" styleClass="btn-secondary"/>
+                                </HBox>
+                            </VBox>
+
+                            <!-- Icono de la aplicación -->
+                            <VBox styleClass="config-field-group">
+                                <Label text="Icono de la aplicación (Ventana)" styleClass="config-field-label"/>
+                                <HBox styleClass="config-input-container" spacing="10">
+                                    <FontAwesomeIconView glyphName="DESKTOP" size="14" fill="#b0b0b0"/>
+                                    <TextField fx:id="txtAppIconPath" promptText="Ruta del icono de la aplicación"
+                                               HBox.hgrow="ALWAYS" styleClass="modern-input-field" editable="false"/>
+                                    <Button text="Examinar..." onAction="#handleBrowseIcon" styleClass="btn-secondary"/>
+                                </HBox>
+                            </VBox>
+
+                            <!-- Nombre de la aplicación -->
+                            <VBox styleClass="config-field-group">
+                                <Label text="Nombre de la aplicación" styleClass="config-field-label"/>
+                                <HBox styleClass="config-input-container">
+                                    <FontAwesomeIconView glyphName="WINDOW_MAXIMIZE" size="14" fill="#b0b0b0"/>
+                                    <TextField fx:id="txtAppName" promptText="Ej: Mi Sistema TPV"
+                                               HBox.hgrow="ALWAYS" styleClass="modern-input-field"/>
                                 </HBox>
                             </VBox>
                         </VBox>
@@ -284,6 +305,25 @@
                                 </HBox>
                             </VBox>
 
+                            <!-- Formato de ticket -->
+                            <VBox styleClass="config-field-group">
+                                <Label text="Formato de papel (Ancho)" styleClass="config-field-label"/>
+                                <HBox styleClass="config-input-container">
+                                    <FontAwesomeIconView glyphName="ARROWS_H" size="14" fill="#b0b0b0"/>
+                                    <ComboBox fx:id="cmbTicketFormat" maxWidth="Infinity" HBox.hgrow="ALWAYS"
+                                              styleClass="modern-combo-box">
+                                        <items>
+                                            <FXCollections fx:factory="observableArrayList">
+                                                <String fx:value="80mm (Estándar Térmico)"/>
+                                                <String fx:value="58mm (Datáfono/Portátil)"/>
+                                                <String fx:value="A4 (Folio)"/>
+                                            </FXCollections>
+                                        </items>
+                                    </ComboBox>
+                                </HBox>
+                                <Label text="Ajusta el diseño al tamaño de tu impresora" styleClass="config-field-hint"/>
+                            </VBox>
+
                             <!-- Imprimir automáticamente -->
                             <HBox spacing="12" alignment="CENTER_LEFT" styleClass="config-check-row">
                                 <CheckBox fx:id="chkAutoPrint" text="Imprimir ticket automáticamente tras cobro"
@@ -357,7 +397,7 @@
                             </HBox>
                         </graphic>
                     </Button>
-                    <Button text="Guardar Cambios" onAction="#handleSave" styleClass="config-btn-save">
+                    <Button text="Guardar Cambios" onAction="#handleSave" styleClass="config-btn-save" defaultButton="true">
                         <graphic>
                             <HBox spacing="8" alignment="CENTER">
                                 <FontAwesomeIconView glyphName="CHECK" size="13" fill="white"/>

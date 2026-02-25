@@ -62,8 +62,8 @@
          <!-- Footer Actions -->
          <HBox alignment="CENTER_RIGHT" spacing="15.0" style="-fx-padding: 20 30 30 30;">
             <children>
-               <Button mnemonicParsing="false" onAction="#handleCancel" styleClass="modern-btn-secondary" text="Cancelar" />
-               <Button mnemonicParsing="false" onAction="#handleConfirm" styleClass="modern-btn-primary" text="Confirmar Devolución">
+               <Button mnemonicParsing="false" onAction="#handleCancel" styleClass="modern-btn-secondary" text="Cancelar" cancelButton="true"/>
+               <Button mnemonicParsing="false" onAction="#handleConfirm" styleClass="modern-btn-primary" text="Confirmar Devolución" defaultButton="true">
                   <graphic>
                      <FontAwesomeIconView glyphName="CHECK" size="14" fill="WHITE" />
                   </graphic>

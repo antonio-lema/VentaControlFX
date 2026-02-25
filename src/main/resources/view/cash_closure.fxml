@@ -24,7 +24,7 @@
             </HBox>
         </VBox>
         <Region HBox.hgrow="ALWAYS"/>
-        <Button onAction="#handleClose" style="-fx-background-color: #f5f6f7; -fx-background-radius: 30; -fx-padding: 8; -fx-cursor: hand;">
+        <Button onAction="#handleClose" style="-fx-background-color: #f5f6f7; -fx-background-radius: 30; -fx-padding: 8; -fx-cursor: hand;" cancelButton="true">
             <graphic>
                 <FontAwesomeIconView glyphName="CLOSE" size="18" fill="#95a5a6"/>
             </graphic>
@@ -70,7 +70,7 @@
 
             <!-- Action Button -->
             <Button fx:id="btnPerformClosure" onAction="#handlePerformClosure" maxWidth="Infinity" text="REALIZAR CIERRE DE CAJA"
-                    style="-fx-background-color: #1a73e8; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 16px; -fx-padding: 18; -fx-background-radius: 15; -fx-cursor: hand; -fx-effect: dropshadow(three-pass-box, rgba(26,115,232,0.3), 10, 0, 0, 5);"/>
+                    style="-fx-background-color: #1a73e8; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 16px; -fx-padding: 18; -fx-background-radius: 15; -fx-cursor: hand; -fx-effect: dropshadow(three-pass-box, rgba(26,115,232,0.3), 10, 0, 0, 5);" defaultButton="true"/>
         </VBox>
 
         <!-- Right Column: Product Breakdown -->

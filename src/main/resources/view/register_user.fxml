@@ -25,7 +25,7 @@
 
         <!-- Header -->
         <VBox styleClass="modern-register-header" alignment="CENTER_LEFT">
-             <Label text="Crear Nueva Cuenta" styleClass="modern-register-title"/>
+             <Label fx:id="lblTitle" text="Crear Nueva Cuenta" styleClass="modern-register-title"/>
              <Label text="Introduce los datos del nuevo usuario" styleClass="modern-register-subtitle"/>
         </VBox>
 
@@ -96,8 +96,8 @@
 
         <!-- Actions -->
         <HBox spacing="15" alignment="CENTER_RIGHT">
-             <Button text="Cancelar" onAction="#handleCancel" styleClass="modern-btn-secondary"/>
-             <Button text="Registrar Usuario" onAction="#handleRegister" styleClass="modern-btn-primary"/>
+             <Button fx:id="btnCancel" text="Cancelar" onAction="#handleCancel" styleClass="modern-btn-secondary" cancelButton="true"/>
+             <Button fx:id="btnRegister" text="Registrar Usuario" onAction="#handleRegister" styleClass="modern-btn-primary" defaultButton="true"/>
         </HBox>
 
     </VBox>

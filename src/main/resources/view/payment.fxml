@@ -21,7 +21,7 @@
          <children>
             <Label text="Forma de pago" textFill="WHITE" style="-fx-font-size: 18px; -fx-font-weight: bold;" />
             <Region HBox.hgrow="ALWAYS" />
-            <Button mnemonicParsing="false" onAction="#handleClose" style="-fx-background-color: transparent; -fx-cursor: hand;">
+            <Button mnemonicParsing="false" onAction="#handleClose" style="-fx-background-color: transparent; -fx-cursor: hand;" cancelButton="true">
                <graphic>
                   <FontAwesomeIconView fill="WHITE" glyphName="CLOSE" size="20" />
                </graphic>
@@ -63,7 +63,7 @@
                               <HBox spacing="10.0" alignment="CENTER_LEFT">
                                  <children>
                                      <TextField fx:id="txtGivenAmount" promptText="0.00" style="-fx-font-size: 16px; -fx-pref-height: 40;" HBox.hgrow="ALWAYS" />
-                                     <Button text="Cobrar" onAction="#handleCashPayment" style="-fx-background-color: #1e88e5; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 14px; -fx-pref-height: 40; -fx-pref-width: 100; -fx-cursor: hand;" />
+                                     <Button text="Cobrar" onAction="#handleCashPayment" style="-fx-background-color: #1e88e5; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 14px; -fx-pref-height: 40; -fx-pref-width: 100; -fx-cursor: hand;" defaultButton="true" />
                                  </children>
                               </HBox>
                               
@@ -111,7 +111,7 @@
    </center>
    <bottom>
        <HBox alignment="CENTER_RIGHT" style="-fx-padding: 10; -fx-background-color: white; -fx-border-color: #e0e0e0; -fx-border-width: 1 0 0 0;">
-           <Button text="Cancelar" onAction="#handleClose" style="-fx-background-color: white; -fx-border-color: #ccc; -fx-text-fill: #555; -fx-background-radius: 4; -fx-border-radius: 4; -fx-cursor: hand;"/>
+           <Button text="Cancelar" onAction="#handleClose" style="-fx-background-color: white; -fx-border-color: #ccc; -fx-text-fill: #555; -fx-background-radius: 4; -fx-border-radius: 4; -fx-cursor: hand;" cancelButton="true" />
        </HBox>
    </bottom>
 </BorderPane>
