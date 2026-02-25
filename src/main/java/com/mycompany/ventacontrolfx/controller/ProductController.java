@@ -58,6 +58,10 @@ public class ProductController {
     @FXML
     private TextField rowsPerPageField;
 
+    // Cache para las imágenes, evita cargar la misma imagen de disco continuamente
+    // (lo que causa lag)
+    private final java.util.Map<String, Image> imageCache = new java.util.HashMap<>();
+
     private ProductService productService;
     private ObservableList<Product> productList;
 
@@ -81,6 +85,10 @@ public class ProductController {
         rowsPerPageField.textProperty().addListener((observable, oldValue, newValue) -> {
             filterProducts(searchField.getText(), newValue);
         });
+
+        // Set visual sort order indication
+        productsTable.getSortOrder().add(colFavorite);
+        colFavorite.setSortType(TableColumn.SortType.DESCENDING);
     }
 
     private void setupColumns() {
@@ -102,7 +110,12 @@ public class ProductController {
                 } else {
                     File file = new File(imagePath);
                     if (file.exists()) {
-                        Image image = new Image(file.toURI().toString());
+                        String fileUri = file.toURI().toString();
+
+                        // Busca la imagen en el caché, si no está, la carga de fondo (asíncrono)
+                        Image image = imageCache.computeIfAbsent(fileUri,
+                                url -> new Image(url, 40, 40, false, true, true));
+
                         imageView.setImage(image);
                         imageView.setFitHeight(40);
                         imageView.setFitWidth(40);
@@ -264,9 +277,19 @@ public class ProductController {
     private void loadAllProducts() {
         try {
             List<Product> products = productService.getAllProducts();
+            // Ordenar para que los favoritos siempre aparezcan primero y luego por nombre
+            products.sort((p1, p2) -> {
+                int favCompare = Boolean.compare(p2.isFavorite(), p1.isFavorite());
+                if (favCompare != 0)
+                    return favCompare;
+                return p1.getName().compareToIgnoreCase(p2.getName());
+            });
             productList.setAll(products);
             // Initial filter to respect default limit
             filterProducts(searchField.getText(), rowsPerPageField.getText());
+
+            // Actualizar el contador de la pantalla principal (abajo)
+            MainController.updateCounts();
         } catch (SQLException e) {
             e.printStackTrace();
             showAlert("Error", "No se pudieron cargar los productos: " + e.getMessage());
@@ -310,6 +333,9 @@ public class ProductController {
             }
         }
         productsTable.setItems(filtered);
+
+        // Actualizar el contador de la pantalla principal con los resultados filtrados
+        MainController.updateProductCount(filtered.size());
     }
 
     @FXML
@@ -372,12 +398,17 @@ public class ProductController {
                 loadAllProducts();
             } catch (SQLException e) {
                 e.printStackTrace();
-                showAlert("Error", "No se pudo eliminar el producto: " + e.getMessage());
+                if (e.getMessage().toLowerCase().contains("foreign key constraint")) {
+                    AlertUtil.showError("Error al Eliminar",
+                            "No se puede eliminar el producto porque tiene ventas (o historial) asociadas.");
+                } else {
+                    AlertUtil.showError("Error", "No se pudo eliminar el producto: " + e.getMessage());
+                }
             }
         }
     }
 
     private void showAlert(String title, String content) {
-        AlertUtil.showInfo(title, content);
+        AlertUtil.showError(title, content);
     }
 }

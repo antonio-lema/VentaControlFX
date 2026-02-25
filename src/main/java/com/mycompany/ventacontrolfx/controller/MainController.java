@@ -57,6 +57,9 @@ public class MainController {
     private ProductFilterService filterService;
     private SaleService saleService;
     private NavigationService navigationService;
+
+    // Static instance to allow other controllers to update badges
+    private static MainController instance;
     private UserService userService;
     private CashClosureService closureService;
     private ClientService clientService;
@@ -156,6 +159,9 @@ public class MainController {
     @FXML
     private Button payButton;
 
+    @FXML
+    private Button btnClearCart;
+
     // Other Sidebar Buttons
 
     @FXML
@@ -179,6 +185,14 @@ public class MainController {
     private Label lblProductsArrow;
     @FXML
     private VBox loadingOverlay;
+    @FXML
+    private ImageView imgLogo;
+    @FXML
+    private HBox logoTextContainer;
+    @FXML
+    private Label lblAppPrefix;
+    @FXML
+    private Label lblAppName;
 
     @FXML
     private HBox favoriteCategoriesBox;
@@ -240,14 +254,16 @@ public class MainController {
                 Integer clientId = client != null ? client.getId() : null;
 
                 try {
-                    saleService.saveSale(items, total, method, clientId);
+                    int saleId = saleService.saveSale(items, total, method, clientId);
+                    Platform.runLater(() -> cartService.clear()); // Vaciar inmediatamente
 
-                    showReceipt(items, total, paid, change, method, client,
+                    showReceipt(items, total, paid, change, method, client, saleId,
                             () -> {
-                                cartService.clear();
+                                // cartService.clear() ya llamado
                             },
                             () -> {
-                                Platform.runLater(this::handlePayButton);
+                                // Platform.runLater(this::handlePayButton); ya no aplica porque se guardó la
+                                // venta
                             });
                 } catch (SQLException e) {
                     AlertUtil.showError("No se pudo guardar la venta",
@@ -271,20 +287,19 @@ public class MainController {
     }
 
     private void showReceipt(List<CartItem> items, double total, double paid, double change, String method,
-            com.mycompany.ventacontrolfx.model.Client client,
+            com.mycompany.ventacontrolfx.model.Client client, int saleId,
             Runnable onNewSale, Runnable onBack) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/receipt.fxml"));
             Parent root = loader.load();
 
             ReceiptController controller = loader.getController();
-            controller.setReceiptData(items, total, paid, change, method, onNewSale, onBack);
-
-            // If client is present, we might want to tell the controller to show invoice
-            // fields
+            // If client is present, we MUST set it BEFORE setReceiptData so item rows know
+            // the format
             if (client != null) {
                 controller.setClientInfo(client);
             }
+            controller.setReceiptData(items, total, paid, change, method, saleId, onNewSale, onBack);
 
             Stage stage = new Stage();
             stage.initModality(Modality.APPLICATION_MODAL);
@@ -313,8 +328,8 @@ public class MainController {
         navigationService.showCategoriesView(null);
     }
 
-    @FXML
     public void initialize() {
+        instance = this;
         productService = new ProductService();
         categoryService = new CategoryService();
         cartService = new CartService();
@@ -323,6 +338,7 @@ public class MainController {
         userService = new UserService();
         closureService = new CashClosureService();
         clientService = new ClientService();
+        loadLogo();
         initCartListener();
         initClientSelectionListener();
         refreshCounts();
@@ -335,6 +351,16 @@ public class MainController {
                 cartService,
                 cardCountProducts, cardCountCategories, cardCountHistory,
                 cardCountClosures, cardCountClients, cardCountUsers);
+
+        // Asegurar que el contador de productos sea visible al iniciar
+        if (navigationService != null) {
+            navigationService.setActiveButton(btnSell);
+            // Hacer visible el card del contador de productos manualmente al inicio
+            if (cardCountProducts != null) {
+                cardCountProducts.setVisible(true);
+                cardCountProducts.setManaged(true);
+            }
+        }
 
         // Apply Ripple Effect to Sidebar Buttons
 
@@ -371,9 +397,15 @@ public class MainController {
         emptyCartView.visibleProperty().bind(cartService.itemCountProperty().isEqualTo(0));
         emptyCartView.managedProperty().bind(emptyCartView.visibleProperty());
 
-        // Disable Pay Button if Cart is Empty
+        // Hide elements if Cart is Empty
         if (payButton != null) {
             payButton.disableProperty().bind(cartService.itemCountProperty().isEqualTo(0));
+            payButton.visibleProperty().bind(cartService.itemCountProperty().greaterThan(0));
+            payButton.managedProperty().bind(payButton.visibleProperty());
+        }
+        if (btnClearCart != null) {
+            btnClearCart.visibleProperty().bind(cartService.itemCountProperty().greaterThan(0));
+            btnClearCart.managedProperty().bind(btnClearCart.visibleProperty());
         }
 
         subtotalLabel.textProperty().bind(cartService.subtotalProperty().asString("%.2f €"));
@@ -584,6 +616,11 @@ public class MainController {
             ProductBox productBox = new ProductBox(p, this::addToCart);
             productsPane.getChildren().add(productBox);
         }
+
+        // Actualizar el contador de productos mostrados basándonos en el filtro
+        if (labelCountProducts != null) {
+            labelCountProducts.setText(String.valueOf(products.size()));
+        }
     }
 
     private void initCartListener() {
@@ -704,6 +741,14 @@ public class MainController {
 
     @FXML
     private void handleShowConfig() {
+        // Verificar rol de administrador por seguridad
+        com.mycompany.ventacontrolfx.model.User currentUser = com.mycompany.ventacontrolfx.util.UserSession
+                .getInstance().getCurrentUser();
+        if (currentUser == null || !"admin".equalsIgnoreCase(currentUser.getRole())) {
+            AlertUtil.showError("Acceso Denegado", "No tienes permisos para acceder a la configuración.");
+            return;
+        }
+
         if (navigationService != null) {
             navigationService.showConfigView(null);
         }
@@ -739,12 +784,20 @@ public class MainController {
                 btnUsers.setVisible(true);
                 btnUsers.setManaged(true);
             }
+            if (btnConfig != null) {
+                btnConfig.setVisible(true);
+                btnConfig.setManaged(true);
+            }
             // Update user label
             updateUserLabel(currentUser.getUsername() + " (Admin)");
         } else {
             if (btnUsers != null) {
                 btnUsers.setVisible(false);
                 btnUsers.setManaged(false);
+            }
+            if (btnConfig != null) {
+                btnConfig.setVisible(false);
+                btnConfig.setManaged(false);
             }
             if (currentUser != null)
                 updateUserLabel(currentUser.getUsername());
@@ -803,11 +856,60 @@ public class MainController {
         }
     }
 
-    private void refreshCounts() {
+    private void loadLogo() {
+        com.mycompany.ventacontrolfx.service.SaleConfigService configService = new com.mycompany.ventacontrolfx.service.SaleConfigService();
+        com.mycompany.ventacontrolfx.model.SaleConfig cfg = configService.load();
+        String logoPath = cfg.getLogoPath();
+        String appName = cfg.getAppName();
+
+        if (logoPath != null && !logoPath.isEmpty()) {
+            java.io.File file = new java.io.File(logoPath);
+            if (file.exists()) {
+                try {
+                    imgLogo.setImage(new Image(file.toURI().toString()));
+                    imgLogo.setManaged(true);
+                    imgLogo.setVisible(true);
+                    logoTextContainer.setManaged(false);
+                    logoTextContainer.setVisible(false);
+                } catch (Exception e) {
+                    System.err.println("Error loading logo: " + e.getMessage());
+                    showDefaultLogo(appName);
+                }
+            } else {
+                showDefaultLogo(appName);
+            }
+        } else {
+            showDefaultLogo(appName);
+        }
+    }
+
+    private void showDefaultLogo(String appName) {
+        imgLogo.setManaged(false);
+        imgLogo.setVisible(false);
+        logoTextContainer.setManaged(true);
+        logoTextContainer.setVisible(true);
+        if (lblAppName != null && appName != null && !appName.isEmpty()) {
+            lblAppName.setText(appName);
+        }
+    }
+
+    public void refreshCounts() {
         Platform.runLater(() -> {
             try {
-                if (labelCountProducts != null)
-                    labelCountProducts.setText(String.valueOf(productService.getCount()));
+                if (labelCountProducts != null) {
+                    // Si estamos en la vista de venta (productsPane es el contenido actual),
+                    // mostramos la cantidad de productos filtrados en lugar del total de la BD.
+                    // Si estamos en la vista de venta (el contenido del scroll es el panel de
+                    // productos),
+                    // mostramos la cantidad de productos filtrados.
+                    if (productsPane != null && mainContent != null && mainContent.getContent() == productsPane) {
+                        labelCountProducts.setText(String.valueOf(products.size()));
+                    } else {
+                        // En cualquier otro caso (o si no podemos determinarlo), mostramos el total de
+                        // la base de datos
+                        labelCountProducts.setText(String.valueOf(productService.getCount()));
+                    }
+                }
                 if (labelCountCategories != null)
                     labelCountCategories.setText(String.valueOf(categoryService.getCount()));
                 if (labelCountHistory != null)
@@ -822,6 +924,18 @@ public class MainController {
                 e.printStackTrace();
             }
         });
+    }
+
+    public static void updateCounts() {
+        if (instance != null) {
+            instance.refreshCounts();
+        }
+    }
+
+    public static void updateProductCount(int count) {
+        if (instance != null && instance.labelCountProducts != null) {
+            Platform.runLater(() -> instance.labelCountProducts.setText(String.valueOf(count)));
+        }
     }
 
 }
