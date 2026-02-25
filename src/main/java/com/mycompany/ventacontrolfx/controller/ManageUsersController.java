@@ -61,6 +61,9 @@ public class ManageUsersController {
             List<User> users = userService.getAllUsers();
             userList.setAll(users);
             renderUserCards(userList);
+
+            // Actualizar el contador de usuarios en la pantalla principal
+            MainController.updateCounts();
         } catch (SQLException e) {
             e.printStackTrace();
             AlertUtil.showError("Error", "No se pudieron cargar los usuarios: " + e.getMessage());

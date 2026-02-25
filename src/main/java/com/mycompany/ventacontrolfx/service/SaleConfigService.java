@@ -18,6 +18,8 @@ public class SaleConfigService {
     private static final String K_PHONE = "phone";
     private static final String K_EMAIL = "email";
     private static final String K_LOGO_PATH = "logoPath";
+    private static final String K_APP_ICON_PATH = "appIconPath";
+    private static final String K_APP_NAME = "appName";
     private static final String K_TAX_RATE = "taxRate";
     private static final String K_TAX_TYPE = "taxType";
     private static final String K_PRICES_INC_TAX = "pricesIncludeTax";
@@ -29,6 +31,7 @@ public class SaleConfigService {
     private static final String K_SHOW_CIF = "showCif";
     private static final String K_FOOTER_MSG = "footerMessage";
     private static final String K_TICKET_COPIES = "ticketCopies";
+    private static final String K_TICKET_FORMAT = "ticketFormat";
     private static final String K_AUTO_PRINT = "autoPrint";
     private static final String K_CASH = "cash";
     private static final String K_CARD = "card";
@@ -60,6 +63,8 @@ public class SaleConfigService {
         cfg.setPhone(getString(K_PHONE, d.getPhone()));
         cfg.setEmail(getString(K_EMAIL, d.getEmail()));
         cfg.setLogoPath(getString(K_LOGO_PATH, d.getLogoPath()));
+        cfg.setAppIconPath(getString(K_APP_ICON_PATH, d.getAppIconPath()));
+        cfg.setAppName(getString(K_APP_NAME, d.getAppName()));
         cfg.setTaxRate(getDouble(K_TAX_RATE, d.getTaxRate()));
         cfg.setTaxType(getString(K_TAX_TYPE, d.getTaxType()));
         cfg.setPricesIncludeTax(getBoolean(K_PRICES_INC_TAX, d.isPricesIncludeTax()));
@@ -71,6 +76,7 @@ public class SaleConfigService {
         cfg.setShowCif(getBoolean(K_SHOW_CIF, d.isShowCif()));
         cfg.setFooterMessage(getString(K_FOOTER_MSG, d.getFooterMessage()));
         cfg.setTicketCopies(getString(K_TICKET_COPIES, d.getTicketCopies()));
+        cfg.setTicketFormat(getString(K_TICKET_FORMAT, d.getTicketFormat()));
         cfg.setAutoPrint(getBoolean(K_AUTO_PRINT, d.isAutoPrint()));
         cfg.setCash(getBoolean(K_CASH, d.isCash()));
         cfg.setCard(getBoolean(K_CARD, d.isCard()));
@@ -99,6 +105,8 @@ public class SaleConfigService {
         dao.setValue(K_PHONE, orEmpty(cfg.getPhone()));
         dao.setValue(K_EMAIL, orEmpty(cfg.getEmail()));
         dao.setValue(K_LOGO_PATH, orEmpty(cfg.getLogoPath()));
+        dao.setValue(K_APP_ICON_PATH, orEmpty(cfg.getAppIconPath()));
+        dao.setValue(K_APP_NAME, orEmpty(cfg.getAppName()));
         dao.setValue(K_TAX_RATE, String.valueOf(cfg.getTaxRate()));
         dao.setValue(K_TAX_TYPE, orEmpty(cfg.getTaxType()));
         dao.setValue(K_PRICES_INC_TAX, String.valueOf(cfg.isPricesIncludeTax()));
@@ -110,6 +118,7 @@ public class SaleConfigService {
         dao.setValue(K_SHOW_CIF, String.valueOf(cfg.isShowCif()));
         dao.setValue(K_FOOTER_MSG, orEmpty(cfg.getFooterMessage()));
         dao.setValue(K_TICKET_COPIES, orEmpty(cfg.getTicketCopies()));
+        dao.setValue(K_TICKET_FORMAT, orEmpty(cfg.getTicketFormat()));
         dao.setValue(K_AUTO_PRINT, String.valueOf(cfg.isAutoPrint()));
         dao.setValue(K_CASH, String.valueOf(cfg.isCash()));
         dao.setValue(K_CARD, String.valueOf(cfg.isCard()));

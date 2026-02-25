@@ -12,6 +12,8 @@ public class SaleConfig {
     private String phone = "";
     private String email = "";
     private String logoPath = "";
+    private String appIconPath = "";
+    private String appName = "GestionTPV";
 
     // ── Fiscal ────────────────────────────────────────────────────────
     private double taxRate = 21.0;
@@ -27,6 +29,7 @@ public class SaleConfig {
     private boolean showCif = true;
     private String footerMessage = "¡Gracias por su compra!";
     private String ticketCopies = "1 copia";
+    private String ticketFormat = "80mm";
     private boolean autoPrint = false;
 
     // ── Métodos de pago ───────────────────────────────────────────────
@@ -95,6 +98,22 @@ public class SaleConfig {
 
     public void setLogoPath(String logoPath) {
         this.logoPath = logoPath;
+    }
+
+    public String getAppIconPath() {
+        return appIconPath;
+    }
+
+    public void setAppIconPath(String appIconPath) {
+        this.appIconPath = appIconPath;
+    }
+
+    public String getAppName() {
+        return appName;
+    }
+
+    public void setAppName(String appName) {
+        this.appName = appName;
     }
 
     public double getTaxRate() {
@@ -191,6 +210,14 @@ public class SaleConfig {
 
     public void setAutoPrint(boolean v) {
         this.autoPrint = v;
+    }
+
+    public String getTicketFormat() {
+        return ticketFormat;
+    }
+
+    public void setTicketFormat(String ticketFormat) {
+        this.ticketFormat = ticketFormat;
     }
 
     public boolean isCash() {

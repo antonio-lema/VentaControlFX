@@ -25,6 +25,12 @@ public class PrintPreviewController {
     @FXML
     private VBox paperSheet;
     @FXML
+    private VBox companyHeaderSection;
+    @FXML
+    private VBox ticketInfoSection;
+    @FXML
+    private HBox itemsHeaderHBox;
+    @FXML
     private Label lblTicketTitle;
     @FXML
     private Label lblDate;
@@ -91,14 +97,16 @@ public class PrintPreviewController {
     private Label lblClientAddress;
 
     private boolean isGiftMode = false;
+    private com.mycompany.ventacontrolfx.model.Client currentClient;
     private final SaleConfigService configService = new SaleConfigService();
     private SaleConfig cfg;
 
-    public void setReceiptData(List<CartItem> items, double total, double paid, String paymentMethod) {
-        setReceiptData(items, total, paid, paymentMethod, false);
+    public void setReceiptData(List<CartItem> items, double total, double paid, String paymentMethod, int saleId) {
+        setReceiptData(items, total, paid, paymentMethod, saleId, false);
     }
 
-    public void setReceiptData(List<CartItem> items, double total, double paid, String paymentMethod, boolean isGift) {
+    public void setReceiptData(List<CartItem> items, double total, double paid, String paymentMethod, int saleId,
+            boolean isGift) {
         this.isGiftMode = isGift;
         this.cfg = configService.load();
         String sym = cfg.getCurrencySymbol();
@@ -117,9 +125,8 @@ public class PrintPreviewController {
         lblDate.setText("Fecha: " + now.format(formatter) + " Caja: 01");
 
         // Número de ticket
-        int randomNum = 1000 + (int) (Math.random() * 9000);
-        String prefix = isGiftMode ? "Ticket regalo Nº: 01/" : "Factura simplificada Nº: 01/";
-        lblTicketTitle.setText(prefix + randomNum);
+        String prefix = isGiftMode ? "Ticket regalo Nº: " : "Factura simplificada Nº: ";
+        lblTicketTitle.setText(prefix + String.format("%03d", saleId));
 
         // Artículos
         itemsContainer.getChildren().clear();
@@ -167,50 +174,217 @@ public class PrintPreviewController {
 
         // Datos de empresa desde SaleConfig
         applyCompanyHeader();
+
+        // Aplicar formato de papel
+        applyPaperFormat();
+    }
+
+    private void applyPaperFormat() {
+        if (cfg == null || paperSheet == null)
+            return;
+
+        String format = cfg.getTicketFormat();
+
+        // Si hay un cliente asignado, es una Factura completa y la sacamos en A4
+        if (currentClient != null) {
+            format = "A4";
+        }
+
+        if (format == null)
+            format = "80mm";
+
+        if (format.contains("80mm")) {
+            paperSheet.setMinWidth(300);
+            paperSheet.setPrefWidth(300);
+            paperSheet.setMaxWidth(300);
+            paperSheet.setStyle(paperSheet.getStyle() + "; -fx-padding: 10 10 10 10;");
+        } else if (format.contains("58mm")) {
+            paperSheet.setMinWidth(220);
+            paperSheet.setPrefWidth(220);
+            paperSheet.setMaxWidth(220);
+            paperSheet.setStyle(paperSheet.getStyle() + "; -fx-padding: 5 5 5 5;");
+        } else { // A4
+            paperSheet.setMinWidth(750);
+            paperSheet.setPrefWidth(750);
+            paperSheet.setMaxWidth(750);
+            paperSheet.setStyle("-fx-background-color: white; -fx-padding: 40 50 40 50;");
+
+            // Rediseñar el árbol visual para A4 de forma condicional
+            paperSheet.getChildren().clear();
+
+            // Cabecera top: Datos empresa (Izda) + Datos ticket (Derecha)
+            HBox topRow = new HBox();
+            topRow.setSpacing(20);
+            topRow.setStyle("-fx-padding: 0 0 30 0;");
+
+            companyHeaderSection.setAlignment(javafx.geometry.Pos.TOP_LEFT);
+            if (lblCompanyBrand != null)
+                lblCompanyBrand.setStyle("-fx-font-weight: bold; -fx-font-size: 26; -fx-text-fill: #2196F3;");
+            if (lblCompanyName != null)
+                lblCompanyName.setStyle("-fx-font-weight: bold; -fx-font-size: 14; -fx-text-fill: black;");
+            if (lblCompanyAddress != null)
+                lblCompanyAddress.setStyle("-fx-font-size: 12; -fx-text-fill: black;");
+            if (lblCompanyPhone != null)
+                lblCompanyPhone.setStyle("-fx-font-size: 12; -fx-text-fill: black;");
+            if (lblCompanyCif != null)
+                lblCompanyCif.setStyle("-fx-font-size: 12; -fx-text-fill: black;");
+
+            clientInfoSection.setPrefWidth(300);
+            clientInfoSection.setStyle(
+                    "-fx-padding: 10; -fx-border-color: #ddd; -fx-border-width: 1; -fx-border-radius: 5; -fx-background-color: #fcfcfc;");
+
+            VBox leftCol = new VBox(15);
+            leftCol.getChildren().addAll(companyHeaderSection, clientInfoSection);
+
+            ticketInfoSection.setAlignment(javafx.geometry.Pos.TOP_RIGHT);
+            if (lblTicketTitle != null)
+                lblTicketTitle.setStyle("-fx-font-weight: bold; -fx-font-size: 20; -fx-text-fill: #333;");
+            if (lblDate != null)
+                lblDate.setStyle("-fx-font-size: 12; -fx-text-fill: #555;");
+
+            javafx.scene.layout.Region topSpacer = new javafx.scene.layout.Region();
+            HBox.setHgrow(topSpacer, javafx.scene.layout.Priority.ALWAYS);
+            topRow.getChildren().addAll(leftCol, topSpacer, ticketInfoSection);
+
+            itemsHeaderHBox.setSpacing(10);
+            itemsHeaderHBox.setMinWidth(650);
+            itemsHeaderHBox.setPrefWidth(650);
+            itemsHeaderHBox.setMaxWidth(650);
+            itemsHeaderHBox.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+            itemsHeaderHBox.setStyle(
+                    "-fx-border-color: transparent transparent #ccc transparent; -fx-border-width: 1; -fx-padding: 5; -fx-background-color: #f9f9f9;");
+
+            for (javafx.scene.Node n : itemsHeaderHBox.getChildren()) {
+                if (n instanceof Label) {
+                    Label l = (Label) n;
+                    l.setStyle("-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: black;");
+                    javafx.scene.layout.HBox.setHgrow(l, javafx.scene.layout.Priority.NEVER);
+                    String text = l.getText().toLowerCase();
+                    if (text.contains("desc")) {
+                        l.setMinWidth(340);
+                        l.setPrefWidth(340);
+                        l.setMaxWidth(340);
+                        l.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+                    } else if (text.contains("cant")) {
+                        l.setMinWidth(80);
+                        l.setPrefWidth(80);
+                        l.setMaxWidth(80);
+                        l.setAlignment(javafx.geometry.Pos.CENTER);
+                    } else if (text.contains("pvp")) {
+                        l.setMinWidth(100);
+                        l.setPrefWidth(100);
+                        l.setMaxWidth(100);
+                        l.setAlignment(javafx.geometry.Pos.CENTER);
+                    } else if (text.contains("total")) {
+                        l.setMinWidth(100);
+                        l.setPrefWidth(100);
+                        l.setMaxWidth(100);
+                        l.setAlignment(javafx.geometry.Pos.CENTER);
+                    }
+                }
+            }
+
+            // Contenedor de items y finales se re-agregan
+            HBox totalsRow = new HBox();
+            totalsRow.setStyle("-fx-padding: 20 0 0 0;");
+            javafx.scene.layout.Region totalsSpacer = new javafx.scene.layout.Region();
+            HBox.setHgrow(totalsSpacer, javafx.scene.layout.Priority.ALWAYS);
+            totalsContainer.setPrefWidth(250);
+            if (lblTotal != null)
+                lblTotal.setStyle("-fx-font-weight: bold; -fx-font-size: 18; -fx-text-fill: black;");
+            totalsRow.getChildren().addAll(totalsSpacer, totalsContainer);
+
+            HBox paymentRow = new HBox();
+            paymentInfoContainer.setPrefWidth(250);
+            javafx.scene.layout.Region paySpacer = new javafx.scene.layout.Region();
+            HBox.setHgrow(paySpacer, javafx.scene.layout.Priority.ALWAYS);
+            paymentRow.getChildren().addAll(paySpacer, paymentInfoContainer);
+
+            javafx.scene.layout.Region footerSpacer = new javafx.scene.layout.Region();
+            javafx.scene.layout.VBox.setVgrow(footerSpacer, javafx.scene.layout.Priority.ALWAYS);
+
+            paperSheet.getChildren().addAll(
+                    topRow,
+                    itemsHeaderHBox,
+                    itemsContainer,
+                    totalsRow,
+                    paymentRow,
+                    footerSpacer,
+                    barcodeSection);
+        }
     }
 
     @FXML
     private void handleGiftTicket() {
         this.isGiftMode = !this.isGiftMode;
-        setReceiptData(currentItems, currentTotal, currentPaid, currentPaymentMethod, isGiftMode);
+        setReceiptData(currentItems, currentTotal, currentPaid, currentPaymentMethod, currentSaleId, isGiftMode);
     }
 
     private List<CartItem> currentItems;
     private double currentTotal;
     private double currentPaid;
     private String currentPaymentMethod;
+    private int currentSaleId;
 
     private void addItemRow(CartItem item, String sym) {
-        HBox row = new HBox(5);
-        row.setStyle("-fx-border-color: transparent transparent #eee transparent; -fx-padding: 2 0 2 0;");
+        HBox row = new HBox(10);
+        // Sincronizar detección de A4 con applyPaperFormat
+        boolean isA4 = (cfg != null && cfg.getTicketFormat().contains("A4")) || currentClient != null;
+
+        if (isA4) {
+            row.setMinWidth(650);
+            row.setPrefWidth(650);
+            row.setMaxWidth(650);
+            row.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+        }
+
+        row.setStyle(isA4
+                ? "-fx-border-color: transparent transparent #eee transparent; -fx-padding: 8 5 8 5;"
+                : "-fx-border-color: transparent transparent #eee transparent; -fx-padding: 2 0 2 0;");
+
+        String fontSize = isA4 ? "12px" : "10px";
 
         Label lblDesc = new Label(item.getProduct().getName());
-        lblDesc.setMaxWidth(Double.MAX_VALUE);
-        HBox.setHgrow(lblDesc, Priority.ALWAYS);
-        lblDesc.setStyle("-fx-font-size: 10px; -fx-text-fill: black;");
+        if (isA4) {
+            lblDesc.setMinWidth(340);
+            lblDesc.setPrefWidth(340);
+            lblDesc.setMaxWidth(340);
+        } else {
+            lblDesc.setMaxWidth(Double.MAX_VALUE);
+            HBox.setHgrow(lblDesc, javafx.scene.layout.Priority.ALWAYS);
+        }
+        lblDesc.setStyle("-fx-font-size: " + fontSize + "; -fx-text-fill: black;");
 
         Label lblQty = new Label(String.valueOf(item.getQuantity()));
-        lblQty.setPrefWidth(30);
-        lblQty.setStyle("-fx-alignment: CENTER-RIGHT; -fx-font-size: 10px; -fx-text-fill: black;");
+        lblQty.setMinWidth(isA4 ? 80 : 30);
+        lblQty.setPrefWidth(isA4 ? 80 : 30);
+        lblQty.setMaxWidth(isA4 ? 80 : 30);
+        lblQty.setStyle("-fx-alignment: " + (isA4 ? "CENTER" : "CENTER-RIGHT") + "; -fx-font-size: " + fontSize
+                + "; -fx-text-fill: black;");
 
         row.getChildren().addAll(lblDesc, lblQty);
 
         if (!isGiftMode) {
             int dec = cfg != null ? cfg.getDecimalCount() : 2;
-            String priceFmt = "%." + dec + "f";
+            String priceFmt = "%." + dec + "f " + sym;
             String totalFmt = "%." + dec + "f " + sym;
 
             Label lblPrice = new Label(String.format(priceFmt, item.getProduct().getPrice()));
-            lblPrice.setPrefWidth(55);
-            lblPrice.setStyle("-fx-alignment: CENTER-RIGHT; -fx-font-size: 10px; -fx-text-fill: black;");
+            lblPrice.setMinWidth(isA4 ? 100 : 55);
+            lblPrice.setPrefWidth(isA4 ? 100 : 55);
+            lblPrice.setMaxWidth(isA4 ? 100 : 55);
+            lblPrice.setStyle("-fx-alignment: " + (isA4 ? "CENTER" : "CENTER-RIGHT") + "; -fx-font-size: " + fontSize
+                    + "; -fx-text-fill: black;");
 
             Label lblTotal = new Label(String.format(totalFmt, item.getTotal()));
-            lblTotal.setPrefWidth(55);
-            lblTotal.setStyle("-fx-alignment: CENTER-RIGHT; -fx-font-size: 10px; -fx-text-fill: black;");
+            lblTotal.setMinWidth(isA4 ? 100 : 55);
+            lblTotal.setPrefWidth(isA4 ? 100 : 55);
+            lblTotal.setMaxWidth(isA4 ? 100 : 55);
+            lblTotal.setStyle("-fx-alignment: " + (isA4 ? "CENTER" : "CENTER-RIGHT") + "; -fx-font-size: " + fontSize
+                    + "; -fx-text-fill: black;");
 
             row.getChildren().addAll(lblPrice, lblTotal);
         }
-
         itemsContainer.getChildren().add(row);
     }
 
@@ -285,7 +459,9 @@ public class PrintPreviewController {
     }
 
     public void setClientInfo(com.mycompany.ventacontrolfx.model.Client client) {
+        this.currentClient = client;
         if (client != null) {
+            applyPaperFormat(); // Re-aplicar para cambiar a formato A4 si es necesario
             if (clientInfoSection != null) {
                 clientInfoSection.setVisible(true);
                 clientInfoSection.setManaged(true);
@@ -319,7 +495,7 @@ public class PrintPreviewController {
 
     private void generateBarcode(String code) {
         barcodeContainer.getChildren().clear();
-        lblBarcodeValue.setText("01/" + code);
+        lblBarcodeValue.setText(code);
         for (int i = 0; i < 40; i++) {
             Rectangle rect = new Rectangle();
             rect.setHeight(40);
@@ -335,10 +511,31 @@ public class PrintPreviewController {
         PrinterJob job = PrinterJob.createPrinterJob(selectedPrinter);
 
         if (job != null) {
+            // Forzar pass de layout antes de medir
+            paperSheet.applyCss();
+            paperSheet.layout();
+
             // Scale content to fit printable area width
             double pageWidth = job.getJobSettings().getPageLayout().getPrintableWidth();
             double contentWidth = paperSheet.getWidth();
+            if (contentWidth <= 0)
+                contentWidth = currentClient != null ? 750 : 300;
+
             double scale = pageWidth / contentWidth;
+
+            // Evitar que los formatos de ticket se estiren al imprimir en papel grande (PDF
+            // o A4)
+            String format = cfg.getTicketFormat();
+            if (currentClient != null)
+                format = "A4"; // Forzar lógica A4 para facturas
+
+            if (format != null && !format.contains("A4")) {
+                // Ancho físico aproximado en puntos (58mm ~ 164pt, 80mm ~ 226pt)
+                double maxTicketPoints = format.contains("58mm") ? 180 : 250;
+                if (pageWidth > maxTicketPoints) {
+                    scale = maxTicketPoints / contentWidth;
+                }
+            }
 
             // Apply scale
             javafx.scene.transform.Scale scaleTransform = new javafx.scene.transform.Scale(scale, scale);

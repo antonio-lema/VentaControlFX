@@ -33,6 +33,15 @@ public class RegisterUserController {
     @FXML
     private Label lblError;
 
+    @FXML
+    private Button btnCancel;
+
+    @FXML
+    private Button btnRegister;
+
+    @FXML
+    private Label lblTitle;
+
     private UserService userService;
 
     @FXML
@@ -60,6 +69,28 @@ public class RegisterUserController {
         // Initialize roles if not done in FXML (though FXML covers it)
         if (cmbRole.getItems().isEmpty()) {
             cmbRole.setItems(FXCollections.observableArrayList("admin", "cajero"));
+        }
+
+        checkSetupMode();
+    }
+
+    private boolean isInitialSetup = false;
+
+    private void checkSetupMode() {
+        try {
+            if (userService.getCount() == 0) {
+                isInitialSetup = true;
+                if (lblTitle != null)
+                    lblTitle.setText("Configuración: Crear Administrador");
+                if (btnCancel != null) {
+                    btnCancel.setVisible(false);
+                    btnCancel.setManaged(false);
+                }
+                cmbRole.setValue("admin");
+                cmbRole.setDisable(true);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 
@@ -147,7 +178,17 @@ public class RegisterUserController {
 
                 if (userService.createUser(newUser)) {
                     showSuccess("Usuario creado correctamente.");
-                    closeWindow();
+
+                    if (isInitialSetup) {
+                        // Redirect back to login if it was initial setup
+                        com.mycompany.ventacontrolfx.util.SceneNavigator.loadScene(
+                                (javafx.stage.Stage) rootStackPane.getScene().getWindow(),
+                                "/view/login.fxml",
+                                "Login - TPV",
+                                900, 600);
+                    } else {
+                        closeWindow();
+                    }
                 } else {
                     showError("No se pudo crear el usuario.");
                 }

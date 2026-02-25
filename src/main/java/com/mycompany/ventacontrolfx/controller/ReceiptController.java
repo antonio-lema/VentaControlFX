@@ -16,14 +16,23 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.StackPane;
 
 public class ReceiptController {
 
     @FXML
-    private VBox receiptContent; // Based on FXML edit
-
+    private VBox receiptContent;
+    @FXML
+    private VBox companyHeaderSection;
+    @FXML
+    private VBox ticketInfoSection;
+    @FXML
+    private javafx.scene.layout.HBox itemsHeaderHBox;
     @FXML
     private Label lblTicketTitle;
+    @FXML
+    private Label lblSuccessMessage;
     @FXML
     private Label lblDate;
     @FXML
@@ -64,6 +73,10 @@ public class ReceiptController {
     private Button btnGiftTicket;
     @FXML
     private Label lblGiftIcon;
+    @FXML
+    private ImageView imgAppLogoRight;
+    @FXML
+    private Label lblSuccessIcon;
 
     @FXML
     private VBox clientInfoSection;
@@ -116,11 +129,11 @@ public class ReceiptController {
             // Let's modify setReceiptData to store items and total.
 
             if (this.currentItems != null) {
-                controller.setReceiptData(this.currentItems, this.currentTotal, this.currentPaid,
-                        this.currentPaymentMethod, this.isGiftMode);
                 if (this.currentClient != null) {
                     controller.setClientInfo(this.currentClient);
                 }
+                controller.setReceiptData(this.currentItems, this.currentTotal, this.currentPaid,
+                        this.currentPaymentMethod, this.currentSaleId, this.isGiftMode);
             }
 
             Stage stage = new Stage();
@@ -138,14 +151,16 @@ public class ReceiptController {
     private double currentTotal;
     private double currentPaid;
     private String currentPaymentMethod;
+    private int currentSaleId;
     private com.mycompany.ventacontrolfx.model.Client currentClient;
 
     public void setReceiptData(List<CartItem> items, double total, double paid, double change, String paymentMethod,
-            Runnable onNewSale, Runnable onBack) {
+            int saleId, Runnable onNewSale, Runnable onBack) {
         this.currentItems = items;
         this.currentTotal = total;
         this.currentPaid = paid;
         this.currentPaymentMethod = paymentMethod;
+        this.currentSaleId = saleId;
 
         this.cfg = configService.load();
         this.onNewSale = onNewSale;
@@ -160,9 +175,18 @@ public class ReceiptController {
         lblDate.setText("Fecha: " + now.format(formatter) + " Caja: 01");
 
         // Número de ticket
-        int randomNum = 1000 + (int) (Math.random() * 9000);
-        String prefix = isGiftMode ? "Ticket regalo Nº: 01/" : "Factura simplificada Nº: 01/";
-        lblTicketTitle.setText(prefix + randomNum);
+        String prefix = isGiftMode ? "Ticket regalo Nº: " : "Factura simplificada Nº: ";
+        lblTicketTitle.setText(prefix + String.format("%03d", saleId));
+
+        if (lblSuccessMessage != null) {
+            if (isGiftMode) {
+                lblSuccessMessage.setText("¡Ticket regalo creado con éxito!");
+            } else if (currentClient != null) {
+                lblSuccessMessage.setText("¡Factura creada con éxito!");
+            } else {
+                lblSuccessMessage.setText("¡Factura simplificada creada con éxito!");
+            }
+        }
 
         // Cabecera empresa en el ticket (si el label existe en el FXML)
         applyCompanyHeader();
@@ -209,8 +233,146 @@ public class ReceiptController {
         lblPaid.setText(String.format(fmt, paid));
         lblChange.setText(String.format(fmt, change));
         lblPaymentMethod.setText(paymentMethod);
-        lblTotalRight.setText(String.format(fmt, total));
         lblChangeRight.setText(String.format(fmt, change));
+
+        if (lblTotalRight != null) {
+            lblTotalRight.setText(String.format(fmt, total));
+        }
+
+        applyCompanyHeader();
+        applyPaperFormat();
+    }
+
+    private void applyPaperFormat() {
+        if (cfg == null || receiptContent == null)
+            return;
+
+        String format = cfg.getTicketFormat();
+        if (currentClient != null)
+            format = "A4"; // Facturas completas siempre A4
+        if (format == null)
+            format = "80mm";
+
+        if (format.contains("80mm")) {
+            receiptContent.setMinWidth(300);
+            receiptContent.setPrefWidth(300);
+            receiptContent.setMaxWidth(300);
+            receiptContent.setStyle(receiptContent.getStyle() + "; -fx-padding: 10;");
+        } else if (format.contains("58mm")) {
+            receiptContent.setMinWidth(220);
+            receiptContent.setPrefWidth(220);
+            receiptContent.setMaxWidth(220);
+            receiptContent.setStyle(receiptContent.getStyle() + "; -fx-padding: 5;");
+        } else { // A4
+            receiptContent.setMinWidth(750);
+            receiptContent.setPrefWidth(750);
+            receiptContent.setMaxWidth(750);
+            receiptContent.setStyle("-fx-background-color: white; -fx-padding: 40 50 40 50;");
+
+            // Rediseñar el árbol visual para A4 de forma condicional
+            receiptContent.getChildren().clear();
+
+            // Cabecera top: Datos empresa (Izda) + Datos ticket (Derecha)
+            javafx.scene.layout.HBox topRow = new javafx.scene.layout.HBox();
+            topRow.setSpacing(20);
+            topRow.setStyle("-fx-padding: 0 0 30 0;");
+
+            companyHeaderSection.setAlignment(javafx.geometry.Pos.TOP_LEFT);
+            if (lblCompanyBrand != null)
+                lblCompanyBrand.setStyle("-fx-font-weight: bold; -fx-font-size: 26; -fx-text-fill: #2196F3;");
+            if (lblCompanyName != null)
+                lblCompanyName.setStyle("-fx-font-weight: bold; -fx-font-size: 14; -fx-text-fill: black;");
+            if (lblCompanyAddress != null)
+                lblCompanyAddress.setStyle("-fx-font-size: 12; -fx-text-fill: black;");
+            if (lblCompanyPhone != null)
+                lblCompanyPhone.setStyle("-fx-font-size: 12; -fx-text-fill: black;");
+            if (lblCompanyCif != null)
+                lblCompanyCif.setStyle("-fx-font-size: 12; -fx-text-fill: black;");
+
+            clientInfoSection.setPrefWidth(300);
+            clientInfoSection.setStyle(
+                    "-fx-padding: 10; -fx-border-color: #ddd; -fx-border-width: 1; -fx-border-radius: 5; -fx-background-color: #fcfcfc;");
+
+            VBox leftCol = new VBox(15);
+            leftCol.getChildren().addAll(companyHeaderSection, clientInfoSection);
+
+            ticketInfoSection.setAlignment(javafx.geometry.Pos.TOP_RIGHT);
+            if (lblTicketTitle != null)
+                lblTicketTitle.setStyle("-fx-font-weight: bold; -fx-font-size: 20; -fx-text-fill: #333;");
+            if (lblDate != null)
+                lblDate.setStyle("-fx-font-size: 12; -fx-text-fill: #555;");
+
+            javafx.scene.layout.Region topSpacer = new javafx.scene.layout.Region();
+            javafx.scene.layout.HBox.setHgrow(topSpacer, javafx.scene.layout.Priority.ALWAYS);
+            topRow.getChildren().addAll(leftCol, topSpacer, ticketInfoSection);
+
+            // Header de tabla
+            itemsHeaderHBox.setSpacing(10);
+            itemsHeaderHBox.setMinWidth(650);
+            itemsHeaderHBox.setPrefWidth(650);
+            itemsHeaderHBox.setMaxWidth(650);
+            itemsHeaderHBox.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+            itemsHeaderHBox.setStyle(
+                    "-fx-border-color: transparent transparent #ccc transparent; -fx-border-width: 1; -fx-padding: 5; -fx-background-color: #f9f9f9;");
+
+            for (javafx.scene.Node n : itemsHeaderHBox.getChildren()) {
+                if (n instanceof Label) {
+                    Label l = (Label) n;
+                    l.setStyle("-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: black;");
+                    javafx.scene.layout.HBox.setHgrow(l, javafx.scene.layout.Priority.NEVER);
+                    String text = l.getText().toLowerCase();
+                    if (text.contains("desc")) {
+                        l.setMinWidth(340);
+                        l.setPrefWidth(340);
+                        l.setMaxWidth(340);
+                        l.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+                    } else if (text.contains("cant")) {
+                        l.setMinWidth(80);
+                        l.setPrefWidth(80);
+                        l.setMaxWidth(80);
+                        l.setAlignment(javafx.geometry.Pos.CENTER);
+                    } else if (text.contains("pvp")) {
+                        l.setMinWidth(100);
+                        l.setPrefWidth(100);
+                        l.setMaxWidth(100);
+                        l.setAlignment(javafx.geometry.Pos.CENTER);
+                    } else if (text.contains("total")) {
+                        l.setMinWidth(100);
+                        l.setPrefWidth(100);
+                        l.setMaxWidth(100);
+                        l.setAlignment(javafx.geometry.Pos.CENTER);
+                    }
+                }
+            }
+
+            // Contenedor de items y finales se re-agregan
+            javafx.scene.layout.HBox totalsRow = new javafx.scene.layout.HBox();
+            totalsRow.setStyle("-fx-padding: 20 0 0 0;");
+            javafx.scene.layout.Region totalsSpacer = new javafx.scene.layout.Region();
+            javafx.scene.layout.HBox.setHgrow(totalsSpacer, javafx.scene.layout.Priority.ALWAYS);
+            totalsContainer.setPrefWidth(250);
+            if (lblTotal != null)
+                lblTotal.setStyle("-fx-font-weight: bold; -fx-font-size: 18; -fx-text-fill: black;");
+            totalsRow.getChildren().addAll(totalsSpacer, totalsContainer);
+
+            javafx.scene.layout.HBox paymentRow = new javafx.scene.layout.HBox();
+            paymentInfoContainer.setPrefWidth(250);
+            javafx.scene.layout.Region paySpacer = new javafx.scene.layout.Region();
+            javafx.scene.layout.HBox.setHgrow(paySpacer, javafx.scene.layout.Priority.ALWAYS);
+            paymentRow.getChildren().addAll(paySpacer, paymentInfoContainer);
+
+            javafx.scene.layout.Region footerSpacer = new javafx.scene.layout.Region();
+            javafx.scene.layout.VBox.setVgrow(footerSpacer, javafx.scene.layout.Priority.ALWAYS);
+
+            receiptContent.getChildren().addAll(
+                    topRow,
+                    itemsHeaderHBox,
+                    itemsContainer,
+                    totalsRow,
+                    paymentRow,
+                    footerSpacer,
+                    barcodeSection);
+        }
     }
 
     /** Rellena la cabecera de empresa del ticket con los datos de SaleConfig */
@@ -230,9 +392,18 @@ public class ReceiptController {
                         imgCompanyLogo.setVisible(true);
                         imgCompanyLogo.setManaged(true);
                     }
+                    if (imgAppLogoRight != null) {
+                        imgAppLogoRight.setImage(image);
+                        imgAppLogoRight.setVisible(true);
+                        imgAppLogoRight.setManaged(true);
+                    }
                     if (lblCompanyIcon != null) {
                         lblCompanyIcon.setVisible(false);
                         lblCompanyIcon.setManaged(false);
+                    }
+                    if (lblSuccessIcon != null) {
+                        lblSuccessIcon.setVisible(false);
+                        lblSuccessIcon.setManaged(false);
                     }
                 } else {
                     showDefaultIcon();
@@ -245,9 +416,17 @@ public class ReceiptController {
                 imgCompanyLogo.setVisible(false);
                 imgCompanyLogo.setManaged(false);
             }
+            if (imgAppLogoRight != null) {
+                imgAppLogoRight.setVisible(false);
+                imgAppLogoRight.setManaged(false);
+            }
             if (lblCompanyIcon != null) {
                 lblCompanyIcon.setVisible(false);
                 lblCompanyIcon.setManaged(false);
+            }
+            if (lblSuccessIcon != null) {
+                lblSuccessIcon.setVisible(true);
+                lblSuccessIcon.setManaged(true);
             }
         }
 
@@ -269,9 +448,17 @@ public class ReceiptController {
             imgCompanyLogo.setVisible(false);
             imgCompanyLogo.setManaged(false);
         }
+        if (imgAppLogoRight != null) {
+            imgAppLogoRight.setVisible(false);
+            imgAppLogoRight.setManaged(false);
+        }
         if (lblCompanyIcon != null) {
             lblCompanyIcon.setVisible(true);
             lblCompanyIcon.setManaged(true);
+        }
+        if (lblSuccessIcon != null) {
+            lblSuccessIcon.setVisible(true);
+            lblSuccessIcon.setManaged(true);
         }
     }
 
@@ -286,6 +473,7 @@ public class ReceiptController {
 
     public void setClientInfo(com.mycompany.ventacontrolfx.model.Client client) {
         this.currentClient = client;
+        applyPaperFormat(); // Cambiar a A4 si hay cliente
         if (client != null) {
             if (clientInfoSection != null) {
                 clientInfoSection.setVisible(true);
@@ -315,6 +503,10 @@ public class ReceiptController {
                 String currentTitle = lblTicketTitle.getText();
                 lblTicketTitle.setText(currentTitle.replace("Factura simplificada", "Factura"));
             }
+
+            if (!isGiftMode && lblSuccessMessage != null) {
+                lblSuccessMessage.setText("¡Factura creada con éxito!");
+            }
         }
     }
 
@@ -324,40 +516,67 @@ public class ReceiptController {
         setReceiptData(currentItems, currentTotal, currentPaid,
                 Double.parseDouble(lblChange.getText()
                         .replaceAll("[^0-9.,]", "").replace(",", ".")),
-                currentPaymentMethod, onNewSale, onBack);
+                currentPaymentMethod, currentSaleId, onNewSale, onBack);
     }
 
     private void addItemRow(CartItem item, String sym) {
-        HBox row = new HBox(5);
-        row.setStyle("-fx-border-color: transparent transparent #eee transparent; -fx-padding: 2 0 2 0;");
+        javafx.scene.layout.HBox row = new javafx.scene.layout.HBox(10);
+        boolean isA4 = (cfg != null && cfg.getTicketFormat().contains("A4")) || currentClient != null;
+
+        if (isA4) {
+            row.setMinWidth(650);
+            row.setPrefWidth(650);
+            row.setMaxWidth(650);
+            row.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+        }
+
+        row.setStyle(isA4
+                ? "-fx-border-color: transparent transparent #eee transparent; -fx-padding: 8 5 8 5;"
+                : "-fx-border-color: transparent transparent #eee transparent; -fx-padding: 2 0 2 0;");
+
+        String fontSize = isA4 ? "12px" : "10px";
 
         Label lblDesc = new Label(item.getProduct().getName());
-        lblDesc.setMaxWidth(Double.MAX_VALUE);
-        HBox.setHgrow(lblDesc, Priority.ALWAYS);
-        lblDesc.setStyle("-fx-font-size: 10px; -fx-text-fill: black;");
+        if (isA4) {
+            lblDesc.setMinWidth(340);
+            lblDesc.setPrefWidth(340);
+            lblDesc.setMaxWidth(340);
+        } else {
+            lblDesc.setMaxWidth(Double.MAX_VALUE);
+            javafx.scene.layout.HBox.setHgrow(lblDesc, javafx.scene.layout.Priority.ALWAYS);
+        }
+        lblDesc.setStyle("-fx-font-size: " + fontSize + "; -fx-text-fill: black;");
 
         Label lblQty = new Label(String.valueOf(item.getQuantity()));
-        lblQty.setPrefWidth(30);
-        lblQty.setStyle("-fx-alignment: CENTER-RIGHT; -fx-font-size: 10px; -fx-text-fill: black;");
+        lblQty.setMinWidth(isA4 ? 80 : 30);
+        lblQty.setPrefWidth(isA4 ? 80 : 30);
+        lblQty.setMaxWidth(isA4 ? 80 : 30);
+        lblQty.setStyle("-fx-alignment: " + (isA4 ? "CENTER" : "CENTER-RIGHT") + "; -fx-font-size: " + fontSize
+                + "; -fx-text-fill: black;");
 
         row.getChildren().addAll(lblDesc, lblQty);
 
         if (!isGiftMode) {
             int dec = cfg != null ? cfg.getDecimalCount() : 2;
-            String priceFmt = "%." + dec + "f";
+            String priceFmt = "%." + dec + "f " + sym;
             String totalFmt = "%." + dec + "f " + sym;
 
             Label lblPrice = new Label(String.format(priceFmt, item.getProduct().getPrice()));
-            lblPrice.setPrefWidth(55);
-            lblPrice.setStyle("-fx-alignment: CENTER-RIGHT; -fx-font-size: 10px; -fx-text-fill: black;");
+            lblPrice.setMinWidth(isA4 ? 100 : 55);
+            lblPrice.setPrefWidth(isA4 ? 100 : 55);
+            lblPrice.setMaxWidth(isA4 ? 100 : 55);
+            lblPrice.setStyle("-fx-alignment: " + (isA4 ? "CENTER" : "CENTER-RIGHT") + "; -fx-font-size: " + fontSize
+                    + "; -fx-text-fill: black;");
 
             Label lblTotal = new Label(String.format(totalFmt, item.getTotal()));
-            lblTotal.setPrefWidth(55);
-            lblTotal.setStyle("-fx-alignment: CENTER-RIGHT; -fx-font-size: 10px; -fx-text-fill: black;");
+            lblTotal.setMinWidth(isA4 ? 100 : 55);
+            lblTotal.setPrefWidth(isA4 ? 100 : 55);
+            lblTotal.setMaxWidth(isA4 ? 100 : 55);
+            lblTotal.setStyle("-fx-alignment: " + (isA4 ? "CENTER" : "CENTER-RIGHT") + "; -fx-font-size: " + fontSize
+                    + "; -fx-text-fill: black;");
 
             row.getChildren().addAll(lblPrice, lblTotal);
         }
-
         itemsContainer.getChildren().add(row);
     }
 

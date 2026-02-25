@@ -28,7 +28,25 @@ public class LoginController {
 
     @FXML
     public void initialize() {
-        // Cualquier inicialización que necesites al mostrar la pantalla
+        checkIfUsersExist();
+    }
+
+    private void checkIfUsersExist() {
+        try {
+            if (userService.getCount() == 0) {
+                lblMessage.setText("No hay usuarios registrados. Redirigiendo a registro de Administrador...");
+
+                javafx.application.Platform.runLater(() -> {
+                    com.mycompany.ventacontrolfx.util.SceneNavigator.loadScene(
+                            (javafx.stage.Stage) btnLogin.getScene().getWindow(),
+                            "/view/register_user.fxml",
+                            "Registro Primer Administrador",
+                            900, 600);
+                });
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     @FXML
@@ -43,26 +61,12 @@ public class LoginController {
                 UserSession.getInstance().setCurrentUser(user);
                 lblMessage.setText("Login correcto 👍");
 
-                // Switch to Main View
-                try {
-                    javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(
-                            getClass().getResource("/view/main.fxml"));
-                    javafx.scene.Parent root = loader.load();
-
-                    javafx.stage.Stage stage = (javafx.stage.Stage) btnLogin.getScene().getWindow();
-                    javafx.scene.Scene scene = new javafx.scene.Scene(root);
-                    scene.getStylesheets().add(getClass().getResource("/view/style.css").toExternalForm());
-
-                    stage.setScene(scene);
-                    stage.setTitle("TPV Bazar Electrónico");
-                    stage.centerOnScreen();
-                    stage.setMaximized(true); // Open main window maximized
-                    stage.show();
-
-                } catch (java.io.IOException e) {
-                    e.printStackTrace();
-                    lblMessage.setText("Error al cargar la aplicación principal: " + e.getMessage());
-                }
+                // Switch to Main View using SceneNavigator
+                com.mycompany.ventacontrolfx.util.SceneNavigator.loadScene(
+                        (javafx.stage.Stage) btnLogin.getScene().getWindow(),
+                        "/view/main.fxml",
+                        "TPV",
+                        1200, 800, true);
 
             } else {
                 lblMessage.setText("Usuario o contraseña incorrectos ❌");
@@ -96,7 +100,7 @@ public class LoginController {
             }
 
             stage.setScene(scene);
-            stage.setTitle("Recuperar Contraseña - TPV Bazar Electrónico");
+            stage.setTitle("Recuperar Contraseña");
             stage.centerOnScreen();
             stage.show();
 

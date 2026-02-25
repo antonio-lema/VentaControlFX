@@ -126,26 +126,26 @@ public class PaymentController {
     private void handleCardPayment() {
         // Simulate card processing...
 
+        handleClose();
         // Success
         if (callback != null) {
-            callback.onSuccess(totalAmount, 0.0, "Tarjeta");
+            javafx.application.Platform.runLater(() -> callback.onSuccess(totalAmount, 0.0, "Tarjeta"));
         }
-        handleClose();
     }
 
     @FXML
     private void handleCashPayment() {
         try {
-            String text = txtGivenAmount.getText().replace(",", ".");
-            double given = Double.parseDouble(text);
+            String text = txtGivenAmount.getText().trim().replace(",", ".");
+            double given = text.isEmpty() ? totalAmount : Double.parseDouble(text);
 
             if (given >= totalAmount) {
                 // Success
                 double change = given - totalAmount;
-                if (callback != null) {
-                    callback.onSuccess(given, change, "Efectivo");
-                }
                 handleClose();
+                if (callback != null) {
+                    javafx.application.Platform.runLater(() -> callback.onSuccess(given, change, "Efectivo"));
+                }
             } else {
                 // Show error or shake
                 txtGivenAmount.setStyle("-fx-border-color: red;");

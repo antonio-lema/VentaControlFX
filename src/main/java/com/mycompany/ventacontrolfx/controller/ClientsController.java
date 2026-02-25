@@ -84,6 +84,9 @@ public class ClientsController {
         try {
             List<Client> clients = clientService.getAllClients();
             displayClients(clients);
+
+            // Actualizar el contador de empresas en la pantalla principal
+            MainController.updateCounts();
         } catch (SQLException e) {
             e.printStackTrace();
             AlertUtil.showError("Error", "No se pudieron cargar las empresas");

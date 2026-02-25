@@ -209,6 +209,9 @@ public class CategoryController {
 
             // Initial filter to respect default limit
             filterCategories(searchField.getText(), rowsPerPageField.getText());
+
+            // Actualizar el contador de la pantalla principal (abajo)
+            MainController.updateCounts();
         } catch (SQLException e) {
             e.printStackTrace();
             showAlert("Error", "No se pudieron cargar las categorías: " + e.getMessage());

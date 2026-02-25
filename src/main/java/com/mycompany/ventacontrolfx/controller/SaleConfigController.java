@@ -31,6 +31,10 @@ public class SaleConfigController {
     private TextField txtEmail;
     @FXML
     private TextField txtLogoPath;
+    @FXML
+    private TextField txtAppIconPath;
+    @FXML
+    private TextField txtAppName;
 
     // ── Email / SMTP ──────────────────────────────────────────────────
     @FXML
@@ -68,6 +72,8 @@ public class SaleConfigController {
     @FXML
     private ComboBox<String> cmbTicketCopies;
     @FXML
+    private ComboBox<String> cmbTicketFormat;
+    @FXML
     private CheckBox chkAutoPrint;
 
     // ── Banner ────────────────────────────────────────────────────────
@@ -96,6 +102,12 @@ public class SaleConfigController {
         if (txtLogoPath != null) {
             txtLogoPath.setText(cfg.getLogoPath());
         }
+        if (txtAppIconPath != null) {
+            txtAppIconPath.setText(cfg.getAppIconPath());
+        }
+        if (txtAppName != null) {
+            txtAppName.setText(cfg.getAppName());
+        }
 
         // Fiscal
         txtTaxRate.setText(String.valueOf(cfg.getTaxRate()));
@@ -111,6 +123,7 @@ public class SaleConfigController {
         chkShowCif.setSelected(cfg.isShowCif());
         txtFooterMessage.setText(cfg.getFooterMessage());
         setComboValue(cmbTicketCopies, cfg.getTicketCopies());
+        setComboValue(cmbTicketFormat, cfg.getTicketFormat());
         chkAutoPrint.setSelected(cfg.isAutoPrint());
 
         // SMTP
@@ -156,6 +169,18 @@ public class SaleConfigController {
         }
     }
 
+    @FXML
+    private void handleBrowseIcon() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Seleccionar Icono de Aplicación");
+        fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("Iconos", "*.png", "*.jpg", "*.jpeg", "*.ico"));
+        File file = fileChooser.showOpenDialog(txtAppIconPath.getScene().getWindow());
+        if (file != null) {
+            txtAppIconPath.setText(file.getAbsolutePath());
+        }
+    }
+
     // ─────────────────────────────────────────────────────────────────
     private SaleConfig buildConfig() {
         SaleConfig cfg = new SaleConfig();
@@ -168,6 +193,12 @@ public class SaleConfigController {
         cfg.setEmail(txtEmail.getText().trim());
         if (txtLogoPath != null) {
             cfg.setLogoPath(txtLogoPath.getText().trim());
+        }
+        if (txtAppIconPath != null) {
+            cfg.setAppIconPath(txtAppIconPath.getText().trim());
+        }
+        if (txtAppName != null) {
+            cfg.setAppName(txtAppName.getText().trim());
         }
 
         // Fiscal
@@ -188,6 +219,7 @@ public class SaleConfigController {
         cfg.setShowCif(chkShowCif.isSelected());
         cfg.setFooterMessage(txtFooterMessage.getText().trim());
         cfg.setTicketCopies(cmbTicketCopies.getValue());
+        cfg.setTicketFormat(cmbTicketFormat.getValue());
         cfg.setAutoPrint(chkAutoPrint.isSelected());
 
         // Métodos de pago y opciones generales: secciones eliminadas

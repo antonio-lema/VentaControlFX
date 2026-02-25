@@ -105,7 +105,7 @@ public class LockScreenController {
             Scene scene = new Scene(root, 900, 600);
             scene.getStylesheets().add(getClass().getResource("/view/style.css").toExternalForm());
             loginStage.setScene(scene);
-            loginStage.setTitle("Login - TPV Bazar Electrónico");
+            loginStage.setTitle("Login");
             loginStage.show();
 
         } catch (IOException e) {
