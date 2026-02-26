@@ -87,7 +87,7 @@ public class HeaderController implements Injectable {
         if (AlertUtil.showConfirmation("Cerrar Sesión", "¿Estás seguro?", "Se cerrará la sesión actual.")) {
             container.getUserSession().logout();
             Stage stage = (Stage) userMenuButton.getScene().getWindow();
-            SceneNavigator.loadScene(stage, "/view/login.fxml", "Login", 900, 600);
+            SceneNavigator.loadScene(stage, "/view/login.fxml", "Login", 900, 600, false, container);
         }
     }
 }
