@@ -84,26 +84,46 @@ public class LockScreenController implements com.mycompany.ventacontrolfx.util.I
         }
 
         Stage currentStage = (Stage) passwordField.getScene().getWindow();
-        Stage parentStage = (Stage) currentStage.getOwner();
 
-        // Open new Login screen FIRST so application doesn't implicitly exit
-        Stage loginStage = new Stage();
-        com.mycompany.ventacontrolfx.util.SceneNavigator.loadScene(
-                loginStage,
-                "/view/login.fxml",
-                "Login",
-                900, 600,
-                false,
-                container);
-
-        // Safely close the lock screen modal
+        // Safely exit fullscreen first to prevent JavaFX native crash
         currentStage.setFullScreen(false);
-        currentStage.close();
 
-        // Close the main app window
-        if (parentStage != null) {
-            parentStage.close();
-        }
+        // Run later to ensure the fullscreen transition completes safely
+        javafx.application.Platform.runLater(() -> {
+            Stage mainAppStage = null;
+
+            // Search for the existing background main stage
+            for (javafx.stage.Window window : javafx.stage.Window.getWindows()) {
+                if (window instanceof Stage && window != currentStage) {
+                    mainAppStage = (Stage) window;
+                    break;
+                }
+            }
+
+            if (mainAppStage != null) {
+                // Reuse the existing application stage to render the Login View
+                com.mycompany.ventacontrolfx.util.SceneNavigator.loadScene(
+                        mainAppStage,
+                        "/view/login.fxml",
+                        "Login",
+                        900, 600,
+                        false,
+                        container);
+            } else {
+                // Fallback in case main is lost
+                Stage loginStage = new Stage();
+                com.mycompany.ventacontrolfx.util.SceneNavigator.loadScene(
+                        loginStage,
+                        "/view/login.fxml",
+                        "Login",
+                        900, 600,
+                        false,
+                        container);
+            }
+
+            // Close the lock screen
+            currentStage.close();
+        });
     }
 
     private void showAlert(String title, String content) {
