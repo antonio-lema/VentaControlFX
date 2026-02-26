@@ -24,7 +24,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import java.io.IOException;
 
-public class ClientsController {
+public class ClientsController implements com.mycompany.ventacontrolfx.util.Injectable {
 
     @FXML
     private TextField searchField;
@@ -36,13 +36,20 @@ public class ClientsController {
     private ClientService clientService;
     private CartService cartService;
     private Runnable closeAction;
+    private com.mycompany.ventacontrolfx.service.ServiceContainer container;
+
+    @Override
+    public void inject(com.mycompany.ventacontrolfx.service.ServiceContainer container) {
+        this.container = container;
+        this.clientService = container.getClientService();
+        this.cartService = container.getCartService();
+        loadClients();
+        setupSearch();
+    }
 
     public void init(CartService cartService, Runnable closeAction) {
         this.cartService = cartService;
         this.closeAction = closeAction;
-        this.clientService = new ClientService();
-        loadClients();
-        setupSearch();
     }
 
     @FXML
@@ -56,6 +63,7 @@ public class ClientsController {
             Parent root = loader.load();
 
             ClientFormController controller = loader.getController();
+            controller.inject(container); // CRÍTICO: inyectar antes de init() para que clientService no sea null
             controller.init(client);
 
             Stage stage = new Stage();
@@ -85,8 +93,7 @@ public class ClientsController {
             List<Client> clients = clientService.getAllClients();
             displayClients(clients);
 
-            // Actualizar el contador de empresas en la pantalla principal
-            MainController.updateCounts();
+            // Note: StatusBar update is now handled via GlobalEventBus if applicable
         } catch (SQLException e) {
             e.printStackTrace();
             AlertUtil.showError("Error", "No se pudieron cargar las empresas");
@@ -226,7 +233,15 @@ public class ClientsController {
         } else {
             // Fallback for independent windows
             if (searchField.getScene() != null && searchField.getScene().getWindow() != null) {
-                ((Stage) searchField.getScene().getWindow()).close();
+                Stage stage = (Stage) searchField.getScene().getWindow();
+                // Check if it's a modal dialog (not the main application stage)
+                if (stage.getModality() != javafx.stage.Modality.NONE) {
+                    stage.close();
+                } else {
+                    // It's running in the main view. Just notify.
+                    AlertUtil.showInfo("Selección Exitosa",
+                            "La empresa seleccionada se ha aplicado al carrito.\nRegresa a 'TPV' (Ventas) para continuar.");
+                }
             }
         }
     }
