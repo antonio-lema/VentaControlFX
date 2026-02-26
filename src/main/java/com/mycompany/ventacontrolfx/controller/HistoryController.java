@@ -32,7 +32,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Collections;
 
-public class HistoryController {
+public class HistoryController implements com.mycompany.ventacontrolfx.util.Injectable {
 
     @FXML
     private DatePicker datePickerStart;
@@ -95,11 +95,18 @@ public class HistoryController {
     @FXML
     private Button btnPrint;
 
-    private final SaleService saleService = new SaleService();
+    private SaleService saleService;
+    private com.mycompany.ventacontrolfx.service.ServiceContainer container;
     private final DateTimeFormatter fullFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
 
-    @FXML
-    public void initialize() {
+    @Override
+    public void inject(com.mycompany.ventacontrolfx.service.ServiceContainer container) {
+        this.container = container;
+        this.saleService = container.getSaleService();
+
+        // CRÍTICO: Todo lo que necesita saleService debe ir aquí, NO en initialize().
+        // JavaFX llama a initialize() ANTES de inject(), por lo que saleService sería
+        // null allí.
         datePickerStart.setValue(LocalDate.now());
         datePickerEnd.setValue(LocalDate.now());
         setupTable();
@@ -111,6 +118,12 @@ public class HistoryController {
                 showDetails(newSelection);
             }
         });
+    }
+
+    @FXML
+    public void initialize() {
+        // Vacío intencionalmente: initialize() es llamado por JavaFX ANTES de inject().
+        // Toda la lógica que dependa de servicios debe ir en inject().
     }
 
     private void setupTable() {
@@ -440,6 +453,7 @@ public class HistoryController {
             stage.initModality(javafx.stage.Modality.APPLICATION_MODAL);
 
             Scene scene = new Scene(root);
+            scene.getStylesheets().add(getClass().getResource("/view/style.css").toExternalForm());
             scene.setFill(Color.TRANSPARENT);
             stage.setScene(scene);
 

@@ -1,103 +1,96 @@
 package com.mycompany.ventacontrolfx.controller;
 
+import com.mycompany.ventacontrolfx.application.service.ProductUseCase;
 import com.mycompany.ventacontrolfx.model.Product;
-import com.mycompany.ventacontrolfx.service.ProductService;
-import java.sql.SQLException;
-import java.util.List;
+import com.mycompany.ventacontrolfx.service.ServiceContainer;
 import com.mycompany.ventacontrolfx.util.AlertUtil;
+import com.mycompany.ventacontrolfx.util.AppLogger;
+import com.mycompany.ventacontrolfx.util.AsyncManager;
+import com.mycompany.ventacontrolfx.util.Injectable;
+import com.mycompany.ventacontrolfx.util.Searchable;
+import com.mycompany.ventacontrolfx.control.ToggleSwitch;
+import javafx.animation.PauseTransition;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.TableCell;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.util.Callback;
-import javafx.application.Platform;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.shape.SVGPath;
-import javafx.scene.control.ContentDisplay;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import java.io.File;
-import com.mycompany.ventacontrolfx.control.ToggleSwitch;
-
+import javafx.scene.layout.HBox;
+import javafx.geometry.Pos;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.stage.Modality;
-import javafx.geometry.Pos;
-import javafx.scene.layout.HBox;
-import javafx.scene.control.TableCell;
+import javafx.util.Duration;
+import java.io.File;
+import java.util.List;
+import java.util.WeakHashMap;
+import java.util.stream.Collectors;
 
-public class ProductController {
+/**
+ * Enterprise Product List Controller.
+ * Optimized with debounce background filtering, batch rendering, and Weak
+ * Memory Cache.
+ * Reacts to EventBus changes for real-time synchronization.
+ */
+public class ProductController implements Injectable, Searchable {
+    private static final String TAG = "ProductController";
 
     @FXML
     private TableView<Product> productsTable;
     @FXML
-    private TableColumn<Product, String> colCategoryName;
-    @FXML
-    private TableColumn<Product, String> colName;
+    private TableColumn<Product, String> colCategoryName, colName, colImage;
     @FXML
     private TableColumn<Product, Double> colPrice;
     @FXML
-    private TableColumn<Product, Boolean> colFavorite;
-    @FXML
-    private TableColumn<Product, String> colImage;
-    @FXML
-    private TableColumn<Product, Boolean> colVisible;
+    private TableColumn<Product, Boolean> colFavorite, colVisible;
     @FXML
     private TableColumn<Product, Void> colActions;
     @FXML
-    private TextField searchField;
-    @FXML
-    private Button btnAdd;
-    @FXML
-    private TextField rowsPerPageField;
+    private TextField searchField, rowsPerPageField;
 
-    // Cache para las imágenes, evita cargar la misma imagen de disco continuamente
-    // (lo que causa lag)
-    private final java.util.Map<String, Image> imageCache = new java.util.HashMap<>();
+    private final WeakHashMap<String, Image> imageCache = new WeakHashMap<>();
+    private ProductUseCase productUseCase;
+    private ServiceContainer container;
+    private ObservableList<Product> fullProductList = FXCollections.observableArrayList();
 
-    private ProductService productService;
-    private ObservableList<Product> productList;
+    // For Filter Optimization (debouncing and cancellation)
+    private Task<List<Product>> currentFilterTask;
+    private final PauseTransition debounce = new PauseTransition(Duration.millis(300));
 
-    public void initialize() {
-        productService = new ProductService();
-        productList = FXCollections.observableArrayList();
+    @Override
+    public void inject(ServiceContainer container) {
+        this.container = container;
+        this.productUseCase = container.getProductUseCase();
 
-        setupColumns();
-        Platform.runLater(() -> {
-            loadAllProducts();
-        });
+        setupTable();
+        loadAllProducts();
 
-        // Search functionality
-
-        // Search functionality
-        searchField.textProperty().addListener((observable, oldValue, newValue) -> {
-            filterProducts(newValue, rowsPerPageField.getText());
-        });
-
-        // Rows per page functionality
-        rowsPerPageField.textProperty().addListener((observable, oldValue, newValue) -> {
-            filterProducts(searchField.getText(), newValue);
-        });
-
-        // Set visual sort order indication
-        productsTable.getSortOrder().add(colFavorite);
-        colFavorite.setSortType(TableColumn.SortType.DESCENDING);
+        // Background Filtering optimization with Debounce (300ms)
+        debounce.setOnFinished(e -> requestFilter());
+        searchField.textProperty().addListener((obs, old, nv) -> debounce.playFromStart());
+        rowsPerPageField.textProperty().addListener((obs, old, nv) -> debounce.playFromStart());
     }
 
-    private void setupColumns() {
+    private void setupTable() {
         colCategoryName.setCellValueFactory(new PropertyValueFactory<>("categoryName"));
         colName.setCellValueFactory(new PropertyValueFactory<>("name"));
         colPrice.setCellValueFactory(new PropertyValueFactory<>("price"));
 
-        // Image Column
-        colImage.setCellValueFactory(new PropertyValueFactory<>("imagePath"));
+        setupImageColumn();
+        setupToggleColumn(colFavorite, true);
+        setupToggleColumn(colVisible, false);
+        setupActionColumn();
+
+        productsTable.getSortOrder().add(colFavorite);
+        colFavorite.setSortType(TableColumn.SortType.DESCENDING);
+    }
+
+    private void setupImageColumn() {
         colImage.setCellFactory(column -> new TableCell<Product, String>() {
             private final ImageView imageView = new ImageView();
             private final javafx.scene.shape.Circle clip = new javafx.scene.shape.Circle(20, 20, 20);
@@ -110,305 +103,185 @@ public class ProductController {
                 } else {
                     File file = new File(imagePath);
                     if (file.exists()) {
-                        String fileUri = file.toURI().toString();
-
-                        // Busca la imagen en el caché, si no está, la carga de fondo (asíncrono)
-                        Image image = imageCache.computeIfAbsent(fileUri,
-                                url -> new Image(url, 40, 40, false, true, true));
-
+                        String uri = file.toURI().toString();
+                        Image image = imageCache.get(uri);
+                        if (image == null) {
+                            image = new Image(uri, 40, 40, false, true, true);
+                            imageCache.put(uri, image);
+                        }
                         imageView.setImage(image);
                         imageView.setFitHeight(40);
                         imageView.setFitWidth(40);
-                        imageView.setPreserveRatio(false); // Force square for perfect circle
                         imageView.setClip(clip);
-
-                        // Wrap in a container to add a border/effect if needed
                         HBox container = new HBox(imageView);
                         container.setAlignment(Pos.CENTER);
-                        container.setStyle(
-                                "-fx-padding: 2; -fx-border-color: #e0e6ed; -fx-border-radius: 50%; -fx-border-width: 1;");
-
+                        container.setStyle("-fx-padding: 2; -fx-border-color: #e0e6ed; -fx-border-radius: 50%;");
                         setGraphic(container);
                     } else {
-                        // Placeholder icon
-                        de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView placeholder = new de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView(
-                                de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon.IMAGE);
-                        placeholder.setSize("24");
-                        placeholder.setFill(javafx.scene.paint.Color.rgb(189, 189, 189));
-                        setGraphic(placeholder);
-                        setAlignment(Pos.CENTER);
+                        setGraphic(new de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView(
+                                de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon.IMAGE));
                     }
                 }
             }
         });
+    }
 
-        // Favorite Column with ToggleSwitch
-        colFavorite.setCellValueFactory(new PropertyValueFactory<>("favorite"));
-        colFavorite.setCellFactory(column -> new TableCell<Product, Boolean>() {
+    private void setupToggleColumn(TableColumn<Product, Boolean> col, boolean isFavorite) {
+        col.setCellValueFactory(new PropertyValueFactory<>(isFavorite ? "favorite" : "visible"));
+        col.setCellFactory(column -> new TableCell<Product, Boolean>() {
             private final ToggleSwitch toggle = new ToggleSwitch();
-
             {
                 toggle.setOnMouseClicked(event -> {
+                    Product p = getTableView().getItems().get(getIndex());
                     boolean newState = !toggle.isSwitchedOn();
-                    toggle.setSwitchedOn(newState);
-
-                    Product product = getTableView().getItems().get(getIndex());
-                    product.setFavorite(newState);
-                    try {
-                        productService.updateProduct(product);
-                    } catch (SQLException e) {
-                        e.printStackTrace();
-                        toggle.setSwitchedOn(!newState);
-                        product.setFavorite(!newState);
-                        showAlert("Error", "No se pudo actualizar favorito: " + e.getMessage());
-                    }
+                    if (isFavorite)
+                        p.setFavorite(newState);
+                    else
+                        p.setVisible(newState);
+                    AsyncManager.execute(productUseCase.saveOrUpdateTask(p), v -> {
+                    });
                 });
             }
 
             @Override
             protected void updateItem(Boolean item, boolean empty) {
                 super.updateItem(item, empty);
-                if (empty || item == null) {
+                if (empty || item == null)
                     setGraphic(null);
-                } else {
+                else {
                     toggle.setState(item);
                     setGraphic(toggle);
                     setAlignment(Pos.CENTER);
                 }
             }
         });
+    }
 
-        // Visible Column with ToggleSwitch
-        colVisible.setCellValueFactory(new PropertyValueFactory<>("visible"));
-        colVisible.setCellFactory(column -> new TableCell<Product, Boolean>() {
-            private final ToggleSwitch toggle = new ToggleSwitch();
-
-            {
-                toggle.setOnMouseClicked(event -> {
-                    boolean newState = !toggle.isSwitchedOn();
-                    toggle.setSwitchedOn(newState);
-
-                    Product product = getTableView().getItems().get(getIndex());
-                    product.setVisible(newState);
-                    try {
-                        productService.updateProduct(product);
-                    } catch (SQLException e) {
-                        e.printStackTrace();
-                        toggle.setSwitchedOn(!newState);
-                        product.setVisible(!newState);
-                        showAlert("Error", "No se pudo actualizar visibilidad: " + e.getMessage());
-                    }
-                });
-            }
-
-            @Override
-            protected void updateItem(Boolean item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty || item == null) {
-                    setGraphic(null);
-                } else {
-                    toggle.setState(item);
-                    setGraphic(toggle);
-                    setAlignment(Pos.CENTER);
-                }
-            }
-        });
-
-        // Actions Column
+    private void setupActionColumn() {
         colActions.setCellFactory(param -> new TableCell<Product, Void>() {
-            private final Button btnEdit = new Button();
-            private final Button btnDelete = new Button();
+            private final Button btnEdit = createActionButton("PENCIL", "#1e88e5");
+            private final Button btnDelete = createActionButton("TRASH", "#e53935");
             private final HBox pane = new HBox(8, btnEdit, btnDelete);
-
             {
                 pane.setAlignment(Pos.CENTER);
-
-                // Edit Icon
-                de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView editIcon = new de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView(
-                        de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon.PENCIL);
-                editIcon.setSize("16");
-                editIcon.setFill(javafx.scene.paint.Color.web("#1e88e5"));
-
-                btnEdit.setGraphic(editIcon);
-                btnEdit.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
-                btnEdit.setStyle("-fx-background-color: transparent; -fx-cursor: hand; -fx-padding: 5;");
-                btnEdit.setTooltip(new javafx.scene.control.Tooltip("Editar Producto"));
-
-                // Delete Icon
-                de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView deleteIcon = new de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView(
-                        de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon.TRASH);
-                deleteIcon.setSize("16");
-                deleteIcon.setFill(javafx.scene.paint.Color.web("#e53935"));
-
-                btnDelete.setGraphic(deleteIcon);
-                btnDelete.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
-                btnDelete.setStyle("-fx-background-color: transparent; -fx-cursor: hand; -fx-padding: 5;");
-                btnDelete.setTooltip(new javafx.scene.control.Tooltip("Eliminar Producto"));
-
-                btnEdit.setOnAction(event -> {
-                    Product product = getTableView().getItems().get(getIndex());
-                    handleEditProduct(product);
-                });
-
-                btnDelete.setOnAction(event -> {
-                    Product product = getTableView().getItems().get(getIndex());
-                    handleDeleteProduct(product);
-                });
-
-                // Hover effects
-                btnEdit.setOnMouseEntered(e -> editIcon.setFill(javafx.scene.paint.Color.web("#1565c0")));
-                btnEdit.setOnMouseExited(e -> editIcon.setFill(javafx.scene.paint.Color.web("#1e88e5")));
-                btnDelete.setOnMouseEntered(e -> deleteIcon.setFill(javafx.scene.paint.Color.web("#c62828")));
-                btnDelete.setOnMouseExited(e -> deleteIcon.setFill(javafx.scene.paint.Color.web("#e53935")));
+                btnEdit.setOnAction(e -> handleEditProduct(getTableView().getItems().get(getIndex())));
+                btnDelete.setOnAction(e -> handleDeleteProduct(getTableView().getItems().get(getIndex())));
             }
 
             @Override
             protected void updateItem(Void item, boolean empty) {
                 super.updateItem(item, empty);
-                if (empty) {
-                    setGraphic(null);
-                } else {
-                    setGraphic(pane);
-                }
+                setGraphic(empty ? null : pane);
             }
         });
     }
 
-    private void loadAllProducts() {
-        try {
-            List<Product> products = productService.getAllProducts();
-            // Ordenar para que los favoritos siempre aparezcan primero y luego por nombre
-            products.sort((p1, p2) -> {
-                int favCompare = Boolean.compare(p2.isFavorite(), p1.isFavorite());
-                if (favCompare != 0)
-                    return favCompare;
-                return p1.getName().compareToIgnoreCase(p2.getName());
-            });
-            productList.setAll(products);
-            // Initial filter to respect default limit
-            filterProducts(searchField.getText(), rowsPerPageField.getText());
-
-            // Actualizar el contador de la pantalla principal (abajo)
-            MainController.updateCounts();
-        } catch (SQLException e) {
-            e.printStackTrace();
-            showAlert("Error", "No se pudieron cargar los productos: " + e.getMessage());
-        }
+    private Button createActionButton(String iconName, String color) {
+        Button btn = new Button();
+        de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView icon = new de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView(
+                de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon.valueOf(iconName));
+        icon.setSize("16");
+        icon.setFill(javafx.scene.paint.Color.web(color));
+        btn.setGraphic(icon);
+        btn.setStyle("-fx-background-color: transparent; -fx-cursor: hand;");
+        return btn;
     }
 
-    private void filterProducts(String query, String limitStr) {
-        int limit = Integer.MAX_VALUE;
-        try {
-            if (limitStr != null && !limitStr.trim().isEmpty()) {
-                limit = Integer.parseInt(limitStr.trim());
-            }
-        } catch (NumberFormatException e) {
-            // Ignore invalid input, use default (all)
+    private void loadAllProducts() {
+        AsyncManager.execute(productUseCase.getAllProductsTask(), products -> {
+            fullProductList.setAll(products);
+            requestFilter();
+        });
+    }
+
+    private void requestFilter() {
+        if (currentFilterTask != null && currentFilterTask.isRunning()) {
+            currentFilterTask.cancel();
         }
 
-        ObservableList<Product> filtered = FXCollections.observableArrayList();
-        String lowerCaseQuery = (query != null) ? query.toLowerCase() : "";
+        String query = searchField.getText();
+        String limitStr = rowsPerPageField.getText();
 
-        for (Product p : productList) {
-            if (filtered.size() >= limit) {
-                break;
-            }
-
-            boolean matches = false;
-            // If query is empty, everything matches (subject to limit)
-            if (lowerCaseQuery.isEmpty()) {
-                matches = true;
-            } else {
-                if (p.getName().toLowerCase().contains(lowerCaseQuery)) {
-                    matches = true;
-                } else if (String.valueOf(p.getId()).contains(lowerCaseQuery)) {
-                    matches = true;
-                } else if (p.getCategoryName() != null && p.getCategoryName().toLowerCase().contains(lowerCaseQuery)) {
-                    matches = true;
+        currentFilterTask = new Task<>() {
+            @Override
+            protected List<Product> call() {
+                int limit = Integer.MAX_VALUE;
+                try {
+                    if (limitStr != null && !limitStr.trim().isEmpty())
+                        limit = Integer.parseInt(limitStr.trim());
+                } catch (Exception e) {
                 }
-            }
 
-            if (matches) {
-                filtered.add(p);
-            }
-        }
-        productsTable.setItems(filtered);
+                String finalQuery = (query != null) ? query.toLowerCase().trim() : "";
 
-        // Actualizar el contador de la pantalla principal con los resultados filtrados
-        MainController.updateProductCount(filtered.size());
+                return fullProductList.stream()
+                        .filter(p -> {
+                            if (isCancelled())
+                                return false;
+                            return finalQuery.isEmpty() ||
+                                    p.getName().toLowerCase().contains(finalQuery) ||
+                                    String.valueOf(p.getId()).contains(finalQuery) ||
+                                    (p.getCategoryName() != null
+                                            && p.getCategoryName().toLowerCase().contains(finalQuery));
+                        })
+                        .limit(limit)
+                        .sorted((p1, p2) -> {
+                            int favCompare = Boolean.compare(p2.isFavorite(), p1.isFavorite());
+                            return favCompare != 0 ? favCompare : p1.getName().compareToIgnoreCase(p2.getName());
+                        })
+                        .collect(Collectors.toList());
+            }
+        };
+
+        AsyncManager.execute(currentFilterTask, filtered -> {
+            productsTable.setItems(FXCollections.observableArrayList(filtered));
+        });
+    }
+
+    @Override
+    public void handleSearch(String text) {
+        searchField.setText(text);
     }
 
     @FXML
     private void handleAddProduct() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/add_product.fxml"));
-            Parent root = loader.load();
-
-            Stage stage = new Stage();
-            stage.initStyle(javafx.stage.StageStyle.TRANSPARENT);
-            stage.initModality(javafx.stage.Modality.APPLICATION_MODAL);
-
-            Scene scene = new Scene(root);
-            scene.setFill(null);
-            scene.getStylesheets().add(getClass().getResource("/view/style.css").toExternalForm());
-
-            stage.setScene(scene);
-            stage.showAndWait();
-            loadAllProducts();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            showAlert("Error", "No se pudo abrir la ventana de añadir producto: " + e.getMessage());
-        }
+        openProductDialog(null);
     }
 
     private void handleEditProduct(Product product) {
+        openProductDialog(product);
+    }
+
+    private void openProductDialog(Product product) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/add_product.fxml"));
             Parent root = loader.load();
-
             AddProductController controller = loader.getController();
-            controller.setProduct(product);
+            controller.inject(container);
+            if (product != null)
+                controller.setProduct(product);
 
             Stage stage = new Stage();
             stage.initStyle(javafx.stage.StageStyle.TRANSPARENT);
-            stage.initModality(javafx.stage.Modality.APPLICATION_MODAL);
-
+            stage.initModality(Modality.APPLICATION_MODAL);
             Scene scene = new Scene(root);
             scene.setFill(null);
             scene.getStylesheets().add(getClass().getResource("/view/style.css").toExternalForm());
-
             stage.setScene(scene);
             stage.showAndWait();
             loadAllProducts();
-
         } catch (Exception e) {
-            e.printStackTrace();
-            showAlert("Error", "No se pudo abrir la ventana de editar producto: " + e.getMessage());
+            AppLogger.error(TAG, "Failed to open product dialog", e);
+            AlertUtil.showError("Error UI", "No se pudo abrir la ventana del producto.");
         }
     }
 
     private void handleDeleteProduct(Product product) {
-        boolean confirmed = AlertUtil.showConfirmation("Confirmar Eliminación",
-                "¿Está seguro de que desea eliminar el producto '" + product.getName() + "'?",
-                "Esta acción no se puede deshacer.");
-        if (confirmed) {
-            try {
-                productService.deleteProduct(product.getId());
+        if (AlertUtil.showConfirmation("Confirmar Eliminación", "¿Eliminar '" + product.getName() + "'?",
+                "Esta acción no se puede deshacer.")) {
+            AsyncManager.execute(productUseCase.deleteTask(product.getId()), v -> {
                 loadAllProducts();
-            } catch (SQLException e) {
-                e.printStackTrace();
-                if (e.getMessage().toLowerCase().contains("foreign key constraint")) {
-                    AlertUtil.showError("Error al Eliminar",
-                            "No se puede eliminar el producto porque tiene ventas (o historial) asociadas.");
-                } else {
-                    AlertUtil.showError("Error", "No se pudo eliminar el producto: " + e.getMessage());
-                }
-            }
+            });
         }
-    }
-
-    private void showAlert(String title, String content) {
-        AlertUtil.showError(title, content);
     }
 }
