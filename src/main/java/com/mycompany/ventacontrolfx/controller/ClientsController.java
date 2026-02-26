@@ -184,6 +184,9 @@ public class ClientsController implements com.mycompany.ventacontrolfx.util.Inje
             if (cartService != null) {
                 cartService.setSelectedClient(client);
                 handleClose();
+                if (container != null && container.getNavigationService() != null) {
+                    container.getNavigationService().navigateTo("/view/sell_view.fxml");
+                }
             }
         });
 

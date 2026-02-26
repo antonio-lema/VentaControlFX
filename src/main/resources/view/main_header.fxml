@@ -43,9 +43,6 @@
                 </HBox>
             </graphic>
             <items>
-                <MenuItem text="Mi Perfil">
-                    <graphic><FontAwesomeIconView glyphName="USER" size="14"/></graphic>
-                </MenuItem>
                 <MenuItem text="Cerrar caja" onAction="#handleCashClosure">
                     <graphic><FontAwesomeIconView glyphName="MONEY" size="14"/></graphic>
                 </MenuItem>

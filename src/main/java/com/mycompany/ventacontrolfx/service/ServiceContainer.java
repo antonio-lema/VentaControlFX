@@ -39,6 +39,9 @@ public class ServiceContainer {
     private final SaleConfigService configService;
     private final SaleApplicationService saleAppService;
 
+    // Core Application Architecture
+    private NavigationService navigationService;
+
     public ServiceContainer() {
         this.eventBus = new GlobalEventBus();
         this.userSession = new UserSession();
@@ -147,6 +150,14 @@ public class ServiceContainer {
 
     public SaleApplicationService getSaleAppService() {
         return saleAppService;
+    }
+
+    public NavigationService getNavigationService() {
+        return navigationService;
+    }
+
+    public void setNavigationService(NavigationService navigationService) {
+        this.navigationService = navigationService;
     }
 
     /** @deprecated Use ProductUseCase to manage product data. */

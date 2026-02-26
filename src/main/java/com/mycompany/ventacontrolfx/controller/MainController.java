@@ -30,6 +30,7 @@ public class MainController implements Injectable {
         this.container = container;
         // Core navigation setup
         navigationService = new NavigationService(mainContent, loadingOverlay, container);
+        container.setNavigationService(navigationService);
 
         // Fix #4 – Visibilidad del carrito: mostrar solo en la vista de ventas.
         // setManaged(false) es CRÍTICO: además de ocultarlo, libera el espacio en el
