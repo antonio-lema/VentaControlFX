@@ -36,7 +36,4 @@
         <StackPane fx:id="cartContainer" />
     </right>
 
-    <bottom>
-        <StackPane fx:id="statusBarContainer" />
-    </bottom>
 </BorderPane>

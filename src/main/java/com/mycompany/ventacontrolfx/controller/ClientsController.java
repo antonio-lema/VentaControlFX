@@ -32,6 +32,8 @@ public class ClientsController implements com.mycompany.ventacontrolfx.util.Inje
     private FlowPane clientsListContainer;
     @FXML
     private Button btnToggleForm;
+    @FXML
+    private Label lblCount;
 
     private ClientService clientService;
     private CartService cartService;
@@ -113,6 +115,10 @@ public class ClientsController implements com.mycompany.ventacontrolfx.util.Inje
 
     private void displayClients(List<Client> clients) {
         clientsListContainer.getChildren().clear();
+        if (lblCount != null) {
+            lblCount.setText(clients.size() + " empresas encontradas");
+        }
+
         if (clients.isEmpty()) {
             Label placeholder = new Label("No se encontraron empresas");
             placeholder.setStyle("-fx-text-fill: #a0aec0; -fx-padding: 20;");

@@ -45,6 +45,8 @@ public class CategoryController implements com.mycompany.ventacontrolfx.util.Inj
     private Button btnAdd;
     @FXML
     private TextField rowsPerPageField;
+    @FXML
+    private javafx.scene.control.Label lblCount;
 
     private CategoryService categoryService;
     private ObservableList<Category> categoryList;
@@ -84,10 +86,13 @@ public class CategoryController implements com.mycompany.ventacontrolfx.util.Inj
 
             {
                 toggle.setOnMouseClicked(event -> {
+                    Category category = (Category) getTableRow().getItem();
+                    if (category == null)
+                        return;
+
                     boolean newState = !toggle.isSwitchedOn();
                     toggle.setSwitchedOn(newState);
 
-                    Category category = getTableView().getItems().get(getIndex());
                     category.setVisible(newState);
                     try {
                         categoryService.updateCategory(category);
@@ -97,6 +102,7 @@ public class CategoryController implements com.mycompany.ventacontrolfx.util.Inj
                         category.setVisible(!newState);
                         showAlert("Error", "No se pudo actualizar la visibilidad: " + e.getMessage());
                     }
+                    event.consume();
                 });
             }
 
@@ -120,10 +126,13 @@ public class CategoryController implements com.mycompany.ventacontrolfx.util.Inj
 
             {
                 toggle.setOnMouseClicked(event -> {
+                    Category category = (Category) getTableRow().getItem();
+                    if (category == null)
+                        return;
+
                     boolean newState = !toggle.isSwitchedOn();
                     toggle.setSwitchedOn(newState);
 
-                    Category category = getTableView().getItems().get(getIndex());
                     category.setFavorite(newState);
                     try {
                         categoryService.updateCategory(category);
@@ -133,6 +142,7 @@ public class CategoryController implements com.mycompany.ventacontrolfx.util.Inj
                         category.setFavorite(!newState);
                         showAlert("Error", "No se pudo actualizar favorito: " + e.getMessage());
                     }
+                    event.consume();
                 });
             }
 
@@ -259,6 +269,9 @@ public class CategoryController implements com.mycompany.ventacontrolfx.util.Inj
             }
         }
         categoriesTable.setItems(filtered);
+        if (lblCount != null) {
+            lblCount.setText(filtered.size() + " categorías encontradas");
+        }
     }
 
     @FXML

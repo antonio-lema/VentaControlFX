@@ -36,7 +36,7 @@
             <ScrollPane fx:id="categoriesScrollPane" hbarPolicy="NEVER" vbarPolicy="NEVER" fitToWidth="true" style="-fx-background-color: transparent; -fx-background: transparent;" prefHeight="100" maxHeight="100" HBox.hgrow="ALWAYS">
                 <FlowPane fx:id="categoriesFlowPane" hgap="12" vgap="12" style="-fx-background-color: transparent;" />
             </ScrollPane>
-            <Button onAction="#handleExpandCategories" styleClass="expand-categories-btn">
+            <Button fx:id="btnExpandCategories" onAction="#handleExpandCategories" styleClass="expand-categories-btn">
                 <graphic>
                     <FontAwesomeIconView fx:id="expandIcon" glyphName="CHEVRON_UP" size="14" fill="#1e88e5"/>
                 </graphic>

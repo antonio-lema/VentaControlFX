@@ -75,8 +75,14 @@ public class ManageUsersController implements com.mycompany.ventacontrolfx.util.
         }
     }
 
+    @FXML
+    private Label lblCount;
+
     private void renderUserCards(List<User> users) {
         userCardsPane.getChildren().clear();
+        if (lblCount != null) {
+            lblCount.setText(users.size() + " usuarios encontrados");
+        }
         for (User user : users) {
             userCardsPane.getChildren().add(createUserCard(user));
         }

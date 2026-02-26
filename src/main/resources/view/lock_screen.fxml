@@ -34,6 +34,7 @@
         <VBox spacing="8" maxWidth="300" alignment="CENTER_LEFT" style="-fx-padding: 20 0 10 0;">
             <Label text="Contraseña" styleClass="lock-input-label"/>
             <PasswordField fx:id="passwordField" promptText="Introduce tu contraseña" styleClass="lock-field" onAction="#handleUnlock"/>
+            <Label fx:id="lblError" style="-fx-text-fill: #e53935; -fx-font-size: 13px; -fx-font-weight: bold;" visible="false" managed="false"/>
         </VBox>
 
         <Button text="DESBLOQUEAR" onAction="#handleUnlock" styleClass="btn-unlock" maxWidth="300" prefHeight="45" defaultButton="true"/>

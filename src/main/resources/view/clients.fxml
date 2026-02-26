@@ -42,6 +42,13 @@
             <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" style="-fx-background-color: transparent; -fx-background: transparent; -fx-padding: 5;" hbarPolicy="NEVER">
                 <FlowPane fx:id="clientsListContainer" hgap="20" vgap="20" style="-fx-padding: 10; -fx-background-color: transparent;"/>
             </ScrollPane>
+            
+            <!-- Count Section -->
+            <HBox alignment="CENTER_RIGHT" style="-fx-padding: 10;">
+                <children>
+                    <Label fx:id="lblCount" text="0 empresas encontradas" style="-fx-text-fill: #7f8c8d; -fx-font-weight: bold;"/>
+                </children>
+            </HBox>
         </VBox>
 
         <!-- Form Section (Right) -->

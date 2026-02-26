@@ -63,6 +63,8 @@ public class HistoryController implements com.mycompany.ventacontrolfx.util.Inje
     private Label lblTotalCash;
     @FXML
     private Label lblTotalCard;
+    @FXML
+    private Label lblCount;
 
     // Details Panel
     @FXML
@@ -330,6 +332,10 @@ public class HistoryController implements com.mycompany.ventacontrolfx.util.Inje
         lblTotalAmount.setText(String.format("%.2f €", total));
         lblTotalCash.setText(String.format("%.2f €", cash));
         lblTotalCard.setText(String.format("%.2f €", card));
+
+        if (lblCount != null) {
+            lblCount.setText(count + " tickets encontrados");
+        }
     }
 
     private void showDetails(Sale sale) {

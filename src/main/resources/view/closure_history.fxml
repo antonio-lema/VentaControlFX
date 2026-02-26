@@ -135,6 +135,14 @@
                               <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                            </columnResizePolicy>
                         </TableView>
+                        <HBox alignment="CENTER_RIGHT" prefHeight="30.0" spacing="10.0">
+                           <children>
+                              <Label fx:id="lblCount" text="0 cierres encontrados" textFill="#7f8c8d" style="-fx-font-weight: bold;" />
+                           </children>
+                           <padding>
+                              <Insets right="10.0" />
+                           </padding>
+                        </HBox>
                      </children>
                   </VBox>
 

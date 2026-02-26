@@ -89,6 +89,12 @@
                         <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                      </columnResizePolicy>
                   </TableView>
+                  <!-- Count Section -->
+                  <HBox alignment="CENTER_RIGHT" style="-fx-padding: 10;">
+                      <children>
+                          <Label fx:id="lblCount" text="0 categorías encontradas" style="-fx-text-fill: #7f8c8d; -fx-font-weight: bold;"/>
+                      </children>
+                  </HBox>
                </children>
             </VBox>
          </children>

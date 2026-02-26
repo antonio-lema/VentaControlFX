@@ -63,5 +63,12 @@
             </FlowPane>
         </content>
     </ScrollPane>
+    
+    <!-- Count Section -->
+    <HBox alignment="CENTER_RIGHT" style="-fx-padding: 10;">
+        <children>
+            <Label fx:id="lblCount" text="0 usuarios encontrados" style="-fx-text-fill: #7f8c8d; -fx-font-weight: bold;"/>
+        </children>
+    </HBox>
 
 </VBox>

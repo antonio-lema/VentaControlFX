@@ -22,6 +22,8 @@ public class LockScreenController implements com.mycompany.ventacontrolfx.util.I
 
     @FXML
     private PasswordField passwordField;
+    @FXML
+    private Label lblError;
 
     private User currentUser;
     private UserService userService;
@@ -42,6 +44,12 @@ public class LockScreenController implements com.mycompany.ventacontrolfx.util.I
     public void initialize() {
         // Focus password field by default
         Platform.runLater(() -> passwordField.requestFocus());
+
+        // Hide error on start
+        if (lblError != null) {
+            lblError.setVisible(false);
+            lblError.setManaged(false);
+        }
     }
 
     public void setOnUnlock(Runnable onUnlock) {
@@ -68,12 +76,27 @@ public class LockScreenController implements com.mycompany.ventacontrolfx.util.I
                 stage.setFullScreen(false);
                 stage.close();
             } else {
-                showAlert("Error", "Contraseña incorrecta.");
+                showInPlaceError("Contraseña incorrecta.");
                 passwordField.clear();
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            showAlert("Error", "Error al verificar la contraseña: " + e.getMessage());
+            showInPlaceError("Error de conexión con la base de datos.");
+        }
+    }
+
+    private void showInPlaceError(String message) {
+        if (lblError != null) {
+            lblError.setText(message);
+            lblError.setVisible(true);
+            lblError.setManaged(true);
+
+            // Subtle shake animation could go here, but for now just clear after a few
+            // seconds
+            // or let it stay until next attempt
+        } else {
+            // Fallback if label is missing
+            showAlert("Error", message);
         }
     }
 

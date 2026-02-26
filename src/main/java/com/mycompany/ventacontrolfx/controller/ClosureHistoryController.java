@@ -64,6 +64,8 @@ public class ClosureHistoryController implements com.mycompany.ventacontrolfx.ut
     private Label lblTotalCard;
     @FXML
     private Label lblTotalRevenue;
+    @FXML
+    private Label lblCount;
 
     private CashClosureService closureService;
     private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
@@ -243,9 +245,10 @@ public class ClosureHistoryController implements com.mycompany.ventacontrolfx.ut
                 + (card >= 0 ? "#2e7d32" : "#e53935") + ";");
 
         lblTotalRevenue.setText(String.format("%.2f €", total));
-        // We don't change textFill for revenue if it's the blue card unless requested,
-        // but let's keep it white as the background is blue.
-        // If the background was white, we would color it.
+
+        if (lblCount != null) {
+            lblCount.setText(closures.size() + " cierres encontrados");
+        }
     }
 
     @FXML

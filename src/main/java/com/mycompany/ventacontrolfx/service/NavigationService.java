@@ -26,6 +26,11 @@ public class NavigationService {
         void onCartVisibilityChanged(boolean shouldShowCart);
     }
 
+    @FunctionalInterface
+    public interface SearchBarVisibilityListener {
+        void onSearchBarVisibilityChanged(boolean shouldShowSearch);
+    }
+
     private final ScrollPane mainContent;
     private final VBox loadingOverlay;
     private final ServiceContainer container;
@@ -35,6 +40,7 @@ public class NavigationService {
 
     // Listener opcional para visibilidad del carrito
     private CartVisibilityListener cartVisibilityListener;
+    private SearchBarVisibilityListener searchBarVisibilityListener;
 
     /** Vista que debe mostrar el carrito */
     private static final String SELL_VIEW = "/view/sell_view.fxml";
@@ -53,15 +59,22 @@ public class NavigationService {
         this.cartVisibilityListener = listener;
     }
 
+    public void setSearchBarVisibilityListener(SearchBarVisibilityListener listener) {
+        this.searchBarVisibilityListener = listener;
+    }
+
     public void navigateTo(String fxmlPath) {
         if (loadingOverlay != null)
             loadingOverlay.setVisible(true);
         searchHandlers.clear(); // Clear search handlers for the new view
 
-        // Notificar visibilidad del carrito ANTES de cargar la vista
+        // Notificar visibilidad del carrito y búsqueda ANTES de cargar la vista
+        boolean isSellView = SELL_VIEW.equals(fxmlPath);
         if (cartVisibilityListener != null) {
-            boolean showCart = SELL_VIEW.equals(fxmlPath);
-            cartVisibilityListener.onCartVisibilityChanged(showCart);
+            cartVisibilityListener.onCartVisibilityChanged(isSellView);
+        }
+        if (searchBarVisibilityListener != null) {
+            searchBarVisibilityListener.onSearchBarVisibilityChanged(isSellView);
         }
 
         try {

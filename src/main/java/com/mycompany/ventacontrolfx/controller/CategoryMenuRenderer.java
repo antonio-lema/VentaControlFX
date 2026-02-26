@@ -2,7 +2,7 @@ package com.mycompany.ventacontrolfx.controller;
 
 import com.mycompany.ventacontrolfx.model.Category;
 import com.mycompany.ventacontrolfx.service.ProductFilterService.FilterType;
-import com.mycompany.ventacontrolfx.service.ServiceContainer;
+import com.mycompany.ventacontrolfx.application.service.ProductFilterUseCase;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.layout.FlowPane;
@@ -10,7 +10,7 @@ import java.util.List;
 
 public class CategoryMenuRenderer {
     private final FlowPane categoriesFlowPane;
-    private final ServiceContainer container;
+    private final ProductFilterUseCase filterUseCase;
     private final CategorySelectionHandler handler;
 
     public interface CategorySelectionHandler {
@@ -19,10 +19,10 @@ public class CategoryMenuRenderer {
         void onSpecialFilterSelected(FilterType type);
     }
 
-    public CategoryMenuRenderer(FlowPane categoriesFlowPane, ServiceContainer container,
+    public CategoryMenuRenderer(FlowPane categoriesFlowPane, ProductFilterUseCase filterUseCase,
             CategorySelectionHandler handler) {
         this.categoriesFlowPane = categoriesFlowPane;
-        this.container = container;
+        this.filterUseCase = filterUseCase;
         this.handler = handler;
     }
 
@@ -57,8 +57,8 @@ public class CategoryMenuRenderer {
     }
 
     public void updateStyles() {
-        FilterType currentType = container.getFilterService().getCurrentType();
-        Object currentCriteria = container.getFilterService().getCurrentCriteria();
+        FilterType currentType = filterUseCase.getCurrentType();
+        Object currentCriteria = filterUseCase.getCurrentCriteria();
 
         for (Node node : categoriesFlowPane.getChildren()) {
             if (node instanceof Button) {

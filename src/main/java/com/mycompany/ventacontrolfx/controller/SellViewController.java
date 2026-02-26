@@ -32,6 +32,8 @@ public class SellViewController implements Searchable, Injectable, CategoryMenuR
     private FontAwesomeIconView expandIcon;
     @FXML
     private VBox loadingOverlay;
+    @FXML
+    private Button btnExpandCategories;
 
     private ServiceContainer container;
     private ProductGridRenderer productRenderer;
@@ -43,7 +45,17 @@ public class SellViewController implements Searchable, Injectable, CategoryMenuR
         this.container = container;
         this.filterUseCase = container.getProductFilterUseCase();
         this.productRenderer = new ProductGridRenderer(productsPane, null, container.getCartService()::addItem);
-        this.categoryRenderer = new CategoryMenuRenderer(categoriesFlowPane, container, this);
+        this.categoryRenderer = new CategoryMenuRenderer(categoriesFlowPane, filterUseCase, this);
+
+        // Hide expand button if categories fit in one row
+        categoriesFlowPane.heightProperty().addListener((obs, oldVal, newVal) -> {
+            boolean needsScroll = newVal.doubleValue() > 105; // 100 + threshold
+            btnExpandCategories.setVisible(needsScroll);
+            btnExpandCategories.setManaged(needsScroll);
+            if (!needsScroll && categoriesScrollPane.getMaxHeight() > 100) {
+                collapseCategories();
+            }
+        });
 
         loadInitialData();
     }
@@ -89,11 +101,11 @@ public class SellViewController implements Searchable, Injectable, CategoryMenuR
     }
 
     private void renderProducts(List<Product> products) {
-        updateFilterUI();
+        updateFilterUI(products);
         productRenderer.render(products);
     }
 
-    private void updateFilterUI() {
+    private void updateFilterUI(List<Product> products) {
         FilterType type = filterUseCase.getCurrentType();
         Object criteria = filterUseCase.getCurrentCriteria();
 
@@ -105,7 +117,7 @@ public class SellViewController implements Searchable, Injectable, CategoryMenuR
         else if (type == FilterType.CATEGORY)
             lbl = ((Category) criteria).getName();
 
-        filterLabel.setText(lbl);
+        filterLabel.setText(lbl + " (" + (products != null ? products.size() : 0) + ")");
         categoryRenderer.updateStyles();
     }
 

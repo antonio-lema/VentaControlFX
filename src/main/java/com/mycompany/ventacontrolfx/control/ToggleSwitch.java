@@ -68,6 +68,7 @@ public class ToggleSwitch extends Parent {
 
         setOnMouseClicked(event -> {
             switchedOn.set(!switchedOn.get());
+            event.consume();
         });
 
         // Initial state logic to set colors without animation

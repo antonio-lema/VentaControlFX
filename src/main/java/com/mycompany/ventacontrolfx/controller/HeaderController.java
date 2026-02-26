@@ -28,6 +28,8 @@ public class HeaderController implements Injectable {
     private TextField searchField;
     @FXML
     private MenuButton userMenuButton;
+    @FXML
+    private HBox searchBarContainer;
 
     private ServiceContainer container;
     private NavigationService navigationService;
@@ -75,6 +77,13 @@ public class HeaderController implements Injectable {
                 navigationService.search(newVal);
             }
         });
+    }
+
+    public void setSearchBarVisible(boolean visible) {
+        if (searchBarContainer != null) {
+            searchBarContainer.setVisible(visible);
+            searchBarContainer.setManaged(visible);
+        }
     }
 
     @FXML

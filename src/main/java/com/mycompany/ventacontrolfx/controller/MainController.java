@@ -51,8 +51,10 @@ public class MainController implements Injectable {
     private void loadStaticComponents() {
         // Load Header and link it with Navigation for search delegation
         HeaderController hc = loadStaticComponent("/view/main_header.fxml", headerContainer);
-        if (hc != null)
+        if (hc != null) {
             hc.setNavigationService(navigationService);
+            navigationService.setSearchBarVisibilityListener(hc::setSearchBarVisible);
+        }
 
         // Load Sidebar for menu navigation
         SidebarController sc = loadStaticComponent("/view/sidebar.fxml", sidebarContainer);
@@ -65,8 +67,6 @@ public class MainController implements Injectable {
         if (cc != null)
             cc.init(navigationService);
 
-        // Load Status Bar (it will self-refresh via GlobalEventBus)
-        loadStaticComponent("/view/status_bar.fxml", statusBarContainer);
     }
 
     private void showInitialView() {

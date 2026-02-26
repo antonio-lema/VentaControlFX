@@ -52,6 +52,8 @@ public class ProductController implements Injectable, Searchable {
     private TableColumn<Product, Void> colActions;
     @FXML
     private TextField searchField, rowsPerPageField;
+    @FXML
+    private Label lblCount;
 
     private final WeakHashMap<String, Image> imageCache = new WeakHashMap<>();
     private ProductUseCase productUseCase;
@@ -132,14 +134,21 @@ public class ProductController implements Injectable, Searchable {
             private final ToggleSwitch toggle = new ToggleSwitch();
             {
                 toggle.setOnMouseClicked(event -> {
-                    Product p = getTableView().getItems().get(getIndex());
+                    Product p = (Product) getTableRow().getItem();
+                    if (p == null)
+                        return;
+
                     boolean newState = !toggle.isSwitchedOn();
+                    toggle.setSwitchedOn(newState);
+
                     if (isFavorite)
                         p.setFavorite(newState);
                     else
                         p.setVisible(newState);
+
                     AsyncManager.execute(productUseCase.saveOrUpdateTask(p), v -> {
                     });
+                    event.consume();
                 });
             }
 
@@ -235,6 +244,10 @@ public class ProductController implements Injectable, Searchable {
 
         AsyncManager.execute(currentFilterTask, filtered -> {
             productsTable.setItems(FXCollections.observableArrayList(filtered));
+
+            if (lblCount != null) {
+                lblCount.setText(filtered.size() + " productos encontrados");
+            }
         });
     }
 
