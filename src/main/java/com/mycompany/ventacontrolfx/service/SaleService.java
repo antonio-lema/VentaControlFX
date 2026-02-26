@@ -25,6 +25,11 @@ import java.util.ArrayList;
 import java.util.Map;
 
 public class SaleService {
+    private final UserSession userSession;
+
+    public SaleService(UserSession userSession) {
+        this.userSession = userSession;
+    }
 
     public int saveSale(List<CartItem> items, double total, String paymentMethod) throws SQLException {
         return saveSale(items, total, paymentMethod, null);
@@ -41,8 +46,8 @@ public class SaleService {
                 String saleSql = "INSERT INTO sales (sale_datetime, user_id, client_id, total, payment_method, iva, is_return, return_reason) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
                 int userId = 1; // Default
-                if (UserSession.getInstance().getCurrentUser() != null) {
-                    userId = UserSession.getInstance().getCurrentUser().getUserId();
+                if (userSession.getCurrentUser() != null) {
+                    userId = userSession.getCurrentUser().getUserId();
                 }
 
                 // Calculate IVA (e.g. 21% included in total)
@@ -165,8 +170,8 @@ public class SaleService {
 
                 // 1. Create Return Record
                 int userId = 1;
-                if (UserSession.getInstance().getCurrentUser() != null) {
-                    userId = UserSession.getInstance().getCurrentUser().getUserId();
+                if (userSession.getCurrentUser() != null) {
+                    userId = userSession.getCurrentUser().getUserId();
                 }
 
                 Return newReturn = new Return();
@@ -265,8 +270,8 @@ public class SaleService {
                 if (refundAmountForThisTransaction > 0) {
                     // 1. Create Return Record
                     int userId = 1;
-                    if (UserSession.getInstance().getCurrentUser() != null) {
-                        userId = UserSession.getInstance().getCurrentUser().getUserId();
+                    if (userSession.getCurrentUser() != null) {
+                        userId = userSession.getCurrentUser().getUserId();
                     }
 
                     Return newReturn = new Return();

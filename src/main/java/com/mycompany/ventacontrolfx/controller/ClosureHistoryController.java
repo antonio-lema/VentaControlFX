@@ -14,7 +14,7 @@ import com.mycompany.ventacontrolfx.util.AlertUtil;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.VBox;
 
-public class ClosureHistoryController {
+public class ClosureHistoryController implements com.mycompany.ventacontrolfx.util.Injectable {
 
     @FXML
     private DatePicker datePickerStart;
@@ -65,12 +65,16 @@ public class ClosureHistoryController {
     @FXML
     private Label lblTotalRevenue;
 
-    private final CashClosureService closureService = new CashClosureService();
+    private CashClosureService closureService;
     private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+    private com.mycompany.ventacontrolfx.service.ServiceContainer container;
 
-    @FXML
-    public void initialize() {
+    @Override
+    public void inject(com.mycompany.ventacontrolfx.service.ServiceContainer container) {
+        this.container = container;
+        this.closureService = container.getClosureService();
+
         datePickerStart.setValue(LocalDate.now().withDayOfMonth(1));
         datePickerEnd.setValue(LocalDate.now());
         setupTable();
@@ -83,6 +87,11 @@ public class ClosureHistoryController {
                 showClosureDetails(newVal);
             }
         });
+    }
+
+    @FXML
+    public void initialize() {
+        // Initialization handled in inject()
     }
 
     private void setupTable() {

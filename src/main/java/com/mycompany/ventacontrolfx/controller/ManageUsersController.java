@@ -33,7 +33,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-public class ManageUsersController {
+public class ManageUsersController implements com.mycompany.ventacontrolfx.util.Injectable {
 
     @FXML
     private FlowPane userCardsPane;
@@ -41,11 +41,14 @@ public class ManageUsersController {
     @FXML
     private TextField txtSearch;
 
-    private final UserService userService = new UserService();
+    private UserService userService;
     private ObservableList<User> userList = FXCollections.observableArrayList();
+    private com.mycompany.ventacontrolfx.service.ServiceContainer container;
 
-    @FXML
-    public void initialize() {
+    @Override
+    public void inject(com.mycompany.ventacontrolfx.service.ServiceContainer container) {
+        this.container = container;
+        this.userService = container.getUserService();
         loadUsers();
 
         // Listener para búsqueda
@@ -56,14 +59,16 @@ public class ManageUsersController {
         }
     }
 
+    @FXML
+    public void initialize() {
+        // Initialization handled in inject()
+    }
+
     private void loadUsers() {
         try {
             List<User> users = userService.getAllUsers();
             userList.setAll(users);
             renderUserCards(userList);
-
-            // Actualizar el contador de usuarios en la pantalla principal
-            MainController.updateCounts();
         } catch (SQLException e) {
             e.printStackTrace();
             AlertUtil.showError("Error", "No se pudieron cargar los usuarios: " + e.getMessage());
@@ -162,6 +167,10 @@ public class ManageUsersController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/register_user.fxml"));
             Parent root = loader.load();
 
+            // CRÍTICO: inyectar el container para que userService esté disponible
+            RegisterUserController controller = loader.getController();
+            controller.inject(container);
+
             Stage stage = new Stage();
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.initStyle(javafx.stage.StageStyle.TRANSPARENT);
@@ -188,8 +197,10 @@ public class ManageUsersController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/register_user.fxml"));
             Parent root = loader.load();
 
-            // Configure controller for edit mode
+            // CRÍTICO: inyectar el container ANTES de setUser() para que userService no sea
+            // null
             RegisterUserController controller = loader.getController();
+            controller.inject(container);
             controller.setUser(user);
 
             Stage stage = new Stage();

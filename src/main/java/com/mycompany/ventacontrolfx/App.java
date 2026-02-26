@@ -27,13 +27,18 @@ public class App extends Application {
             System.err.println("Error initializing database: " + e.getMessage());
         }
 
+        // Create Global Service Container
+        com.mycompany.ventacontrolfx.service.ServiceContainer container = new com.mycompany.ventacontrolfx.service.ServiceContainer();
+
         // Use SceneNavigator to load the Login screen
         com.mycompany.ventacontrolfx.util.SceneNavigator.loadScene(
                 primaryStage,
                 "/view/login.fxml",
                 "Login",
                 900,
-                600);
+                600,
+                false,
+                container);
     }
 
     public static void main(String[] args) {

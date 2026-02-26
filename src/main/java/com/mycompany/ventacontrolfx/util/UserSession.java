@@ -2,18 +2,15 @@ package com.mycompany.ventacontrolfx.util;
 
 import com.mycompany.ventacontrolfx.model.User;
 
+/**
+ * Manages the current user session.
+ * Now injectable via ServiceContainer.
+ */
 public class UserSession {
-    private static UserSession instance;
     private User currentUser;
 
-    private UserSession() {
-    }
-
-    public static UserSession getInstance() {
-        if (instance == null) {
-            instance = new UserSession();
-        }
-        return instance;
+    public UserSession() {
+        // Public constructor for ServiceContainer
     }
 
     public User getCurrentUser() {
@@ -26,5 +23,9 @@ public class UserSession {
 
     public void logout() {
         this.currentUser = null;
+    }
+
+    public boolean isLoggedIn() {
+        return currentUser != null;
     }
 }

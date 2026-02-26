@@ -27,7 +27,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.control.TableCell;
 import com.mycompany.ventacontrolfx.control.ToggleSwitch;
 
-public class CategoryController {
+public class CategoryController implements com.mycompany.ventacontrolfx.util.Injectable {
 
     @FXML
     private TableView<Category> categoriesTable;
@@ -48,10 +48,13 @@ public class CategoryController {
 
     private CategoryService categoryService;
     private ObservableList<Category> categoryList;
+    private com.mycompany.ventacontrolfx.service.ServiceContainer container;
 
-    public void initialize() {
-        categoryService = new CategoryService();
-        categoryList = FXCollections.observableArrayList();
+    @Override
+    public void inject(com.mycompany.ventacontrolfx.service.ServiceContainer container) {
+        this.container = container;
+        this.categoryService = container.getCategoryService();
+        this.categoryList = FXCollections.observableArrayList();
 
         setupColumns();
         loadCategories();
@@ -65,6 +68,10 @@ public class CategoryController {
         rowsPerPageField.textProperty().addListener((observable, oldValue, newValue) -> {
             filterCategories(searchField.getText(), newValue);
         });
+    }
+
+    public void initialize() {
+        // Initialization handled in inject()
     }
 
     private void setupColumns() {
@@ -210,8 +217,7 @@ public class CategoryController {
             // Initial filter to respect default limit
             filterCategories(searchField.getText(), rowsPerPageField.getText());
 
-            // Actualizar el contador de la pantalla principal (abajo)
-            MainController.updateCounts();
+            // Note: StatusBar update is now handled via GlobalEventBus if applicable
         } catch (SQLException e) {
             e.printStackTrace();
             showAlert("Error", "No se pudieron cargar las categorías: " + e.getMessage());
@@ -261,6 +267,9 @@ public class CategoryController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/add_category.fxml"));
             Parent root = loader.load();
 
+            AddCategoryController controller = loader.getController();
+            controller.inject(container); // CRÍTICO: inyectar para que categoryService no sea null
+
             Stage stage = new Stage();
             stage.initStyle(javafx.stage.StageStyle.TRANSPARENT);
             stage.initModality(javafx.stage.Modality.APPLICATION_MODAL);
@@ -285,6 +294,7 @@ public class CategoryController {
             Parent root = loader.load();
 
             AddCategoryController controller = loader.getController();
+            controller.inject(container); // CRÍTICO: inyectar antes de setCategory()
             controller.setCategory(category);
 
             Stage stage = new Stage();

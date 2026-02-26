@@ -10,45 +10,50 @@ import javafx.stage.Stage;
 
 import java.sql.SQLException;
 
-public class RegisterUserController {
+public class RegisterUserController implements com.mycompany.ventacontrolfx.util.Injectable {
 
     @FXML
     private TextField txtFullName;
-
     @FXML
     private TextField txtUsername;
-
     @FXML
     private TextField txtEmail;
-
     @FXML
     private ComboBox<String> cmbRole;
-
     @FXML
     private PasswordField txtPassword;
-
     @FXML
     private PasswordField txtConfirmPassword;
-
     @FXML
     private Label lblError;
-
     @FXML
     private Button btnCancel;
-
     @FXML
     private Button btnRegister;
-
     @FXML
     private Label lblTitle;
 
     private UserService userService;
+    private com.mycompany.ventacontrolfx.service.ServiceContainer container;
 
     @FXML
     private javafx.scene.layout.StackPane rootStackPane;
 
     private double xOffset = 0;
     private double yOffset = 0;
+
+    @Override
+    public void inject(com.mycompany.ventacontrolfx.service.ServiceContainer container) {
+        this.container = container;
+        this.userService = container.getUserService();
+
+        // Initialize roles if not done in FXML (though FXML covers it)
+        if (cmbRole.getItems().isEmpty()) {
+            cmbRole.setItems(FXCollections.observableArrayList("admin", "cajero"));
+        }
+
+        checkSetupMode();
+    }
 
     @FXML
     private void handleMousePressed(javafx.scene.input.MouseEvent event) {
@@ -65,13 +70,7 @@ public class RegisterUserController {
 
     @FXML
     public void initialize() {
-        userService = new UserService();
-        // Initialize roles if not done in FXML (though FXML covers it)
-        if (cmbRole.getItems().isEmpty()) {
-            cmbRole.setItems(FXCollections.observableArrayList("admin", "cajero"));
-        }
-
-        checkSetupMode();
+        // Initialization handled in inject()
     }
 
     private boolean isInitialSetup = false;

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.*?>
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml/1"
+            fx:id="sellViewRoot"
+            fx:controller="com.mycompany.ventacontrolfx.controller.SellViewController">
+    <center>
+        <VBox spacing="0">
+            <HBox alignment="CENTER_LEFT" styleClass="modern-filter-bar">
+                <StackPane style="-fx-background-color: #e3f2fd; -fx-background-radius: 10; -fx-padding: 10;">
+                     <FontAwesomeIconView glyphName="FILTER" size="18" fill="#1e88e5"/>
+                </StackPane>
+                <VBox alignment="CENTER_LEFT">
+                     <Label text="Mostrando en este momento:" styleClass="filter-label-helper"/>
+                     <Label fx:id="filterLabel" text="Todos los productos" styleClass="filter-label-value"/>
+                </VBox>
+            </HBox>
+            
+            <StackPane VBox.vgrow="ALWAYS">
+                <ScrollPane fitToHeight="true" fitToWidth="true" style="-fx-background: #f4f6f9; -fx-background-color: transparent;">
+                    <TilePane fx:id="productsPane" hgap="15" vgap="15" prefColumns="4" style="-fx-padding: 20;" />
+                </ScrollPane>
+                <VBox fx:id="loadingOverlay" visible="false" alignment="CENTER" style="-fx-background-color: rgba(244, 246, 249, 0.7);">
+                    <ProgressIndicator />
+                    <Label text="Cargando..." style="-fx-text-fill: #666; -fx-padding: 10 0 0 0;"/>
+                </VBox>
+            </StackPane>
+        </VBox>
+    </center>
+    <bottom>
+        <HBox alignment="CENTER_LEFT" spacing="15" style="-fx-padding: 15 20; -fx-background-color: white; -fx-border-color: #f0f0f0; -fx-border-width: 1 0 0 0;">
+            <ScrollPane fx:id="categoriesScrollPane" hbarPolicy="NEVER" vbarPolicy="NEVER" fitToWidth="true" style="-fx-background-color: transparent; -fx-background: transparent;" prefHeight="100" maxHeight="100" HBox.hgrow="ALWAYS">
+                <FlowPane fx:id="categoriesFlowPane" hgap="12" vgap="12" style="-fx-background-color: transparent;" />
+            </ScrollPane>
+            <Button onAction="#handleExpandCategories" styleClass="expand-categories-btn">
+                <graphic>
+                    <FontAwesomeIconView fx:id="expandIcon" glyphName="CHEVRON_UP" size="14" fill="#1e88e5"/>
+                </graphic>
+            </Button>
+        </HBox>
+    </bottom>
+</BorderPane>

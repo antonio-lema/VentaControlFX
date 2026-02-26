@@ -8,7 +8,7 @@ import javafx.stage.Stage;
 import com.mycompany.ventacontrolfx.util.AlertUtil;
 import java.sql.SQLException;
 
-public class ClientFormController {
+public class ClientFormController implements com.mycompany.ventacontrolfx.util.Injectable {
 
     @FXML
     private Label lblTitle;
@@ -30,19 +30,23 @@ public class ClientFormController {
 
     @FXML
     private void handleMouseDragged(javafx.scene.input.MouseEvent event) {
-        if (rootStackPane.getScene() != null && rootStackPane.getScene().getWindow() != null) {
-            Stage stage = (Stage) rootStackPane.getScene().getWindow();
-            stage.setX(event.getScreenX() - xOffset);
-            stage.setY(event.getScreenY() - yOffset);
-        }
+        Stage stage = (Stage) rootStackPane.getScene().getWindow();
+        stage.setX(event.getScreenX() - xOffset);
+        stage.setY(event.getScreenY() - yOffset);
     }
 
     private ClientService clientService;
     private Client currentClient;
     private boolean saveClicked = false;
+    private com.mycompany.ventacontrolfx.service.ServiceContainer container;
+
+    @Override
+    public void inject(com.mycompany.ventacontrolfx.service.ServiceContainer container) {
+        this.container = container;
+        this.clientService = container.getClientService();
+    }
 
     public void init(Client client) {
-        this.clientService = new ClientService();
         this.currentClient = client;
 
         if (client != null) {

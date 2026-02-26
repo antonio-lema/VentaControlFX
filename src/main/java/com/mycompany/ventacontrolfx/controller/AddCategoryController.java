@@ -8,7 +8,7 @@ import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import com.mycompany.ventacontrolfx.util.AlertUtil;
 
-public class AddCategoryController {
+public class AddCategoryController implements com.mycompany.ventacontrolfx.util.Injectable {
 
     @FXML
     private TextField txtName;
@@ -19,6 +19,7 @@ public class AddCategoryController {
 
     private CategoryService categoryService;
     private Category categoryToEdit;
+    private com.mycompany.ventacontrolfx.service.ServiceContainer container;
 
     @FXML
     private javafx.scene.layout.StackPane rootStackPane;
@@ -45,8 +46,14 @@ public class AddCategoryController {
         stage.close();
     }
 
+    @Override
+    public void inject(com.mycompany.ventacontrolfx.service.ServiceContainer container) {
+        this.container = container;
+        this.categoryService = container.getCategoryService();
+    }
+
     public void initialize() {
-        categoryService = new CategoryService();
+        // Initialization handled in inject()
     }
 
     public void setCategory(Category category) {

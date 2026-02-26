@@ -2,30 +2,33 @@ package com.mycompany.ventacontrolfx.controller;
 
 import com.mycompany.ventacontrolfx.model.Category;
 import com.mycompany.ventacontrolfx.model.Product;
-import com.mycompany.ventacontrolfx.service.CategoryService;
-import com.mycompany.ventacontrolfx.service.ProductService;
-import java.io.File;
-import java.sql.SQLException;
-import java.util.List;
-import javafx.fxml.FXML;
+import com.mycompany.ventacontrolfx.service.*;
 import com.mycompany.ventacontrolfx.util.AlertUtil;
+import com.mycompany.ventacontrolfx.util.AppLogger;
+import com.mycompany.ventacontrolfx.util.AsyncManager;
+import com.mycompany.ventacontrolfx.util.Injectable;
 import javafx.collections.FXCollections;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.fxml.FXML;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.StackPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
+import java.io.File;
+import java.sql.SQLException;
+import java.util.List;
 
-public class AddProductController {
+/**
+ * Enterprise Add/Edit Product Controller.
+ * Decoupled from persistence, uses ProductUseCase.
+ */
+public class AddProductController implements Injectable {
+    private static final String TAG = "AddProductController";
 
     @FXML
-    private TextField txtName;
-    @FXML
-    private TextField txtPrice;
+    private TextField txtName, txtPrice;
     @FXML
     private ComboBox<Category> cmbCategory;
     @FXML
@@ -33,49 +36,24 @@ public class AddProductController {
     @FXML
     private ImageView ivProductImage;
     @FXML
-    private javafx.scene.control.Label lblTitle;
+    private Label lblTitle, lblSubtitle;
     @FXML
-    private javafx.scene.control.Label lblSubtitle;
+    private StackPane rootStackPane;
 
-    private CategoryService categoryService;
-    private ProductService productService;
-
+    private ServiceContainer container;
     private File selectedImageFile;
     private Product productToEdit;
+    private double xOffset = 0, yOffset = 0;
 
-    @FXML
-    private javafx.scene.layout.StackPane rootStackPane;
-
-    private double xOffset = 0;
-    private double yOffset = 0;
-
-    @FXML
-    private void handleMousePressed(javafx.scene.input.MouseEvent event) {
-        xOffset = event.getSceneX();
-        yOffset = event.getSceneY();
-    }
-
-    @FXML
-    private void handleMouseDragged(javafx.scene.input.MouseEvent event) {
-        Stage stage = (Stage) rootStackPane.getScene().getWindow();
-        stage.setX(event.getScreenX() - xOffset);
-        stage.setY(event.getScreenY() - yOffset);
-    }
-
-    @FXML
-    private void handleCancel() {
-        Stage stage = (Stage) rootStackPane.getScene().getWindow();
-        stage.close();
-    }
-
-    @FXML
-    public void initialize() {
-        categoryService = new CategoryService();
-        productService = new ProductService();
+    @Override
+    public void inject(ServiceContainer container) {
+        this.container = container;
+        setupCategoryComboBox();
         loadCategories();
+    }
 
-        // Setup StringConverter for ComboBox to display Category names
-        cmbCategory.setConverter(new StringConverter<Category>() {
+    private void setupCategoryComboBox() {
+        cmbCategory.setConverter(new StringConverter<>() {
             @Override
             public String toString(Category category) {
                 return category != null ? category.getName() : "";
@@ -83,9 +61,27 @@ public class AddProductController {
 
             @Override
             public Category fromString(String string) {
-                return null; // Not needed for selection
+                return null;
             }
         });
+    }
+
+    private void loadCategories() {
+        try {
+            List<Category> categories = container.getCategoryService().getAllCategories();
+            cmbCategory.setItems(FXCollections.observableArrayList(categories));
+            if (productToEdit != null) {
+                for (Category c : categories) {
+                    if (c.getId() == productToEdit.getCategoryId()) {
+                        cmbCategory.setValue(c);
+                        break;
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            AppLogger.error(TAG, "Failed to load categories", e);
+            AlertUtil.showError("Error", "No se pudieron cargar las categorías.");
+        }
     }
 
     public void setProduct(Product product) {
@@ -95,113 +91,81 @@ public class AddProductController {
             lblSubtitle.setText("Modifica los datos del producto");
             txtName.setText(product.getName());
             txtPrice.setText(String.valueOf(product.getPrice()));
-            // Set category
-            for (Category category : cmbCategory.getItems()) {
-                if (category.getId() == product.getCategoryId()) {
-                    cmbCategory.setValue(category);
-                    break;
-                }
-            }
             chkFavorite.setSelected(product.isFavorite());
-
-            // Set image if exists
             if (product.getImagePath() != null && !product.getImagePath().isEmpty()) {
                 File file = new File(product.getImagePath());
                 if (file.exists()) {
                     selectedImageFile = file;
-                    Image image = new Image(file.toURI().toString());
-                    ivProductImage.setImage(image);
+                    ivProductImage.setImage(new Image(file.toURI().toString()));
                 }
             }
-        } else {
-            lblTitle.setText("Nuevo Producto");
-            lblSubtitle.setText("Introduce los datos del nuevo producto");
-        }
-    }
-
-    private void loadCategories() {
-        try {
-            List<Category> categories = categoryService.getAllCategories();
-            cmbCategory.setItems(FXCollections.observableArrayList(categories));
-        } catch (SQLException e) {
-            showAlert("Error", "No se pudieron cargar las categorías: " + e.getMessage());
         }
     }
 
     @FXML
     private void handleSelectImage() {
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Seleccionar Imagen del Producto");
-        fileChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("Imágenes", "*.png", "*.jpg", "*.jpeg", "*.gif"));
-        File file = fileChooser.showOpenDialog(rootStackPane.getScene().getWindow());
+        FileChooser fc = new FileChooser();
+        fc.setTitle("Seleccionar Imagen");
+        fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("Imágenes", "*.png", "*.jpg", "*.jpeg"));
+        File file = fc.showOpenDialog(rootStackPane.getScene().getWindow());
         if (file != null) {
             selectedImageFile = file;
-            Image image = new Image(file.toURI().toString());
-            ivProductImage.setImage(image);
+            ivProductImage.setImage(new Image(file.toURI().toString()));
         }
     }
 
     @FXML
     private void handleSave() {
-        String name = txtName.getText();
-        String priceText = txtPrice.getText();
-        Category selectedCategory = cmbCategory.getValue();
-        boolean isFavorite = chkFavorite.isSelected();
-
-        // Validation
-        if (name == null || name.trim().isEmpty()) {
-            showAlert("Validación", "Por favor, introduce un nombre.");
-            return;
-        }
-        if (priceText == null || priceText.trim().isEmpty()) {
-            showAlert("Validación", "Por favor, introduce un precio.");
-            return;
-        }
-        if (selectedCategory == null) {
-            showAlert("Validación", "Por favor, selecciona una categoría.");
+        if (txtName.getText().isBlank() || txtPrice.getText().isBlank() || cmbCategory.getValue() == null) {
+            AlertUtil.showWarning("Validación", "Complete todos los campos obligatorios.");
             return;
         }
 
-        double price;
         try {
-            price = Double.parseDouble(priceText);
-        } catch (NumberFormatException e) {
-            showAlert("Validación", "El precio debe ser un número válido.");
-            return;
-        }
+            double price = Double.parseDouble(txtPrice.getText());
+            Product product = (productToEdit == null)
+                    ? new Product(cmbCategory.getValue().getId(), txtName.getText(), price, chkFavorite.isSelected())
+                    : productToEdit;
 
-        // Create/Update Product
-        try {
-            Product product;
-            if (productToEdit == null) {
-                product = new Product(selectedCategory.getId(), name, price, isFavorite);
-            } else {
-                product = productToEdit;
-                product.setName(name);
+            if (productToEdit != null) {
+                product.setName(txtName.getText());
                 product.setPrice(price);
-                product.setCategoryId(selectedCategory.getId());
-                product.setFavorite(isFavorite);
+                product.setCategoryId(cmbCategory.getValue().getId());
+                product.setFavorite(chkFavorite.isSelected());
             }
 
-            if (selectedImageFile != null) {
+            if (selectedImageFile != null)
                 product.setImagePath(selectedImageFile.getAbsolutePath());
-            }
 
-            if (productToEdit == null) {
-                productService.addProduct(product);
-            } else {
-                productService.updateProduct(product);
-            }
+            // Use Case based Persistence
+            AsyncManager.execute(container.getProductUseCase().saveOrUpdateTask(product), v -> {
+                AppLogger.info(TAG, "Product saved: " + product.getName());
+                handleCancel();
+            });
 
-            handleCancel(); // Close dialog
-        } catch (SQLException e) {
-            e.printStackTrace();
-            showAlert("Error", "No se pudo guardar el producto: " + e.getMessage());
+        } catch (NumberFormatException e) {
+            AlertUtil.showWarning("Validación", "El precio debe ser un número válido.");
+        } catch (Exception e) {
+            AppLogger.error(TAG, "General failure saving product", e);
+            AlertUtil.showError("Error", "Ocurrió un error al intentar guardar el producto.");
         }
     }
 
-    private void showAlert(String title, String content) {
-        AlertUtil.showWarning(title, content);
+    @FXML
+    private void handleCancel() {
+        ((Stage) rootStackPane.getScene().getWindow()).close();
+    }
+
+    @FXML
+    private void handleMousePressed(javafx.scene.input.MouseEvent e) {
+        xOffset = e.getSceneX();
+        yOffset = e.getSceneY();
+    }
+
+    @FXML
+    private void handleMouseDragged(javafx.scene.input.MouseEvent e) {
+        Stage s = (Stage) rootStackPane.getScene().getWindow();
+        s.setX(e.getScreenX() - xOffset);
+        s.setY(e.getScreenY() - yOffset);
     }
 }

@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.*?>
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
+
+<VBox xmlns:fx="http://javafx.com/fxml/1" 
+      fx:controller="com.mycompany.ventacontrolfx.controller.SidebarController"
+      spacing="5" styleClass="sidebar">
+    <padding>
+        <Insets top="20" right="10" bottom="20" left="10"/>
+    </padding>
+
+    <Button fx:id="btnSell" styleClass="sidebar-button, active-sidebar-button" onAction="#showSellView" contentDisplay="GRAPHIC_ONLY" maxWidth="Infinity">
+        <graphic>
+            <HBox alignment="CENTER_LEFT" spacing="15">
+                <StackPane styleClass="icon-container">
+                    <FontAwesomeIconView glyphName="SHOPPING_CART" size="20" styleClass="sidebar-icon"/>
+                </StackPane>
+                <Label text="Vender" styleClass="sidebar-button-label"/>
+            </HBox>
+        </graphic>
+    </Button>
+
+    <Button fx:id="btnProducts" styleClass="sidebar-button" onAction="#toggleProductsMenu" contentDisplay="GRAPHIC_ONLY" maxWidth="Infinity">
+        <graphic>
+            <HBox alignment="CENTER_LEFT" maxWidth="Infinity" spacing="15">
+                <StackPane styleClass="icon-container">
+                    <FontAwesomeIconView glyphName="TAGS" size="20" styleClass="sidebar-icon"/>
+                </StackPane>
+                <Label text="Productos" styleClass="sidebar-button-label"/> 
+                <Region HBox.hgrow="ALWAYS"/>
+                <Label fx:id="lblProductsArrow" text="&lt;" style="-fx-font-size: 12px; -fx-font-weight: bold;"/>
+            </HBox>
+        </graphic>
+    </Button>
+    <VBox fx:id="productsSubmenu" managed="false" visible="false" spacing="0">
+        <padding><Insets left="20"/></padding>
+        <Button fx:id="btnProductsList" text="Lista de Productos" styleClass="sidebar-button" onAction="#showProductsView"/>
+        <Button fx:id="btnCategories" text="Categorías" styleClass="sidebar-button" onAction="#showCategoriesView"/>
+    </VBox>
+    <Button fx:id="btnHistory" styleClass="sidebar-button" onAction="#showHistoryView" contentDisplay="GRAPHIC_ONLY" maxWidth="Infinity">
+        <graphic>
+            <HBox alignment="CENTER_LEFT" spacing="15">
+                <StackPane styleClass="icon-container">
+                    <FontAwesomeIconView glyphName="HISTORY" size="20" styleClass="sidebar-icon"/>
+                </StackPane>
+                <Label text="Historial" styleClass="sidebar-button-label"/>
+            </HBox>
+        </graphic>
+    </Button>
+    <Button fx:id="btnClosures" styleClass="sidebar-button" onAction="#handleShowClosures" contentDisplay="GRAPHIC_ONLY" maxWidth="Infinity">
+        <graphic>
+            <HBox alignment="CENTER_LEFT" spacing="15">
+                <StackPane styleClass="icon-container">
+                    <FontAwesomeIconView glyphName="ARCHIVE" size="20" styleClass="sidebar-icon"/>
+                </StackPane>
+                <Label text="Cierres" styleClass="sidebar-button-label"/>
+            </HBox>
+        </graphic>
+    </Button>
+    <Button fx:id="btnClients" styleClass="sidebar-button" contentDisplay="GRAPHIC_ONLY" maxWidth="Infinity" onAction="#showAddClientDialog">
+        <graphic>
+            <HBox alignment="CENTER_LEFT" spacing="15">
+                <StackPane styleClass="icon-container">
+                    <FontAwesomeIconView glyphName="USERS" size="20" styleClass="sidebar-icon"/>
+                </StackPane>
+                <Label text="Empresas" styleClass="sidebar-button-label"/>
+            </HBox>
+        </graphic>
+    </Button>
+
+    <Button fx:id="btnUsers" styleClass="sidebar-button" contentDisplay="GRAPHIC_ONLY" maxWidth="Infinity" onAction="#handleShowUsers">
+        <graphic>
+            <HBox alignment="CENTER_LEFT" spacing="15">
+                <StackPane styleClass="icon-container">
+                    <FontAwesomeIconView glyphName="USER_CIRCLE" size="20" styleClass="sidebar-icon"/>
+                </StackPane>
+                <Label text="Usuarios" styleClass="sidebar-button-label"/>
+            </HBox>
+        </graphic>
+    </Button>
+    <Button fx:id="btnConfig" styleClass="sidebar-button" contentDisplay="GRAPHIC_ONLY" maxWidth="Infinity" onAction="#handleShowConfig">
+        <graphic>
+            <HBox alignment="CENTER_LEFT" spacing="15">
+                <StackPane styleClass="icon-container">
+                    <FontAwesomeIconView glyphName="COG" size="20" styleClass="sidebar-icon"/>
+                </StackPane>
+                <Label text="Configuración" styleClass="sidebar-button-label"/>
+            </HBox>
+        </graphic>
+    </Button>
+    
+    <Region VBox.vgrow="ALWAYS"/>
+    <Button fx:id="btnLock" styleClass="sidebar-button" contentDisplay="GRAPHIC_ONLY" maxWidth="Infinity" onAction="#handleLockApp">
+        <graphic>
+            <HBox alignment="CENTER_LEFT" spacing="15">
+                <StackPane styleClass="icon-container">
+                    <FontAwesomeIconView glyphName="LOCK" size="20" styleClass="sidebar-icon"/>
+                </StackPane>
+                <Label text="Bloquear" styleClass="sidebar-button-label"/>
+            </HBox>
+        </graphic>
+    </Button>
+</VBox>

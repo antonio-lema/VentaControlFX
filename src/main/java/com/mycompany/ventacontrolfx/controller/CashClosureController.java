@@ -20,7 +20,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 
-public class CashClosureController {
+public class CashClosureController implements com.mycompany.ventacontrolfx.util.Injectable {
 
     @FXML
     private Label lblDate;
@@ -48,21 +48,30 @@ public class CashClosureController {
     @FXML
     private TableColumn<ProductSummary, Double> colProdTotal;
 
-    private final CashClosureService closureService = new CashClosureService();
+    private CashClosureService closureService;
+    private com.mycompany.ventacontrolfx.util.UserSession userSession;
     private double currentCash = 0;
     private double currentCard = 0;
 
-    @FXML
-    public void initialize() {
+    @Override
+    public void inject(com.mycompany.ventacontrolfx.service.ServiceContainer container) {
+        this.closureService = container.getClosureService();
+        this.userSession = container.getUserSession();
+
         lblDate.setText(LocalDate.now().format(DateTimeFormatter.ofPattern("dd MMM, yyyy")));
 
-        User user = UserSession.getInstance().getCurrentUser();
+        User user = userSession.getCurrentUser();
         if (user != null) {
             lblCurrentUser.setText(user.getUsername());
         }
 
         setupTable();
         loadTodayData();
+    }
+
+    @FXML
+    public void initialize() {
+        // Initialization handled in inject()
     }
 
     private void setupTable() {

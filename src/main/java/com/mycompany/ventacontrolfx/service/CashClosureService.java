@@ -13,6 +13,11 @@ import java.util.List;
 import java.util.Map;
 
 public class CashClosureService {
+    private final UserSession userSession;
+
+    public CashClosureService(UserSession userSession) {
+        this.userSession = userSession;
+    }
 
     public Map<String, Double> getTodaySalesTotals() throws SQLException {
         try (Connection conn = DBConnection.getConnection()) {
@@ -62,8 +67,8 @@ public class CashClosureService {
             closure.setClosureDate(LocalDate.now());
 
             int userId = 1; // Default fallback
-            if (UserSession.getInstance().getCurrentUser() != null) {
-                userId = UserSession.getInstance().getCurrentUser().getUserId();
+            if (userSession.getCurrentUser() != null) {
+                userId = userSession.getCurrentUser().getUserId();
             }
 
             closure.setUserId(userId);
