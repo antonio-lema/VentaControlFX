@@ -5,52 +5,42 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.VBox?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.StackPane?>
-<?import javafx.scene.layout.VBox?>
 <?import javafx.scene.shape.Circle?>
 <?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
 
-<StackPane xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mycompany.ventacontrolfx.controller.LoginController"
-           styleClass="login-background">
-    
-    <VBox alignment="CENTER" spacing="20" maxWidth="350" styleClass="login-card">
+<StackPane styleClass="lock-screen-root" style="-fx-background-color: white;" stylesheets="@style.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mycompany.ventacontrolfx.controller.LoginController">
+    <VBox alignment="CENTER" spacing="20" styleClass="lock-screen-glass" maxWidth="380" maxHeight="-Infinity">
         <padding>
-            <Insets top="40" right="40" bottom="40" left="40"/>
+            <Insets bottom="40" left="40" right="40" top="40" />
         </padding>
 
-        <!-- Logo / Icon -->
+        <!-- User Avatar -->
         <StackPane>
-            <Circle radius="35" styleClass="login-icon-bg"/>
-            <FontAwesomeIconView glyphName="USER" size="35" styleClass="login-icon-glyph"/>
+            <Circle radius="45" styleClass="user-avatar-circle" fill="#f5f5f5"/>
+            <FontAwesomeIconView glyphName="USER" size="35" fill="#909090"/>
         </StackPane>
 
-        <VBox spacing="5" alignment="CENTER">
-            <Label text="Bienvenido" styleClass="login-title"/>
-            <Label text="Inicia sesión para continuar" styleClass="login-subtitle"/>
+        <VBox alignment="CENTER" spacing="5">
+            <Label text="Bienvenido a VentaControl" styleClass="lock-title"/>
+            <Label text="Inicia sesión para continuar" styleClass="lock-username"/>
         </VBox>
 
-        <VBox spacing="15">
-            <!-- Username -->
-            <HBox alignment="CENTER_LEFT" styleClass="input-container">
-                <padding><Insets left="15"/></padding>
-                <FontAwesomeIconView glyphName="USER" size="16" styleClass="input-icon"/>
-                <TextField fx:id="txtUsername" promptText="Usuario" HBox.hgrow="ALWAYS" styleClass="login-input"/>
-            </HBox>
-
-            <!-- Password -->
-            <HBox alignment="CENTER_LEFT" styleClass="input-container">
-                <padding><Insets left="15"/></padding>
-                 <FontAwesomeIconView glyphName="LOCK" size="16" styleClass="input-icon"/>
-                <PasswordField fx:id="txtPassword" promptText="Contraseña" HBox.hgrow="ALWAYS" styleClass="login-input"/>
-            </HBox>
+        <VBox spacing="8" maxWidth="300" alignment="CENTER_LEFT" style="-fx-padding: 20 0 10 0;">
+            <Label text="Usuario" styleClass="lock-input-label"/>
+            <TextField fx:id="txtUsername" promptText="Introduce tu usuario" styleClass="lock-field"/>
+            
+            <Label text="Contraseña" styleClass="lock-input-label"/>
+            <PasswordField fx:id="txtPassword" promptText="Introduce tu contraseña" styleClass="lock-field" onAction="#handleLogin"/>
         </VBox>
 
         <Label fx:id="lblMessage" text="" styleClass="error-label" wrapText="true"/>
 
-        <Button fx:id="btnLogin" text="ACCEDER" onAction="#handleLogin" maxWidth="Infinity" styleClass="login-button" defaultButton="true"/>
+        <Button fx:id="btnLogin" text="INICIAR SESIÓN" onAction="#handleLogin" styleClass="btn-unlock" maxWidth="300" prefHeight="45" defaultButton="true"/>
         
-        <Label text="¿Olvidaste tu contraseña?" styleClass="forgot-password-link" onMouseClicked="#handleForgotPassword"/>
+        <Button text="¿Olvidaste tu contraseña?" onAction="#handleForgotPassword" styleClass="btn-change-user" maxWidth="200"/>
 
     </VBox>
 </StackPane>

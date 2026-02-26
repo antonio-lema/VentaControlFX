@@ -10,9 +10,9 @@ import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 
-public class LoginController {
-
-    private final UserService userService = new UserService();
+public class LoginController implements com.mycompany.ventacontrolfx.util.Injectable {
+    private com.mycompany.ventacontrolfx.service.ServiceContainer container;
+    private UserService userService;
 
     @FXML
     private TextField txtUsername;
@@ -26,9 +26,16 @@ public class LoginController {
     @FXML
     private Label lblMessage;
 
+    @Override
+    public void inject(com.mycompany.ventacontrolfx.service.ServiceContainer container) {
+        this.container = container;
+        this.userService = container.getUserService();
+        checkIfUsersExist();
+    }
+
     @FXML
     public void initialize() {
-        checkIfUsersExist();
+        // Initialization handled in inject()
     }
 
     private void checkIfUsersExist() {
@@ -41,7 +48,9 @@ public class LoginController {
                             (javafx.stage.Stage) btnLogin.getScene().getWindow(),
                             "/view/register_user.fxml",
                             "Registro Primer Administrador",
-                            900, 600);
+                            900, 600,
+                            false,
+                            container);
                 });
             }
         } catch (SQLException e) {
@@ -58,7 +67,7 @@ public class LoginController {
             User user = userService.findByUsername(username);
 
             if (user != null && user.getPassword().equals(password)) {
-                UserSession.getInstance().setCurrentUser(user);
+                container.getUserSession().setCurrentUser(user);
                 lblMessage.setText("Login correcto 👍");
 
                 // Switch to Main View using SceneNavigator
@@ -66,7 +75,9 @@ public class LoginController {
                         (javafx.stage.Stage) btnLogin.getScene().getWindow(),
                         "/view/main.fxml",
                         "TPV",
-                        1200, 800, true);
+                        1200, 800,
+                        true,
+                        container);
 
             } else {
                 lblMessage.setText("Usuario o contraseña incorrectos ❌");

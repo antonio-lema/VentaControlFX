@@ -15,7 +15,7 @@ import com.mycompany.ventacontrolfx.util.AlertUtil;
 import java.io.IOException;
 import java.sql.SQLException;
 
-public class LockScreenController {
+public class LockScreenController implements com.mycompany.ventacontrolfx.util.Injectable {
 
     @FXML
     private Label lblUsername;
@@ -26,14 +26,20 @@ public class LockScreenController {
     private User currentUser;
     private UserService userService;
     private Runnable onUnlockCallback;
+    private com.mycompany.ventacontrolfx.service.ServiceContainer container;
 
-    public void initialize() {
-        userService = new UserService();
-        currentUser = UserSession.getInstance().getCurrentUser();
+    @Override
+    public void inject(com.mycompany.ventacontrolfx.service.ServiceContainer container) {
+        this.container = container;
+        this.userService = container.getUserService();
+        this.currentUser = container.getUserSession().getCurrentUser();
+
         if (currentUser != null) {
             lblUsername.setText(currentUser.getUsername());
         }
+    }
 
+    public void initialize() {
         // Focus password field by default
         Platform.runLater(() -> passwordField.requestFocus());
     }
@@ -57,8 +63,9 @@ public class LockScreenController {
                 if (onUnlockCallback != null) {
                     onUnlockCallback.run();
                 }
-                // Close the lock screen
+                // Close the lock screen safely by removing fullscreen first
                 Stage stage = (Stage) passwordField.getScene().getWindow();
+                stage.setFullScreen(false);
                 stage.close();
             } else {
                 showAlert("Error", "Contraseña incorrecta.");
@@ -72,44 +79,30 @@ public class LockScreenController {
 
     @FXML
     private void handleChangeUser() {
-        try {
-            // Logout logic
-            UserSession.getInstance().logout();
+        if (container != null && container.getUserSession() != null) {
+            container.getUserSession().logout();
+        }
 
-            // Load Login Screen
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/login.fxml"));
-            Parent root = loader.load();
+        Stage currentStage = (Stage) passwordField.getScene().getWindow();
+        Stage parentStage = (Stage) currentStage.getOwner();
 
-            Stage stage = (Stage) passwordField.getScene().getWindow(); // Get current stage (Lock Screen modal)
+        // Open new Login screen FIRST so application doesn't implicitly exit
+        Stage loginStage = new Stage();
+        com.mycompany.ventacontrolfx.util.SceneNavigator.loadScene(
+                loginStage,
+                "/view/login.fxml",
+                "Login",
+                900, 600,
+                false,
+                container);
 
-            // We need to get the PRIMARY stage to set the scene there, OR create a new one
-            // and verify what to close.
-            // Since Lock Screen is likely a modal on top of Main Window, we might want to
-            // close Main Window too or redirect it.
-            // Best approach: Close Lock Screen, Close Main Window (if possible to
-            // reference), Open Login Window.
+        // Safely close the lock screen modal
+        currentStage.setFullScreen(false);
+        currentStage.close();
 
-            // Getting the owner of the modal (Main Window)
-            Stage mainStage = (Stage) stage.getOwner();
-            if (mainStage != null) {
-                mainStage.close();
-            } else {
-                // Fallback if no owner (shouldn't happen if opened as modal)
-                // Try to find the main stage via other means or just open login.
-            }
-
-            stage.close(); // Close lock screen
-
-            // Open Login Stage
-            Stage loginStage = new Stage();
-            Scene scene = new Scene(root, 900, 600);
-            scene.getStylesheets().add(getClass().getResource("/view/style.css").toExternalForm());
-            loginStage.setScene(scene);
-            loginStage.setTitle("Login");
-            loginStage.show();
-
-        } catch (IOException e) {
-            e.printStackTrace();
+        // Close the main app window
+        if (parentStage != null) {
+            parentStage.close();
         }
     }
 
