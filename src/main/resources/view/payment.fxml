@@ -12,106 +12,96 @@
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
-<?import javafx.scene.shape.SVGPath?>
 <?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="500.0" style="-fx-background-color: white; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.5), 20, 0, 0, 0);" stylesheets="@style.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mycompany.ventacontrolfx.controller.PaymentController">
+<BorderPane prefHeight="700.0" prefWidth="500.0" styleClass="payment-root"
+            xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.mycompany.ventacontrolfx.presentation.controller.PaymentController">
    <top>
-      <HBox alignment="CENTER_LEFT" style="-fx-background-color: #1e88e5; -fx-padding: 15;">
-         <children>
-            <Label text="Forma de pago" textFill="WHITE" style="-fx-font-size: 18px; -fx-font-weight: bold;" />
-            <Region HBox.hgrow="ALWAYS" />
-            <Button mnemonicParsing="false" onAction="#handleClose" style="-fx-background-color: transparent; -fx-cursor: hand;" cancelButton="true">
-               <graphic>
-                  <FontAwesomeIconView fill="WHITE" glyphName="CLOSE" size="20" />
-               </graphic>
-            </Button>
-         </children>
+      <HBox alignment="CENTER_LEFT" styleClass="payment-header">
+         <Label text="Forma de pago" styleClass="payment-header-title" />
+         <Region HBox.hgrow="ALWAYS" />
+         <Button onAction="#handleClose" styleClass="btn-icon" cancelButton="true">
+            <graphic>
+               <FontAwesomeIconView glyphName="CLOSE" size="20" fill="WHITE" />
+            </graphic>
+         </Button>
       </HBox>
    </top>
    <center>
-      <ScrollPane fitToWidth="true" style="-fx-background-color: white;" vbarPolicy="AS_NEEDED">
+      <ScrollPane fitToWidth="true" styleClass="detail-scroll" vbarPolicy="AS_NEEDED">
          <content>
-            <VBox alignment="TOP_CENTER" spacing="15.0" style="-fx-padding: 20; -fx-background-color: white;">
-               <children>
-                  <VBox alignment="CENTER" spacing="5.0">
-                     <children>
-                        <Label fx:id="lblTotalAmount" text="34,99 €" style="-fx-font-size: 32px; -fx-font-weight: bold; -fx-text-fill: #555;" />
-                        <Label text="Total a cobrar" style="-fx-font-size: 14px; -fx-text-fill: #888;" />
-                     </children>
-                     <padding>
-                        <Insets bottom="20.0" top="10.0" />
-                     </padding>
+            <VBox alignment="TOP_CENTER" spacing="15.0" styleClass="payment-body">
+               <!-- Total Display -->
+               <VBox alignment="CENTER" spacing="5.0">
+                  <Label fx:id="lblTotalAmount" text="34,99 €" styleClass="payment-total-amount" />
+                  <Label text="Total a cobrar" styleClass="label-muted" />
+                  <padding><Insets bottom="20.0" top="10.0" /></padding>
+               </VBox>
+
+               <!-- Cash Section -->
+               <VBox styleClass="payment-method-card payment-method-active">
+                  <!-- Header -->
+                  <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="payment-method-header">
+                     <FontAwesomeIconView glyphName="MONEY" size="16" styleClass="sidebar-icon" />
+                     <Label text="Efectivo" styleClass="payment-method-label" />
+                     <Region HBox.hgrow="ALWAYS" />
+                     <Label fx:id="lblCashAmount" text="34.99 €" styleClass="badge-primary" />
+                  </HBox>
+
+                  <!-- Content -->
+                  <VBox spacing="15.0" style="-fx-padding: 15;">
+                     <HBox spacing="10.0" alignment="CENTER_LEFT">
+                        <TextField fx:id="txtGivenAmount" promptText="0.00"
+                                   styleClass="modern-input-field payment-amount-field"
+                                   HBox.hgrow="ALWAYS" />
+                        <Button text="Cobrar" onAction="#handleCashPayment"
+                                styleClass="btn-primary btn-lg" defaultButton="true" />
+                     </HBox>
+
+                     <!-- Quick Buttons -->
+                     <GridPane hgap="10.0" vgap="10.0" styleClass="quick-money-grid">
+                       <columnConstraints>
+                         <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                         <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                         <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                         <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                       </columnConstraints>
+                       <rowConstraints>
+                         <RowConstraints minHeight="10.0" prefHeight="40.0" vgrow="SOMETIMES" />
+                       </rowConstraints>
+                        <Button fx:id="btnQuick1" text="35 €" maxWidth="Infinity" maxHeight="Infinity"
+                                onAction="#handleQuickMoney" styleClass="btn-primary" />
+                        <Button fx:id="btnQuick2" text="36 €" maxWidth="Infinity" maxHeight="Infinity"
+                                onAction="#handleQuickMoney" styleClass="btn-primary" GridPane.columnIndex="1" />
+                        <Button fx:id="btnQuick3" text="40 €" maxWidth="Infinity" maxHeight="Infinity"
+                                onAction="#handleQuickMoney" styleClass="btn-primary" GridPane.columnIndex="2" />
+                        <Button fx:id="btnQuick4" text="50 €" maxWidth="Infinity" maxHeight="Infinity"
+                                onAction="#handleQuickMoney" styleClass="btn-primary" GridPane.columnIndex="3" />
+                     </GridPane>
                   </VBox>
+               </VBox>
 
-                  <!-- Cash Section (Expanded) -->
-                  <VBox style="-fx-border-color: #e0e0e0; -fx-border-radius: 5; -fx-background-radius: 5; -fx-border-width: 1;">
-                     <children>
-                        <!-- Header -->
-                        <HBox alignment="CENTER_LEFT" spacing="10.0" style="-fx-padding: 10; -fx-background-color: #f8f9fa;">
-                           <children>
-                              <FontAwesomeIconView glyphName="MONEY" size="16" fill="#555" />
-                              <Label text="Efectivo" style="-fx-font-weight: bold; -fx-text-fill: #555;" />
-                              <Region HBox.hgrow="ALWAYS" />
-                              <Label fx:id="lblCashAmount" text="34.99 €" style="-fx-background-color: #1e88e5; -fx-text-fill: white; -fx-padding: 2 8; -fx-background-radius: 3; -fx-font-weight: bold;" />
-                           </children>
-                        </HBox>
-                        
-                        <!-- Content -->
-                        <VBox spacing="15.0" style="-fx-padding: 15;">
-                           <children>
-                              <HBox spacing="10.0" alignment="CENTER_LEFT">
-                                 <children>
-                                     <TextField fx:id="txtGivenAmount" promptText="0.00" style="-fx-font-size: 16px; -fx-pref-height: 40;" HBox.hgrow="ALWAYS" />
-                                     <Button text="Cobrar" onAction="#handleCashPayment" style="-fx-background-color: #1e88e5; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 14px; -fx-pref-height: 40; -fx-pref-width: 100; -fx-cursor: hand;" defaultButton="true" />
-                                 </children>
-                              </HBox>
-                              
-                              <!-- Quick Buttons -->
-                              <GridPane hgap="10.0" vgap="10.0">
-                                <columnConstraints>
-                                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                                </columnConstraints>
-                                <rowConstraints>
-                                  <RowConstraints minHeight="10.0" prefHeight="40.0" vgrow="SOMETIMES" />
-                                </rowConstraints>
-                                 <children>
-                                    <Button fx:id="btnQuick1" text="35 €" maxWidth="Infinity" maxHeight="Infinity" onAction="#handleQuickMoney" style="-fx-background-color: #1e88e5; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;" />
-                                    <Button fx:id="btnQuick2" text="36 €" maxWidth="Infinity" maxHeight="Infinity" onAction="#handleQuickMoney" style="-fx-background-color: #1e88e5; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;" GridPane.columnIndex="1" />
-                                    <Button fx:id="btnQuick3" text="40 €" maxWidth="Infinity" maxHeight="Infinity" onAction="#handleQuickMoney" style="-fx-background-color: #1e88e5; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;" GridPane.columnIndex="2" />
-                                    <Button fx:id="btnQuick4" text="50 €" maxWidth="Infinity" maxHeight="Infinity" onAction="#handleQuickMoney" style="-fx-background-color: #1e88e5; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;" GridPane.columnIndex="3" />
-                                 </children>
-                              </GridPane>
-                           </children>
-                        </VBox>
-                     </children>
-                  </VBox>
-
-                  <!-- Other Methods -->
-                  <Button onAction="#handleCardPayment" maxWidth="Infinity" alignment="CENTER_LEFT" style="-fx-background-color: white; -fx-border-color: #e0e0e0; -fx-border-radius: 5; -fx-padding: 15; -fx-cursor: hand;">
-                      <graphic>
-                          <HBox alignment="CENTER_LEFT" spacing="15" maxWidth="Infinity">
-                              <FontAwesomeIconView glyphName="CREDIT_CARD" size="16" fill="#1e88e5" />
-                              <Label text="Tarjeta de Crédito" style="-fx-font-size: 14px; -fx-text-fill: #555; -fx-font-weight: bold;" />
-                              <Region HBox.hgrow="ALWAYS" />
-                              <FontAwesomeIconView glyphName="ANGLE_RIGHT" size="16" fill="#aaa" />
-                          </HBox>
-                      </graphic>
-                  </Button>
-                  
-
-
-               </children>
+               <!-- Card Payment -->
+               <Button onAction="#handleCardPayment" maxWidth="Infinity"
+                       alignment="CENTER_LEFT" styleClass="payment-method-card payment-method-btn">
+                   <graphic>
+                       <HBox alignment="CENTER_LEFT" spacing="15" maxWidth="Infinity">
+                           <FontAwesomeIconView glyphName="CREDIT_CARD" size="16" styleClass="icon-primary" />
+                           <Label text="Tarjeta de Crédito" styleClass="payment-method-label" />
+                           <Region HBox.hgrow="ALWAYS" />
+                           <FontAwesomeIconView glyphName="ANGLE_RIGHT" size="16" styleClass="sidebar-icon" />
+                       </HBox>
+                   </graphic>
+               </Button>
             </VBox>
          </content>
       </ScrollPane>
    </center>
    <bottom>
-       <HBox alignment="CENTER_RIGHT" style="-fx-padding: 10; -fx-background-color: white; -fx-border-color: #e0e0e0; -fx-border-width: 1 0 0 0;">
-           <Button text="Cancelar" onAction="#handleClose" style="-fx-background-color: white; -fx-border-color: #ccc; -fx-text-fill: #555; -fx-background-radius: 4; -fx-border-radius: 4; -fx-cursor: hand;" cancelButton="true" />
+       <HBox alignment="CENTER_RIGHT" styleClass="payment-footer">
+           <Button text="Cancelar" onAction="#handleClose"
+                   styleClass="btn-secondary" cancelButton="true" />
        </HBox>
    </bottom>
 </BorderPane>

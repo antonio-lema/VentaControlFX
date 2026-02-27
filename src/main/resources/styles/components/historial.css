@@ -1,0 +1,401 @@
+/*
+ * HISTORIAL.CSS
+ * Estilos específicos para la vista de Historial de Ventas (sales.fxml).
+ * También contiene utilities globales reutilizables:
+ *   - stat-card, stat-icon-bg, filter-card, detail-panel
+ *   - quick-filter-btn, badge-danger, btn-lg, btn-warning
+ */
+
+/* =========================================
+   TARJETAS DE ESTADÍSTICAS (stat-card)
+   ========================================= */
+.stat-card {
+    -fx-background-color: -bg-surface;
+    -fx-background-radius: 15;
+    -fx-padding: 18 22;
+    -fx-effect: -shadow-sm;
+    -fx-border-color: -border-light;
+    -fx-border-width: 1;
+    -fx-border-radius: 15;
+}
+
+.stat-card:hover {
+    -fx-effect: -shadow-md;
+    -fx-translate-y: -3;
+}
+
+/* Tarjeta con fondo de color primario (totales destacados) */
+.stat-card-highlight {
+    -fx-background-color: linear-gradient(to bottom right, -color-primary, -color-primary-light);
+    -fx-effect: -shadow-primary;
+    -fx-border-width: 0;
+}
+
+.stat-card-highlight:hover {
+    -fx-effect: -shadow-primary;
+    -fx-translate-y: -3;
+}
+
+.stat-icon-bg-white {
+    -fx-background-color: rgba(255, 255, 255, 0.25);
+}
+
+.stat-label-light {
+    -fx-text-fill: rgba(255, 255, 255, 0.85);
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+
+.stat-value-light {
+    -fx-text-fill: white;
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+    -fx-padding: 5 0 0 0;
+}
+
+.stat-icon-bg {
+    -fx-background-radius: 10;
+    -fx-padding: 10;
+    -fx-min-width: 48;
+    -fx-min-height: 48;
+    -fx-alignment: CENTER;
+}
+
+.stat-icon-bg-blue {
+    -fx-background-color: -color-primary;
+}
+
+.stat-icon-bg-green {
+    -fx-background-color: -color-success;
+}
+
+.stat-icon-bg-orange {
+    -fx-background-color: -color-warning;
+}
+
+.stat-icon-bg-purple {
+    -fx-background-color: #9c27b0;
+}
+
+.stat-icon-bg-teal {
+    -fx-background-color: #008080;
+}
+
+.stat-icon-bg-red {
+    -fx-background-color: -color-danger;
+}
+
+.stat-label {
+    -fx-text-fill: -text-light;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+
+.stat-value {
+    -fx-text-fill: -text-main;
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+    -fx-padding: 5 0 0 0;
+}
+
+/* Vivid Colors for Amounts */
+.text-cash {
+    -fx-text-fill: -color-warning;
+}
+
+.text-card {
+    -fx-text-fill: -color-purple;
+}
+
+.text-total {
+    -fx-text-fill: -color-success;
+}
+
+.text-info {
+    -fx-text-fill: -color-primary;
+}
+
+/* =========================================
+   FILTROS / FILTER CARD
+   ========================================= */
+.filter-card {
+    -fx-background-color: -bg-surface;
+    -fx-background-radius: 14;
+    -fx-padding: 12 20;
+    -fx-effect: -shadow-sm;
+    -fx-border-color: -border-light;
+    -fx-border-width: 1;
+    -fx-border-radius: 14;
+    -fx-spacing: 12;
+}
+
+.filter-label-cap {
+    -fx-font-size: 9px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -text-muted;
+    -fx-text-transform: uppercase;
+}
+
+.filter-datepicker {
+    -fx-background-color: transparent;
+    -fx-border-width: 0;
+}
+
+.filter-search-field {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-text-fill: -text-main;
+}
+
+/* =========================================
+   QUICK FILTER BUTTONS
+   ========================================= */
+.quick-filter-btn {
+    -fx-background-color: -bg-surface;
+    -fx-text-fill: -text-medium;
+    -fx-border-color: -border-light;
+    -fx-border-width: 1;
+    -fx-border-radius: 25;
+    -fx-background-radius: 25;
+    -fx-padding: 6 18;
+    -fx-cursor: hand;
+    -fx-font-size: 13px;
+    -fx-transition-duration: 200ms;
+}
+
+.quick-filter-btn:hover {
+    -fx-background-color: -color-primary-bg;
+    -fx-text-fill: -color-primary;
+    -fx-border-color: -color-primary;
+}
+
+.active-filter {
+    -fx-background-color: -color-primary;
+    -fx-text-fill: white;
+    -fx-border-color: -color-primary;
+    -fx-effect: -shadow-primary;
+}
+
+/* =========================================
+   PANEL DETALLE DE VENTA
+   ========================================= */
+.detail-panel {
+    -fx-background-color: -bg-surface;
+    -fx-background-radius: 15;
+    -fx-effect: -shadow-md;
+    -fx-border-color: -border-light;
+    -fx-border-width: 1;
+    -fx-border-radius: 15;
+}
+
+.detail-panel-accent {
+    -fx-background-color: linear-gradient(to right, -color-primary, -color-primary-light);
+    -fx-background-radius: 15 15 0 0;
+}
+
+.detail-panel-body {
+    -fx-padding: 25;
+}
+
+.detail-sale-id {
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -text-main;
+}
+
+.detail-info-value {
+    -fx-font-weight: bold;
+    -fx-font-size: 13px;
+    -fx-text-fill: -text-main;
+}
+
+.detail-total-label {
+    -fx-font-weight: bold;
+    -fx-font-size: 16px;
+    -fx-text-fill: -text-main;
+}
+
+.detail-total-value {
+    -fx-font-weight: bold;
+    -fx-font-size: 22px;
+    -fx-text-fill: -color-primary;
+}
+
+.detail-scroll {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+    -fx-padding: 0;
+}
+
+.detail-items-container {
+    -fx-background-color: transparent;
+}
+
+/* =========================================
+   BADGES
+   ========================================= */
+.badge-danger {
+    -fx-background-color: -color-danger;
+    -fx-text-fill: white;
+    -fx-font-size: 10px;
+    -fx-font-weight: bold;
+    -fx-padding: 3 8;
+    -fx-background-radius: 5;
+}
+
+.badge-success {
+    -fx-background-color: -color-success;
+    -fx-text-fill: white;
+    -fx-font-size: 10px;
+    -fx-font-weight: bold;
+    -fx-padding: 3 8;
+    -fx-background-radius: 5;
+}
+
+.badge-warning {
+    -fx-background-color: -color-warning;
+    -fx-text-fill: white;
+    -fx-font-size: 10px;
+    -fx-font-weight: bold;
+    -fx-padding: 3 8;
+    -fx-background-radius: 5;
+}
+
+/* =========================================
+   BOTONES GRANDES (btn-lg)
+   ========================================= */
+.btn-lg {
+    -fx-padding: 14 24;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 12;
+}
+
+/* Botón de advertencia / devolución */
+.btn-warning {
+    -fx-background-color: linear-gradient(to right, -color-warning, derive(-color-warning, -10%));
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-padding: 12 24;
+    -fx-background-radius: 25;
+    -fx-effect: dropshadow(three-pass-box, rgba(255, 165, 0, 0.3), 10, 0, 0, 4);
+}
+
+.btn-warning:hover {
+    -fx-scale-x: 1.03;
+    -fx-scale-y: 1.03;
+}
+
+.btn-warning:disabled {
+    -fx-background-color: -bg-subtle;
+    -fx-text-fill: -text-muted;
+    -fx-opacity: 0.6;
+    -fx-effect: none;
+}
+
+/* =========================================
+   LABELS REUTILIZABLES
+   ========================================= */
+.label-muted {
+    -fx-text-fill: -text-muted;
+}
+
+.section-title {
+    -fx-font-size: 26px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -text-main;
+}
+
+.section-subtitle {
+    -fx-font-size: 13px;
+    -fx-text-fill: -text-muted;
+}
+
+/* =========================================
+   SEARCH BAR (reutilizada en tablas)
+   ========================================= */
+.search-bar {
+    -fx-background-color: -bg-main;
+    -fx-background-radius: 10;
+    -fx-padding: 8 14;
+    -fx-border-color: -border-light;
+    -fx-border-width: 1;
+    -fx-border-radius: 10;
+    -fx-spacing: 8;
+}
+
+.search-field {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-text-fill: -text-main;
+    -fx-prompt-text-fill: -text-muted;
+    -fx-padding: 0;
+}
+
+/* =========================================
+   CIERRE DE CAJA
+   ========================================= */
+.detail-panel-header {
+    -fx-background-color: -bg-surface;
+    -fx-padding: 20 25;
+    -fx-border-color: -border-light;
+    -fx-border-width: 0 0 1 0;
+    -fx-effect: -shadow-sm;
+}
+
+.closure-user-label {
+    -fx-text-fill: -color-primary;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+}
+
+.closure-amount-row {
+    -fx-background-color: -bg-main;
+    -fx-padding: 15;
+    -fx-background-radius: 12;
+    -fx-border-color: -border-light;
+    -fx-border-width: 1;
+    -fx-border-radius: 12;
+}
+
+.closure-amount-cash {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -color-warning;
+}
+
+.closure-amount-card {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -color-purple;
+}
+
+.closure-total-highlight {
+    -fx-background-color: linear-gradient(to bottom right, -color-primary, -color-primary-light);
+    -fx-padding: 20;
+    -fx-background-radius: 12;
+}
+
+.closure-grand-total {
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+}
+
+.closure-stat-value {
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+    -fx-text-fill: -text-main;
+}
+
+.closure-status-pending {
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+    -fx-text-fill: -color-warning;
+}
+
+.closure-status-done {
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+    -fx-text-fill: -color-success;
+}

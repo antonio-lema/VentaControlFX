@@ -13,7 +13,7 @@
 <?import javafx.scene.text.Font?>
 <?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
 
-<AnchorPane id="AnchorPane" prefHeight="600.0" prefWidth="900.0" style="-fx-background-color: #f4f6f9;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mycompany.ventacontrolfx.controller.CategoryController">
+<AnchorPane id="AnchorPane" prefHeight="600.0" prefWidth="900.0" styleClass="main-content-area" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mycompany.ventacontrolfx.presentation.controller.CategoryController">
    <children>
       <VBox spacing="20.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <padding>
@@ -25,27 +25,15 @@
                <children>
                   <VBox>
                      <children>
-                        <Label text="Categorías de Productos" textFill="#2c3e50">
-                           <font>
-                              <Font name="System Bold" size="26.0" />
-                           </font>
-                        </Label>
-                        <Label text="Organiza tus productos por grupos" textFill="#7f8c8d" />
+                        <Label text="Categorías de Productos" styleClass="section-title"/>
+                        <Label text="Organiza tus productos por grupos" styleClass="section-subtitle"/>
                      </children>
                   </VBox>
                   <Region HBox.hgrow="ALWAYS" />
                   <HBox spacing="10.0" alignment="CENTER_RIGHT">
                      <children>
-                        <Button mnemonicParsing="false" styleClass="action-icon-button" style="-fx-background-color: white; -fx-text-fill: #1e88e5; -fx-border-color: #e0e6ed; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 8 15;">
-                           <graphic><FontAwesomeIconView glyphName="FILE_EXCEL_ALT" size="14" fill="#1e88e5"/></graphic>
-                           <text> Excel</text>
-                        </Button>
-                        <Button mnemonicParsing="false" styleClass="action-icon-button" style="-fx-background-color: white; -fx-text-fill: #e53935; -fx-border-color: #e0e6ed; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 8 15;">
-                           <graphic><FontAwesomeIconView glyphName="FILE_PDF_ALT" size="14" fill="#e53935"/></graphic>
-                           <text> PDF</text>
-                        </Button>
-                        <Button fx:id="btnAdd" onAction="#handleAddCategory" styleClass="modern-btn-primary" style="-fx-background-color: #1e88e5; -fx-text-fill: white; -fx-background-radius: 25; -fx-padding: 10 25; -fx-font-weight: bold; -fx-cursor: hand;">
-                           <graphic><FontAwesomeIconView glyphName="PLUS" size="14" fill="white"/></graphic>
+                        <Button fx:id="btnAdd" onAction="#handleAddCategory" styleClass="btn-primary">
+                           <graphic><FontAwesomeIconView glyphName="PLUS" size="14" fill="WHITE"/></graphic>
                            <text> Nueva Categoría</text>
                         </Button>
                      </children>
@@ -59,18 +47,18 @@
                   <!-- Filter Section -->
                   <HBox alignment="CENTER_LEFT" styleClass="modern-filter-bar">
                      <children>
-                        <Label text="Buscar categoría:" textFill="#7f8c8d" />
-                        <HBox alignment="CENTER_LEFT" styleClass="search-input-modern" HBox.hgrow="ALWAYS" maxWidth="400">
+                        <Label text="Buscar categoría:" styleClass="label-muted" />
+                        <HBox alignment="CENTER_LEFT" styleClass="search-bar" HBox.hgrow="ALWAYS" maxWidth="400">
                            <children>
-                              <FontAwesomeIconView glyphName="SEARCH" size="14" fill="#95a5a6" />
-                              <TextField fx:id="searchField" promptText="Escribe el nombre..." style="-fx-background-color: transparent; -fx-padding: 0 0 0 10;" HBox.hgrow="ALWAYS" />
+                              <FontAwesomeIconView glyphName="SEARCH" size="14" styleClass="sidebar-icon" />
+                              <TextField fx:id="searchField" promptText="Escribe el nombre..." styleClass="search-field" HBox.hgrow="ALWAYS" />
                            </children>
                         </HBox>
                         <Region HBox.hgrow="ALWAYS" />
                         <HBox alignment="CENTER_LEFT" spacing="10">
                            <children>
                               <Label text="Ver" textFill="#7f8c8d" />
-                              <TextField fx:id="rowsPerPageField" prefWidth="45.0" text="10" style="-fx-background-color: #f4f6f9; -fx-background-radius: 5; -fx-alignment: center;" />
+                              <TextField fx:id="rowsPerPageField" prefWidth="45.0" text="10" styleClass="row-count-field" />
                               <Label text="filas" textFill="#7f8c8d" />
                            </children>
                         </HBox>

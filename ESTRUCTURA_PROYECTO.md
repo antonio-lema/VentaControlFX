@@ -62,12 +62,16 @@ Raíz del código fuente. Contiene `App.java`, que es el punto de entrada princi
 
 ## 3. Recursos (`src/main/resources`)
 
+### 📂 `styles` (Estilos Modulares)
+Contiene el sistema de diseño moderno y modular.
+*   **`variables.css`**: Define la paleta de colores, espaciados y tokens globales.
+*   **`layout/`**: Estilos para la estructura principal (sidebar, topbar, status bar).
+*   **`components/`**: Estilos específicos para botones, tablas, tarjetas, formularios, etc.
+
 ### 📂 `view` (Vistas)
-Contiene los archivos que definen la **apariencia** de la aplicación.
-*   **`.fxml`**: Archivos XML que describen la estructura visual (ventanas, botones, tablas).
-    *   `products.fxml`, `categories.fxml`, `main.fxml`, `add_product.fxml`.
-*   **`.css`**: Archivos de estilos (colores, fuentes, bordes).
-    *   `style.css`: Define el aspecto visual (tema oscuro, botones naranjas, esquinas redondeadas).
+Contiene los archivos que definen la **estructura** de la interfaz.
+*   **`.fxml`**: Archivos XML que describen la disposición de elementos (ventanas, botones, tablas).
+    *   `products.fxml`, `categories.fxml`, `main.fxml`, `add_product.fxml`, etc.
 
 ---
 

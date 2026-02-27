@@ -6,7 +6,7 @@
 <?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
 
 <VBox xmlns:fx="http://javafx.com/fxml/1" 
-      fx:controller="com.mycompany.ventacontrolfx.controller.SidebarController"
+      fx:controller="com.mycompany.ventacontrolfx.presentation.controller.SidebarController"
       spacing="5" styleClass="sidebar">
     <padding>
         <Insets top="20" right="10" bottom="20" left="10"/>
@@ -31,7 +31,7 @@
                 </StackPane>
                 <Label text="Productos" styleClass="sidebar-button-label"/> 
                 <Region HBox.hgrow="ALWAYS"/>
-                <Label fx:id="lblProductsArrow" text="&lt;" style="-fx-font-size: 12px; -fx-font-weight: bold;"/>
+                <Label fx:id="lblProductsArrow" text="&lt;" styleClass="sidebar-submenu-arrow"/>
             </HBox>
         </graphic>
     </Button>
@@ -93,6 +93,19 @@
     </Button>
     
     <Region VBox.vgrow="ALWAYS"/>
+
+    <!-- Botón de cambio de tema claro/oscuro -->
+    <Button fx:id="btnThemeToggle" styleClass="sidebar-button" contentDisplay="GRAPHIC_ONLY" maxWidth="Infinity" onAction="#handleThemeToggle">
+        <graphic>
+            <HBox alignment="CENTER_LEFT" spacing="15">
+                <StackPane styleClass="icon-container">
+                    <FontAwesomeIconView fx:id="themeIcon" glyphName="MOON_ALT" size="20" styleClass="sidebar-icon"/>
+                </StackPane>
+                <Label fx:id="lblTheme" text="Modo Oscuro" styleClass="sidebar-button-label"/>
+            </HBox>
+        </graphic>
+    </Button>
+
     <Button fx:id="btnLock" styleClass="sidebar-button" contentDisplay="GRAPHIC_ONLY" maxWidth="Infinity" onAction="#handleLockApp">
         <graphic>
             <HBox alignment="CENTER_LEFT" spacing="15">

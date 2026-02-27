@@ -1,0 +1,165 @@
+.root {
+    /* Tipografía Global */
+    -fx-font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    -font-size-base: 14px;
+    -font-size-large: 18px;
+    -font-size-small: 12px;
+
+    /* Espaciado y Bordes */
+    -border-radius-sm: 4px;
+    -border-radius-md: 8px;
+    -border-radius-lg: 12px;
+    -grid-gap: 15px;
+
+    /* Gradientes Premium */
+    -grad-primary: linear-gradient(to right, #1e88e5, #42a5f5);
+    -grad-primary-dark: linear-gradient(to right, #1565c0, #1e88e5);
+    -grad-success: linear-gradient(to bottom, #4caf50, #388e3c);
+    -grad-danger: linear-gradient(to bottom, #e53935, #b71c1c);
+
+    /* Sombras Premium */
+    -shadow-sm: dropshadow(three-pass-box, rgba(0, 0, 0, 0.05), 10, 0, 0, 2);
+    -shadow-md: dropshadow(three-pass-box, rgba(0, 0, 0, 0.08), 15, 0, 0, 4);
+    -shadow-lg: dropshadow(three-pass-box, rgba(0, 0, 0, 0.12), 30, 0, 0, 10);
+    -shadow-primary: dropshadow(three-pass-box, rgba(30, 136, 229, 0.3), 15, 0, 0, 5);
+
+    /* --- VARIABLES POR DEFECTO (TEMA CLARO) --- */
+    /* Colores Marca */
+    -color-primary: #1e88e5;
+    -color-primary-dark: #1565c0;
+    -color-primary-light: #42a5f5;
+    -color-primary-bg: #e3f2fd;
+    -color-primary-hover: #bbdefb;
+
+    -color-secondary: #64748b;
+
+    -color-success: #4caf50;
+    -color-success-dark: #388e3c;
+    -color-success-bg: rgba(76, 175, 80, 0.1);
+
+    -color-danger: #e53935;
+    -color-danger-dark: #d32f2f;
+    -color-danger-bg: rgba(229, 57, 53, 0.1);
+
+    -color-warning: #fb8c00;
+    -color-warning-bg: rgba(251, 140, 0, 0.1);
+
+    -color-purple: #9c27b0;
+
+    /* Fondos */
+    -bg-main: #fafbfc;
+    -bg-surface: #ffffff;
+    -bg-sidebar: #ffffff;
+    -bg-topbar: #ffffff;
+    -bg-input: #f8f9fa;
+    -bg-subtle: #f5f5f5;
+
+    /* Texto */
+    -text-main: #2c3e50;
+    -text-medium: #555555;
+    -text-light: #777777;
+    -text-muted: #999999;
+    -text-on-primary: #ffffff;
+
+    /* Bordes */
+    -border-color: #e0e0e0;
+    -border-light: #f0f0f0;
+
+    /* Efectos */
+    -shadow-color: rgba(0, 0, 0, 0.08);
+}
+
+/* MODO CLARO (Opcional si ya están en .root, pero mantenemos por compatibilidad) */
+.light-theme {
+    /* Los valores ya son los de .root */
+}
+
+/* MODO OSCURO */
+.dark-theme {
+    /* Colores Marca */
+    -color-primary: #3b82f6;
+    -color-primary-dark: #1d4ed8;
+    -color-primary-light: #60a5fa;
+    -color-primary-bg: rgba(59, 130, 246, 0.15);
+    -color-primary-hover: #60a5fa;
+
+    -color-secondary: #94a3b8;
+
+    -color-success: #34d399;
+    -color-success-dark: #065f46;
+    -color-success-bg: rgba(52, 211, 153, 0.1);
+
+    -color-danger: #f87171;
+    -color-danger-dark: #991b1b;
+    -color-danger-bg: rgba(248, 113, 113, 0.1);
+
+    -color-warning: #fbbf24;
+    -color-warning-bg: rgba(251, 191, 36, 0.1);
+
+    /* Fondos */
+    -bg-main: #0f172a;
+    -bg-surface: #1e293b;
+    -bg-sidebar: #020617;
+    -bg-topbar: #1e293b;
+    -bg-input: #0f172a;
+    -bg-subtle: #334155;
+
+    /* Texto */
+    -text-main: #f1f5f9;
+    -text-medium: #cbd5e1;
+    -text-light: #94a3b8;
+    -text-muted: #64748b;
+    -text-on-primary: #ffffff;
+
+    /* Bordes */
+    -border-color: #334155;
+    -border-light: #1e293b;
+
+    /* Efectos */
+    -shadow-color: rgba(0, 0, 0, 0.4);
+}
+
+/* UTILS GLOBALES DE LAYOUT */
+.main-background {
+    -fx-background-color: -bg-main;
+}
+
+.main-content-area {
+    -fx-background-color: -bg-main;
+}
+
+.main-content-scroll {
+    -fx-background: -bg-main;
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+
+.loading-overlay {
+    -fx-background-color: rgba(255, 255, 255, 0.7);
+}
+
+.dark-theme .loading-overlay {
+    -fx-background-color: rgba(15, 23, 42, 0.8);
+}
+
+/* Scrollbars Minimalistas */
+.scroll-pane {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+
+.scroll-bar:vertical,
+.scroll-bar:horizontal {
+    -fx-background-color: transparent;
+}
+
+.scroll-bar:vertical .thumb,
+.scroll-bar:horizontal .thumb {
+    -fx-background-color: -border-color;
+    -fx-background-radius: 10;
+}
+
+.scroll-bar:vertical .thumb:hover,
+.scroll-bar:horizontal .thumb:hover {
+    -fx-background-color: -text-muted;
+}

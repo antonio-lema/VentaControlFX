@@ -1,0 +1,61 @@
+/*
+ * CONFIG.CSS
+ */
+
+.config-page-header {
+    -fx-background-color: -color-primary;
+    -fx-padding: 20 25;
+}
+
+.config-page-title {
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+}
+
+.config-card {
+    -fx-background-color: -bg-surface;
+    -fx-background-radius: 14;
+    -fx-effect: dropshadow(three-pass-box, -shadow-color, 12, 0, 0, 4);
+    -fx-border-color: -border-light;
+    -fx-border-width: 1;
+}
+
+.config-card-header {
+    -fx-padding: 17 20 14 20;
+    -fx-background-color: -bg-subtle;
+    -fx-border-color: -border-light;
+    -fx-border-width: 0 0 1 0;
+}
+
+.config-card-title {
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -text-main;
+}
+
+.config-input-container {
+    -fx-background-color: -bg-input;
+    -fx-background-radius: 9;
+    -fx-border-color: -border-color;
+    -fx-border-width: 1;
+    -fx-padding: 0 12;
+}
+
+.config-input-container:focused-within {
+    -fx-background-color: -bg-surface;
+    -fx-border-color: -color-primary;
+}
+
+/* Payment Rows */
+.config-payment-row {
+    -fx-background-color: -bg-surface;
+    -fx-border-color: -border-light;
+    -fx-border-radius: 10;
+    -fx-padding: 12 14;
+}
+
+.config-payment-row:hover {
+    -fx-background-color: derive(-color-primary, 95%);
+    -fx-border-color: -color-primary-hover;
+}

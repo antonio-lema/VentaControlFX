@@ -1,0 +1,222 @@
+package com.mycompany.ventacontrolfx.infrastructure.persistence;
+
+import com.mycompany.ventacontrolfx.domain.model.Return;
+import com.mycompany.ventacontrolfx.domain.model.ReturnDetail;
+import com.mycompany.ventacontrolfx.domain.model.Sale;
+import com.mycompany.ventacontrolfx.domain.model.SaleDetail;
+import com.mycompany.ventacontrolfx.domain.repository.ISaleRepository;
+import java.sql.*;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+
+public class JdbcSaleRepository implements ISaleRepository {
+
+    @Override
+    public int saveSale(Sale sale) throws SQLException {
+        String sql = "INSERT INTO sales (user_id, client_id, total, payment_method, iva, sale_datetime, is_return) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            pstmt.setInt(1, sale.getUserId());
+            if (sale.getClientId() != null && sale.getClientId() > 0) {
+                pstmt.setInt(2, sale.getClientId());
+            } else {
+                pstmt.setNull(2, Types.INTEGER);
+            }
+            pstmt.setDouble(3, sale.getTotal());
+            pstmt.setString(4, sale.getPaymentMethod());
+            pstmt.setDouble(5, sale.getIva());
+            pstmt.setTimestamp(6, Timestamp.valueOf(sale.getSaleDateTime()));
+            pstmt.setBoolean(7, sale.isReturn());
+            pstmt.executeUpdate();
+
+            try (ResultSet rs = pstmt.getGeneratedKeys()) {
+                if (rs.next()) {
+                    int id = rs.getInt(1);
+                    sale.setSaleId(id);
+                    return id;
+                } else {
+                    throw new SQLException("Error al crear la venta, no se obtuvo el ID generado.");
+                }
+            }
+        }
+    }
+
+    @Override
+    public void saveSaleDetails(List<SaleDetail> details, int saleId) throws SQLException {
+        String sql = "INSERT INTO sale_details (sale_id, product_id, quantity, unit_price, line_total) VALUES (?, ?, ?, ?, ?)";
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            for (SaleDetail detail : details) {
+                pstmt.setInt(1, saleId);
+                pstmt.setInt(2, detail.getProductId());
+                pstmt.setInt(3, detail.getQuantity());
+                pstmt.setDouble(4, detail.getUnitPrice());
+                pstmt.setDouble(5, detail.getLineTotal());
+                pstmt.addBatch();
+            }
+            pstmt.executeBatch();
+        }
+    }
+
+    @Override
+    public List<SaleDetail> getDetailsBySaleId(int saleId) throws SQLException {
+        List<SaleDetail> details = new ArrayList<>();
+        String sql = "SELECT sd.*, p.name as product_name FROM sale_details sd JOIN products p ON sd.product_id = p.product_id WHERE sd.sale_id = ?";
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, saleId);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    SaleDetail detail = new SaleDetail();
+                    detail.setDetailId(rs.getInt("detail_id"));
+                    detail.setSaleId(rs.getInt("sale_id"));
+                    detail.setProductId(rs.getInt("product_id"));
+                    detail.setQuantity(rs.getInt("quantity"));
+                    detail.setUnitPrice(rs.getDouble("unit_price"));
+                    detail.setLineTotal(rs.getDouble("line_total"));
+                    detail.setProductName(rs.getString("product_name"));
+                    detail.setReturnedQuantity(rs.getInt("returned_quantity"));
+                    details.add(detail);
+                }
+            }
+        }
+        return details;
+    }
+
+    @Override
+    public Sale getById(int saleId) throws SQLException {
+        String sql = "SELECT s.*, u.username FROM sales s JOIN users u ON s.user_id = u.user_id WHERE s.sale_id = ?";
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, saleId);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    Sale sale = mapResultSetToSale(rs);
+                    sale.setDetails(getDetailsBySaleId(sale.getSaleId()));
+                    return sale;
+                }
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public List<Sale> getByRange(LocalDate start, LocalDate end) throws SQLException {
+        List<Sale> sales = new ArrayList<>();
+        String sql = "SELECT s.*, u.username FROM sales s " +
+                "JOIN users u ON s.user_id = u.user_id " +
+                "WHERE DATE(s.sale_datetime) BETWEEN ? AND ? " +
+                "ORDER BY s.sale_datetime DESC";
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setDate(1, Date.valueOf(start));
+            pstmt.setDate(2, Date.valueOf(end));
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    sales.add(mapResultSetToSale(rs));
+                }
+            }
+        }
+        return sales;
+    }
+
+    @Override
+    public int saveReturn(Return returnRecord) throws SQLException {
+        String sql = "INSERT INTO returns (sale_id, user_id, return_datetime, total_refunded, reason) VALUES (?, ?, ?, ?, ?)";
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            pstmt.setInt(1, returnRecord.getSaleId());
+            if (returnRecord.getUserId() > 0) {
+                pstmt.setInt(2, returnRecord.getUserId());
+            } else {
+                pstmt.setNull(2, Types.INTEGER);
+            }
+            pstmt.setTimestamp(3, Timestamp.valueOf(returnRecord.getReturnDatetime()));
+            pstmt.setDouble(4, returnRecord.getTotalRefunded());
+            pstmt.setString(5, returnRecord.getReason());
+
+            pstmt.executeUpdate();
+            try (ResultSet rs = pstmt.getGeneratedKeys()) {
+                if (rs.next()) {
+                    int id = rs.getInt(1);
+                    returnRecord.setReturnId(id);
+                    return id;
+                } else {
+                    throw new SQLException("Error al crear la devolución, no se obtuvo el ID generado.");
+                }
+            }
+        }
+    }
+
+    @Override
+    public void saveReturnDetails(List<ReturnDetail> details, int returnId) throws SQLException {
+        String sql = "INSERT INTO return_details (return_id, product_id, quantity, unit_price, subtotal) VALUES (?, ?, ?, ?, ?)";
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            for (ReturnDetail detail : details) {
+                pstmt.setInt(1, returnId);
+                pstmt.setInt(2, detail.getProductId());
+                pstmt.setInt(3, detail.getQuantity());
+                pstmt.setDouble(4, detail.getUnitPrice());
+                pstmt.setDouble(5, detail.getSubtotal());
+                pstmt.addBatch();
+            }
+            pstmt.executeBatch();
+        }
+    }
+
+    @Override
+    public void updateSaleReturnStatus(int saleId, boolean isReturn, String reason, double returnedAmount)
+            throws SQLException {
+        String sql = "UPDATE sales SET is_return = ?, return_reason = ?, returned_amount = ? WHERE sale_id = ?";
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setBoolean(1, isReturn);
+            pstmt.setString(2, reason);
+            pstmt.setDouble(3, returnedAmount);
+            pstmt.setInt(4, saleId);
+            pstmt.executeUpdate();
+        }
+    }
+
+    @Override
+    public void updateDetailReturnedQuantity(int detailId, int quantity) throws SQLException {
+        String sql = "UPDATE sale_details SET returned_quantity = ? WHERE detail_id = ?";
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, quantity);
+            pstmt.setInt(2, detailId);
+            pstmt.executeUpdate();
+        }
+    }
+
+    @Override
+    public int count() throws SQLException {
+        String sql = "SELECT COUNT(*) FROM sales";
+        try (Connection conn = DBConnection.getConnection();
+                Statement stmt = conn.createStatement();
+                ResultSet rs = stmt.executeQuery(sql)) {
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        }
+        return 0;
+    }
+
+    private Sale mapResultSetToSale(ResultSet rs) throws SQLException {
+        Sale sale = new Sale();
+        sale.setSaleId(rs.getInt("sale_id"));
+        sale.setSaleDateTime(rs.getTimestamp("sale_datetime").toLocalDateTime());
+        sale.setUserId(rs.getInt("user_id"));
+        sale.setUserName(rs.getString("username"));
+        sale.setClientId((Integer) rs.getObject("client_id"));
+        sale.setTotal(rs.getDouble("total"));
+        sale.setPaymentMethod(rs.getString("payment_method"));
+        sale.setIva(rs.getDouble("iva"));
+        sale.setReturn(rs.getBoolean("is_return"));
+        sale.setReturnReason(rs.getString("return_reason"));
+        sale.setReturnedAmount(rs.getDouble("returned_amount"));
+        return sale;
+    }
+}

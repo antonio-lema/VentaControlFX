@@ -6,21 +6,21 @@
 <?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
 
 <VBox xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="com.mycompany.ventacontrolfx.controller.CartController"
+      fx:controller="com.mycompany.ventacontrolfx.presentation.controller.CartController"
       spacing="0" styleClass="cart-panel" prefWidth="450">
     
     <HBox alignment="CENTER_LEFT" styleClass="cart-customer-header">
         <HBox spacing="10" alignment="CENTER_LEFT">
             <StackPane styleClass="icon-container-small-blue">
-                <FontAwesomeIconView glyphName="USER_PLUS" size="14" fill="#1e88e5"/>
+                <FontAwesomeIconView glyphName="USER_PLUS" size="14" styleClass="icon-primary"/>
             </StackPane>
             <Label fx:id="lblSelectedClient" text="Añadir empresa" styleClass="cart-customer-title"/>
         </HBox>
         <Region HBox.hgrow="ALWAYS"/>
         <HBox spacing="5" alignment="CENTER_RIGHT">
-            <Button fx:id="btnRemoveClient" onAction="#handleRemoveSelectedClient" visible="false" managed="false" styleClass="btn-remove-client" style="-fx-background-color: #fff5f5; -fx-padding: 5; -fx-background-radius: 5; -fx-cursor: hand;">
+            <Button fx:id="btnRemoveClient" onAction="#handleRemoveSelectedClient" visible="false" managed="false" styleClass="btn-remove-client">
                 <graphic>
-                    <FontAwesomeIconView glyphName="TRASH" size="12" fill="#e53935"/>
+                <FontAwesomeIconView glyphName="TRASH" size="12" styleClass="icon-danger"/>
                 </graphic>
             </Button>
             <Button onAction="#showAddClientDialog" styleClass="btn-add-customer">
@@ -33,7 +33,7 @@
     <HBox alignment="CENTER_LEFT" styleClass="cart-items-header">
         <HBox spacing="10" alignment="CENTER_LEFT">
             <StackPane styleClass="icon-container-small">
-                <FontAwesomeIconView glyphName="LIST_UL" size="14" fill="#555"/>
+                <FontAwesomeIconView glyphName="LIST_UL" size="14" styleClass="sidebar-icon"/>
             </StackPane>
             <Label text="Artículos" styleClass="cart-section-title"/>
         </HBox>
@@ -43,13 +43,13 @@
             <graphic>
                 <HBox spacing="8" alignment="CENTER">
                     <Label text="Vaciar carrito" styleClass="btn-clear-cart-text"/>
-                    <FontAwesomeIconView glyphName="TRASH" size="14" fill="#e53935"/>
+                    <FontAwesomeIconView glyphName="TRASH" size="14" styleClass="icon-danger"/>
                 </HBox>
             </graphic>
         </Button>
     </HBox>
 
-    <StackPane VBox.vgrow="ALWAYS" style="-fx-background-color: white;">
+    <StackPane VBox.vgrow="ALWAYS" styleClass="cart-items-pane">
         <VBox fx:id="emptyCartView" alignment="CENTER" spacing="10">
             <Label text="🛒" style="-fx-font-size: 60px; -fx-text-fill: #eee;"/>
         </VBox>

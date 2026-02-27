@@ -9,7 +9,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
 
-<StackPane fx:id="rootStackPane" styleClass="register-popup-background" onMousePressed="#handleMousePressed" onMouseDragged="#handleMouseDragged" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mycompany.ventacontrolfx.controller.ClientFormController">
+<StackPane fx:id="rootStackPane" styleClass="register-popup-background" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mycompany.ventacontrolfx.presentation.controller.ClientFormController">
     <VBox maxWidth="500" spacing="0" alignment="CENTER" styleClass="modern-register-card">
         <padding>
             <Insets top="40" right="40" bottom="40" left="40"/>
@@ -27,7 +27,7 @@
             <!-- Name -->
             <VBox styleClass="modern-input-group">
                 <HBox styleClass="modern-input-container" alignment="CENTER_LEFT">
-                    <FontAwesomeIconView glyphName="BUILDING" size="18" fill="#b0b0b0">
+                    <FontAwesomeIconView glyphName="BUILDING" size="18" styleClass="sidebar-icon">
                         <HBox.margin>
                             <Insets right="10"/>
                         </HBox.margin>
@@ -64,7 +64,7 @@
             <!-- Email -->
             <VBox styleClass="modern-input-group">
                 <HBox styleClass="modern-input-container" alignment="CENTER_LEFT">
-                    <FontAwesomeIconView glyphName="ENVELOPE" size="18" fill="#b0b0b0">
+                    <FontAwesomeIconView glyphName="ENVELOPE" size="18" styleClass="sidebar-icon">
                         <HBox.margin>
                             <Insets right="10"/>
                         </HBox.margin>
@@ -76,7 +76,7 @@
             <!-- Address -->
             <VBox styleClass="modern-input-group">
                 <HBox styleClass="modern-input-container" alignment="CENTER_LEFT">
-                    <FontAwesomeIconView glyphName="MAP_MARKER" size="18" fill="#b0b0b0">
+                    <FontAwesomeIconView glyphName="MAP_MARKER" size="18" styleClass="sidebar-icon">
                         <HBox.margin>
                             <Insets right="10"/>
                         </HBox.margin>

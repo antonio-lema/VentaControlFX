@@ -1,6 +1,6 @@
 package com.mycompany.ventacontrolfx.component;
 
-import com.mycompany.ventacontrolfx.model.Product;
+import com.mycompany.ventacontrolfx.domain.model.Product;
 import java.io.File;
 import java.util.function.Consumer;
 import javafx.geometry.Pos;
@@ -19,30 +19,29 @@ public class ProductBox extends VBox {
 
     public ProductBox(Product product, Consumer<Product> onAddToCart) {
         this.getStyleClass().add("product-box");
-        this.setPrefWidth(180);
+        this.setPrefWidth(200); // Antes 180
 
         // Image Container
         StackPane imageContainer = new StackPane();
         imageContainer.getStyleClass().add("product-image-container");
-        imageContainer.setPrefHeight(140);
-        imageContainer.setMinHeight(140);
-        imageContainer.setMaxHeight(140);
+        imageContainer.setPrefHeight(150); // Antes 140
+        imageContainer.setMinHeight(150);
+        imageContainer.setMaxHeight(150);
         imageContainer.setAlignment(Pos.CENTER);
 
         // Clip for top corners
-        Rectangle clip = new Rectangle(180, 140);
+        Rectangle clip = new Rectangle(200, 150);
         clip.setArcWidth(15);
         clip.setArcHeight(15);
         imageContainer.setClip(clip);
 
         // Image Logic
         if (product.getImagePath() != null && !product.getImagePath().isEmpty()) {
-            File file = new File(product.getImagePath());
-            if (file.exists()) {
+            File file = resolveFile(product.getImagePath());
+            if (file != null && file.exists()) {
                 ImageView imageView = new ImageView(new Image(file.toURI().toString()));
-                imageView.setFitHeight(140);
-                imageView.setFitWidth(180);
-                // imageView.setPreserveRatio(true); // Crop approach might be better
+                imageView.setFitHeight(150);
+                imageView.setFitWidth(200);
                 imageContainer.getChildren().add(imageView);
             } else {
                 imageContainer.getChildren().add(createPlaceholder());
@@ -52,14 +51,14 @@ public class ProductBox extends VBox {
         }
 
         // Info Container
-        VBox infoBox = new VBox(5);
+        VBox infoBox = new VBox(8);
         infoBox.getStyleClass().add("product-info");
 
         Label nameLabel = new Label(product.getName());
         nameLabel.getStyleClass().add("product-name");
         nameLabel.setWrapText(true);
-        nameLabel.setMinHeight(40);
-        nameLabel.setMaxHeight(40);
+        nameLabel.setMinHeight(45); // Antes 40
+        nameLabel.setMaxHeight(45);
 
         HBox priceBox = new HBox(10);
         priceBox.setAlignment(Pos.CENTER_LEFT);
@@ -82,6 +81,21 @@ public class ProductBox extends VBox {
                 onAddToCart.accept(product);
             }
         });
+    }
+
+    private File resolveFile(String path) {
+        // 1. Try as is (absolute or relative to project root)
+        File f = new File(path);
+        if (f.exists())
+            return f;
+
+        // 2. If it's just a filename, try in default directory
+        File defaultDir = new File("data/images/products");
+        File f2 = new File(defaultDir, f.getName());
+        if (f2.exists())
+            return f2;
+
+        return null;
     }
 
     private Label createPlaceholder() {

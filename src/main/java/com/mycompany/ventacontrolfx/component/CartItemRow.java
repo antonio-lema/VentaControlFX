@@ -1,7 +1,7 @@
 package com.mycompany.ventacontrolfx.component;
 
-import com.mycompany.ventacontrolfx.model.CartItem;
-import com.mycompany.ventacontrolfx.model.Product;
+import com.mycompany.ventacontrolfx.domain.model.CartItem;
+import com.mycompany.ventacontrolfx.domain.model.Product;
 import java.io.File;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -44,17 +44,18 @@ public class CartItemRow extends HBox {
         infoBox.setAlignment(Pos.CENTER_LEFT);
 
         Label nameLabel = new Label(product.getName());
-        nameLabel.getStyleClass().add("cart-product-name");
+        nameLabel.getStyleClass().add("cart-item-name");
 
         // Quantity Controls
-        HBox quantityBox = new HBox(5);
-        quantityBox.setAlignment(Pos.CENTER_LEFT);
+        HBox quantityBox = new HBox(2);
+        quantityBox.setAlignment(Pos.CENTER);
+        quantityBox.getStyleClass().add("quantity-selector-pill");
 
         Button decreaseBtn = new Button();
         decreaseBtn.getStyleClass().add("quantity-btn");
         FontAwesomeIconView minusIcon = new FontAwesomeIconView(FontAwesomeIcon.MINUS);
         minusIcon.setSize("10");
-        minusIcon.setFill(Color.web("#7f8c8d"));
+        minusIcon.getStyleClass().add("cart-icon-minus");
         decreaseBtn.setGraphic(minusIcon);
         decreaseBtn.setOnAction(e -> {
             if (cartItem.getQuantity() > 1) {
@@ -66,6 +67,8 @@ public class CartItemRow extends HBox {
 
         TextField quantityField = new TextField();
         quantityField.getStyleClass().add("quantity-field-modern");
+        quantityField.setAlignment(Pos.CENTER);
+        quantityField.setPrefWidth(35);
         quantityField.setText(String.valueOf(cartItem.getQuantity()));
 
         // COMMIT logic: when user presses Enter or focus leaves
@@ -89,7 +92,7 @@ public class CartItemRow extends HBox {
         increaseBtn.getStyleClass().add("quantity-btn");
         FontAwesomeIconView plusIcon = new FontAwesomeIconView(FontAwesomeIcon.PLUS);
         plusIcon.setSize("10");
-        plusIcon.setFill(Color.web("#1e88e5"));
+        plusIcon.getStyleClass().add("cart-icon-plus");
         increaseBtn.setGraphic(plusIcon);
         increaseBtn.setOnAction(e -> onIncrement.run());
 
@@ -105,14 +108,14 @@ public class CartItemRow extends HBox {
         rightSide.setMinWidth(100);
 
         Label priceLabel = new Label(String.format("%.2f €", product.getPrice() * cartItem.getQuantity()));
-        priceLabel.getStyleClass().add("cart-product-price");
+        priceLabel.getStyleClass().add("cart-item-price");
         StackPane.setAlignment(priceLabel, Pos.CENTER_RIGHT);
 
         Button deleteBtn = new Button();
         deleteBtn.getStyleClass().add("cart-delete-btn-reveal");
         FontAwesomeIconView trashIcon = new FontAwesomeIconView(FontAwesomeIcon.TRASH);
         trashIcon.setSize("14");
-        trashIcon.setFill(Color.WHITE);
+        trashIcon.getStyleClass().add("icon-white");
         deleteBtn.setGraphic(trashIcon);
         StackPane.setAlignment(deleteBtn, Pos.CENTER_RIGHT);
         deleteBtn.setOpacity(0);

@@ -1,6 +1,6 @@
 package com.mycompany.ventacontrolfx.util;
 
-import com.mycompany.ventacontrolfx.model.User;
+import com.mycompany.ventacontrolfx.domain.model.User;
 
 /**
  * Enterprise Authorization Service.

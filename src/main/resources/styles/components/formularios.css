@@ -1,0 +1,125 @@
+/*
+ * FORMULARIOS.CSS
+ */
+
+.text-field,
+.password-field,
+.combo-box,
+.modern-input-field,
+.modern-combo-box {
+    -fx-background-color: -bg-input;
+    -fx-border-color: -border-color;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+    -fx-text-fill: -text-main;
+    -fx-padding: 12 15;
+    -fx-font-size: 14px;
+    -fx-prompt-text-fill: -text-muted;
+}
+
+.text-field:focused,
+.modern-input-field:focused,
+.modern-combo-box:focused {
+    -fx-background-color: -bg-surface;
+    -fx-border-color: -color-primary;
+    -fx-effect: -shadow-sm;
+    -fx-border-width: 1.5;
+}
+
+/* Títulos de sección */
+.section-title,
+.modern-register-title {
+    -fx-font-size: 26px;
+    -fx-font-weight: 800;
+    -fx-text-fill: -text-main;
+    -fx-padding: 0 0 5 0;
+}
+
+.section-subtitle,
+.modern-register-subtitle {
+    -fx-font-size: 14px;
+    -fx-text-fill: -text-muted;
+    -fx-padding: 0 0 20 0;
+}
+
+.label {
+    -fx-text-fill: -text-main;
+    -fx-font-weight: 600;
+}
+
+.label-muted {
+    -fx-text-fill: -text-light;
+    -fx-font-size: 12px;
+    -fx-font-weight: normal;
+}
+
+.error-label,
+.modern-error-label {
+    -fx-text-fill: -color-danger;
+    -fx-font-size: 13px;
+    -fx-background-color: -color-danger-bg;
+    -fx-padding: 8 12;
+    -fx-background-radius: 8;
+}
+
+/* Input groups */
+.input-group,
+.modern-input-group {
+    -fx-spacing: 8;
+    -fx-padding: 0 0 10 0;
+}
+
+/* ===== FORMULARIO MODAL (register-popup / client-form) ===== */
+
+/* Fondo semitransparente del popup */
+.register-popup-background {
+    -fx-background-color: rgba(0, 0, 0, 0.45);
+    -fx-background-radius: 0;
+}
+
+/* Tarjeta principal del formulario */
+.modern-register-card {
+    -fx-background-color: -bg-surface;
+    -fx-background-radius: 20;
+    -fx-border-radius: 20;
+    -fx-border-color: -border-light;
+    -fx-border-width: 1;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.20), 40, 0, 0, 15);
+}
+
+/* Cabecera del formulario */
+.modern-register-header {
+    -fx-padding: 0 0 20 0;
+}
+
+/* Contenedor de cada campo con icono */
+.modern-input-container {
+    -fx-background-color: -bg-input;
+    -fx-border-color: -border-color;
+    -fx-border-width: 1.2;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+    -fx-padding: 6 12;
+}
+
+.modern-input-container:focused,
+.modern-input-container:focused-within {
+    -fx-border-color: -color-primary;
+    -fx-background-color: -bg-surface;
+    -fx-effect: dropshadow(three-pass-box, rgba(30, 136, 229, 0.20), 8, 0, 0, 2);
+}
+
+/* Campo dentro del contenedor: sin borde propio */
+.modern-input-container .text-field,
+.modern-input-container .modern-input-field {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-border-width: 0;
+    -fx-background-radius: 0;
+    -fx-border-radius: 0;
+    -fx-padding: 6 8;
+    -fx-font-size: 14px;
+    -fx-text-fill: -text-main;
+    -fx-prompt-text-fill: -text-muted;
+    -fx-effect: null;
+}

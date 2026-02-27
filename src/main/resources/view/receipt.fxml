@@ -13,7 +13,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.image.ImageView?>
 
-<HBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="900.0" spacing="0.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mycompany.ventacontrolfx.controller.ReceiptController">
+<HBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="900.0" spacing="0.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mycompany.ventacontrolfx.presentation.controller.ReceiptController">
    <children>
       <!-- LEFT SIDE: The Receipt Preview -->
       <VBox prefWidth="380.0" style="-fx-background-color: #f4f4f4; -fx-padding: 20;">
@@ -109,9 +109,9 @@
                                 
                                 <!-- Footer -->
                                 <VBox alignment="CENTER" spacing="5.0" style="-fx-padding: 20 0 0 0;">
-                                    <Label style="-fx-text-fill: grey; -fx-font-size: 9;" text="Le ha atendido Admin" />
+                                    <Label fx:id="lblAttendedBy" style="-fx-text-fill: grey; -fx-font-size: 9;" text="" />
                                     <Label fx:id="lblFooterMessage" style="-fx-font-weight: bold; -fx-font-size: 10; -fx-text-fill: black;" text="GRACIAS POR SU VISITA" />
-                                    <Label style="-fx-font-size: 8; -fx-text-fill: grey;" text="www.gestiontpv.com" />
+                                    <Label fx:id="lblWebsiteUrl" style="-fx-font-size: 8; -fx-text-fill: grey;" text="" />
                                 </VBox>
                                 
                                 <!-- Barcode (Gift Ticket) -->
@@ -140,12 +140,12 @@
                
                <HBox alignment="CENTER" spacing="20.0" style="-fx-padding: 10;">
                   <VBox alignment="CENTER">
-                      <Label fx:id="lblTotalRight" text="19,99 €" style="-fx-font-size: 24; -fx-font-weight: bold; -fx-text-fill: #333;" />
+                      <Label fx:id="lblTotalRight" text="" style="-fx-font-size: 24; -fx-font-weight: bold; -fx-text-fill: #333;" />
                       <Label text="Total cobrado" style="-fx-text-fill: grey;" />
                   </VBox>
                   <Separator orientation="VERTICAL" />
                   <VBox alignment="CENTER">
-                      <Label fx:id="lblChangeRight" text="30,01 €" style="-fx-font-size: 24; -fx-font-weight: bold; -fx-text-fill: #E91E63;" />
+                      <Label fx:id="lblChangeRight" text="" style="-fx-font-size: 24; -fx-font-weight: bold; -fx-text-fill: #E91E63;" />
                       <Label text="Cambio" style="-fx-text-fill: #E91E63;" />
                   </VBox>
                </HBox>

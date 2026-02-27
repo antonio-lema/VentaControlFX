@@ -1,0 +1,250 @@
+/*
+ * TOPBAR.CSS — Modern Premium TopBar
+ */
+
+/* ===================================================
+   BARRA SUPERIOR PRINCIPAL
+   =================================================== */
+.top-bar {
+    -fx-background-color: -bg-surface;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.08), 0, 0, 0, 1);
+    -fx-border-color: -border-light;
+    -fx-border-width: 0 0 1 0;
+    -fx-min-height: 70px;
+    -fx-max-height: 70px;
+    -fx-padding: 0 30;
+}
+
+/* ===================================================
+   LOGO / MARCA
+   =================================================== */
+.logo-container {
+    -fx-alignment: CENTER_LEFT;
+    -fx-spacing: 10;
+    -fx-min-width: 160;
+}
+
+.logo-text {
+    -fx-text-fill: -color-primary;
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-font-family: 'Segoe UI Black', 'Arial Black', sans-serif;
+}
+
+.brand-text {
+    -fx-text-fill: -text-main;
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-font-family: 'Segoe UI', sans-serif;
+}
+
+/* ===================================================
+   BARRA DE BÚSQUEDA — Centro del TopBar
+   =================================================== */
+.search-bar {
+    -fx-background-color: -bg-input;
+    -fx-background-radius: 12;
+    -fx-border-color: -border-color;
+    -fx-border-width: 1.5;
+    -fx-border-radius: 12;
+    -fx-padding: 0 18;
+    -fx-min-width: 420px;
+    -fx-max-width: 480px;
+    -fx-min-height: 44px;
+    -fx-max-height: 44px;
+    -fx-spacing: 10;
+}
+
+.search-bar:focused,
+.search-bar:focus-within {
+    -fx-background-color: -bg-surface;
+    -fx-border-color: -text-muted;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.04), 8, 0, 0, 0);
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+}
+
+.search-field {
+    -fx-background-color: transparent;
+    -fx-text-fill: -text-main;
+    -fx-prompt-text-fill: -text-muted;
+    -fx-font-size: 14px;
+    -fx-padding: 0 6;
+    -fx-border-width: 0;
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+    -fx-background-insets: 0;
+}
+
+.search-field:focused {
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+    -fx-background-color: transparent;
+    -fx-effect: none;
+}
+
+.search-field .text-input-content:focused,
+.search-field .text-field:focused {
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+}
+
+/* Atajo de teclado ⌘K */
+.search-shortcut {
+    -fx-background-color: -border-light;
+    -fx-background-radius: 6;
+    -fx-padding: 2 7;
+    -fx-text-fill: -text-muted;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+}
+
+/* ===================================================
+   ZONA DERECHA: ACCIONES + USUARIO
+   =================================================== */
+
+/* Botón circular de acción (campana, etc.) */
+.top-bar-action-btn {
+    -fx-background-color: -bg-subtle;
+    -fx-background-radius: 50%;
+    -fx-border-radius: 50%;
+    -fx-min-width: 40;
+    -fx-min-height: 40;
+    -fx-max-width: 40;
+    -fx-max-height: 40;
+    -fx-cursor: hand;
+    -fx-alignment: CENTER;
+}
+
+.top-bar-action-btn:hover {
+    -fx-background-color: -color-primary-bg;
+    -fx-scale-x: 1.08;
+    -fx-scale-y: 1.08;
+}
+
+/* ===================================================
+   MENÚ DE USUARIO (MenuButton)
+   =================================================== */
+.user-menu-button {
+    -fx-background-color: -bg-subtle;
+    -fx-background-radius: 30;
+    -fx-border-radius: 30;
+    -fx-border-color: -border-color;
+    -fx-border-width: 1.5;
+    -fx-padding: 6 14 6 10;
+    -fx-cursor: hand;
+    /* Ocultar la flecha nativa del MenuButton */
+    -fx-arrow-button-gap: 0;
+}
+
+.user-menu-button:hover {
+    -fx-background-color: -color-primary-bg;
+    -fx-border-color: -color-primary;
+    -fx-effect: dropshadow(three-pass-box, rgba(30, 136, 229, 0.12), 8, 0, 0, 0);
+}
+
+.user-menu-button:showing {
+    -fx-background-color: -color-primary-bg;
+    -fx-border-color: -color-primary;
+}
+
+/* Texto del usuario dentro del menú */
+.user-menu-button .label {
+    -fx-text-fill: -text-main;
+    -fx-font-weight: 600;
+    -fx-font-size: 13px;
+}
+
+/* Avatar circular del usuario */
+.user-avatar-circle {
+    -fx-fill: linear-gradient(to bottom right, -color-primary, -color-primary-light);
+    -fx-effect: dropshadow(three-pass-box, rgba(30, 136, 229, 0.3), 6, 0, 0, 2);
+}
+
+/* Label "En línea" */
+.user-status-online {
+    -fx-text-fill: -color-success;
+    -fx-font-size: 10px;
+}
+
+/* Flecha del menú */
+.user-menu-button .arrow-button {
+    -fx-background-color: transparent;
+    -fx-padding: 0 0 0 4;
+}
+
+.user-menu-button .arrow-button .arrow {
+    -fx-background-color: -text-muted;
+}
+
+/* ===================================================
+   ESTRUCTURA DEL DESPLEGABLE (ContextMenu)
+   =================================================== */
+.context-menu {
+    -fx-background-color: rgba(255, 255, 255, 0.98);
+    -fx-background-radius: 16;
+    -fx-border-color: rgba(0, 0, 0, 0.05);
+    -fx-border-width: 1;
+    -fx-border-radius: 16;
+    -fx-padding: 10 5;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.12), 25, 0, 0, 10);
+}
+
+.menu-item {
+    -fx-padding: 12 18;
+    -fx-background-color: transparent;
+    -fx-background-radius: 10;
+}
+
+.menu-item:focused,
+.menu-item:hover {
+    -fx-background-color: -color-primary-bg;
+}
+
+.menu-item .label {
+    -fx-text-fill: -text-main;
+    -fx-font-size: 14px;
+    -fx-font-weight: 500;
+}
+
+.menu-item:focused .label,
+.menu-item:hover .label {
+    -fx-text-fill: -color-primary;
+    -fx-font-weight: 600;
+}
+
+/* Iconos dentro del menú */
+.menu-item .graphic {
+    -fx-padding: 0 10 0 0;
+}
+
+.menu-item .font-awesome-icon-view {
+    -fx-fill: -text-muted;
+    -fx-opacity: 0.8;
+}
+
+.menu-item:focused .font-awesome-icon-view,
+.menu-item:hover .font-awesome-icon-view {
+    -fx-fill: -color-primary;
+    -fx-opacity: 1.0;
+}
+
+/* Separadores internos */
+.separator-menu-item {
+    -fx-padding: 6 15;
+}
+
+.separator-menu-item .separator .line {
+    -fx-border-color: -border-light;
+    -fx-border-width: 0.8 0 0 0;
+}
+
+/* Badge de notificación */
+.notification-badge {
+    -fx-background-color: -color-danger;
+    -fx-background-radius: 50%;
+    -fx-min-width: 8;
+    -fx-min-height: 8;
+    -fx-max-width: 8;
+    -fx-max-height: 8;
+}

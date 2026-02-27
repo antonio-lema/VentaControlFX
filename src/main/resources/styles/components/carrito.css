@@ -1,0 +1,331 @@
+/*
+ * CARRITO.CSS
+ */
+
+.cart-panel {
+    -fx-background-color: -bg-surface;
+    -fx-border-color: -border-color;
+    -fx-border-width: 0 0 0 1;
+}
+
+.cart-customer-header {
+    -fx-padding: 15 20;
+    -fx-background-color: derive(-color-primary, 98%);
+    -fx-border-color: derive(-color-primary, 90%);
+    -fx-border-width: 0 0 1 0;
+}
+
+.cart-items-header {
+    -fx-padding: 14 20;
+    -fx-background-color: -bg-main;
+    -fx-border-color: -border-color;
+    -fx-border-width: 0 0 1 0;
+}
+
+.cart-customer-title {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -text-main;
+}
+
+.btn-add-customer {
+    -fx-background-color: -color-primary-bg;
+    -fx-background-radius: 10;
+    -fx-min-width: 38px;
+    -fx-min-height: 38px;
+    -fx-cursor: hand;
+    -fx-border-color: -color-primary-light;
+    -fx-border-width: 1;
+    -fx-border-radius: 10;
+    -fx-effect: -shadow-sm;
+    -fx-transition: all 0.2s;
+}
+
+.btn-add-customer:hover {
+    -fx-background-color: -color-primary;
+    -fx-border-color: -color-primary-dark;
+    -fx-effect: -shadow-primary;
+    -fx-translate-y: -1;
+}
+
+.add-customer-icon {
+    -fx-fill: -color-primary;
+}
+
+.btn-add-customer:hover .add-customer-icon {
+    -fx-fill: white;
+}
+
+.cart-item {
+    -fx-background-color: -bg-surface;
+    -fx-padding: 15;
+    -fx-border-color: -bg-subtle;
+    -fx-border-width: 0 0 1 0;
+}
+
+.cart-item:hover {
+    -fx-background-color: -bg-main;
+}
+
+.cart-item-name {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -text-main;
+}
+
+.cart-item-price {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -text-medium;
+}
+
+.quantity-field-modern {
+    -fx-background-color: transparent;
+    -fx-text-fill: -text-main;
+    -fx-font-weight: bold;
+    -fx-padding: 0;
+    -fx-alignment: center;
+}
+
+.quantity-selector-pill {
+    -fx-background-color: -bg-input;
+    -fx-background-radius: 20;
+    -fx-border-color: -border-light;
+    -fx-border-width: 1;
+    -fx-border-radius: 20;
+    -fx-padding: 3 6;
+}
+
+/* =========================================
+   CHECKOUT SUMMARY & BUTTONS
+   ========================================= */
+.checkout-summary {
+    -fx-padding: 20 25;
+    -fx-background-color: -bg-surface;
+    -fx-border-color: -border-color;
+    -fx-border-width: 1 0 0 0;
+    -fx-spacing: 12;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.05), 10, 0, 0, -5);
+}
+
+.summary-label {
+    -fx-font-size: 14px;
+    -fx-text-fill: -text-muted;
+}
+
+.summary-value {
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -text-main;
+}
+
+.total-label {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -text-main;
+    -fx-padding: 10 0 0 0;
+}
+
+.total-value {
+    -fx-text-fill: -color-primary;
+    -fx-font-size: 26px;
+    -fx-font-weight: bold;
+    -fx-padding: 10 0 0 0;
+}
+
+.btn-pay {
+    -fx-background-color: -grad-success;
+    -fx-text-fill: white;
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-padding: 18 0;
+    -fx-background-radius: 15;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(three-pass-box, rgba(76, 175, 80, 0.3), 15, 0, 0, 8);
+    -fx-transition: all 0.2s;
+}
+
+.btn-pay:hover {
+    -fx-background-color: derive(-color-success, -10%);
+    -fx-scale-x: 1.02;
+    -fx-scale-y: 1.02;
+    -fx-effect: dropshadow(three-pass-box, rgba(76, 175, 80, 0.5), 20, 0, 0, 10);
+}
+
+.btn-pay:pressed {
+    -fx-scale-x: 0.98;
+    -fx-scale-y: 0.98;
+}
+
+/* SELL VIEW SPECIFIC LAYOUT */
+.view-header-bar {
+    -fx-padding: 20 25;
+    -fx-background-color: -bg-surface;
+    -fx-border-color: -border-light;
+    -fx-border-width: 0 0 1 0;
+    -fx-spacing: 20;
+    -fx-alignment: CENTER_LEFT;
+}
+
+.filter-icon-container {
+    -fx-background-color: -color-primary;
+    -fx-background-radius: 12;
+    -fx-padding: 12;
+    -fx-effect: -shadow-primary;
+}
+
+.products-scroll-pane {
+    -fx-background: -bg-main;
+    -fx-background-color: transparent;
+}
+
+.categories-bar {
+    -fx-padding: 15 25;
+    -fx-background-color: -bg-surface;
+    -fx-border-color: -border-light;
+    -fx-border-width: 1 0 0 0;
+}
+
+.categories-scroll-pane {
+    -fx-background: transparent;
+    -fx-background-color: transparent;
+}
+
+.categories-flow-pane {
+    -fx-background-color: transparent;
+}
+
+/* =========================================
+   CART PANEL - CLASES ADICIONALES
+   ========================================= */
+.cart-items-pane {
+    -fx-background-color: -bg-surface;
+}
+
+
+/* =========================================
+   RETURN DIALOG
+   ========================================= */
+.return-table-header {
+    -fx-border-color: -border-light;
+    -fx-border-width: 0 0 1 0;
+    -fx-padding: 0 0 10 0;
+}
+
+.table-col-header {
+    -fx-font-weight: bold;
+    -fx-text-fill: -text-muted;
+    -fx-font-size: 11px;
+}
+
+.return-reason-area {
+    -fx-background-color: -bg-main;
+    -fx-border-color: -border-light;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-padding: 10;
+}
+
+/* =========================================
+   UTILITY ICON COLORS
+   ========================================= */
+.icon-primary {
+    -fx-fill: -color-primary;
+}
+
+.icon-danger {
+    -fx-fill: -color-danger;
+}
+
+.icon-white {
+    -fx-fill: white;
+}
+
+.cart-icon-minus {
+    -fx-fill: -text-muted;
+}
+
+.cart-icon-plus {
+    -fx-fill: -color-primary;
+}
+
+/* =========================================
+   CART ITEM CONTROLS (CartItemRow)
+   ========================================= */
+.quantity-btn {
+    -fx-background-color: transparent;
+    -fx-border-width: 0;
+    -fx-cursor: hand;
+    -fx-padding: 4;
+    -fx-background-radius: 50%;
+}
+
+.quantity-btn:hover {
+    -fx-background-color: -border-light;
+}
+
+.cart-delete-btn-reveal {
+    -fx-background-color: -color-danger;
+    -fx-background-radius: 20;
+    -fx-border-width: 0;
+    -fx-padding: 6 10;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(three-pass-box, rgba(229, 57, 53, 0.4), 8, 0, 0, 2);
+}
+
+.cart-delete-btn-reveal:hover {
+    -fx-background-color: -color-danger-dark;
+}
+
+/* =========================================
+   BTN-LINK (botón transparente tipo enlace)
+   ========================================= */
+.btn-link {
+    -fx-background-color: transparent;
+    -fx-text-fill: -text-muted;
+    -fx-cursor: hand;
+    -fx-border-width: 0;
+}
+
+.btn-link:hover {
+    -fx-text-fill: -color-primary;
+}
+
+/* =========================================
+   ESTILOS ADICIONALES PARA BOTONES DEL CARRITO
+   ========================================= */
+.btn-clear-cart {
+    -fx-background-color: transparent;
+    -fx-background-radius: 12;
+    -fx-padding: 9 18;
+    -fx-cursor: hand;
+    -fx-border-color: -border-color;
+    -fx-border-width: 1.5;
+    -fx-border-radius: 12;
+    -fx-transition: all 0.2s;
+    -fx-effect: dropshadow(two-pass-box, rgba(0, 0, 0, 0.04), 3, 0, 0, 1);
+}
+
+.btn-clear-cart:hover {
+    -fx-background-color: -color-danger-bg;
+    -fx-border-color: -color-danger;
+    -fx-translate-x: -2;
+}
+
+.btn-clear-cart-text {
+    -fx-text-fill: -text-medium;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+}
+
+.btn-clear-cart:hover .btn-clear-cart-text {
+    -fx-text-fill: -color-danger;
+}
+
+.btn-clear-cart .icon-danger {
+    -fx-fill: -text-muted;
+}
+
+.btn-clear-cart:hover .icon-danger {
+    -fx-fill: -color-danger;
+}

@@ -6,12 +6,12 @@
 <?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
 
 <HBox xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="com.mycompany.ventacontrolfx.controller.StatusBarController"
+      fx:controller="com.mycompany.ventacontrolfx.presentation.controller.StatusBarController"
       spacing="15" alignment="CENTER_RIGHT" styleClass="status-bar">
     <padding>
         <Insets top="5" right="20" bottom="5" left="20"/>
     </padding>
-    <Label text="VentaControlFX v1.0" style="-fx-text-fill: #bdc3c7; -fx-font-size: 11px;"/>
+    <Label text="VentaControl Pro v1.0" styleClass="label-muted" style="-fx-font-size: 10px;"/>
     <Region HBox.hgrow="ALWAYS"/>
     
     <HBox fx:id="cardCountProducts" styleClass="status-badge">

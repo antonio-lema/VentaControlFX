@@ -5,52 +5,52 @@
 <?import javafx.geometry.Insets?>
 <?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
 
-<VBox xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mycompany.ventacontrolfx.controller.ClientsController"
-      spacing="20" style="-fx-padding: 25 25 10 25; -fx-background-color: #f4f6f9;">
-    
+<VBox xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.mycompany.ventacontrolfx.presentation.controller.ClientsController"
+      spacing="20" styleClass="main-content-area" style="-fx-padding: 25 25 10 25;">
+
     <!-- Header -->
     <HBox alignment="CENTER_LEFT" spacing="20">
         <VBox HBox.hgrow="ALWAYS">
-            <Label text="Gestión de Empresas" style="-fx-font-size: 26; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
-            <Label text="Selecciona o añade una empresa para la factura" style="-fx-text-fill: #7f8c8d;"/>
+            <Label text="Gestión de Empresas" styleClass="section-title"/>
+            <Label text="Selecciona o añade una empresa para la factura" styleClass="section-subtitle"/>
         </VBox>
-        
-        <Button fx:id="btnToggleForm" text=" Nueva Empresa" onAction="#handleToggleForm" 
-                style="-fx-background-color: #1e88e5; -fx-text-fill: white; -fx-background-radius: 25; -fx-padding: 10 25; -fx-font-weight: bold; -fx-cursor: hand; -fx-effect: dropshadow(three-pass-box, rgba(30,136,229,0.3), 10, 0, 0, 5);">
+
+        <Button fx:id="btnToggleForm" text=" Nueva Empresa" onAction="#handleAddClient"
+                styleClass="btn-primary">
             <graphic>
-                <FontAwesomeIconView glyphName="PLUS" size="14" fill="white"/>
+                <FontAwesomeIconView glyphName="PLUS" size="14" fill="WHITE"/>
             </graphic>
         </Button>
     </HBox>
 
     <HBox VBox.vgrow="ALWAYS" spacing="25">
-        
+
         <!-- List Section (Left) -->
         <VBox spacing="15" HBox.hgrow="ALWAYS" maxWidth="Infinity">
             <!-- Search Bar -->
-            <HBox spacing="10" alignment="CENTER_LEFT" 
-                  style="-fx-background-color: white; -fx-padding: 10 15; -fx-background-radius: 25; -fx-border-color: #e2e8f0; -fx-border-width: 1; -fx-border-radius: 25;">
-                <FontAwesomeIconView glyphName="SEARCH" size="16" fill="#95a5a6"/>
-                <TextField fx:id="searchField" promptText="Buscar por nombre, CIF o teléfono..." HBox.hgrow="ALWAYS" 
-                           style="-fx-background-color: transparent; -fx-padding: 0; -fx-text-fill: #2c3e50;"/>
-                <Button fx:id="btnClearSearch" visible="false" style="-fx-background-color: transparent;">
-                    <graphic><FontAwesomeIconView glyphName="CLOSE" size="12" fill="#a0aec0"/></graphic>
+            <HBox spacing="10" alignment="CENTER_LEFT" styleClass="search-bar">
+                <FontAwesomeIconView glyphName="SEARCH" size="16" styleClass="sidebar-icon"/>
+                <TextField fx:id="searchField" promptText="Buscar por nombre, CIF o teléfono..."
+                           HBox.hgrow="ALWAYS" styleClass="search-field"/>
+                <Button fx:id="btnClearSearch" visible="false" styleClass="btn-icon">
+                    <graphic><FontAwesomeIconView glyphName="CLOSE" size="12" styleClass="sidebar-icon"/></graphic>
                 </Button>
             </HBox>
 
             <!-- Clients List Container -->
-            <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" style="-fx-background-color: transparent; -fx-background: transparent; -fx-padding: 5;" hbarPolicy="NEVER">
+            <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" styleClass="detail-scroll" hbarPolicy="NEVER">
                 <FlowPane fx:id="clientsListContainer" hgap="20" vgap="20" style="-fx-padding: 10; -fx-background-color: transparent;"/>
             </ScrollPane>
-            
+
             <!-- Count Section -->
-            <HBox alignment="CENTER_RIGHT" style="-fx-padding: 10;">
+            <HBox alignment="CENTER_RIGHT" style="-fx-padding: 5 10;">
                 <children>
-                    <Label fx:id="lblCount" text="0 empresas encontradas" style="-fx-text-fill: #7f8c8d; -fx-font-weight: bold;"/>
+                    <Label fx:id="lblCount" text="0 empresas encontradas" styleClass="label-muted" style="-fx-font-weight: bold;"/>
                 </children>
             </HBox>
         </VBox>
 
-        <!-- Form Section (Right) -->
+        <!-- Form Section (Right) - populated dynamically -->
     </HBox>
 </VBox>

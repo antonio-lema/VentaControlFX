@@ -13,7 +13,7 @@
 <?import javafx.collections.FXCollections?>
 <?import java.lang.String?>
 
-<StackPane xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mycompany.ventacontrolfx.controller.RegisterUserController"
+<StackPane xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mycompany.ventacontrolfx.presentation.controller.RegisterUserController"
            styleClass="register-popup-background" fx:id="rootStackPane"
            onMousePressed="#handleMousePressed" onMouseDragged="#handleMouseDragged">
 
@@ -35,7 +35,7 @@
             <!-- Full Name -->
             <VBox styleClass="modern-input-group">
                 <HBox styleClass="modern-input-container">
-                    <FontAwesomeIconView fx:id="iconUser" glyphName="USER" size="18" fill="#b0b0b0"/>
+                    <FontAwesomeIconView fx:id="iconUser" glyphName="USER" size="18" styleClass="sidebar-icon"/>
                     <TextField fx:id="txtFullName" promptText="Nombre completo" HBox.hgrow="ALWAYS" styleClass="modern-input-field"/>
                 </HBox>
             </VBox>
@@ -44,23 +44,34 @@
             <HBox spacing="15">
                 <VBox styleClass="modern-input-group" HBox.hgrow="ALWAYS">
                     <HBox styleClass="modern-input-container">
-                        <FontAwesomeIconView fx:id="iconUserCircle" glyphName="USER_CIRCLE" size="18" fill="#b0b0b0"/>
+                        <FontAwesomeIconView fx:id="iconUserCircle" glyphName="USER_CIRCLE" size="18" styleClass="sidebar-icon"/>
                         <TextField fx:id="txtUsername" promptText="Usuario" HBox.hgrow="ALWAYS" styleClass="modern-input-field"/>
                     </HBox>
                 </VBox>
                 
                  <VBox styleClass="modern-input-group" HBox.hgrow="ALWAYS">
                     <HBox styleClass="modern-input-container">
-                        <FontAwesomeIconView fx:id="iconEnvelope" glyphName="ENVELOPE" size="16" fill="#b0b0b0"/>
+                        <FontAwesomeIconView fx:id="iconEnvelope" glyphName="ENVELOPE" size="16" styleClass="sidebar-icon"/>
                         <TextField fx:id="txtEmail" promptText="Email (Opcional)" HBox.hgrow="ALWAYS" styleClass="modern-input-field"/>
                     </HBox>
                 </VBox>
             </HBox>
             
+            <!-- Company Selection -->
+            <VBox styleClass="modern-input-group">
+                <HBox styleClass="modern-input-container" spacing="10" alignment="CENTER_LEFT">
+                    <FontAwesomeIconView fx:id="iconBuilding" glyphName="BUILDING" size="16" styleClass="sidebar-icon"/>
+                    <VBox HBox.hgrow="ALWAYS">
+                        <Label fx:id="lblSelectedCompany" text="Sin empresa asignada" styleClass="modern-input-field" style="-fx-text-fill: #adb5bd;"/>
+                    </VBox>
+                    <Button fx:id="btnSelectCompany" text="Seleccionar" onAction="#handleSelectCompany" styleClass="modern-btn-secondary" style="-fx-padding: 5 10; -fx-font-size: 11px;"/>
+                </HBox>
+            </VBox>
+
             <!-- Role Selection -->
             <VBox styleClass="modern-input-group">
                 <HBox styleClass="modern-input-container">
-                    <FontAwesomeIconView fx:id="iconUsers" glyphName="USERS" size="16" fill="#b0b0b0"/>
+                    <FontAwesomeIconView fx:id="iconUsers" glyphName="USERS" size="16" styleClass="sidebar-icon"/>
                     <ComboBox fx:id="cmbRole" promptText="Seleccionar Rol" maxWidth="Infinity" HBox.hgrow="ALWAYS" styleClass="modern-combo-box">
                          <items>
                             <FXCollections fx:factory="observableArrayList">
@@ -75,7 +86,7 @@
             <!-- Password -->
             <VBox styleClass="modern-input-group">
                 <HBox styleClass="modern-input-container">
-                    <FontAwesomeIconView fx:id="iconLock" glyphName="LOCK" size="18" fill="#b0b0b0"/>
+                    <FontAwesomeIconView fx:id="iconLock" glyphName="LOCK" size="18" styleClass="sidebar-icon"/>
                     <PasswordField fx:id="txtPassword" promptText="Contraseña" HBox.hgrow="ALWAYS" styleClass="modern-input-field"/>
                 </HBox>
             </VBox>
@@ -83,7 +94,7 @@
             <!-- Confirm Password -->
             <VBox styleClass="modern-input-group">
                 <HBox styleClass="modern-input-container">
-                    <FontAwesomeIconView fx:id="iconCheck" glyphName="CHECK_CIRCLE" size="18" fill="#b0b0b0"/>
+                    <FontAwesomeIconView fx:id="iconCheck" glyphName="CHECK_CIRCLE" size="18" styleClass="sidebar-icon"/>
                     <PasswordField fx:id="txtConfirmPassword" promptText="Confirmar contraseña" HBox.hgrow="ALWAYS" styleClass="modern-input-field"/>
                 </HBox>
             </VBox>

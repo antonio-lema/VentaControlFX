@@ -20,8 +20,8 @@
 <?import java.lang.String?>
 
 <BorderPane xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="com.mycompany.ventacontrolfx.controller.SaleConfigController"
-            style="-fx-background-color: #f4f6f9;">
+            fx:controller="com.mycompany.ventacontrolfx.presentation.controller.SaleConfigController"
+            styleClass="main-content-area">
 
     <!-- ===== CABECERA ===== -->
     <top>
@@ -49,8 +49,7 @@
 
     <!-- ===== CONTENIDO PRINCIPAL ===== -->
     <center>
-        <ScrollPane fitToWidth="true" hbarPolicy="NEVER"
-                    style="-fx-background-color: transparent; -fx-background: transparent;">
+        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="detail-scroll">
             <VBox spacing="20">
                 <padding>
                     <Insets top="20" right="25" bottom="30" left="25"/>
@@ -75,7 +74,7 @@
                             <VBox styleClass="config-field-group">
                                 <Label text="Nombre de la empresa" styleClass="config-field-label"/>
                                 <HBox styleClass="config-input-container">
-                                    <FontAwesomeIconView glyphName="BRIEFCASE" size="14" fill="#b0b0b0"/>
+                                    <FontAwesomeIconView glyphName="BRIEFCASE" size="14" styleClass="sidebar-icon"/>
                                     <TextField fx:id="txtCompanyName" promptText="Ej: Mi Tienda S.L."
                                                HBox.hgrow="ALWAYS" styleClass="modern-input-field"/>
                                 </HBox>
@@ -84,7 +83,7 @@
                             <VBox styleClass="config-field-group">
                                 <Label text="CIF / NIF" styleClass="config-field-label"/>
                                 <HBox styleClass="config-input-container">
-                                    <FontAwesomeIconView glyphName="ID_CARD" size="14" fill="#b0b0b0"/>
+                                    <FontAwesomeIconView glyphName="ID_CARD" size="14" styleClass="sidebar-icon"/>
                                     <TextField fx:id="txtCif" promptText="Ej: B12345678"
                                                HBox.hgrow="ALWAYS" styleClass="modern-input-field"/>
                                 </HBox>
@@ -93,7 +92,7 @@
                             <VBox styleClass="config-field-group">
                                 <Label text="Dirección" styleClass="config-field-label"/>
                                 <HBox styleClass="config-input-container">
-                                    <FontAwesomeIconView glyphName="MAP_MARKER" size="14" fill="#b0b0b0"/>
+                                    <FontAwesomeIconView glyphName="MAP_MARKER" size="14" styleClass="sidebar-icon"/>
                                     <TextField fx:id="txtAddress" promptText="Calle, Número, Ciudad"
                                                HBox.hgrow="ALWAYS" styleClass="modern-input-field"/>
                                 </HBox>
@@ -102,7 +101,7 @@
                             <VBox styleClass="config-field-group">
                                 <Label text="Teléfono de contacto" styleClass="config-field-label"/>
                                 <HBox styleClass="config-input-container">
-                                    <FontAwesomeIconView glyphName="PHONE" size="14" fill="#b0b0b0"/>
+                                    <FontAwesomeIconView glyphName="PHONE" size="14" styleClass="sidebar-icon"/>
                                     <TextField fx:id="txtPhone" promptText="Ej: +34 600 000 000"
                                                HBox.hgrow="ALWAYS" styleClass="modern-input-field"/>
                                 </HBox>
@@ -111,7 +110,7 @@
                             <VBox styleClass="config-field-group">
                                 <Label text="Email de la empresa" styleClass="config-field-label"/>
                                 <HBox styleClass="config-input-container">
-                                    <FontAwesomeIconView glyphName="ENVELOPE" size="14" fill="#b0b0b0"/>
+                                    <FontAwesomeIconView glyphName="ENVELOPE" size="14" styleClass="sidebar-icon"/>
                                     <TextField fx:id="txtEmail" promptText="Ej: info@mitienda.com"
                                                HBox.hgrow="ALWAYS" styleClass="modern-input-field"/>
                                 </HBox>
@@ -121,7 +120,7 @@
                             <VBox styleClass="config-field-group">
                                 <Label text="Logo de la empresa (Tickets)" styleClass="config-field-label"/>
                                 <HBox styleClass="config-input-container" spacing="10">
-                                    <FontAwesomeIconView glyphName="IMAGE" size="14" fill="#b0b0b0"/>
+                                    <FontAwesomeIconView glyphName="IMAGE" size="14" styleClass="sidebar-icon"/>
                                     <TextField fx:id="txtLogoPath" promptText="Ruta del logo para los tickets"
                                                HBox.hgrow="ALWAYS" styleClass="modern-input-field" editable="false"/>
                                     <Button text="Examinar..." onAction="#handleBrowseLogo" styleClass="btn-secondary"/>
@@ -132,7 +131,7 @@
                             <VBox styleClass="config-field-group">
                                 <Label text="Icono de la aplicación (Ventana)" styleClass="config-field-label"/>
                                 <HBox styleClass="config-input-container" spacing="10">
-                                    <FontAwesomeIconView glyphName="DESKTOP" size="14" fill="#b0b0b0"/>
+                                    <FontAwesomeIconView glyphName="DESKTOP" size="14" styleClass="sidebar-icon"/>
                                     <TextField fx:id="txtAppIconPath" promptText="Ruta del icono de la aplicación"
                                                HBox.hgrow="ALWAYS" styleClass="modern-input-field" editable="false"/>
                                     <Button text="Examinar..." onAction="#handleBrowseIcon" styleClass="btn-secondary"/>
@@ -143,7 +142,7 @@
                             <VBox styleClass="config-field-group">
                                 <Label text="Nombre de la aplicación" styleClass="config-field-label"/>
                                 <HBox styleClass="config-input-container">
-                                    <FontAwesomeIconView glyphName="WINDOW_MAXIMIZE" size="14" fill="#b0b0b0"/>
+                                    <FontAwesomeIconView glyphName="WINDOW_MAXIMIZE" size="14" styleClass="sidebar-icon"/>
                                     <TextField fx:id="txtAppName" promptText="Ej: Mi Sistema TPV"
                                                HBox.hgrow="ALWAYS" styleClass="modern-input-field"/>
                                 </HBox>
@@ -166,7 +165,7 @@
                             <VBox styleClass="config-field-group">
                                 <Label text="Porcentaje de IVA (%)" styleClass="config-field-label"/>
                                 <HBox styleClass="config-input-container">
-                                    <FontAwesomeIconView glyphName="CALCULATOR" size="14" fill="#b0b0b0"/>
+                                    <FontAwesomeIconView glyphName="CALCULATOR" size="14" styleClass="sidebar-icon"/>
                                     <TextField fx:id="txtTaxRate" promptText="Ej: 21"
                                                HBox.hgrow="ALWAYS" styleClass="modern-input-field"/>
                                 </HBox>
@@ -177,7 +176,7 @@
                             <VBox styleClass="config-field-group">
                                 <Label text="Tipo de impuesto" styleClass="config-field-label"/>
                                 <HBox styleClass="config-input-container">
-                                    <FontAwesomeIconView glyphName="LIST_ALT" size="14" fill="#b0b0b0"/>
+                                    <FontAwesomeIconView glyphName="LIST_ALT" size="14" styleClass="sidebar-icon"/>
                                     <ComboBox fx:id="cmbTaxType" promptText="Seleccionar tipo"
                                               maxWidth="Infinity" HBox.hgrow="ALWAYS" styleClass="modern-combo-box">
                                         <items>
@@ -206,7 +205,7 @@
                             <VBox styleClass="config-field-group">
                                 <Label text="Moneda" styleClass="config-field-label"/>
                                 <HBox styleClass="config-input-container">
-                                    <FontAwesomeIconView glyphName="EUR" size="14" fill="#b0b0b0"/>
+                                    <FontAwesomeIconView glyphName="EUR" size="14" styleClass="sidebar-icon"/>
                                     <ComboBox fx:id="cmbCurrency" promptText="Seleccionar moneda"
                                               maxWidth="Infinity" HBox.hgrow="ALWAYS" styleClass="modern-combo-box">
                                         <items>
@@ -224,7 +223,7 @@
                             <VBox styleClass="config-field-group">
                                 <Label text="Decimales en precios" styleClass="config-field-label"/>
                                 <HBox styleClass="config-input-container">
-                                    <FontAwesomeIconView glyphName="SORT_NUMERIC_ASC" size="14" fill="#b0b0b0"/>
+                                    <FontAwesomeIconView glyphName="SORT_NUMERIC_ASC" size="14" styleClass="sidebar-icon"/>
                                     <ComboBox fx:id="cmbDecimals" maxWidth="Infinity" HBox.hgrow="ALWAYS"
                                               styleClass="modern-combo-box">
                                         <items>
@@ -281,7 +280,7 @@
                             <VBox styleClass="config-field-group">
                                 <Label text="Mensaje al pie del ticket" styleClass="config-field-label"/>
                                 <HBox styleClass="config-input-container">
-                                    <FontAwesomeIconView glyphName="COMMENT" size="14" fill="#b0b0b0"/>
+                                    <FontAwesomeIconView glyphName="COMMENT" size="14" styleClass="sidebar-icon"/>
                                     <TextField fx:id="txtFooterMessage" promptText="Ej: ¡Gracias por su compra!"
                                                HBox.hgrow="ALWAYS" styleClass="modern-input-field"/>
                                 </HBox>
@@ -291,7 +290,7 @@
                             <VBox styleClass="config-field-group">
                                 <Label text="Copias de ticket a imprimir" styleClass="config-field-label"/>
                                 <HBox styleClass="config-input-container">
-                                    <FontAwesomeIconView glyphName="PRINT" size="14" fill="#b0b0b0"/>
+                                    <FontAwesomeIconView glyphName="PRINT" size="14" styleClass="sidebar-icon"/>
                                     <ComboBox fx:id="cmbTicketCopies" maxWidth="Infinity" HBox.hgrow="ALWAYS"
                                               styleClass="modern-combo-box">
                                         <items>
@@ -309,7 +308,7 @@
                             <VBox styleClass="config-field-group">
                                 <Label text="Formato de papel (Ancho)" styleClass="config-field-label"/>
                                 <HBox styleClass="config-input-container">
-                                    <FontAwesomeIconView glyphName="ARROWS_H" size="14" fill="#b0b0b0"/>
+                                    <FontAwesomeIconView glyphName="ARROWS_H" size="14" styleClass="sidebar-icon"/>
                                     <ComboBox fx:id="cmbTicketFormat" maxWidth="Infinity" HBox.hgrow="ALWAYS"
                                               styleClass="modern-combo-box">
                                         <items>
@@ -347,7 +346,7 @@
                             <VBox styleClass="config-field-group">
                                 <Label text="Servidor SMTP" styleClass="config-field-label"/>
                                 <HBox styleClass="config-input-container">
-                                    <FontAwesomeIconView glyphName="SERVER" size="14" fill="#b0b0b0"/>
+                                    <FontAwesomeIconView glyphName="SERVER" size="14" styleClass="sidebar-icon"/>
                                     <TextField fx:id="txtSmtpHost" promptText="Ej: smtp.gmail.com"
                                                HBox.hgrow="ALWAYS" styleClass="modern-input-field"/>
                                 </HBox>
@@ -357,7 +356,7 @@
                             <VBox styleClass="config-field-group">
                                 <Label text="Puerto" styleClass="config-field-label"/>
                                 <HBox styleClass="config-input-container">
-                                    <FontAwesomeIconView glyphName="PLUG" size="14" fill="#b0b0b0"/>
+                                    <FontAwesomeIconView glyphName="PLUG" size="14" styleClass="sidebar-icon"/>
                                     <TextField fx:id="txtSmtpPort" promptText="Ej: 587"
                                                HBox.hgrow="ALWAYS" styleClass="modern-input-field"/>
                                 </HBox>
@@ -367,7 +366,7 @@
                             <VBox styleClass="config-field-group">
                                 <Label text="Correo emisor" styleClass="config-field-label"/>
                                 <HBox styleClass="config-input-container">
-                                    <FontAwesomeIconView glyphName="AT" size="14" fill="#b0b0b0"/>
+                                    <FontAwesomeIconView glyphName="AT" size="14" styleClass="sidebar-icon"/>
                                     <TextField fx:id="txtEmailFrom" promptText="Ej: mitienda@gmail.com"
                                                HBox.hgrow="ALWAYS" styleClass="modern-input-field"/>
                                 </HBox>
@@ -377,7 +376,7 @@
                             <VBox styleClass="config-field-group">
                                 <Label text="Contraseña de aplicación" styleClass="config-field-label"/>
                                 <HBox styleClass="config-input-container">
-                                    <FontAwesomeIconView glyphName="KEY" size="14" fill="#b0b0b0"/>
+                                    <FontAwesomeIconView glyphName="KEY" size="14" styleClass="sidebar-icon"/>
                                     <PasswordField fx:id="txtEmailPassword" promptText="Contraseña"
                                                HBox.hgrow="ALWAYS" styleClass="modern-input-field"/>
                                 </HBox>

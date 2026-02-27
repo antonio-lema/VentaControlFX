@@ -1,0 +1,133 @@
+/*
+ * PAGO.CSS — Estilos para la pantalla de cobro y métodos de pago
+ */
+
+.payment-root {
+    -fx-background-color: -bg-main;
+}
+
+.payment-header {
+    -fx-background-color: -color-primary;
+    -fx-padding: 20 30;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.1), 0, 0, 0, 2);
+}
+
+.payment-header-title {
+    -fx-text-fill: white;
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+}
+
+.payment-body {
+    -fx-padding: 25;
+}
+
+.payment-total-amount {
+    -fx-text-fill: -color-primary;
+    -fx-font-size: 42px;
+    -fx-font-weight: bold;
+}
+
+/* Tarjetas de método de pago */
+.payment-method-card {
+    -fx-background-color: -bg-surface;
+    -fx-background-radius: 15;
+    -fx-border-radius: 15;
+    -fx-border-color: -border-color;
+    -fx-border-width: 1.5;
+    -fx-effect: -shadow-sm;
+    -fx-transition: all 0.3s;
+}
+
+.payment-method-active {
+    -fx-border-color: -color-primary;
+    -fx-effect: -shadow-primary;
+}
+
+.payment-method-header {
+    -fx-padding: 15 20;
+    -fx-border-color: -border-light;
+    -fx-border-width: 0 0 1 0;
+}
+
+.payment-method-label {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -text-main;
+}
+
+/* Botones de acción rápida de dinero */
+.payment-body .grid-pane .button {
+    -fx-background-color: -bg-subtle;
+    -fx-text-fill: -text-main;
+    -fx-border-color: -border-color;
+    -fx-border-width: 1;
+    -fx-background-radius: 10;
+    -fx-padding: 10;
+    -fx-font-weight: bold;
+}
+
+.payment-body .grid-pane .button:hover {
+    -fx-background-color: -color-primary-bg;
+    -fx-border-color: -color-primary;
+    -fx-text-fill: -color-primary;
+}
+
+/* Botón de Cobro Principal (Hacerlo destacar en verde) */
+.payment-body .btn-primary {
+    -fx-background-color: linear-gradient(to bottom, #4caf50, #2e7d32);
+    -fx-background-radius: 12;
+    -fx-padding: 14 35;
+    -fx-font-size: 16px;
+    -fx-effect: dropshadow(three-pass-box, rgba(46, 125, 50, 0.35), 15, 0, 0, 5);
+}
+
+.payment-body .btn-primary:hover {
+    -fx-background-color: linear-gradient(to bottom, #66bb6a, #388e3c);
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
+    -fx-effect: dropshadow(three-pass-box, rgba(46, 125, 50, 0.5), 20, 0, 0, 8);
+}
+
+/* Botones que actúan como tarjetas de método de pago (Tarjeta) */
+.payment-method-btn {
+    -fx-padding: 22;
+    -fx-cursor: hand;
+    -fx-background-color: -bg-surface;
+    -fx-border-color: -border-color;
+    -fx-border-width: 1.5;
+    -fx-border-radius: 15;
+    -fx-background-radius: 15;
+}
+
+.payment-method-btn:hover {
+    -fx-border-color: -color-primary;
+    -fx-background-color: -color-primary-bg;
+    -fx-translate-y: -3;
+    -fx-effect: -shadow-md;
+}
+
+/* Campos de entrada */
+.payment-amount-field {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -color-primary;
+    -fx-alignment: CENTER_RIGHT;
+    -fx-min-height: 55px;
+}
+
+.payment-footer {
+    -fx-padding: 20 30;
+    -fx-background-color: -bg-surface;
+    -fx-border-color: -border-light;
+    -fx-border-width: 1 0 0 0;
+}
+
+/* Badges y estados */
+.badge-primary {
+    -fx-background-color: -color-primary-bg;
+    -fx-text-fill: -color-primary;
+    -fx-padding: 5 12;
+    -fx-background-radius: 20;
+    -fx-font-weight: bold;
+}

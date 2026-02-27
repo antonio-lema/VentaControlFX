@@ -1,0 +1,96 @@
+/*
+ * DIALOGOS.CSS
+ */
+
+/* Fondo del diálogo */
+.dialog-pane {
+    -fx-background-color: -bg-surface;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.25), 30, 0, 0, 12);
+    -fx-border-radius: 20;
+    -fx-background-radius: 20;
+    -fx-padding: 0;
+}
+
+/* Ocultar la graphic-container por defecto */
+.dialog-pane .graphic-container {
+    -fx-padding: 0;
+}
+
+/* Barra de botones */
+.dialog-pane .button-bar {
+    -fx-padding: 0 25 20 25;
+    -fx-background-radius: 0 0 20 20;
+    -fx-background-color: -bg-surface;
+}
+
+/* Botón de confirmación (OK / Aceptar) */
+.dialog-pane .button-bar .button:default,
+.dialog-pane .button-bar .button.default {
+    -fx-background-color: linear-gradient(to right, -color-primary, -color-primary-light);
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+    -fx-padding: 11 30;
+    -fx-background-radius: 20;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(three-pass-box, rgba(30, 136, 229, 0.30), 10, 0, 0, 4);
+}
+
+.dialog-pane .button-bar .button:default:hover,
+.dialog-pane .button-bar .button.default:hover {
+    -fx-background-color: linear-gradient(to right, -color-primary-dark, -color-primary);
+    -fx-scale-x: 1.04;
+    -fx-scale-y: 1.04;
+}
+
+/* Botón de cancelar */
+.dialog-pane .button-bar .button:cancel,
+.dialog-pane .button-bar .button.cancel {
+    -fx-background-color: -bg-subtle;
+    -fx-text-fill: -text-medium;
+    -fx-font-size: 14px;
+    -fx-padding: 11 24;
+    -fx-border-color: -border-color;
+    -fx-border-width: 1;
+    -fx-border-radius: 20;
+    -fx-background-radius: 20;
+    -fx-cursor: hand;
+}
+
+.dialog-pane .button-bar .button:cancel:hover,
+.dialog-pane .button-bar .button.cancel:hover {
+    -fx-background-color: -border-color;
+    -fx-text-fill: -text-main;
+}
+
+/* Botones genéricos dentro del button-bar */
+.dialog-pane .button-bar .button {
+    -fx-background-color: -bg-subtle;
+    -fx-text-fill: -text-medium;
+    -fx-font-size: 14px;
+    -fx-padding: 11 24;
+    -fx-border-color: -border-color;
+    -fx-border-width: 1;
+    -fx-border-radius: 20;
+    -fx-background-radius: 20;
+    -fx-cursor: hand;
+}
+
+.dialog-pane .button-bar .button:hover {
+    -fx-background-color: -border-color;
+    -fx-text-fill: -text-main;
+    -fx-scale-x: 1.02;
+    -fx-scale-y: 1.02;
+}
+
+/* === Alertas Modernas (clase .modern-alert) === */
+.modern-alert .header-panel {
+    -fx-padding: 0;
+    -fx-background-radius: 20 20 0 0;
+    -fx-background-color: transparent;
+}
+
+.modern-alert .content {
+    -fx-padding: 0;
+    -fx-background-color: -bg-surface;
+}

@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
@@ -10,66 +9,64 @@
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
 
-<StackPane fx:id="rootStackPane" styleClass="register-popup-background" stylesheets="@style.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mycompany.ventacontrolfx.controller.ReturnDialogController">
+<StackPane fx:id="rootStackPane" styleClass="register-popup-background"
+           xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="com.mycompany.ventacontrolfx.presentation.controller.ReturnDialogController">
    <VBox maxWidth="850.0" spacing="0.0" styleClass="modern-register-card" StackPane.alignment="CENTER">
-      <children>
-         <!-- Header -->
-         <VBox styleClass="modern-register-header" alignment="CENTER_LEFT">
-            <padding>
-               <Insets bottom="20.0" left="30.0" right="30.0" top="30.0" />
-            </padding>
-            <children>
-               <Label text="Devolución de Productos" styleClass="modern-register-title" />
-               <Label fx:id="lblTicketInfo" text="Seleccione los productos a devolver del ticket #" styleClass="modern-register-subtitle" />
-            </children>
-         </VBox>
+      <!-- Header -->
+      <VBox styleClass="modern-register-header" alignment="CENTER_LEFT">
+         <padding>
+            <Insets bottom="20.0" left="30.0" right="30.0" top="30.0" />
+         </padding>
+         <Label text="Devolución de Productos" styleClass="modern-register-title" />
+         <Label fx:id="lblTicketInfo" text="Seleccione los productos a devolver del ticket #"
+                styleClass="modern-register-subtitle" />
+      </VBox>
 
-         <!-- Content -->
-         <VBox spacing="15.0">
-            <padding>
-               <Insets bottom="20.0" left="30.0" right="30.0" top="10.0" />
-            </padding>
-            <children>
-               <!-- Table Headers -->
-               <HBox spacing="10.0" style="-fx-border-color: #f1f5f9; -fx-border-width: 0 0 1 0; -fx-padding: 0 0 10 0;">
-                  <children>
-                     <Label prefWidth="40.0" text="Sel." style="-fx-font-weight: bold; -fx-text-fill: #64748b; -fx-font-size: 11px;" />
-                     <Label HBox.hgrow="ALWAYS" maxWidth="Infinity" text="PRODUCTO" style="-fx-font-weight: bold; -fx-text-fill: #64748b; -fx-font-size: 11px;" />
-                     <Region HBox.hgrow="ALWAYS" />
-                     <Label prefWidth="70.0" text="VEND." style="-fx-font-weight: bold; -fx-text-fill: #64748b; -fx-font-size: 11px;" alignment="CENTER" />
-                     <Label prefWidth="70.0" text="DEV." style="-fx-font-weight: bold; -fx-text-fill: #64748b; -fx-font-size: 11px;" alignment="CENTER" />
-                     <Label prefWidth="90.0" text="CANT." style="-fx-font-weight: bold; -fx-text-fill: #64748b; -fx-font-size: 11px;" alignment="CENTER" />
-                  </children>
-               </HBox>
+      <!-- Content -->
+      <VBox spacing="15.0">
+         <padding>
+            <Insets bottom="20.0" left="30.0" right="30.0" top="10.0" />
+         </padding>
 
-               <ScrollPane fitToWidth="true" minHeight="200.0" maxHeight="350.0" style="-fx-background-color: transparent; -fx-background: transparent; -fx-border-color: transparent;">
-                  <content>
-                     <VBox fx:id="itemsContainer" spacing="2.0" style="-fx-background-color: transparent;" />
-                  </content>
-               </ScrollPane>
-
-               <VBox spacing="8.0" styleClass="modern-input-group">
-                  <children>
-                     <Label text="Motivo de la devolución" styleClass="summary-label" style="-fx-font-weight: bold; -fx-text-fill: #475569; -fx-font-size: 13px;" />
-                     <TextArea fx:id="txtReason" prefHeight="70.0" promptText="Motivo detallado..." styleClass="modern-input-field" wrapText="true" 
-                               style="-fx-background-color: #f8fafc; -fx-border-color: #e2e8f0; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 10;"/>
-                  </children>
-               </VBox>
-            </children>
-         </VBox>
-
-         <!-- Footer Actions -->
-         <HBox alignment="CENTER_RIGHT" spacing="15.0" style="-fx-padding: 20 30 30 30;">
-            <children>
-               <Button mnemonicParsing="false" onAction="#handleCancel" styleClass="modern-btn-secondary" text="Cancelar" cancelButton="true"/>
-               <Button mnemonicParsing="false" onAction="#handleConfirm" styleClass="modern-btn-primary" text="Confirmar Devolución" defaultButton="true">
-                  <graphic>
-                     <FontAwesomeIconView glyphName="CHECK" size="14" fill="WHITE" />
-                  </graphic>
-               </Button>
-            </children>
+         <!-- Table Header Row -->
+         <HBox spacing="10.0" styleClass="return-table-header">
+            <Label prefWidth="40.0" text="Sel." styleClass="table-col-header" />
+            <Label HBox.hgrow="ALWAYS" maxWidth="Infinity" text="PRODUCTO" styleClass="table-col-header" />
+            <Region HBox.hgrow="ALWAYS" />
+            <Label prefWidth="70.0" text="VEND." styleClass="table-col-header" alignment="CENTER" />
+            <Label prefWidth="70.0" text="DEV." styleClass="table-col-header" alignment="CENTER" />
+            <Label prefWidth="90.0" text="CANT." styleClass="table-col-header" alignment="CENTER" />
          </HBox>
-      </children>
+
+         <ScrollPane fitToWidth="true" minHeight="200.0" maxHeight="350.0" styleClass="detail-scroll">
+            <content>
+               <VBox fx:id="itemsContainer" spacing="2.0" style="-fx-background-color: transparent;" />
+            </content>
+         </ScrollPane>
+
+         <!-- Reason TextArea -->
+         <VBox spacing="8.0" styleClass="modern-input-group">
+            <Label text="Motivo de la devolución" styleClass="config-field-label" />
+            <TextArea fx:id="txtReason" prefHeight="70.0"
+                      promptText="Motivo detallado..."
+                      styleClass="modern-input-field return-reason-area"
+                      wrapText="true" />
+         </VBox>
+      </VBox>
+
+      <!-- Footer -->
+      <HBox alignment="CENTER_RIGHT" spacing="15.0" style="-fx-padding: 20 30 30 30;">
+         <Button onAction="#handleCancel" styleClass="modern-btn-secondary"
+                 text="Cancelar" cancelButton="true"/>
+         <Button onAction="#handleConfirm" styleClass="modern-btn-primary"
+                 text="Confirmar Devolución" defaultButton="true">
+            <graphic>
+               <FontAwesomeIconView glyphName="CHECK" size="14" fill="WHITE" />
+            </graphic>
+         </Button>
+      </HBox>
    </VBox>
 </StackPane>

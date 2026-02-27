@@ -28,8 +28,6 @@ import java.util.Optional;
  */
 public class AlertUtil {
 
-    private static final String STYLE_SHEET = "/view/style.css";
-
     public static void showError(String header, String content) {
         showAlert(AlertType.ERROR, "Error", header, content);
     }
@@ -61,7 +59,7 @@ public class AlertUtil {
 
         // Style the DialogPane
         DialogPane dialogPane = alert.getDialogPane();
-        dialogPane.getStylesheets().add(AlertUtil.class.getResource(STYLE_SHEET).toExternalForm());
+        ThemeManager.applyStyles(dialogPane.getStylesheets());
         dialogPane.getStyleClass().add("modern-alert");
         dialogPane.setPrefWidth(450);
 

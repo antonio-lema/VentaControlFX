@@ -1,5 +1,7 @@
 package com.mycompany.ventacontrolfx.util;
 
+import com.mycompany.ventacontrolfx.infrastructure.config.Injectable;
+import com.mycompany.ventacontrolfx.infrastructure.config.ServiceContainer;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -13,7 +15,7 @@ import java.util.function.Consumer;
 public class ModalService {
 
     public static <T> T showModal(String fxmlPath, String title, Modality modality, StageStyle style,
-            com.mycompany.ventacontrolfx.service.ServiceContainer container,
+            com.mycompany.ventacontrolfx.infrastructure.config.ServiceContainer container,
             Consumer<T> controllerConsumer) {
         try {
             FXMLLoader loader = new FXMLLoader(ModalService.class.getResource(fxmlPath));
@@ -37,7 +39,7 @@ public class ModalService {
             if (style == StageStyle.TRANSPARENT) {
                 scene.setFill(null);
             }
-            scene.getStylesheets().add(ModalService.class.getResource("/view/style.css").toExternalForm());
+            ThemeManager.applyStyles(scene);
             stage.setScene(scene);
 
             stage.showAndWait();
@@ -50,21 +52,21 @@ public class ModalService {
     }
 
     public static <T> T showTransparentModal(String fxmlPath, String title,
-            com.mycompany.ventacontrolfx.service.ServiceContainer container,
+            com.mycompany.ventacontrolfx.infrastructure.config.ServiceContainer container,
             Consumer<T> controllerConsumer) {
         return showModal(fxmlPath, title, Modality.APPLICATION_MODAL, StageStyle.TRANSPARENT, container,
                 controllerConsumer);
     }
 
     public static <T> T showStandardModal(String fxmlPath, String title,
-            com.mycompany.ventacontrolfx.service.ServiceContainer container,
+            com.mycompany.ventacontrolfx.infrastructure.config.ServiceContainer container,
             Consumer<T> controllerConsumer) {
         return showModal(fxmlPath, title, Modality.APPLICATION_MODAL, StageStyle.DECORATED, container,
                 controllerConsumer);
     }
 
     public static <T> T showFullScreenModal(String fxmlPath, String title,
-            com.mycompany.ventacontrolfx.service.ServiceContainer container,
+            com.mycompany.ventacontrolfx.infrastructure.config.ServiceContainer container,
             Consumer<T> controllerConsumer) {
         try {
             FXMLLoader loader = new FXMLLoader(ModalService.class.getResource(fxmlPath));
@@ -85,7 +87,7 @@ public class ModalService {
             stage.setTitle(title);
 
             Scene scene = new Scene(root);
-            scene.getStylesheets().add(ModalService.class.getResource("/view/style.css").toExternalForm());
+            ThemeManager.applyStyles(scene);
             stage.setScene(scene);
 
             stage.setMaximized(true);

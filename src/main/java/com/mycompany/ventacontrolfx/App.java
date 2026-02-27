@@ -21,14 +21,15 @@ public class App extends Application {
         }
 
         // Initialize Database
-        try (java.sql.Connection conn = com.mycompany.ventacontrolfx.dao.DBConnection.getConnection()) {
-            com.mycompany.ventacontrolfx.dao.DatabaseInitializer.initialize(conn);
+        try (java.sql.Connection conn = com.mycompany.ventacontrolfx.infrastructure.persistence.DBConnection
+                .getConnection()) {
+            com.mycompany.ventacontrolfx.infrastructure.persistence.DatabaseInitializer.initialize(conn);
         } catch (Exception e) {
             System.err.println("Error initializing database: " + e.getMessage());
         }
 
         // Create Global Service Container
-        com.mycompany.ventacontrolfx.service.ServiceContainer container = new com.mycompany.ventacontrolfx.service.ServiceContainer();
+        com.mycompany.ventacontrolfx.infrastructure.config.ServiceContainer container = new com.mycompany.ventacontrolfx.infrastructure.config.ServiceContainer();
 
         // Use SceneNavigator to load the Login screen
         com.mycompany.ventacontrolfx.util.SceneNavigator.loadScene(

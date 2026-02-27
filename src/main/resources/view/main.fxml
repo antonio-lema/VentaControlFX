@@ -6,9 +6,9 @@
 
 <BorderPane xmlns:fx="http://javafx.com/fxml/1"
             fx:id="rootPane"
-            fx:controller="com.mycompany.ventacontrolfx.controller.MainController"
+            fx:controller="com.mycompany.ventacontrolfx.presentation.controller.MainController"
             prefWidth="1200" prefHeight="800"
-            style="-fx-background-color: #f4f6f9;">
+            styleClass="main-background">
 
     <top>
         <StackPane fx:id="headerContainer" />
@@ -20,14 +20,14 @@
 
     <center>
         <StackPane>
-            <ScrollPane fx:id="mainContent" fitToHeight="true" fitToWidth="true" style="-fx-background: #f4f6f9; -fx-background-color: transparent;">
+            <ScrollPane fx:id="mainContent" fitToHeight="true" fitToWidth="true" styleClass="main-content-scroll">
                 <!-- Main view content will be injected here -->
             </ScrollPane>
             
             <!-- Loading Overlay (Global for center) -->
-            <VBox fx:id="loadingOverlay" visible="false" alignment="CENTER" style="-fx-background-color: rgba(244, 246, 249, 0.7);">
+            <VBox fx:id="loadingOverlay" visible="false" alignment="CENTER" styleClass="loading-overlay">
                 <ProgressIndicator />
-                <Label text="Cargando..." style="-fx-text-fill: #666; -fx-padding: 10 0 0 0;"/>
+                <Label text="Cargando..." styleClass="label-muted"/>
             </VBox>
         </StackPane>
     </center>

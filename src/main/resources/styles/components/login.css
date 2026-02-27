@@ -1,0 +1,123 @@
+/*
+ * LOGIN.CSS - Estetica Unificada (Login & Lock Screen)
+ */
+
+.login-background,
+.lock-screen-root {
+    -fx-background-color: linear-gradient(to bottom right, -color-primary, -color-primary-dark);
+}
+
+.login-card,
+.lock-screen-glass {
+    -fx-background-color: rgba(255, 255, 255, 0.95);
+    -fx-background-radius: 20;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.2), 40, 0, 0, 15);
+    -fx-padding: 40;
+    -fx-border-color: rgba(255, 255, 255, 0.3);
+    -fx-border-width: 1;
+    -fx-border-radius: 20;
+}
+
+/* Modo oscuro para el glass */
+.dark-theme .login-card,
+.dark-theme .lock-screen-glass {
+    -fx-background-color: rgba(30, 41, 59, 0.85);
+    /* Slate 800 with alpha */
+    -fx-border-color: rgba(255, 255, 255, 0.1);
+}
+
+.login-title,
+.lock-title {
+    -fx-font-size: 26px;
+    -fx-font-weight: 800;
+    -fx-text-fill: -text-main;
+}
+
+.login-subtitle {
+    -fx-font-size: 14px;
+    -fx-text-fill: -text-muted;
+}
+
+.lock-username {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -color-primary;
+}
+
+/* Avatar de usuario */
+.user-avatar-circle {
+    -fx-fill: -bg-input;
+    -fx-stroke: -border-light;
+    -fx-stroke-width: 2;
+}
+
+.lock-badge {
+    -fx-background-color: -color-primary;
+    -fx-background-radius: 50%;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.1), 4, 0, 0, 2);
+}
+
+.lock-badge .sidebar-icon {
+    -fx-fill: white;
+}
+
+/* Labels de entrada */
+.lock-input-label,
+.login-input-label {
+    -fx-font-size: 11px;
+    -fx-font-weight: 800;
+    -fx-text-fill: -text-muted;
+    -fx-text-transform: uppercase;
+    -fx-padding: 0 0 5 2;
+}
+
+/* Campos de entrada estilo "lock" */
+.lock-field,
+.login-field {
+    -fx-background-color: -bg-input;
+    -fx-background-radius: 10;
+    -fx-border-color: -border-color;
+    -fx-border-width: 1.2;
+    -fx-border-radius: 10;
+    -fx-padding: 12 15;
+    -fx-font-size: 14px;
+    -fx-text-fill: -text-main;
+}
+
+.lock-field:focused,
+.login-field:focused {
+    -fx-background-color: -bg-surface;
+    -fx-border-color: -color-primary;
+}
+
+/* Botones de acción */
+.btn-unlock,
+.btn-login-main {
+    -fx-background-color: linear-gradient(to right, -color-primary, -color-primary-light);
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-padding: 14;
+    -fx-background-radius: 25;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(three-pass-box, rgba(30, 136, 229, 0.3), 15, 0, 0, 5);
+}
+
+.btn-unlock:hover,
+.btn-login-main:hover {
+    -fx-scale-x: 1.02;
+    -fx-scale-y: 1.02;
+}
+
+.btn-change-user,
+.btn-forgot-password {
+    -fx-background-color: transparent;
+    -fx-text-fill: -color-primary;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+}
+
+.btn-change-user:hover,
+.btn-forgot-password:hover {
+    -fx-text-fill: -color-primary-dark;
+    -fx-underline: true;
+}

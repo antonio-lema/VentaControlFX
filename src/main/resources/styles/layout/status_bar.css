@@ -1,0 +1,64 @@
+/*
+ * STATUS_BAR.CSS
+ */
+
+.status-bar {
+    -fx-background-color: -bg-surface;
+    -fx-border-color: -border-color;
+    -fx-border-width: 1 0 0 0;
+    -fx-padding: 5 20;
+    -fx-min-height: 35;
+}
+
+.status-badge {
+    -fx-background-color: -bg-surface;
+    -fx-background-radius: 20;
+    -fx-padding: 4 12;
+    -fx-border-color: -border-light;
+    -fx-border-width: 1;
+    -fx-border-radius: 20;
+}
+
+.status-badge-label {
+    -fx-font-size: 13px;
+    -fx-text-fill: -text-light;
+}
+
+.status-badge-value {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -text-main;
+}
+
+.status-icon-bg-blue {
+    -fx-background-color: -color-primary;
+}
+
+.status-icon-bg-green {
+    -fx-background-color: -color-success;
+}
+
+.status-icon-bg-red {
+    -fx-background-color: -color-danger;
+}
+
+.status-icon-bg-orange {
+    -fx-background-color: -color-warning;
+}
+
+.status-icon-bg-purple {
+    -fx-background-color: #9c27b0;
+}
+
+.status-icon-bg-teal {
+    -fx-background-color: #008080;
+}
+
+.status-badge StackPane {
+    -fx-background-radius: 50;
+    -fx-min-width: 18;
+    -fx-min-height: 18;
+    -fx-max-width: 18;
+    -fx-max-height: 18;
+    -fx-alignment: CENTER;
+}

@@ -1,0 +1,151 @@
+/*
+ * TABLAS.CSS - Diseño Premium
+ */
+
+.table-view,
+.modern-table-view {
+    -fx-background-color: -bg-surface;
+    -fx-border-color: -border-light;
+    -fx-border-width: 1;
+    -fx-background-radius: 12;
+    -fx-border-radius: 12;
+    -fx-padding: 2;
+}
+
+.table-view:focused,
+.modern-table-view:focused {
+    -fx-background-color: -bg-surface;
+}
+
+.table-view .column-header-background,
+.modern-table-view .column-header-background {
+    -fx-background-color: -bg-surface;
+    -fx-background-radius: 12 12 0 0;
+    -fx-border-color: -border-light;
+    -fx-border-width: 0 0 2 0;
+    -fx-padding: 2 0;
+}
+
+.table-view .column-header,
+.modern-table-view .column-header {
+    -fx-background-color: transparent;
+    -fx-padding: 15 10;
+}
+
+.table-view .column-header .label,
+.modern-table-view .column-header .label {
+    -fx-text-fill: -text-muted;
+    -fx-font-weight: 800;
+    -fx-font-size: 11px;
+    -fx-text-transform: uppercase;
+    -fx-alignment: CENTER_LEFT;
+}
+
+.table-view .filler,
+.modern-table-view .filler {
+    -fx-background-color: transparent;
+}
+
+.table-row-cell {
+    -fx-background-color: -bg-surface;
+    -fx-border-color: -border-light;
+    -fx-border-width: 0 0 1 0;
+    -fx-padding: 8 0;
+}
+
+.table-row-cell:empty {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+
+.table-row-cell:hover {
+    -fx-background-color: -bg-subtle;
+    -fx-cursor: hand;
+}
+
+.table-row-cell:selected {
+    -fx-background-color: -color-primary-bg;
+    -fx-border-color: -color-primary;
+    -fx-border-width: 0 0 0 4;
+}
+
+.table-row-cell:selected .cell {
+    -fx-text-fill: -color-primary-dark;
+    -fx-font-weight: bold;
+}
+
+.table-view .cell,
+.modern-table-view .cell {
+    -fx-text-fill: -text-main;
+    -fx-font-size: 14px;
+    -fx-padding: 8 10;
+    -fx-alignment: CENTER_LEFT;
+    -fx-border-color: transparent;
+}
+
+/* Card contenedor para tablas */
+.table-card {
+    -fx-background-color: -bg-surface;
+    -fx-background-radius: 12;
+    -fx-border-radius: 12;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.06), 15, 0, 0, 5);
+    -fx-padding: 20;
+}
+
+/* Filtros */
+.modern-filter-bar {
+    -fx-background-color: transparent;
+    -fx-padding: 10 20 15 20;
+    -fx-spacing: 15;
+}
+
+/* Barra de búsqueda contenedor */
+.search-bar {
+    -fx-background-color: -bg-input;
+    -fx-border-color: -border-color;
+    -fx-border-width: 1.2;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+    -fx-padding: 6 12;
+    -fx-spacing: 8;
+    -fx-alignment: CENTER_LEFT;
+}
+
+.search-bar:focused-within {
+    -fx-border-color: -color-primary;
+    -fx-background-color: -bg-surface;
+    -fx-effect: dropshadow(three-pass-box, rgba(30, 136, 229, 0.15), 8, 0, 0, 2);
+}
+
+/* Campo de texto de búsqueda (sin borde propio, hereda del contenedor) */
+.search-field {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-border-width: 0;
+    -fx-background-radius: 0;
+    -fx-text-fill: -text-main;
+    -fx-prompt-text-fill: -text-muted;
+    -fx-font-size: 14px;
+    -fx-padding: 4 0;
+}
+
+/* row-count-field used in "Ver X filas" */
+.row-count-field {
+    -fx-background-color: -bg-subtle;
+    -fx-background-radius: 8;
+    -fx-border-color: -border-color;
+    -fx-border-width: 1.2;
+    -fx-border-radius: 8;
+    -fx-text-fill: -text-main;
+    -fx-font-weight: bold;
+    -fx-padding: 5 8;
+    -fx-alignment: center;
+    -fx-font-size: 13px;
+    -fx-pref-height: 34;
+}
+
+.row-count-field:focused {
+    -fx-background-color: -bg-surface;
+    -fx-border-color: -color-primary;
+    -fx-effect: dropshadow(three-pass-box, rgba(30, 136, 229, 0.15), 6, 0, 0, 2);
+}

@@ -83,17 +83,17 @@ public class RippleEffect {
 
     private static void createRipple(Pane container, double x, double y, double boundsWidth) {
         Circle circle = new Circle(x, y, 0);
-        circle.setFill(Color.web("#ffffff", 0.3)); // White, semi-transparent
+        circle.setFill(Color.web("#ffffff", 0.28)); // White, semi-transparent
         circle.setManaged(false); // Important: Prevent Pane from resizing to fit the circle
 
         container.getChildren().add(circle);
 
-        // Animation
-        double maxRadius = boundsWidth * 2.5; // Make it much larger to ensure coverage before fadeout
+        // Animation — snappy modern ripple (380ms)
+        double maxRadius = boundsWidth * 1.5;
 
         Timeline timeline = new Timeline();
         timeline.getKeyFrames().add(
-                new KeyFrame(Duration.millis(1000),
+                new KeyFrame(Duration.millis(380),
                         new KeyValue(circle.radiusProperty(), maxRadius),
                         new KeyValue(circle.opacityProperty(), 0)));
 

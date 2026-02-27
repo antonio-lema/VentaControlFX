@@ -9,46 +9,37 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
-<?import javafx.scene.control.TableView?>
-<?import javafx.scene.control.TableColumn?>
-<?import javafx.scene.text.Font?>
 <?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
 
-<VBox spacing="20" style="-fx-padding: 25 25 10 25; -fx-background-color: #f4f6f9;" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mycompany.ventacontrolfx.controller.ManageUsersController">
+<VBox spacing="20" styleClass="main-content-area" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mycompany.ventacontrolfx.presentation.controller.ManageUsersController">
+    <padding>
+        <Insets top="30" right="30" bottom="20" left="30"/>
+    </padding>
 
     <!-- Header Section -->
     <HBox alignment="CENTER_LEFT" spacing="15.0">
        <children>
-          <VBox>
+          <VBox spacing="5">
              <children>
-                <Label text="Gestión de Usuarios" textFill="#2c3e50">
-                   <font>
-                      <Font name="System Bold" size="26.0" />
-                   </font>
-                </Label>
-                <Label text="Administra los accesos y roles del sistema" textFill="#7f8c8d" />
+                <Label text="Gestión de Usuarios" styleClass="section-title" />
+                <Label text="Administra los accesos y roles del sistema" styleClass="section-subtitle" />
              </children>
           </VBox>
           <Region HBox.hgrow="ALWAYS" />
-          <HBox spacing="10.0" alignment="CENTER_RIGHT">
-             <children>
-                <Button onAction="#handleNewUser" styleClass="modern-btn-primary" style="-fx-background-color: #1e88e5; -fx-text-fill: white; -fx-background-radius: 25; -fx-padding: 10 25; -fx-font-weight: bold; -fx-cursor: hand;">
-                   <graphic><FontAwesomeIconView glyphName="PLUS" size="14" fill="white" /></graphic>
-                   <text> Nuevo Usuario</text>
-                </Button>
-             </children>
-          </HBox>
+          <Button onAction="#handleNewUser" styleClass="btn-primary">
+             <graphic><FontAwesomeIconView glyphName="PLUS" size="14" fill="white" /></graphic>
+             <text> Nuevo Usuario</text>
+          </Button>
        </children>
     </HBox>
 
     <!-- Filter Section -->
-    <HBox alignment="CENTER_LEFT" styleClass="modern-filter-bar" style="-fx-margin: 0 0 20 0;">
+    <HBox alignment="CENTER_LEFT" spacing="15" styleClass="modern-filter-bar">
         <children>
-            <Label text="Buscar Usuario:" textFill="#7f8c8d" />
-            <HBox alignment="CENTER_LEFT" styleClass="search-input-modern" HBox.hgrow="ALWAYS" maxWidth="400">
+            <HBox alignment="CENTER_LEFT" styleClass="search-bar" maxWidth="500" HBox.hgrow="ALWAYS">
                 <children>
-                    <FontAwesomeIconView glyphName="SEARCH" size="14" fill="#95a5a6" />
-                    <TextField fx:id="txtSearch" promptText="Nombre, usuario o email..." style="-fx-background-color: transparent; -fx-padding: 0 0 0 10;" HBox.hgrow="ALWAYS" />
+                    <FontAwesomeIconView glyphName="SEARCH" size="16" fill="#adb5bd" />
+                    <TextField fx:id="txtSearch" promptText="Nombre, usuario o email..." styleClass="search-field" HBox.hgrow="ALWAYS" />
                 </children>
             </HBox>
             <Region HBox.hgrow="ALWAYS" />
@@ -58,7 +49,10 @@
     <!-- Cards Section -->
     <ScrollPane fitToWidth="true" style="-fx-background-color: transparent; -fx-background: transparent;" VBox.vgrow="ALWAYS" hbarPolicy="NEVER">
         <content>
-            <FlowPane fx:id="userCardsPane" hgap="20" vgap="20" style="-fx-padding: 10;">
+            <FlowPane fx:id="userCardsPane" hgap="25" vgap="25">
+                <padding>
+                    <Insets top="10" right="10" bottom="10" left="10"/>
+                </padding>
                 <!-- Cards will be populated here -->
             </FlowPane>
         </content>
@@ -67,7 +61,7 @@
     <!-- Count Section -->
     <HBox alignment="CENTER_RIGHT" style="-fx-padding: 10;">
         <children>
-            <Label fx:id="lblCount" text="0 usuarios encontrados" style="-fx-text-fill: #7f8c8d; -fx-font-weight: bold;"/>
+            <Label fx:id="lblCount" text="0 usuarios encontrados" styleClass="label-muted" style="-fx-font-weight: bold;"/>
         </children>
     </HBox>
 

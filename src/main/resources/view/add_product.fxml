@@ -13,7 +13,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
 
-<StackPane fx:id="rootStackPane" styleClass="register-popup-background" onMousePressed="#handleMousePressed" onMouseDragged="#handleMouseDragged" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mycompany.ventacontrolfx.controller.AddProductController">
+<StackPane fx:id="rootStackPane" styleClass="register-popup-background" onMousePressed="#handleMousePressed" onMouseDragged="#handleMouseDragged" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mycompany.ventacontrolfx.presentation.controller.AddProductController">
     <VBox maxWidth="500" spacing="0" alignment="CENTER" styleClass="modern-register-card">
         <padding>
             <Insets top="40" right="40" bottom="40" left="40"/>
@@ -28,7 +28,7 @@
             <!-- Name -->
             <VBox styleClass="modern-input-group">
                 <HBox styleClass="modern-input-container" alignment="CENTER_LEFT">
-                    <FontAwesomeIconView glyphName="TAG" size="18" fill="#b0b0b0">
+                    <FontAwesomeIconView glyphName="TAG" size="18" styleClass="sidebar-icon">
                         <HBox.margin>
                             <Insets right="10"/>
                         </HBox.margin>
@@ -40,7 +40,7 @@
             <!-- Price -->
              <VBox styleClass="modern-input-group">
                 <HBox styleClass="modern-input-container" alignment="CENTER_LEFT">
-                    <FontAwesomeIconView glyphName="MONEY" size="18" fill="#b0b0b0">
+                    <FontAwesomeIconView glyphName="MONEY" size="18" styleClass="sidebar-icon">
                          <HBox.margin>
                             <Insets right="10"/>
                         </HBox.margin>
@@ -52,7 +52,7 @@
             <!-- Category -->
              <VBox styleClass="modern-input-group">
                 <HBox styleClass="modern-input-container" alignment="CENTER_LEFT">
-                    <FontAwesomeIconView glyphName="FOLDER_OPEN" size="18" fill="#b0b0b0">
+                    <FontAwesomeIconView glyphName="FOLDER_OPEN" size="18" styleClass="sidebar-icon">
                         <HBox.margin>
                             <Insets right="10"/>
                         </HBox.margin>

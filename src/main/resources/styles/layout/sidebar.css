@@ -1,0 +1,74 @@
+/*
+ * SIDEBAR.CSS
+ */
+
+.sidebar {
+    -fx-background-color: -bg-sidebar;
+    -fx-pref-width: 280;
+    -fx-effect: dropshadow(three-pass-box, -shadow-color, 15, 0, 5, 0);
+    -fx-padding: 25 10;
+}
+
+.sidebar-button {
+    -fx-background-color: transparent;
+    -fx-alignment: CENTER_LEFT;
+    -fx-padding: 14 20;
+    -fx-text-fill: -text-medium;
+    -fx-font-size: 15px;
+    -fx-font-weight: 600;
+    -fx-cursor: hand;
+    -fx-background-radius: 12;
+    -fx-transition: all 0.2s ease;
+}
+
+.sidebar-button:hover {
+    -fx-background-color: -color-primary-bg;
+    -fx-text-fill: -color-primary;
+}
+
+.active-sidebar-button {
+    -fx-background-color: -color-primary;
+    -fx-text-fill: white !important;
+    -fx-effect: -shadow-primary;
+}
+
+.active-sidebar-button:hover {
+    -fx-background-color: -color-primary-dark;
+}
+
+.sidebar-icon {
+    -fx-fill: -text-muted;
+}
+
+.sidebar-button:hover .sidebar-icon {
+    -fx-fill: -color-primary;
+}
+
+.active-sidebar-button .sidebar-icon {
+    -fx-fill: white;
+}
+
+.sidebar-button-label {
+    -fx-text-fill: inherit;
+}
+
+/* Icon Container Decoration */
+.icon-container {
+    -fx-min-width: 32;
+    -fx-min-height: 32;
+    -fx-alignment: center;
+}
+
+.sidebar-submenu-arrow {
+    -fx-font-size: 10px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -text-muted;
+}
+
+.sidebar-button:hover .sidebar-submenu-arrow {
+    -fx-text-fill: -color-primary;
+}
+
+.active-sidebar-button .sidebar-submenu-arrow {
+    -fx-text-fill: white;
+}

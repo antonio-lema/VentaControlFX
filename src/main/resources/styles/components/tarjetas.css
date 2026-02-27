@@ -1,0 +1,117 @@
+/*
+ * TARJETAS.CSS
+ */
+
+/* Tarjetas de Producto */
+.product-box {
+    -fx-background-color: -bg-surface;
+    -fx-background-radius: 14;
+    -fx-border-color: -border-light;
+    -fx-border-width: 1;
+    -fx-effect: -shadow-md;
+    -fx-padding: 0;
+    -fx-cursor: hand;
+}
+
+.product-box:hover {
+    -fx-effect: -shadow-primary;
+    -fx-translate-y: -5;
+    -fx-scale-x: 1.02;
+    -fx-scale-y: 1.02;
+}
+
+.product-info {
+    -fx-padding: 15;
+    -fx-spacing: 12;
+}
+
+.product-name {
+    -fx-font-size: 15px;
+    -fx-text-fill: -text-main;
+    -fx-font-weight: bold;
+}
+
+.product-price-badge {
+    -fx-background-color: -color-primary-bg;
+    -fx-text-fill: -color-primary;
+    -fx-font-weight: 700;
+    -fx-padding: 6 12;
+    -fx-background-radius: 10;
+}
+
+/* Tarjetas de Usuario */
+.user-card {
+    -fx-background-color: -bg-surface;
+    -fx-background-radius: 20;
+    -fx-padding: 30; // Aumentado de 25
+    -fx-effect: -shadow-md;
+    -fx-border-color: -border-light;
+    -fx-border-width: 1;
+}
+
+.user-card:hover {
+    -fx-translate-y: -8;
+    -fx-effect: -shadow-lg;
+    -fx-background-color: -color-primary-bg;
+}
+
+.user-card-avatar {
+    -fx-background-color: -bg-subtle;
+    -fx-text-fill: -color-primary;
+    -fx-font-weight: bold;
+    -fx-font-size: 32px; // Aumentado de 28
+    -fx-background-radius: 60; // Ajustado para ser redondo
+    -fx-min-width: 80; // Aumentado de 65
+    -fx-min-height: 80; // Aumentado de 65
+    -fx-alignment: center;
+}
+
+.user-name-label {
+    -fx-text-fill: -text-main;
+    -fx-font-weight: bold;
+    -fx-font-size: 20px; // Aumentado de 18
+}
+
+.user-username-label {
+    -fx-text-fill: -text-muted;
+    -fx-font-size: 13px;
+}
+
+.user-email-label {
+    -fx-text-fill: -text-medium;
+    -fx-font-size: 13px;
+}
+
+/* Badges de rol */
+.user-card-badge-admin {
+    -fx-background-color: -color-primary-bg;
+    -fx-text-fill: -color-primary;
+    -fx-padding: 5 15;
+    -fx-background-radius: 25;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+}
+
+.user-card-badge-user {
+    -fx-background-color: -bg-subtle;
+    -fx-text-fill: -text-medium;
+    -fx-padding: 5 15;
+    -fx-background-radius: 25;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-border-color: -border-color;
+    -fx-border-width: 1;
+}
+
+.user-action-btn {
+    -fx-background-color: transparent;
+    -fx-background-radius: 10;
+    -fx-padding: 8;
+    -fx-cursor: hand;
+}
+
+.user-action-btn:hover {
+    -fx-background-color: -border-light;
+    -fx-scale-x: 1.1;
+    -fx-scale-y: 1.1;
+}

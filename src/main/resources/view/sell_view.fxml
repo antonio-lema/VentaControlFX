@@ -7,38 +7,47 @@
 
 <BorderPane xmlns:fx="http://javafx.com/fxml/1"
             fx:id="sellViewRoot"
-            fx:controller="com.mycompany.ventacontrolfx.controller.SellViewController">
+            fx:controller="com.mycompany.ventacontrolfx.presentation.controller.SellViewController"
+            styleClass="main-content-area">
     <center>
         <VBox spacing="0">
-            <HBox alignment="CENTER_LEFT" styleClass="modern-filter-bar">
-                <StackPane style="-fx-background-color: #e3f2fd; -fx-background-radius: 10; -fx-padding: 10;">
-                     <FontAwesomeIconView glyphName="FILTER" size="18" fill="#1e88e5"/>
+            <HBox alignment="CENTER_LEFT" styleClass="view-header-bar">
+                <StackPane styleClass="filter-icon-container">
+                     <FontAwesomeIconView glyphName="FILTER" size="18" fill="WHITE"/>
                 </StackPane>
-                <VBox alignment="CENTER_LEFT">
-                     <Label text="Mostrando en este momento:" styleClass="filter-label-helper"/>
-                     <Label fx:id="filterLabel" text="Todos los productos" styleClass="filter-label-value"/>
+                <VBox alignment="CENTER_LEFT" spacing="2">
+                     <Label text="Mostrando en este momento:" styleClass="label-muted" style="-fx-font-size: 11px;"/>
+                     <Label fx:id="filterLabel" text="Todos los productos" styleClass="section-title" style="-fx-font-size: 18px;"/>
                 </VBox>
             </HBox>
             
             <StackPane VBox.vgrow="ALWAYS">
-                <ScrollPane fitToHeight="true" fitToWidth="true" style="-fx-background: #f4f6f9; -fx-background-color: transparent;">
-                    <TilePane fx:id="productsPane" hgap="15" vgap="15" prefColumns="4" style="-fx-padding: 20;" />
+                <ScrollPane fitToHeight="true" fitToWidth="true" styleClass="products-scroll-pane">
+                    <TilePane fx:id="productsPane" hgap="20" vgap="20" prefColumns="4">
+                        <padding>
+                            <Insets top="25" right="25" bottom="25" left="25"/>
+                        </padding>
+                    </TilePane>
                 </ScrollPane>
-                <VBox fx:id="loadingOverlay" visible="false" alignment="CENTER" style="-fx-background-color: rgba(244, 246, 249, 0.7);">
+                <VBox fx:id="loadingOverlay" visible="false" alignment="CENTER" styleClass="loading-overlay">
                     <ProgressIndicator />
-                    <Label text="Cargando..." style="-fx-text-fill: #666; -fx-padding: 10 0 0 0;"/>
+                    <Label text="Cargando productos..." styleClass="label-muted"/>
                 </VBox>
             </StackPane>
         </VBox>
     </center>
     <bottom>
-        <HBox alignment="CENTER_LEFT" spacing="15" style="-fx-padding: 15 20; -fx-background-color: white; -fx-border-color: #f0f0f0; -fx-border-width: 1 0 0 0;">
-            <ScrollPane fx:id="categoriesScrollPane" hbarPolicy="NEVER" vbarPolicy="NEVER" fitToWidth="true" style="-fx-background-color: transparent; -fx-background: transparent;" prefHeight="100" maxHeight="100" HBox.hgrow="ALWAYS">
-                <FlowPane fx:id="categoriesFlowPane" hgap="12" vgap="12" style="-fx-background-color: transparent;" />
+        <HBox alignment="CENTER_LEFT" spacing="15" styleClass="categories-bar">
+            <ScrollPane fx:id="categoriesScrollPane" hbarPolicy="NEVER" vbarPolicy="NEVER" fitToWidth="true" styleClass="categories-scroll-pane" prefHeight="110" maxHeight="110" HBox.hgrow="ALWAYS">
+                <FlowPane fx:id="categoriesFlowPane" hgap="15" vgap="15" styleClass="categories-flow-pane">
+                    <padding>
+                        <Insets top="10" right="10" bottom="10" left="10"/>
+                    </padding>
+                </FlowPane>
             </ScrollPane>
-            <Button fx:id="btnExpandCategories" onAction="#handleExpandCategories" styleClass="expand-categories-btn">
+            <Button fx:id="btnExpandCategories" onAction="#handleExpandCategories" styleClass="btn-icon">
                 <graphic>
-                    <FontAwesomeIconView fx:id="expandIcon" glyphName="CHEVRON_UP" size="14" fill="#1e88e5"/>
+                    <FontAwesomeIconView fx:id="expandIcon" glyphName="CHEVRON_UP" size="16" fill="#1e88e5"/>
                 </graphic>
             </Button>
         </HBox>
