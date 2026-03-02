@@ -26,7 +26,8 @@ public class ThemeManager {
             "/styles/components/dialogos.css",
             "/styles/components/config.css",
             "/styles/components/historial.css",
-            "/styles/components/pago.css"
+            "/styles/components/pago.css",
+            "/styles/components/devoluciones.css"
     };
 
     /**

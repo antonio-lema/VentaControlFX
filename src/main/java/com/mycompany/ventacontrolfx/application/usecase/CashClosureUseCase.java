@@ -15,8 +15,10 @@ public class CashClosureUseCase {
     }
 
     public void performClosure(CashClosure closure) throws SQLException {
-        if (repository.isClosureDone(closure.getClosureDate())) {
-            throw new SQLException("Ya existe un cierre de caja para la fecha: " + closure.getClosureDate());
+        // Permitir múltiples cierres si hay transacciones pendientes.
+        // El repositorio ya se encarga de cerrar solo lo que tiene closure_id IS NULL.
+        if (repository.getPendingTransactionCount() == 0) {
+            throw new SQLException("No hay transacciones pendientes para realizar un cierre.");
         }
         repository.save(closure);
     }

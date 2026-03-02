@@ -82,16 +82,16 @@ public class JdbcCashClosureRepository implements ICashClosureRepository {
     public List<ProductSummary> getProductSummary(int closureId) throws SQLException {
         List<ProductSummary> summary = new ArrayList<>();
         String sql = "SELECT name, SUM(quantity) as total_qty, SUM(amount) as total_amount FROM (" +
-                "  SELECT p.name, sd.quantity, sd.line_total as amount " +
+                "  SELECT COALESCE(p.name, 'Producto Eliminado') as name, sd.quantity, sd.line_total as amount " +
                 "  FROM sale_details sd " +
                 "  JOIN sales s ON sd.sale_id = s.sale_id " +
-                "  JOIN products p ON sd.product_id = p.product_id " +
+                "  LEFT JOIN products p ON sd.product_id = p.product_id " +
                 "  WHERE s.closure_id = ? " +
                 "  UNION ALL " +
-                "  SELECT p.name, -rd.quantity, -rd.subtotal as amount " +
+                "  SELECT COALESCE(p.name, 'Producto Eliminado') as name, -rd.quantity, -rd.subtotal as amount " +
                 "  FROM return_details rd " +
                 "  JOIN returns r ON rd.return_id = r.return_id " +
-                "  JOIN products p ON rd.product_id = p.product_id " +
+                "  LEFT JOIN products p ON rd.product_id = p.product_id " +
                 "  WHERE r.closure_id = ?" +
                 ") as combined GROUP BY name HAVING total_qty <> 0 OR total_amount <> 0 ORDER BY total_qty DESC";
         try (Connection connection = DBConnection.getConnection();
@@ -114,16 +114,16 @@ public class JdbcCashClosureRepository implements ICashClosureRepository {
     public List<ProductSummary> getPendingProductSummary() throws SQLException {
         List<ProductSummary> summary = new ArrayList<>();
         String sql = "SELECT name, SUM(quantity) as total_qty, SUM(amount) as total_amount FROM (" +
-                "  SELECT p.name, sd.quantity, sd.line_total as amount " +
+                "  SELECT COALESCE(p.name, 'Producto Eliminado') as name, sd.quantity, sd.line_total as amount " +
                 "  FROM sale_details sd " +
                 "  JOIN sales s ON sd.sale_id = s.sale_id " +
-                "  JOIN products p ON sd.product_id = p.product_id " +
+                "  LEFT JOIN products p ON sd.product_id = p.product_id " +
                 "  WHERE s.closure_id IS NULL " +
                 "  UNION ALL " +
-                "  SELECT p.name, -rd.quantity, -rd.subtotal as amount " +
+                "  SELECT COALESCE(p.name, 'Producto Eliminado') as name, -rd.quantity, -rd.subtotal as amount " +
                 "  FROM return_details rd " +
                 "  JOIN returns r ON rd.return_id = r.return_id " +
-                "  JOIN products p ON rd.product_id = p.product_id " +
+                "  LEFT JOIN products p ON rd.product_id = p.product_id " +
                 "  WHERE r.closure_id IS NULL" +
                 ") as combined GROUP BY name HAVING total_qty <> 0 OR total_amount <> 0 ORDER BY total_qty DESC";
         try (Connection connection = DBConnection.getConnection();
@@ -171,43 +171,48 @@ public class JdbcCashClosureRepository implements ICashClosureRepository {
     @Override
     public Map<String, Double> getPendingTotals() throws SQLException {
         Map<String, Double> totals = new HashMap<>();
-        String sql = "SELECT payment_method, SUM(total) as amount FROM sales WHERE closure_id IS NULL GROUP BY payment_method";
+        String sql = "SELECT COALESCE(payment_method, 'Efectivo') as method, SUM(total) as amount FROM sales WHERE closure_id IS NULL GROUP BY method";
 
-        double cash = 0, card = 0;
+        double cash = 0, card = 0, others = 0;
         try (Connection connection = DBConnection.getConnection();
                 Statement stmt = connection.createStatement();
                 ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
-                String method = rs.getString("payment_method");
+                String method = rs.getString("method");
                 double amount = rs.getDouble("amount");
                 if ("Efectivo".equalsIgnoreCase(method))
-                    cash = amount;
+                    cash += amount;
                 else if ("Tarjeta".equalsIgnoreCase(method))
-                    card = amount;
+                    card += amount;
+                else
+                    others += amount;
             }
         }
 
-        String sqlReturns = "SELECT s.payment_method, SUM(r.total_refunded) as amount " +
+        String sqlReturns = "SELECT COALESCE(s.payment_method, 'Efectivo') as method, SUM(r.total_refunded) as amount "
+                +
                 "FROM returns r " +
                 "JOIN sales s ON r.sale_id = s.sale_id " +
                 "WHERE r.closure_id IS NULL " +
-                "GROUP BY s.payment_method";
+                "GROUP BY method";
         try (Connection connection = DBConnection.getConnection();
                 Statement stmt = connection.createStatement();
                 ResultSet rs = stmt.executeQuery(sqlReturns)) {
             while (rs.next()) {
-                String method = rs.getString("payment_method");
+                String method = rs.getString("method");
                 double amount = rs.getDouble("amount");
                 if ("Efectivo".equalsIgnoreCase(method))
                     cash -= amount;
                 else if ("Tarjeta".equalsIgnoreCase(method))
                     card -= amount;
+                else
+                    others -= amount;
             }
         }
 
         totals.put("cash", cash);
         totals.put("card", card);
-        totals.put("total", cash + card);
+        totals.put("total", cash + card + others);
         return totals;
     }
 

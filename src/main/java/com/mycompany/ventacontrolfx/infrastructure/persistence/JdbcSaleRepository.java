@@ -62,7 +62,10 @@ public class JdbcSaleRepository implements ISaleRepository {
     @Override
     public List<SaleDetail> getDetailsBySaleId(int saleId) throws SQLException {
         List<SaleDetail> details = new ArrayList<>();
-        String sql = "SELECT sd.*, p.name as product_name FROM sale_details sd JOIN products p ON sd.product_id = p.product_id WHERE sd.sale_id = ?";
+        String sql = "SELECT sd.*, COALESCE(p.name, 'Producto No Encontrado') as product_name " +
+                "FROM sale_details sd " +
+                "LEFT JOIN products p ON sd.product_id = p.product_id " +
+                "WHERE sd.sale_id = ?";
         try (Connection conn = DBConnection.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, saleId);

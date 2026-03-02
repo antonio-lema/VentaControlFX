@@ -49,18 +49,6 @@ public class SaleConfigController implements Injectable {
     @FXML
     private PasswordField txtEmailPassword;
 
-    // ── Fiscal ────────────────────────────────────────────────────────
-    @FXML
-    private TextField txtTaxRate;
-    @FXML
-    private ComboBox<String> cmbTaxType;
-    @FXML
-    private CheckBox chkPricesIncludeTax;
-    @FXML
-    private ComboBox<String> cmbCurrency;
-    @FXML
-    private ComboBox<String> cmbDecimals;
-
     // ── Ticket ────────────────────────────────────────────────────────
     @FXML
     private CheckBox chkShowLogo;
@@ -116,13 +104,6 @@ public class SaleConfigController implements Injectable {
         if (txtAppName != null)
             txtAppName.setText(cfg.getAppName());
 
-        // Fiscal
-        txtTaxRate.setText(String.format("%.2f", cfg.getTaxRate()));
-        setComboValue(cmbTaxType, cfg.getTaxType());
-        chkPricesIncludeTax.setSelected(cfg.isPricesIncludeTax());
-        setComboValue(cmbCurrency, cfg.getCurrency());
-        setComboValue(cmbDecimals, cfg.getDecimals());
-
         // Ticket
         chkShowLogo.setSelected(cfg.isShowLogo());
         chkShowAddress.setSelected(cfg.isShowAddress());
@@ -133,8 +114,11 @@ public class SaleConfigController implements Injectable {
         setComboValue(cmbTicketFormat, cfg.getTicketFormat());
         chkAutoPrint.setSelected(cfg.isAutoPrint());
 
-        // SMTP (Pending implementation in ConfigUseCase)
-        // txtSmtpHost.setText(...);
+        // SMTP
+        txtSmtpHost.setText(cfg.getSmtpHost());
+        txtSmtpPort.setText(cfg.getSmtpPort());
+        txtEmailFrom.setText(cfg.getEmailFrom());
+        txtEmailPassword.setText(cfg.getEmailPassword());
     }
 
     // ─────────────────────────────────────────────────────────────────
@@ -201,16 +185,12 @@ public class SaleConfigController implements Injectable {
             cfg.setAppName(txtAppName.getText().trim());
         }
 
-        // Fiscal
-        try {
-            cfg.setTaxRate(Double.parseDouble(txtTaxRate.getText().trim().replace(",", ".")));
-        } catch (NumberFormatException e) {
-            cfg.setTaxRate(21.0);
-        }
-        cfg.setTaxType(cmbTaxType.getValue());
-        cfg.setPricesIncludeTax(chkPricesIncludeTax.isSelected());
-        cfg.setCurrency(cmbCurrency.getValue());
-        cfg.setDecimals(cmbDecimals.getValue());
+        // Fiscal (Defaults removed from UI)
+        cfg.setTaxRate(21.0);
+        cfg.setTaxType("IVA General (21%)");
+        cfg.setPricesIncludeTax(true);
+        cfg.setCurrency("EUR — Euro (€)");
+        cfg.setDecimals("2 decimales");
 
         // Ticket
         cfg.setShowLogo(chkShowLogo.isSelected());
@@ -222,7 +202,11 @@ public class SaleConfigController implements Injectable {
         cfg.setTicketFormat(cmbTicketFormat.getValue());
         cfg.setAutoPrint(chkAutoPrint.isSelected());
 
-        // Métodos de pago y opciones generales: secciones eliminadas
+        // SMTP
+        cfg.setSmtpHost(txtSmtpHost.getText().trim());
+        cfg.setSmtpPort(txtSmtpPort.getText().trim());
+        cfg.setEmailFrom(txtEmailFrom.getText().trim());
+        cfg.setEmailPassword(txtEmailPassword.getText());
 
         return cfg;
     }

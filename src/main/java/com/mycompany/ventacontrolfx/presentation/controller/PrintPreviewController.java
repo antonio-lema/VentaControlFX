@@ -47,6 +47,8 @@ public class PrintPreviewController implements Injectable {
     @FXML
     private Label lblPaid;
     @FXML
+    private Label lblChange;
+    @FXML
     private Label lblPaymentMethod;
     @FXML
     private ComboBox<Printer> cmbPrinters;
@@ -108,13 +110,21 @@ public class PrintPreviewController implements Injectable {
         this.configUseCase = container.getConfigUseCase();
     }
 
-    public void setReceiptData(List<CartItem> items, double total, double paid, String paymentMethod, int saleId) {
-        setReceiptData(items, total, paid, paymentMethod, saleId, false);
+    public void setReceiptData(List<CartItem> items, double total, double paid, double change, String paymentMethod,
+            int saleId) {
+        setReceiptData(items, total, paid, change, paymentMethod, saleId, false);
     }
 
-    public void setReceiptData(List<CartItem> items, double total, double paid, String paymentMethod, int saleId,
+    public void setReceiptData(List<CartItem> items, double total, double paid, double change, String paymentMethod,
+            int saleId,
             boolean isGift) {
         this.isGiftMode = isGift;
+        this.currentItems = items;
+        this.currentTotal = total;
+        this.currentPaid = paid;
+        this.currentChange = change;
+        this.currentPaymentMethod = paymentMethod;
+        this.currentSaleId = saleId;
         if (configUseCase != null) {
             this.cfg = configUseCase.getConfig();
         }
@@ -179,6 +189,8 @@ public class PrintPreviewController implements Injectable {
         lblVat.setText("(" + cfg.getTaxRate() + "%) " + String.format(fmt, vat));
         lblTotal.setText(String.format(fmt, total));
         lblPaid.setText(String.format(fmt, paid));
+        if (lblChange != null)
+            lblChange.setText(String.format(fmt, change));
         lblPaymentMethod.setText(paymentMethod);
 
         // Datos de empresa desde SaleConfig
@@ -326,12 +338,14 @@ public class PrintPreviewController implements Injectable {
     @FXML
     private void handleGiftTicket() {
         this.isGiftMode = !this.isGiftMode;
-        setReceiptData(currentItems, currentTotal, currentPaid, currentPaymentMethod, currentSaleId, isGiftMode);
+        setReceiptData(currentItems, currentTotal, currentPaid, currentChange, currentPaymentMethod, currentSaleId,
+                isGiftMode);
     }
 
     private List<CartItem> currentItems;
     private double currentTotal;
     private double currentPaid;
+    private double currentChange;
     private String currentPaymentMethod;
     private int currentSaleId;
 

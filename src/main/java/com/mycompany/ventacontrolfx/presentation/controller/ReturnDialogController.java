@@ -30,51 +30,58 @@ public class ReturnDialogController {
     private BiConsumer<String, Map<Integer, Integer>> onSuccess;
 
     public void init(Sale sale) {
+        if (sale == null || sale.getDetails() == null)
+            return;
+
         lblTicketInfo.setText("Seleccione los productos a devolver del ticket #" + sale.getSaleId());
+        itemsContainer.getChildren().clear();
 
         for (SaleDetail detail : sale.getDetails()) {
             int availableToReturn = detail.getQuantity() - detail.getReturnedQuantity();
             if (availableToReturn <= 0)
                 continue;
 
-            HBox row = new HBox(10);
+            HBox row = new HBox(15);
             row.setAlignment(Pos.CENTER_LEFT);
-            row.setPadding(new Insets(10));
-            row.setStyle(
-                    "-fx-background-color: white; -fx-background-radius: 8; -fx-border-color: #f1f5f9; -fx-border-radius: 8;");
+            row.getStyleClass().add("return-item-row");
 
             CheckBox cb = new CheckBox();
+            cb.getStyleClass().add("return-checkbox");
+
+            VBox info = new VBox(2);
             Label nameLabel = new Label(detail.getProductName());
-            nameLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #334155;");
+            nameLabel.getStyleClass().add("return-product-name");
             nameLabel.setWrapText(true);
-            HBox.setHgrow(nameLabel, Priority.ALWAYS);
-            nameLabel.setMaxWidth(Double.MAX_VALUE);
 
-            Label soldLabel = new Label(String.valueOf(detail.getQuantity()));
-            soldLabel.setPrefWidth(70);
-            soldLabel.setAlignment(Pos.CENTER);
+            Label priceLabel = new Label(String.format("%.2f € / ud.", detail.getUnitPrice()));
+            priceLabel.getStyleClass().add("return-product-price");
+            info.getChildren().addAll(nameLabel, priceLabel);
+            HBox.setHgrow(info, Priority.ALWAYS);
 
-            Label returnedLabel = new Label(String.valueOf(detail.getReturnedQuantity()));
-            returnedLabel.setPrefWidth(70);
-            returnedLabel.setAlignment(Pos.CENTER);
-            returnedLabel.setStyle("-fx-text-fill: #ef4444;");
+            Label soldLabel = new Label("Vend: " + detail.getQuantity());
+            soldLabel.getStyleClass().add("return-count-label");
+
+            Label returnedLabel = new Label("Dev: " + detail.getReturnedQuantity());
+            returnedLabel.getStyleClass().add("return-count-label");
+            returnedLabel.getStyleClass().add("text-danger");
 
             Spinner<Integer> spinner = new Spinner<>(1, availableToReturn, 1);
-            spinner.setPrefWidth(90);
+            spinner.setPrefWidth(100);
             spinner.setDisable(true);
-            spinner.getStyleClass().add(Spinner.STYLE_CLASS_SPLIT_ARROWS_HORIZONTAL);
+            spinner.getStyleClass().add("modern-spinner");
 
             cb.selectedProperty().addListener((obs, oldVal, newVal) -> {
                 spinner.setDisable(!newVal);
-                row.setStyle(newVal
-                        ? "-fx-background-color: #f0f9ff; -fx-border-color: #bae6fd; -fx-background-radius: 8; -fx-border-radius: 8;"
-                        : "-fx-background-color: white; -fx-border-color: #f1f5f9; -fx-background-radius: 8; -fx-border-radius: 8;");
+                if (newVal)
+                    row.getStyleClass().add("row-selected");
+                else
+                    row.getStyleClass().remove("row-selected");
             });
 
             checkBoxes.put(detail.getDetailId(), cb);
             spinners.put(detail.getDetailId(), spinner);
 
-            row.getChildren().addAll(cb, nameLabel, soldLabel, returnedLabel, spinner);
+            row.getChildren().addAll(cb, info, soldLabel, returnedLabel, spinner);
             itemsContainer.getChildren().add(row);
         }
     }

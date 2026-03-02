@@ -36,12 +36,15 @@ public class ProductBox extends VBox {
         imageContainer.setClip(clip);
 
         // Image Logic
+        ImageView imageView = new ImageView();
+        imageView.setFitHeight(150);
+        imageView.setFitWidth(200);
+        imageView.setPreserveRatio(true);
+
         if (product.getImagePath() != null && !product.getImagePath().isEmpty()) {
             File file = resolveFile(product.getImagePath());
             if (file != null && file.exists()) {
-                ImageView imageView = new ImageView(new Image(file.toURI().toString()));
-                imageView.setFitHeight(150);
-                imageView.setFitWidth(200);
+                imageView.setImage(new Image(file.toURI().toString()));
                 imageContainer.getChildren().add(imageView);
             } else {
                 imageContainer.getChildren().add(createPlaceholder());
@@ -84,16 +87,24 @@ public class ProductBox extends VBox {
     }
 
     private File resolveFile(String path) {
-        // 1. Try as is (absolute or relative to project root)
+        if (path == null || path.isEmpty())
+            return null;
+
+        // 1. Try as is (absolute or relative to current working directory)
         File f = new File(path);
         if (f.exists())
             return f;
 
-        // 2. If it's just a filename, try in default directory
+        // 2. Try relative to "data/images/products" (if only filename)
         File defaultDir = new File("data/images/products");
         File f2 = new File(defaultDir, f.getName());
         if (f2.exists())
             return f2;
+
+        // 3. Try with root prepended (common in some envs)
+        File f3 = new File(".", path);
+        if (f3.exists())
+            return f3;
 
         return null;
     }

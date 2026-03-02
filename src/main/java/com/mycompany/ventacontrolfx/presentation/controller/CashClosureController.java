@@ -94,7 +94,8 @@ public class CashClosureController implements Injectable {
 
     private void markAsClosed() {
         lblStatus.setText("Realizado ✅");
-        lblStatus.setStyle("-fx-text-fill: #34a853; -fx-font-weight: bold;");
+        lblStatus.getStyleClass().removeAll("closure-status-pending");
+        lblStatus.getStyleClass().add("closure-status-done");
         btnPerformClosure.setDisable(true);
         btnPerformClosure.setText("CIERRE COMPLETADO");
     }

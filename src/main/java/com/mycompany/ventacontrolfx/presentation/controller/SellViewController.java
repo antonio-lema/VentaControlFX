@@ -55,6 +55,16 @@ public class SellViewController implements Injectable, CategoryMenuRenderer.Cate
         this.productRenderer = new ProductGridRenderer(productsPane, null, container.getCartUseCase()::addItem);
         this.categoryRenderer = new CategoryMenuRenderer(categoriesFlowPane, filterUseCase, this);
 
+        if (btnExpandCategories != null) {
+            btnExpandCategories.setVisible(false);
+            btnExpandCategories.setManaged(false);
+            categoriesFlowPane.heightProperty().addListener((obs, oldVal, newVal) -> {
+                boolean needsExpansion = newVal.doubleValue() > 110;
+                btnExpandCategories.setVisible(needsExpansion);
+                btnExpandCategories.setManaged(needsExpansion);
+            });
+        }
+
         loadInitialData();
     }
 
@@ -66,12 +76,9 @@ public class SellViewController implements Injectable, CategoryMenuRenderer.Cate
                 categoryRenderer.render(categoryUseCase.getFavorites());
                 onSpecialFilterSelected(FilterType.FAVORITES);
 
-                // Auto-hide expand button if few categories
-                if (btnExpandCategories != null) {
-                    boolean needsExpansion = categoriesFlowPane.getChildren().size() > 6;
-                    btnExpandCategories.setVisible(needsExpansion);
-                    btnExpandCategories.setManaged(needsExpansion);
-                }
+                // We will rely on the FlowPane height to show/hide the button
+                // It will be handled in the inject() or initialized block,
+                // but we can set up the bindings here or in inject.
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -105,7 +112,7 @@ public class SellViewController implements Injectable, CategoryMenuRenderer.Cate
         }
         String query = text.toLowerCase().trim();
         container.getAsyncManager().runAsyncTask(() -> productUseCase.getVisibleProducts(), allProducts -> {
-            var filtered = allProducts.stream()
+            List<Product> filtered = allProducts.stream()
                     .filter(p -> p.getName().toLowerCase().contains(query) ||
                             (p.getCategoryName() != null && p.getCategoryName().toLowerCase().contains(query)))
                     .toList();

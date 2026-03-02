@@ -86,8 +86,8 @@ public class AddProductController implements Injectable {
             }
 
             if (product.getImagePath() != null) {
-                File f = new File(product.getImagePath());
-                if (f.exists())
+                File f = resolveFile(product.getImagePath());
+                if (f != null && f.exists())
                     ivProductImage.setImage(new Image(f.toURI().toString()));
             }
         }
@@ -155,6 +155,22 @@ public class AddProductController implements Injectable {
     @FXML
     private void handleCancel() {
         ((Stage) txtName.getScene().getWindow()).close();
+    }
+
+    private File resolveFile(String path) {
+        if (path == null || path.isEmpty())
+            return null;
+        File f = new File(path);
+        if (f.exists())
+            return f;
+        File defaultDir = new File("data/images/products");
+        File f2 = new File(defaultDir, f.getName());
+        if (f2.exists())
+            return f2;
+        File f3 = new File(".", path);
+        if (f3.exists())
+            return f3;
+        return null;
     }
 
     private double xOffset = 0, yOffset = 0;

@@ -46,7 +46,10 @@ public class SaleUseCase {
         }
         sale.setDetails(details);
 
-        return saleRepository.saveSale(sale);
+        int saleId = saleRepository.saveSale(sale);
+        saleRepository.saveSaleDetails(details, saleId);
+
+        return saleId;
     }
 
     public List<Sale> getHistory(LocalDate start, LocalDate end) throws SQLException {

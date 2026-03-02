@@ -108,6 +108,11 @@ public class ReceiptController implements Injectable {
         lblChange.setText(String.format(fmt, change));
         lblPaymentMethod.setText(paymentMethod);
 
+        if (lblTotalRight != null)
+            lblTotalRight.setText(String.format(fmt, total));
+        if (lblChangeRight != null)
+            lblChangeRight.setText(String.format(fmt, change));
+
         applyPaperFormat();
     }
 
@@ -175,7 +180,8 @@ public class ReceiptController implements Injectable {
                 (PrintPreviewController ctrl) -> {
                     if (currentClient != null)
                         ctrl.setClientInfo(currentClient);
-                    ctrl.setReceiptData(currentItems, currentTotal, currentPaid, currentPaymentMethod, currentSaleId,
+                    ctrl.setReceiptData(currentItems, currentTotal, currentPaid, currentChange, currentPaymentMethod,
+                            currentSaleId,
                             isGiftMode);
                 });
     }

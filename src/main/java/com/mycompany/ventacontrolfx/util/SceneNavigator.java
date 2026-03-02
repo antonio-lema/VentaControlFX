@@ -25,7 +25,32 @@ public class SceneNavigator {
             // Aplicar sistema modular de estilos
             ThemeManager.applyStyles(scene);
 
-            stage.setTitle(title);
+            // Configurar icono de la aplicación y título
+            if (container != null) {
+                var cfg = container.getConfigUseCase().getConfig();
+                String iconPath = cfg.getAppIconPath();
+                if (iconPath == null || iconPath.isEmpty()) {
+                    iconPath = cfg.getLogoPath();
+                }
+
+                if (iconPath != null && !iconPath.isEmpty()) {
+                    java.io.File file = new java.io.File(iconPath);
+                    if (file.exists()) {
+                        stage.getIcons().clear();
+                        stage.getIcons().add(new javafx.scene.image.Image(file.toURI().toString()));
+                    }
+                }
+
+                String appName = cfg.getAppName();
+                if (appName != null && !appName.isEmpty()) {
+                    stage.setTitle(appName + " - " + title);
+                } else {
+                    stage.setTitle(title);
+                }
+            } else {
+                stage.setTitle(title);
+            }
+
             stage.setScene(scene);
             stage.setMaximized(fullScreen);
             stage.centerOnScreen();

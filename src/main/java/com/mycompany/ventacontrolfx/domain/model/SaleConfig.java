@@ -14,6 +14,10 @@ public class SaleConfig {
     private String logoPath = "";
     private String appIconPath = "";
     private String appName = "GestionTPV";
+    private String smtpHost = "";
+    private String smtpPort = "";
+    private String emailFrom = "";
+    private String emailPassword = "";
 
     // ── Fiscal ────────────────────────────────────────────────────────
     private double taxRate = 21.0;
@@ -114,6 +118,38 @@ public class SaleConfig {
 
     public void setAppName(String appName) {
         this.appName = appName;
+    }
+
+    public String getSmtpHost() {
+        return smtpHost;
+    }
+
+    public void setSmtpHost(String smtpHost) {
+        this.smtpHost = smtpHost;
+    }
+
+    public String getSmtpPort() {
+        return smtpPort;
+    }
+
+    public void setSmtpPort(String smtpPort) {
+        this.smtpPort = smtpPort;
+    }
+
+    public String getEmailFrom() {
+        return emailFrom;
+    }
+
+    public void setEmailFrom(String emailFrom) {
+        this.emailFrom = emailFrom;
+    }
+
+    public String getEmailPassword() {
+        return emailPassword;
+    }
+
+    public void setEmailPassword(String emailPassword) {
+        this.emailPassword = emailPassword;
     }
 
     public double getTaxRate() {

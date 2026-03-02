@@ -44,6 +44,10 @@ public class JdbcCompanyConfigRepository implements ICompanyConfigRepository {
     private static final String K_SHOW_BARCODE = "showBarcode";
     private static final String K_SOUND_ON_ADD = "soundOnAdd";
     private static final String K_CONFIRM_DELETE = "confirmDelete";
+    private static final String K_SMTP_HOST = "smtp_host";
+    private static final String K_SMTP_PORT = "smtp_port";
+    private static final String K_EMAIL_FROM = "email_from";
+    private static final String K_EMAIL_PASS = "email_password";
 
     @Override
     public SaleConfig load() {
@@ -84,6 +88,10 @@ public class JdbcCompanyConfigRepository implements ICompanyConfigRepository {
         cfg.setShowBarcode(getBoolean(K_SHOW_BARCODE, d.isShowBarcode()));
         cfg.setSoundOnAdd(getBoolean(K_SOUND_ON_ADD, d.isSoundOnAdd()));
         cfg.setConfirmDelete(getBoolean(K_CONFIRM_DELETE, d.isConfirmDelete()));
+        cfg.setSmtpHost(getString(K_SMTP_HOST, d.getSmtpHost()));
+        cfg.setSmtpPort(getString(K_SMTP_PORT, d.getSmtpPort()));
+        cfg.setEmailFrom(getString(K_EMAIL_FROM, d.getEmailFrom()));
+        cfg.setEmailPassword(getString(K_EMAIL_PASS, d.getEmailPassword()));
         return cfg;
     }
 
@@ -124,6 +132,10 @@ public class JdbcCompanyConfigRepository implements ICompanyConfigRepository {
         setValue(K_SHOW_BARCODE, String.valueOf(cfg.isShowBarcode()));
         setValue(K_SOUND_ON_ADD, String.valueOf(cfg.isSoundOnAdd()));
         setValue(K_CONFIRM_DELETE, String.valueOf(cfg.isConfirmDelete()));
+        setValue(K_SMTP_HOST, orEmpty(cfg.getSmtpHost()));
+        setValue(K_SMTP_PORT, orEmpty(cfg.getSmtpPort()));
+        setValue(K_EMAIL_FROM, orEmpty(cfg.getEmailFrom()));
+        setValue(K_EMAIL_PASS, orEmpty(cfg.getEmailPassword()));
     }
 
     @Override

@@ -34,20 +34,13 @@ public class RegisterUserController implements Injectable {
     @FXML
     private Button btnCancel;
     @FXML
-    private Button btnRegister;
-    @FXML
     private Label lblTitle;
-    @FXML
-    private Label lblSelectedCompany;
-    @FXML
-    private Button btnSelectCompany;
     @FXML
     private StackPane rootStackPane;
 
     private UserUseCase userUseCase;
     private ServiceContainer container;
     private User userToEdit;
-    private int selectedCompanyId = 0;
     private boolean isInitialSetup = false;
     private double xOffset = 0;
     private double yOffset = 0;
@@ -92,12 +85,6 @@ public class RegisterUserController implements Injectable {
             String uiRole = "admin".equalsIgnoreCase(user.getRole()) ? "admin" : "cajero";
             cmbRole.setValue(uiRole);
 
-            if (user.getCompanyName() != null && !user.getCompanyName().isEmpty()) {
-                lblSelectedCompany.setText(user.getCompanyName());
-                lblSelectedCompany.setStyle("-fx-text-fill: -text-main;");
-                selectedCompanyId = user.getCompanyId();
-            }
-
             if (lblTitle != null)
                 lblTitle.setText("Editar Usuario");
         }
@@ -141,7 +128,6 @@ public class RegisterUserController implements Injectable {
                 newUser.setEmail(email);
                 newUser.setRole(role);
                 newUser.setPassword(pass1);
-                newUser.setCompanyId(selectedCompanyId);
 
                 User existing = userUseCase.getUserByUsername(username);
                 if (existing != null) {
@@ -167,7 +153,6 @@ public class RegisterUserController implements Injectable {
                 userToEdit.setFullName(fullName);
                 userToEdit.setEmail(email);
                 userToEdit.setRole(role);
-                userToEdit.setCompanyId(selectedCompanyId);
 
                 userUseCase.updateUser(userToEdit);
                 if (!pass1.isEmpty()) {
@@ -180,18 +165,6 @@ public class RegisterUserController implements Injectable {
             e.printStackTrace();
             showError("Error: " + e.getMessage());
         }
-    }
-
-    @FXML
-    private void handleSelectCompany() {
-        ModalService.showStandardModal("/view/clients.fxml", "Seleccionar Empresa", container,
-                (ClientsController ctrl) -> {
-                    ctrl.setOnClientSelected(client -> {
-                        this.selectedCompanyId = client.getId();
-                        lblSelectedCompany.setText(client.getName());
-                        lblSelectedCompany.setStyle("-fx-text-fill: -text-main;");
-                    });
-                });
     }
 
     private void showError(String message) {
