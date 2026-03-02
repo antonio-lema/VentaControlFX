@@ -38,4 +38,8 @@ public class ClientUseCase {
     public int getCount() throws SQLException {
         return repository.count();
     }
+
+    public Client getById(int id) throws SQLException {
+        return repository.getById(id);
+    }
 }

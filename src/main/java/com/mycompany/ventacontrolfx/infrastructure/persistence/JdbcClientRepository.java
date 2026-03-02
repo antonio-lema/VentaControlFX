@@ -109,6 +109,21 @@ public class JdbcClientRepository implements IClientRepository {
         return 0;
     }
 
+    @Override
+    public Client getById(int id) throws SQLException {
+        String sql = "SELECT * FROM clients WHERE client_id = ?";
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, id);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return mapResultSetToClient(rs);
+                }
+            }
+        }
+        return null;
+    }
+
     private Client mapResultSetToClient(ResultSet rs) throws SQLException {
         return new Client(
                 rs.getInt("client_id"),

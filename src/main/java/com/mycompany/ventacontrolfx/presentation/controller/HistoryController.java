@@ -2,6 +2,8 @@ package com.mycompany.ventacontrolfx.presentation.controller;
 
 import com.mycompany.ventacontrolfx.domain.model.Sale;
 import com.mycompany.ventacontrolfx.domain.model.SaleDetail;
+import com.mycompany.ventacontrolfx.domain.model.Product;
+import com.mycompany.ventacontrolfx.domain.model.CartItem;
 import com.mycompany.ventacontrolfx.application.usecase.SaleUseCase;
 import com.mycompany.ventacontrolfx.infrastructure.config.Injectable;
 import com.mycompany.ventacontrolfx.infrastructure.config.ServiceContainer;
@@ -95,13 +97,26 @@ public class HistoryController implements Injectable, Searchable {
                     setText(String.format("%.2f €", item));
                     if (s != null) {
                         if (s.isReturn()) {
-                            setStyle("-fx-font-weight: bold; -fx-text-fill: #e74c3c; -fx-strikethrough: true;");
+                            setStyle("-fx-font-weight: bold; -fx-text-fill: #ef4444; -fx-strikethrough: true;");
                         } else if (s.getReturnedAmount() > 0) {
-                            setStyle("-fx-font-weight: bold; -fx-text-fill: #f39c12;");
+                            setStyle("-fx-font-weight: bold; -fx-text-fill: #f59e0b;");
                         } else {
-                            setStyle("-fx-font-weight: bold; -fx-text-fill: #1e88e5;");
+                            setStyle("-fx-font-weight: bold; -fx-text-fill: #3b82f6;");
                         }
                     }
+                }
+            }
+        });
+
+        colMethod.setCellFactory(col -> new TableCell<Sale, String>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                } else {
+                    String emoji = "Tarjeta".equalsIgnoreCase(item) ? "💳 " : "💵 ";
+                    setText(emoji + item);
                 }
             }
         });
@@ -110,15 +125,13 @@ public class HistoryController implements Injectable, Searchable {
             @Override
             protected void updateItem(Sale item, boolean empty) {
                 super.updateItem(item, empty);
+                getStyleClass().removeAll("row-return", "row-partial-return");
                 if (item != null) {
                     if (item.isReturn())
-                        setStyle("-fx-background-color: #fff5f5;");
+                        getStyleClass().add("row-return");
                     else if (item.getReturnedAmount() > 0)
-                        setStyle("-fx-background-color: #fff8e1;");
-                    else
-                        setStyle("");
-                } else
-                    setStyle("");
+                        getStyleClass().add("row-partial-return");
+                }
             }
         });
     }
@@ -282,7 +295,7 @@ public class HistoryController implements Injectable, Searchable {
             lblReturnBadge.setVisible(false);
         }
 
-        btnReturn.setDisable(!hasReturnable);
+        btnReturn.setDisable(sale.isReturn());
         // La opacidad y el color ahora se gestionan vía CSS (.btn-warning:disabled)
 
         lblSaleFullDate.setText(sale.getSaleDateTime().format(fullFormatter) + "\nAtendido por: " + sale.getUserName());
@@ -309,13 +322,13 @@ public class HistoryController implements Injectable, Searchable {
                     + ";");
 
             Label qtyLabel = new Label(
-                    detail.getQuantity() + " un. x " + String.format("%.2f", detail.getUnitPrice()) + " €");
+                    "📦 " + detail.getQuantity() + " un. x " + String.format("%.2f", detail.getUnitPrice()) + " €");
             qtyLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: #95a5a6;");
             nameBox.getChildren().addAll(nameLabel, qtyLabel);
 
             Region spacer = new Region();
             HBox.setHgrow(spacer, Priority.ALWAYS);
-            Label priceLabel = new Label(String.format("%.2f €", detail.getLineTotal()));
+            Label priceLabel = new Label("💰 " + String.format("%.2f €", detail.getLineTotal()));
             priceLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #2c3e50;");
 
             row.getChildren().addAll(nameBox, spacer, priceLabel);
@@ -332,9 +345,67 @@ public class HistoryController implements Injectable, Searchable {
 
     @FXML
     private void handlePrintTicket() {
-        Sale s = salesTable.getSelectionModel().getSelectedItem();
-        if (s != null)
-            AlertUtil.showInfo("Impresión", "Enviando ticket #" + s.getSaleId() + "...");
+        Sale selected = salesTable.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            AlertUtil.showWarning("Aviso", "Por favor, seleccione un ticket primero.");
+            return;
+        }
+
+        // 1. Garantizar que los detalles estén cargados
+        if (selected.getDetails() == null || selected.getDetails().isEmpty()) {
+            try {
+                Sale fullSale = saleUseCase.getSaleDetails(selected.getSaleId());
+                if (fullSale != null && fullSale.getDetails() != null) {
+                    selected.setDetails(fullSale.getDetails());
+                    // También actualizar clientId si no lo tiene (aunque debería)
+                    if (selected.getClientId() == null) {
+                        selected.setClientId(fullSale.getClientId());
+                    }
+                }
+            } catch (SQLException e) {
+                AlertUtil.showError("Error", "No se pudieron cargar los detalles del ticket: " + e.getMessage());
+                return;
+            }
+        }
+
+        if (selected.getDetails() == null || selected.getDetails().isEmpty()) {
+            AlertUtil.showWarning("Aviso", "Este ticket no tiene productos para mostrar.");
+            return;
+        }
+
+        // 2. Mostrar ventana de ticket (Receipt)
+        ModalService.showStandardModal("/view/receipt.fxml",
+                selected.getClientId() != null ? "Factura" : "Factura Simplificada", container,
+                (ReceiptController rc) -> {
+                    try {
+                        // Convertir SaleDetails a CartItems para que el ReceiptController los entienda
+                        List<CartItem> cartItems = new java.util.ArrayList<>();
+                        for (SaleDetail detail : selected.getDetails()) {
+                            Product p = new Product();
+                            p.setName(detail.getProductName());
+                            p.setPrice(detail.getUnitPrice());
+                            cartItems.add(new CartItem(p, detail.getQuantity()));
+                        }
+
+                        // Cargar cliente si existe
+                        if (selected.getClientId() != null) {
+                            com.mycompany.ventacontrolfx.domain.model.Client client = container.getClientUseCase()
+                                    .getById(selected.getClientId());
+                            if (client != null) {
+                                rc.setClientInfo(client);
+                            }
+                        }
+
+                        // Configurar datos en el ticket
+                        // Pasamos total como pagado y 0 de cambio por ser reimpresión
+                        rc.setReceiptData(cartItems, selected.getTotal(), selected.getTotal(), 0.0,
+                                selected.getPaymentMethod(), selected.getSaleId(), null, null);
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        AlertUtil.showError("Error", "Error al preparar el ticket para impresión.");
+                    }
+                });
     }
 
     @FXML
@@ -343,7 +414,25 @@ public class HistoryController implements Injectable, Searchable {
         if (selected == null)
             return;
 
-        ModalService.showModal("/view/return_dialog.fxml", "Devolución", Modality.APPLICATION_MODAL,
+        // Garantizar que los detalles estén cargados antes de abrir el diálogo
+        if (selected.getDetails() == null || selected.getDetails().isEmpty()) {
+            try {
+                Sale fullSale = saleUseCase.getSaleDetails(selected.getSaleId());
+                if (fullSale != null && fullSale.getDetails() != null) {
+                    selected.setDetails(fullSale.getDetails());
+                }
+            } catch (SQLException e) {
+                AlertUtil.showError("Error", "No se pudieron cargar los detalles del ticket: " + e.getMessage());
+                return;
+            }
+        }
+
+        if (selected.getDetails() == null || selected.getDetails().isEmpty()) {
+            AlertUtil.showWarning("Aviso", "Este ticket no tiene productos registrados o ya han sido devueltos todos.");
+            return;
+        }
+
+        ModalService.showModal("/view/return_dialog.fxml", "Registrar Devolución", Modality.APPLICATION_MODAL,
                 StageStyle.TRANSPARENT, container, (ReturnDialogController controller) -> {
                     controller.init(selected);
                     controller.setOnSuccess((reason, items) -> {

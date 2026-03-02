@@ -16,4 +16,6 @@ public interface IClientRepository {
     void delete(int id) throws SQLException;
 
     int count() throws SQLException;
+
+    Client getById(int id) throws SQLException;
 }
