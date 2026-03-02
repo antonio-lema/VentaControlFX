@@ -15,7 +15,7 @@
     <HBox alignment="CENTER_LEFT" spacing="10" styleClass="logo-container">
         <StackPane styleClass="top-bar-action-btn">
             <ImageView fx:id="imgLogo" fitHeight="28" preserveRatio="true" managed="false" visible="false"/>
-            <FontAwesomeIconView glyphName="SHOPPING_BAG" size="20" fill="#1e88e5" />
+            <FontAwesomeIconView fx:id="defaultLogoIcon" glyphName="SHOPPING_BAG" size="20" fill="#1e88e5" />
         </StackPane>
         <HBox spacing="4" alignment="CENTER_LEFT">
             <Label fx:id="lblAppPrefix" text="Venta" styleClass="logo-text"/>
@@ -33,9 +33,6 @@
                    promptText="Buscar productos, clientes o códigos..."
                    styleClass="search-field"
                    HBox.hgrow="ALWAYS"/>
-        <StackPane styleClass="search-shortcut">
-            <Label text="⌘K" styleClass="search-shortcut"/>
-        </StackPane>
     </HBox>
 
     <!-- Separador flexible derecho -->

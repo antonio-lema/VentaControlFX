@@ -8,6 +8,7 @@ import com.mycompany.ventacontrolfx.infrastructure.navigation.NavigationService;
 import com.mycompany.ventacontrolfx.util.AlertUtil;
 import com.mycompany.ventacontrolfx.util.ModalService;
 import com.mycompany.ventacontrolfx.util.SceneNavigator;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
@@ -21,6 +22,8 @@ public class HeaderController implements Injectable {
 
     @FXML
     private ImageView imgLogo;
+    @FXML
+    private de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView defaultLogoIcon;
     @FXML
     private Label lblAppName;
     @FXML
@@ -48,12 +51,23 @@ public class HeaderController implements Injectable {
 
     private void loadLogo() {
         SaleConfig cfg = configUseCase.getConfig();
-        if (cfg.getLogoPath() != null && !cfg.getLogoPath().isEmpty()) {
-            File file = new File(cfg.getLogoPath());
+        String path = cfg.getLogoPath();
+
+        // Fallback to app icon if logo is not set
+        if (path == null || path.isEmpty()) {
+            path = cfg.getAppIconPath();
+        }
+
+        if (path != null && !path.isEmpty()) {
+            File file = new File(path);
             if (file.exists()) {
                 imgLogo.setImage(new Image(file.toURI().toString()));
                 imgLogo.setVisible(true);
                 imgLogo.setManaged(true);
+                if (defaultLogoIcon != null) {
+                    defaultLogoIcon.setVisible(false);
+                    defaultLogoIcon.setManaged(false);
+                }
                 return;
             }
         }
@@ -82,6 +96,13 @@ public class HeaderController implements Injectable {
         searchField.textProperty().addListener((obs, oldVal, newVal) -> {
             if (navigationService != null) {
                 navigationService.search(newVal);
+            }
+        });
+
+        // Evitar que el campo de búsqueda robe el foco al arrancar
+        Platform.runLater(() -> {
+            if (searchBarContainer != null) {
+                searchBarContainer.requestFocus();
             }
         });
     }
