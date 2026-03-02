@@ -94,7 +94,7 @@ public class NavigationService {
                 registerSearchHandler((Searchable) activeView);
             }
             if (searchBarVisibilityListener != null) {
-                searchBarVisibilityListener.onSearchBarVisibilityChanged(isSearchable || isHistoryView);
+                searchBarVisibilityListener.onSearchBarVisibilityChanged(isSellView);
             }
 
             mainContent.setContent(viewNode);

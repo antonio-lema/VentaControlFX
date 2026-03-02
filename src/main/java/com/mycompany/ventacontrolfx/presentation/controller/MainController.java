@@ -41,10 +41,20 @@ public class MainController implements Injectable {
         showInitialView();
     }
 
+    // HeaderController reference para controlar visibilidad del search bar
+    private HeaderController headerController;
+
     private void loadStaticComponents() {
-        loadComponent("/view/main_header.fxml", headerContainer);
+        headerController = loadComponentWithController("/view/main_header.fxml", headerContainer);
         loadComponent("/view/sidebar.fxml", sidebarContainer);
         loadComponent("/view/cart_panel.fxml", cartContainer);
+
+        // Conectar la visibilidad de la barra de búsqueda con el header
+        if (headerController != null) {
+            navigationService.setSearchBarVisibilityListener(shouldShow -> {
+                headerController.setSearchBarVisible(shouldShow);
+            });
+        }
     }
 
     private void showInitialView() {
@@ -62,6 +72,23 @@ public class MainController implements Injectable {
             target.getChildren().setAll(node);
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T> T loadComponentWithController(String fxml, StackPane target) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxml));
+            Node node = loader.load();
+            Object controller = loader.getController();
+            if (controller instanceof Injectable) {
+                ((Injectable) controller).inject(container);
+            }
+            target.getChildren().setAll(node);
+            return (T) controller;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
         }
     }
 }
