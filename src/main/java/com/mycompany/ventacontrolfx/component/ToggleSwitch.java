@@ -1,4 +1,4 @@
-package com.mycompany.ventacontrolfx.control;
+package com.mycompany.ventacontrolfx.component;
 
 import javafx.animation.FillTransition;
 import javafx.animation.ParallelTransition;

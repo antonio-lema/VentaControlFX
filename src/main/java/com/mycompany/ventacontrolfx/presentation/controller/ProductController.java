@@ -7,7 +7,7 @@ import com.mycompany.ventacontrolfx.infrastructure.config.ServiceContainer;
 import com.mycompany.ventacontrolfx.shared.async.AsyncManager;
 import com.mycompany.ventacontrolfx.util.AlertUtil;
 import com.mycompany.ventacontrolfx.util.ModalService;
-import com.mycompany.ventacontrolfx.control.ToggleSwitch;
+import com.mycompany.ventacontrolfx.component.ToggleSwitch;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import javafx.collections.FXCollections;
@@ -18,11 +18,13 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Modality;
 
 import java.io.File;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.WeakHashMap;
 
 public class ProductController implements Injectable, com.mycompany.ventacontrolfx.util.Searchable {
@@ -39,6 +41,10 @@ public class ProductController implements Injectable, com.mycompany.ventacontrol
     private TableColumn<Product, Void> colActions;
     @FXML
     private TextField searchField;
+    @FXML
+    private TextField rowsPerPageField;
+    @FXML
+    private Button btnAdd;
     @FXML
     private Label lblCount;
 
@@ -62,6 +68,7 @@ public class ProductController implements Injectable, com.mycompany.ventacontrol
         colCategoryName.setCellValueFactory(new PropertyValueFactory<>("categoryName"));
         colName.setCellValueFactory(new PropertyValueFactory<>("name"));
         colPrice.setCellValueFactory(new PropertyValueFactory<>("price"));
+        colImage.setCellValueFactory(new PropertyValueFactory<>("imagePath"));
 
         setupImageColumn();
         setupToggleColumn(colFavorite, true);
@@ -72,21 +79,39 @@ public class ProductController implements Injectable, com.mycompany.ventacontrol
     private void setupImageColumn() {
         colImage.setCellFactory(column -> new TableCell<>() {
             private final ImageView imageView = new ImageView();
+            private final StackPane container = new StackPane(imageView);
+
+            {
+                imageView.setFitWidth(40);
+                imageView.setFitHeight(40);
+                imageView.setPreserveRatio(true);
+                container.setAlignment(Pos.CENTER);
+            }
 
             @Override
             protected void updateItem(String imagePath, boolean empty) {
                 super.updateItem(imagePath, empty);
-                if (empty || imagePath == null || imagePath.isEmpty()) {
+                if (empty) {
                     setGraphic(null);
+                } else if (imagePath == null || imagePath.isEmpty()) {
+                    imageView.setImage(null);
+                    FontAwesomeIconView icon = new FontAwesomeIconView(FontAwesomeIcon.IMAGE);
+                    icon.setSize("24");
+                    icon.setFill(Color.web("#bdc3c7"));
+                    setGraphic(new StackPane(icon));
                 } else {
                     File file = resolveFile(imagePath);
                     if (file != null && file.exists()) {
                         String uri = file.toURI().toString();
-                        Image img = imageCache.computeIfAbsent(uri, k -> new Image(k, 40, 40, true, true));
+                        Image img = imageCache.computeIfAbsent(uri, k -> new Image(k, 80, 80, true, true));
                         imageView.setImage(img);
-                        setGraphic(imageView);
+                        setGraphic(container);
                     } else {
-                        setGraphic(null);
+                        imageView.setImage(null);
+                        FontAwesomeIconView icon = new FontAwesomeIconView(FontAwesomeIcon.IMAGE);
+                        icon.setSize("24");
+                        icon.setFill(Color.web("#bdc3c7"));
+                        setGraphic(new StackPane(icon));
                     }
                 }
             }
@@ -94,16 +119,24 @@ public class ProductController implements Injectable, com.mycompany.ventacontrol
     }
 
     private File resolveFile(String path) {
-        // 1. Try as is (absolute or relative to project root)
+        if (path == null || path.isEmpty())
+            return null;
+
+        // 1. Try as is (absolute or relative to current working directory)
         File f = new File(path);
         if (f.exists())
             return f;
 
-        // 2. If it's just a filename, try in default directory
+        // 2. Try relative to "data/images/products" (if only filename)
         File defaultDir = new File("data/images/products");
         File f2 = new File(defaultDir, f.getName());
         if (f2.exists())
             return f2;
+
+        // 3. Try with root prepended (common in some envs)
+        File f3 = new File(".", path);
+        if (f3.exists())
+            return f3;
 
         return null;
     }
@@ -198,7 +231,7 @@ public class ProductController implements Injectable, com.mycompany.ventacontrol
         }
         String query = text.toLowerCase().trim();
         asyncManager.runAsyncTask(() -> productUseCase.getAllProducts(), allProducts -> {
-            var filtered = allProducts.stream()
+            List<Product> filtered = allProducts.stream()
                     .filter(p -> p.getName().toLowerCase().contains(query) ||
                             (p.getCategoryName() != null && p.getCategoryName().toLowerCase().contains(query)))
                     .toList();
