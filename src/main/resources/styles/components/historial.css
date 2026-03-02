@@ -99,6 +99,7 @@
 }
 
 /* Vivid Colors for Amounts */
+
 .text-cash {
     -fx-text-fill: -color-warning;
 }
@@ -398,4 +399,75 @@
     -fx-font-weight: bold;
     -fx-font-size: 14px;
     -fx-text-fill: -color-success;
+}
+
+/* =========================================
+   BOTONES DE ACCIÓN (History Panel)
+   ========================================= */
+
+.btn-history-print {
+    -fx-background-color: -grad-primary;
+    -fx-text-fill: white;
+    -fx-font-weight: 800;
+    -fx-font-size: 13px;
+    -fx-padding: 12 24;
+    -fx-background-radius: 10px;
+    -fx-cursor: hand;
+    -fx-effect: -shadow-sm;
+    -fx-graphic-text-gap: 10px;
+}
+
+.btn-history-print:hover {
+    -fx-background-color: -color-primary-dark;
+    -fx-effect: -shadow-primary;
+    -fx-scale-x: 1.02;
+    -fx-scale-y: 1.02;
+}
+
+.btn-history-return {
+    -fx-background-color: linear-gradient(to right, #fb8c00, #f4511e);
+    /* Naranja vibrante */
+    -fx-text-fill: white;
+    -fx-font-weight: 800;
+    -fx-font-size: 13px;
+    -fx-padding: 12 24;
+    -fx-background-radius: 10px;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(three-pass-box, rgba(251, 140, 0, 0.4), 10, 0, 0, 4);
+    -fx-graphic-text-gap: 10px;
+}
+
+.btn-history-return:hover {
+    -fx-background-color: linear-gradient(to right, #f4511e, #e64a19);
+    -fx-effect: dropshadow(three-pass-box, rgba(251, 140, 0, 0.6), 15, 0, 0, 5);
+    -fx-scale-x: 1.02;
+    -fx-scale-y: 1.02;
+}
+
+.btn-history-return:disabled {
+    -fx-background-color: rgba(251, 140, 0, 0.3);
+    /* Naranja muy suave/faded */
+    -fx-text-fill: rgba(255, 255, 255, 0.6);
+    -fx-opacity: 0.7;
+    -fx-effect: none;
+    -fx-cursor: default;
+}
+
+.btn-history-close {
+    -fx-background-color: -bg-subtle;
+    -fx-text-fill: -text-medium;
+    -fx-border-color: -border-color;
+    -fx-border-width: 1px;
+    -fx-border-radius: 10px;
+    -fx-background-radius: 10px;
+    -fx-font-weight: bold;
+    -fx-font-size: 13px;
+    -fx-padding: 12 0;
+    -fx-cursor: hand;
+}
+
+.btn-history-close:hover {
+    -fx-background-color: -border-light;
+    -fx-text-fill: -text-main;
+    -fx-border-color: -text-medium;
 }

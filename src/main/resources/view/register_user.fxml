@@ -57,16 +57,7 @@
                 </VBox>
             </HBox>
             
-            <!-- Company Selection -->
-            <VBox styleClass="modern-input-group">
-                <HBox styleClass="modern-input-container" spacing="10" alignment="CENTER_LEFT">
-                    <FontAwesomeIconView fx:id="iconBuilding" glyphName="BUILDING" size="16" styleClass="sidebar-icon"/>
-                    <VBox HBox.hgrow="ALWAYS">
-                        <Label fx:id="lblSelectedCompany" text="Sin empresa asignada" styleClass="modern-input-field" style="-fx-text-fill: #adb5bd;"/>
-                    </VBox>
-                    <Button fx:id="btnSelectCompany" text="Seleccionar" onAction="#handleSelectCompany" styleClass="modern-btn-secondary" style="-fx-padding: 5 10; -fx-font-size: 11px;"/>
-                </HBox>
-            </VBox>
+
 
             <!-- Role Selection -->
             <VBox styleClass="modern-input-group">

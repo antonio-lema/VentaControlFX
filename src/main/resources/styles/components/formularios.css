@@ -123,3 +123,29 @@
     -fx-prompt-text-fill: -text-muted;
     -fx-effect: null;
 }
+
+/* Spinner Moderno */
+.modern-spinner {
+    -fx-background-color: -bg-input;
+    -fx-background-radius: 8;
+    -fx-border-color: -border-color;
+    -fx-border-width: 1;
+    -fx-border-radius: 8;
+}
+
+.modern-spinner .text-field {
+    -fx-background-color: transparent;
+    -fx-border-width: 0;
+    -fx-padding: 5 8;
+}
+
+.modern-spinner .increment-arrow-button,
+.modern-spinner .decrement-arrow-button {
+    -fx-background-color: transparent;
+    -fx-cursor: hand;
+}
+
+.modern-spinner .increment-arrow-button:hover,
+.modern-spinner .decrement-arrow-button:hover {
+    -fx-background-color: -bg-subtle;
+}

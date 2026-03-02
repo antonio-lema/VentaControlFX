@@ -5,10 +5,14 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
 <?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
+<?import java.net.URL?>
 
 <AnchorPane id="AnchorPane" prefHeight="750.0" prefWidth="1100.0" styleClass="main-content-area"
             xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="com.mycompany.ventacontrolfx.presentation.controller.HistoryController">
+   <stylesheets>
+       <URL value="@/styles/components/historial.css" />
+   </stylesheets>
    <children>
       <VBox spacing="20.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <padding>
@@ -207,23 +211,21 @@
 
                                <HBox spacing="10">
                                   <children>
-                                      <Button fx:id="btnPrint" onAction="#handlePrintTicket" HBox.hgrow="ALWAYS" maxWidth="Infinity" styleClass="btn-primary btn-lg">
+                                      <Button fx:id="btnPrint" text="IMPRIMIR" onAction="#handlePrintTicket" HBox.hgrow="ALWAYS" maxWidth="Infinity" styleClass="btn-history-print">
                                          <graphic>
-                                            <FontAwesomeIconView glyphName="PRINT" fill="white" size="18" />
+                                            <FontAwesomeIconView glyphName="PRINT" fill="white" size="16" />
                                          </graphic>
-                                         <text> IMPRIMIR </text>
                                       </Button>
-                                      <Button fx:id="btnReturn" onAction="#handleRegisterReturn" HBox.hgrow="ALWAYS" maxWidth="Infinity" styleClass="btn-warning btn-lg">
+                                      <Button fx:id="btnReturn" text="DEVOLVER" onAction="#handleRegisterReturn" HBox.hgrow="ALWAYS" maxWidth="Infinity" styleClass="btn-history-return">
                                          <graphic>
-                                            <FontAwesomeIconView glyphName="REPLY" fill="white" size="18" />
+                                            <FontAwesomeIconView glyphName="REPLY" fill="white" size="16" />
                                          </graphic>
-                                         <text> DEVOLVER </text>
                                       </Button>
                                   </children>
                                </HBox>
 
                                <Region VBox.vgrow="ALWAYS" />
-                               <Button onAction="#handleCloseDetails" maxWidth="Infinity" styleClass="btn-secondary btn-lg" text="CERRAR DETALLES" />
+                               <Button onAction="#handleCloseDetails" text="CERRAR DETALLES" maxWidth="Infinity" styleClass="btn-history-close" />
                            </children>
                         </VBox>
                      </children>

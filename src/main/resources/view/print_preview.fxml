@@ -103,6 +103,10 @@
                                         <Label text="Entregado" HBox.hgrow="ALWAYS" maxWidth="Infinity" style="-fx-font-size: 10; -fx-text-fill: black;" />
                                         <Label fx:id="lblPaid" text="0,00 €" style="-fx-font-size: 10; -fx-text-fill: black;" />
                                     </HBox>
+                                     <HBox>
+                                        <Label text="Cambio" HBox.hgrow="ALWAYS" maxWidth="Infinity" style="-fx-font-size: 10; -fx-text-fill: black;" />
+                                        <Label fx:id="lblChange" text="0,00 €" style="-fx-font-size: 10; -fx-text-fill: black;" />
+                                    </HBox>
                                 </VBox>
                                 
                                 <Region VBox.vgrow="ALWAYS" />

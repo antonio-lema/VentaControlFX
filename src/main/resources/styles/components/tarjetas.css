@@ -43,7 +43,8 @@
 .user-card {
     -fx-background-color: -bg-surface;
     -fx-background-radius: 20;
-    -fx-padding: 30; // Aumentado de 25
+    -fx-padding: 30;
+    /* Aumentado de 25 */
     -fx-effect: -shadow-md;
     -fx-border-color: -border-light;
     -fx-border-width: 1;
@@ -59,17 +60,22 @@
     -fx-background-color: -bg-subtle;
     -fx-text-fill: -color-primary;
     -fx-font-weight: bold;
-    -fx-font-size: 32px; // Aumentado de 28
-    -fx-background-radius: 60; // Ajustado para ser redondo
-    -fx-min-width: 80; // Aumentado de 65
-    -fx-min-height: 80; // Aumentado de 65
+    -fx-font-size: 32px;
+    /* Aumentado de 28 */
+    -fx-background-radius: 60;
+    /* Ajustado para ser redondo */
+    -fx-min-width: 80;
+    /* Aumentado de 65 */
+    -fx-min-height: 80;
+    /* Aumentado de 65 */
     -fx-alignment: center;
 }
 
 .user-name-label {
     -fx-text-fill: -text-main;
     -fx-font-weight: bold;
-    -fx-font-size: 20px; // Aumentado de 18
+    -fx-font-size: 20px;
+    /* Aumentado de 18 */
 }
 
 .user-username-label {
