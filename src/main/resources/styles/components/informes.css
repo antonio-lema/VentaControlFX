@@ -1,0 +1,165 @@
+/* ── Informes: KPI Cards ─────────────────────────────────────────────────── */
+
+.kpi-row {
+    -fx-padding: 20 28 10 28;
+}
+
+.kpi-card {
+    -fx-background-color: -bg-surface;
+    -fx-border-color: -border-color;
+    -fx-border-width: 1;
+    -fx-border-radius: 12;
+    -fx-background-radius: 12;
+    -fx-padding: 18 20 18 20;
+    -fx-spacing: 6;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.07), 8, 0, 0, 2);
+}
+
+.kpi-label {
+    -fx-font-size: 12px;
+    -fx-text-fill: -text-muted;
+    -fx-font-weight: normal;
+}
+
+.kpi-value {
+    -fx-font-size: 26px;
+    -fx-font-weight: bold;
+}
+
+.kpi-green {
+    -fx-text-fill: #22c55e;
+}
+
+.kpi-blue {
+    -fx-text-fill: #3b82f6;
+}
+
+.kpi-gold {
+    -fx-text-fill: #f59e0b;
+}
+
+.kpi-purple {
+    -fx-text-fill: #a855f7;
+}
+
+/* ── Section title / empty state ─────────────────────────────────────────── */
+
+.section-title {
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -text-main;
+}
+
+.empty-icon {
+    -fx-fill: -text-muted;
+    -fx-opacity: 0.4;
+}
+
+.empty-label {
+    -fx-font-size: 13px;
+    -fx-text-fill: -text-muted;
+}
+
+/* ── Header filtros ──────────────────────────────────────────────────────── */
+
+.filter-label {
+    -fx-font-size: 12px;
+    -fx-text-fill: -text-muted;
+}
+
+.badge-info {
+    -fx-font-size: 11px;
+    -fx-text-fill: #3b82f6;
+    -fx-background-color: rgba(59, 130, 246, 0.12);
+    -fx-background-radius: 6;
+    -fx-padding: 3 8 3 8;
+}
+
+.search-field-inline {
+    -fx-background-color: -bg-surface;
+    -fx-border-color: -border-color;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-padding: 6 12 6 12;
+    -fx-font-size: 13px;
+}
+
+/* ── Ranking & Trends ────────────────────────────────────────────────────── */
+
+.trend-up {
+    -fx-text-fill: #22c55e;
+    -fx-font-weight: bold;
+}
+
+.trend-down {
+    -fx-text-fill: #ef4444;
+    -fx-font-weight: bold;
+}
+
+.trend-neutral {
+    -fx-text-fill: #94a3b8;
+}
+
+.trend-blue {
+    -fx-text-fill: #3b82f6;
+    -fx-font-weight: bold;
+}
+
+.view-header-icon-glyph {
+    -fx-fill: -color-primary;
+}
+
+
+.rank-badge {
+    -fx-background-radius: 50;
+    -fx-min-width: 24;
+    -fx-min-height: 24;
+    -fx-alignment: center;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+}
+
+.rank-1 {
+    -fx-background-color: #f59e0b;
+}
+
+/* Gold */
+.rank-2 {
+    -fx-background-color: #94a3b8;
+}
+
+/* Silver */
+.rank-3 {
+    -fx-background-color: #b45309;
+}
+
+/* Bronze */
+.rank-other {
+    -fx-background-color: rgba(148, 163, 184, 0.2);
+    -fx-text-fill: -text-muted;
+}
+
+.chart-container {
+    -fx-background-color: -bg-surface;
+    -fx-border-color: -border-color;
+    -fx-border-width: 1;
+    -fx-border-radius: 12;
+    -fx-background-radius: 12;
+    -fx-padding: 15;
+}
+
+.export-btn {
+    -fx-background-color: #f1f5f9;
+    -fx-text-fill: #475569;
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-padding: 8 12;
+    -fx-cursor: hand;
+    -fx-font-weight: bold;
+}
+
+.export-btn:hover {
+    -fx-background-color: #e2e8f0;
+}

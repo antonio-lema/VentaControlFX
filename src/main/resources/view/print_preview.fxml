@@ -82,9 +82,9 @@
                                        <Label text="Subtotal" HBox.hgrow="ALWAYS" maxWidth="Infinity" style="-fx-font-size: 10; -fx-text-fill: black;" />
                                        <Label fx:id="lblSubtotal" text="0,00 €" style="-fx-font-size: 10; -fx-alignment: CENTER_RIGHT; -fx-text-fill: black;" />
                                     </HBox>
-                                    <HBox>
-                                       <Label text="IVA 21%" HBox.hgrow="ALWAYS" maxWidth="Infinity" style="-fx-font-size: 10; -fx-text-fill: black;" />
-                                       <Label fx:id="lblVat" text="0,00 €" style="-fx-font-size: 10; -fx-text-fill: black;" />
+                                     <HBox>
+                                        <Label fx:id="lblVatLabel" text="IVA" HBox.hgrow="ALWAYS" maxWidth="Infinity" style="-fx-font-size: 10; -fx-text-fill: black;" />
+                                        <Label fx:id="lblVat" text="0,00 €" style="-fx-font-size: 10; -fx-text-fill: black;" />
                                     </HBox>
                                     <HBox style="-fx-padding: 5 0 0 0;">
                                        <Label text="TOTAL" style="-fx-font-weight: bold; -fx-font-size: 14; -fx-text-fill: black;" HBox.hgrow="ALWAYS" maxWidth="Infinity" />
@@ -117,7 +117,7 @@
                                 
                                 <!-- Footer -->
                                 <VBox alignment="CENTER" spacing="5.0" style="-fx-padding: 10 0 0 0;">
-                                    <Label text="Le ha atendido Admin" style="-fx-text-fill: grey; -fx-font-size: 9;" />
+                                    <Label fx:id="lblAttendedBy" text="" style="-fx-text-fill: grey; -fx-font-size: 9;" />
                                     <Label fx:id="lblFooterMessage" text="GRACIAS POR SU VISITA" style="-fx-font-weight: bold; -fx-font-size: 10; -fx-text-fill: black;" />
                                     
                                     <Region prefHeight="10.0" />

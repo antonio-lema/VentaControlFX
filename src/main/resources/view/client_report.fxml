@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.*?>
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
+
+<VBox xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.mycompany.ventacontrolfx.presentation.controller.ClientReportController"
+      styleClass="view-root" spacing="0">
+    <stylesheets>
+        <java.net.URL value="@/styles/components/informes.css" />
+    </stylesheets>
+
+    <!-- Header de la vista -->
+    <HBox styleClass="view-header" alignment="CENTER_LEFT" spacing="16">
+        <padding><Insets top="24" right="28" bottom="24" left="28"/></padding>
+        <StackPane styleClass="view-header-icon">
+            <FontAwesomeIconView glyphName="USERS" size="22" styleClass="view-header-icon-glyph"/>
+        </StackPane>
+        <VBox spacing="2">
+            <Label text="Historial de Clientes" styleClass="view-title"/>
+            <Label text="Compras realizadas por cada empresa o cliente" styleClass="view-subtitle"/>
+        </VBox>
+        <Region HBox.hgrow="ALWAYS"/>
+        <!-- Filtros -->
+        <HBox spacing="10" alignment="CENTER">
+            <TextField fx:id="txtSearch" promptText="Buscar cliente..." styleClass="search-field-inline" prefWidth="180"/>
+            <Label text="Desde:" styleClass="filter-label"/>
+            <DatePicker fx:id="dpFrom" prefWidth="140"/>
+            <Label text="Hasta:" styleClass="filter-label"/>
+            <DatePicker fx:id="dpTo" prefWidth="140"/>
+            <Button fx:id="btnFilter" text="Filtrar" styleClass="btn-primary" onAction="#handleFilter"/>
+        </HBox>
+    </HBox>
+
+    <!-- KPI Cards -->
+    <HBox spacing="16" styleClass="kpi-row">
+        <padding><Insets top="20" right="28" bottom="10" left="28"/></padding>
+        <VBox styleClass="kpi-card" HBox.hgrow="ALWAYS">
+            <Label text="👥 Clientes Activos" styleClass="kpi-label"/>
+            <Label fx:id="lblKpiClients" text="0" styleClass="kpi-value kpi-blue"/>
+        </VBox>
+        <VBox styleClass="kpi-card" HBox.hgrow="ALWAYS">
+            <Label text="💰 Facturación Total" styleClass="kpi-label"/>
+            <Label fx:id="lblKpiTotal" text="0.00 €" styleClass="kpi-value kpi-green"/>
+        </VBox>
+        <VBox styleClass="kpi-card" HBox.hgrow="ALWAYS">
+            <Label text="🏆 Mejor Cliente" styleClass="kpi-label"/>
+            <Label fx:id="lblKpiBest" text="—" styleClass="kpi-value kpi-gold"/>
+        </VBox>
+        <VBox styleClass="kpi-card" HBox.hgrow="ALWAYS">
+            <Label text="🔄 Compra Media" styleClass="kpi-label"/>
+            <Label fx:id="lblKpiAvg" text="0.00 €" styleClass="kpi-value kpi-purple"/>
+        </VBox>
+    </HBox>
+
+    <!-- Contenido: lista de clientes + detalle de compras -->
+    <HBox VBox.vgrow="ALWAYS" spacing="0">
+        <padding><Insets top="10" right="28" bottom="28" left="28"/></padding>
+
+        <!-- Lista de clientes -->
+        <VBox spacing="12" prefWidth="360" minWidth="320">
+            <Label text="Clientes / Empresas" styleClass="section-title"/>
+            <TableView fx:id="clientTable" VBox.vgrow="ALWAYS" styleClass="modern-table">
+                <columns>
+                    <TableColumn fx:id="colClient" text="Cliente" prefWidth="180" styleClass="col-header"/>
+                    <TableColumn fx:id="colTotal" text="Total €" prefWidth="100" styleClass="col-header"/>
+                    <TableColumn fx:id="colOrders" text="Pedidos" prefWidth="70" styleClass="col-header"/>
+                </columns>
+                <placeholder>
+                    <VBox alignment="CENTER" spacing="8">
+                        <FontAwesomeIconView glyphName="USERS" size="36" styleClass="empty-icon"/>
+                        <Label text="No hay clientes con compras en este periodo" styleClass="empty-label"/>
+                    </VBox>
+                </placeholder>
+            </TableView>
+        </VBox>
+
+        <Region minWidth="20"/>
+
+        <!-- Detalle de compras del cliente seleccionado -->
+        <VBox spacing="12" HBox.hgrow="ALWAYS">
+            <HBox alignment="CENTER_LEFT" spacing="12">
+                <Label fx:id="lblDetailTitle" text="Selecciona un cliente" styleClass="section-title"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Label fx:id="lblClientInfo" text="" styleClass="badge-info"/>
+            </HBox>
+            <TableView fx:id="purchaseTable" VBox.vgrow="ALWAYS" styleClass="modern-table">
+                <columns>
+                    <TableColumn fx:id="colDate" text="Fecha" prefWidth="150" styleClass="col-header"/>
+                    <TableColumn fx:id="colSeller" text="Vendedor" prefWidth="120" styleClass="col-header"/>
+                    <TableColumn fx:id="colMethod" text="Método Pago" prefWidth="110" styleClass="col-header"/>
+                    <TableColumn fx:id="colItems" text="Artículos" prefWidth="80" styleClass="col-header"/>
+                    <TableColumn fx:id="colAmount" text="Importe" prefWidth="100" styleClass="col-header"/>
+                </columns>
+                <placeholder>
+                    <VBox alignment="CENTER" spacing="8">
+                        <FontAwesomeIconView glyphName="MOUSE_POINTER" size="36" styleClass="empty-icon"/>
+                        <Label text="Selecciona un cliente para ver sus compras" styleClass="empty-label"/>
+                    </VBox>
+                </placeholder>
+            </TableView>
+        </VBox>
+    </HBox>
+</VBox>

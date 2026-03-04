@@ -75,6 +75,11 @@ public class HistoryController implements Injectable, Searchable {
             if (newVal != null)
                 showDetails(newVal);
         });
+
+        // Verificación de permisos para Devoluciones
+        boolean canReturn = container.getUserSession().hasPermission("venta.devolucion");
+        btnReturn.setVisible(canReturn);
+        btnReturn.setManaged(canReturn);
     }
 
     private void setupTable() {
@@ -373,17 +378,18 @@ public class HistoryController implements Injectable, Searchable {
             return;
         }
 
-        // 2. Mostrar ventana de ticket (Receipt)
-        ModalService.showStandardModal("/view/receipt.fxml",
+        // 2. Abrir vista previa de impresión
+        ModalService.showStandardModal("/view/print_preview.fxml",
                 selected.getClientId() != null ? "Factura" : "Factura Simplificada", container,
-                (ReceiptController rc) -> {
+                (PrintPreviewController ppc) -> {
                     try {
-                        // Convertir SaleDetails a CartItems para que el ReceiptController los entienda
+                        // Convertir SaleDetails a CartItems
                         List<CartItem> cartItems = new java.util.ArrayList<>();
                         for (SaleDetail detail : selected.getDetails()) {
                             Product p = new Product();
                             p.setName(detail.getProductName());
                             p.setPrice(detail.getUnitPrice());
+                            p.setIva(detail.getIvaRate()); // Usar IVA histórico
                             cartItems.add(new CartItem(p, detail.getQuantity()));
                         }
 
@@ -392,18 +398,17 @@ public class HistoryController implements Injectable, Searchable {
                             com.mycompany.ventacontrolfx.domain.model.Client client = container.getClientUseCase()
                                     .getById(selected.getClientId());
                             if (client != null) {
-                                rc.setClientInfo(client);
+                                ppc.setClientInfo(client);
                             }
                         }
 
-                        // Configurar datos en el ticket
-                        // Pasamos total como pagado y 0 de cambio por ser reimpresión
-                        rc.setReceiptData(cartItems, selected.getTotal(), selected.getTotal(), 0.0,
-                                selected.getPaymentMethod(), selected.getSaleId(), null, null);
+                        // Pasar los datos al controlador de vista previa
+                        ppc.setReceiptData(cartItems, selected.getTotal(), selected.getTotal(), 0.0,
+                                selected.getPaymentMethod(), selected.getSaleId());
 
                     } catch (Exception e) {
                         e.printStackTrace();
-                        AlertUtil.showError("Error", "Error al preparar el ticket para impresión.");
+                        AlertUtil.showError("Error", "Error al preparar la vista previa de impresión.");
                     }
                 });
     }
@@ -432,11 +437,71 @@ public class HistoryController implements Injectable, Searchable {
             return;
         }
 
+        // ── Validar efectivo disponible para devoluciones en efectivo ──────────
+        boolean isCashSale = "Efectivo".equalsIgnoreCase(selected.getPaymentMethod());
+        if (isCashSale) {
+            // Calcular el máximo devolvible (productos aún no devueltos)
+            double maxRefundable = selected.getDetails().stream()
+                    .mapToDouble(d -> (d.getQuantity() - d.getReturnedQuantity()) * d.getUnitPrice())
+                    .sum();
+
+            if (maxRefundable > 0) {
+                try {
+                    com.mycompany.ventacontrolfx.application.usecase.CashClosureUseCase closureUseCase = container
+                            .getClosureUseCase();
+                    double cashAvailable = closureUseCase.getCurrentCashInDrawer();
+
+                    if (cashAvailable <= 0) {
+                        AlertUtil.showError("❌ Sin efectivo en caja",
+                                String.format(
+                                        "No hay efectivo disponible en la caja para procesar esta devolución.\n\n" +
+                                                "💵 Efectivo en caja: %.2f €\n" +
+                                                "💰 Importe máximo a devolver: %.2f €\n\n" +
+                                                "Abre la caja con un fondo o verifica el saldo disponible.",
+                                        cashAvailable, maxRefundable));
+                        return;
+                    }
+
+                    if (maxRefundable > cashAvailable) {
+                        // Advertir, pero dejar que el usuario elija cuánto devolver (puede ser parcial)
+                        boolean continuar = AlertUtil.showConfirmation("⚠️ Efectivo limitado",
+                                "Efectivo insuficiente para devolver el total",
+                                String.format(
+                                        "El efectivo en caja (%.2f €) es menor que el importe total del ticket (%.2f €).\n\n"
+                                                +
+                                                "Solo podrás devolver hasta %.2f € en efectivo.\n\n" +
+                                                "¿Deseas continuar con una devolución parcial?",
+                                        cashAvailable, maxRefundable, cashAvailable));
+                        if (!continuar)
+                            return;
+                    }
+                } catch (SQLException e) {
+                    // Si no podemos leer el efectivo, dejar pasar (mejor UX que bloquear)
+                    e.printStackTrace();
+                }
+            }
+        }
+
         ModalService.showModal("/view/return_dialog.fxml", "Registrar Devolución", Modality.APPLICATION_MODAL,
                 StageStyle.TRANSPARENT, container, (ReturnDialogController controller) -> {
                     controller.init(selected);
                     controller.setOnSuccess((reason, items) -> {
                         try {
+                            // Validación final de efectivo justo antes de confirmar
+                            if (isCashSale) {
+                                double refundTotal = selected.getDetails().stream()
+                                        .filter(d -> items.containsKey(d.getDetailId()))
+                                        .mapToDouble(d -> items.get(d.getDetailId()) * d.getUnitPrice())
+                                        .sum();
+
+                                try {
+                                    container.getClosureUseCase().validateCashAvailableForReturn(refundTotal);
+                                } catch (SQLException cashEx) {
+                                    AlertUtil.showError("❌ Efectivo insuficiente", cashEx.getMessage());
+                                    return;
+                                }
+                            }
+
                             int userId = container.getUserSession().getCurrentUser().getUserId();
                             saleUseCase.registerPartialReturn(selected.getSaleId(), items, reason, userId);
                             AlertUtil.showInfo("Éxito", "Devolución registrada correctamente.");

@@ -100,13 +100,20 @@ public class PrintPreviewController implements Injectable {
     @FXML
     private Label lblClientAddress;
 
+    @FXML
+    private Label lblVatLabel;
+    @FXML
+    private Label lblAttendedBy;
+
     private boolean isGiftMode = false;
     private com.mycompany.ventacontrolfx.domain.model.Client currentClient;
     private ConfigUseCase configUseCase;
     private SaleConfig cfg;
+    private ServiceContainer container;
 
     @Override
     public void inject(ServiceContainer container) {
+        this.container = container;
         this.configUseCase = container.getConfigUseCase();
     }
 
@@ -180,13 +187,38 @@ public class PrintPreviewController implements Injectable {
             lblGiftIcon.setStyle("-fx-font-size: 16; -fx-text-fill: #1a73e8;");
         }
 
-        // Totales con IVA real
-        double taxDiv = cfg.getTaxDivisor();
-        double subtotal = total / taxDiv;
-        double vat = total - subtotal;
+        // Totales con IVA dinámico — agrupado por tasa
+        double totalVatAmount = 0.0;
+        double totalSubtotal = 0.0;
+        java.util.Map<Double, Double> vatByRate = new java.util.LinkedHashMap<>();
 
-        lblSubtotal.setText(String.format(fmt, subtotal));
-        lblVat.setText("(" + cfg.getTaxRate() + "%) " + String.format(fmt, vat));
+        if (currentItems != null) {
+            for (CartItem item : currentItems) {
+                double itemTotal = item.getTotal();
+                double effectiveRate = item.getProduct().resolveEffectiveIva(cfg.getTaxRate());
+                double itemSubtotal = itemTotal / (1.0 + (effectiveRate / 100.0));
+                double itemVat = itemTotal - itemSubtotal;
+                totalVatAmount += itemVat;
+                totalSubtotal += itemSubtotal;
+                vatByRate.merge(effectiveRate, itemVat, Double::sum);
+            }
+        }
+
+        lblSubtotal.setText(String.format(fmt, totalSubtotal));
+        // Construir texto de IVA: si hay varias tasas, mostrar desglose; si hay una
+        // sola, mostrar el %
+        if (vatByRate.size() == 1) {
+            double singleRate = vatByRate.keySet().iterator().next();
+            if (lblVatLabel != null)
+                lblVatLabel.setText("IVA " + String.format("%.0f%%", singleRate));
+        } else if (vatByRate.size() > 1) {
+            if (lblVatLabel != null)
+                lblVatLabel.setText("IVA (varios tipos)");
+        } else {
+            if (lblVatLabel != null)
+                lblVatLabel.setText("IVA " + String.format("%.0f%%", cfg.getTaxRate()));
+        }
+        lblVat.setText(String.format(fmt, totalVatAmount));
         lblTotal.setText(String.format(fmt, total));
         lblPaid.setText(String.format(fmt, paid));
         if (lblChange != null)
@@ -459,6 +491,24 @@ public class PrintPreviewController implements Injectable {
         setLabelText(lblCompanyCif, cfg.isShowCif() ? "CIF: " + cfg.getCif() : "");
         String footer = cfg.getFooterMessage();
         setLabelText(lblFooterMessage, (footer != null && !footer.isEmpty()) ? footer : "GRACIAS POR SU VISITA");
+
+        // Usuario en sesión (cajero que atiende)
+        if (lblAttendedBy != null) {
+            try {
+                if (container != null && container.getUserSession() != null
+                        && container.getUserSession().getCurrentUser() != null) {
+                    String userName = container.getUserSession().getCurrentUser().getFullName();
+                    if (userName == null || userName.isEmpty()) {
+                        userName = container.getUserSession().getCurrentUser().getUsername();
+                    }
+                    setLabelText(lblAttendedBy, "Le ha atendido: " + userName);
+                } else {
+                    setLabelText(lblAttendedBy, "");
+                }
+            } catch (Exception e) {
+                setLabelText(lblAttendedBy, "");
+            }
+        }
     }
 
     private void showDefaultIcon() {
