@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.*?>
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
+
+<VBox xmlns:fx="http://javafx.com/fxml/1" 
+      fx:controller="com.mycompany.ventacontrolfx.presentation.controller.SuspendedCartsDialogController"
+      spacing="20" styleClass="modal-container" prefWidth="600" prefHeight="500">
+    
+    <padding>
+        <Insets top="25" right="25" bottom="25" left="25"/>
+    </padding>
+
+    <HBox alignment="CENTER_LEFT" spacing="15">
+        <StackPane styleClass="icon-container-blue">
+            <FontAwesomeIconView glyphName="FOLDER_OPEN" size="24" styleClass="icon-primary"/>
+        </StackPane>
+        <VBox>
+            <Label text="Ventas Aplazadas" styleClass="modal-title"/>
+            <Label text="Recupere una venta pendiente para continuar" styleClass="modal-subtitle"/>
+        </VBox>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Button onAction="#handleClose" styleClass="btn-close-modal">
+            <graphic><FontAwesomeIconView glyphName="CLOSE" size="18"/></graphic>
+        </Button>
+    </HBox>
+
+    <TableView fx:id="tblCarts" VBox.vgrow="ALWAYS" styleClass="modern-table">
+        <columns>
+            <TableColumn fx:id="colAlias" text="Identificador" prefWidth="150"/>
+            <TableColumn fx:id="colDate" text="Fecha/Hora" prefWidth="150"/>
+            <TableColumn fx:id="colClient" text="Cliente" prefWidth="150"/>
+            <TableColumn fx:id="colTotal" text="Total" prefWidth="80"/>
+            <TableColumn fx:id="colActions" text="Acciones" prefWidth="70"/>
+        </columns>
+        <placeholder>
+            <Label text="No hay ventas aplazadas"/>
+        </placeholder>
+    </TableView>
+
+    <HBox alignment="CENTER_RIGHT" spacing="10">
+        <Button text="Cancelar" onAction="#handleClose" styleClass="btn-secondary"/>
+        <Button text="Recuperar Seleccionado" onAction="#handleResume" styleClass="btn-primary"/>
+    </HBox>
+</VBox>

@@ -38,14 +38,20 @@ public class CartUseCase {
 
     private void updateTotals() {
         SaleConfig config = configRepository.load();
-        double totalInclusive = cartItems.stream().mapToDouble(CartItem::getTotal).sum();
+        double totalInclusive = 0.0;
+        double totalBase = 0.0;
 
-        double taxDivisor = config.getTaxDivisor();
-        double baseAmount = totalInclusive / taxDivisor;
-        double taxAmount = totalInclusive - baseAmount;
+        for (CartItem item : cartItems) {
+            double itemTotal = item.getTotal();
+            totalInclusive += itemTotal;
 
-        subtotal.set(baseAmount);
-        tax.set(taxAmount);
+            double effectiveRate = item.getProduct().resolveEffectiveIva(config.getTaxRate());
+            double itemBase = itemTotal / (1.0 + (effectiveRate / 100.0));
+            totalBase += itemBase;
+        }
+
+        subtotal.set(totalBase);
+        tax.set(totalInclusive - totalBase);
         grandTotal.set(totalInclusive);
 
         itemCount.set(cartItems.stream().mapToInt(CartItem::getQuantity).sum());

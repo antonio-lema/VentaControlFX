@@ -38,15 +38,22 @@
             <Label text="Artículos" styleClass="cart-section-title"/>
         </HBox>
         <Region HBox.hgrow="ALWAYS"/>
-        <Button fx:id="btnClearCart" onAction="#clearCart" styleClass="btn-clear-cart">
-            <tooltip><Tooltip text="Vaciar carrito"/></tooltip>
-            <graphic>
-                <HBox spacing="8" alignment="CENTER">
-                    <Label text="Vaciar carrito" styleClass="btn-clear-cart-text"/>
+        <HBox spacing="5" alignment="CENTER_RIGHT">
+            <Button onAction="#handleSuspendCart" styleClass="btn-suspend-cart">
+                <tooltip><Tooltip text="Aplazar esta venta"/></tooltip>
+                <graphic><FontAwesomeIconView glyphName="PAUSE" size="14" styleClass="icon-warning"/></graphic>
+            </Button>
+            <Button onAction="#handleShowSuspendedCarts" styleClass="btn-resume-cart">
+                <tooltip><Tooltip text="Recuperar carritos aplazados"/></tooltip>
+                <graphic><FontAwesomeIconView glyphName="FOLDER_OPEN" size="14" styleClass="icon-primary"/></graphic>
+            </Button>
+            <Button fx:id="btnClearCart" onAction="#clearCart" styleClass="btn-clear-cart">
+                <tooltip><Tooltip text="Vaciar carrito"/></tooltip>
+                <graphic>
                     <FontAwesomeIconView glyphName="TRASH" size="14" styleClass="icon-danger"/>
-                </HBox>
-            </graphic>
-        </Button>
+                </graphic>
+            </Button>
+        </HBox>
     </HBox>
 
     <StackPane VBox.vgrow="ALWAYS" styleClass="cart-items-pane">
