@@ -11,7 +11,10 @@ public class JdbcProductRepository implements IProductRepository {
     @Override
     public List<Product> getAll() throws SQLException {
         List<Product> products = new ArrayList<>();
-        String sql = "SELECT p.*, c.name AS category_name FROM products p LEFT JOIN categories c ON p.category_id = c.category_id";
+        String sql = "SELECT p.*, c.name AS category_name, c.default_iva AS category_iva, " +
+                "COALESCE((SELECT pp.price FROM product_prices pp JOIN price_lists pl ON pp.price_list_id = pl.price_list_id WHERE pp.product_id = p.product_id AND pl.is_default = 1 AND pp.end_date IS NULL LIMIT 1), 0.0) AS current_price "
+                +
+                "FROM products p LEFT JOIN categories c ON p.category_id = c.category_id";
         try (Connection conn = DBConnection.getConnection();
                 Statement stmt = conn.createStatement();
                 ResultSet rs = stmt.executeQuery(sql)) {
@@ -25,7 +28,10 @@ public class JdbcProductRepository implements IProductRepository {
     @Override
     public List<Product> getAllVisible() throws SQLException {
         List<Product> products = new ArrayList<>();
-        String sql = "SELECT p.*, c.name AS category_name FROM products p LEFT JOIN categories c ON p.category_id = c.category_id WHERE p.visible = TRUE";
+        String sql = "SELECT p.*, c.name AS category_name, c.default_iva AS category_iva, " +
+                "COALESCE((SELECT pp.price FROM product_prices pp JOIN price_lists pl ON pp.price_list_id = pl.price_list_id WHERE pp.product_id = p.product_id AND pl.is_default = 1 AND pp.end_date IS NULL LIMIT 1), 0.0) AS current_price "
+                +
+                "FROM products p LEFT JOIN categories c ON p.category_id = c.category_id WHERE p.visible = TRUE";
         try (Connection conn = DBConnection.getConnection();
                 Statement stmt = conn.createStatement();
                 ResultSet rs = stmt.executeQuery(sql)) {
@@ -39,7 +45,10 @@ public class JdbcProductRepository implements IProductRepository {
     @Override
     public List<Product> getFavorites() throws SQLException {
         List<Product> products = new ArrayList<>();
-        String sql = "SELECT p.*, c.name AS category_name FROM products p LEFT JOIN categories c ON p.category_id = c.category_id WHERE p.visible = TRUE AND p.is_favorite = TRUE";
+        String sql = "SELECT p.*, c.name AS category_name, c.default_iva AS category_iva, " +
+                "COALESCE((SELECT pp.price FROM product_prices pp JOIN price_lists pl ON pp.price_list_id = pl.price_list_id WHERE pp.product_id = p.product_id AND pl.is_default = 1 AND pp.end_date IS NULL LIMIT 1), 0.0) AS current_price "
+                +
+                "FROM products p LEFT JOIN categories c ON p.category_id = c.category_id WHERE p.visible = TRUE AND p.is_favorite = TRUE";
         try (Connection conn = DBConnection.getConnection();
                 Statement stmt = conn.createStatement();
                 ResultSet rs = stmt.executeQuery(sql)) {
@@ -52,20 +61,74 @@ public class JdbcProductRepository implements IProductRepository {
 
     @Override
     public void save(Product product) throws SQLException {
-        String sql = "INSERT INTO products (category_id, name, price, is_favorite, image_path, visible) VALUES (?, ?, ?, ?, ?, ?)";
-        try (Connection conn = DBConnection.getConnection();
-                PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            pstmt.setInt(1, product.getCategoryId());
-            pstmt.setString(2, product.getName());
-            pstmt.setDouble(3, product.getPrice());
-            pstmt.setBoolean(4, product.isFavorite());
-            pstmt.setString(5, product.getImagePath());
-            pstmt.setBoolean(6, product.isVisible());
-            pstmt.executeUpdate();
+        Connection conn = null;
+        try {
+            conn = DBConnection.getConnection();
+            conn.setAutoCommit(false); // Transacción para doble escritura
 
-            try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
-                if (generatedKeys.next()) {
-                    product.setId(generatedKeys.getInt(1));
+            String sql = "INSERT INTO products (category_id, name, is_favorite, image_path, visible, iva, tax_rate) VALUES (?, ?, ?, ?, ?, ?, ?)";
+            try (PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+                pstmt.setInt(1, product.getCategoryId());
+                pstmt.setString(2, product.getName());
+                pstmt.setBoolean(3, product.isFavorite());
+                pstmt.setString(4, product.getImagePath());
+                pstmt.setBoolean(5, product.isVisible());
+
+                Double iva = product.getIva();
+                if (iva != null) {
+                    pstmt.setDouble(6, iva);
+                    pstmt.setDouble(7, iva); // Compatibility
+                } else {
+                    pstmt.setNull(6, Types.DOUBLE);
+                    pstmt.setNull(7, Types.DOUBLE);
+                }
+                pstmt.executeUpdate();
+
+                try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
+                    if (generatedKeys.next()) {
+                        product.setId(generatedKeys.getInt(1));
+                    }
+                }
+
+                // Insertar en la estructura nueva product_prices de forma transparente
+                if (product.getId() > 0) {
+                    // Obtener ID lista default (fallback 1)
+                    int defaultPriceListId = 1;
+                    try (Statement stmtList = conn.createStatement();
+                            ResultSet rsList = stmtList.executeQuery(
+                                    "SELECT price_list_id FROM price_lists WHERE is_default = 1 LIMIT 1")) {
+                        if (rsList.next()) {
+                            defaultPriceListId = rsList.getInt(1);
+                        }
+                    } catch (Exception ignored) {
+                    }
+
+                    String priceSql = "INSERT INTO product_prices (product_id, price_list_id, price, start_date, reason) VALUES (?, ?, ?, NOW(), 'Creación de producto')";
+                    try (PreparedStatement pstmtPrice = conn.prepareStatement(priceSql)) {
+                        pstmtPrice.setInt(1, product.getId());
+                        pstmtPrice.setInt(2, defaultPriceListId);
+                        pstmtPrice.setDouble(3, product.getPrice());
+                        pstmtPrice.executeUpdate();
+                    }
+                }
+            } // Close pstmt
+            conn.commit();
+        } catch (SQLException e) {
+            if (conn != null) {
+                try {
+                    conn.rollback();
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
+            }
+            throw e;
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.setAutoCommit(true);
+                    conn.close();
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
                 }
             }
         }
@@ -73,17 +136,98 @@ public class JdbcProductRepository implements IProductRepository {
 
     @Override
     public void update(Product product) throws SQLException {
-        String sql = "UPDATE products SET category_id = ?, name = ?, price = ?, is_favorite = ?, image_path = ?, visible = ? WHERE product_id = ?";
-        try (Connection conn = DBConnection.getConnection();
-                PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setInt(1, product.getCategoryId());
-            pstmt.setString(2, product.getName());
-            pstmt.setDouble(3, product.getPrice());
-            pstmt.setBoolean(4, product.isFavorite());
-            pstmt.setString(5, product.getImagePath());
-            pstmt.setBoolean(6, product.isVisible());
-            pstmt.setInt(7, product.getId());
-            pstmt.executeUpdate();
+        Connection conn = null;
+        try {
+            conn = DBConnection.getConnection();
+            conn.setAutoCommit(false); // Transacción para doble escritura
+
+            String sql = "UPDATE products SET category_id = ?, name = ?, is_favorite = ?, image_path = ?, visible = ?, iva = ?, tax_rate = ? WHERE product_id = ?";
+            try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                pstmt.setInt(1, product.getCategoryId());
+                pstmt.setString(2, product.getName());
+                pstmt.setBoolean(3, product.isFavorite());
+                pstmt.setString(4, product.getImagePath());
+                pstmt.setBoolean(5, product.isVisible());
+
+                Double iva = product.getIva();
+                if (iva != null) {
+                    pstmt.setDouble(6, iva);
+                    pstmt.setDouble(7, iva); // Compatibility
+                } else {
+                    pstmt.setNull(6, Types.DOUBLE);
+                    pstmt.setNull(7, Types.DOUBLE);
+                }
+                pstmt.setInt(8, product.getId());
+                pstmt.executeUpdate();
+            }
+
+            // --- LÓGICA DE DOBLE ESCRITURA PARA product_prices ---
+            // 1. Obtener ID de la lista por defecto
+            int defaultPriceListId = 1;
+            try (Statement stmtList = conn.createStatement();
+                    ResultSet rsList = stmtList
+                            .executeQuery("SELECT price_list_id FROM price_lists WHERE is_default = 1 LIMIT 1")) {
+                if (rsList.next()) {
+                    defaultPriceListId = rsList.getInt(1);
+                }
+            } catch (Exception ignored) {
+            }
+
+            // 2. Comprobar si el precio actual es distinto (o simplemente cerrar el actual
+            // e insertar nuevo)
+            // Para evitar basura, vamos a comprobar qué precio activo hay
+            double activePrice = -1;
+            boolean hasActive = false;
+            String selectSql = "SELECT price FROM product_prices WHERE product_id = ? AND price_list_id = ? AND end_date IS NULL LIMIT 1";
+            try (PreparedStatement selectStmt = conn.prepareStatement(selectSql)) {
+                selectStmt.setInt(1, product.getId());
+                selectStmt.setInt(2, defaultPriceListId);
+                try (ResultSet rs = selectStmt.executeQuery()) {
+                    if (rs.next()) {
+                        hasActive = true;
+                        activePrice = rs.getDouble(1);
+                    }
+                }
+            }
+
+            // Si el precio cambió, generamos el histórico
+            if (!hasActive || activePrice != product.getPrice()) {
+                if (hasActive) {
+                    String updateOld = "UPDATE product_prices SET end_date = NOW(), reason = 'Cambio individual de tarifa' WHERE product_id = ? AND price_list_id = ? AND end_date IS NULL";
+                    try (PreparedStatement updStmt = conn.prepareStatement(updateOld)) {
+                        updStmt.setInt(1, product.getId());
+                        updStmt.setInt(2, defaultPriceListId);
+                        updStmt.executeUpdate();
+                    }
+                }
+                String insertNew = "INSERT INTO product_prices (product_id, price_list_id, price, start_date, end_date, reason) VALUES (?, ?, ?, NOW(), NULL, 'Actualización de producto')";
+                try (PreparedStatement insStmt = conn.prepareStatement(insertNew)) {
+                    insStmt.setInt(1, product.getId());
+                    insStmt.setInt(2, defaultPriceListId);
+                    insStmt.setDouble(3, product.getPrice());
+                    insStmt.executeUpdate();
+                }
+            }
+
+            conn.commit();
+        } catch (SQLException e) {
+            if (conn != null) {
+                try {
+                    conn.rollback();
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
+            }
+            throw e;
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.setAutoCommit(true);
+                    conn.close();
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
+            }
         }
     }
 
@@ -131,6 +275,18 @@ public class JdbcProductRepository implements IProductRepository {
     }
 
     @Override
+    public void updateTaxRateByCategory(int categoryId, double taxRate) throws SQLException {
+        String sql = "UPDATE products SET iva = ?, tax_rate = ? WHERE category_id = ?";
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setDouble(1, taxRate);
+            pstmt.setDouble(2, taxRate); // Compatibility
+            pstmt.setInt(3, categoryId);
+            pstmt.executeUpdate();
+        }
+    }
+
+    @Override
     public int count() throws SQLException {
         String sql = "SELECT COUNT(*) FROM products";
         try (Connection conn = DBConnection.getConnection();
@@ -144,14 +300,50 @@ public class JdbcProductRepository implements IProductRepository {
     }
 
     private Product mapResultSetToProduct(ResultSet rs) throws SQLException {
+        double ivaVal = rs.getDouble("iva");
+        Double iva = rs.wasNull() ? null : ivaVal;
+
+        if (iva == null) {
+            try {
+                double taxRateVal = rs.getDouble("tax_rate");
+                if (!rs.wasNull()) {
+                    iva = taxRateVal;
+                }
+            } catch (SQLException e) {
+                // tax_rate doesn't exist
+            }
+        }
+
+        Double categoryIva = null;
+        try {
+            double catIvaVal = rs.getDouble("category_iva");
+            if (!rs.wasNull()) {
+                categoryIva = catIvaVal;
+            }
+        } catch (SQLException e) {
+            // column missing in legacy queries or joins
+        }
+
+        Double calculatedPrice = 0.0;
+        try {
+            double currPriceVal = rs.getDouble("current_price");
+            if (!rs.wasNull()) {
+                calculatedPrice = currPriceVal;
+            }
+        } catch (SQLException e) {
+            // column missing
+        }
+
         return new Product(
                 rs.getInt("product_id"),
                 rs.getInt("category_id"),
                 rs.getString("name"),
-                rs.getDouble("price"),
+                calculatedPrice,
                 rs.getBoolean("is_favorite"),
                 rs.getBoolean("visible"),
                 rs.getString("image_path"),
-                rs.getString("category_name"));
+                rs.getString("category_name"),
+                iva,
+                categoryIva);
     }
 }

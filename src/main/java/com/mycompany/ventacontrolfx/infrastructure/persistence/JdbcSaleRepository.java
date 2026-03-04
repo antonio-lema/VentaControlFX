@@ -44,7 +44,7 @@ public class JdbcSaleRepository implements ISaleRepository {
 
     @Override
     public void saveSaleDetails(List<SaleDetail> details, int saleId) throws SQLException {
-        String sql = "INSERT INTO sale_details (sale_id, product_id, quantity, unit_price, line_total) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO sale_details (sale_id, product_id, quantity, unit_price, line_total, iva_rate, iva_amount) VALUES (?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = DBConnection.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
             for (SaleDetail detail : details) {
@@ -53,6 +53,8 @@ public class JdbcSaleRepository implements ISaleRepository {
                 pstmt.setInt(3, detail.getQuantity());
                 pstmt.setDouble(4, detail.getUnitPrice());
                 pstmt.setDouble(5, detail.getLineTotal());
+                pstmt.setDouble(6, detail.getIvaRate());
+                pstmt.setDouble(7, detail.getIvaAmount());
                 pstmt.addBatch();
             }
             pstmt.executeBatch();
@@ -78,6 +80,8 @@ public class JdbcSaleRepository implements ISaleRepository {
                     detail.setQuantity(rs.getInt("quantity"));
                     detail.setUnitPrice(rs.getDouble("unit_price"));
                     detail.setLineTotal(rs.getDouble("line_total"));
+                    detail.setIvaRate(rs.getDouble("iva_rate"));
+                    detail.setIvaAmount(rs.getDouble("iva_amount"));
                     detail.setProductName(rs.getString("product_name"));
                     detail.setReturnedQuantity(rs.getInt("returned_quantity"));
                     details.add(detail);
@@ -89,7 +93,7 @@ public class JdbcSaleRepository implements ISaleRepository {
 
     @Override
     public Sale getById(int saleId) throws SQLException {
-        String sql = "SELECT s.*, u.username FROM sales s JOIN users u ON s.user_id = u.user_id WHERE s.sale_id = ?";
+        String sql = "SELECT s.*, u.username FROM sales s LEFT JOIN users u ON s.user_id = u.user_id WHERE s.sale_id = ?";
         try (Connection conn = DBConnection.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, saleId);
@@ -108,7 +112,7 @@ public class JdbcSaleRepository implements ISaleRepository {
     public List<Sale> getByRange(LocalDate start, LocalDate end) throws SQLException {
         List<Sale> sales = new ArrayList<>();
         String sql = "SELECT s.*, u.username FROM sales s " +
-                "JOIN users u ON s.user_id = u.user_id " +
+                "LEFT JOIN users u ON s.user_id = u.user_id " +
                 "WHERE DATE(s.sale_datetime) BETWEEN ? AND ? " +
                 "ORDER BY s.sale_datetime DESC";
         try (Connection conn = DBConnection.getConnection();
@@ -126,9 +130,15 @@ public class JdbcSaleRepository implements ISaleRepository {
 
     @Override
     public int saveReturn(Return returnRecord) throws SQLException {
-        String sql = "INSERT INTO returns (sale_id, user_id, return_datetime, total_refunded, reason) VALUES (?, ?, ?, ?, ?)";
-        try (Connection conn = DBConnection.getConnection();
-                PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        try (Connection conn = DBConnection.getConnection()) {
+            return saveReturn(returnRecord, conn);
+        }
+    }
+
+    @Override
+    public int saveReturn(Return returnRecord, Connection conn) throws SQLException {
+        String sql = "INSERT INTO returns (sale_id, user_id, return_datetime, total_refunded, reason, payment_method) VALUES (?, ?, ?, ?, ?, ?)";
+        try (PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             pstmt.setInt(1, returnRecord.getSaleId());
             if (returnRecord.getUserId() > 0) {
                 pstmt.setInt(2, returnRecord.getUserId());
@@ -138,6 +148,7 @@ public class JdbcSaleRepository implements ISaleRepository {
             pstmt.setTimestamp(3, Timestamp.valueOf(returnRecord.getReturnDatetime()));
             pstmt.setDouble(4, returnRecord.getTotalRefunded());
             pstmt.setString(5, returnRecord.getReason());
+            pstmt.setString(6, returnRecord.getPaymentMethod());
 
             pstmt.executeUpdate();
             try (ResultSet rs = pstmt.getGeneratedKeys()) {
@@ -154,9 +165,15 @@ public class JdbcSaleRepository implements ISaleRepository {
 
     @Override
     public void saveReturnDetails(List<ReturnDetail> details, int returnId) throws SQLException {
+        try (Connection conn = DBConnection.getConnection()) {
+            saveReturnDetails(details, returnId, conn);
+        }
+    }
+
+    @Override
+    public void saveReturnDetails(List<ReturnDetail> details, int returnId, Connection conn) throws SQLException {
         String sql = "INSERT INTO return_details (return_id, product_id, quantity, unit_price, subtotal) VALUES (?, ?, ?, ?, ?)";
-        try (Connection conn = DBConnection.getConnection();
-                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             for (ReturnDetail detail : details) {
                 pstmt.setInt(1, returnId);
                 pstmt.setInt(2, detail.getProductId());
@@ -172,9 +189,16 @@ public class JdbcSaleRepository implements ISaleRepository {
     @Override
     public void updateSaleReturnStatus(int saleId, boolean isReturn, String reason, double returnedAmount)
             throws SQLException {
+        try (Connection conn = DBConnection.getConnection()) {
+            updateSaleReturnStatus(saleId, isReturn, reason, returnedAmount, conn);
+        }
+    }
+
+    @Override
+    public void updateSaleReturnStatus(int saleId, boolean isReturn, String reason, double returnedAmount,
+            Connection conn) throws SQLException {
         String sql = "UPDATE sales SET is_return = ?, return_reason = ?, returned_amount = ? WHERE sale_id = ?";
-        try (Connection conn = DBConnection.getConnection();
-                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setBoolean(1, isReturn);
             pstmt.setString(2, reason);
             pstmt.setDouble(3, returnedAmount);
@@ -185,13 +209,82 @@ public class JdbcSaleRepository implements ISaleRepository {
 
     @Override
     public void updateDetailReturnedQuantity(int detailId, int quantity) throws SQLException {
+        try (Connection conn = DBConnection.getConnection()) {
+            updateDetailReturnedQuantity(detailId, quantity, conn);
+        }
+    }
+
+    @Override
+    public void updateDetailReturnedQuantity(int detailId, int quantity, Connection conn) throws SQLException {
         String sql = "UPDATE sale_details SET returned_quantity = ? WHERE detail_id = ?";
-        try (Connection conn = DBConnection.getConnection();
-                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, quantity);
             pstmt.setInt(2, detailId);
             pstmt.executeUpdate();
         }
+    }
+
+    @Override
+    public List<Return> getReturnsByRange(LocalDate start, LocalDate end) throws SQLException {
+        List<Return> returns = new ArrayList<>();
+        String sql = "SELECT r.*, u.username FROM returns r " +
+                "LEFT JOIN users u ON r.user_id = u.user_id " +
+                "WHERE DATE(r.return_datetime) BETWEEN ? AND ? " +
+                "ORDER BY r.return_datetime DESC";
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setDate(1, Date.valueOf(start));
+            pstmt.setDate(2, Date.valueOf(end));
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    Return ret = new Return();
+                    ret.setReturnId(rs.getInt("return_id"));
+                    ret.setSaleId(rs.getInt("sale_id"));
+                    ret.setUserId(rs.getInt("user_id"));
+                    ret.setUserName(rs.getString("username"));
+                    Timestamp ts = rs.getTimestamp("return_datetime");
+                    if (ts != null) {
+                        ret.setReturnDatetime(ts.toLocalDateTime());
+                    }
+                    ret.setTotalRefunded(rs.getDouble("total_refunded"));
+                    ret.setReason(rs.getString("reason"));
+                    ret.setClosureId((Integer) rs.getObject("closure_id"));
+                    try {
+                        ret.setPaymentMethod(rs.getString("payment_method"));
+                    } catch (SQLException ignored) {
+                    }
+                    returns.add(ret);
+                }
+            }
+        }
+        return returns;
+    }
+
+    @Override
+    public List<ReturnDetail> getReturnDetailsByReturnId(int returnId) throws SQLException {
+        List<ReturnDetail> details = new ArrayList<>();
+        String sql = "SELECT rd.*, p.name as product_name " +
+                "FROM return_details rd " +
+                "LEFT JOIN products p ON rd.product_id = p.product_id " +
+                "WHERE rd.return_id = ?";
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, returnId);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    ReturnDetail detail = new ReturnDetail();
+                    detail.setReturnDetailId(rs.getInt("return_detail_id"));
+                    detail.setReturnId(rs.getInt("return_id"));
+                    detail.setProductId(rs.getInt("product_id"));
+                    detail.setQuantity(rs.getInt("quantity"));
+                    detail.setUnitPrice(rs.getDouble("unit_price"));
+                    detail.setSubtotal(rs.getDouble("subtotal"));
+                    detail.setProductName(rs.getString("product_name"));
+                    details.add(detail);
+                }
+            }
+        }
+        return details;
     }
 
     @Override
@@ -210,7 +303,10 @@ public class JdbcSaleRepository implements ISaleRepository {
     private Sale mapResultSetToSale(ResultSet rs) throws SQLException {
         Sale sale = new Sale();
         sale.setSaleId(rs.getInt("sale_id"));
-        sale.setSaleDateTime(rs.getTimestamp("sale_datetime").toLocalDateTime());
+        Timestamp ts = rs.getTimestamp("sale_datetime");
+        if (ts != null) {
+            sale.setSaleDateTime(ts.toLocalDateTime());
+        }
         sale.setUserId(rs.getInt("user_id"));
         sale.setUserName(rs.getString("username"));
         sale.setClientId((Integer) rs.getObject("client_id"));

@@ -1,5 +1,10 @@
 package com.mycompany.ventacontrolfx.domain.model;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
+
 public class User {
 
     private int userId;
@@ -11,6 +16,16 @@ public class User {
     private String email;
     private int companyId;
     private String companyName;
+    private Role roleObject;
+    private Integer currentBranchId; // ID de la sucursal actual
+
+    // Mapeo de BranchID -> Lista de Permisos Contextuales
+    private java.util.Map<Integer, List<Permission>> branchPermissions = new java.util.HashMap<>();
+
+    // Permisos heredados del ROL
+    private List<Permission> rolePermissions = new ArrayList<>();
+    // Permisos adicionales asignados DIRECTAMENTE al usuario
+    private List<Permission> individualPermissions = new ArrayList<>();
 
     public User() {
         // Constructor vacío
@@ -23,6 +38,18 @@ public class User {
         this.fullName = fullName;
         this.role = role;
         this.email = email;
+    }
+
+    public Role getRoleObject() {
+        return roleObject;
+    }
+
+    public void setRoleObject(Role role) {
+        this.roleObject = role;
+        if (role != null) {
+            this.role = role.getName();
+            setRolePermissions(role.getPermissions());
+        }
     }
 
     public int getUserId() {
@@ -87,5 +114,79 @@ public class User {
 
     public void setCompanyName(String companyName) {
         this.companyName = companyName;
+    }
+
+    public List<Permission> getRolePermissions() {
+        return rolePermissions;
+    }
+
+    public void setRolePermissions(List<Permission> permissions) {
+        this.rolePermissions = permissions != null ? permissions : new ArrayList<>();
+    }
+
+    public List<Permission> getIndividualPermissions() {
+        return individualPermissions;
+    }
+
+    public void setIndividualPermissions(List<Permission> permissions) {
+        this.individualPermissions = permissions != null ? permissions : new ArrayList<>();
+    }
+
+    /**
+     * Retorna la unión de permisos del rol y permisos individuales.
+     */
+    public List<Permission> getEffectivePermissions() {
+        List<Permission> effective = new ArrayList<>(rolePermissions);
+        for (Permission p : individualPermissions) {
+            if (effective.stream().noneMatch(ep -> ep.getCode().equals(p.getCode()))) {
+                effective.add(p);
+            }
+        }
+        return effective;
+    }
+
+    public void setPermissions(List<Permission> permissions) {
+        this.individualPermissions = permissions != null ? permissions : new ArrayList<>();
+    }
+
+    public Integer getCurrentBranchId() {
+        return currentBranchId;
+    }
+
+    public void setCurrentBranchId(Integer currentBranchId) {
+        this.currentBranchId = currentBranchId;
+    }
+
+    public void setBranchPermissions(int branchId, List<Permission> permissions) {
+        this.branchPermissions.put(branchId, permissions != null ? permissions : new ArrayList<>());
+    }
+
+    /**
+     * Comprueba si el usuario tiene un permiso, considerando el contexto
+     * global y el contexto de la sucursal actual.
+     */
+    public boolean hasPermission(String code) {
+        if (code == null)
+            return false;
+
+        // 1. Administrador Global siempre tiene todo
+        if (this.role != null && (this.role.equalsIgnoreCase("Administrador") ||
+                this.role.equalsIgnoreCase("admin") ||
+                this.role.equalsIgnoreCase("SUPERADMIN")))
+            return true;
+
+        // 2. Comprobar permisos globales (Rol + Individuales)
+        if (rolePermissions.stream().anyMatch(p -> code.equalsIgnoreCase(p.getCode())))
+            return true;
+        if (individualPermissions.stream().anyMatch(p -> code.equalsIgnoreCase(p.getCode())))
+            return true;
+
+        // 3. Comprobar permisos contextuales de la sucursal actual
+        if (currentBranchId != null && branchPermissions.containsKey(currentBranchId)) {
+            return branchPermissions.get(currentBranchId).stream()
+                    .anyMatch(p -> code.equalsIgnoreCase(p.getCode()));
+        }
+
+        return false;
     }
 }

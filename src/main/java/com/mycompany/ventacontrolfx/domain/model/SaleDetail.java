@@ -7,9 +7,12 @@ public class SaleDetail {
     private int quantity;
     private double unitPrice;
     private double lineTotal;
+    private double ivaRate;
+    private double ivaAmount;
 
     // Auxiliary field for UI display
     private String productName;
+    private int returnedQuantity;
 
     public SaleDetail() {
     }
@@ -62,6 +65,22 @@ public class SaleDetail {
         this.lineTotal = lineTotal;
     }
 
+    public double getIvaRate() {
+        return ivaRate;
+    }
+
+    public void setIvaRate(double ivaRate) {
+        this.ivaRate = ivaRate;
+    }
+
+    public double getIvaAmount() {
+        return ivaAmount;
+    }
+
+    public void setIvaAmount(double ivaAmount) {
+        this.ivaAmount = ivaAmount;
+    }
+
     public String getProductName() {
         return productName;
     }
@@ -69,8 +88,6 @@ public class SaleDetail {
     public void setProductName(String productName) {
         this.productName = productName;
     }
-
-    private int returnedQuantity;
 
     public int getReturnedQuantity() {
         return returnedQuantity;

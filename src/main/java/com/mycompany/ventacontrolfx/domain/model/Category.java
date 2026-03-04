@@ -5,17 +5,23 @@ public class Category {
     private String name;
     private boolean visible;
     private boolean favorite;
+    private double defaultIva = 21.0;
 
     public Category() {
         this.visible = true;
         this.favorite = false;
     }
 
-    public Category(int id, String name, boolean visible, boolean favorite) {
+    public Category(int id, String name, boolean visible, boolean favorite, double defaultIva) {
         this.id = id;
         this.name = name;
         this.visible = visible;
         this.favorite = favorite;
+        this.defaultIva = defaultIva;
+    }
+
+    public Category(int id, String name, boolean visible, boolean favorite) {
+        this(id, name, visible, favorite, 21.0);
     }
 
     public Category(int id, String name, boolean visible) {
@@ -66,6 +72,14 @@ public class Category {
 
     public void setFavorite(boolean favorite) {
         this.favorite = favorite;
+    }
+
+    public double getDefaultIva() {
+        return defaultIva;
+    }
+
+    public void setDefaultIva(double defaultIva) {
+        this.defaultIva = defaultIva;
     }
 
     @Override

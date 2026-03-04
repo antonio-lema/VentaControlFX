@@ -17,6 +17,8 @@ public class Product {
     private String imagePath;
     private boolean visible;
     private String categoryName;
+    private Double iva; // Nullable, if null it inherits default_iva from category
+    private Double categoryIva; // Inherited from category for resolution logic
 
     public Product() {
         this.visible = true;
@@ -24,7 +26,7 @@ public class Product {
 
     // Modified constructor to include categoryName
     public Product(int id, int categoryId, String name, double price, boolean isFavorite, boolean visible,
-            String imagePath, String categoryName) {
+            String imagePath, String categoryName, Double iva, Double categoryIva) {
         this.id = id;
         this.categoryId = categoryId;
         this.name = name;
@@ -33,6 +35,13 @@ public class Product {
         this.visible = visible;
         this.imagePath = imagePath;
         this.categoryName = categoryName;
+        this.iva = iva;
+        this.categoryIva = categoryIva;
+    }
+
+    public Product(int id, int categoryId, String name, double price, boolean isFavorite, boolean visible,
+            String imagePath, String categoryName) {
+        this(id, categoryId, name, price, isFavorite, visible, imagePath, categoryName, null, null);
     }
 
     // Kept for backward compatibility
@@ -121,6 +130,45 @@ public class Product {
 
     public void setCategoryName(String categoryName) {
         this.categoryName = categoryName;
+    }
+
+    public Double getIva() {
+        return iva;
+    }
+
+    public void setIva(Double iva) {
+        this.iva = iva;
+    }
+
+    // Keep legacy support for templates/older code if needed
+    public Double getTaxRate() {
+        return iva;
+    }
+
+    public void setTaxRate(Double taxRate) {
+        this.iva = taxRate;
+    }
+
+    public Double getCategoryIva() {
+        return categoryIva;
+    }
+
+    public void setCategoryIva(Double categoryIva) {
+        this.categoryIva = categoryIva;
+    }
+
+    /**
+     * Resolves the effective IVA for this product based on the priority:
+     * 1. Product IVA (if set)
+     * 2. Category IVA (if set)
+     * 3. Global IVA (provided as fallback)
+     */
+    public double resolveEffectiveIva(double globalIva) {
+        if (iva != null)
+            return iva;
+        if (categoryIva != null)
+            return categoryIva;
+        return globalIva;
     }
 
     @Override

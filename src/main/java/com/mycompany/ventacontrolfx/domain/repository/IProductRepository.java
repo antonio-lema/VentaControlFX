@@ -24,4 +24,6 @@ public interface IProductRepository {
     void updateVisibility(int productId, boolean visible) throws SQLException;
 
     void updateVisibilityByCategory(int categoryId, boolean visible) throws SQLException;
+
+    void updateTaxRateByCategory(int categoryId, double taxRate) throws SQLException;
 }

@@ -22,4 +22,9 @@ public interface IUserRepository {
     List<User> listByCompany(int companyId) throws SQLException;
 
     int count() throws SQLException;
+
+    // Gestión de permisos individuales
+    boolean addIndividualPermission(int userId, int permissionId) throws SQLException;
+
+    boolean removeIndividualPermission(int userId, int permissionId) throws SQLException;
 }

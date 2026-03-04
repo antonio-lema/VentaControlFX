@@ -10,6 +10,9 @@ public class CashClosure {
     private double totalCash;
     private double totalCard;
     private double totalAll;
+    private double actualCash; // NEW: Real cash counted
+    private double difference; // NEW: Diff between theoretical and actual
+    private String notes; // NEW: Comments about the difference
     private LocalDateTime createdAt;
     private String username; // Added for display in UI
 
@@ -17,13 +20,15 @@ public class CashClosure {
     }
 
     public CashClosure(int closureId, LocalDate closureDate, int userId, double totalCash, double totalCard,
-            double totalAll, LocalDateTime createdAt) {
+            double totalAll, double actualCash, double difference, LocalDateTime createdAt) {
         this.closureId = closureId;
         this.closureDate = closureDate;
         this.userId = userId;
         this.totalCash = totalCash;
         this.totalCard = totalCard;
         this.totalAll = totalAll;
+        this.actualCash = actualCash;
+        this.difference = difference;
         this.createdAt = createdAt;
     }
 
@@ -82,6 +87,30 @@ public class CashClosure {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public double getActualCash() {
+        return actualCash;
+    }
+
+    public void setActualCash(double actualCash) {
+        this.actualCash = actualCash;
+    }
+
+    public double getDifference() {
+        return difference;
+    }
+
+    public void setDifference(double difference) {
+        this.difference = difference;
+    }
+
+    public String getNotes() {
+        return notes;
+    }
+
+    public void setNotes(String notes) {
+        this.notes = notes;
     }
 
     public String getUsername() {

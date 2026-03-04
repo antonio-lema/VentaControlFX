@@ -33,11 +33,18 @@ public class JdbcCategoryRepository implements ICategoryRepository {
                         // ignore if column issue, default false
                     }
 
+                    double defaultIva = 21.0;
+                    try {
+                        defaultIva = rs.getDouble("default_iva");
+                    } catch (SQLException e) {
+                    }
+
                     Category category = new Category(
                             rs.getInt("category_id"),
                             rs.getString("name"),
                             rs.getBoolean("visible"),
-                            isFavorite);
+                            isFavorite,
+                            defaultIva);
                     categories.add(category);
                 }
             }
@@ -57,14 +64,20 @@ public class JdbcCategoryRepository implements ICategoryRepository {
                 try {
                     isFavorite = rs.getBoolean("is_favorite");
                 } catch (SQLException e) {
-                    // ignore
+                }
+
+                double defaultIva = 21.0;
+                try {
+                    defaultIva = rs.getDouble("default_iva");
+                } catch (SQLException e) {
                 }
 
                 Category category = new Category(
                         rs.getInt("category_id"),
                         rs.getString("name"),
                         rs.getBoolean("visible"),
-                        isFavorite);
+                        isFavorite,
+                        defaultIva);
                 categories.add(category);
             }
         }
@@ -80,11 +93,18 @@ public class JdbcCategoryRepository implements ICategoryRepository {
             try (Statement stmt = connection.createStatement();
                     ResultSet rs = stmt.executeQuery(sql)) {
                 while (rs.next()) {
+                    double defaultIva = 21.0;
+                    try {
+                        defaultIva = rs.getDouble("default_iva");
+                    } catch (SQLException e) {
+                    }
+
                     categories.add(new Category(
                             rs.getInt("category_id"),
                             rs.getString("name"),
                             rs.getBoolean("visible"),
-                            rs.getBoolean("is_favorite")));
+                            rs.getBoolean("is_favorite"),
+                            defaultIva));
                 }
             }
         }
@@ -93,25 +113,29 @@ public class JdbcCategoryRepository implements ICategoryRepository {
 
     @Override
     public void save(Category category) throws SQLException {
-        String sql = "INSERT INTO categories (name, visible, is_favorite) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO categories (name, visible, is_favorite, default_iva, tax_rate) VALUES (?, ?, ?, ?, ?)";
         try (Connection connection = DBConnection.getConnection();
                 PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setString(1, category.getName());
             pstmt.setBoolean(2, category.isVisible());
             pstmt.setBoolean(3, category.isFavorite());
+            pstmt.setDouble(4, category.getDefaultIva());
+            pstmt.setDouble(5, category.getDefaultIva()); // Compatibility
             pstmt.executeUpdate();
         }
     }
 
     @Override
     public void update(Category category) throws SQLException {
-        String sql = "UPDATE categories SET name = ?, visible = ?, is_favorite = ? WHERE category_id = ?";
+        String sql = "UPDATE categories SET name = ?, visible = ?, is_favorite = ?, default_iva = ?, tax_rate = ? WHERE category_id = ?";
         try (Connection connection = DBConnection.getConnection();
                 PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setString(1, category.getName());
             pstmt.setBoolean(2, category.isVisible());
             pstmt.setBoolean(3, category.isFavorite());
-            pstmt.setInt(4, category.getId());
+            pstmt.setDouble(4, category.getDefaultIva());
+            pstmt.setDouble(5, category.getDefaultIva()); // Compatibility
+            pstmt.setInt(6, category.getId());
             pstmt.executeUpdate();
         }
     }

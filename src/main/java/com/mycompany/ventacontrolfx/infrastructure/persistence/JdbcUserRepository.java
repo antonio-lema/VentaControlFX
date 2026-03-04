@@ -159,6 +159,77 @@ public class JdbcUserRepository implements IUserRepository {
         } catch (SQLException e) {
             // Se ignoran columnas si no existen en esta versión de la DB
         }
+
+        // Cargar permisos del ROL
+        user.setRolePermissions(loadRolePermissions(user.getRole()));
+        // Cargar permisos INDIVIDUALES
+        user.setIndividualPermissions(loadIndividualPermissions(user.getUserId()));
+
         return user;
+    }
+
+    private List<com.mycompany.ventacontrolfx.domain.model.Permission> loadRolePermissions(String roleName)
+            throws SQLException {
+        List<com.mycompany.ventacontrolfx.domain.model.Permission> perms = new ArrayList<>();
+        String sql = "SELECT p.* FROM permissions p " +
+                "JOIN role_permissions rp ON p.permission_id = rp.permission_id " +
+                "JOIN roles r ON rp.role_id = r.role_id " +
+                "WHERE r.name = ?";
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, roleName);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    com.mycompany.ventacontrolfx.domain.model.Permission p = new com.mycompany.ventacontrolfx.domain.model.Permission();
+                    p.setPermissionId(rs.getInt("permission_id"));
+                    p.setCode(rs.getString("code"));
+                    perms.add(p);
+                }
+            }
+        }
+        return perms;
+    }
+
+    private List<com.mycompany.ventacontrolfx.domain.model.Permission> loadIndividualPermissions(int userId)
+            throws SQLException {
+        List<com.mycompany.ventacontrolfx.domain.model.Permission> perms = new ArrayList<>();
+        String sql = "SELECT p.* FROM permissions p " +
+                "JOIN user_permissions up ON p.permission_id = up.permission_id " +
+                "WHERE up.user_id = ?";
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, userId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    com.mycompany.ventacontrolfx.domain.model.Permission p = new com.mycompany.ventacontrolfx.domain.model.Permission();
+                    p.setPermissionId(rs.getInt("permission_id"));
+                    p.setCode(rs.getString("code"));
+                    perms.add(p);
+                }
+            }
+        }
+        return perms;
+    }
+
+    @Override
+    public boolean addIndividualPermission(int userId, int permissionId) throws SQLException {
+        String sql = "INSERT IGNORE INTO user_permissions (user_id, permission_id) VALUES (?, ?)";
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, userId);
+            ps.setInt(2, permissionId);
+            return ps.executeUpdate() > 0;
+        }
+    }
+
+    @Override
+    public boolean removeIndividualPermission(int userId, int permissionId) throws SQLException {
+        String sql = "DELETE FROM user_permissions WHERE user_id = ? AND permission_id = ?";
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, userId);
+            ps.setInt(2, permissionId);
+            return ps.executeUpdate() > 0;
+        }
     }
 }
