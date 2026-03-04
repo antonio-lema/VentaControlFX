@@ -31,7 +31,7 @@
                 </StackPane>
                 <Label text="Productos" styleClass="sidebar-button-label"/> 
                 <Region HBox.hgrow="ALWAYS"/>
-                <Label fx:id="lblProductsArrow" text="&lt;" styleClass="sidebar-submenu-arrow"/>
+                <Label fx:id="lblProductsArrow" text="&gt;" styleClass="sidebar-submenu-arrow"/>
             </HBox>
         </graphic>
     </Button>
@@ -50,6 +50,37 @@
             </HBox>
         </graphic>
     </Button>
+    
+    <Button fx:id="btnReturns" styleClass="sidebar-button" onAction="#handleShowReturns" contentDisplay="GRAPHIC_ONLY" maxWidth="Infinity">
+        <graphic>
+            <HBox alignment="CENTER_LEFT" spacing="15">
+                <StackPane styleClass="icon-container">
+                    <FontAwesomeIconView glyphName="REPLY" size="20" styleClass="sidebar-icon"/>
+                </StackPane>
+                <Label text="Devoluciones" styleClass="sidebar-button-label"/>
+            </HBox>
+        </graphic>
+    </Button>
+
+    <!-- Informes -->
+    <Button fx:id="btnReports" styleClass="sidebar-button" onAction="#toggleReportsMenu" contentDisplay="GRAPHIC_ONLY" maxWidth="Infinity">
+        <graphic>
+            <HBox alignment="CENTER_LEFT" maxWidth="Infinity" spacing="15">
+                <StackPane styleClass="icon-container">
+                    <FontAwesomeIconView glyphName="BAR_CHART" size="20" styleClass="sidebar-icon"/>
+                </StackPane>
+                <Label text="Informes" styleClass="sidebar-button-label"/> 
+                <Region HBox.hgrow="ALWAYS"/>
+                <Label fx:id="lblReportsArrow" text="&lt;" styleClass="sidebar-submenu-arrow"/>
+            </HBox>
+        </graphic>
+    </Button>
+    <VBox fx:id="reportsSubmenu" managed="false" visible="false" spacing="0">
+        <padding><Insets left="20"/></padding>
+        <Button fx:id="btnSellerReport" text="Ventas por Vendedor" styleClass="sidebar-button" onAction="#showSellerReport"/>
+        <Button fx:id="btnClientReport" text="Historial de Clientes" styleClass="sidebar-button" onAction="#showClientReport"/>
+    </VBox>
+
     <Button fx:id="btnClosures" styleClass="sidebar-button" onAction="#handleShowClosures" contentDisplay="GRAPHIC_ONLY" maxWidth="Infinity">
         <graphic>
             <HBox alignment="CENTER_LEFT" spacing="15">
@@ -71,23 +102,41 @@
         </graphic>
     </Button>
 
-    <Button fx:id="btnUsers" styleClass="sidebar-button" contentDisplay="GRAPHIC_ONLY" maxWidth="Infinity" onAction="#handleShowUsers">
+    <!-- Usuarios Dropdown -->
+    <Button fx:id="btnUsers" styleClass="sidebar-button" onAction="#toggleUsersMenu" contentDisplay="GRAPHIC_ONLY" maxWidth="Infinity">
         <graphic>
             <HBox alignment="CENTER_LEFT" spacing="15">
                 <StackPane styleClass="icon-container">
                     <FontAwesomeIconView glyphName="USER_CIRCLE" size="20" styleClass="sidebar-icon"/>
                 </StackPane>
                 <Label text="Usuarios" styleClass="sidebar-button-label"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Label fx:id="lblUsersArrow" text="&gt;" styleClass="sidebar-submenu-arrow"/>
             </HBox>
         </graphic>
     </Button>
-    <Button fx:id="btnConfig" styleClass="sidebar-button" contentDisplay="GRAPHIC_ONLY" maxWidth="Infinity" onAction="#handleShowConfig">
+    <VBox fx:id="usersSubmenu" managed="false" visible="false" spacing="0">
+        <padding><Insets left="20"/></padding>
+        <Button fx:id="btnUsersList" text="Lista de Usuarios" styleClass="sidebar-button" onAction="#handleShowUsers"/>
+        <Button fx:id="btnRoles" text="Roles y Permisos" styleClass="sidebar-button" onAction="#handleShowRoles"/>
+    </VBox>    <Button fx:id="btnConfig" styleClass="sidebar-button" contentDisplay="GRAPHIC_ONLY" maxWidth="Infinity" onAction="#handleShowConfig">
         <graphic>
             <HBox alignment="CENTER_LEFT" spacing="15">
                 <StackPane styleClass="icon-container">
                     <FontAwesomeIconView glyphName="COG" size="20" styleClass="sidebar-icon"/>
                 </StackPane>
                 <Label text="Configuración" styleClass="sidebar-button-label"/>
+            </HBox>
+        </graphic>
+    </Button>
+
+    <Button fx:id="btnThemeSettings" styleClass="sidebar-button" contentDisplay="GRAPHIC_ONLY" maxWidth="Infinity" onAction="#handleShowCustomization">
+        <graphic>
+            <HBox alignment="CENTER_LEFT" spacing="15">
+                <StackPane styleClass="icon-container">
+                    <FontAwesomeIconView glyphName="PAINT_BRUSH" size="20" styleClass="sidebar-icon"/>
+                </StackPane>
+                <Label text="Estética" styleClass="sidebar-button-label"/>
             </HBox>
         </graphic>
     </Button>

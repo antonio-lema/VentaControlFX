@@ -1,19 +1,26 @@
 package com.mycompany.ventacontrolfx.presentation.controller;
 
+import com.mycompany.ventacontrolfx.domain.model.Permission;
 import com.mycompany.ventacontrolfx.domain.model.User;
 import com.mycompany.ventacontrolfx.application.usecase.UserUseCase;
+import com.mycompany.ventacontrolfx.application.usecase.PermissionUseCase;
+import com.mycompany.ventacontrolfx.application.usecase.RoleUseCase;
+import com.mycompany.ventacontrolfx.domain.model.Role;
 import com.mycompany.ventacontrolfx.infrastructure.config.Injectable;
 import com.mycompany.ventacontrolfx.infrastructure.config.ServiceContainer;
 import com.mycompany.ventacontrolfx.util.AlertUtil;
-import com.mycompany.ventacontrolfx.util.ModalService;
 import com.mycompany.ventacontrolfx.util.SceneNavigator;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.*;
-import javafx.scene.layout.StackPane;
+import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class RegisterUserController implements Injectable {
 
@@ -37,24 +44,112 @@ public class RegisterUserController implements Injectable {
     private Label lblTitle;
     @FXML
     private StackPane rootStackPane;
+    @FXML
+    private VBox permissionsContainer; // Contenedor donde se renderizan los checkboxes
 
     private UserUseCase userUseCase;
+    private PermissionUseCase permissionUseCase;
+    private RoleUseCase roleUseCase;
     private ServiceContainer container;
     private User userToEdit;
     private boolean isInitialSetup = false;
     private double xOffset = 0;
     private double yOffset = 0;
 
+    // Lista de permisos disponibles y sus checkboxes
+    private List<Permission> allPermissions = new ArrayList<>();
+    private List<CheckBox> permissionCheckboxes = new ArrayList<>();
+    private CheckBox chkAllowExtraPerms;
+
     @Override
     public void inject(ServiceContainer container) {
         this.container = container;
         this.userUseCase = container.getUserUseCase();
+        this.permissionUseCase = container.getPermissionUseCase();
+        this.roleUseCase = container.getRoleUseCase();
 
-        if (cmbRole.getItems().isEmpty()) {
-            cmbRole.setItems(FXCollections.observableArrayList("admin", "cajero"));
-        }
+        loadRoles();
+        loadAndRenderPermissions();
+
+        cmbRole.valueProperty().addListener((obs, oldVal, newVal) -> updatePermissionsByRole(newVal));
 
         checkSetupMode();
+    }
+
+    private void loadRoles() {
+        try {
+            List<Role> roles = roleUseCase.getAllRoles();
+            List<String> roleNames = roles.stream().map(Role::getName).toList();
+            if (roleNames.isEmpty()) {
+                // Fallback si no hay roles en BD
+                roleNames = List.of("admin", "cajero");
+            }
+            cmbRole.setItems(FXCollections.observableArrayList(roleNames));
+        } catch (SQLException e) {
+            e.printStackTrace();
+            cmbRole.setItems(FXCollections.observableArrayList("admin", "cajero"));
+        }
+    }
+
+    private void updatePermissionsByRole(String roleName) {
+        if (roleName == null)
+            return;
+        try {
+            Role role = roleUseCase.getRoleByName(roleName);
+            if (role == null)
+                return;
+
+            List<String> rolePermCodes = role.getPermissions().stream()
+                    .map(Permission::getCode)
+                    .toList();
+
+            for (CheckBox cb : permissionCheckboxes) {
+                String code = cb.getUserData().toString();
+                if (rolePermCodes.contains(code)) {
+                    cb.setSelected(true);
+                    cb.setDisable(true);
+                    cb.setStyle("-fx-opacity: 0.8; -fx-text-fill: #888888; -fx-font-weight: bold;");
+                } else {
+                    boolean customizationEnabled = chkAllowExtraPerms.isSelected();
+                    cb.setDisable(!customizationEnabled);
+                    cb.setStyle(customizationEnabled ? "" : "-fx-opacity: 0.5;");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Carga el catálogo de permisos desde la BD y genera checkboxes dinámicamente.
+     */
+    private void loadAndRenderPermissions() {
+        if (permissionsContainer == null)
+            return;
+        permissionsContainer.getChildren().clear();
+        permissionCheckboxes.clear();
+
+        // Checkbox maestro para habilitar personalización
+        chkAllowExtraPerms = new CheckBox("Habilitar permisos adicionales (fuera del rol)");
+        chkAllowExtraPerms.setStyle("-fx-text-fill: -color-primary; -fx-font-weight: bold; -fx-padding: 0 0 10 0;");
+        chkAllowExtraPerms.selectedProperty()
+                .addListener((obs, old, val) -> updatePermissionsByRole(cmbRole.getValue()));
+        permissionsContainer.getChildren().add(chkAllowExtraPerms);
+        permissionsContainer.getChildren().add(new Separator());
+
+        try {
+            allPermissions = permissionUseCase.getAllPermissions();
+            for (Permission perm : allPermissions) {
+                CheckBox cb = new CheckBox(perm.getDescription());
+                cb.setId("perm_" + perm.getCode());
+                cb.getStyleClass().add("permission-checkbox");
+                cb.setUserData(perm.getCode());
+                permissionCheckboxes.add(cb);
+                permissionsContainer.getChildren().add(cb);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     private void checkSetupMode() {
@@ -69,6 +164,8 @@ public class RegisterUserController implements Injectable {
                 }
                 cmbRole.setValue("admin");
                 cmbRole.setDisable(true);
+                // En el setup inicial marcar todos los permisos por defecto
+                permissionCheckboxes.forEach(cb -> cb.setSelected(true));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -87,6 +184,37 @@ public class RegisterUserController implements Injectable {
 
             if (lblTitle != null)
                 lblTitle.setText("Editar Usuario");
+
+            updatePermissionsByRole(user.getRole());
+            // Cargar los permisos actuales del usuario y marcar sus checkboxes
+            loadUserPermissions(user.getUserId());
+        }
+    }
+
+    private void loadUserPermissions(int userId) {
+        try {
+            List<Permission> userPerms = permissionUseCase.getPermissionsForUser(userId);
+            List<String> userCodes = new ArrayList<>();
+            for (Permission p : userPerms) {
+                userCodes.add(p.getCode());
+            }
+
+            // Si el usuario tiene permisos que NO están en su rol, habilitamos el toggle de
+            // personalización
+            Role role = roleUseCase.getRoleByName(cmbRole.getValue());
+            if (role != null) {
+                List<String> roleCodes = role.getPermissions().stream().map(Permission::getCode).toList();
+                boolean hasExtra = userCodes.stream().anyMatch(code -> !roleCodes.contains(code));
+                if (hasExtra) {
+                    chkAllowExtraPerms.setSelected(true);
+                }
+            }
+
+            for (CheckBox cb : permissionCheckboxes) {
+                cb.setSelected(userCodes.contains(cb.getUserData().toString()));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 
@@ -120,6 +248,14 @@ public class RegisterUserController implements Injectable {
             }
         }
 
+        // Recopilar los códigos de permisos marcados
+        List<String> selectedPermissions = new ArrayList<>();
+        for (CheckBox cb : permissionCheckboxes) {
+            if (cb.isSelected()) {
+                selectedPermissions.add(cb.getUserData().toString());
+            }
+        }
+
         try {
             if (userToEdit == null) {
                 User newUser = new User();
@@ -136,6 +272,13 @@ public class RegisterUserController implements Injectable {
                 }
 
                 userUseCase.registerUser(newUser);
+
+                // Obtener el ID del usuario recién creado para asignar permisos
+                User created = userUseCase.getUserByUsername(username);
+                if (created != null) {
+                    permissionUseCase.savePermissionsForUser(created.getUserId(), selectedPermissions);
+                }
+
                 showSuccess("Usuario creado correctamente.");
 
                 if (isInitialSetup) {
@@ -155,6 +298,8 @@ public class RegisterUserController implements Injectable {
                 userToEdit.setRole(role);
 
                 userUseCase.updateUser(userToEdit);
+                permissionUseCase.savePermissionsForUser(userToEdit.getUserId(), selectedPermissions);
+
                 if (!pass1.isEmpty()) {
                     userUseCase.resetPassword(userToEdit.getEmail(), pass1);
                 }
