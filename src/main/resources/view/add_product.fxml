@@ -60,6 +60,18 @@
                     <ComboBox fx:id="cmbCategory" promptText="Categoría" styleClass="modern-input-field" maxWidth="Infinity" HBox.hgrow="ALWAYS" style="-fx-background-color: transparent;"/>
                 </HBox>
             </VBox>
+
+            <!-- IVA -->
+            <VBox styleClass="modern-input-group">
+                <HBox styleClass="modern-input-container" alignment="CENTER_LEFT">
+                    <FontAwesomeIconView glyphName="PERCENT" size="18" styleClass="sidebar-icon">
+                        <HBox.margin>
+                            <Insets right="10"/>
+                        </HBox.margin>
+                    </FontAwesomeIconView> 
+                    <TextField fx:id="txtIva" promptText="IVA específico (vacio = defecto cat)" styleClass="modern-input-field" HBox.hgrow="ALWAYS"/>
+                </HBox>
+            </VBox>
             
             <!-- Image & Favorite Row -->
             <HBox spacing="15" alignment="CENTER_LEFT">

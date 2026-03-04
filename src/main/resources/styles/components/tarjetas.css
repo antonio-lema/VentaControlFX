@@ -5,19 +5,18 @@
 /* Tarjetas de Producto */
 .product-box {
     -fx-background-color: -bg-surface;
-    -fx-background-radius: 14;
-    -fx-border-color: -border-light;
-    -fx-border-width: 1;
-    -fx-effect: -shadow-md;
+    -fx-background-radius: 12px;
+    -fx-border-color: -border-subtle;
+    -fx-border-width: 1.5px;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.06), 15, 0, 0, 8);
     -fx-padding: 0;
     -fx-cursor: hand;
 }
 
 .product-box:hover {
     -fx-effect: -shadow-primary;
-    -fx-translate-y: -5;
-    -fx-scale-x: 1.02;
-    -fx-scale-y: 1.02;
+    -fx-translate-y: -8px;
+    -fx-border-color: -color-primary-light;
 }
 
 .product-info {
@@ -36,13 +35,13 @@
     -fx-text-fill: -color-primary;
     -fx-font-weight: 700;
     -fx-padding: 6 12;
-    -fx-background-radius: 10;
+    -fx-background-radius: 8px;
 }
 
 /* Tarjetas de Usuario */
 .user-card {
     -fx-background-color: -bg-surface;
-    -fx-background-radius: 20;
+    -fx-background-radius: 12px;
     -fx-padding: 30;
     /* Aumentado de 25 */
     -fx-effect: -shadow-md;
@@ -60,9 +59,9 @@
     -fx-background-color: -bg-subtle;
     -fx-text-fill: -color-primary;
     -fx-font-weight: bold;
-    -fx-font-size: 32px;
+    -fx-font-size: 26px;
     /* Aumentado de 28 */
-    -fx-background-radius: 60;
+    -fx-background-radius: 60px;
     /* Ajustado para ser redondo */
     -fx-min-width: 80;
     /* Aumentado de 65 */
@@ -93,7 +92,7 @@
     -fx-background-color: -color-primary-bg;
     -fx-text-fill: -color-primary;
     -fx-padding: 5 15;
-    -fx-background-radius: 25;
+    -fx-background-radius: 25px;
     -fx-font-size: 11px;
     -fx-font-weight: bold;
 }
@@ -102,7 +101,7 @@
     -fx-background-color: -bg-subtle;
     -fx-text-fill: -text-medium;
     -fx-padding: 5 15;
-    -fx-background-radius: 25;
+    -fx-background-radius: 25px;
     -fx-font-size: 11px;
     -fx-font-weight: bold;
     -fx-border-color: -border-color;
@@ -111,7 +110,7 @@
 
 .user-action-btn {
     -fx-background-color: transparent;
-    -fx-background-radius: 10;
+    -fx-background-radius: 10px;
     -fx-padding: 8;
     -fx-cursor: hand;
 }

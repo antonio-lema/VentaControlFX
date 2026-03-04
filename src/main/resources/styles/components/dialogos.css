@@ -5,10 +5,12 @@
 /* Fondo del diálogo */
 .dialog-pane {
     -fx-background-color: -bg-surface;
-    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.25), 30, 0, 0, 12);
-    -fx-border-radius: 20;
-    -fx-background-radius: 20;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.15), 30, 0, 0, 15);
+    -fx-border-radius: 20px;
+    -fx-background-radius: 20px;
     -fx-padding: 0;
+    -fx-border-color: -border-subtle;
+    -fx-border-width: 1px;
 }
 
 /* Ocultar la graphic-container por defecto */
@@ -26,14 +28,14 @@
 /* Botón de confirmación (OK / Aceptar) */
 .dialog-pane .button-bar .button:default,
 .dialog-pane .button-bar .button.default {
-    -fx-background-color: linear-gradient(to right, -color-primary, -color-primary-light);
+    -fx-background-color: -grad-primary;
     -fx-text-fill: white;
     -fx-font-weight: bold;
     -fx-font-size: 14px;
     -fx-padding: 11 30;
-    -fx-background-radius: 20;
+    -fx-background-radius: 25px;
     -fx-cursor: hand;
-    -fx-effect: dropshadow(three-pass-box, rgba(30, 136, 229, 0.30), 10, 0, 0, 4);
+    -fx-effect: -shadow-primary;
 }
 
 .dialog-pane .button-bar .button:default:hover,
@@ -93,4 +95,73 @@
 .modern-alert .content {
     -fx-padding: 0;
     -fx-background-color: -bg-surface;
+}
+
+/* Estilos para los botones de las alertas modernas */
+.modern-alert .button-bar .button {
+    -fx-min-width: 100;
+    -fx-cursor: hand;
+}
+
+.modern-alert .button-bar .button:default {
+    -fx-background-color: linear-gradient(to right, -color-primary, -color-primary-light);
+    -fx-text-fill: white;
+    -fx-background-radius: 12;
+    -fx-font-weight: bold;
+    -fx-padding: 10 25;
+}
+
+.modern-alert .button-bar .button:cancel,
+.modern-alert .button-bar .button.cancel-button {
+    -fx-background-color: -bg-subtle;
+    -fx-text-fill: -text-medium;
+    -fx-background-radius: 12;
+    -fx-border-color: -border-color;
+    -fx-border-width: 1;
+    -fx-padding: 10 25;
+}
+
+.modern-alert .button-bar .button:hover {
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
+}
+
+/* === Custom Modal Layouts (usados en FXMLs) === */
+.modal-container {
+    -fx-background-color: -bg-surface;
+    -fx-background-radius: 20;
+    -fx-border-radius: 20;
+    -fx-effect: -shadow-lg;
+    -fx-border-color: -border-color;
+    -fx-border-width: 1;
+}
+
+.modal-title {
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -text-main;
+}
+
+.modal-subtitle {
+    -fx-font-size: 14px;
+    -fx-text-fill: -text-muted;
+}
+
+.btn-close-modal {
+    -fx-background-color: transparent;
+    -fx-padding: 8;
+    -fx-background-radius: 50%;
+    -fx-cursor: hand;
+}
+
+.btn-close-modal:hover {
+    -fx-background-color: -bg-subtle;
+    -fx-scale-x: 1.1;
+    -fx-scale-y: 1.1;
+}
+
+.icon-container-blue {
+    -fx-background-color: -color-primary-bg;
+    -fx-background-radius: 12;
+    -fx-padding: 12;
 }

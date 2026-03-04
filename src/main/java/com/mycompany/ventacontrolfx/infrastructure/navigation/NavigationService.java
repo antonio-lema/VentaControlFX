@@ -7,9 +7,15 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.VBox;
+import com.mycompany.ventacontrolfx.util.AuthorizationService;
+import com.mycompany.ventacontrolfx.util.AlertUtil;
+import com.mycompany.ventacontrolfx.domain.repository.IAuditRepository;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Enterprise Navigation and Event Delegation Service.
@@ -43,6 +49,21 @@ public class NavigationService {
     private CartVisibilityListener cartVisibilityListener;
     private SearchBarVisibilityListener searchBarVisibilityListener;
 
+    // Control de Accesos
+    private static final Map<String, String> ACCESS_RULES = new HashMap<>();
+    static {
+        ACCESS_RULES.put("/view/products.fxml", "PRODUCTOS");
+        ACCESS_RULES.put("/view/categories.fxml", "PRODUCTOS");
+        ACCESS_RULES.put("/view/sales.fxml", "HISTORIAL");
+        ACCESS_RULES.put("/view/closure_history.fxml", "CIERRES");
+        ACCESS_RULES.put("/view/clients.fxml", "CLIENTES");
+        ACCESS_RULES.put("/view/manage_users.fxml", "USUARIOS");
+        ACCESS_RULES.put("/view/sale_config.fxml", "CONFIGURACION");
+        ACCESS_RULES.put("/view/seller_report.fxml", "HISTORIAL");
+        ACCESS_RULES.put("/view/client_report.fxml", "HISTORIAL");
+        ACCESS_RULES.put("/view/return_list.fxml", "venta.devolucion");
+    }
+
     /** Vista que debe mostrar el carrito */
     private static final String SELL_VIEW = "/view/sell_view.fxml";
     private static final String HISTORY_VIEW = "/view/sales.fxml";
@@ -66,6 +87,32 @@ public class NavigationService {
     }
 
     public void navigateTo(String fxmlPath) {
+        // 1. Verificar Permisos (Control de Acceso)
+        String requiredPermission = ACCESS_RULES.get(fxmlPath);
+        AuthorizationService auth = container.getAuthService();
+        IAuditRepository audit = container.getAuditRepository();
+        int userId = container.getUserSession().getCurrentUser() != null
+                ? container.getUserSession().getCurrentUser().getUserId()
+                : -1;
+
+        if (requiredPermission != null && !auth.hasPermission(requiredPermission)) {
+            // Bloqueado: Registrar intento fallido
+            try {
+                audit.logAccess(userId, "ACCESS_DENIED", fxmlPath,
+                        "Intento de acceso sin permiso: " + requiredPermission);
+            } catch (SQLException ignored) {
+            }
+
+            AlertUtil.showError("Acceso Denegado", "No tienes permiso para acceder a esta sección.");
+            return;
+        }
+
+        // Permitido: Registrar acceso exitoso (Audit Trail)
+        try {
+            audit.logAccess(userId, "NAVIGATE", fxmlPath, "Acceso a módulo");
+        } catch (SQLException ignored) {
+        }
+
         if (loadingOverlay != null)
             loadingOverlay.setVisible(true);
         searchHandlers.clear(); // Clear search handlers for the new view
@@ -98,8 +145,10 @@ public class NavigationService {
             }
 
             mainContent.setContent(viewNode);
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
+            AlertUtil.showError("Error de Navegación",
+                    "No se pudo cargar la vista: " + fxmlPath + "\nError: " + e.getMessage());
         } finally {
             if (loadingOverlay != null)
                 loadingOverlay.setVisible(false);

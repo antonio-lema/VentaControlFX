@@ -22,8 +22,10 @@ public class SceneNavigator {
                 ((Injectable) controller).inject(container);
             }
 
-            // Aplicar sistema modular de estilos
-            ThemeManager.applyStyles(scene);
+            // Aplicar sistema modular de estilos dinámicos
+            if (container != null) {
+                container.getThemeManager().applyFullTheme(scene);
+            }
 
             // Configurar icono de la aplicación y título
             if (container != null) {

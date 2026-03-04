@@ -8,9 +8,9 @@
 .modern-input-field,
 .modern-combo-box {
     -fx-background-color: -bg-input;
-    -fx-border-color: -border-color;
-    -fx-border-radius: 10;
-    -fx-background-radius: 10;
+    -fx-border-color: -border-subtle;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
     -fx-text-fill: -text-main;
     -fx-padding: 12 15;
     -fx-font-size: 14px;
@@ -59,7 +59,7 @@
     -fx-font-size: 13px;
     -fx-background-color: -color-danger-bg;
     -fx-padding: 8 12;
-    -fx-background-radius: 8;
+    -fx-background-radius: 8px;
 }
 
 /* Input groups */
@@ -80,11 +80,11 @@
 /* Tarjeta principal del formulario */
 .modern-register-card {
     -fx-background-color: -bg-surface;
-    -fx-background-radius: 20;
-    -fx-border-radius: 20;
-    -fx-border-color: -border-light;
-    -fx-border-width: 1;
-    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.20), 40, 0, 0, 15);
+    -fx-background-radius: 16px;
+    -fx-border-radius: 16px;
+    -fx-border-color: -border-subtle;
+    -fx-border-width: 1px;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.12), 40, 0, 0, 15);
 }
 
 /* Cabecera del formulario */
@@ -97,8 +97,8 @@
     -fx-background-color: -bg-input;
     -fx-border-color: -border-color;
     -fx-border-width: 1.2;
-    -fx-border-radius: 10;
-    -fx-background-radius: 10;
+    -fx-border-radius: 10px;
+    -fx-background-radius: 10px;
     -fx-padding: 6 12;
 }
 
@@ -127,10 +127,10 @@
 /* Spinner Moderno */
 .modern-spinner {
     -fx-background-color: -bg-input;
-    -fx-background-radius: 8;
+    -fx-background-radius: 8px;
     -fx-border-color: -border-color;
-    -fx-border-width: 1;
-    -fx-border-radius: 8;
+    -fx-border-width: 1px;
+    -fx-border-radius: 8px;
 }
 
 .modern-spinner .text-field {
@@ -148,4 +148,63 @@
 .modern-spinner .increment-arrow-button:hover,
 .modern-spinner .decrement-arrow-button:hover {
     -fx-background-color: -bg-subtle;
+}
+
+/* ===== SECCIÓN DE PERMISOS ===== */
+
+.permission-section-title {
+    -fx-font-size: 15px;
+    -fx-font-weight: 700;
+    -fx-text-fill: -text-main;
+}
+
+.permission-section-subtitle {
+    -fx-font-size: 12px;
+    -fx-text-fill: -text-muted;
+    -fx-padding: 0 0 4 0;
+}
+
+/* Caja que envuelve los checkboxes */
+.permissions-box {
+    -fx-background-color: -bg-input;
+    -fx-border-color: -border-color;
+    -fx-border-width: 1.2;
+    -fx-border-radius: 12px;
+    -fx-background-radius: 12px;
+}
+
+/* Cada checkbox de permiso */
+.permission-checkbox {
+    -fx-font-size: 13px;
+    -fx-text-fill: -text-main;
+    -fx-cursor: hand;
+    -fx-padding: 4 0;
+}
+
+.permission-checkbox:selected {
+    -fx-text-fill: -color-primary;
+    -fx-font-weight: 600;
+}
+
+.permission-checkbox .box {
+    -fx-background-color: -bg-surface;
+    -fx-border-color: -border-color;
+    -fx-border-radius: 4px;
+    -fx-background-radius: 4px;
+    -fx-padding: 3;
+}
+
+.permission-checkbox:selected .box {
+    -fx-background-color: -color-primary;
+    -fx-border-color: -color-primary;
+}
+
+.permission-checkbox:selected .mark {
+    -fx-background-color: white;
+    -fx-shape: "M 0,5 L 3,8 L 8,0";
+}
+
+.permission-checkbox:hover .box {
+    -fx-border-color: -color-primary;
+    -fx-effect: dropshadow(three-pass-box, rgba(30, 136, 229, 0.15), 4, 0, 0, 1);
 }

@@ -329,3 +329,85 @@
 .btn-clear-cart:hover .icon-danger {
     -fx-fill: -color-danger;
 }
+
+/* =========================================
+   NUEVOS BOTONES DE ACCIÓN (APLAZAR/RECUPERAR)
+   ========================================= */
+.btn-suspend-cart,
+.btn-resume-cart {
+    -fx-background-color: -bg-surface;
+    -fx-background-radius: 12;
+    -fx-padding: 10;
+    -fx-cursor: hand;
+    -fx-border-color: -border-light;
+    -fx-border-width: 1.5;
+    -fx-border-radius: 12;
+    -fx-effect: dropshadow(two-pass-box, rgba(0, 0, 0, 0.04), 4, 0, 0, 1);
+}
+
+.btn-suspend-cart:hover {
+    -fx-background-color: #fff9db;
+    /* Tender yellow */
+    -fx-border-color: #f59e0b;
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
+}
+
+.btn-resume-cart:hover {
+    -fx-background-color: #e3f2fd;
+    /* Tender blue */
+    -fx-border-color: -color-primary;
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
+}
+
+.icon-warning {
+    -fx-fill: #f59e0b;
+}
+
+/* =========================================
+   DIÁLOGOS MODERNOS (MODAL CUSTOM)
+   ========================================= */
+.custom-modal-root {
+    -fx-background-color: -bg-surface;
+    -fx-background-radius: 20;
+    -fx-border-radius: 20;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.3), 40, 0, 0, 15);
+}
+
+.custom-modal-header {
+    -fx-padding: 25 30 15 30;
+    -fx-background-color: transparent;
+}
+
+.custom-modal-title {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -text-main;
+}
+
+.custom-modal-content {
+    -fx-padding: 10 30 30 30;
+}
+
+.custom-modal-footer {
+    -fx-padding: 0 30 25 30;
+    -fx-alignment: center-right;
+    -fx-spacing: 15;
+}
+
+.input-field-modern {
+    -fx-background-color: -bg-input;
+    -fx-background-radius: 12;
+    -fx-border-color: -border-light;
+    -fx-border-width: 1.5;
+    -fx-border-radius: 12;
+    -fx-padding: 12 15;
+    -fx-font-size: 14px;
+    -fx-text-fill: -text-main;
+}
+
+.input-field-modern:focused {
+    -fx-border-color: -color-primary;
+    -fx-background-color: white;
+}

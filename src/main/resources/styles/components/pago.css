@@ -7,9 +7,9 @@
 }
 
 .payment-header {
-    -fx-background-color: -color-primary;
-    -fx-padding: 20 30;
-    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.1), 0, 0, 0, 2);
+    -fx-background-color: -grad-primary;
+    -fx-padding: 30;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.15), 15, 0, 0, 5);
 }
 
 .payment-header-title {
@@ -31,8 +31,8 @@
 /* Tarjetas de método de pago */
 .payment-method-card {
     -fx-background-color: -bg-surface;
-    -fx-background-radius: 15;
-    -fx-border-radius: 15;
+    -fx-background-radius: 8px;
+    -fx-border-radius: 8px;
     -fx-border-color: -border-color;
     -fx-border-width: 1.5;
     -fx-effect: -shadow-sm;
@@ -51,7 +51,7 @@
 }
 
 .payment-method-label {
-    -fx-font-size: 16px;
+    -fx-font-size: 18px;
     -fx-font-weight: bold;
     -fx-text-fill: -text-main;
 }
@@ -62,7 +62,7 @@
     -fx-text-fill: -text-main;
     -fx-border-color: -border-color;
     -fx-border-width: 1;
-    -fx-background-radius: 10;
+    -fx-background-radius: 4px;
     -fx-padding: 10;
     -fx-font-weight: bold;
 }
@@ -77,13 +77,13 @@
 .payment-body .btn-primary {
     -fx-background-color: linear-gradient(to bottom, -color-primary, -color-primary-dark);
     -fx-text-fill: white;
-    -fx-background-radius: 12;
+    -fx-background-radius: 8px;
     -fx-font-weight: bold;
 }
 
 /* Botón de Cobro "Cobrar" al lado del TextField */
 .payment-body .btn-lg.btn-primary {
-    -fx-background-color: linear-gradient(to right, -color-primary, -color-primary-dark) !important;
+    -fx-background-color: -grad-primary !important;
     -fx-text-fill: white !important;
     -fx-font-weight: bold;
     -fx-font-size: 16px;
@@ -92,7 +92,7 @@
     -fx-background-radius: 0 12 12 0;
     -fx-border-radius: 0 12 12 0;
     -fx-cursor: hand;
-    -fx-effect: dropshadow(three-pass-box, rgba(30, 136, 229, 0.4), 12, 0, 0, 4);
+    -fx-effect: -shadow-primary;
 }
 
 .payment-body .btn-lg.btn-primary:hover {
@@ -127,8 +127,8 @@
     -fx-background-color: -bg-surface;
     -fx-border-color: -border-color;
     -fx-border-width: 1.5;
-    -fx-border-radius: 15;
-    -fx-background-radius: 15;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
 }
 
 .payment-method-btn:hover {

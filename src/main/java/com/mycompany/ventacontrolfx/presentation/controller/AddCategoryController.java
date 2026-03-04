@@ -16,7 +16,7 @@ import java.sql.SQLException;
 public class AddCategoryController implements Injectable {
 
     @FXML
-    private TextField txtName;
+    private TextField txtName, txtIva;
     @FXML
     private Label lblTitle, lblSubtitle;
     @FXML
@@ -38,25 +38,39 @@ public class AddCategoryController implements Injectable {
             lblTitle.setText("Editar Categoría");
             lblSubtitle.setText("Modifica el nombre de la categoría");
             txtName.setText(category.getName());
+            txtIva.setText(String.valueOf(category.getDefaultIva()));
         } else {
             lblTitle.setText("Nueva Categoría");
             lblSubtitle.setText("Introduce el nombre de la categoría");
+            txtIva.setText("21.0");
         }
     }
 
     @FXML
     private void handleSave() {
         String name = txtName.getText();
+        String ivaStr = txtIva.getText();
+
         if (name == null || name.trim().isEmpty()) {
             AlertUtil.showWarning("Validación", "Introduce un nombre.");
             return;
         }
 
+        double iva = 21.0;
+        try {
+            iva = Double.parseDouble(ivaStr);
+        } catch (NumberFormatException e) {
+            AlertUtil.showWarning("Validación", "IVA inválido. Se usará 21.0%.");
+        }
+
         try {
             if (categoryToEdit == null) {
-                categoryUseCase.addCategory(new Category(name));
+                Category newCat = new Category(name);
+                newCat.setDefaultIva(iva);
+                categoryUseCase.addCategory(newCat);
             } else {
                 categoryToEdit.setName(name);
+                categoryToEdit.setDefaultIva(iva);
                 categoryUseCase.updateCategory(categoryToEdit);
             }
             handleCancel();

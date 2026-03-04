@@ -28,4 +28,8 @@ public class UserSession {
     public boolean isLoggedIn() {
         return currentUser != null;
     }
+
+    public boolean hasPermission(String code) {
+        return currentUser != null && currentUser.hasPermission(code);
+    }
 }

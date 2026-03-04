@@ -39,7 +39,9 @@ public class ModalService {
             if (style == StageStyle.TRANSPARENT) {
                 scene.setFill(null);
             }
-            ThemeManager.applyStyles(scene);
+            if (container != null) {
+                container.getThemeManager().applyFullTheme(scene);
+            }
             stage.setScene(scene);
 
             stage.showAndWait();
@@ -87,7 +89,9 @@ public class ModalService {
             stage.setTitle(title);
 
             Scene scene = new Scene(root);
-            ThemeManager.applyStyles(scene);
+            if (container != null) {
+                container.getThemeManager().applyFullTheme(scene);
+            }
             stage.setScene(scene);
 
             stage.setMaximized(true);

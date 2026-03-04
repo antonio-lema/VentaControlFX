@@ -6,102 +6,197 @@
 <?import javafx.scene.text.*?>
 <?import de.jensd.fx.glyphs.fontawesome.*?>
 
-<VBox prefWidth="950" prefHeight="700" spacing="0" styleClass="main-content-area"
+<VBox spacing="0" styleClass="estetica-root"
       xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="com.mycompany.ventacontrolfx.presentation.controller.CashClosureController">
+      fx:controller="com.mycompany.ventacontrolfx.presentation.controller.CashClosureController"
+      maxWidth="Infinity" maxHeight="Infinity">
 
-    <!-- Header Area -->
-    <HBox alignment="CENTER_LEFT" spacing="20" styleClass="detail-panel-header">
-        <StackPane styleClass="stat-icon-bg stat-icon-bg-blue">
-            <FontAwesomeIconView glyphName="CALCULATOR" size="22" fill="white"/>
-        </StackPane>
-        <VBox spacing="2">
-            <Label text="📊 Resumen de Turno" styleClass="section-title"/>
-            <HBox spacing="10" alignment="CENTER_LEFT">
-                <Label fx:id="lblDate" text="20 Feb, 2026" styleClass="label-muted"/>
-                <Label text="•" styleClass="label-muted"/>
-                <Label fx:id="lblCurrentUser" text="Admin" styleClass="closure-user-label"/>
-            </HBox>
-        </VBox>
-        <Region HBox.hgrow="ALWAYS"/>
-        <Button onAction="#handleClose" styleClass="btn-icon" cancelButton="true">
-            <graphic>
-                <FontAwesomeIconView glyphName="CLOSE" size="18" styleClass="sidebar-icon"/>
-            </graphic>
-        </Button>
-    </HBox>
+    <!-- Header Area Modernizado -->
+    <VBox styleClass="estetica-header" spacing="0">
+        <HBox alignment="CENTER_LEFT" spacing="20">
+            <StackPane styleClass="estetica-header-icon-wrap">
+                <FontAwesomeIconView glyphName="CALCULATOR" size="22" fill="white"/>
+            </StackPane>
+            <VBox spacing="2">
+                <Label text="Arqueo y Cierre de Caja" styleClass="estetica-title"/>
+                <HBox spacing="10" alignment="CENTER_LEFT">
+                    <Label fx:id="lblDate" text="20 Feb, 2026" styleClass="estetica-subtitle"/>
+                    <Label text="•" styleClass="estetica-subtitle"/>
+                    <Label fx:id="lblCurrentUser" text="Admin" styleClass="estetica-subtitle" style="-fx-font-weight: bold;"/>
+                </HBox>
+            </VBox>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button onAction="#handleClose" styleClass="btn-icon" style="-fx-background-color: rgba(255,255,255,0.1); -fx-background-radius: 50;">
+                <graphic>
+                    <FontAwesomeIconView glyphName="CLOSE" size="18" fill="white"/>
+                </graphic>
+            </Button>
+        </HBox>
+    </VBox>
 
     <HBox spacing="25" VBox.vgrow="ALWAYS" style="-fx-padding: 25;">
-        <!-- Left Column: Details and Totals -->
-        <VBox spacing="20" prefWidth="350">
-            <!-- Totals Section -->
-            <VBox spacing="15" styleClass="stat-card">
-                <Label text="CONTABILIDAD" styleClass="filter-label-cap"/>
+        <!-- Left Column: Scrollable stats and actions -->
+        <ScrollPane prefWidth="420" fitToWidth="true" hbarPolicy="NEVER" styleClass="estetica-scroll" 
+                   style="-fx-background-color: transparent; -fx-background: transparent;">
+            <VBox spacing="14">
+                <!-- ╔══ TARJETA: EFECTIVO EN CAJA ══╗ -->
+                <VBox spacing="12" styleClass="estetica-card">
+                    <HBox styleClass="estetica-card-header" alignment="CENTER_LEFT" spacing="12">
+                        <StackPane styleClass="estetica-card-icon-wrap, estetica-icon-green">
+                            <FontAwesomeIconView glyphName="MONEY" size="18" fill="#22c55e"/>
+                        </StackPane>
+                        <VBox>
+                            <Label text="Efectivo en Caja" styleClass="estetica-card-title"/>
+                            <Label text="Saldo actual y control de fondo" styleClass="estetica-card-desc"/>
+                        </VBox>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Button fx:id="btnRefreshCash" onAction="#handleRefreshCash"
+                                styleClass="btn-icon" style="-fx-min-width: 28; -fx-min-height: 28;">
+                            <graphic>
+                                <FontAwesomeIconView glyphName="REFRESH" size="13" styleClass="sidebar-icon"/>
+                            </graphic>
+                            <tooltip><Tooltip text="Actualizar saldo"/></tooltip>
+                        </Button>
+                    </HBox>
 
-                <VBox spacing="5" styleClass="closure-amount-row">
-                    <Label text="💵 Efectivo" styleClass="label-muted"/>
-                    <Label fx:id="lblTotalCash" text="0,00 €" styleClass="closure-amount-cash"/>
+                    <!-- Saldo actual prominente -->
+                    <VBox alignment="CENTER" spacing="4" style="-fx-padding: 10 0 6 0;">
+                        <Label fx:id="lblCashInDrawer" text="🏦 Sin sesión"
+                               style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: -text-muted;"/>
+                        <Label fx:id="lblActiveFund" text="⚠️ Sin fondo de caja"
+                               style="-fx-font-size: 12px; -fx-text-fill: -color-warning; -fx-font-weight: bold;"/>
+                    </VBox>
+
+                    <!-- Botones de gestión de caja -->
+                    <VBox styleClass="estetica-card-body" spacing="8">
+                        <Button fx:id="btnOpenFund" onAction="#handleOpenFund"
+                                maxWidth="Infinity" text="💼 ABRIR CAJA CON FONDO"
+                                styleClass="btn-success"/>
+                        <Button fx:id="btnWithdrawCash" onAction="#handleWithdrawCash"
+                                maxWidth="Infinity" text="💸 RETIRAR EFECTIVO"
+                                styleClass="btn-danger" disable="true"/>
+                        <Button fx:id="btnRegisterCashEntry" onAction="#handleRegisterCashEntry"
+                                maxWidth="Infinity" text="➕ INGRESAR EFECTIVO"
+                                styleClass="btn-primary" disable="true"/>
+                    </VBox>
                 </VBox>
 
-                <VBox spacing="5" styleClass="closure-amount-row">
-                    <Label text="💳 Tarjeta" styleClass="label-muted"/>
-                    <Label fx:id="lblTotalCard" text="0,00 €" styleClass="closure-amount-card"/>
+                <!-- ╔══ TARJETA: CONTABILIDAD ══╗ -->
+                <VBox spacing="15" styleClass="estetica-card">
+                    <HBox styleClass="estetica-card-header" alignment="CENTER_LEFT" spacing="12">
+                        <StackPane styleClass="estetica-card-icon-wrap, estetica-icon-blue">
+                            <FontAwesomeIconView glyphName="BALANCE_SCALE" size="16" fill="#1e88e5"/>
+                        </StackPane>
+                        <VBox>
+                            <Label text="Contabilidad del Turno" styleClass="estetica-card-title"/>
+                            <Label text="Resumen de ventas por método" styleClass="estetica-card-desc"/>
+                        </VBox>
+                    </HBox>
+                    <VBox styleClass="estetica-card-body" spacing="18">
+                        <VBox spacing="5" styleClass="closure-amount-row">
+                            <Label text="💵 Efectivo vendido" styleClass="label-muted"/>
+                            <Label fx:id="lblTotalCash" text="0,00 €" styleClass="closure-amount-cash" style="-fx-font-size: 20px;"/>
+                        </VBox>
+
+                        <VBox spacing="5" styleClass="closure-amount-row">
+                            <Label text="💳 Tarjeta" styleClass="label-muted"/>
+                            <Label fx:id="lblTotalCard" text="0,00 €" styleClass="closure-amount-card" style="-fx-font-size: 20px;"/>
+                        </VBox>
+
+                        <!-- Devoluciones -->
+                        <VBox fx:id="containerReturns" spacing="5" styleClass="closure-amount-row" visible="false" managed="false">
+                            <Label text="↩️ Devoluciones" styleClass="label-muted"/>
+                            <Label fx:id="lblTotalReturns" text="0,00 €"
+                                   style="-fx-text-fill: -color-danger; -fx-font-weight: bold; -fx-font-size: 20px;"/>
+                        </VBox>
+
+                        <!-- Highlighted total -->
+                        <VBox spacing="8" styleClass="estetica-preview-wrapper" style="-fx-alignment: center;">
+                            <Label text="NETO TOTAL DEL TURNO" styleClass="estetica-preview-title"/>
+                            <Label fx:id="lblTotalAll" text="0,00 €" styleClass="closure-grand-total" style="-fx-font-size: 32px; -fx-text-fill: -color-primary;"/>
+                        </VBox>
+                    </VBox>
                 </VBox>
 
-                <!-- Highlighted total -->
-                <VBox spacing="5" styleClass="closure-total-highlight">
-                    <Label text="💰 Total a Cerrar" styleClass="stat-label-light"/>
-                    <Label fx:id="lblTotalAll" text="0,00 €" styleClass="closure-grand-total"/>
+                <!-- Stats Section -->
+                <VBox spacing="15" styleClass="estetica-card">
+                    <HBox styleClass="estetica-card-header" alignment="CENTER_LEFT" spacing="12">
+                        <StackPane styleClass="estetica-card-icon-wrap, estetica-icon-purple">
+                            <FontAwesomeIconView glyphName="BAR_CHART" size="16" fill="#8b5cf6"/>
+                        </StackPane>
+                        <VBox>
+                            <Label text="Estadísticas Rápidas" styleClass="estetica-card-title"/>
+                            <Label text="Actividad del periodo actual" styleClass="estetica-card-desc"/>
+                        </VBox>
+                    </HBox>
+                    <VBox styleClass="estetica-card-body">
+                        <GridPane vgap="14" hgap="10">
+                            <Label text="Transacciones:" styleClass="label-muted" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                            <Label fx:id="lblSalesCount" text="0" styleClass="estetica-card-title" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+
+                            <Label text="Estado:" styleClass="label-muted" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+                            <Label fx:id="lblStatus" text="Pendiente" styleClass="badge-primary" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+                        </GridPane>
+                    </VBox>
                 </VBox>
+
+                <Region VBox.vgrow="ALWAYS" minHeight="10"/>
+
+
             </VBox>
-
-            <!-- Stats Section -->
-            <VBox spacing="15" styleClass="stat-card">
-                <Label text="ESTADÍSTICAS" styleClass="filter-label-cap"/>
-                <GridPane vgap="14" hgap="10">
-                    <Label text="Transacciones:" styleClass="label-muted"
-                           GridPane.columnIndex="0" GridPane.rowIndex="0"/>
-                    <Label fx:id="lblSalesCount" text="0" styleClass="closure-stat-value"
-                           GridPane.columnIndex="1" GridPane.rowIndex="0"/>
-
-                    <Label text="Estado:" styleClass="label-muted"
-                           GridPane.columnIndex="0" GridPane.rowIndex="1"/>
-                    <Label fx:id="lblStatus" text="Pendiente" styleClass="closure-status-pending"
-                           GridPane.columnIndex="1" GridPane.rowIndex="1"/>
-                </GridPane>
-            </VBox>
-
-            <Region VBox.vgrow="ALWAYS"/>
-
-            <!-- Action Button -->
-            <Button fx:id="btnPerformClosure" onAction="#handlePerformClosure"
-                    maxWidth="Infinity" text="REALIZAR CIERRE DE CAJA"
-                    styleClass="btn-primary btn-lg" defaultButton="true"/>
-        </VBox>
+        </ScrollPane>
 
         <!-- Right Column: Product Breakdown -->
-        <VBox spacing="15" HBox.hgrow="ALWAYS" styleClass="table-card" style="-fx-padding: 25;">
-            <HBox alignment="CENTER_LEFT" spacing="10">
-                <StackPane styleClass="stat-icon-bg stat-icon-bg-blue">
-                    <FontAwesomeIconView glyphName="LIST" size="16" fill="white"/>
+        <VBox spacing="20" HBox.hgrow="ALWAYS" styleClass="estetica-card" style="-fx-padding: 0;">
+            <HBox styleClass="estetica-card-header" alignment="CENTER_LEFT" spacing="12">
+                <StackPane styleClass="estetica-card-icon-wrap, estetica-icon-blue">
+                    <FontAwesomeIconView glyphName="LIST" size="16" fill="#1e88e5"/>
                 </StackPane>
-                <Label text="Desglose de Ventas por Producto" styleClass="section-title" style="-fx-font-size: 18px;"/>
+                <VBox>
+                    <Label text="Desglose de Ventas por Producto" styleClass="estetica-card-title"/>
+                    <Label text="Artículos vendidos y devoluciones detalladas" styleClass="estetica-card-desc"/>
+                </VBox>
             </HBox>
 
-            <TableView fx:id="tableProductSummary" VBox.vgrow="ALWAYS" styleClass="modern-table-view">
-                <columns>
-                    <TableColumn fx:id="colProdName" text="PRODUCTO" prefWidth="350" />
-                    <TableColumn fx:id="colProdQty" text="CANT." prefWidth="100" />
-                    <TableColumn fx:id="colProdTotal" text="VENTA TOTAL" prefWidth="150" />
-                </columns>
-                <columnResizePolicy>
-                    <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
-                </columnResizePolicy>
-            </TableView>
+            <VBox VBox.vgrow="ALWAYS" style="-fx-padding: 20;" spacing="15">
+                <TableView fx:id="tableProductSummary" VBox.vgrow="ALWAYS" styleClass="modern-table">
+                    <columns>
+                        <TableColumn fx:id="colProdName" text="PRODUCTO" prefWidth="350" />
+                        <TableColumn fx:id="colProdQty" text="CANTIDAD" prefWidth="120" />
+                        <TableColumn fx:id="colProdTotal" text="VENTA TOTAL" prefWidth="180" />
+                    </columns>
+                    <columnResizePolicy>
+                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                    </columnResizePolicy>
+                </TableView>
 
-            <HBox alignment="CENTER_RIGHT">
-                <Label text="Ventas pendientes de vincular al cierre" styleClass="label-muted" style="-fx-font-size: 11px;"/>
-            </HBox>
+                <HBox alignment="CENTER_RIGHT">
+                    <Label text="ⓘ  Ventas y devoluciones pendientes de vincular al cierre" styleClass="estetica-card-desc"/>
+                </HBox>
+            </VBox>
         </VBox>
+    </HBox>
+
+    <!-- Fixed Footer Action Bar -->
+    <HBox styleClass="estetica-action-bar" spacing="20" alignment="CENTER_LEFT">
+        <HBox alignment="CENTER_LEFT" spacing="10">
+            <FontAwesomeIconView glyphName="INFO_CIRCLE" size="14" fill="#64748b"/>
+            <Label text="Asegúrese de haber contado el efectivo antes de confirmar el cierre." styleClass="estetica-card-desc"/>
+        </HBox>
+        
+        <Region HBox.hgrow="ALWAYS"/>
+
+        <Button onAction="#handleRefreshCash" styleClass="estetica-btn-secondary" text="  SINCRONIZAR DATOS">
+            <graphic>
+                <FontAwesomeIconView glyphName="REFRESH" size="13"/>
+            </graphic>
+        </Button>
+        <Button fx:id="btnPerformClosure" onAction="#handlePerformClosure"
+                text="  CONFIRMAR CIERRE DE JORNADA"
+                styleClass="estetica-btn-save" prefWidth="320">
+            <graphic>
+                <FontAwesomeIconView glyphName="CHECK_CIRCLE" size="16"/>
+            </graphic>
+        </Button>
     </HBox>
 </VBox>

@@ -23,7 +23,7 @@ import java.util.List;
 public class AddProductController implements Injectable {
 
     @FXML
-    private TextField txtName, txtPrice;
+    private TextField txtName, txtPrice, txtIva;
     @FXML
     private ComboBox<Category> cmbCategory;
     @FXML
@@ -76,6 +76,11 @@ public class AddProductController implements Injectable {
             txtName.setText(product.getName());
             txtPrice.setText(String.valueOf(product.getPrice()));
             chkFavorite.setSelected(product.isFavorite());
+            if (product.getIva() != null) {
+                txtIva.setText(String.valueOf(product.getIva()));
+            } else {
+                txtIva.setText("");
+            }
 
             // Select correct category
             for (Category c : cmbCategory.getItems()) {
@@ -120,6 +125,18 @@ public class AddProductController implements Injectable {
             productToEdit.setPrice(price);
             productToEdit.setCategoryId(cmbCategory.getValue().getId());
             productToEdit.setFavorite(chkFavorite.isSelected());
+
+            String ivaStr = txtIva.getText();
+            if (ivaStr == null || ivaStr.trim().isEmpty()) {
+                productToEdit.setIva(null);
+            } else {
+                try {
+                    productToEdit.setIva(Double.parseDouble(ivaStr));
+                } catch (NumberFormatException e) {
+                    AlertUtil.showWarning("Validación", "IVA inválido. Se usará el defecto de categoría.");
+                    productToEdit.setIva(null);
+                }
+            }
 
             if (selectedImageFile != null) {
                 String relativePath = saveImageLocally(selectedImageFile);

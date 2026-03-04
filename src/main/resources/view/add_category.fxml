@@ -32,6 +32,18 @@
                     <TextField fx:id="txtName" promptText="Nombre de la categoría" styleClass="modern-input-field" HBox.hgrow="ALWAYS"/>
                 </HBox>
             </VBox>
+
+            <!-- Default IVA -->
+            <VBox styleClass="modern-input-group">
+                <HBox styleClass="modern-input-container" alignment="CENTER_LEFT">
+                    <FontAwesomeIconView glyphName="PERCENT" size="18" styleClass="sidebar-icon">
+                        <HBox.margin>
+                            <Insets right="10"/>
+                        </HBox.margin>
+                    </FontAwesomeIconView> 
+                    <TextField fx:id="txtIva" promptText="IVA por defecto (%)" styleClass="modern-input-field" HBox.hgrow="ALWAYS" text="21.0"/>
+                </HBox>
+            </VBox>
         </VBox>
         
         <!-- Actions -->

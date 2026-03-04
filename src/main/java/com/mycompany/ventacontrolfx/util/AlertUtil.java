@@ -1,152 +1,248 @@
 package com.mycompany.ventacontrolfx.util;
 
-import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.DialogPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
-import javafx.scene.paint.Color;
-import javafx.stage.Stage;
-import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
-import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
-import javafx.scene.Node;
-import javafx.stage.WindowEvent;
-import javafx.util.Duration;
-import javafx.animation.FadeTransition;
-import javafx.animation.ScaleTransition;
-import javafx.animation.SequentialTransition;
+import javafx.animation.*;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.layout.VBox;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-import java.util.Optional;
+import javafx.util.Duration;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 
-/**
- * Modern utility class for showing JavaFX alerts consistently with the app's
- * theme.
- */
+import java.util.concurrent.atomic.AtomicBoolean;
+
 public class AlertUtil {
 
+    private static final String APP_PRIMARY = "#1e88e5";
+    private static final String APP_DANGER = "#e53935";
+    private static final String APP_WARNING = "#fb8c00";
+    private static final String APP_SUCCESS = "#4caf50";
+
+    public enum CustomAlertType {
+        ERROR, INFO, WARNING, CONFIRMATION
+    }
+
     public static void showError(String header, String content) {
-        showAlert(AlertType.ERROR, "Error", header, content);
+        showCustomAlert(CustomAlertType.ERROR, header, content);
     }
 
     public static void showInfo(String header, String content) {
-        showAlert(AlertType.INFORMATION, "Información", header, content);
+        showCustomAlert(CustomAlertType.INFO, header, content);
     }
 
     public static void showWarning(String header, String content) {
-        showAlert(AlertType.WARNING, "Advertencia", header, content);
+        showCustomAlert(CustomAlertType.WARNING, header, content);
+    }
+
+    /**
+     * Shows a non-blocking toast notification at the top of the application.
+     */
+    public static void showToast(String message) {
+        Stage toastStage = new Stage();
+        toastStage.initStyle(StageStyle.TRANSPARENT);
+        toastStage.setAlwaysOnTop(true);
+
+        HBox root = new HBox(15);
+        root.setAlignment(Pos.CENTER_LEFT);
+        root.setPadding(new Insets(12, 25, 12, 20));
+        root.setStyle(
+                "-fx-background-color: #333333; -fx-background-radius: 30; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.4), 10, 0, 0, 4);");
+
+        FontAwesomeIconView icon = new FontAwesomeIconView(FontAwesomeIcon.CHECK_CIRCLE);
+        icon.setFill(Color.web(APP_SUCCESS));
+        icon.setSize("20px");
+
+        Label label = new Label(message);
+        label.setStyle("-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 14px;");
+
+        root.getChildren().addAll(icon, label);
+
+        Scene scene = new Scene(root);
+        scene.setFill(null);
+        toastStage.setScene(scene);
+
+        // Dynamic position: Top center of the screen
+        try {
+            javafx.stage.Screen screen = javafx.stage.Screen.getPrimary();
+            double screenWidth = screen.getVisualBounds().getWidth();
+            toastStage.setX((screenWidth - root.prefWidth(-1)) / 2 + screen.getVisualBounds().getMinX());
+            toastStage.setY(screen.getVisualBounds().getMinY() + 40);
+        } catch (Exception e) {
+            toastStage.setX(500);
+            toastStage.setY(50);
+        }
+
+        toastStage.show();
+
+        // Animation
+        root.setOpacity(0);
+        root.setTranslateY(-20);
+
+        FadeTransition fadeIn = new FadeTransition(Duration.millis(300), root);
+        fadeIn.setToValue(1.0);
+        TranslateTransition moveIn = new TranslateTransition(Duration.millis(300), root);
+        moveIn.setToY(0);
+
+        ParallelTransition show = new ParallelTransition(fadeIn, moveIn);
+
+        FadeTransition fadeOut = new FadeTransition(Duration.millis(300), root);
+        fadeOut.setDelay(Duration.seconds(2.5));
+        fadeOut.setToValue(0.0);
+        fadeOut.setOnFinished(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent e) {
+                toastStage.close();
+            }
+        });
+
+        show.play();
+        fadeOut.play();
     }
 
     public static boolean showConfirmation(String title, String header, String content) {
-        Alert alert = createBaseAlert(AlertType.CONFIRMATION, title, header, content);
-        Optional<ButtonType> result = alert.showAndWait();
-        return result.isPresent() && result.get() == ButtonType.OK;
-    }
+        AtomicBoolean response = new AtomicBoolean(false);
+        Stage stage = new Stage();
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.initStyle(StageStyle.TRANSPARENT);
 
-    private static void showAlert(AlertType type, String title, String header, String content) {
-        Alert alert = createBaseAlert(type, title, header, content);
-        alert.showAndWait();
-    }
+        VBox root = createBaseContainer(stage, CustomAlertType.CONFIRMATION, header, content);
 
-    private static Alert createBaseAlert(AlertType type, String title, String header, String content) {
-        Alert alert = new Alert(type);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(null);
+        HBox buttons = new HBox(15);
+        buttons.setAlignment(Pos.CENTER);
+        buttons.setPadding(new Insets(10, 0, 0, 0));
 
-        // Style the DialogPane
-        DialogPane dialogPane = alert.getDialogPane();
-        ThemeManager.applyStyles(dialogPane.getStylesheets());
-        dialogPane.getStyleClass().add("modern-alert");
-        dialogPane.setPrefWidth(450);
-
-        // Remove OS frame for true modernization
-        Stage stage = (Stage) dialogPane.getScene().getWindow();
-        try {
-            // Check if already initialized to avoid error
-            if (stage.getStyle() != StageStyle.TRANSPARENT) {
-                stage.initStyle(StageStyle.TRANSPARENT);
+        Button btnCancel = new Button("CANCELAR");
+        btnCancel.setStyle(
+                "-fx-background-color: #f5f5f5; -fx-text-fill: #666666; -fx-background-radius: 20; -fx-font-weight: bold; -fx-padding: 10 25; -fx-cursor: hand;");
+        btnCancel.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent e) {
+                stage.close();
             }
-        } catch (Exception e) {
-        }
-        dialogPane.getScene().setFill(Color.TRANSPARENT);
+        });
 
-        // Determine colors and icons
+        Button btnOk = new Button("ACEPTAR");
+        btnOk.setStyle("-fx-background-color: " + APP_PRIMARY
+                + "; -fx-text-fill: white; -fx-background-radius: 20; -fx-font-weight: bold; -fx-padding: 10 25; -fx-cursor: hand;");
+        btnOk.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent e) {
+                response.set(true);
+                stage.close();
+            }
+        });
+
+        buttons.getChildren().addAll(btnCancel, btnOk);
+        root.getChildren().add(buttons);
+
+        showWithAnimation(stage, root);
+        return response.get();
+    }
+
+    private static void showCustomAlert(CustomAlertType type, String header, String content) {
+        Stage stage = new Stage();
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.initStyle(StageStyle.TRANSPARENT);
+
+        VBox root = createBaseContainer(stage, type, header, content);
+
+        Button btnOk = new Button("ENTENDIDO");
+        String btnColor = APP_PRIMARY;
+        if (type == CustomAlertType.ERROR)
+            btnColor = APP_DANGER;
+        if (type == CustomAlertType.WARNING)
+            btnColor = APP_WARNING;
+
+        btnOk.setStyle("-fx-background-color: " + btnColor
+                + "; -fx-text-fill: white; -fx-background-radius: 20; -fx-font-weight: bold; -fx-padding: 10 35; -fx-cursor: hand;");
+        btnOk.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent e) {
+                stage.close();
+            }
+        });
+
+        root.getChildren().add(btnOk);
+
+        showWithAnimation(stage, root);
+    }
+
+    private static VBox createBaseContainer(Stage stage, CustomAlertType type, String header, String content) {
+        VBox root = new VBox(20);
+        root.setAlignment(Pos.CENTER);
+        root.setPadding(new Insets(30));
+        root.setStyle(
+                "-fx-background-color: white; -fx-background-radius: 20; -fx-border-color: #eeeeee; -fx-border-width: 1; -fx-border-radius: 20; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 30, 0, 0, 10);");
+
         FontAwesomeIcon icon;
         String color;
         switch (type) {
             case ERROR:
                 icon = FontAwesomeIcon.TIMES_CIRCLE;
-                color = "#FF4B2B";
+                color = APP_DANGER;
                 break;
             case WARNING:
                 icon = FontAwesomeIcon.EXCLAMATION_TRIANGLE;
-                color = "#FFB75E";
-                break;
-            case INFORMATION:
-                icon = FontAwesomeIcon.CHECK_CIRCLE;
-                color = "#43E97B";
+                color = APP_WARNING;
                 break;
             case CONFIRMATION:
                 icon = FontAwesomeIcon.QUESTION_CIRCLE;
-                color = "#4FACFE";
+                color = APP_PRIMARY;
                 break;
             default:
                 icon = FontAwesomeIcon.INFO_CIRCLE;
-                color = "#4FACFE";
+                color = APP_PRIMARY;
         }
 
-        // 1. Icon in a large colored circle
         FontAwesomeIconView iconView = new FontAwesomeIconView(icon);
         iconView.setSize("50px");
-        iconView.setFill(Color.WHITE);
+        iconView.setFill(Color.web(color));
 
-        StackPane iconCircle = new StackPane(iconView);
-        iconCircle.setPrefSize(90, 90);
-        iconCircle.setMaxSize(90, 90);
-        iconCircle.setStyle("-fx-background-color: " + color
-                + "; -fx-background-radius: 50; -fx-effect: dropshadow(three-pass-box, " + color
-                + "88, 20, 0, 0, 10);");
+        Label lblHeader = new Label(header);
+        lblHeader.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #333333;");
+        lblHeader.setWrapText(true);
+        lblHeader.setAlignment(Pos.CENTER);
 
-        // 2. Title and Message
-        javafx.scene.control.Label titleLabel = new javafx.scene.control.Label(header);
-        titleLabel
-                .setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #2D3436; -fx-padding: 15 0 5 0;");
+        Label lblContent = new Label(content);
+        lblContent.setStyle("-fx-font-size: 14px; -fx-text-fill: #777777; -fx-text-alignment: center;");
+        lblContent.setWrapText(true);
+        lblContent.setMaxWidth(350);
+        lblContent.setAlignment(Pos.CENTER);
 
-        javafx.scene.control.Label msgLabel = new javafx.scene.control.Label(content);
-        msgLabel.setWrapText(true);
-        msgLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: #636E72; -fx-text-alignment: center;");
-        msgLabel.setMaxWidth(380);
+        root.getChildren().addAll(iconView, lblHeader, lblContent);
+        return root;
+    }
 
-        // 3. Assemble Custom Layout
-        VBox customContent = new VBox(15, iconCircle, titleLabel, msgLabel);
-        customContent.setAlignment(Pos.CENTER);
-        customContent.setPadding(new Insets(30, 25, 20, 25));
+    private static void showWithAnimation(Stage stage, VBox root) {
+        Scene scene = new Scene(root);
+        scene.setFill(null);
+        stage.setScene(scene);
 
-        dialogPane.setContent(customContent);
-        dialogPane.setGraphic(null);
-        dialogPane.setHeader(null);
+        root.setOpacity(0);
+        root.setScaleX(0.85);
+        root.setScaleY(0.85);
 
-        // 4. Entrance Animation (Scale + Fade)
-        dialogPane.setOpacity(0);
-        dialogPane.setScaleX(0.8);
-        dialogPane.setScaleY(0.8);
-
-        stage.setOnShowing(e -> {
-            ScaleTransition st = new ScaleTransition(Duration.millis(300), dialogPane);
-            st.setToX(1.0);
-            st.setToY(1.0);
-
-            FadeTransition ft = new FadeTransition(Duration.millis(300), dialogPane);
-            ft.setToValue(1.0);
-
-            st.play();
-            ft.play();
+        stage.setOnShowing(new EventHandler<javafx.stage.WindowEvent>() {
+            @Override
+            public void handle(javafx.stage.WindowEvent e) {
+                FadeTransition ft = new FadeTransition(Duration.millis(200), root);
+                ft.setToValue(1.0);
+                ScaleTransition st = new ScaleTransition(Duration.millis(250), root);
+                st.setToX(1.0);
+                st.setToY(1.0);
+                st.setInterpolator(Interpolator.EASE_OUT);
+                new ParallelTransition(ft, st).play();
+            }
         });
 
-        return alert;
+        stage.showAndWait();
     }
 }

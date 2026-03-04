@@ -45,6 +45,19 @@ public class UserUseCase {
         return userRepository.listAll();
     }
 
+    /** Alias de listUsers para los controladores de informes */
+    public List<User> getAllUsers() throws SQLException {
+        return userRepository.listAll();
+    }
+
+    /** Obtiene un usuario por su ID */
+    public User getUserById(int userId) throws SQLException {
+        return userRepository.listAll().stream()
+                .filter(u -> u.getUserId() == userId)
+                .findFirst()
+                .orElse(null);
+    }
+
     public void registerUser(User user) throws SQLException {
         userRepository.create(user);
     }

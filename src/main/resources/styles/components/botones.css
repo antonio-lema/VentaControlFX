@@ -4,18 +4,18 @@
 
 .button {
     -fx-cursor: hand;
-    -fx-background-radius: 8;
+    -fx-background-radius: 8px;
 }
 
 /* Botones Principales Modernos */
 .btn-primary,
 .modern-btn-primary {
-    -fx-background-color: linear-gradient(to right, -color-primary, -color-primary-light);
+    -fx-background-color: -grad-primary;
     -fx-text-fill: white;
     -fx-font-weight: bold;
     -fx-font-size: 14px;
-    -fx-padding: 12 28;
-    -fx-background-radius: 25;
+    -fx-padding: 12 32;
+    -fx-background-radius: 12px;
     -fx-effect: -shadow-primary;
 }
 
@@ -34,8 +34,8 @@
     -fx-padding: 12 24;
     -fx-border-color: -border-color;
     -fx-border-width: 1;
-    -fx-border-radius: 25;
-    -fx-background-radius: 25;
+    -fx-border-radius: 12px;
+    -fx-background-radius: 12px;
 }
 
 .btn-secondary:hover {
@@ -52,7 +52,7 @@
     -fx-text-fill: white;
     -fx-font-weight: bold;
     -fx-padding: 14 30;
-    -fx-background-radius: 12;
+    -fx-background-radius: 12px;
     -fx-effect: dropshadow(three-pass-box, rgba(76, 175, 80, 0.3), 15, 0, 0, 5);
 }
 
@@ -68,7 +68,7 @@
     -fx-text-fill: -color-danger;
     -fx-border-color: -color-danger;
     -fx-border-width: 1;
-    -fx-border-radius: 8;
+    -fx-border-radius: 8px;
     -fx-padding: 8 16;
 }
 
@@ -81,7 +81,7 @@
 .btn-icon {
     -fx-background-color: transparent;
     -fx-padding: 8;
-    -fx-background-radius: 10;
+    -fx-background-radius: 10px;
 }
 
 .btn-icon:hover {
@@ -95,14 +95,16 @@
     -fx-background-color: -bg-surface;
     -fx-text-fill: -text-medium;
     -fx-padding: 12 24;
-    -fx-background-radius: 14;
-    -fx-border-color: -border-color;
-    -fx-border-width: 1;
+    -fx-background-radius: 12px;
+    -fx-border-color: -border-subtle;
+    -fx-border-width: 1.5;
+    -fx-font-weight: 600;
 }
 
 .category-btn:hover {
-    -fx-background-color: -bg-subtle;
-    -fx-border-color: -color-primary;
+    -fx-background-color: -color-primary-bg;
+    -fx-border-color: -color-primary-light;
+    -fx-text-fill: -color-primary;
 }
 
 .active-category-btn {
@@ -119,8 +121,8 @@
     -fx-font-size: 14px;
     -fx-font-weight: bold;
     -fx-padding: 13 24;
-    -fx-background-radius: 12;
-    -fx-border-radius: 12;
+    -fx-background-radius: 12px;
+    -fx-border-radius: 12px;
     -fx-min-height: 48px;
     -fx-letter-spacing: 0.5px;
 }
@@ -134,7 +136,7 @@
     -fx-font-weight: bold;
     -fx-font-size: 14px;
     -fx-padding: 12 24;
-    -fx-background-radius: 12;
+    -fx-background-radius: 10px;
     -fx-effect: dropshadow(three-pass-box, rgba(245, 158, 11, 0.35), 10, 0, 0, 4);
     -fx-cursor: hand;
 }
@@ -159,22 +161,22 @@
    CIERRE DE CAJA — acción primaria reforzada
    ========================================= */
 #btnPerformClosure {
-    -fx-background-color: linear-gradient(to bottom right, #1e88e5, #1565c0);
+    -fx-background-color: linear-gradient(to bottom right, -color-primary, -color-primary-dark);
     -fx-text-fill: white;
     -fx-font-size: 15px;
     -fx-font-weight: bold;
     -fx-padding: 16 28;
-    -fx-background-radius: 14;
-    -fx-effect: dropshadow(three-pass-box, rgba(30, 136, 229, 0.4), 16, 0, 0, 6);
+    -fx-background-radius: 12px;
+    -fx-effect: dropshadow(three-pass-box, -color-primary-alpha40, 16, 0, 0, 6);
     -fx-letter-spacing: 1px;
     -fx-cursor: hand;
 }
 
 #btnPerformClosure:hover {
-    -fx-background-color: linear-gradient(to bottom right, #2196f3, #1976d2);
+    -fx-background-color: linear-gradient(to bottom right, -color-primary-light, -color-primary);
     -fx-scale-x: 1.03;
     -fx-scale-y: 1.03;
-    -fx-effect: dropshadow(three-pass-box, rgba(30, 136, 229, 0.6), 20, 0, 0, 8);
+    -fx-effect: dropshadow(three-pass-box, -color-primary-alpha60, 20, 0, 0, 8);
 }
 
 #btnPerformClosure:pressed {
@@ -187,4 +189,63 @@
     -fx-text-fill: -text-muted;
     -fx-effect: none;
     -fx-opacity: 0.6;
+}
+
+/* =========================================
+   BOTÓN PEQUEÑO (btn-sm)
+   ========================================= */
+.btn-sm {
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-padding: 9 16;
+    -fx-background-radius: 10px;
+    -fx-border-radius: 10px;
+    -fx-min-height: 36px;
+}
+
+/* =========================================
+   BOTONES CAJA — Abrir fondo / Retirar
+   ========================================= */
+#btnOpenFund {
+    -fx-background-color: linear-gradient(to bottom right, #22c55e, #16a34a);
+    -fx-text-fill: white;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-padding: 10 20;
+    -fx-background-radius: 10px;
+    -fx-effect: dropshadow(three-pass-box, rgba(34, 197, 94, 0.35), 10, 0, 0, 4);
+    -fx-cursor: hand;
+}
+
+#btnOpenFund:hover {
+    -fx-background-color: linear-gradient(to bottom right, #4ade80, #22c55e);
+    -fx-scale-x: 1.03;
+    -fx-scale-y: 1.03;
+}
+
+#btnOpenFund:disabled {
+    -fx-background-color: #16a34a88;
+    -fx-text-fill: white;
+    -fx-opacity: 0.85;
+}
+
+#btnWithdrawCash {
+    -fx-background-color: linear-gradient(to bottom right, #f59e0b, #d97706);
+    -fx-text-fill: white;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-padding: 10 20;
+    -fx-background-radius: 10px;
+    -fx-effect: dropshadow(three-pass-box, rgba(245, 158, 11, 0.35), 10, 0, 0, 4);
+    -fx-cursor: hand;
+}
+
+#btnWithdrawCash:hover {
+    -fx-background-color: linear-gradient(to bottom right, #fbbf24, #f59e0b);
+    -fx-scale-x: 1.03;
+    -fx-scale-y: 1.03;
+}
+
+#btnWithdrawCash:disabled {
+    -fx-opacity: 0.4;
 }

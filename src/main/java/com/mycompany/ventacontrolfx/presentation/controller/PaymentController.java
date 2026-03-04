@@ -82,10 +82,10 @@ public class PaymentController {
                 if (callback != null)
                     callback.onSuccess(given, change, "Efectivo");
             } else {
-                txtGivenAmount.setStyle("-fx-border-color: red;");
+                txtGivenAmount.setStyle("-fx-border-color: -color-danger; -fx-border-width: 2;");
             }
         } catch (NumberFormatException e) {
-            txtGivenAmount.setStyle("-fx-border-color: red;");
+            txtGivenAmount.setStyle("-fx-border-color: -color-danger; -fx-border-width: 2;");
         }
     }
 

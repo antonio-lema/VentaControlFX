@@ -97,12 +97,19 @@ public class ReceiptController implements Injectable {
         lblGiftIndicator.setVisible(isGiftMode);
         lblGiftIndicator.setManaged(isGiftMode);
 
-        double taxDiv = cfg.getTaxDivisor();
-        double subtotal = total / taxDiv;
-        double vat = total - subtotal;
+        double totalVatAmount = 0.0;
+        double totalSubtotal = 0.0;
 
-        lblSubtotal.setText(String.format(fmt, subtotal));
-        lblVat.setText("(" + cfg.getTaxRate() + "%) " + String.format(fmt, vat));
+        for (CartItem item : items) {
+            double itemTotal = item.getTotal();
+            double effectiveRate = item.getProduct().resolveEffectiveIva(cfg.getTaxRate());
+            double itemSubtotal = itemTotal / (1.0 + (effectiveRate / 100.0));
+            totalVatAmount += (itemTotal - itemSubtotal);
+            totalSubtotal += itemSubtotal;
+        }
+
+        lblSubtotal.setText(String.format(fmt, totalSubtotal));
+        lblVat.setText("IVA Incl. " + String.format(fmt, totalVatAmount));
         lblTotal.setText(String.format(fmt, total));
         lblPaid.setText(String.format(fmt, paid));
         lblChange.setText(String.format(fmt, change));

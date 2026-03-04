@@ -13,7 +13,25 @@ public class CartListRenderer {
     public CartListRenderer(VBox container, CartUseCase cartUseCase) {
         this.container = container;
         this.cartUseCase = cartUseCase;
+        renderCurrentItems();
         initListener();
+    }
+
+    private void renderCurrentItems() {
+        container.getChildren().clear();
+        for (CartItem item : cartUseCase.getCartItems()) {
+            addRow(item);
+        }
+    }
+
+    private void addRow(CartItem item) {
+        CartItemRow row = new CartItemRow(
+                item,
+                () -> cartUseCase.incrementQuantity(item.getProduct()),
+                () -> cartUseCase.decrementQuantity(item.getProduct()),
+                () -> cartUseCase.removeItem(item.getProduct()),
+                (newQty) -> cartUseCase.updateQuantity(item.getProduct(), newQty));
+        container.getChildren().add(row);
     }
 
     private void initListener() {

@@ -3,10 +3,10 @@
  */
 
 .sidebar {
-    -fx-background-color: -bg-sidebar;
+    -fx-background-color: linear-gradient(to bottom, -bg-sidebar, derive(-bg-sidebar, -2%));
     -fx-pref-width: 280;
-    -fx-effect: dropshadow(three-pass-box, -shadow-color, 15, 0, 5, 0);
-    -fx-padding: 25 10;
+    -fx-effect: dropshadow(three-pass-box, -shadow-color, 30, 0, 0, 0);
+    -fx-padding: 25 15;
 }
 
 .sidebar-button {
@@ -17,7 +17,7 @@
     -fx-font-size: 15px;
     -fx-font-weight: 600;
     -fx-cursor: hand;
-    -fx-background-radius: 12;
+    -fx-background-radius: 12px;
     -fx-transition: all 0.2s ease;
 }
 
