@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.*?>
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
+
+<VBox xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mycompany.ventacontrolfx.presentation.controller.ReturnListController" 
+      spacing="20" styleClass="main-container">
+    <stylesheets>
+        <java.net.URL value="@/styles/components/historial.css" />
+    </stylesheets>
+
+    <padding>
+        <Insets top="30" right="30" bottom="30" left="30"/>
+    </padding>
+
+    <!-- Header Section -->
+    <HBox alignment="CENTER_LEFT" spacing="20">
+        <VBox spacing="5" HBox.hgrow="ALWAYS">
+            <Label text="GESTIÓN DE DEVOLUCIONES" styleClass="title-label"/>
+            <Label text="Control centralizado y auditoría de reembolsos realizados" styleClass="subtitle-label"/>
+        </VBox>
+        <HBox spacing="10" alignment="CENTER_RIGHT">
+             <Button fx:id="btnRefresh" onAction="#loadReturns" styleClass="btn-secondary">
+                <graphic>
+                    <FontAwesomeIconView glyphName="REFRESH" size="14"/>
+                </graphic>
+                <tooltip><Tooltip text="Actualizar lista"/></tooltip>
+            </Button>
+            <Button fx:id="btnExport" onAction="#handleExport" styleClass="btn-info" text="EXPORTAR">
+                <graphic>
+                    <FontAwesomeIconView glyphName="FILE_EXCEL_ALT" size="14" fill="white"/>
+                </graphic>
+            </Button>
+        </HBox>
+    </HBox>
+
+    <!-- Filters Section -->
+    <HBox spacing="15" alignment="CENTER_LEFT" styleClass="filter-card">
+        <padding><Insets top="15" right="20" bottom="15" left="20"/></padding>
+        
+        <VBox spacing="5">
+            <Label text="Desde:" styleClass="filter-label-cap"/>
+            <DatePicker fx:id="datePickerStart" prefWidth="150" styleClass="modern-datepicker"/>
+        </VBox>
+        
+        <VBox spacing="5">
+            <Label text="Hasta:" styleClass="filter-label-cap"/>
+            <DatePicker fx:id="datePickerEnd" prefWidth="150" styleClass="modern-datepicker"/>
+        </VBox>
+
+        <VBox spacing="5">
+            <Label text="Pago:" styleClass="filter-label-cap"/>
+            <ComboBox fx:id="cmbPaymentMethod" prefWidth="120" promptText="Todos" styleClass="modern-combobox"/>
+        </VBox>
+
+        <VBox spacing="5" HBox.hgrow="ALWAYS">
+            <Label text="Buscar por motivo o usuario:" styleClass="filter-label-cap"/>
+            <TextField fx:id="txtSearch" promptText="🔍 Escriba para filtrar..." styleClass="modern-textfield"/>
+        </VBox>
+
+        <VBox spacing="5" alignment="BOTTOM_LEFT">
+             <Button text="LIMPIAR" onAction="#handleClearFilters" styleClass="btn-outline-secondary"/>
+        </VBox>
+    </HBox>
+
+    <!-- Table Section with Side Panel -->
+    <HBox spacing="20" VBox.vgrow="ALWAYS">
+        <VBox HBox.hgrow="ALWAYS" styleClass="table-card">
+            <TableView fx:id="returnsTable" VBox.vgrow="ALWAYS" styleClass="modern-table-view">
+                <placeholder>
+                    <VBox alignment="CENTER" spacing="10">
+                        <FontAwesomeIconView glyphName="SEARCH" size="40" fill="#cbd5e1"/>
+                        <Label text="No se encontraron devoluciones en este periodo." styleClass="label-muted"/>
+                    </VBox>
+                </placeholder>
+                <columns>
+                    <TableColumn fx:id="colId" text="ID" prefWidth="60" styleClass="column-center"/>
+                    <TableColumn fx:id="colSaleId" text="Ticket" prefWidth="80" styleClass="column-center"/>
+                    <TableColumn fx:id="colActions" text="Acciones" prefWidth="80" styleClass="column-center"/>
+                    <TableColumn fx:id="colDate" text="Fecha y Hora" prefWidth="180"/>
+                    <TableColumn fx:id="colUser" text="Usuario" prefWidth="120"/>
+                    <TableColumn fx:id="colAmount" text="Reembolso" prefWidth="120" styleClass="column-right"/>
+                    <TableColumn fx:id="colReason" text="Motivo" prefWidth="250"/>
+                    <TableColumn fx:id="colClosure" text="Cierre" prefWidth="80" styleClass="column-center"/>
+                </columns>
+                <columnResizePolicy>
+                    <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+                </columnResizePolicy>
+            </TableView>
+            
+            <!-- Summary Footer -->
+            <HBox alignment="CENTER_RIGHT" spacing="20" styleClass="table-footer">
+                <padding><Insets top="15" right="20" bottom="15" left="20"/></padding>
+                <HBox spacing="10" alignment="CENTER_LEFT" HBox.hgrow="ALWAYS">
+                    <Label fx:id="lblCount" text="0 registros" styleClass="label-muted"/>
+                </HBox>
+                <Label text="TOTAL REEMBOLSADO:" styleClass="footer-label"/>
+                <Label fx:id="lblTotalRefunded" text="0,00 €" styleClass="footer-value-danger"/>
+            </HBox>
+        </VBox>
+
+        <!-- Details Panel Section -->
+        <VBox fx:id="detailsPanel" prefWidth="380.0" visible="false" managed="false" styleClass="detail-panel">
+            <HBox prefHeight="6.0" styleClass="detail-panel-accent" />
+            <VBox spacing="15.0" styleClass="detail-panel-body" VBox.vgrow="ALWAYS">
+                <VBox alignment="CENTER" spacing="5">
+                    <Label text="📦 DETALLE DE DEVOLUCIÓN" styleClass="filter-label-cap" />
+                    <HBox spacing="10" alignment="CENTER">
+                        <Label fx:id="lblDetailReturnId" text="Devolución #0000" styleClass="detail-sale-id" />
+                        <Label fx:id="lblDetailSaleId" text="Ticket #0000" styleClass="badge-primary" />
+                    </HBox>
+                    <Label fx:id="lblDetailDate" text="18/02/2026 15:30" styleClass="label-muted" />
+                </VBox>
+
+                <Separator />
+
+                <Label text="PRODUCTOS DEVUELTOS" styleClass="filter-label-cap" />
+                <ScrollPane fitToWidth="true" styleClass="detail-scroll" prefHeight="300.0" VBox.vgrow="ALWAYS">
+                    <content>
+                        <VBox fx:id="detailsItemsContainer" spacing="12.0" styleClass="detail-items-container" />
+                    </content>
+                </ScrollPane>
+
+                <Separator />
+
+                <VBox spacing="8.0">
+                    <HBox alignment="CENTER_LEFT">
+                        <Label text="Motivo:" styleClass="label-muted" />
+                        <Region HBox.hgrow="ALWAYS" />
+                        <Label fx:id="lblDetailReason" text="Motivo" styleClass="detail-info-value" />
+                    </HBox>
+                    <HBox alignment="CENTER_LEFT">
+                        <Label text="Usuario:" styleClass="label-muted" />
+                        <Region HBox.hgrow="ALWAYS" />
+                        <Label fx:id="lblDetailUser" text="Usuario" styleClass="detail-info-value" />
+                    </HBox>
+                    <HBox alignment="CENTER_LEFT" style="-fx-padding: 10 0 0 0;">
+                        <Label text="TOTAL ABONADO" styleClass="detail-total-label" />
+                        <Region HBox.hgrow="ALWAYS" />
+                        <Label fx:id="lblDetailTotal" text="0,00 €" styleClass="detail-total-value text-danger" />
+                    </HBox>
+                </VBox>
+
+                <Region VBox.vgrow="ALWAYS" />
+                <Button onAction="#handleCloseDetails" text="CERRAR DETALLES" maxWidth="Infinity" styleClass="btn-history-close" />
+            </VBox>
+        </VBox>
+    </HBox>
+</VBox>

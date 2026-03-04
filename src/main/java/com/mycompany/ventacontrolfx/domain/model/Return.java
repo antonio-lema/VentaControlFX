@@ -10,6 +10,9 @@ public class Return {
     private LocalDateTime returnDatetime;
     private double totalRefunded;
     private String reason;
+    private String userName;
+    private Integer closureId;
+    private String paymentMethod;
     private List<ReturnDetail> details;
 
     public Return() {
@@ -77,5 +80,29 @@ public class Return {
 
     public void setDetails(List<ReturnDetail> details) {
         this.details = details;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public Integer getClosureId() {
+        return closureId;
+    }
+
+    public void setClosureId(Integer closureId) {
+        this.closureId = closureId;
+    }
+
+    public String getPaymentMethod() {
+        return paymentMethod;
+    }
+
+    public void setPaymentMethod(String paymentMethod) {
+        this.paymentMethod = paymentMethod;
     }
 }
