@@ -116,7 +116,7 @@ public class HeaderController implements Injectable {
 
     @FXML
     private void handleCashClosure() {
-        ModalService.showStandardModal("/view/cash_closure.fxml", "Cierre de Caja", container, null);
+        ModalService.showFullScreenModal("/view/cash_closure.fxml", "Cierre de Caja", container, null);
     }
 
     @FXML

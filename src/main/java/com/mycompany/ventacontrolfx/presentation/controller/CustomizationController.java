@@ -1,0 +1,345 @@
+package com.mycompany.ventacontrolfx.presentation.controller;
+
+import com.mycompany.ventacontrolfx.infrastructure.config.Injectable;
+import com.mycompany.ventacontrolfx.infrastructure.config.ServiceContainer;
+import com.mycompany.ventacontrolfx.domain.repository.IAppSettingsRepository;
+import com.mycompany.ventacontrolfx.presentation.theme.ThemeManager;
+import javafx.fxml.FXML;
+import javafx.scene.control.*;
+import javafx.scene.layout.VBox;
+import javafx.scene.layout.HBox;
+import javafx.scene.paint.Color;
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * Controlador del panel de personalización estética premium.
+ * Permite ajustar colores, tipografía, tarjetas y modo en tiempo real.
+ */
+public class CustomizationController implements Injectable {
+
+    // ─────────────────────────────────────────
+    //  FXML: Colores
+    // ─────────────────────────────────────────
+    @FXML private ColorPicker cpPrimary;
+    @FXML private ColorPicker cpSecondary;
+    @FXML private ColorPicker cpBackground;
+    @FXML private ColorPicker cpText;
+
+    // ─────────────────────────────────────────
+    //  FXML: Tipografía
+    // ─────────────────────────────────────────
+    @FXML private Slider sldFontSize;
+    @FXML private Slider sldBorderRadius;
+    @FXML private Label  lblFontSizeVal;
+    @FXML private Label  lblBorderRadiusVal;
+
+    // ─────────────────────────────────────────
+    //  FXML: Tarjetas
+    // ─────────────────────────────────────────
+    @FXML private Slider sldCardScale;
+    @FXML private Slider sldCardShadow;
+    @FXML private Slider sldCardHoverLift;
+    @FXML private Slider sldCardBorderWidth;
+    @FXML private Slider sldCardHoverScale;
+    @FXML private Label  lblCardScaleVal;
+    @FXML private Label  lblCardShadowVal;
+    @FXML private Label  lblCardHoverLiftVal;
+    @FXML private Label  lblCardBorderWidthVal;
+    @FXML private Label  lblCardHoverScaleVal;
+
+    // ─────────────────────────────────────────
+    //  FXML: Tema (Light / Dark cards)
+    // ─────────────────────────────────────────
+    @FXML private VBox cardLightMode;
+    @FXML private VBox cardDarkMode;
+
+    private boolean isDarkMode = false;
+
+    // ─────────────────────────────────────────
+    //  Servicios
+    // ─────────────────────────────────────────
+    private ServiceContainer container;
+    private ThemeManager themeManager;
+    private IAppSettingsRepository repository;
+
+    // ─────────────────────────────────────────
+    //  Inicialización
+    // ─────────────────────────────────────────
+    @FXML
+    public void initialize() {
+        setupSliderLabels();
+        setupListeners();
+    }
+
+    @Override
+    public void inject(ServiceContainer container) {
+        this.container   = container;
+        this.themeManager = container.getThemeManager();
+        this.repository   = container.getAppSettingsRepository();
+        loadCurrentSettings();
+    }
+
+    // ─────────────────────────────────────────
+    //  Configurar etiquetas de valor en sliders
+    // ─────────────────────────────────────────
+    private void setupSliderLabels() {
+        // Labels de tipografía
+        bindSliderLabel(sldFontSize,     lblFontSizeVal,      v -> (int)(double)v + "px");
+        bindSliderLabel(sldBorderRadius, lblBorderRadiusVal,  v -> (int)(double)v + "px");
+        // Labels de tarjetas
+        bindSliderLabel(sldCardScale,      lblCardScaleVal,      v -> String.format("%.2f\u00d7", v));
+        bindSliderLabel(sldCardShadow,     lblCardShadowVal,     v -> (int)(double)v + "");
+        bindSliderLabel(sldCardHoverLift,  lblCardHoverLiftVal,  v -> (int)(double)v + "px");
+        bindSliderLabel(sldCardBorderWidth,lblCardBorderWidthVal,v -> String.format("%.1fpx", v));
+        bindSliderLabel(sldCardHoverScale, lblCardHoverScaleVal, v -> String.format("%.2f×", v));
+    }
+
+    private void bindSliderLabel(Slider slider, Label label, java.util.function.Function<Double,String> formatter) {
+        if (slider == null || label == null) return;
+        label.setText(formatter.apply(slider.getValue()));
+        slider.valueProperty().addListener((obs, o, n) -> label.setText(formatter.apply(n.doubleValue())));
+    }
+
+    // ─────────────────────────────────────────
+    //  Listeners
+    // ─────────────────────────────────────────
+    private void setupListeners() {
+        // Colores
+        if (cpPrimary    != null) cpPrimary.valueProperty().addListener((obs, o, n) -> updatePreview());
+        if (cpSecondary  != null) cpSecondary.valueProperty().addListener((obs, o, n) -> updatePreview());
+        if (cpBackground != null) cpBackground.valueProperty().addListener((obs, o, n) -> updatePreview());
+        if (cpText       != null) cpText.valueProperty().addListener((obs, o, n) -> updatePreview());
+        // Tipografía
+        if (sldFontSize     != null) sldFontSize.valueProperty().addListener((obs, o, n) -> updatePreview());
+        if (sldBorderRadius != null) sldBorderRadius.valueProperty().addListener((obs, o, n) -> updatePreview());
+        // Tarjetas
+        if (sldCardScale      != null) sldCardScale.valueProperty().addListener((obs, o, n) -> updatePreview());
+        if (sldCardShadow     != null) sldCardShadow.valueProperty().addListener((obs, o, n) -> updatePreview());
+        if (sldCardHoverLift  != null) sldCardHoverLift.valueProperty().addListener((obs, o, n) -> updatePreview());
+        if (sldCardBorderWidth!= null) sldCardBorderWidth.valueProperty().addListener((obs, o, n) -> updatePreview());
+        if (sldCardHoverScale != null) sldCardHoverScale.valueProperty().addListener((obs, o, n) -> updatePreview());
+    }
+
+    // ─────────────────────────────────────────
+    //  Cargar configuración guardada
+    // ─────────────────────────────────────────
+    private void loadCurrentSettings() {
+        if (repository == null) return;
+        try {
+            Map<String, String> settings = repository.getAllSettings();
+
+            trySetColor(cpPrimary,    settings.get("ui.primary_color"));
+            trySetColor(cpSecondary,  settings.get("ui.secondary_color"));
+            trySetColor(cpBackground, settings.get("ui.bg_main"));
+            trySetColor(cpText,       settings.get("ui.text_main"));
+
+            trySetSlider(sldFontSize,      settings.getOrDefault("ui.font_size",         "14"));
+            trySetSlider(sldBorderRadius,  settings.getOrDefault("ui.border_radius",     "8"));
+            trySetSlider(sldCardScale,     settings.getOrDefault("ui.card_scale",        "1.0"));
+            trySetSlider(sldCardShadow,    settings.getOrDefault("ui.card_shadow",       "15"));
+            trySetSlider(sldCardHoverLift, settings.getOrDefault("ui.card_hover_lift",   "8"));
+            trySetSlider(sldCardBorderWidth,settings.getOrDefault("ui.card_border_width","1.5"));
+            trySetSlider(sldCardHoverScale,settings.getOrDefault("ui.card_hover_scale",  "1.02"));
+
+            isDarkMode = "DARK".equals(settings.getOrDefault("ui.theme_mode", "LIGHT"));
+            applyThemeSelection();
+
+        } catch (SQLException | IllegalArgumentException e) {
+            System.err.println("Error cargando ajustes estéticos: " + e.getMessage());
+        }
+    }
+
+    private void trySetColor(ColorPicker cp, String hex) {
+        if (cp != null && hex != null) {
+            try { cp.setValue(Color.valueOf(hex)); } catch (Exception ignored) {}
+        }
+    }
+
+    private void trySetSlider(Slider s, String val) {
+        if (s != null && val != null) {
+            try { s.setValue(Double.parseDouble(val)); } catch (Exception ignored) {}
+        }
+    }
+
+    // ─────────────────────────────────────────
+    //  Preview en tiempo real
+    // ─────────────────────────────────────────
+    private void updatePreview() {
+        if (themeManager == null || cpPrimary == null || cpPrimary.getScene() == null) return;
+
+        Map<String, String> t = buildSettingsMap();
+        themeManager.applyTheme(cpPrimary.getScene(), t);
+    }
+
+    private Map<String, String> buildSettingsMap() {
+        Map<String, String> t = new HashMap<>();
+        if (cpPrimary    != null) t.put("ui.primary_color",    toHex(cpPrimary.getValue()));
+        if (cpSecondary  != null) t.put("ui.secondary_color",  toHex(cpSecondary.getValue()));
+        if (cpBackground != null) t.put("ui.bg_main",          toHex(cpBackground.getValue()));
+        if (cpText       != null) t.put("ui.text_main",        toHex(cpText.getValue()));
+        if (sldFontSize     != null) t.put("ui.font_size",         String.valueOf((int)sldFontSize.getValue()));
+        if (sldBorderRadius != null) t.put("ui.border_radius",     String.valueOf((int)sldBorderRadius.getValue()));
+        if (sldCardScale      != null) t.put("ui.card_scale",        String.valueOf(sldCardScale.getValue()));
+        if (sldCardShadow     != null) t.put("ui.card_shadow",       String.valueOf((int)sldCardShadow.getValue()));
+        if (sldCardHoverLift  != null) t.put("ui.card_hover_lift",   String.valueOf((int)sldCardHoverLift.getValue()));
+        if (sldCardBorderWidth!= null) t.put("ui.card_border_width", String.valueOf(sldCardBorderWidth.getValue()));
+        if (sldCardHoverScale != null) t.put("ui.card_hover_scale",  String.valueOf(sldCardHoverScale.getValue()));
+        t.put("ui.theme_mode", isDarkMode ? "DARK" : "LIGHT");
+        return t;
+    }
+
+    // ─────────────────────────────────────────
+    //  Selección de tema visual
+    // ─────────────────────────────────────────
+    @FXML
+    private void selectLightMode() {
+        isDarkMode = false;
+        applyThemeSelection();
+        updatePreview();
+    }
+
+    @FXML
+    private void selectDarkMode() {
+        isDarkMode = true;
+        applyThemeSelection();
+        updatePreview();
+    }
+
+    private void applyThemeSelection() {
+        if (cardLightMode == null || cardDarkMode == null) return;
+        if (isDarkMode) {
+            cardDarkMode.getStyleClass().add("selected");
+            cardLightMode.getStyleClass().remove("selected");
+        } else {
+            cardLightMode.getStyleClass().add("selected");
+            cardDarkMode.getStyleClass().remove("selected");
+        }
+    }
+
+    // ─────────────────────────────────────────
+    //  Guardar
+    // ─────────────────────────────────────────
+    @FXML
+    private void handleSave() {
+        if (repository == null) return;
+        try {
+            Map<String, String> t = buildSettingsMap();
+            for (Map.Entry<String, String> entry : t.entrySet()) {
+                repository.saveSetting(entry.getKey(), entry.getValue());
+            }
+            if (cpPrimary != null && cpPrimary.getScene() != null) {
+                themeManager.applyTheme(cpPrimary.getScene());
+            }
+            showInfo("✅ Guardado", "La configuración estética se ha guardado correctamente.");
+        } catch (SQLException e) {
+            showError("Error", "No se pudo guardar: " + e.getMessage());
+        }
+    }
+
+    // ─────────────────────────────────────────
+    //  Restablecer
+    // ─────────────────────────────────────────
+    @FXML
+    private void handleReset() {
+        applyPalette("#1e88e5", "#64748b", "#fafbfc", "#2c3e50");
+        trySetSlider(sldFontSize, "14");
+        trySetSlider(sldBorderRadius, "8");
+        trySetSlider(sldCardScale, "1.0");
+        trySetSlider(sldCardShadow, "15");
+        trySetSlider(sldCardHoverLift, "8");
+        trySetSlider(sldCardBorderWidth, "1.5");
+        trySetSlider(sldCardHoverScale, "1.02");
+        isDarkMode = false;
+        applyThemeSelection();
+        updatePreview();
+    }
+
+    // ─────────────────────────────────────────
+    //  Paletas predefinidas
+    // ─────────────────────────────────────────
+    @FXML private void applyClassicBlue()    { applyPalette("#1e88e5","#64748b","#fafbfc","#2c3e50"); }
+    @FXML private void applyEmeraldGreen()   { applyPalette("#2e7d32","#455a64","#f1f8e9","#1b5e20"); }
+    @FXML private void applyMidnightPurple() { applyPalette("#6a1b9a","#37474f","#f3e5f5","#4a148c"); }
+    @FXML private void applySunsetAmber()    { applyPalette("#ef6c00","#4e342e","#fff8e1","#3e2723"); }
+    @FXML private void applySoftRose()       { applyPalette("#d81b60","#4a148c","#fce4ec","#880e4f"); }
+    @FXML private void applyOceanTeal()      { applyPalette("#0d9488","#1e293b","#f0fdfa","#134e4a"); }
+
+    private void applyPalette(String primary, String secondary, String bg, String text) {
+        trySetColor(cpPrimary,    primary);
+        trySetColor(cpSecondary,  secondary);
+        trySetColor(cpBackground, bg);
+        trySetColor(cpText,       text);
+        updatePreview();
+        showThemePreviewPopup(primary, bg, text);
+    }
+
+    // ─────────────────────────────────────────
+    //  Mini popup de preview de paleta
+    // ─────────────────────────────────────────
+    private void showThemePreviewPopup(String primary, String bg, String text) {
+        javafx.stage.Stage stage = new javafx.stage.Stage();
+        stage.initStyle(javafx.stage.StageStyle.TRANSPARENT);
+        stage.initModality(javafx.stage.Modality.NONE);
+
+        javafx.scene.layout.VBox root = new javafx.scene.layout.VBox(15);
+        root.setPadding(new javafx.geometry.Insets(22));
+        root.setPrefWidth(260);
+        root.setStyle("-fx-background-color:" + bg + ";" +
+                      "-fx-border-color:" + primary + ";" +
+                      "-fx-border-width:2.5;" +
+                      "-fx-background-radius:16;" +
+                      "-fx-border-radius:16;" +
+                      "-fx-effect:dropshadow(three-pass-box,rgba(0,0,0,0.28),20,0,0,10);");
+        root.setAlignment(javafx.geometry.Pos.CENTER);
+
+        Label title = new Label("✨ Paleta Aplicada");
+        title.setStyle("-fx-text-fill:" + primary + ";-fx-font-weight:bold;-fx-font-size:17px;");
+
+        Label sub = new Label("Así lucirán tus colores en la app.");
+        sub.setStyle("-fx-text-fill:" + text + ";-fx-font-size:12px;");
+        sub.setWrapText(true);
+        sub.setTextAlignment(javafx.scene.text.TextAlignment.CENTER);
+
+        Button btn = new Button("¡Perfecto!");
+        btn.setStyle("-fx-background-color:" + primary + ";-fx-text-fill:white;-fx-font-weight:bold;" +
+                     "-fx-background-radius:20;-fx-padding:9 28;-fx-cursor:hand;");
+        btn.setOnAction(e -> stage.close());
+
+        root.getChildren().addAll(title, sub, btn);
+
+        javafx.scene.Scene scene = new javafx.scene.Scene(root);
+        scene.setFill(null);
+        stage.setScene(scene);
+
+        if (cpPrimary != null && cpPrimary.getScene() != null) {
+            stage.setX(cpPrimary.getScene().getWindow().getX() + 60);
+            stage.setY(cpPrimary.getScene().getWindow().getY() + 120);
+        }
+
+        stage.show();
+        new Thread(() -> {
+            try { Thread.sleep(3500); } catch (InterruptedException ignored) {}
+            javafx.application.Platform.runLater(stage::close);
+        }).start();
+    }
+
+    // ─────────────────────────────────────────
+    //  Helpers
+    // ─────────────────────────────────────────
+    private String toHex(Color c) {
+        return String.format("#%02X%02X%02X",
+            (int)(c.getRed()*255), (int)(c.getGreen()*255), (int)(c.getBlue()*255));
+    }
+
+    private void showInfo(String title, String content) {
+        Alert a = new Alert(Alert.AlertType.INFORMATION);
+        a.setTitle(title); a.setHeaderText(null); a.setContentText(content); a.showAndWait();
+    }
+
+    private void showError(String title, String content) {
+        Alert a = new Alert(Alert.AlertType.ERROR);
+        a.setTitle(title); a.setHeaderText(null); a.setContentText(content); a.showAndWait();
+    }
+}
