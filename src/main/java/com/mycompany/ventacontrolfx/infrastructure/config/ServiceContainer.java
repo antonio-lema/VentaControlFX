@@ -26,6 +26,13 @@ public class ServiceContainer {
     private final ICashClosureRepository closureRepository;
     private final ICompanyConfigRepository configRepository;
     private final IEmailSender emailSender;
+    private final IPermissionRepository permissionRepository;
+    private final ISuspendedCartRepository suspendedCartRepository;
+    private final IRoleRepository roleRepository;
+    private final IPriceRepository priceRepository;
+    private final IAuditRepository auditRepository;
+    private final IAppSettingsRepository appSettingsRepository;
+    private final com.mycompany.ventacontrolfx.presentation.theme.ThemeManager themeManager;
 
     // Use Cases (Application Layer)
     private final ProductUseCase productUseCase;
@@ -36,6 +43,11 @@ public class ServiceContainer {
     private final CashClosureUseCase closureUseCase;
     private final ConfigUseCase configUseCase;
     private final DashboardUseCase dashboardUseCase;
+    private final PermissionUseCase permissionUseCase;
+    private final SuspendedCartUseCase suspendedCartUseCase;
+    private final RoleUseCase roleUseCase;
+    private final PriceUseCase priceUseCase;
+    private final UserPermissionUseCase userPermissionUseCase;
 
     // Shared Components
     private final GlobalEventBus eventBus;
@@ -65,6 +77,13 @@ public class ServiceContainer {
         this.closureRepository = new JdbcCashClosureRepository();
         this.configRepository = new JdbcCompanyConfigRepository();
         this.emailSender = new SmtpEmailAdapter();
+        this.permissionRepository = new JdbcPermissionRepository();
+        this.suspendedCartRepository = new JdbcSuspendedCartRepository();
+        this.roleRepository = new JdbcRoleRepository(permissionRepository);
+        this.priceRepository = new JdbcPriceRepository();
+        this.auditRepository = new JdbcAuditRepository();
+        this.appSettingsRepository = new JdbcAppSettingsRepository();
+        this.themeManager = new com.mycompany.ventacontrolfx.presentation.theme.ThemeManager(appSettingsRepository);
 
         // 3. Wiring Use Cases (Application Layer)
         this.productUseCase = new ProductUseCase(productRepository);
@@ -76,6 +95,14 @@ public class ServiceContainer {
         this.configUseCase = new ConfigUseCase(configRepository);
         this.dashboardUseCase = new DashboardUseCase(productRepository, categoryRepository, saleRepository,
                 closureRepository, clientRepository, userRepository);
+        this.permissionUseCase = new PermissionUseCase(permissionRepository);
+        this.suspendedCartUseCase = new SuspendedCartUseCase(suspendedCartRepository);
+        this.roleUseCase = new RoleUseCase(roleRepository);
+        this.priceUseCase = new PriceUseCase(priceRepository);
+        this.userPermissionUseCase = new UserPermissionUseCase(userRepository, auditRepository, userSession);
+
+        // Cross-wiring: SaleUseCase necesita CashClosureUseCase para registrar devoluciones en caja
+        this.saleUseCase.setCashClosureUseCase(this.closureUseCase);
     }
 
     // --- Getters ---
@@ -142,5 +169,41 @@ public class ServiceContainer {
     // Factory methods for non-singleton usecases
     public ProductFilterUseCase createProductFilterUseCase() {
         return new ProductFilterUseCase();
+    }
+
+    public PermissionUseCase getPermissionUseCase() {
+        return permissionUseCase;
+    }
+
+    public SuspendedCartUseCase getSuspendedCartUseCase() {
+        return suspendedCartUseCase;
+    }
+
+    public RoleUseCase getRoleUseCase() {
+        return roleUseCase;
+    }
+
+    public IPriceRepository getPriceRepository() {
+        return priceRepository;
+    }
+
+    public PriceUseCase getPriceUseCase() {
+        return priceUseCase;
+    }
+
+    public UserPermissionUseCase getUserPermissionUseCase() {
+        return userPermissionUseCase;
+    }
+
+    public IAuditRepository getAuditRepository() {
+        return auditRepository;
+    }
+
+    public IAppSettingsRepository getAppSettingsRepository() {
+        return appSettingsRepository;
+    }
+
+    public com.mycompany.ventacontrolfx.presentation.theme.ThemeManager getThemeManager() {
+        return themeManager;
     }
 }

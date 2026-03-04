@@ -245,6 +245,15 @@ public class ProductController implements Injectable, com.mycompany.ventacontrol
         openProductDialog(null);
     }
 
+    @FXML
+    private void handleMassivePriceUpdate() {
+        ModalService.showStandardModal("/view/massive_price_update.fxml", "Actualización Masiva de Precios",
+                container, (MassivePriceUpdateController controller) -> {
+                    // No setup needed before showing
+                });
+        loadProducts(); // Recargar productos al cerrar
+    }
+
     private void openProductDialog(Product p) {
         ModalService.showStandardModal("/view/add_product.fxml", p == null ? "Nuevo Producto" : "Editar Producto",
                 container, (AddProductController controller) -> {

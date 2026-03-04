@@ -32,6 +32,10 @@
                   <Region HBox.hgrow="ALWAYS" />
                   <HBox spacing="10.0" alignment="CENTER_RIGHT">
                      <children>
+                        <Button fx:id="btnMassivePriceUpdate" onAction="#handleMassivePriceUpdate" styleClass="btn-secondary" style="-fx-base: #f39c12; -fx-text-fill: white;">
+                           <graphic><FontAwesomeIconView glyphName="PERCENT" size="14" fill="WHITE"/></graphic>
+                           <text> Actualizar Precios</text>
+                        </Button>
                         <Button fx:id="btnAdd" onAction="#handleAddProduct" styleClass="btn-primary">
                            <graphic><FontAwesomeIconView glyphName="PLUS" size="14" fill="WHITE"/></graphic>
                            <text> Nuevo Producto</text>
