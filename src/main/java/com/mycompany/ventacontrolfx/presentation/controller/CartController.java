@@ -2,6 +2,7 @@ package com.mycompany.ventacontrolfx.presentation.controller;
 
 import com.mycompany.ventacontrolfx.domain.model.Client;
 import com.mycompany.ventacontrolfx.application.usecase.CartUseCase;
+import com.mycompany.ventacontrolfx.application.usecase.RestoreSuspendedCartUseCase;
 import com.mycompany.ventacontrolfx.infrastructure.navigation.NavigationService;
 import com.mycompany.ventacontrolfx.presentation.renderer.CartListRenderer;
 import com.mycompany.ventacontrolfx.infrastructure.config.ServiceContainer;
@@ -40,13 +41,14 @@ public class CartController implements Injectable {
     @FXML
     private VBox cartItemsContainer, emptyCartView;
     @FXML
-    private Label subtotalLabel, taxLabel, itemsCountLabel, totalButtonLabel, lblSelectedClient;
+    private Label subtotalLabel, taxLabel, itemsCountLabel, totalButtonLabel, lblSelectedClient, lblCurrentPriceList;
     @FXML
     private Button btnClearCart, payButton, btnRemoveClient;
 
     private ServiceContainer container;
     private NavigationService navigationService;
     private CartUseCase cartUseCase;
+    private RestoreSuspendedCartUseCase restoreSuspendedCartUseCase;
     private CartListRenderer cartRenderer;
 
     @Override
@@ -54,9 +56,18 @@ public class CartController implements Injectable {
         this.container = container;
         this.navigationService = container.getNavigationService();
         this.cartUseCase = container.getCartUseCase();
-        this.cartRenderer = new CartListRenderer(cartItemsContainer, cartUseCase);
+        this.restoreSuspendedCartUseCase = container.getRestoreSuspendedCartUseCase();
+
+        com.mycompany.ventacontrolfx.domain.model.SaleConfig config = container.getICompanyConfigRepository().load();
+        this.cartRenderer = new CartListRenderer(
+                cartItemsContainer,
+                cartUseCase,
+                config.getTaxRate(),
+                config.isPricesIncludeTax());
+
         initBindings();
         initListeners();
+        refreshPriceListLabel();
     }
 
     private void initBindings() {
@@ -90,6 +101,38 @@ public class CartController implements Injectable {
     private void initListeners() {
         cartUseCase.selectedClientProperty()
                 .addListener((obs, oldClient, newClient) -> updateClientUI(newClient));
+
+        cartUseCase.priceListIdProperty()
+                .addListener((obs, oldId, newId) -> {
+                    if (newId != null) {
+                        refreshPriceListLabel();
+                        // Esperamos a que el hilo de fondo de CartUseCase actualice los precios
+                        // y luego forzamos un re-render completo de las filas del carrito.
+                        // Esto garantiza que la UI siempre muestre el precio correcto
+                        // (incluye el caso donde el precio es el mismo entre tarifas).
+                        new Thread(() -> {
+                            try {
+                                Thread.sleep(400);
+                            } catch (InterruptedException ignored) {
+                            }
+                            javafx.application.Platform.runLater(() -> cartRenderer.refreshAllPrices());
+                        }, "cart-ui-refresh").start();
+                    }
+                });
+    }
+
+    private void refreshPriceListLabel() {
+        try {
+            int currentId = cartUseCase.getPriceListId();
+            List<com.mycompany.ventacontrolfx.domain.model.PriceList> lists = container.getPriceListUseCase()
+                    .getAll();
+            lists.stream()
+                    .filter(l -> l.getId() == currentId)
+                    .findFirst()
+                    .ifPresent(l -> lblCurrentPriceList.setText(l.getName()));
+        } catch (Exception e) {
+            lblCurrentPriceList.setText("Tarifa Desconocida");
+        }
     }
 
     private void updateClientUI(Client client) {
@@ -106,7 +149,11 @@ public class CartController implements Injectable {
 
     @FXML
     private void clearCart() {
-        cartUseCase.clear();
+        if (container.getUserSession().hasPermission("venta.limpiar")) {
+            cartUseCase.clear();
+        } else {
+            AlertUtil.showError("Acceso Denegado", "No tiene permiso para vaciar el carrito.");
+        }
     }
 
     @FXML
@@ -120,7 +167,46 @@ public class CartController implements Injectable {
     }
 
     @FXML
+    private void handleChangePriceList() {
+        try {
+            List<com.mycompany.ventacontrolfx.domain.model.PriceList> lists = container.getPriceListUseCase()
+                    .getAll();
+            if (lists.isEmpty()) {
+                AlertUtil.showWarning("Sin Tarifas", "No hay otras tarifas configuradas.");
+                return;
+            }
+
+            int currentId = cartUseCase.getPriceListId();
+            com.mycompany.ventacontrolfx.domain.model.PriceList current = lists.stream()
+                    .filter(l -> l.getId() == currentId)
+                    .findFirst()
+                    .orElse(lists.get(0));
+
+            javafx.scene.control.ChoiceDialog<com.mycompany.ventacontrolfx.domain.model.PriceList> dialog = new javafx.scene.control.ChoiceDialog<>(
+                    current, lists);
+            dialog.setTitle("Cambiar Tarifa");
+            dialog.setHeaderText("Seleccione la tarifa para esta venta");
+            dialog.setContentText("Tarifa activa:");
+
+            // Estilizar un poco el diálogo si es posible o usar ModalService si tuviera
+            // soporte para esto
+            dialog.showAndWait().ifPresent(selected -> {
+                cartUseCase.setPriceListId(selected.getId());
+                AlertUtil.showToast("Cambiado a: " + selected.getName());
+            });
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            AlertUtil.showError("Error", "No se pudieron cargar las tarifas disponibles.");
+        }
+    }
+
+    @FXML
     private void handleSuspendCart() {
+        if (!container.getUserSession().hasPermission("venta.aplazar")) {
+            AlertUtil.showError("Acceso Denegado", "No tiene permiso para aplazar ventas.");
+            return;
+        }
         if (cartUseCase.getItemCount() == 0) {
             AlertUtil.showWarning("Carrito Vacío", "No hay productos para aplazar.");
             return;
@@ -279,29 +365,9 @@ public class CartController implements Injectable {
                                         public void accept(
                                                 com.mycompany.ventacontrolfx.domain.model.SuspendedCart suspendedCart) {
                                             try {
-                                                // 1. Limpiar carrito actual
-                                                cartUseCase.clear();
-
-                                                // 2. Restaurar cliente
-                                                if (suspendedCart.getClientId() != null) {
-                                                    Client client = container.getClientUseCase()
-                                                            .getById(suspendedCart.getClientId());
-                                                    cartUseCase.setSelectedClient(client);
-                                                }
-
-                                                // 3. Restaurar items
-                                                if (suspendedCart.getItems() != null) {
-                                                    for (com.mycompany.ventacontrolfx.domain.model.SuspendedCartItem si : suspendedCart
-                                                            .getItems()) {
-                                                        com.mycompany.ventacontrolfx.domain.model.CartItem ci = new com.mycompany.ventacontrolfx.domain.model.CartItem(
-                                                                si.getProduct(), si.getQuantity());
-                                                        cartUseCase.getCartItems().add(ci);
-                                                    }
-                                                }
-
-                                                // 4. Eliminar de la lista de aplazados
-                                                container.getSuspendedCartUseCase().deleteCart(suspendedCart.getId());
-
+                                                restoreSuspendedCartUseCase.execute(suspendedCart.getId());
+                                                AlertUtil.showToast(
+                                                        "Venta '" + suspendedCart.getAlias() + "' recuperada.");
                                             } catch (Exception e) {
                                                 e.printStackTrace();
                                                 AlertUtil.showError("Error al recuperar",
@@ -326,9 +392,6 @@ public class CartController implements Injectable {
                 container, new java.util.function.Consumer<PaymentController>() {
                     @Override
                     public void accept(PaymentController pc) {
-                        // Aquí asumimos que PaymentController tiene un método similar refactoreado si
-                        // es necesario
-                        // Por ahora mantenemos la lógica interna de processSale
                         pc.setTotalAmount(cartUseCase.getGrandTotal(), (paid, change, method) -> {
                             try {
                                 List<com.mycompany.ventacontrolfx.domain.model.CartItem> items = new java.util.ArrayList<>(
@@ -340,6 +403,35 @@ public class CartController implements Injectable {
 
                                 int saleId = container.getSaleUseCase().processSale(items, total, method, clientId,
                                         userId);
+
+                                // ── EMISIÓN FISCAL AUTOMÁTICA ──
+                                try {
+                                    if (client != null && client.getTaxId() != null
+                                            && !client.getTaxId().trim().isEmpty()) {
+                                        String fullAddress = client.getAddress();
+                                        if (fullAddress == null)
+                                            fullAddress = "";
+                                        if (client.getPostalCode() != null && !client.getPostalCode().isEmpty()) {
+                                            fullAddress += ", " + client.getPostalCode();
+                                        }
+                                        if (client.getCity() != null && !client.getCity().isEmpty()) {
+                                            fullAddress += " " + client.getCity();
+                                        }
+                                        if (client.getProvince() != null && !client.getProvince().isEmpty()) {
+                                            fullAddress += " (" + client.getProvince() + ")";
+                                        }
+
+                                        container.getEmitFiscalDocumentUseCase().emitInvoice(
+                                                saleId,
+                                                client.getName(),
+                                                client.getTaxId(),
+                                                fullAddress);
+                                    } else {
+                                        container.getEmitFiscalDocumentUseCase().emitTicket(saleId);
+                                    }
+                                } catch (Exception fiscalEx) {
+                                    System.err.println("Error en emisión fiscal: " + fiscalEx.getMessage());
+                                }
 
                                 cartUseCase.clear();
                                 container.getEventBus().publishDataChange();
@@ -359,10 +451,90 @@ public class CartController implements Injectable {
                                 });
                             } catch (SQLException e) {
                                 e.printStackTrace();
-                                AlertUtil.showError("Error al procesar venta", e.getMessage());
+                                if (e.getMessage() != null && e.getMessage().contains("OPERACION_BLOQUEADA")) {
+                                    showCashNotOpenAlert(e.getMessage().replace("OPERACION_BLOQUEADA: ", ""));
+                                } else {
+                                    AlertUtil.showError("Error al procesar venta", e.getMessage());
+                                }
                             }
                         });
                     }
                 });
+    }
+
+    /**
+     * Muestra un popup visualmente coherente informando que la caja no está
+     * abierta.
+     */
+    private void showCashNotOpenAlert(String message) {
+        VBox root = new VBox(25);
+        root.setAlignment(Pos.CENTER);
+        root.setPadding(new Insets(35));
+        root.setPrefWidth(450);
+        root.getStyleClass().add("modal-container");
+
+        // Icono de advertencia premium
+        javafx.scene.image.ImageView iconImg = null; // Reemplazar con FontAwesome si está disponible en este contexto
+        FontAwesomeIconView iconView = new FontAwesomeIconView(FontAwesomeIcon.EXCLAMATION_CIRCLE);
+        iconView.setSize("60px");
+        iconView.setFill(javafx.scene.paint.Color.valueOf("#fb8c00")); // Brand warning orange
+
+        VBox textContent = new VBox(10);
+        textContent.setAlignment(Pos.CENTER);
+
+        Label title = new Label("CAJA CERRADA");
+        title.getStyleClass().add("modal-title");
+
+        Label content = new Label(message);
+        content.getStyleClass().add("modal-subtitle");
+        content.setWrapText(true);
+        content.setMaxWidth(380);
+        content.setStyle("-fx-text-alignment: center;");
+
+        textContent.getChildren().addAll(title, content);
+
+        HBox footer = new HBox(15);
+        footer.setAlignment(Pos.CENTER);
+
+        Button btnClose = new Button("ENTENDIDO");
+        btnClose.getStyleClass().add("btn-primary");
+        btnClose.setPrefWidth(180);
+        btnClose.setPrefHeight(45);
+
+        footer.getChildren().add(btnClose);
+        root.getChildren().addAll(iconView, textContent, footer);
+
+        Stage stage = new Stage();
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.initStyle(StageStyle.TRANSPARENT);
+
+        if (cartItemsContainer.getScene() != null) {
+            stage.initOwner(cartItemsContainer.getScene().getWindow());
+        }
+
+        javafx.scene.Scene scene = new javafx.scene.Scene(root);
+        scene.setFill(javafx.scene.paint.Color.TRANSPARENT);
+        if (container != null) {
+            container.getThemeManager().applyFullTheme(scene);
+        }
+        stage.setScene(scene);
+
+        btnClose.setOnAction(e -> stage.close());
+
+        // Animación de entrada
+        root.setOpacity(0);
+        root.setScaleX(0.9);
+        root.setScaleY(0.9);
+        stage.setOnShowing(evt -> {
+            FadeTransition ft = new FadeTransition(Duration.millis(300), root);
+            ft.setToValue(1.0);
+            ScaleTransition st = new ScaleTransition(Duration.millis(300), root);
+            st.setToX(1.0);
+            st.setToY(1.0);
+            st.play();
+            ft.play();
+        });
+
+        stage.showAndWait();
     }
 }

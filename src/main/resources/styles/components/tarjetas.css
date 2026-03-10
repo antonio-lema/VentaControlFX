@@ -3,58 +3,59 @@
  */
 
 /* Tarjetas de Producto */
+/* Tarjetas de Producto (Premium SaaS Style) */
 .product-box {
     -fx-background-color: white;
-    -fx-background-radius: 16px;
-    -fx-border-color: rgba(0, 0, 0, 0.04);
+    -fx-background-radius: 14px;
+    -fx-border-color: -fx-neutral-200;
     -fx-border-width: 1px;
-    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.12), 12, 0, 0, 4);
+    -fx-effect: -fx-shadow-premium-sm;
     -fx-padding: 0;
     -fx-cursor: hand;
 }
 
 .product-box:hover {
-    -fx-effect: -fx-shadow-primary;
-    -fx-translate-y: -5px;
+    -fx-effect: -fx-shadow-premium-lg;
+    -fx-translate-y: -4px;
     -fx-border-color: -fx-custom-color-primary;
-    -fx-border-width: 1px;
-    -fx-scale-x: 1.02;
-    -fx-scale-y: 1.02;
-    -fx-background-color: white;
+    -fx-scale-x: 1.01;
+    -fx-scale-y: 1.01;
 }
 
-/* Image Container in Product Card */
+/* Image Container */
 .product-image-container {
-    -fx-background-color: transparent;
-    -fx-background-radius: 16 16 0 0;
-    -fx-border-color: transparent transparent rgba(0, 0, 0, 0.04) transparent;
+    -fx-background-color: #f8fafc;
+    /* Neutral clean background - removes checkerboard feel */
+    -fx-background-radius: 14 14 0 0;
+    -fx-border-color: transparent transparent -fx-neutral-100 transparent;
     -fx-border-width: 0 0 1 0;
+    -fx-alignment: center;
 }
 
 .product-box:hover .product-image-container {
-    -fx-background-color: -fx-custom-color-primary-bg;
+    -fx-background-color: white;
+    /* Clean transition to white on hover */
 }
 
 .product-info {
-    -fx-padding: 18;
+    -fx-padding: 15;
     -fx-spacing: 12;
 }
 
 .product-name {
     -fx-font-size: 14px;
-    -fx-text-fill: -fx-text-custom-on-primary;
-    -fx-font-weight: 700;
-    -fx-line-spacing: 1.2;
+    -fx-text-fill: -fx-neutral-800;
+    -fx-font-weight: 600;
+    -fx-line-spacing: 1.1;
 }
 
 .product-price-badge {
-    -fx-background-color: -fx-grad-primary;
-    -fx-text-fill: white;
+    -fx-background-color: transparent;
+    -fx-text-fill: -fx-custom-color-primary;
     -fx-font-weight: 800;
-    -fx-font-size: 13px;
-    -fx-padding: 6 14;
-    -fx-background-radius: 10px;
-    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.06), 8, 0, 0, 2);
+    -fx-font-size: 18px;
+    /* Prominent price as requested */
+    -fx-padding: 0;
 }
 
 /* Tarjetas de Usuario */

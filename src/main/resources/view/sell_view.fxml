@@ -11,25 +11,40 @@
             styleClass="main-content-area">
     <center>
         <VBox spacing="0">
-            <HBox alignment="CENTER_LEFT" styleClass="view-header-bar">
-                <StackPane styleClass="filter-icon-container">
-                     <FontAwesomeIconView glyphName="FILTER" size="18" fill="#ffffff"/>
-                </StackPane>
-                <VBox alignment="CENTER_LEFT" spacing="2">
-                     <Label text="Mostrando en este momento:" styleClass="label-muted" style="-fx-font-size: 11px;"/>
-                     <Label fx:id="filterLabel" text="Todos los productos" styleClass="section-title" style="-fx-font-size: 18px;"/>
-                </VBox>
-                
-                <Region HBox.hgrow="ALWAYS" />
-                
-                <VBox alignment="CENTER_RIGHT" spacing="2">
-                    <Label text="Tarifa activa:" styleClass="label-muted" style="-fx-font-size: 11px;"/>
-                    <ComboBox fx:id="comboPriceList" prefWidth="200" styleClass="price-list-selector" />
-                </VBox>
-                <padding>
-                    <Insets right="20" left="0" />
-                </padding>
-            </HBox>
+            <!-- Replaced legacy header with professional view-header -->
+            <VBox styleClass="view-header" spacing="0">
+                <children>
+                    <HBox spacing="16" alignment="CENTER_LEFT">
+                        <children>
+                            <StackPane styleClass="view-header-icon-wrap">
+                                <children>
+                                    <FontAwesomeIconView glyphName="SHOPPING_CART" size="24" fill="white"/>
+                                </children>
+                            </StackPane>
+                            <VBox spacing="2">
+                                <children>
+                                    <Label text="Realizar Venta" styleClass="view-title"/>
+                                    <Label fx:id="filterLabel" text="Catálogo de productos y punto de venta" styleClass="view-subtitle"/>
+                                </children>
+                            </VBox>
+                            
+                            <Region HBox.hgrow="ALWAYS" />
+                            
+                            <!-- Control Section in Header -->
+                            <HBox alignment="CENTER_LEFT" spacing="15.0" styleClass="filter-card">
+                                <children>
+                                    <VBox spacing="2">
+                                        <children>
+                                            <Label text="TARIFA ACTIVA" styleClass="filter-label-cap" />
+                                            <ComboBox fx:id="comboPriceList" prefWidth="200" styleClass="price-list-selector" />
+                                        </children>
+                                    </VBox>
+                                </children>
+                            </HBox>
+                        </children>
+                    </HBox>
+                </children>
+            </VBox>
             
             <StackPane VBox.vgrow="ALWAYS">
                 <ScrollPane fitToHeight="true" fitToWidth="true" styleClass="products-scroll-pane">

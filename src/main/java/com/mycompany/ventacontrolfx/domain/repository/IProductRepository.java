@@ -7,9 +7,17 @@ import java.util.List;
 public interface IProductRepository {
     List<Product> getAll() throws SQLException;
 
+    List<Product> getAll(int priceListId) throws SQLException;
+
     List<Product> getAllVisible() throws SQLException;
 
+    List<Product> getAllVisible(int priceListId) throws SQLException;
+
     List<Product> getFavorites() throws SQLException;
+
+    List<Product> getFavorites(int priceListId) throws SQLException;
+
+    Product getById(int id) throws SQLException;
 
     void save(Product product) throws SQLException;
 
@@ -26,4 +34,7 @@ public interface IProductRepository {
     void updateVisibilityByCategory(int categoryId, boolean visible) throws SQLException;
 
     void updateTaxRateByCategory(int categoryId, double taxRate) throws SQLException;
+
+    void updateTaxRateToAll(double taxRate) throws SQLException;
+
 }

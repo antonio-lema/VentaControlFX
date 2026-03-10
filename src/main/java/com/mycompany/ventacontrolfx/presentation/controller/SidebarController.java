@@ -6,31 +6,26 @@ import com.mycompany.ventacontrolfx.util.AuthorizationService;
 import com.mycompany.ventacontrolfx.infrastructure.config.Injectable;
 import com.mycompany.ventacontrolfx.util.RippleEffect;
 import com.mycompany.ventacontrolfx.util.ModalService;
-import com.mycompany.ventacontrolfx.presentation.theme.ThemeManager;
-import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
-import javafx.scene.layout.Region;
 
 public class SidebarController implements Injectable {
 
     @FXML
-    private Button btnSell, btnProducts, btnProductsList, btnCategories, btnHistory, btnReturns, btnClosures,
-            btnClients, btnUsers,
-            btnConfig, btnLock, btnThemeToggle, btnReports, btnSellerReport, btnClientReport, btnThemeSettings,
-            btnUsersList, btnRoles;
+    private Button btnSell, btnProducts, btnProductsList, btnCategories,
+            btnHistory, btnReturns, btnClosures, btnBilling,
+            btnClients,
+            btnUsers, btnUsersList, btnRoles,
+            btnConfig, btnLock, btnThemeSettings, btnMassivePrices, btnPriceLists,
+            btnReports, btnSellerReport, btnClientReport;
+
     @FXML
     private VBox productsSubmenu, reportsSubmenu, usersSubmenu;
+
     @FXML
     private Label lblProductsArrow, lblReportsArrow, lblUsersArrow;
-    @FXML
-    private FontAwesomeIconView themeIcon;
-    @FXML
-    private Label lblTheme;
-
-    private boolean isDarkTheme = false;
 
     private NavigationService navigationService;
     private AuthorizationService authService;
@@ -41,26 +36,22 @@ public class SidebarController implements Injectable {
         this.container = container;
         this.authService = container.getAuthService();
         this.navigationService = container.getNavigationService();
-        String theme = "LIGHT";
-        try {
-            String savedTheme = container.getAppSettingsRepository().getSetting("ui.theme_mode");
-            if (savedTheme != null)
-                theme = savedTheme;
-        } catch (Exception e) {
-            // Fallback to light
-        }
-        this.isDarkTheme = "DARK".equals(theme);
-
         applyVisualEffects();
         checkRoles();
-        updateThemeUI();
+
+        // El botón activo por defecto al abrir la aplicación
+        setActiveButton(btnSell);
     }
 
     private void applyVisualEffects() {
-        Button[] btns = { btnSell, btnProducts, btnProductsList, btnCategories, btnHistory, btnReturns, btnClosures,
+        Button[] btns = {
+                btnSell, btnProducts, btnProductsList, btnCategories,
+                btnHistory, btnReturns, btnClosures, btnBilling,
                 btnClients,
-                btnUsers, btnConfig, btnLock, btnThemeToggle, btnReports, btnSellerReport, btnClientReport,
-                btnThemeSettings };
+                btnUsers, btnUsersList, btnRoles,
+                btnConfig, btnLock, btnThemeSettings, btnMassivePrices, btnPriceLists,
+                btnReports, btnSellerReport, btnClientReport
+        };
         for (Button b : btns) {
             if (b != null)
                 RippleEffect.applyTo(b);
@@ -73,23 +64,23 @@ public class SidebarController implements Injectable {
 
         setVisible(btnSell, authService.hasPermission("VENTAS"));
         setVisible(btnHistory, authService.hasPermission("HISTORIAL"));
+        setVisible(btnReturns, authService.hasPermission("venta.devolucion"));
         setVisible(btnProducts, authService.hasPermission("PRODUCTOS"));
         setVisible(btnProductsList, authService.hasPermission("PRODUCTOS"));
         setVisible(btnCategories, authService.hasPermission("PRODUCTOS"));
+        setVisible(btnPriceLists, authService.hasPermission("PRODUCTOS"));
         setVisible(btnClients, authService.hasPermission("CLIENTES"));
         setVisible(btnClosures, authService.hasPermission("CIERRES"));
-        setVisible(btnReturns, authService.hasPermission("venta.devolucion"));
-        setVisible(btnUsers, authService.hasPermission("USUARIOS"));
+        setVisible(btnUsers, authService.hasPermission("usuario.crear"));
         setVisible(btnConfig, authService.hasPermission("CONFIGURACION"));
         setVisible(btnThemeSettings, authService.hasPermission("CONFIGURACION"));
 
-        boolean hasReports = authService.hasPermission("HISTORIAL");
-        setVisible(btnReports, hasReports);
-
-        if (productsSubmenu != null && !authService.hasPermission("PRODUCTOS")) {
-            productsSubmenu.setVisible(false);
-            productsSubmenu.setManaged(false);
-        }
+        setVisible(btnMassivePrices, authService.hasPermission("admin.precios_masivo"));
+        setVisible(btnReports,
+                authService.hasPermission("reporte.vendedores") || authService.hasPermission("reporte.clientes"));
+        setVisible(btnSellerReport, authService.hasPermission("reporte.vendedores"));
+        setVisible(btnClientReport, authService.hasPermission("reporte.clientes"));
+        setVisible(btnBilling, authService.hasPermission("HISTORIAL"));
     }
 
     private void setVisible(Button btn, boolean visible) {
@@ -100,10 +91,14 @@ public class SidebarController implements Injectable {
     }
 
     private void setActiveButton(Button activeBtn) {
-        Button[] btns = { btnSell, btnProducts, btnProductsList, btnCategories, btnHistory, btnReturns, btnClosures,
+        Button[] btns = {
+                btnSell, btnProducts, btnProductsList, btnCategories,
+                btnHistory, btnReturns, btnClosures, btnBilling,
                 btnClients,
-                btnUsers, btnConfig, btnLock, btnReports, btnSellerReport, btnClientReport, btnThemeSettings,
-                btnUsersList, btnRoles };
+                btnUsers, btnUsersList, btnRoles,
+                btnConfig, btnLock, btnThemeSettings, btnPriceLists, btnMassivePrices,
+                btnReports, btnSellerReport, btnClientReport
+        };
         for (Button b : btns) {
             if (b != null)
                 b.getStyleClass().remove("active-sidebar-button");
@@ -111,6 +106,8 @@ public class SidebarController implements Injectable {
         if (activeBtn != null)
             activeBtn.getStyleClass().add("active-sidebar-button");
     }
+
+    // ─── PRINCIPAL ──────────────────────────────────────────
 
     @FXML
     private void showSellView() {
@@ -130,10 +127,15 @@ public class SidebarController implements Injectable {
         navigationService.navigateTo("/view/return_list.fxml");
     }
 
+    // ─── CATÁLOGO ────────────────────────────────────────────
+
     @FXML
-    private void handleShowClosures() {
-        setActiveButton(btnClosures);
-        navigationService.navigateTo("/view/closure_history.fxml");
+    private void toggleProductsMenu() {
+        setActiveButton(btnProducts);
+        boolean visible = !productsSubmenu.isVisible();
+        productsSubmenu.setVisible(visible);
+        productsSubmenu.setManaged(visible);
+        lblProductsArrow.setText(visible ? "˅" : "›");
     }
 
     @FXML
@@ -149,19 +151,26 @@ public class SidebarController implements Injectable {
     }
 
     @FXML
-    private void showAddClientDialog() {
+    private void showPriceListsView() {
+        setActiveButton(btnPriceLists);
+        navigationService.navigateTo("/view/price_lists.fxml");
+    }
+
+    @FXML
+    private void handleShowVatPrices() {
+        setActiveButton(btnMassivePrices);
+        navigationService.navigateTo("/view/vat_management.fxml");
+    }
+
+    // ─── CLIENTES ────────────────────────────────────────────
+
+    @FXML
+    private void handleShowClients() {
         setActiveButton(btnClients);
         navigationService.navigateTo("/view/clients.fxml");
     }
 
-    @FXML
-    private void toggleProductsMenu() {
-        setActiveButton(btnProducts);
-        boolean visible = !productsSubmenu.isVisible();
-        productsSubmenu.setVisible(visible);
-        productsSubmenu.setManaged(visible);
-        lblProductsArrow.setText(visible ? "v" : "<");
-    }
+    // ─── ANALÍTICA ───────────────────────────────────────────
 
     @FXML
     private void toggleReportsMenu() {
@@ -170,7 +179,7 @@ public class SidebarController implements Injectable {
         reportsSubmenu.setVisible(visible);
         reportsSubmenu.setManaged(visible);
         if (lblReportsArrow != null)
-            lblReportsArrow.setText(visible ? "v" : "<");
+            lblReportsArrow.setText(visible ? "˅" : "‹");
     }
 
     @FXML
@@ -186,13 +195,27 @@ public class SidebarController implements Injectable {
     }
 
     @FXML
+    private void handleShowClosures() {
+        setActiveButton(btnClosures);
+        navigationService.navigateTo("/view/closure_history.fxml");
+    }
+
+    @FXML
+    private void handleShowBilling() {
+        setActiveButton(btnBilling);
+        navigationService.navigateTo("/view/fiscal_documents.fxml");
+    }
+
+    // ─── ADMINISTRACIÓN ──────────────────────────────────────
+
+    @FXML
     private void toggleUsersMenu() {
         setActiveButton(btnUsers);
         boolean visible = !usersSubmenu.isVisible();
         usersSubmenu.setVisible(visible);
         usersSubmenu.setManaged(visible);
         if (lblUsersArrow != null)
-            lblUsersArrow.setText(visible ? "v" : "<");
+            lblUsersArrow.setText(visible ? "˅" : "›");
     }
 
     @FXML
@@ -219,34 +242,10 @@ public class SidebarController implements Injectable {
         navigationService.navigateTo("/view/customization_panel.fxml");
     }
 
+    // ─── ACCIONES INFERIORES ─────────────────────────────────
+
     @FXML
     private void handleLockApp() {
         ModalService.showFullScreenModal("/view/lock_screen.fxml", "Pantalla de Bloqueo", container, null);
-    }
-
-    @FXML
-    private void handleThemeToggle() {
-        isDarkTheme = !isDarkTheme;
-        try {
-            container.getAppSettingsRepository().saveSetting("ui.theme_mode", isDarkTheme ? "DARK" : "LIGHT");
-            container.getThemeManager().applyTheme(btnThemeToggle.getScene());
-            updateThemeUI();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void updateThemeUI() {
-        if (isDarkTheme) {
-            if (themeIcon != null)
-                themeIcon.setGlyphName("SUN_ALT");
-            if (lblTheme != null)
-                lblTheme.setText("Modo Claro");
-        } else {
-            if (themeIcon != null)
-                themeIcon.setGlyphName("MOON_ALT");
-            if (lblTheme != null)
-                lblTheme.setText("Modo Oscuro");
-        }
     }
 }

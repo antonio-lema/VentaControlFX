@@ -22,7 +22,8 @@ public class CartUseCaseTest {
         config.setTaxRate(21.0); // 21% IVA
         when(configRepository.load()).thenReturn(config);
 
-        cartUseCase = new CartUseCase(configRepository);
+        cartUseCase = new CartUseCase(configRepository,
+                Mockito.mock(com.mycompany.ventacontrolfx.domain.repository.IPriceRepository.class));
     }
 
     @Test

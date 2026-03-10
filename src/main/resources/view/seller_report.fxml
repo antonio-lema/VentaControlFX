@@ -5,164 +5,247 @@
 <?import javafx.geometry.*?>
 <?import javafx.scene.chart.*?>
 <?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
+<?import org.controlsfx.control.SegmentedButton?>
+<?import java.net.URL?>
 
 <VBox xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="com.mycompany.ventacontrolfx.presentation.controller.SellerReportController"
-      styleClass="view-root" spacing="0">
+      styleClass="main-content-area" spacing="0" style="-fx-background-color: -fx-bg-main;">
     <stylesheets>
         <java.net.URL value="@/styles/components/informes.css" />
     </stylesheets>
 
-    <!-- Header de la vista -->
-    <HBox styleClass="view-header" alignment="CENTER_LEFT" spacing="16">
-        <padding><Insets top="20" right="28" bottom="20" left="28"/></padding>
-        <StackPane styleClass="view-header-icon">
-            <FontAwesomeIconView glyphName="BAR_CHART" size="24" styleClass="view-header-icon-glyph"/>
-        </StackPane>
-        <VBox spacing="2">
-            <Label text="Análisis de Ventas por Vendedor" styleClass="view-title"/>
-            <Label text="Monitorización profesional de rendimiento y KPIs comerciales" styleClass="view-subtitle"/>
-        </VBox>
-        <Region HBox.hgrow="ALWAYS"/>
-        
-        <!-- Botones de Exportación -->
-        <HBox spacing="8" alignment="CENTER">
-            <Button text="Excel" onAction="#handleExportExcel" styleClass="export-btn">
-                <graphic><FontAwesomeIconView glyphName="FILE_EXCEL_ALT" size="14"/></graphic>
-            </Button>
-            <Button text="PDF" onAction="#handleExportPDF" styleClass="export-btn">
-                <graphic><FontAwesomeIconView glyphName="FILE_PDF_ALT" size="14"/></graphic>
-            </Button>
-        </HBox>
-    </HBox>
-
-    <Separator/>
-
-    <!-- Filtros Avanzados -->
-    <HBox spacing="15" alignment="CENTER_LEFT" style="-fx-background-color: -bg-subtle; -fx-padding: 12 28;">
-        <Label text="Periodo:" styleClass="filter-label"/>
-        <DatePicker fx:id="dpFrom" prefWidth="130" promptText="Desde"/>
-        <DatePicker fx:id="dpTo" prefWidth="130" promptText="Hasta"/>
-        
-        <Separator orientation="VERTICAL" prefHeight="20"/>
-        
-        <Label text="Método Pago:" styleClass="filter-label"/>
-        <ComboBox fx:id="cbPaymentMethod" prefWidth="120" promptText="Todos"/>
-        
-        <CheckBox fx:id="chkIncludeReturns" text="Incluir Devoluciones" style="-fx-font-size: 12px;"/>
-        
-        <Region HBox.hgrow="ALWAYS"/>
-        <Button fx:id="btnFilter" text="Actualizar Análisis" styleClass="btn-primary" onAction="#handleFilter">
-            <graphic><FontAwesomeIconView glyphName="REFRESH" fill="white"/></graphic>
-        </Button>
-    </HBox>
-
-    <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" style="-fx-background-color: transparent;">
-        <VBox spacing="20" style="-fx-padding: 20 28;">
+    <!-- Header & Action Bar -->
+    <VBox styleClass="view-header" spacing="0">
+        <HBox alignment="CENTER_LEFT" spacing="20">
+            <StackPane styleClass="view-header-icon-wrap">
+                <FontAwesomeIconView glyphName="LINE_CHART" size="24" fill="white"/>
+            </StackPane>
+            <VBox spacing="2">
+                <Label text="Análisis de Ventas por Vendedor" styleClass="view-title"/>
+                <Label text="Monitorización dinámica de KPIs de tu equipo comercial" styleClass="view-subtitle"/>
+            </VBox>
+            <Region HBox.hgrow="ALWAYS"/>
             
-            <!-- KPI Cards Row -->
-            <HBox spacing="16">
-                <VBox styleClass="kpi-card" HBox.hgrow="ALWAYS">
+            <HBox spacing="12" alignment="CENTER_RIGHT">
+                <Label text="Periodo:" styleClass="view-subtitle" style="-fx-font-weight: bold;"/>
+                <DatePicker fx:id="dpFrom" prefWidth="120" promptText="Desde" styleClass="input-saas"/>
+                <Label text="-" styleClass="view-subtitle"/>
+                <DatePicker fx:id="dpTo" prefWidth="120" promptText="Hasta" styleClass="input-saas"/>
+                
+                <Separator orientation="VERTICAL" prefHeight="24" style="-fx-padding: 0 10; -fx-opacity: 0.3;"/>
+                
+                <ComboBox fx:id="cbPaymentMethod" prefWidth="130" promptText="Pago" styleClass="input-saas"/>
+                
+                <Button fx:id="btnFilter" text="Actualizar" onAction="#handleFilter" styleClass="btn-primary">
+                    <graphic><FontAwesomeIconView glyphName="REFRESH" fill="white"/></graphic>
+                </Button>
+            </HBox>
+        </HBox>
+    </VBox>
+
+    <Separator style="-fx-border-color: transparent; -fx-border-width: 0 0 1 0; -fx-border-style: solid; -fx-background-color: -fx-bg-main;"/>
+
+    <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" style="-fx-background-color: transparent; -fx-border-color: transparent;">
+        <VBox spacing="24" style="-fx-padding: 24 32;">
+            
+            <!-- ROW 1: Metric Cards -->
+            <FlowPane hgap="20" vgap="20" prefWrapLength="1500">
+                <!-- Ventas Totales -->
+                <VBox styleClass="kpi-card-saas, kpi-card-green" prefWidth="250">
                     <HBox alignment="CENTER_LEFT" spacing="10">
-                        <Label text="Ventas Totales" styleClass="kpi-label"/>
+                        <Label text="Ventas Netas Totales" styleClass="kpi-label-saas"/>
                         <Region HBox.hgrow="ALWAYS"/>
-                        <Label fx:id="lblTrendTotal" text="+0%" styleClass="trend-up"/>
+                        <StackPane styleClass="icon-bg-green"><FontAwesomeIconView glyphName="DOLLAR" fill="#10b981"/></StackPane>
                     </HBox>
-                    <Label fx:id="lblKpiTotal" text="0.00 €" styleClass="kpi-value kpi-green"/>
-                    <Label text="vs. periodo anterior" styleClass="filter-label" style="-fx-font-size: 10px;"/>
+                    <Label fx:id="lblKpiTotal" text="0.00 €" styleClass="kpi-value-saas"/>
+                    <HBox alignment="CENTER_LEFT" spacing="6">
+                        <Label fx:id="lblTrendTotal" text="+0%" styleClass="trend-badge-up"/>
+                        <Label text="vs anterior" styleClass="trend-text"/>
+                    </HBox>
                 </VBox>
                 
-                <VBox styleClass="kpi-card" HBox.hgrow="ALWAYS">
+                <!-- Margen -->
+                <VBox styleClass="kpi-card-saas, kpi-card-purple" prefWidth="250">
                     <HBox alignment="CENTER_LEFT" spacing="10">
-                        <Label text="Nº Transacciones" styleClass="kpi-label"/>
+                        <Label text="Margen (Est. 35%)" styleClass="kpi-label-saas"/>
                         <Region HBox.hgrow="ALWAYS"/>
-                        <Label fx:id="lblTrendCount" text="+0" styleClass="trend-blue"/>
+                        <StackPane styleClass="icon-bg-purple"><FontAwesomeIconView glyphName="PIE_CHART" fill="#8b5cf6"/></StackPane>
                     </HBox>
-                    <Label fx:id="lblKpiCount" text="0" styleClass="kpi-value kpi-blue"/>
-                    <Label text="Ventas realizadas" styleClass="filter-label" style="-fx-font-size: 10px;"/>
+                    <Label fx:id="lblKpiMargin" text="0.00 €" styleClass="kpi-value-saas"/>
+                    <HBox alignment="CENTER_LEFT" spacing="6">
+                        <Label fx:id="lblTrendMargin" text="+0%" styleClass="trend-badge-up"/>
+                        <Label text="vs anterior" styleClass="trend-text"/>
+                    </HBox>
                 </VBox>
                 
-                <VBox styleClass="kpi-card" HBox.hgrow="ALWAYS">
-                    <Label text="🏆 Mejor Vendedor" styleClass="kpi-label"/>
-                    <Label fx:id="lblKpiBest" text="—" styleClass="kpi-value kpi-gold"/>
-                    <Label fx:id="lblBestPerformance" text="0.00 € vendidos" styleClass="filter-label" style="-fx-font-size: 10px;"/>
+                <!-- Ticket Medio -->
+                <VBox styleClass="kpi-card-saas, kpi-card-blue" prefWidth="250">
+                    <HBox alignment="CENTER_LEFT" spacing="10">
+                        <Label text="Ticket Promedio" styleClass="kpi-label-saas"/>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <StackPane styleClass="icon-bg-blue"><FontAwesomeIconView glyphName="TAG" fill="#3b82f6"/></StackPane>
+                    </HBox>
+                    <Label fx:id="lblKpiAvg" text="0.00 €" styleClass="kpi-value-saas"/>
+                    <HBox alignment="CENTER_LEFT" spacing="6">
+                        <Label fx:id="lblTrendAvg" text="+0%" styleClass="trend-badge-neutral"/>
+                        <Label text="vs anterior" styleClass="trend-text"/>
+                    </HBox>
+                </VBox>
+
+                <!-- Transacciones -->
+                <VBox styleClass="kpi-card-saas, kpi-card-gray" prefWidth="250">
+                    <HBox alignment="CENTER_LEFT" spacing="10">
+                        <Label text="Nº Transacciones" styleClass="kpi-label-saas"/>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <StackPane styleClass="icon-bg-gray"><FontAwesomeIconView glyphName="SHOPPING_BASKET" fill="#64748b"/></StackPane>
+                    </HBox>
+                    <Label fx:id="lblKpiCount" text="0" styleClass="kpi-value-saas"/>
+                    <HBox alignment="CENTER_LEFT" spacing="6">
+                        <Label fx:id="lblTrendCount" text="+0" styleClass="trend-badge-blue"/>
+                        <Label text="operaciones hechas" styleClass="trend-text"/>
+                    </HBox>
                 </VBox>
                 
-                <VBox styleClass="kpi-card" HBox.hgrow="ALWAYS">
-                    <Label text="📊 Ticket Medio" styleClass="kpi-label"/>
-                    <Label fx:id="lblKpiAvg" text="0.00 €" styleClass="kpi-value kpi-purple"/>
-                    <Label text="Promedio por venta" styleClass="filter-label" style="-fx-font-size: 10px;"/>
+                <!-- Mejor Vendedor -->
+                <VBox styleClass="kpi-card-saas, kpi-card-gold" prefWidth="250">
+                    <HBox alignment="CENTER_LEFT" spacing="10">
+                        <Label text="Top Performer" styleClass="kpi-label-saas"/>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <StackPane styleClass="icon-bg-gold"><FontAwesomeIconView glyphName="TROPHY" fill="#f59e0b"/></StackPane>
+                    </HBox>
+                    <Label fx:id="lblKpiBest" text="—" styleClass="kpi-value-saas"/>
+                    <Label fx:id="lblBestPerformance" text="0.00 € / Mes" styleClass="trend-text"/>
+                </VBox>
+                
+                <!-- Objetivo -->
+                <VBox styleClass="kpi-card-saas, kpi-card-blue" prefWidth="250">
+                    <HBox alignment="CENTER_LEFT" spacing="10">
+                        <Label text="Objetivo Mensual" styleClass="kpi-label-saas"/>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Label fx:id="lblGoalPct" text="0%" styleClass="kpi-label-saas" style="-fx-font-weight: bold;"/>
+                    </HBox>
+                    <ProgressBar fx:id="progressGoal" progress="0.0" prefWidth="230" styleClass="progress-saas" style="-fx-min-height: 12px; -fx-translate-y: 8;"/>
+                    <Label fx:id="lblGoalText" text="0 / 15000 €" styleClass="trend-text" style="-fx-translate-y: 12;"/>
+                </VBox>
+            </FlowPane>
+
+            <!-- ROW 2: Charts & Leaderboard -->
+            <HBox spacing="24">
+                <!-- GRÁFICAS (Evolución y barras) -->
+                <VBox styleClass="widget-panel" HBox.hgrow="ALWAYS" spacing="16">
+                    <HBox alignment="CENTER_LEFT">
+                        <Label text="Rendimiento Comercial" styleClass="widget-title"/>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <SegmentedButton visible="false" managed="false"/> <!-- Placeholder para tabs si se deseara -->
+                    </HBox>
+                    <HBox spacing="10" VBox.vgrow="ALWAYS">
+                        <VBox HBox.hgrow="ALWAYS">
+                             <Label text="Ventas Totales por Agente" styleClass="chart-label"/>
+                             <BarChart fx:id="salesBarChart" legendVisible="false" VBox.vgrow="ALWAYS" animated="true">
+                                <xAxis><CategoryAxis label="Vendedor"/></xAxis>
+                                <yAxis><NumberAxis label="Ventas (€)"/></yAxis>
+                            </BarChart>
+                        </VBox>
+                        <VBox HBox.hgrow="ALWAYS">
+                            <Label text="Evolución Acumulada del Periodo" styleClass="chart-label"/>
+                            <LineChart fx:id="trendLineChart" legendVisible="true" VBox.vgrow="ALWAYS" animated="true" createSymbols="false">
+                                <xAxis><CategoryAxis label="Fecha"/></xAxis>
+                                <yAxis><NumberAxis/></yAxis>
+                            </LineChart>
+                        </VBox>
+                    </HBox>
                 </VBox>
             </HBox>
 
-            <!-- Middle Row: Charts & Ranking -->
-            <HBox spacing="20">
-                <!-- Gráfico de distribución -->
-                <VBox styleClass="chart-container" HBox.hgrow="ALWAYS" prefHeight="300">
-                    <Label text="Distribución de Ventas (%)" styleClass="section-title"/>
-                    <PieChart fx:id="pieChartDistribution" legendSide="BOTTOM" labelsVisible="true" VBox.vgrow="ALWAYS"/>
-                </VBox>
-                
-                <!-- Tabla de Ranking Avanzada -->
-                <VBox spacing="10" prefWidth="450">
-                    <Label text="Ranking de Rendimiento" styleClass="section-title"/>
-                    <TableView fx:id="sellerTable" VBox.vgrow="ALWAYS" styleClass="modern-table">
+            <!-- ROW 3: Ranking de Vendedores y Desglose Pago -->
+            <HBox spacing="24" prefHeight="350">
+                <!-- RANKING TABLE -->
+                <VBox styleClass="widget-panel" HBox.hgrow="ALWAYS" spacing="12">
+                    <Label text="Leaderboard de Vendedores" styleClass="widget-title"/>
+                    <TableView fx:id="sellerTable" VBox.vgrow="ALWAYS" styleClass="table-saas">
                         <columns>
                             <TableColumn fx:id="colRank" text="#" prefWidth="40" style="-fx-alignment: CENTER;"/>
-                            <TableColumn fx:id="colSeller" text="Vendedor" prefWidth="150"/>
-                            <TableColumn fx:id="colTotal" text="Total" prefWidth="90"/>
-                            <TableColumn fx:id="colAvgTicket" text="Ticket M." prefWidth="80"/>
-                            <TableColumn fx:id="colParticip" text="Part. %" prefWidth="70"/>
+                            <TableColumn fx:id="colAvatar" text="" prefWidth="40" style="-fx-alignment: CENTER;"/>
+                            <TableColumn fx:id="colSeller" text="Agente de Ventas" prefWidth="180"/>
+                            <TableColumn fx:id="colTotal" text="Ventas Netas" prefWidth="120"/>
+                            <TableColumn fx:id="colReturns" text="Devoluciones" prefWidth="110"/>
+                            <TableColumn fx:id="colParticip" text="Contrib.% (Share)" prefWidth="120"/>
+                            <TableColumn fx:id="colGoal" text="Objetivo (3K€)" prefWidth="180"/>
+                            <TableColumn fx:id="colAvgTicket" text="Ticket Med." prefWidth="90"/>
                         </columns>
                     </TableView>
                 </VBox>
-            </HBox>
-
-            <!-- Bottom Row: Payment Summary & Detail -->
-            <HBox spacing="20">
-                <!-- Resumen Pagos -->
-                <VBox spacing="10" prefWidth="300" styleClass="chart-container">
-                    <Label text="Resumen de Cobros" styleClass="section-title"/>
-                    <VBox spacing="15" alignment="CENTER">
-                        <VBox spacing="5" alignment="CENTER_LEFT">
-                            <HBox alignment="CENTER_LEFT" spacing="10">
-                                <FontAwesomeIconView glyphName="MONEY" size="14" fill="#22c55e"/>
-                                <Label text="Efectivo" style="-fx-font-weight: bold;"/>
-                                <Region HBox.hgrow="ALWAYS"/>
-                                <Label fx:id="lblCashTotal" text="0.00 €"/>
-                            </HBox>
-                            <ProgressBar fx:id="progressCash" progress="0.5" maxWidth="Infinity" style="-fx-accent: #22c55e;"/>
-                        </VBox>
-                        
-                        <VBox spacing="5" alignment="CENTER_LEFT">
-                            <HBox alignment="CENTER_LEFT" spacing="10">
-                                <FontAwesomeIconView glyphName="CREDIT_CARD" size="14" fill="#3b82f6"/>
-                                <Label text="Tarjeta" style="-fx-font-weight: bold;"/>
-                                <Region HBox.hgrow="ALWAYS"/>
-                                <Label fx:id="lblCardTotal" text="0.00 €"/>
-                            </HBox>
-                            <ProgressBar fx:id="progressCard" progress="0.5" maxWidth="Infinity" style="-fx-accent: #3b82f6;"/>
-                        </VBox>
+                
+                <!-- Right column: Pies -->
+                <VBox spacing="24" prefWidth="400" minWidth="380">
+                    <VBox styleClass="widget-panel" VBox.vgrow="ALWAYS" spacing="15">
+                        <Label text="Distribución por Pagos" styleClass="widget-title"/>
+                        <HBox alignment="CENTER" spacing="20" VBox.vgrow="ALWAYS">
+                            <!-- El gráfico circular ocupará una porción pero sin constreñirlo excesivamente -->
+                            <PieChart fx:id="pieChartDistribution" legendVisible="false" minHeight="160" minWidth="160" prefHeight="180" prefWidth="180"/>
+                            
+                            <!-- Columna separada y ancla para las leyendas y progresos, forzando buen espaciado -->
+                            <VBox spacing="18" alignment="CENTER_LEFT" HBox.hgrow="ALWAYS">
+                                <!-- EFECTIVO -->
+                                <VBox spacing="8">
+                                    <HBox alignment="CENTER_LEFT" spacing="8">
+                                        <StackPane styleClass="dot-cash"/>
+                                        <Label text="Efectivo" styleClass="pie-label" style="-fx-font-weight: bold;"/>
+                                        <Region HBox.hgrow="ALWAYS"/>
+                                        <Label fx:id="lblCashTotal" text="0 €" styleClass="pie-value" style="-fx-text-fill: #10b981; -fx-font-weight: bold;"/>
+                                    </HBox>
+                                    <ProgressBar fx:id="progressCash" progress="0.0" prefWidth="200" maxWidth="Infinity" styleClass="progress-saas" style="-fx-accent: #10b981;"/>
+                                </VBox>
+                                
+                                <!-- TARJETA -->
+                                <VBox spacing="8">
+                                    <HBox alignment="CENTER_LEFT" spacing="8">
+                                        <StackPane styleClass="dot-card"/>
+                                        <Label text="Tarjeta" styleClass="pie-label" style="-fx-font-weight: bold;"/>
+                                        <Region HBox.hgrow="ALWAYS"/>
+                                        <Label fx:id="lblCardTotal" text="0 €" styleClass="pie-value" style="-fx-text-fill: #3b82f6; -fx-font-weight: bold;"/>
+                                    </HBox>
+                                    <ProgressBar fx:id="progressCard" progress="0.0" prefWidth="200" maxWidth="Infinity" styleClass="progress-saas" style="-fx-accent: #3b82f6;"/>
+                                </VBox>
+                            </VBox>
+                        </HBox>
+                    </VBox>
+                    
+                    <VBox styleClass="widget-panel" spacing="8" minHeight="140">
+                        <HBox alignment="CENTER_LEFT">
+                            <Label text="Devoluciones" styleClass="widget-title"/>
+                            <Region HBox.hgrow="ALWAYS"/>
+                            <StackPane styleClass="icon-bg-red"><FontAwesomeIconView glyphName="REPLY" fill="#ef4444"/></StackPane>
+                        </HBox>
+                        <Label fx:id="lblReturnsTotal" text="0.00 €" styleClass="kpi-value-saas" style="-fx-text-fill: #ef4444;"/>
+                        <Label text="Total descontado en devoluciones este periodo" styleClass="trend-text"/>
                     </VBox>
                 </VBox>
-
-                <!-- Detalle de Ventas -->
-                <VBox spacing="10" HBox.hgrow="ALWAYS" minHeight="300">
-                    <HBox alignment="CENTER_LEFT">
-                        <Label fx:id="lblDetailTitle" text="Detalle de Operaciones" styleClass="section-title"/>
-                        <Region HBox.hgrow="ALWAYS"/>
-                        <TextField fx:id="txtDetailSearch" promptText="Buscar venta..." styleClass="search-field-inline"/>
-                    </HBox>
-                    <TableView fx:id="detailTable" VBox.vgrow="ALWAYS" styleClass="modern-table">
-                        <columns>
-                            <TableColumn fx:id="colDate" text="Fecha" prefWidth="130"/>
-                            <TableColumn fx:id="colMethod" text="Método" prefWidth="90"/>
-                            <TableColumn fx:id="colClient" text="Cliente" prefWidth="130"/>
-                            <TableColumn fx:id="colAmount" text="Importe" prefWidth="100"/>
-                        </columns>
-                    </TableView>
-                </VBox>
             </HBox>
+
+            <!-- ROW 4: DETALLE DE OPERACIONES -->
+            <VBox styleClass="widget-panel" spacing="12" VBox.vgrow="ALWAYS">
+                <HBox alignment="CENTER_LEFT" spacing="15">
+                    <Label fx:id="lblDetailTitle" text="Log de Operaciones (Detalle)" styleClass="widget-title"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <StackPane styleClass="search-box-saas">
+                        <FontAwesomeIconView glyphName="SEARCH" fill="#94a3b8" StackPane.alignment="CENTER_LEFT" style="-fx-translate-x: 12;"/>
+                        <TextField fx:id="txtDetailSearch" promptText="Buscar venta, cliente..." styleClass="input-search"/>
+                    </StackPane>
+                </HBox>
+                <TableView fx:id="detailTable" VBox.vgrow="ALWAYS" styleClass="table-saas" prefHeight="250">
+                    <columns>
+                        <TableColumn fx:id="colDate" text="Fecha Operación" prefWidth="180"/>
+                        <TableColumn fx:id="colRecordType" text="Tipo" prefWidth="100"/>
+                        <TableColumn fx:id="colMethod" text="Medio Pago" prefWidth="120"/>
+                        <TableColumn fx:id="colClient" text="Cliente Registrado" prefWidth="180"/>
+                        <TableColumn fx:id="colAmount" text="Importe Final" prefWidth="120"/>
+                    </columns>
+                </TableView>
+            </VBox>
+
         </VBox>
     </ScrollPane>
 </VBox>
+

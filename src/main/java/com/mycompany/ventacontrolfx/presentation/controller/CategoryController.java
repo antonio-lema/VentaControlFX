@@ -114,9 +114,11 @@ public class CategoryController implements Injectable, com.mycompany.ventacontro
             {
                 pane.setAlignment(Pos.CENTER);
                 btnEdit.setGraphic(createIcon(FontAwesomeIcon.PENCIL, "#1e88e5"));
-                btnDelete.setGraphic(createIcon(FontAwesomeIcon.TRASH, "#e53935"));
+                FontAwesomeIconView trashIcon = new FontAwesomeIconView(FontAwesomeIcon.TRASH);
+                trashIcon.setSize("16");
+                btnDelete.setGraphic(trashIcon);
+                btnDelete.getStyleClass().add("btn-trash-small");
                 btnEdit.setStyle("-fx-background-color: transparent; -fx-cursor: hand;");
-                btnDelete.setStyle("-fx-background-color: transparent; -fx-cursor: hand;");
 
                 btnEdit.setOnAction(e -> handleEditCategory(getTableRow().getItem()));
                 btnDelete.setOnAction(e -> handleDeleteCategory(getTableRow().getItem()));
@@ -158,10 +160,18 @@ public class CategoryController implements Injectable, com.mycompany.ventacontro
 
     @FXML
     private void handleAddCategory() {
+        if (!container.getUserSession().hasPermission("producto.crear")) {
+            AlertUtil.showError("Acceso Denegado", "No tiene permiso para crear categorías.");
+            return;
+        }
         openCategoryDialog(null);
     }
 
     private void handleEditCategory(Category category) {
+        if (!container.getUserSession().hasPermission("producto.editar")) {
+            AlertUtil.showError("Acceso Denegado", "No tiene permiso para editar categorías.");
+            return;
+        }
         openCategoryDialog(category);
     }
 
@@ -175,6 +185,10 @@ public class CategoryController implements Injectable, com.mycompany.ventacontro
     }
 
     private void handleDeleteCategory(Category category) {
+        if (!container.getUserSession().hasPermission("producto.eliminar")) {
+            AlertUtil.showError("Acceso Denegado", "No tiene permiso para eliminar categorías.");
+            return;
+        }
         if (AlertUtil.showConfirmation("Eliminar",
                 "¿Seguro que desea eliminar la categoría '" + category.getName() + "'?", "")) {
             try {

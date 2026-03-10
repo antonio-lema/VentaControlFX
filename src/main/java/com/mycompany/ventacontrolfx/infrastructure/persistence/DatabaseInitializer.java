@@ -1,8 +1,11 @@
 package com.mycompany.ventacontrolfx.infrastructure.persistence;
 
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 public class DatabaseInitializer {
 
@@ -56,7 +59,8 @@ public class DatabaseInitializer {
                     "province VARCHAR(100)",
                     "country VARCHAR(100) DEFAULT 'Spain'",
                     "email VARCHAR(255)",
-                    "phone VARCHAR(50)"
+                    "phone VARCHAR(50)",
+                    "price_list_id INT DEFAULT NULL"
             };
             for (String col : clientCols) {
                 try {
@@ -346,6 +350,39 @@ public class DatabaseInitializer {
                     "config_key VARCHAR(50) PRIMARY KEY, " +
                     "config_value VARCHAR(255))");
 
+            // 7. password_recoveries Table (Security Fix V-01)
+            stmt.execute("CREATE TABLE IF NOT EXISTS password_recoveries (" +
+                    "recovery_id INT AUTO_INCREMENT PRIMARY KEY, " +
+                    "email VARCHAR(255) NOT NULL, " +
+                    "code_hash VARCHAR(255) NOT NULL, " +
+                    "expires_at DATETIME NOT NULL, " +
+                    "is_used BOOLEAN DEFAULT FALSE, " +
+                    "attempts INT DEFAULT 0, " +
+                    "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)");
+
+            // Asegurarse de que la columna 'attempts' existe en instalaciones antiguas (Fix
+            // V-01)
+            try {
+                stmt.execute("ALTER TABLE password_recoveries ADD COLUMN attempts INT DEFAULT 0");
+            } catch (SQLException ignored) {
+                /* Ya existe */ }
+
+            // Seed default company config
+            String[][] companyDefaults = {
+                    { "companyName", "MI EMPRESA S.L." },
+                    { "cif", "B12345678" },
+                    { "address", "Calle Falsa 123, 28001 Madrid" },
+                    { "phone", "912 345 678" },
+                    { "email", "info@miempresa.com" },
+                    { "logoPath", "" },
+                    { "currency", "EUR" }
+            };
+            for (String[] row : companyDefaults) {
+                stmt.execute(String.format(
+                        "INSERT IGNORE INTO system_config (config_key, config_value) VALUES ('%s', '%s')",
+                        row[0], row[1]));
+            }
+
             // 7. Permissions Catalog Table
             stmt.execute("CREATE TABLE IF NOT EXISTS permissions (" +
                     "permission_id INT AUTO_INCREMENT PRIMARY KEY, " +
@@ -432,7 +469,7 @@ public class DatabaseInitializer {
             String[][] defaultSettings = {
                     { "ui.primary_color", "#1e88e5", "Color principal de la aplicación" },
                     { "ui.secondary_color", "#64748b", "Color secundario de la aplicación" },
-                    { "ui.bg_main", "#fafbfc", "Color de fondo principal" },
+                    { "ui.bg_main", "#f1f5f9", "Color de fondo principal" },
                     { "ui.font_size", "14", "Tamaño de fuente base (px)" },
                     { "ui.border_radius", "8", "Redondeado de bordes base (px)" },
                     { "ui.theme_mode", "LIGHT", "Modo de tema activo (LIGHT/DARK)" }
@@ -444,30 +481,51 @@ public class DatabaseInitializer {
                         setting[0], setting[1], setting[2]));
             }
 
+            // Actualizar bases de datos antiguas para que las tarjetas destaquen sobre el
+            // fondo
+            try {
+                stmt.execute(
+                        "UPDATE app_settings SET setting_value = '#f1f5f9' WHERE setting_key = 'ui.bg_main' AND setting_value = '#fafbfc'");
+            } catch (SQLException e) {
+            }
+
             // 12. Seed the permission catalog with ATOMIC permissions
             String[] permSeeds = {
                     // Ventas
-                    "INSERT IGNORE INTO permissions (code, description) VALUES ('venta.crear', 'Crear nuevas ventas')",
-                    "INSERT IGNORE INTO permissions (code, description) VALUES ('venta.anular', 'Anular ventas realizadas')",
-                    "INSERT IGNORE INTO permissions (code, description) VALUES ('venta.descuento', 'Aplicar descuentos en ventas')",
-                    "INSERT IGNORE INTO permissions (code, description) VALUES ('venta.ticket', 'Reimprimir tickets de venta')",
                     "INSERT IGNORE INTO permissions (code, description) VALUES ('venta.devolucion', 'Gestionar devoluciones de productos')",
+                    "INSERT IGNORE INTO permissions (code, description) VALUES ('venta.limpiar', 'Limpiar carrito de venta')",
+                    "INSERT IGNORE INTO permissions (code, description) VALUES ('venta.aplazar', 'Aplazar ventas en curso')",
+
                     // Productos
                     "INSERT IGNORE INTO permissions (code, description) VALUES ('producto.crear', 'Crear nuevos productos')",
                     "INSERT IGNORE INTO permissions (code, description) VALUES ('producto.editar', 'Editar productos existentes')",
-                    "INSERT IGNORE INTO permissions (code, description) VALUES ('producto.precios', 'Gestionar listas de precios')",
+                    "INSERT IGNORE INTO permissions (code, description) VALUES ('producto.eliminar', 'Eliminar productos del catálogo')",
+
+                    // Clientes
+                    "INSERT IGNORE INTO permissions (code, description) VALUES ('cliente.crear', 'Registrar nuevos clientes')",
+                    "INSERT IGNORE INTO permissions (code, description) VALUES ('cliente.editar', 'Actualizar datos de clientes')",
+                    "INSERT IGNORE INTO permissions (code, description) VALUES ('cliente.eliminar', 'Borrar clientes del sistema')",
+
                     // Caja
                     "INSERT IGNORE INTO permissions (code, description) VALUES ('caja.abrir', 'Realizar apertura de caja')",
                     "INSERT IGNORE INTO permissions (code, description) VALUES ('caja.cerrar', 'Realizar cierre de caja diario')",
+                    "INSERT IGNORE INTO permissions (code, description) VALUES ('caja.ingresar', 'Realizar ingresos manuales de efectivo')",
                     "INSERT IGNORE INTO permissions (code, description) VALUES ('caja.retirada', 'Realizar retiradas de efectivo')",
+                    "INSERT IGNORE INTO permissions (code, description) VALUES ('caja.ver_totales', 'Ver efectivo esperado y fondo inicial en cierres')",
+
+                    // Administración / Configuración
+                    "INSERT IGNORE INTO permissions (code, description) VALUES ('admin.iva', 'Gestionar tipos de IVA y tasas')",
+                    "INSERT IGNORE INTO permissions (code, description) VALUES ('admin.precios_masivo', 'Realizar actualizaciones masivas de precios')",
+
                     // Usuarios y Roles
                     "INSERT IGNORE INTO permissions (code, description) VALUES ('usuario.crear', 'Gestionar usuarios del sistema')",
                     "INSERT IGNORE INTO permissions (code, description) VALUES ('rol.editar', 'Crear y editar roles personalizados')",
-                    // Informes
-                    "INSERT IGNORE INTO permissions (code, description) VALUES ('informe.ver_global', 'Ver informes generales y KPI')",
-                    "INSERT IGNORE INTO permissions (code, description) VALUES ('informe.ver_propio', 'Ver historial de ventas propias')",
+
+                    // Informes y Analíticas
+                    "INSERT IGNORE INTO permissions (code, description) VALUES ('reporte.vendedores', 'Ver analíticas por vendedor')",
+                    "INSERT IGNORE INTO permissions (code, description) VALUES ('reporte.clientes', 'Ver informes de consumo de clientes')",
                     // Otros
-                    "INSERT IGNORE INTO permissions (code, description) VALUES ('CONFIGURACION', 'Configuración técnica del sistema')"
+                    "INSERT IGNORE INTO permissions (code, description) VALUES ('CONFIGURACION', 'Ajustes técnicos de empresa')"
             };
             for (String seed : permSeeds) {
                 stmt.execute(seed);
@@ -485,6 +543,57 @@ public class DatabaseInitializer {
             for (String seed : legacySeeds) {
                 stmt.execute(seed);
             }
+
+            // 13. Seed Default Roles
+            String[][] rolesSeed = {
+                    { "Administrador", "Acceso total al sistema", "1" },
+                    { "Encargado", "Gestión de tienda, stock y cierres", "1" },
+                    { "Supervisor", "Cajas, devoluciones e informes", "1" },
+                    { "Vendedor", "Atención al cliente y ventas", "1" },
+                    { "Almacenero", "Gestión de inventario y productos", "1" }
+            };
+            for (String[] role : rolesSeed) {
+                stmt.execute(String.format(
+                        "INSERT IGNORE INTO roles (name, description, is_system) VALUES ('%s', '%s', %s)",
+                        role[0], role[1], role[2]));
+            }
+
+            // 14. Assign Permissions to Roles (Atomic and Legacy)
+            // -- ADMINISTRADOR: All permissions
+            stmt.execute("INSERT IGNORE INTO role_permissions (role_id, permission_id) " +
+                    "SELECT r.role_id, p.permission_id FROM roles r, permissions p " +
+                    "WHERE r.name = 'Administrador'");
+
+            // -- ENCARGADO: Most permissions except user/config management
+            stmt.execute("INSERT IGNORE INTO role_permissions (role_id, permission_id) " +
+                    "SELECT r.role_id, p.permission_id FROM roles r, permissions p " +
+                    "WHERE r.name = 'Encargado' AND p.code IN (" +
+                    "'VENTAS', 'venta.devolucion', 'venta.limpiar', 'venta.aplazar', " +
+                    "'PRODUCTOS', 'producto.crear', 'producto.editar', 'producto.eliminar', " +
+                    "'admin.precios_masivo', " +
+                    "'CLIENTES', 'cliente.crear', 'cliente.editar', 'cliente.eliminar', " +
+                    "'CIERRES', 'HISTORIAL', " +
+                    "'caja.abrir', 'caja.cerrar', 'caja.ingresar', 'caja.retirada', " +
+                    "'reporte.vendedores', 'reporte.clientes')");
+
+            // -- SUPERVISOR: Vendedor + Devoluciones + Cierres y Reportes básicos
+            stmt.execute("INSERT IGNORE INTO role_permissions (role_id, permission_id) " +
+                    "SELECT r.role_id, p.permission_id FROM roles r, permissions p " +
+                    "WHERE r.name = 'Supervisor' AND p.code IN (" +
+                    "'VENTAS', 'venta.aplazar', 'venta.devolucion', 'venta.limpiar', 'CLIENTES', " +
+                    "'HISTORIAL', 'CIERRES', " +
+                    "'caja.abrir', 'caja.cerrar', 'caja.ingresar', 'caja.retirada', 'reporte.vendedores')");
+
+            // -- VENDEDOR: Only sales and basic operations
+            stmt.execute("INSERT IGNORE INTO role_permissions (role_id, permission_id) " +
+                    "SELECT r.role_id, p.permission_id FROM roles r, permissions p " +
+                    "WHERE r.name = 'Vendedor' AND p.code IN (" +
+                    "'VENTAS', 'venta.aplazar', 'venta.devolucion', 'CLIENTES', 'cliente.crear', 'cliente.editar', 'caja.abrir', 'caja.cerrar')");
+
+            // -- ALMACENERO: Only product management
+            stmt.execute("INSERT IGNORE INTO role_permissions (role_id, permission_id) " +
+                    "SELECT r.role_id, p.permission_id FROM roles r, permissions p " +
+                    "WHERE r.name = 'Almacenero' AND p.code IN ('PRODUCTOS', 'producto.crear', 'producto.editar', 'admin.precios_masivo')");
 
             // 10. Suspended Carts (Aplazamiento de carrito)
             stmt.execute("CREATE TABLE IF NOT EXISTS suspended_carts (" +
@@ -517,33 +626,82 @@ public class DatabaseInitializer {
                     "price_id INT AUTO_INCREMENT PRIMARY KEY, " +
                     "product_id INT NOT NULL, " +
                     "price_list_id INT NOT NULL, " +
-                    "price DECIMAL(10,2) NOT NULL CHECK (price >= 0), " +
+                    "price DECIMAL(10,4) NOT NULL CHECK (price >= 0), " +
                     "start_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, " +
                     "end_date DATETIME DEFAULT NULL, " +
                     "reason VARCHAR(255), " +
+                    "update_log_id INT NULL, " +
                     "FOREIGN KEY (product_id) REFERENCES products(product_id) ON DELETE CASCADE, " +
                     "FOREIGN KEY (price_list_id) REFERENCES price_lists(price_list_id) ON DELETE CASCADE)");
+
+            // Ensure update_log_id exists if table was already there
+            try {
+                stmt.execute("ALTER TABLE product_prices ADD COLUMN update_log_id INT NULL");
+            } catch (SQLException e) {
+            }
+
+            // Seed default price list if empty
+            stmt.execute(
+                    "INSERT IGNORE INTO price_lists (price_list_id, name, is_default) VALUES (1, 'Tarifa General', 1)");
 
             // Índices para optimización de precios
             stmt.execute(
                     "CREATE INDEX IF NOT EXISTS idx_product_active_price ON product_prices (product_id, price_list_id, end_date)");
             stmt.execute("CREATE INDEX IF NOT EXISTS idx_price_dates ON product_prices (start_date, end_date)");
 
-            // --- Migración Inicial de Precios (Idempotente) ---
-            // 1. Asegurar lista por defecto
-            stmt.execute(
-                    "INSERT IGNORE INTO price_lists (price_list_id, name, is_default) VALUES (1, 'PVP General', TRUE)");
-
-            // 2. Migrar precios desde la tabla products si la tabla product_prices está
-            // vacía
-            try {
-                stmt.execute("INSERT INTO product_prices (product_id, price_list_id, price, start_date, reason) " +
-                        "SELECT product_id, 1, price, CURRENT_TIMESTAMP, 'Migración inicial' " +
-                        "FROM products p " +
-                        "WHERE NOT EXISTS (SELECT 1 FROM product_prices)");
-            } catch (SQLException e) {
-                // Columna price puede no existir en nuevas instalaciones
+            // 3. Migrar precio de cada producto que NO tenga aún una entrada activa en
+            // product_prices.
+            // Esto es idempotente: si el producto ya tiene precio activo, no hace nada.
+            // Detectamos si existe la columna legacy 'price' para migrarla, si no usamos
+            // 0.00.
+            boolean hasPriceColumn = false;
+            try (java.sql.ResultSet rsCol = conn.getMetaData().getColumns(null, null, "products", "price")) {
+                if (rsCol.next()) {
+                    hasPriceColumn = true;
+                }
             }
+
+            String migrationSql;
+            if (hasPriceColumn) {
+                migrationSql = "INSERT INTO product_prices (product_id, price_list_id, price, start_date, reason) " +
+                        "SELECT p.product_id, 1, COALESCE(p.price, 0.00), CURRENT_TIMESTAMP, 'Migración inicial' " +
+                        "FROM products p " +
+                        "WHERE NOT EXISTS (SELECT 1 FROM product_prices pp WHERE pp.product_id = p.product_id AND pp.price_list_id = 1 AND pp.end_date IS NULL)";
+            } else {
+                migrationSql = "INSERT INTO product_prices (product_id, price_list_id, price, start_date, reason) " +
+                        "SELECT p.product_id, 1, 0.00, CURRENT_TIMESTAMP, 'Inicialización automática' " +
+                        "FROM products p " +
+                        "WHERE NOT EXISTS (SELECT 1 FROM product_prices pp WHERE pp.product_id = p.product_id AND pp.price_list_id = 1 AND pp.end_date IS NULL)";
+            }
+
+            try {
+                stmt.execute(migrationSql);
+            } catch (SQLException e) {
+                // Si falla por columna inexistente a pesar del check, simplemente no migramos
+                if (e.getMessage().contains("Unknown column")) {
+                    System.err.println(
+                            "[INFO] Columna legacy 'price' no encontrada realmente, omitiendo migración de valores antiguos.");
+                } else {
+                    System.err.println("[WARN] Migración de precios fallida: " + e.getMessage());
+                }
+            }
+
+            // ── 11. Tabla de Log de Actualizaciones Masivas de Precios ─────
+            stmt.execute("CREATE TABLE IF NOT EXISTS price_update_log (" +
+                    "  log_id INT AUTO_INCREMENT PRIMARY KEY," +
+                    "  update_type VARCHAR(50) NOT NULL COMMENT 'percentage, fixed, rounding'," +
+                    "  scope VARCHAR(255) NOT NULL COMMENT 'La agrupación aplicada'," +
+                    "  category_id INT NULL," +
+                    "  value DECIMAL(10,4) NOT NULL," +
+                    "  products_updated INT NOT NULL DEFAULT 0," +
+                    "  reason VARCHAR(255)," +
+                    "  applied_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP" +
+                    ")");
+            // Aseguramos tamaño por si se creó antes con tamaño pequeño
+            try {
+                stmt.execute("ALTER TABLE price_update_log MODIFY COLUMN scope VARCHAR(255) NOT NULL");
+            } catch (SQLException e) {
+                /* ignorar si falla */ }
 
             // 12. Seed default roles
             String[] roleSeeds = {
@@ -580,8 +738,13 @@ public class DatabaseInitializer {
                     "initial_amount DECIMAL(10,2) NOT NULL DEFAULT 0, " +
                     "is_closed BOOLEAN DEFAULT FALSE, " +
                     "closure_id INT DEFAULT NULL, " +
+                    "notes TEXT, " +
                     "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)");
 
+            try {
+                stmt.execute("ALTER TABLE cash_fund_sessions ADD COLUMN notes TEXT");
+            } catch (SQLException e) {
+            }
             try {
                 stmt.execute("ALTER TABLE cash_fund_sessions ADD COLUMN closure_id INT DEFAULT NULL");
             } catch (SQLException e) {
@@ -684,27 +847,51 @@ public class DatabaseInitializer {
                     "ip_address VARCHAR(45), " +
                     "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)");
 
+            // Migración: Asegurar que la columna 'type' acepte 'DEVOLUCION' si la tabla ya
+            // existía
+            try {
+                stmt.execute(
+                        "ALTER TABLE cash_movements MODIFY COLUMN type ENUM('APERTURA', 'VENTA', 'RETIRADA', 'INGRESO', 'CIERRE', 'DEVOLUCION') NOT NULL");
+            } catch (SQLException e) {
+                // Probablemente ya tenga el tipo correcto o sea compatible
+            }
+
             // 9. Audit Log (Historial de acciones críticas de seguridad)
             // Ya definido como audit_logs en el bloque 14 para soporte enterprise.
 
-            // Nuevo permiso caja.ingresar
-            stmt.execute(
-                    "INSERT IGNORE INTO permissions (code, description) VALUES ('caja.ingresar', 'Realizar ingresos manuales de efectivo')");
-
-            // Asignar caja.ingresar al Administrador por defecto
-            stmt.execute("INSERT IGNORE INTO role_permissions (role_id, permission_id) " +
-                    "SELECT r.role_id, p.permission_id FROM roles r, permissions p " +
-                    "WHERE r.name = 'Administrador' AND p.code = 'caja.ingresar'");
-
-            stmt.execute("INSERT IGNORE INTO role_permissions (role_id, permission_id) " +
-                    "SELECT r.role_id, p.permission_id FROM roles r, permissions p " +
-                    "WHERE r.name = 'Administrador' AND p.code = 'venta.devolucion'");
+            // Ya definido en el nuevo bloque de seeding de roles
 
             // --- Indices para optimización ---
             tryIndex(stmt, "CREATE INDEX IF NOT EXISTS idx_cm_session ON cash_movements(session_id)");
             tryIndex(stmt, "CREATE INDEX IF NOT EXISTS idx_cm_closure ON cash_movements(closure_id)");
             tryIndex(stmt, "CREATE INDEX IF NOT EXISTS idx_audit_user ON audit_logs(user_id)");
             tryIndex(stmt, "CREATE INDEX IF NOT EXISTS idx_audit_event ON audit_logs(event_type)");
+            tryIndex(stmt, "CREATE INDEX IF NOT EXISTS idx_audit_resource ON audit_logs(resource_name)");
+            tryIndex(stmt, "CREATE INDEX IF NOT EXISTS idx_audit_created ON audit_logs(created_at)");
+
+            // --- users ---
+            tryIndex(stmt, "CREATE INDEX IF NOT EXISTS idx_user_role ON users(role)");
+
+            // --- password_recoveries ---
+            tryIndex(stmt, "CREATE INDEX IF NOT EXISTS idx_pwd_rec_email ON password_recoveries(email)");
+            tryIndex(stmt, "CREATE INDEX IF NOT EXISTS idx_audit_created ON audit_logs(created_at)");
+
+            // --- products ---
+            tryIndex(stmt, "CREATE INDEX IF NOT EXISTS idx_prod_category       ON products(category_id)");
+            tryIndex(stmt, "CREATE INDEX IF NOT EXISTS idx_prod_name           ON products(name)");
+            tryIndex(stmt, "CREATE INDEX IF NOT EXISTS idx_prod_visible        ON products(visible)");
+            tryIndex(stmt, "CREATE INDEX IF NOT EXISTS idx_prod_favorite       ON products(is_favorite)");
+
+            // --- categories ---
+            tryIndex(stmt, "CREATE INDEX IF NOT EXISTS idx_cat_name            ON categories(name)");
+            tryIndex(stmt, "CREATE INDEX IF NOT EXISTS idx_cat_visible         ON categories(visible)");
+
+            // --- suspended_carts ---
+            tryIndex(stmt, "CREATE INDEX IF NOT EXISTS idx_sus_user            ON suspended_carts(user_id)");
+            tryIndex(stmt, "CREATE INDEX IF NOT EXISTS idx_sus_items_cart      ON suspended_cart_items(cart_id)");
+
+            // --- price_update_log ---
+            tryIndex(stmt, "CREATE INDEX IF NOT EXISTS idx_price_log_date      ON price_update_log(applied_at)");
 
             // --- clients ---
             // Búsqueda por nombre de cliente
@@ -725,6 +912,131 @@ public class DatabaseInitializer {
                     // Si ya existe la FK o la columna, simplemente seguimos
                 }
             }
+
+            // ─── SISTEMA DE HISTORIAL DE IVA ───────────────────────────────
+            // Tabla para versionado de tasas de IVA por producto, categoría o global.
+            // Nunca se borran registros — solo se cierran (end_date).
+            stmt.execute("CREATE TABLE IF NOT EXISTS tax_rates ("
+                    + "tax_rate_id  INT AUTO_INCREMENT PRIMARY KEY, "
+                    + "product_id   INT NULL, "
+                    + "category_id  INT NULL, "
+                    + "scope        VARCHAR(10) NOT NULL, " // 'PRODUCT', 'CATEGORY', 'GLOBAL'
+                    + "rate         DECIMAL(5,2) NOT NULL, "
+                    + "label        VARCHAR(100), "
+                    + "start_date   DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, "
+                    + "end_date     DATETIME NULL, "
+                    + "reason       VARCHAR(255), "
+                    + "FOREIGN KEY (product_id)  REFERENCES products(product_id)  ON DELETE CASCADE, "
+                    + "FOREIGN KEY (category_id) REFERENCES categories(category_id) ON DELETE CASCADE"
+                    + ")");
+
+            // Índice para acelerar las consultas de tasa vigente
+            tryIndex(stmt, "CREATE INDEX idx_tax_rates_scope_active "
+                    + "ON tax_rates (scope, product_id, category_id, start_date, end_date)");
+
+            // Insertar tasa global inicial (21% IVA General) solo si no hay ninguna
+            try {
+                stmt.execute("INSERT INTO tax_rates (scope, rate, label, reason) "
+                        + "SELECT 'GLOBAL', 21.00, 'IVA General (21%)', 'Configuración inicial' "
+                        + "FROM DUAL "
+                        + "WHERE NOT EXISTS (SELECT 1 FROM tax_rates WHERE scope = 'GLOBAL')");
+            } catch (SQLException e) {
+                // Algunos motores no soportan DUAL; ignorar si ya existe
+            }
+
+            // ═══════════════════════════════════════════════════════════════
+            // MÓDULO: PERSISTENCIA FISCAL DE TICKETS Y FACTURAS
+            // Migración aditiva — no modifica ni elimina datos existentes.
+            // ═══════════════════════════════════════════════════════════════
+
+            // ── 1. Series de numeración correlativa ─────────────────────────
+            stmt.execute("CREATE TABLE IF NOT EXISTS doc_series (" +
+                    "series_id   INT AUTO_INCREMENT PRIMARY KEY, " +
+                    "series_code VARCHAR(10) UNIQUE NOT NULL, " +
+                    "prefix      VARCHAR(20) NOT NULL, " +
+                    "last_number INT NOT NULL DEFAULT 0, " +
+                    "year        INT NOT NULL DEFAULT 2026, " +
+                    "description VARCHAR(100)" +
+                    ")");
+
+            // Seeds de las tres series (idempotente)
+            int currentYear = java.time.LocalDate.now().getYear();
+            stmt.execute("INSERT IGNORE INTO doc_series (series_code, prefix, last_number, year, description) VALUES " +
+                    "('T', '" + currentYear + "-T-', 0, " + currentYear + ", 'Tickets / Facturas Simplificadas'), " +
+                    "('F', '" + currentYear + "-F-', 0, " + currentYear + ", 'Facturas Completas')");
+
+            // ── 2. Snapshot de emisor por documento ─────────────────────────
+            stmt.execute("CREATE TABLE IF NOT EXISTS doc_issuer_snapshots (" +
+                    "snapshot_id      INT AUTO_INCREMENT PRIMARY KEY, " +
+                    "sale_id          INT NOT NULL UNIQUE, " +
+                    "company_name     VARCHAR(255), " +
+                    "tax_id           VARCHAR(50), " +
+                    "address          TEXT, " +
+                    "phone            VARCHAR(50), " +
+                    "issued_at        TIMESTAMP DEFAULT CURRENT_TIMESTAMP, " +
+                    "receiver_name    VARCHAR(255), " +
+                    "receiver_tax_id  VARCHAR(50), " +
+                    "receiver_address TEXT, " +
+                    "base_amount      DECIMAL(10,2) DEFAULT 0.00, " +
+                    "vat_amount       DECIMAL(10,2) DEFAULT 0.00, " +
+                    "total_amount     DECIMAL(10,2) DEFAULT 0.00, " +
+                    "FOREIGN KEY (sale_id) REFERENCES sales(sale_id) ON DELETE CASCADE" +
+                    ")");
+
+            try {
+                stmt.execute("ALTER TABLE doc_issuer_snapshots ADD COLUMN phone VARCHAR(50)");
+            } catch (SQLException e) {
+                /* columna ya existe */ }
+
+            // ── 3. Columnas fiscales en la tabla sales (aditivo) ────────────
+            String[] fiscalCols = {
+                    "doc_type       VARCHAR(20)  DEFAULT NULL", // TICKET / FACTURA
+                    "doc_series     VARCHAR(10)  DEFAULT NULL", // T / F
+                    "doc_number     INT          DEFAULT NULL", // correlativo
+                    "doc_status     VARCHAR(20)  DEFAULT NULL", // EMITIDO / ANULADO
+                    "control_hash   VARCHAR(64)  DEFAULT NULL" // SHA-256 integridad
+            };
+            for (String col : fiscalCols) {
+                try {
+                    stmt.execute("ALTER TABLE sales ADD COLUMN " + col);
+                } catch (SQLException e) {
+                    /* columna ya existe */ }
+            }
+
+            // ── 4. Columna snapshot de nombre de producto en sale_details ───
+            // Garantiza que los detalles de línea son inmutables ante cambios de catálogo.
+            String[] detailSnapCols = {
+                    "product_name_snapshot VARCHAR(255) DEFAULT NULL",
+                    "discount_pct          DECIMAL(5,2)  DEFAULT 0.00"
+            };
+            for (String col : detailSnapCols) {
+                try {
+                    stmt.execute("ALTER TABLE sale_details ADD COLUMN " + col);
+                } catch (SQLException e) {
+                    /* columna ya existe */ }
+            }
+
+            // ── 5. Migración inicial: rellenar snapshot con nombre actual ───
+            // Sólo rellena filas donde product_name_snapshot todavía es NULL
+            try {
+                stmt.execute(
+                        "UPDATE sale_details sd " +
+                                "JOIN products p ON sd.product_id = p.product_id " +
+                                "SET sd.product_name_snapshot = p.name " +
+                                "WHERE sd.product_name_snapshot IS NULL");
+            } catch (SQLException e) {
+                // Si la tabla products no tiene columna name aún, ignorar
+            }
+
+            // ── 6. Índices de rendimiento para documentos fiscales ──────────
+            tryIndex(stmt, "CREATE INDEX IF NOT EXISTS idx_sales_doc_series  ON sales(doc_series)");
+            tryIndex(stmt, "CREATE INDEX IF NOT EXISTS idx_sales_doc_number  ON sales(doc_series, doc_number)");
+            tryIndex(stmt, "CREATE INDEX IF NOT EXISTS idx_sales_doc_status  ON sales(doc_status)");
+            tryIndex(stmt, "CREATE INDEX IF NOT EXISTS idx_sales_doc_type    ON sales(doc_type)");
+            tryIndex(stmt, "CREATE INDEX IF NOT EXISTS idx_snapshot_sale     ON doc_issuer_snapshots(sale_id)");
+
+            // ── 7. Migración de seguridad: BCrypt ───────────────────────────
+            BCryptMigrationService.migratePasswords(conn);
         }
     }
 

@@ -9,12 +9,20 @@ import javafx.scene.layout.VBox;
 public class CartListRenderer {
     private final VBox container;
     private final CartUseCase cartUseCase;
+    private final double globalTaxRate;
+    private final boolean pricesIncludeTax;
 
-    public CartListRenderer(VBox container, CartUseCase cartUseCase) {
+    public CartListRenderer(VBox container, CartUseCase cartUseCase, double globalTaxRate, boolean pricesIncludeTax) {
         this.container = container;
         this.cartUseCase = cartUseCase;
+        this.globalTaxRate = globalTaxRate;
+        this.pricesIncludeTax = pricesIncludeTax;
         renderCurrentItems();
         initListener();
+    }
+
+    public void refreshAllPrices() {
+        renderCurrentItems();
     }
 
     private void renderCurrentItems() {
@@ -27,6 +35,8 @@ public class CartListRenderer {
     private void addRow(CartItem item) {
         CartItemRow row = new CartItemRow(
                 item,
+                globalTaxRate,
+                pricesIncludeTax,
                 () -> cartUseCase.incrementQuantity(item.getProduct()),
                 () -> cartUseCase.decrementQuantity(item.getProduct()),
                 () -> cartUseCase.removeItem(item.getProduct()),
@@ -41,6 +51,8 @@ public class CartListRenderer {
                     for (CartItem item : c.getAddedSubList()) {
                         CartItemRow row = new CartItemRow(
                                 item,
+                                globalTaxRate,
+                                pricesIncludeTax,
                                 () -> cartUseCase.incrementQuantity(item.getProduct()),
                                 () -> cartUseCase.decrementQuantity(item.getProduct()),
                                 () -> cartUseCase.removeItem(item.getProduct()),

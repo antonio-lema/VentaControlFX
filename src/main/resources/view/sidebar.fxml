@@ -7,162 +7,204 @@
 
 <VBox xmlns:fx="http://javafx.com/fxml/1" 
       fx:controller="com.mycompany.ventacontrolfx.presentation.controller.SidebarController"
-      spacing="5" styleClass="sidebar">
+      spacing="2" styleClass="sidebar">
     <padding>
-        <Insets top="20" right="10" bottom="20" left="10"/>
+        <Insets top="20" right="10" bottom="16" left="10"/>
     </padding>
 
-    <Button fx:id="btnSell" styleClass="sidebar-button, active-sidebar-button" onAction="#showSellView" contentDisplay="GRAPHIC_ONLY" maxWidth="Infinity">
-        <graphic>
-            <HBox alignment="CENTER_LEFT" spacing="15">
-                <StackPane styleClass="icon-container">
-                    <FontAwesomeIconView glyphName="SHOPPING_CART" size="20" styleClass="sidebar-icon"/>
-                </StackPane>
-                <Label text="Vender" styleClass="sidebar-button-label"/>
-            </HBox>
-        </graphic>
-    </Button>
+    <ScrollPane VBox.vgrow="ALWAYS" fitToWidth="true" style="-fx-background-color: transparent; -fx-background: transparent; -fx-padding: 0; -fx-hbar-policy: NEVER; -fx-vbar-policy: AS_NEEDED;">
+        <VBox spacing="2" style="-fx-background-color: transparent;">
+            <!-- ─── SECCIÓN PRINCIPAL ─── -->
+            <Label text="PRINCIPAL" styleClass="sidebar-section-label"/>
 
-    <Button fx:id="btnProducts" styleClass="sidebar-button" onAction="#toggleProductsMenu" contentDisplay="GRAPHIC_ONLY" maxWidth="Infinity">
-        <graphic>
-            <HBox alignment="CENTER_LEFT" maxWidth="Infinity" spacing="15">
-                <StackPane styleClass="icon-container">
-                    <FontAwesomeIconView glyphName="TAGS" size="20" styleClass="sidebar-icon"/>
-                </StackPane>
-                <Label text="Productos" styleClass="sidebar-button-label"/> 
-                <Region HBox.hgrow="ALWAYS"/>
-                <Label fx:id="lblProductsArrow" text="&gt;" styleClass="sidebar-submenu-arrow"/>
-            </HBox>
-        </graphic>
-    </Button>
-    <VBox fx:id="productsSubmenu" managed="false" visible="false" spacing="0">
-        <padding><Insets left="20"/></padding>
-        <Button fx:id="btnProductsList" text="Lista de Productos" styleClass="sidebar-button" onAction="#showProductsView"/>
-        <Button fx:id="btnCategories" text="Categorías" styleClass="sidebar-button" onAction="#showCategoriesView"/>
-    </VBox>
-    <Button fx:id="btnHistory" styleClass="sidebar-button" onAction="#showHistoryView" contentDisplay="GRAPHIC_ONLY" maxWidth="Infinity">
-        <graphic>
-            <HBox alignment="CENTER_LEFT" spacing="15">
-                <StackPane styleClass="icon-container">
-                    <FontAwesomeIconView glyphName="HISTORY" size="20" styleClass="sidebar-icon"/>
-                </StackPane>
-                <Label text="Historial" styleClass="sidebar-button-label"/>
-            </HBox>
-        </graphic>
-    </Button>
-    
-    <Button fx:id="btnReturns" styleClass="sidebar-button" onAction="#handleShowReturns" contentDisplay="GRAPHIC_ONLY" maxWidth="Infinity">
-        <graphic>
-            <HBox alignment="CENTER_LEFT" spacing="15">
-                <StackPane styleClass="icon-container">
-                    <FontAwesomeIconView glyphName="REPLY" size="20" styleClass="sidebar-icon"/>
-                </StackPane>
-                <Label text="Devoluciones" styleClass="sidebar-button-label"/>
-            </HBox>
-        </graphic>
-    </Button>
+            <Button fx:id="btnSell" styleClass="sidebar-button" onAction="#showSellView" contentDisplay="GRAPHIC_ONLY" maxWidth="Infinity">
+                <graphic>
+                    <HBox alignment="CENTER_LEFT" spacing="14">
+                        <StackPane styleClass="icon-container">
+                            <FontAwesomeIconView glyphName="SHOPPING_CART" size="18" styleClass="sidebar-icon"/>
+                        </StackPane>
+                        <Label text="Vender" styleClass="sidebar-button-label"/>
+                    </HBox>
+                </graphic>
+            </Button>
 
-    <!-- Informes -->
-    <Button fx:id="btnReports" styleClass="sidebar-button" onAction="#toggleReportsMenu" contentDisplay="GRAPHIC_ONLY" maxWidth="Infinity">
-        <graphic>
-            <HBox alignment="CENTER_LEFT" maxWidth="Infinity" spacing="15">
-                <StackPane styleClass="icon-container">
-                    <FontAwesomeIconView glyphName="BAR_CHART" size="20" styleClass="sidebar-icon"/>
-                </StackPane>
-                <Label text="Informes" styleClass="sidebar-button-label"/> 
-                <Region HBox.hgrow="ALWAYS"/>
-                <Label fx:id="lblReportsArrow" text="&lt;" styleClass="sidebar-submenu-arrow"/>
-            </HBox>
-        </graphic>
-    </Button>
-    <VBox fx:id="reportsSubmenu" managed="false" visible="false" spacing="0">
-        <padding><Insets left="20"/></padding>
-        <Button fx:id="btnSellerReport" text="Ventas por Vendedor" styleClass="sidebar-button" onAction="#showSellerReport"/>
-        <Button fx:id="btnClientReport" text="Historial de Clientes" styleClass="sidebar-button" onAction="#showClientReport"/>
-    </VBox>
+            <Button fx:id="btnHistory" styleClass="sidebar-button" onAction="#showHistoryView" contentDisplay="GRAPHIC_ONLY" maxWidth="Infinity">
+                <graphic>
+                    <HBox alignment="CENTER_LEFT" spacing="14">
+                        <StackPane styleClass="icon-container">
+                            <FontAwesomeIconView glyphName="HISTORY" size="18" styleClass="sidebar-icon"/>
+                        </StackPane>
+                        <Label text="Historial" styleClass="sidebar-button-label"/>
+                    </HBox>
+                </graphic>
+            </Button>
 
-    <Button fx:id="btnClosures" styleClass="sidebar-button" onAction="#handleShowClosures" contentDisplay="GRAPHIC_ONLY" maxWidth="Infinity">
-        <graphic>
-            <HBox alignment="CENTER_LEFT" spacing="15">
-                <StackPane styleClass="icon-container">
-                    <FontAwesomeIconView glyphName="ARCHIVE" size="20" styleClass="sidebar-icon"/>
-                </StackPane>
-                <Label text="Cierres" styleClass="sidebar-button-label"/>
-            </HBox>
-        </graphic>
-    </Button>
-    <Button fx:id="btnClients" styleClass="sidebar-button" contentDisplay="GRAPHIC_ONLY" maxWidth="Infinity" onAction="#showAddClientDialog">
-        <graphic>
-            <HBox alignment="CENTER_LEFT" spacing="15">
-                <StackPane styleClass="icon-container">
-                    <FontAwesomeIconView glyphName="USERS" size="20" styleClass="sidebar-icon"/>
-                </StackPane>
-                <Label text="Empresas" styleClass="sidebar-button-label"/>
-            </HBox>
-        </graphic>
-    </Button>
+            <Button fx:id="btnReturns" styleClass="sidebar-button" onAction="#handleShowReturns" contentDisplay="GRAPHIC_ONLY" maxWidth="Infinity">
+                <graphic>
+                    <HBox alignment="CENTER_LEFT" spacing="14">
+                        <StackPane styleClass="icon-container">
+                            <FontAwesomeIconView glyphName="REPLY" size="18" styleClass="sidebar-icon"/>
+                        </StackPane>
+                        <Label text="Devoluciones" styleClass="sidebar-button-label"/>
+                    </HBox>
+                </graphic>
+            </Button>
 
-    <!-- Usuarios Dropdown -->
-    <Button fx:id="btnUsers" styleClass="sidebar-button" onAction="#toggleUsersMenu" contentDisplay="GRAPHIC_ONLY" maxWidth="Infinity">
-        <graphic>
-            <HBox alignment="CENTER_LEFT" spacing="15">
-                <StackPane styleClass="icon-container">
-                    <FontAwesomeIconView glyphName="USER_CIRCLE" size="20" styleClass="sidebar-icon"/>
-                </StackPane>
-                <Label text="Usuarios" styleClass="sidebar-button-label"/>
-                <Region HBox.hgrow="ALWAYS"/>
-                <Label fx:id="lblUsersArrow" text="&gt;" styleClass="sidebar-submenu-arrow"/>
-            </HBox>
-        </graphic>
-    </Button>
-    <VBox fx:id="usersSubmenu" managed="false" visible="false" spacing="0">
-        <padding><Insets left="20"/></padding>
-        <Button fx:id="btnUsersList" text="Lista de Usuarios" styleClass="sidebar-button" onAction="#handleShowUsers"/>
-        <Button fx:id="btnRoles" text="Roles y Permisos" styleClass="sidebar-button" onAction="#handleShowRoles"/>
-    </VBox>    <Button fx:id="btnConfig" styleClass="sidebar-button" contentDisplay="GRAPHIC_ONLY" maxWidth="Infinity" onAction="#handleShowConfig">
-        <graphic>
-            <HBox alignment="CENTER_LEFT" spacing="15">
-                <StackPane styleClass="icon-container">
-                    <FontAwesomeIconView glyphName="COG" size="20" styleClass="sidebar-icon"/>
-                </StackPane>
-                <Label text="Configuración" styleClass="sidebar-button-label"/>
-            </HBox>
-        </graphic>
-    </Button>
+            <!-- ─── SECCIÓN CATÁLOGO ─── -->
+            <Label text="CATÁLOGO" styleClass="sidebar-section-label">
+                <VBox.margin>
+                    <Insets top="10" />
+                </VBox.margin>
+            </Label>
 
-    <Button fx:id="btnThemeSettings" styleClass="sidebar-button" contentDisplay="GRAPHIC_ONLY" maxWidth="Infinity" onAction="#handleShowCustomization">
-        <graphic>
-            <HBox alignment="CENTER_LEFT" spacing="15">
-                <StackPane styleClass="icon-container">
-                    <FontAwesomeIconView glyphName="PAINT_BRUSH" size="20" styleClass="sidebar-icon"/>
-                </StackPane>
-                <Label text="Estética" styleClass="sidebar-button-label"/>
-            </HBox>
-        </graphic>
-    </Button>
-    
-    <Region VBox.vgrow="ALWAYS"/>
+            <Button fx:id="btnProducts" styleClass="sidebar-button" onAction="#toggleProductsMenu" contentDisplay="GRAPHIC_ONLY" maxWidth="Infinity">
+                <graphic>
+                    <HBox alignment="CENTER_LEFT" maxWidth="Infinity" spacing="14">
+                        <StackPane styleClass="icon-container">
+                            <FontAwesomeIconView glyphName="TAGS" size="18" styleClass="sidebar-icon"/>
+                        </StackPane>
+                        <Label text="Productos" styleClass="sidebar-button-label"/>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Label fx:id="lblProductsArrow" text="›" styleClass="sidebar-submenu-arrow"/>
+                    </HBox>
+                </graphic>
+            </Button>
+            <VBox fx:id="productsSubmenu" managed="false" visible="false" spacing="1" style="-fx-padding: 2 0 2 0;">
+                <padding><Insets left="18"/></padding>
+                <Button fx:id="btnProductsList" text="Lista de Productos" styleClass="sidebar-button,submenu-item" onAction="#showProductsView" maxWidth="Infinity"/>
+                <Button fx:id="btnCategories" text="Categorías" styleClass="sidebar-button,submenu-item" onAction="#showCategoriesView" maxWidth="Infinity"/>
+                <Button fx:id="btnPriceLists" text="Tarifas" styleClass="sidebar-button,submenu-item" onAction="#showPriceListsView" maxWidth="Infinity"/>
+                <Button fx:id="btnMassivePrices" text="Subida de Precios" styleClass="sidebar-button,submenu-item" onAction="#handleShowVatPrices" maxWidth="Infinity"/>
+            </VBox>
 
-    <!-- Botón de cambio de tema claro/oscuro -->
-    <Button fx:id="btnThemeToggle" styleClass="sidebar-button" contentDisplay="GRAPHIC_ONLY" maxWidth="Infinity" onAction="#handleThemeToggle">
-        <graphic>
-            <HBox alignment="CENTER_LEFT" spacing="15">
-                <StackPane styleClass="icon-container">
-                    <FontAwesomeIconView fx:id="themeIcon" glyphName="MOON_ALT" size="20" styleClass="sidebar-icon"/>
-                </StackPane>
-                <Label fx:id="lblTheme" text="Modo Oscuro" styleClass="sidebar-button-label"/>
-            </HBox>
-        </graphic>
-    </Button>
+            <!-- ─── SECCIÓN CRM ─── -->
+            <Label text="CLIENTES" styleClass="sidebar-section-label">
+                <VBox.margin>
+                    <Insets top="10" />
+                </VBox.margin>
+            </Label>
+
+            <Button fx:id="btnClients" styleClass="sidebar-button" contentDisplay="GRAPHIC_ONLY" maxWidth="Infinity" onAction="#handleShowClients">
+                <graphic>
+                    <HBox alignment="CENTER_LEFT" spacing="14">
+                        <StackPane styleClass="icon-container">
+                            <FontAwesomeIconView glyphName="ADDRESS_BOOK" size="18" styleClass="sidebar-icon"/>
+                        </StackPane>
+                        <Label text="Directorio" styleClass="sidebar-button-label"/>
+                    </HBox>
+                </graphic>
+            </Button>
+
+            <!-- ─── SECCIÓN INFORMES ─── -->
+            <Label text="ANALÍTICA" styleClass="sidebar-section-label">
+                <VBox.margin>
+                    <Insets top="10" />
+                </VBox.margin>
+            </Label>
+
+            <Button fx:id="btnReports" styleClass="sidebar-button" onAction="#toggleReportsMenu" contentDisplay="GRAPHIC_ONLY" maxWidth="Infinity">
+                <graphic>
+                    <HBox alignment="CENTER_LEFT" maxWidth="Infinity" spacing="14">
+                        <StackPane styleClass="icon-container">
+                            <FontAwesomeIconView glyphName="BAR_CHART" size="18" styleClass="sidebar-icon"/>
+                        </StackPane>
+                        <Label text="Informes" styleClass="sidebar-button-label"/>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Label fx:id="lblReportsArrow" text="‹" styleClass="sidebar-submenu-arrow"/>
+                    </HBox>
+                </graphic>
+            </Button>
+            <VBox fx:id="reportsSubmenu" managed="false" visible="false" spacing="1" style="-fx-padding: 2 0 2 0;">
+                <padding><Insets left="18"/></padding>
+                <Button fx:id="btnSellerReport" text="Ventas por Vendedor" styleClass="sidebar-button,submenu-item" onAction="#showSellerReport" maxWidth="Infinity"/>
+                <Button fx:id="btnClientReport" text="Historial de Clientes" styleClass="sidebar-button,submenu-item" onAction="#showClientReport" maxWidth="Infinity"/>
+            </VBox>
+
+            <Button fx:id="btnClosures" styleClass="sidebar-button" onAction="#handleShowClosures" contentDisplay="GRAPHIC_ONLY" maxWidth="Infinity">
+                <graphic>
+                    <HBox alignment="CENTER_LEFT" maxWidth="Infinity" spacing="14">
+                        <StackPane styleClass="icon-container">
+                            <FontAwesomeIconView glyphName="CALCULATOR" size="18" styleClass="sidebar-icon"/>
+                        </StackPane>
+                        <Label text="Arqueos de Caja" styleClass="sidebar-button-label"/>
+                    </HBox>
+                </graphic>
+            </Button>
+
+            <Button fx:id="btnBilling" styleClass="sidebar-button" onAction="#handleShowBilling" contentDisplay="GRAPHIC_ONLY" maxWidth="Infinity">
+                <graphic>
+                    <HBox alignment="CENTER_LEFT" maxWidth="Infinity" spacing="14">
+                        <StackPane styleClass="icon-container">
+                            <FontAwesomeIconView glyphName="FILE_TEXT_ALT" size="18" styleClass="sidebar-icon"/>
+                        </StackPane>
+                        <Label text="Facturación" styleClass="sidebar-button-label"/>
+                    </HBox>
+                </graphic>
+            </Button>
+
+            <!-- ─── SECCIÓN ADMINISTRACIÓN ─── -->
+            <Label text="ADMINISTRACIÓN" styleClass="sidebar-section-label">
+                <VBox.margin>
+                    <Insets top="10" />
+                </VBox.margin>
+            </Label>
+
+            <Button fx:id="btnUsers" styleClass="sidebar-button" onAction="#toggleUsersMenu" contentDisplay="GRAPHIC_ONLY" maxWidth="Infinity">
+                <graphic>
+                    <HBox alignment="CENTER_LEFT" spacing="14">
+                        <StackPane styleClass="icon-container">
+                            <FontAwesomeIconView glyphName="USER_CIRCLE" size="18" styleClass="sidebar-icon"/>
+                        </StackPane>
+                        <Label text="Usuarios" styleClass="sidebar-button-label"/>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Label fx:id="lblUsersArrow" text="›" styleClass="sidebar-submenu-arrow"/>
+                    </HBox>
+                </graphic>
+            </Button>
+            <VBox fx:id="usersSubmenu" managed="false" visible="false" spacing="1" style="-fx-padding: 2 0 2 0;">
+                <padding><Insets left="18"/></padding>
+                <Button fx:id="btnUsersList" text="Lista de Usuarios" styleClass="sidebar-button,submenu-item" onAction="#handleShowUsers" maxWidth="Infinity"/>
+                <Button fx:id="btnRoles" text="Roles y Permisos" styleClass="sidebar-button,submenu-item" onAction="#handleShowRoles" maxWidth="Infinity"/>
+            </VBox>
+
+            <Button fx:id="btnConfig" styleClass="sidebar-button" contentDisplay="GRAPHIC_ONLY" maxWidth="Infinity" onAction="#handleShowConfig">
+                <graphic>
+                    <HBox alignment="CENTER_LEFT" spacing="14">
+                        <StackPane styleClass="icon-container">
+                            <FontAwesomeIconView glyphName="COG" size="18" styleClass="sidebar-icon"/>
+                        </StackPane>
+                        <Label text="Configuración" styleClass="sidebar-button-label"/>
+                    </HBox>
+                </graphic>
+            </Button>
+
+            <Button fx:id="btnThemeSettings" styleClass="sidebar-button" contentDisplay="GRAPHIC_ONLY" maxWidth="Infinity" onAction="#handleShowCustomization">
+                <graphic>
+                    <HBox alignment="CENTER_LEFT" spacing="14">
+                        <StackPane styleClass="icon-container">
+                            <FontAwesomeIconView glyphName="PAINT_BRUSH" size="18" styleClass="sidebar-icon"/>
+                        </StackPane>
+                        <Label text="Estética" styleClass="sidebar-button-label"/>
+                    </HBox>
+                </graphic>
+            </Button>
+
+
+        </VBox>
+    </ScrollPane>
+
+    <Separator styleClass="sidebar-divider"/>
 
     <Button fx:id="btnLock" styleClass="sidebar-button" contentDisplay="GRAPHIC_ONLY" maxWidth="Infinity" onAction="#handleLockApp">
         <graphic>
-            <HBox alignment="CENTER_LEFT" spacing="15">
+            <HBox alignment="CENTER_LEFT" spacing="14">
                 <StackPane styleClass="icon-container">
-                    <FontAwesomeIconView glyphName="LOCK" size="20" styleClass="sidebar-icon"/>
+                    <FontAwesomeIconView glyphName="LOCK" size="18" styleClass="sidebar-icon"/>
                 </StackPane>
-                <Label text="Bloquear" styleClass="sidebar-button-label"/>
+                <Label text="Bloquear sesión" styleClass="sidebar-button-label"/>
             </HBox>
         </graphic>
     </Button>
+
+
 </VBox>

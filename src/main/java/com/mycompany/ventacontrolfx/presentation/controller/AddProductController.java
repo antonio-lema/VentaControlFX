@@ -1,29 +1,47 @@
 package com.mycompany.ventacontrolfx.presentation.controller;
 
-import com.mycompany.ventacontrolfx.domain.model.Category;
+import com.mycompany.ventacontrolfx.domain.model.Price;
+import com.mycompany.ventacontrolfx.domain.model.PriceList;
 import com.mycompany.ventacontrolfx.domain.model.Product;
+import com.mycompany.ventacontrolfx.domain.model.Category;
 import com.mycompany.ventacontrolfx.application.usecase.ProductUseCase;
 import com.mycompany.ventacontrolfx.application.usecase.CategoryUseCase;
-import com.mycompany.ventacontrolfx.infrastructure.config.Injectable;
-import com.mycompany.ventacontrolfx.infrastructure.config.ServiceContainer;
-import com.mycompany.ventacontrolfx.util.AlertUtil;
+import com.mycompany.ventacontrolfx.application.usecase.PriceListUseCase;
+import com.mycompany.ventacontrolfx.application.usecase.PriceUseCase;
+import com.mycompany.ventacontrolfx.application.dto.PriceInfoDTO;
+import com.mycompany.ventacontrolfx.domain.exception.BusinessException;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.geometry.Pos;
+import javafx.geometry.Insets;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
+import com.mycompany.ventacontrolfx.util.AlertUtil;
+import com.mycompany.ventacontrolfx.infrastructure.config.Injectable;
+import com.mycompany.ventacontrolfx.infrastructure.config.ServiceContainer;
 
 import java.io.File;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 public class AddProductController implements Injectable {
 
     @FXML
-    private TextField txtName, txtPrice, txtIva;
+    private TextField txtName, txtIva;
+    @FXML
+    private VBox vboxPrices;
     @FXML
     private ComboBox<Category> cmbCategory;
     @FXML
@@ -35,15 +53,130 @@ public class AddProductController implements Injectable {
 
     private ProductUseCase productUseCase;
     private CategoryUseCase categoryUseCase;
+    private PriceListUseCase priceListUseCase;
+    private PriceUseCase priceUseCase;
     private Product productToEdit;
     private File selectedImageFile;
+
+    private Map<Integer, TextField> priceFields = new HashMap<>();
+    private Map<Integer, Label> diffLabels = new HashMap<>();
+    private PriceList defaultPriceList;
 
     @Override
     public void inject(ServiceContainer container) {
         this.productUseCase = container.getProductUseCase();
         this.categoryUseCase = container.getCategoryUseCase();
+        this.priceListUseCase = container.getPriceListUseCase();
+        this.priceUseCase = container.getPriceUseCase();
         setupCategoryComboBox();
         loadCategories();
+        loadPriceLists();
+    }
+
+    private void loadPriceLists() {
+        try {
+            List<PriceList> lists = priceListUseCase.getAll();
+            vboxPrices.getChildren().clear();
+            priceFields.clear();
+            diffLabels.clear();
+
+            for (PriceList pl : lists) {
+                if (pl.isDefault()) {
+                    defaultPriceList = pl;
+                }
+                HBox row = new HBox();
+                row.getStyleClass().add("modern-input-container");
+                row.setAlignment(Pos.CENTER_LEFT);
+
+                FontAwesomeIconView icon = new FontAwesomeIconView(
+                        de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon.MONEY);
+                icon.setSize("18");
+                icon.getStyleClass().add("sidebar-icon");
+                HBox.setMargin(icon, new Insets(0, 10, 0, 0));
+
+                TextField txtDynamicPrice = new TextField();
+                txtDynamicPrice.setPromptText("0.00");
+                txtDynamicPrice.getStyleClass().add("modern-input-field");
+                HBox.setHgrow(txtDynamicPrice, javafx.scene.layout.Priority.ALWAYS);
+
+                // Label para identificar la tarifa claramente
+                Label lblListName = new Label(pl.getName() + (pl.isDefault() ? " (Base):" : ":"));
+                lblListName.setMinWidth(140);
+                lblListName.setStyle("-fx-font-weight: bold; -fx-text-fill: #64748b; -fx-font-size: 13px;");
+                HBox.setMargin(lblListName, new Insets(0, 10, 0, 0));
+
+                Label lblDiff = new Label("");
+                lblDiff.setMinWidth(65);
+                lblDiff.setAlignment(Pos.CENTER_RIGHT);
+                lblDiff.setStyle("-fx-font-size: 12px; -fx-font-weight: bold;");
+                HBox.setMargin(lblDiff, new Insets(0, 0, 0, 10));
+
+                row.getChildren().addAll(icon, lblListName, txtDynamicPrice, lblDiff);
+                vboxPrices.getChildren().add(row);
+
+                priceFields.put(pl.getId(), txtDynamicPrice);
+                if (!pl.isDefault()) {
+                    diffLabels.put(pl.getId(), lblDiff);
+                }
+            }
+
+            // Set up listeners AFTER all fields exist
+            if (defaultPriceList != null && priceFields.containsKey(defaultPriceList.getId())) {
+                TextField defaultField = priceFields.get(defaultPriceList.getId());
+
+                // When default price changes, update all diffs
+                defaultField.textProperty().addListener((obs, oldV, newV) -> updateAllDiffs());
+
+                // When any specific price changes, update its diff
+                for (Map.Entry<Integer, TextField> entry : priceFields.entrySet()) {
+                    if (entry.getKey() != defaultPriceList.getId()) {
+                        entry.getValue().textProperty().addListener((obs, oldV, newV) -> updateDiff(entry.getKey()));
+                    }
+                }
+            }
+
+        } catch (SQLException e) {
+            AlertUtil.showError("Error", "No se pudieron cargar las tarifas.");
+        }
+    }
+
+    private void updateAllDiffs() {
+        for (Integer id : diffLabels.keySet()) {
+            updateDiff(id);
+        }
+    }
+
+    private void updateDiff(int priceListId) {
+        if (defaultPriceList == null || !priceFields.containsKey(defaultPriceList.getId()))
+            return;
+        if (!priceFields.containsKey(priceListId) || !diffLabels.containsKey(priceListId))
+            return;
+
+        try {
+            double defaultPrice = Double
+                    .parseDouble(priceFields.get(defaultPriceList.getId()).getText().replace(",", "."));
+            double currentPrice = Double.parseDouble(priceFields.get(priceListId).getText().replace(",", "."));
+
+            if (defaultPrice > 0) {
+                double diffPercent = ((currentPrice - defaultPrice) / defaultPrice) * 100.0;
+                Label lbl = diffLabels.get(priceListId);
+
+                if (Math.abs(diffPercent) < 0.01) {
+                    lbl.setText("Igual =");
+                    lbl.setStyle("-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #94a3b8;"); // slate-400
+                } else if (diffPercent > 0) {
+                    lbl.setText(String.format("+%.1f%%", diffPercent));
+                    lbl.setStyle("-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #22c55e;"); // green-500
+                } else {
+                    lbl.setText(String.format("%.1f%%", diffPercent));
+                    lbl.setStyle("-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #ef4444;"); // red-500
+                }
+            } else {
+                diffLabels.get(priceListId).setText("");
+            }
+        } catch (Exception e) {
+            diffLabels.get(priceListId).setText("");
+        }
     }
 
     private void setupCategoryComboBox() {
@@ -71,31 +204,46 @@ public class AddProductController implements Injectable {
 
     public void setProduct(Product product) {
         this.productToEdit = product;
-        if (product != null) {
-            lblTitle.setText("Editar Producto");
-            txtName.setText(product.getName());
-            txtPrice.setText(String.valueOf(product.getPrice()));
-            chkFavorite.setSelected(product.isFavorite());
-            if (product.getIva() != null) {
-                txtIva.setText(String.valueOf(product.getIva()));
-            } else {
-                txtIva.setText("");
-            }
+        lblTitle.setText("Editar Producto");
+        txtName.setText(product.getName());
+        chkFavorite.setSelected(product.isFavorite());
+        if (product.getIva() != null) {
+            txtIva.setText(String.valueOf(product.getIva()));
+        } else {
+            txtIva.setText("");
+        }
 
-            // Select correct category
-            for (Category c : cmbCategory.getItems()) {
-                if (c.getId() == product.getCategoryId()) {
-                    cmbCategory.setValue(c);
-                    break;
-                }
-            }
-
-            if (product.getImagePath() != null) {
-                File f = resolveFile(product.getImagePath());
-                if (f != null && f.exists())
-                    ivProductImage.setImage(new Image(f.toURI().toString()));
+        // Select correct category
+        for (Category c : cmbCategory.getItems()) {
+            if (c.getId() == product.getCategoryId()) {
+                cmbCategory.setValue(c);
+                break;
             }
         }
+
+        if (product.getImagePath() != null) {
+            File f = resolveFile(product.getImagePath());
+            if (f != null && f.exists())
+                ivProductImage.setImage(new Image(f.toURI().toString()));
+        }
+
+        // Load explicit prices asynchronously to not block UI thread during load
+        Platform.runLater(() -> {
+            for (Map.Entry<Integer, TextField> entry : priceFields.entrySet()) {
+                try {
+                    Optional<Price> activePrice = priceUseCase.getActivePrice(product.getId(), entry.getKey());
+                    if (activePrice.isPresent()) {
+                        entry.getValue().setText(String.valueOf(activePrice.get().getValue()));
+                    } else if (defaultPriceList != null && entry.getKey() == defaultPriceList.getId()) {
+                        // Fallback in case there is no explicit price record yet for the default
+                        entry.getValue().setText(String.valueOf(product.getPrice()));
+                    }
+                } catch (SQLException ex) {
+                }
+            }
+            // Forzar refresco visual de los porcentajes de diferencia iniciales
+            updateAllDiffs();
+        });
     }
 
     @FXML
@@ -110,19 +258,31 @@ public class AddProductController implements Injectable {
 
     @FXML
     private void handleSave() {
-        if (txtName.getText().isEmpty() || txtPrice.getText().isEmpty() || cmbCategory.getValue() == null) {
-            AlertUtil.showWarning("Validación", "Complete todos los campos.");
+        if (txtName.getText().isEmpty() || cmbCategory.getValue() == null) {
+            AlertUtil.showWarning("Validación", "Complete el nombre y categoría obligatoriamente.");
+            return;
+        }
+
+        double mainPrice = 0.0;
+        if (defaultPriceList != null && priceFields.containsKey(defaultPriceList.getId())) {
+            try {
+                mainPrice = Double.parseDouble(priceFields.get(defaultPriceList.getId()).getText().replace(",", "."));
+            } catch (Exception ex) {
+                AlertUtil.showWarning("Validación", "El precio por defecto es inválido o está vacío.");
+                return;
+            }
+        } else {
+            AlertUtil.showWarning("Validación", "Es obligatorio fijar un precio base.");
             return;
         }
 
         try {
-            double price = Double.parseDouble(txtPrice.getText());
             if (productToEdit == null) {
                 productToEdit = new Product();
                 productToEdit.setVisible(true);
             }
             productToEdit.setName(txtName.getText());
-            productToEdit.setPrice(price);
+            productToEdit.setPrice(mainPrice);
             productToEdit.setCategoryId(cmbCategory.getValue().getId());
             productToEdit.setFavorite(chkFavorite.isSelected());
 
@@ -131,7 +291,7 @@ public class AddProductController implements Injectable {
                 productToEdit.setIva(null);
             } else {
                 try {
-                    productToEdit.setIva(Double.parseDouble(ivaStr));
+                    productToEdit.setIva(Double.parseDouble(ivaStr.replace(",", ".")));
                 } catch (NumberFormatException e) {
                     AlertUtil.showWarning("Validación", "IVA inválido. Se usará el defecto de categoría.");
                     productToEdit.setIva(null);
@@ -143,7 +303,29 @@ public class AddProductController implements Injectable {
                 productToEdit.setImagePath(relativePath);
             }
 
+            // Save the product (this automatically persists the default price to ID 1 via
+            // Repository logic)
             productUseCase.saveProduct(productToEdit);
+
+            // Wait for DB to ensure productToEdit.getId() is established
+            for (Map.Entry<Integer, TextField> entry : priceFields.entrySet()) {
+                int priceListId = entry.getKey();
+                if (defaultPriceList != null && priceListId == defaultPriceList.getId()) {
+                    continue; // Ya guardado automáticamente como fallback en productUseCase.saveProduct
+                }
+
+                String rawPrice = entry.getValue().getText();
+                if (rawPrice != null && !rawPrice.trim().isEmpty()) {
+                    double listPrice = Double.parseDouble(rawPrice.replace(",", "."));
+
+                    Optional<Price> activePrice = priceUseCase.getActivePrice(productToEdit.getId(), priceListId);
+                    if (activePrice.isEmpty() || activePrice.get().getValue() != listPrice) {
+                        priceUseCase.updateProductPrice(productToEdit.getId(), priceListId, listPrice,
+                                "Actualización de tarifa", LocalDateTime.now());
+                    }
+                }
+            }
+
             handleCancel();
         } catch (NumberFormatException e) {
             AlertUtil.showWarning("Error", "Precio inválido.");

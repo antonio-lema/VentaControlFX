@@ -3,55 +3,55 @@
  */
 
 .status-bar {
-    -fx-background-color: -bg-surface;
-    -fx-border-color: -border-color;
+    -fx-background-color: white;
+    -fx-border-color: -fx-neutral-200;
     -fx-border-width: 1 0 0 0;
-    -fx-padding: 5 20;
-    -fx-min-height: 35;
+    -fx-padding: 8 20;
 }
 
 .status-badge {
-    -fx-background-color: -bg-surface;
+    -fx-background-color: #ffffff;
     -fx-background-radius: 20;
     -fx-padding: 4 12;
-    -fx-border-color: -border-light;
+    -fx-border-color: rgba(0, 0, 0, 0.04);
     -fx-border-width: 1;
     -fx-border-radius: 20;
 }
 
 .status-badge-label {
-    -fx-font-size: 13px;
-    -fx-text-fill: -text-light;
+    -fx-font-size: 12px;
+    -fx-text-fill: -fx-neutral-500;
+    -fx-font-weight: 500;
 }
 
 .status-badge-value {
-    -fx-font-size: 14px;
-    -fx-font-weight: bold;
-    -fx-text-fill: -text-main;
+    -fx-font-size: 13px;
+    -fx-font-weight: 600;
+    -fx-text-fill: -fx-neutral-700;
 }
 
 .status-icon-bg-blue {
-    -fx-background-color: -color-primary;
+    -fx-background-color: #1e88e5;
 }
 
 .status-icon-bg-green {
-    -fx-background-color: -color-success;
+    -fx-background-color: #10b981;
 }
 
 .status-icon-bg-red {
-    -fx-background-color: -color-danger;
+    -fx-background-color: #ef4444;
 }
 
 .status-icon-bg-orange {
-    -fx-background-color: -color-warning;
+    -fx-background-color: #f59e0b;
 }
 
 .status-icon-bg-purple {
-    -fx-background-color: #9c27b0;
+    -fx-background-color: #8b5cf6;
 }
 
 .status-icon-bg-teal {
-    -fx-background-color: #008080;
+    -fx-background-color: #14b8a6;
 }
 
 .status-badge StackPane {

@@ -10,28 +10,33 @@
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 <?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
+<?import javafx.scene.layout.StackPane?>
 
-<VBox spacing="20" styleClass="main-content-area" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mycompany.ventacontrolfx.presentation.controller.ManageUsersController">
-    <padding>
-        <Insets top="30" right="30" bottom="20" left="30"/>
-    </padding>
-
+<VBox spacing="0" styleClass="main-content-area" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mycompany.ventacontrolfx.presentation.controller.ManageUsersController">
     <!-- Header Section -->
-    <HBox alignment="CENTER_LEFT" spacing="15.0">
-       <children>
-          <VBox spacing="5">
-             <children>
-                <Label text="Gestión de Usuarios" styleClass="section-title" />
-                <Label text="Administra los accesos y roles del sistema" styleClass="section-subtitle" />
-             </children>
-          </VBox>
-          <Region HBox.hgrow="ALWAYS" />
-          <Button onAction="#handleNewUser" styleClass="btn-primary">
-             <graphic><FontAwesomeIconView glyphName="PLUS" size="14" fill="white" /></graphic>
-             <text> Nuevo Usuario</text>
-          </Button>
-       </children>
-    </HBox>
+    <VBox styleClass="view-header" spacing="0">
+        <children>
+            <HBox spacing="16" alignment="CENTER_LEFT">
+                <children>
+                    <StackPane styleClass="view-header-icon-wrap">
+                        <children><FontAwesomeIconView glyphName="USERS" size="24" fill="white"/></children>
+                    </StackPane>
+                    <VBox spacing="2">
+                        <children>
+                            <Label text="Gestión de Usuarios" styleClass="view-title"/>
+                            <Label text="Administra los accesos y roles del sistema" styleClass="view-subtitle"/>
+                        </children>
+                    </VBox>
+                    <Region HBox.hgrow="ALWAYS" />
+                    <Button onAction="#handleNewUser" styleClass="btn-primary" text=" Nuevo Usuario">
+                        <graphic><FontAwesomeIconView glyphName="PLUS" size="14" fill="white" /></graphic>
+                    </Button>
+                </children>
+            </HBox>
+        </children>
+    </VBox>
+
+    <VBox spacing="20.0" VBox.vgrow="ALWAYS" style="-fx-padding: 30 30 20 30;">
 
     <!-- Filter Section -->
     <HBox alignment="CENTER_LEFT" spacing="15" styleClass="modern-filter-bar">
@@ -65,4 +70,5 @@
         </children>
     </HBox>
 
+</VBox>
 </VBox>

@@ -4,14 +4,14 @@
 
 .login-background,
 .lock-screen-root {
-    -fx-background-color: linear-gradient(to bottom right, -color-primary, -color-primary-dark);
+    -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #1e88e5 0%, #1565c0 100%);
 }
 
 .login-card,
 .lock-screen-glass {
     -fx-background-color: rgba(255, 255, 255, 0.95);
     -fx-background-radius: 20;
-    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.2), 40, 0, 0, 15);
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.12), 40, 0, 0, 15);
     -fx-padding: 40;
     -fx-border-color: rgba(255, 255, 255, 0.3);
     -fx-border-width: 1;
@@ -30,29 +30,29 @@
 .lock-title {
     -fx-font-size: 26px;
     -fx-font-weight: 800;
-    -fx-text-fill: -text-main;
+    -fx-text-fill: #1e293b;
 }
 
 .login-subtitle {
     -fx-font-size: 14px;
-    -fx-text-fill: -text-muted;
+    -fx-text-fill: #64748b;
 }
 
 .lock-username {
     -fx-font-size: 18px;
     -fx-font-weight: bold;
-    -fx-text-fill: -color-primary;
+    -fx-text-fill: #1e88e5;
 }
 
 /* Avatar de usuario */
 .user-avatar-circle {
-    -fx-fill: -bg-input;
-    -fx-stroke: -border-light;
+    -fx-fill: #f8fafc;
+    -fx-stroke: #f1f5f9;
     -fx-stroke-width: 2;
 }
 
 .lock-badge {
-    -fx-background-color: -color-primary;
+    -fx-background-color: #1e88e5;
     -fx-background-radius: 50%;
     -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.1), 4, 0, 0, 2);
 }
@@ -66,7 +66,7 @@
 .login-input-label {
     -fx-font-size: 11px;
     -fx-font-weight: 800;
-    -fx-text-fill: -text-muted;
+    -fx-text-fill: #64748b;
     -fx-text-transform: uppercase;
     -fx-padding: 0 0 5 2;
 }
@@ -74,32 +74,32 @@
 /* Campos de entrada estilo "lock" */
 .lock-field,
 .login-field {
-    -fx-background-color: -bg-input;
+    -fx-background-color: #f8fafc;
     -fx-background-radius: 10;
-    -fx-border-color: -border-color;
+    -fx-border-color: #e2e8f0;
     -fx-border-width: 1.2;
     -fx-border-radius: 10;
     -fx-padding: 12 15;
     -fx-font-size: 14px;
-    -fx-text-fill: -text-main;
+    -fx-text-fill: #0f172a;
 }
 
 .lock-field:focused,
 .login-field:focused {
-    -fx-background-color: -bg-surface;
-    -fx-border-color: -color-primary;
+    -fx-background-color: white;
+    -fx-border-color: #1e88e5;
 }
 
 /* Botones de acción */
 .btn-unlock,
 .btn-login-main {
-    -fx-background-color: linear-gradient(to right, -color-primary, -color-primary-light);
+    -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #1e88e5 0%, #1565c0 100%);
     -fx-text-fill: white;
     -fx-font-weight: bold;
     -fx-padding: 14;
     -fx-background-radius: 25;
     -fx-cursor: hand;
-    -fx-effect: dropshadow(three-pass-box, rgba(30, 136, 229, 0.3), 15, 0, 0, 5);
+    -fx-effect: dropshadow(three-pass-box, rgba(30, 136, 229, 0.25), 15, 0, 0, 5);
 }
 
 .btn-unlock:hover,
@@ -111,13 +111,13 @@
 .btn-change-user,
 .btn-forgot-password {
     -fx-background-color: transparent;
-    -fx-text-fill: -color-primary;
+    -fx-text-fill: #1e88e5;
     -fx-font-weight: bold;
     -fx-cursor: hand;
 }
 
 .btn-change-user:hover,
 .btn-forgot-password:hover {
-    -fx-text-fill: -color-primary-dark;
+    -fx-text-fill: #1565c0;
     -fx-underline: true;
 }

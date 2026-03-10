@@ -6,12 +6,14 @@ import com.mycompany.ventacontrolfx.domain.model.ReturnDetail;
 import com.mycompany.ventacontrolfx.infrastructure.config.Injectable;
 import com.mycompany.ventacontrolfx.infrastructure.config.ServiceContainer;
 import com.mycompany.ventacontrolfx.util.AlertUtil;
+import com.mycompany.ventacontrolfx.util.ModalService;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
+import com.mycompany.ventacontrolfx.presentation.controller.TicketDetailController;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -22,6 +24,9 @@ import javafx.scene.paint.Color;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.scene.layout.*;
+import javafx.scene.input.MouseEvent;
+import javafx.event.EventHandler;
+import com.mycompany.ventacontrolfx.presentation.util.RealTimeSearchBinder;
 
 import java.io.PrintWriter;
 import java.sql.SQLException;
@@ -46,9 +51,7 @@ public class ReturnListController implements Injectable {
     @FXML
     private TableColumn<Return, Double> colAmount;
     @FXML
-    private TableColumn<Return, Void> colActions;
-    @FXML
-    private Label lblCount, lblTotalRefunded;
+    private Label lblCount, lblTotalRefunded, lblKpiTotal, lblKpiCount, lblKpiAverage, lblKpiLast;
 
     // View Details Side Panel
     @FXML
@@ -69,12 +72,19 @@ public class ReturnListController implements Injectable {
     private VBox detailsItemsContainer;
 
     private SaleUseCase saleUseCase;
+    private com.mycompany.ventacontrolfx.application.usecase.GetSaleTicketUseCase getSaleTicketUseCase;
+    private ServiceContainer container;
     private ObservableList<Return> masterData = FXCollections.observableArrayList();
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+    private final DateTimeFormatter kpiFormatter = DateTimeFormatter.ofPattern("dd/MM/yy HH:mm");
+
+    private Return currentSelectedReturn;
 
     @Override
     public void inject(ServiceContainer container) {
+        this.container = container;
         this.saleUseCase = container.getSaleUseCase();
+        this.getSaleTicketUseCase = container.getGetSaleTicketUseCase();
 
         // Inicializar filtros
         if (datePickerStart != null)
@@ -92,7 +102,7 @@ public class ReturnListController implements Injectable {
 
         // Listeners para búsqueda en tiempo real
         if (txtSearch != null)
-            txtSearch.textProperty().addListener((obs, oldVal, newVal) -> applyFilters());
+            RealTimeSearchBinder.bind(txtSearch, query -> applyFilters());
         if (datePickerStart != null)
             datePickerStart.valueProperty().addListener((obs, oldVal, newVal) -> loadReturns());
         if (datePickerEnd != null)
@@ -126,11 +136,12 @@ public class ReturnListController implements Injectable {
                 super.updateItem(item, empty);
                 if (empty || item == null) {
                     setText(null);
-                    setStyle("");
+                    setGraphic(null);
+                    getStyleClass().remove("text-danger");
                 } else {
                     setText(String.format("%.2f €", item));
-                    setTextFill(Color.web("#ef4444")); // text-danger
-                    setStyle("-fx-font-weight: bold;");
+                    getStyleClass().add("text-danger");
+                    setStyle("-fx-font-weight: 800;");
                 }
             }
         });
@@ -145,12 +156,10 @@ public class ReturnListController implements Injectable {
                     setGraphic(null);
                 } else {
                     Label badge = new Label(item.toUpperCase());
+                    badge.getStyleClass().add("badge-info"); // Clase estándar
                     if ("admin".equalsIgnoreCase(item) || "administrador".equalsIgnoreCase(item)) {
                         badge.setStyle(
-                                "-fx-background-color: #ede9fe; -fx-text-fill: #7c3aed; -fx-padding: 2 8; -fx-background-radius: 10; -fx-font-size: 10; -fx-font-weight: bold;");
-                    } else {
-                        badge.setStyle(
-                                "-fx-background-color: #f1f5f9; -fx-text-fill: #475569; -fx-padding: 2 8; -fx-background-radius: 10; -fx-font-size: 10;");
+                                "-fx-background-color: -fx-custom-color-primary-bg; -fx-text-fill: -fx-custom-color-primary;");
                     }
                     setGraphic(badge);
                 }
@@ -181,50 +190,24 @@ public class ReturnListController implements Injectable {
             protected void updateItem(Integer item, boolean empty) {
                 super.updateItem(item, empty);
                 if (empty) {
+                    setGraphic(null);
                     setText(null);
-                    setStyle("");
                 } else if (item == null || item == 0) {
-                    setText("PENDIENTE");
-                    setTextFill(Color.web("#f59e0b"));
-                    setStyle("-fx-font-weight: bold; -fx-font-size: 10;");
+                    Label badge = new Label("PENDIENTE");
+                    badge.getStyleClass().add("badge-warning");
+                    setGraphic(badge);
+                    setText(null);
                 } else {
                     setText("#" + item);
-                    setTextFill(Color.BLACK);
-                    setStyle("");
+                    setTextFill(Color.web("#64748b"));
+                    setGraphic(null);
                 }
             }
         });
 
-        // Columna de Acciones (Ir al Ticket)
-        if (colActions != null) {
-            colActions.setCellFactory(col -> new TableCell<Return, Void>() {
-                private final Button btn = new Button();
-                {
-                    btn.getStyleClass().add("btn-icon-only");
-                    FontAwesomeIconView icon = new FontAwesomeIconView(FontAwesomeIcon.TICKET);
-                    icon.setSize("14");
-                    icon.setFill(Color.web("#6366f1"));
-                    btn.setGraphic(icon);
-                    btn.setTooltip(new Tooltip("Ver Ticket Original"));
-                    btn.setOnAction(event -> {
-                        Return r = getTableRow().getItem();
-                        if (r != null)
-                            handleViewTicket(r.getSaleId());
-                    });
-                }
-
-                @Override
-                protected void updateItem(Void item, boolean empty) {
-                    super.updateItem(item, empty);
-                    setGraphic(empty ? null : btn);
-                }
-            });
-        }
-
-        // Evento de doble clic para drill-down
         returnsTable.setRowFactory(tv -> {
             TableRow<Return> row = new TableRow<>();
-            row.setOnMouseClicked(event -> {
+            row.setOnMouseClicked((MouseEvent event) -> {
                 if (event.getClickCount() == 2 && (!row.isEmpty())) {
                     showReturnDetails(row.getItem());
                 }
@@ -234,12 +217,27 @@ public class ReturnListController implements Injectable {
     }
 
     private void handleViewTicket(int saleId) {
-        AlertUtil.showInfo("Ver Ticket", "Abriendo detalles del Ticket #" + saleId + "...\n(Módulo de Auditoría)");
+        try {
+            com.mycompany.ventacontrolfx.domain.model.Sale sale = getSaleTicketUseCase.execute(saleId);
+            if (sale == null)
+                return;
+
+            ModalService.showStandardModal("/view/view_ticket_modal.fxml", "Detalle de Ticket #" + saleId, container,
+                    (TicketDetailController controller) -> {
+                        controller.setSale(sale);
+                    });
+        } catch (SQLException e) {
+            e.printStackTrace();
+            AlertUtil.showError("Error", "No se pudo cargar el ticket.");
+        }
     }
 
     private void showReturnDetails(Return returnRecord) {
         if (returnRecord == null)
             return;
+
+        this.currentSelectedReturn = returnRecord;
+
         try {
             // Cargar detalles desde el repositorio
             List<ReturnDetail> details = saleUseCase.getReturnDetails(returnRecord.getReturnId());
@@ -294,8 +292,9 @@ public class ReturnListController implements Injectable {
                     itemBox.getChildren().addAll(topRow, bottomRow);
                     detailsItemsContainer.getChildren().add(itemBox);
 
+                    // Separador entre productos
                     Separator sep = new Separator();
-                    sep.setStyle("-fx-opacity: 0.3;");
+                    sep.setStyle("-fx-background-color: #f1f5f9; -fx-opacity: 0.5;");
                     detailsItemsContainer.getChildren().add(sep);
                 }
             }
@@ -332,6 +331,7 @@ public class ReturnListController implements Injectable {
         }
     }
 
+    @FXML
     private void applyFilters() {
         if (txtSearch == null)
             return;
@@ -363,12 +363,34 @@ public class ReturnListController implements Injectable {
     }
 
     private void updateSummary(List<Return> list) {
-        if (lblCount != null)
-            lblCount.setText(list.size() + " registros");
-        if (lblTotalRefunded != null) {
-            double total = list.stream().mapToDouble(Return::getTotalRefunded).sum();
-            lblTotalRefunded.setText(String.format("%.2f €", total));
+        int count = list.size();
+        double total = list.stream().mapToDouble(Return::getTotalRefunded).sum();
+        double average = count > 0 ? (total / count) : 0;
+
+        String lastReturnDate = "-";
+        if (count > 0) {
+            Return lastReturn = list.stream()
+                    .filter(r -> r.getReturnDatetime() != null)
+                    .max((r1, r2) -> r1.getReturnDatetime().compareTo(r2.getReturnDatetime()))
+                    .orElse(null);
+            if (lastReturn != null) {
+                lastReturnDate = lastReturn.getReturnDatetime().format(kpiFormatter);
+            }
         }
+
+        if (lblCount != null)
+            lblCount.setText(count + " registros");
+        if (lblTotalRefunded != null)
+            lblTotalRefunded.setText(String.format("%.2f €", total));
+
+        if (lblKpiTotal != null)
+            lblKpiTotal.setText(String.format("%.2f €", total));
+        if (lblKpiCount != null)
+            lblKpiCount.setText(String.valueOf(count));
+        if (lblKpiAverage != null)
+            lblKpiAverage.setText(String.format("%.2f €", average));
+        if (lblKpiLast != null)
+            lblKpiLast.setText(lastReturnDate);
     }
 
     @FXML
@@ -384,34 +406,104 @@ public class ReturnListController implements Injectable {
         loadReturns();
     }
 
+    // Filtros Rápidos
     @FXML
-    private void handleExport() {
-        if (masterData.isEmpty()) {
-            AlertUtil.showWarning("Exportar", "No hay datos para exportar.");
+    private void handleFilterToday() {
+        if (datePickerStart != null)
+            datePickerStart.setValue(LocalDate.now());
+        if (datePickerEnd != null)
+            datePickerEnd.setValue(LocalDate.now());
+    }
+
+    @FXML
+    private void handleFilter7Days() {
+        if (datePickerStart != null)
+            datePickerStart.setValue(LocalDate.now().minusDays(7));
+        if (datePickerEnd != null)
+            datePickerEnd.setValue(LocalDate.now());
+    }
+
+    @FXML
+    private void handleFilter30Days() {
+        if (datePickerStart != null)
+            datePickerStart.setValue(LocalDate.now().minusDays(30));
+        if (datePickerEnd != null)
+            datePickerEnd.setValue(LocalDate.now());
+    }
+
+    // Panel de Detalles - Acciones
+    @FXML
+    private void handleReprint() {
+        if (currentSelectedReturn == null) {
+            AlertUtil.showWarning("Aviso", "Por favor, seleccione una devolución primero.");
             return;
         }
 
         try {
-            String fileName = "Reporte_Devoluciones_" + LocalDate.now() + ".csv";
-            try (PrintWriter writer = new PrintWriter(fileName, "UTF-8")) {
-                // Header
-                writer.println("ID;Ticket;Fecha;Usuario;Importe;Metodo Pago;Cierre;Motivo");
-
-                for (Return r : returnsTable.getItems()) {
-                    writer.printf("%d;%d;%s;%s;%.2f;%s;%s;\"%s\"\n",
-                            r.getReturnId(),
-                            r.getSaleId(),
-                            (r.getReturnDatetime() != null) ? r.getReturnDatetime().format(formatter) : "-",
-                            r.getUserName() != null ? r.getUserName() : "-",
-                            r.getTotalRefunded(),
-                            r.getPaymentMethod() != null ? r.getPaymentMethod() : "-",
-                            r.getClosureId() != null && r.getClosureId() > 0 ? r.getClosureId() : "PENDIENTE",
-                            r.getReason() != null ? r.getReason().replace("\"", "'") : "");
-                }
+            // 1. Garantizar detalles cargados
+            if (currentSelectedReturn.getDetails() == null || currentSelectedReturn.getDetails().isEmpty()) {
+                currentSelectedReturn.setDetails(saleUseCase.getReturnDetails(currentSelectedReturn.getReturnId()));
             }
-            AlertUtil.showInfo("Exportación Exitosa", "Reporte generado correctamente:\n" + fileName);
-        } catch (Exception e) {
-            AlertUtil.showError("Error de Exportación", "No se pudo generar el CSV: " + e.getMessage());
+
+            // 2. Obtener la venta original para ver si tiene cliente asociado
+            com.mycompany.ventacontrolfx.domain.model.Sale originalSale = saleUseCase
+                    .getSaleDetails(currentSelectedReturn.getSaleId());
+
+            // 3. Abrir vista previa
+            ModalService.showStandardModal("/view/print_preview.fxml", "Ticket de Devolución", container,
+                    (PrintPreviewController ppc) -> {
+                        try {
+                            List<com.mycompany.ventacontrolfx.domain.model.CartItem> cartItems = new java.util.ArrayList<>();
+                            for (ReturnDetail detail : currentSelectedReturn.getDetails()) {
+                                com.mycompany.ventacontrolfx.domain.model.Product p = new com.mycompany.ventacontrolfx.domain.model.Product();
+                                p.setName("[DEV] " + detail.getProductName());
+                                p.setPrice(-detail.getUnitPrice()); // Precio negativo para devolución
+                                p.setIva(0.0); // Simplificado para el ticket de devolución
+                                cartItems.add(new com.mycompany.ventacontrolfx.domain.model.CartItem(p,
+                                        detail.getQuantity()));
+                            }
+
+                            // Cargar datos del cliente si el ticket original los tenía
+                            if (originalSale != null && originalSale.getClientId() != null) {
+                                com.mycompany.ventacontrolfx.domain.model.Client client = container.getClientUseCase()
+                                        .getById(originalSale.getClientId());
+                                if (client != null)
+                                    ppc.setClientInfo(client);
+                            }
+
+                            // Configurar vista previa (ponemos el ID de la venta original para referencia)
+                            ppc.setReceiptData(cartItems, -currentSelectedReturn.getTotalRefunded(),
+                                    -currentSelectedReturn.getTotalRefunded(), 0.0,
+                                    currentSelectedReturn.getPaymentMethod(), currentSelectedReturn.getSaleId());
+
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            AlertUtil.showError("Error", "Error al preparar la impresión de la devolución.");
+                        }
+                    });
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            AlertUtil.showError("Error", "No se pudieron obtener los datos de la devolución: " + e.getMessage());
         }
+    }
+
+    @FXML
+    private void handleViewOriginalTicket() {
+        if (currentSelectedReturn == null)
+            return;
+        handleViewTicket(currentSelectedReturn.getSaleId());
+    }
+
+    @FXML
+    private void handleExport() {
+        if (masterData.isEmpty()) {
+            AlertUtil.showWarning("Aviso", "No hay datos para exportar.");
+            return;
+        }
+
+        // Simulación de exportación
+        AlertUtil.showInfo("Exportación",
+                "La funcionalidad de exportación a Excel se implementará en una futura actualización.");
     }
 }

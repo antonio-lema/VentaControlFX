@@ -44,6 +44,13 @@ public class PriceUseCase {
     }
 
     /**
+     * Recupera el precio actualmente vigente (entidad completa).
+     */
+    public Optional<Price> getActivePrice(int productId, int priceListId) throws SQLException {
+        return priceRepository.getActivePrice(productId, priceListId);
+    }
+
+    /**
      * Actualiza el precio de un producto.
      * Cierra el actual y abre uno nuevo de forma atómica.
      */

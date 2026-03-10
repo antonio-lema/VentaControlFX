@@ -20,11 +20,8 @@ public class DBConnection {
                 .getResourceAsStream("config/db.properties")) {
             java.util.Properties prop = new java.util.Properties();
             if (input == null) {
-                System.err.println("Sorry, unable to find config/db.properties");
-                // Default fallback values just in case
-                URL = "jdbc:mysql://localhost:3306/tpv_bazar?useSSL=false&serverTimezone=UTC";
-                USER = "root";
-                PASS = "";
+                System.err.println("CRITICAL: unable to find config/db.properties");
+                // No fallback for security reasons
             } else {
                 prop.load(input);
                 URL = prop.getProperty("db.url");

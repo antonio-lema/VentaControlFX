@@ -43,7 +43,7 @@ public class JdbcClientRepository implements IClientRepository {
 
     @Override
     public int save(Client client) throws SQLException {
-        String sql = "INSERT INTO clients (name, is_company, tax_id, address, postal_code, city, province, country, email, phone) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO clients (name, is_company, tax_id, address, postal_code, city, province, country, email, phone, price_list_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = DBConnection.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             pstmt.setString(1, client.getName());
@@ -56,6 +56,11 @@ public class JdbcClientRepository implements IClientRepository {
             pstmt.setString(8, client.getCountry());
             pstmt.setString(9, client.getEmail());
             pstmt.setString(10, client.getPhone());
+            if (client.getPriceListId() > 0) {
+                pstmt.setInt(11, client.getPriceListId());
+            } else {
+                pstmt.setNull(11, Types.INTEGER);
+            }
             pstmt.executeUpdate();
             try (ResultSet rs = pstmt.getGeneratedKeys()) {
                 if (rs.next()) {
@@ -68,7 +73,7 @@ public class JdbcClientRepository implements IClientRepository {
 
     @Override
     public void update(Client client) throws SQLException {
-        String sql = "UPDATE clients SET name = ?, is_company = ?, tax_id = ?, address = ?, postal_code = ?, city = ?, province = ?, country = ?, email = ?, phone = ? WHERE client_id = ?";
+        String sql = "UPDATE clients SET name = ?, is_company = ?, tax_id = ?, address = ?, postal_code = ?, city = ?, province = ?, country = ?, email = ?, phone = ?, price_list_id = ? WHERE client_id = ?";
         try (Connection conn = DBConnection.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, client.getName());
@@ -81,7 +86,12 @@ public class JdbcClientRepository implements IClientRepository {
             pstmt.setString(8, client.getCountry());
             pstmt.setString(9, client.getEmail());
             pstmt.setString(10, client.getPhone());
-            pstmt.setInt(11, client.getId());
+            if (client.getPriceListId() > 0) {
+                pstmt.setInt(11, client.getPriceListId());
+            } else {
+                pstmt.setNull(11, Types.INTEGER);
+            }
+            pstmt.setInt(12, client.getId());
             pstmt.executeUpdate();
         }
     }
@@ -136,6 +146,7 @@ public class JdbcClientRepository implements IClientRepository {
                 rs.getString("province"),
                 rs.getString("country"),
                 rs.getString("email"),
-                rs.getString("phone"));
+                rs.getString("phone"),
+                rs.getInt("price_list_id"));
     }
 }

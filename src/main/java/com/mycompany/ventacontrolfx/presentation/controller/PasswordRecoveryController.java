@@ -95,20 +95,24 @@ public class PasswordRecoveryController implements Injectable {
 
         asyncManager.runAsyncTask(() -> {
             try {
-                // Find user by username to get email
-                User user = userUseCase.listUsers().stream()
-                        .filter(u -> u.getUsername().equalsIgnoreCase(username))
-                        .findFirst().orElse(null);
+                // Fix V-02: Usar findEmailByUsername que NO requiere permiso admin
+                // Fix V-04 (anti-enumeración): No distinguimos en el catch si el usuario existe
+                // o no
+                String email = userUseCase.findEmailByUsername(username);
 
-                if (user == null || user.getEmail() == null || user.getEmail().isEmpty()) {
-                    throw new Exception("Usuario no encontrado o sin email.");
+                if (email == null || email.isEmpty()) {
+                    // No revelamos si el usuario no existe; dejamos pasar igual
+                    // para que el siguiente paso muestre el mismo mensaje
+                    currentRecoveryEmail = "__invalid__@noreply.com"; // Correo fake, el envío fallará silenciosamente
+                } else {
+                    currentRecoveryEmail = email;
+                    userUseCase.recoverPassword(currentRecoveryEmail);
                 }
-
-                currentRecoveryEmail = user.getEmail();
-                userUseCase.recoverPassword(currentRecoveryEmail);
                 return null;
             } catch (Exception e) {
-                throw new RuntimeException(e.getMessage());
+                // No propagamos el error para evitar revelar información
+                currentRecoveryEmail = "__invalid__@noreply.com";
+                return null;
             }
         }, result -> {
             step1Box.setVisible(false);
@@ -116,25 +120,52 @@ public class PasswordRecoveryController implements Injectable {
             step2Box.setVisible(true);
             step2Box.setManaged(true);
             lblStatus.setText("Paso 2: Verificación");
-            lblError.setText("Código enviado.");
+            // Fix V-04: Mensaje genérico independientemente de si el usuario existe
+            lblError.setText("Si el usuario existe y tiene correo asociado, recibirá un código en breve.");
         }, error -> {
-            lblError.setText(error.getMessage());
+            // Mensaje genérico para no revelar detalles internos
+            lblError.setText("Si el usuario existe y tiene correo asociado, recibirá un código en breve.");
         });
     }
 
     @FXML
     private void handleVerifyCode() {
         String code = txtCode.getText().trim();
-        if (userUseCase.verifyCode(currentRecoveryEmail, code)) {
-            step2Box.setVisible(false);
-            step2Box.setManaged(false);
-            step3Box.setVisible(true);
-            step3Box.setManaged(true);
-            lblStatus.setText("Paso 3: Nueva Contraseña");
-            lblError.setText("");
-        } else {
-            lblError.setText("Código incorrecto.");
+        if (code.isEmpty()) {
+            lblError.setText("Introduce el código.");
+            return;
         }
+
+        asyncManager.runAsyncTask(() -> {
+            return userUseCase.verifyCode(currentRecoveryEmail, code);
+        }, isCorrect -> {
+            if (isCorrect) {
+                step2Box.setVisible(false);
+                step2Box.setManaged(false);
+                step3Box.setVisible(true);
+                step3Box.setManaged(true);
+                lblStatus.setText("Paso 3: Nueva Contraseña");
+                lblError.setText("");
+            } else {
+                // Fix V-01: Comprobar si está bloqueado por exceso de intentos
+                try {
+                    boolean blocked = userUseCase.isRecoveryBlocked(currentRecoveryEmail);
+                    if (blocked) {
+                        lblError.setText("Código bloqueado por demasiados intentos. Solicita un nuevo código.");
+                        // Volver al paso 1 para que solicite otro
+                        step2Box.setVisible(false);
+                        step2Box.setManaged(false);
+                        step1Box.setVisible(true);
+                        step1Box.setManaged(true);
+                        lblStatus.setText("Paso 1: Identificación");
+                    } else {
+                        lblError.setText("Código incorrecto o expirado. Te quedan pocos intentos.");
+                    }
+                } catch (Exception ex) {
+                    lblError.setText("Código incorrecto o expirado.");
+                }
+            }
+        }, error -> lblError.setText("Error: " + error.getMessage()));
     }
 
     @FXML

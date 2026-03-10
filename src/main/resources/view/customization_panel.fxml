@@ -13,14 +13,14 @@
 
     <!-- ============================= HEADER ============================= -->
     <top>
-        <VBox styleClass="estetica-header" spacing="0">
+        <VBox styleClass="view-header" spacing="0">
             <HBox spacing="16" alignment="CENTER_LEFT">
-                <StackPane styleClass="estetica-header-icon-wrap">
-                    <FontAwesomeIconView glyphName="PAINT_BRUSH" size="22" fill="white"/>
+                <StackPane styleClass="view-header-icon-wrap">
+                    <FontAwesomeIconView glyphName="PAINT_BRUSH" size="24" fill="white"/>
                 </StackPane>
                 <VBox spacing="2">
-                    <Label text="Personalización Visual" styleClass="estetica-title"/>
-                    <Label text="Ajusta colores, tipografía y tarjetas en tiempo real." styleClass="estetica-subtitle"/>
+                    <Label text="Personalización Visual" styleClass="view-title"/>
+                    <Label text="Ajusta colores, tipografía y tarjetas en tiempo real." styleClass="view-subtitle"/>
                 </VBox>
             </HBox>
         </VBox>

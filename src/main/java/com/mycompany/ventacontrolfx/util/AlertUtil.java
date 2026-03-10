@@ -107,11 +107,23 @@ public class AlertUtil {
         fadeOut.play();
     }
 
+    public static String showInput(String title, String header, String defaultValue) {
+        javafx.scene.control.TextInputDialog dialog = new javafx.scene.control.TextInputDialog(defaultValue);
+        dialog.setTitle(title);
+        dialog.setHeaderText(header);
+        dialog.setContentText("Introduce el valor:");
+
+        // Style it a bit to match the app if possible, or just return result
+        java.util.Optional<String> result = dialog.showAndWait();
+        return result.orElse(null);
+    }
+
     public static boolean showConfirmation(String title, String header, String content) {
         AtomicBoolean response = new AtomicBoolean(false);
         Stage stage = new Stage();
         stage.initModality(Modality.APPLICATION_MODAL);
         stage.initStyle(StageStyle.TRANSPARENT);
+        stage.setAlwaysOnTop(true);
 
         VBox root = createBaseContainer(stage, CustomAlertType.CONFIRMATION, header, content);
 
@@ -151,6 +163,7 @@ public class AlertUtil {
         Stage stage = new Stage();
         stage.initModality(Modality.APPLICATION_MODAL);
         stage.initStyle(StageStyle.TRANSPARENT);
+        stage.setAlwaysOnTop(true);
 
         VBox root = createBaseContainer(stage, type, header, content);
 

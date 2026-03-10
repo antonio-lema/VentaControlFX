@@ -7,22 +7,22 @@
 .combo-box,
 .modern-input-field,
 .modern-combo-box {
-    -fx-background-color: -bg-input;
-    -fx-border-color: -border-subtle;
+    -fx-background-color: white;
+    -fx-border-color: rgba(0, 0, 0, 0.04);
     -fx-border-radius: 8px;
     -fx-background-radius: 8px;
-    -fx-text-fill: -text-main;
+    -fx-text-fill: #1e293b;
     -fx-padding: 12 15;
     -fx-font-size: 14px;
-    -fx-prompt-text-fill: -text-muted;
+    -fx-prompt-text-fill: #64748b;
 }
 
 .text-field:focused,
 .modern-input-field:focused,
 .modern-combo-box:focused {
-    -fx-background-color: -bg-surface;
-    -fx-border-color: -color-primary;
-    -fx-effect: -shadow-sm;
+    -fx-background-color: #ffffff;
+    -fx-border-color: #1e88e5;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.06), 8, 0, 0, 2);
     -fx-border-width: 1.5;
 }
 
@@ -31,33 +31,33 @@
 .modern-register-title {
     -fx-font-size: 26px;
     -fx-font-weight: 800;
-    -fx-text-fill: -text-main;
+    -fx-text-fill: #1e293b;
     -fx-padding: 0 0 5 0;
 }
 
 .section-subtitle,
 .modern-register-subtitle {
     -fx-font-size: 14px;
-    -fx-text-fill: -text-muted;
+    -fx-text-fill: #64748b;
     -fx-padding: 0 0 20 0;
 }
 
 .label {
-    -fx-text-fill: -text-main;
+    -fx-text-fill: #1e293b;
     -fx-font-weight: 600;
 }
 
 .label-muted {
-    -fx-text-fill: -text-light;
+    -fx-text-fill: #94a3b8;
     -fx-font-size: 12px;
     -fx-font-weight: normal;
 }
 
 .error-label,
 .modern-error-label {
-    -fx-text-fill: -color-danger;
+    -fx-text-fill: #ef4444;
     -fx-font-size: 13px;
-    -fx-background-color: -color-danger-bg;
+    -fx-background-color: rgba(239, 68, 68, 0.1);
     -fx-padding: 8 12;
     -fx-background-radius: 8px;
 }
@@ -79,12 +79,12 @@
 
 /* Tarjeta principal del formulario */
 .modern-register-card {
-    -fx-background-color: -bg-surface;
+    -fx-background-color: white;
     -fx-background-radius: 16px;
     -fx-border-radius: 16px;
-    -fx-border-color: -border-subtle;
+    -fx-border-color: rgba(0, 0, 0, 0.04);
     -fx-border-width: 1px;
-    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.12), 40, 0, 0, 15);
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.12), 20, 0, 0, 10);
 }
 
 /* Cabecera del formulario */
@@ -94,8 +94,8 @@
 
 /* Contenedor de cada campo con icono */
 .modern-input-container {
-    -fx-background-color: -bg-input;
-    -fx-border-color: -border-color;
+    -fx-background-color: white;
+    -fx-border-color: #e2e8f0;
     -fx-border-width: 1.2;
     -fx-border-radius: 10px;
     -fx-background-radius: 10px;
@@ -104,9 +104,9 @@
 
 .modern-input-container:focused,
 .modern-input-container:focused-within {
-    -fx-border-color: -color-primary;
-    -fx-background-color: -bg-surface;
-    -fx-effect: dropshadow(three-pass-box, rgba(30, 136, 229, 0.20), 8, 0, 0, 2);
+    -fx-border-color: #1e88e5;
+    -fx-background-color: white;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.06), 8, 0, 0, 2);
 }
 
 /* Campo dentro del contenedor: sin borde propio */
@@ -119,16 +119,16 @@
     -fx-border-radius: 0;
     -fx-padding: 6 8;
     -fx-font-size: 14px;
-    -fx-text-fill: -text-main;
-    -fx-prompt-text-fill: -text-muted;
+    -fx-text-fill: #1e293b;
+    -fx-prompt-text-fill: #64748b;
     -fx-effect: null;
 }
 
 /* Spinner Moderno */
 .modern-spinner {
-    -fx-background-color: -bg-input;
+    -fx-background-color: white;
     -fx-background-radius: 8px;
-    -fx-border-color: -border-color;
+    -fx-border-color: #e2e8f0;
     -fx-border-width: 1px;
     -fx-border-radius: 8px;
 }
@@ -147,7 +147,7 @@
 
 .modern-spinner .increment-arrow-button:hover,
 .modern-spinner .decrement-arrow-button:hover {
-    -fx-background-color: -bg-subtle;
+    -fx-background-color: #f8fafc;
 }
 
 /* ===== SECCIÓN DE PERMISOS ===== */
@@ -155,19 +155,19 @@
 .permission-section-title {
     -fx-font-size: 15px;
     -fx-font-weight: 700;
-    -fx-text-fill: -text-main;
+    -fx-text-fill: #1e293b;
 }
 
 .permission-section-subtitle {
     -fx-font-size: 12px;
-    -fx-text-fill: -text-muted;
+    -fx-text-fill: #64748b;
     -fx-padding: 0 0 4 0;
 }
 
 /* Caja que envuelve los checkboxes */
 .permissions-box {
-    -fx-background-color: -bg-input;
-    -fx-border-color: -border-color;
+    -fx-background-color: white;
+    -fx-border-color: #e2e8f0;
     -fx-border-width: 1.2;
     -fx-border-radius: 12px;
     -fx-background-radius: 12px;
@@ -176,27 +176,27 @@
 /* Cada checkbox de permiso */
 .permission-checkbox {
     -fx-font-size: 13px;
-    -fx-text-fill: -text-main;
+    -fx-text-fill: #1e293b;
     -fx-cursor: hand;
     -fx-padding: 4 0;
 }
 
 .permission-checkbox:selected {
-    -fx-text-fill: -color-primary;
+    -fx-text-fill: #1e88e5;
     -fx-font-weight: 600;
 }
 
 .permission-checkbox .box {
-    -fx-background-color: -bg-surface;
-    -fx-border-color: -border-color;
+    -fx-background-color: #ffffff;
+    -fx-border-color: #e2e8f0;
     -fx-border-radius: 4px;
     -fx-background-radius: 4px;
     -fx-padding: 3;
 }
 
 .permission-checkbox:selected .box {
-    -fx-background-color: -color-primary;
-    -fx-border-color: -color-primary;
+    -fx-background-color: #1e88e5;
+    -fx-border-color: #1e88e5;
 }
 
 .permission-checkbox:selected .mark {
@@ -205,6 +205,6 @@
 }
 
 .permission-checkbox:hover .box {
-    -fx-border-color: -color-primary;
+    -fx-border-color: #1e88e5;
     -fx-effect: dropshadow(three-pass-box, rgba(30, 136, 229, 0.15), 4, 0, 0, 1);
 }

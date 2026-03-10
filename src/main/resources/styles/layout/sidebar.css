@@ -1,74 +1,140 @@
 /*
- * SIDEBAR.CSS
+ * SIDEBAR.CSS — Diseño profesional con secciones agrupadas
  */
 
+/* ─── Contenedor principal ─────────────────────────────── */
 .sidebar {
-    -fx-background-color: linear-gradient(to bottom, -bg-sidebar, derive(-bg-sidebar, -2%));
-    -fx-pref-width: 280;
-    -fx-effect: dropshadow(three-pass-box, -shadow-color, 30, 0, 0, 0);
-    -fx-padding: 25 15;
+    -fx-background-color: -fx-bg-sidebar;
+    -fx-pref-width: 260;
+    -fx-max-width: 260;
+    -fx-effect: dropshadow(three-pass-box, -fx-shadow-color-subtle, 10, 0, 1, 0);
+    -fx-padding: 30 14;
+    -fx-border-color: -fx-neutral-200;
+    -fx-border-width: 0 1 0 0;
 }
 
+/* ─── Labels de sección ────────────────────────────────── */
+.sidebar-section-label {
+    -fx-font-size: 10px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -fx-text-custom-light;
+    -fx-padding: 12 4 4 8;
+    -fx-opacity: 0.7;
+}
+
+/* ─── Botón de navegación ──────────────────────────────── */
 .sidebar-button {
     -fx-background-color: transparent;
     -fx-alignment: CENTER_LEFT;
-    -fx-padding: 14 20;
-    -fx-text-fill: -text-medium;
-    -fx-font-size: 15px;
-    -fx-font-weight: 600;
+    -fx-padding: 10 16;
+    -fx-text-fill: -fx-neutral-600;
+    -fx-font-size: 14px;
+    -fx-font-weight: 500;
     -fx-cursor: hand;
-    -fx-background-radius: 12px;
-    -fx-transition: all 0.2s ease;
+    -fx-background-radius: 8px;
+    -fx-spacing: 12;
 }
 
 .sidebar-button:hover {
-    -fx-background-color: -color-primary-bg;
-    -fx-text-fill: -color-primary;
+    -fx-background-color: -fx-custom-color-primary-bg;
+    -fx-text-fill: -fx-custom-color-primary;
 }
 
+/* ─── Ítem activo ──────────────────────────────────────── */
 .active-sidebar-button {
-    -fx-background-color: -color-primary;
-    -fx-text-fill: white !important;
-    -fx-effect: -shadow-primary;
+    -fx-background-color: -fx-custom-color-primary-bg;
+    -fx-text-fill: -fx-custom-color-primary !important;
+    -fx-border-color: -fx-custom-color-primary;
+    -fx-border-width: 0 0 0 4;
 }
 
 .active-sidebar-button:hover {
-    -fx-background-color: -color-primary-dark;
+    -fx-background-color: -fx-custom-color-primary-hover;
 }
 
+/* ─── Iconos ───────────────────────────────────────────── */
 .sidebar-icon {
-    -fx-fill: -text-muted;
+    -fx-fill: -fx-text-custom-muted;
 }
 
 .sidebar-button:hover .sidebar-icon {
-    -fx-fill: -color-primary;
+    -fx-fill: -fx-custom-color-primary;
 }
 
 .active-sidebar-button .sidebar-icon {
-    -fx-fill: white;
+    -fx-fill: -fx-custom-color-primary;
 }
 
+/* ─── Etiqueta de texto del botón ─────────────────────── */
 .sidebar-button-label {
     -fx-text-fill: inherit;
 }
 
-/* Icon Container Decoration */
+/* ─── Contenedor de ícono ──────────────────────────────── */
 .icon-container {
-    -fx-min-width: 32;
-    -fx-min-height: 32;
+    -fx-min-width: 28;
+    -fx-min-height: 28;
     -fx-alignment: center;
 }
 
+/* ─── Flecha de submenú ────────────────────────────────── */
 .sidebar-submenu-arrow {
-    -fx-font-size: 10px;
+    -fx-font-size: 16px;
     -fx-font-weight: bold;
-    -fx-text-fill: -text-muted;
+    -fx-text-fill: -fx-text-custom-light;
 }
 
 .sidebar-button:hover .sidebar-submenu-arrow {
-    -fx-text-fill: -color-primary;
+    -fx-text-fill: -fx-custom-color-primary;
 }
 
-.active-sidebar-button .sidebar-submenu-arrow {
-    -fx-text-fill: white;
+/* ─── Ítem de submenú ──────────────────────────────────── */
+.submenu-item {
+    -fx-font-size: 13px;
+    -fx-font-weight: 500;
+    -fx-padding: 8 16;
+    -fx-background-radius: 8px;
+}
+
+/* ─── Divisor inferior ─────────────────────────────────── */
+.sidebar-divider {
+    -fx-background-color: -fx-color-border-main;
+    -fx-padding: 0;
+}
+
+/* ─── ScrollPane Styling ──────────────────────────────── */
+.sidebar ScrollPane {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+    -fx-border-color: transparent;
+    -fx-padding: 0;
+}
+
+.sidebar ScrollPane .viewport {
+    -fx-background-color: transparent;
+}
+
+/* ─── ScrollBar Styling ───────────────────────────────── */
+.sidebar .scroll-bar:vertical {
+    -fx-background-color: transparent;
+    -fx-width: 6px;
+}
+
+.sidebar .scroll-bar:vertical .thumb {
+    -fx-background-color: -fx-neutral-200;
+    -fx-background-radius: 10;
+}
+
+.sidebar .scroll-bar:vertical .thumb:hover {
+    -fx-background-color: -fx-neutral-400;
+}
+
+.sidebar .scroll-bar:vertical .track {
+    -fx-background-color: transparent;
+}
+
+.sidebar .scroll-bar:vertical .increment-button,
+.sidebar .scroll-bar:vertical .decrement-button {
+    -fx-padding: 0;
+    -fx-background-color: transparent;
 }

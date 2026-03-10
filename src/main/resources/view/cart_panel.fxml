@@ -29,6 +29,20 @@
             </Button>
         </HBox>
     </HBox>
+
+    <HBox alignment="CENTER_LEFT" styleClass="cart-pricelist-header">
+        <HBox spacing="10" alignment="CENTER_LEFT">
+            <StackPane styleClass="icon-container-small" style="-fx-background-color: #e8f5e9;">
+                <FontAwesomeIconView glyphName="TAGS" size="14" style="-fx-fill: #2e7d32;"/>
+            </StackPane>
+            <Label fx:id="lblCurrentPriceList" text="Tarifa General" styleClass="cart-pricelist-title"/>
+        </HBox>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Button onAction="#handleChangePriceList" styleClass="btn-change-pricelist">
+            <tooltip><Tooltip text="Cambiar tarifa aplicada"/></tooltip>
+            <graphic><FontAwesomeIconView glyphName="EDIT" size="14" styleClass="icon-primary"/></graphic>
+        </Button>
+    </HBox>
     
     <HBox alignment="CENTER_LEFT" styleClass="cart-items-header">
         <HBox spacing="10" alignment="CENTER_LEFT">

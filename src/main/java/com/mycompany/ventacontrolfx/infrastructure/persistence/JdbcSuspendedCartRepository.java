@@ -108,7 +108,11 @@ public class JdbcSuspendedCartRepository implements ISuspendedCartRepository {
                 "LEFT JOIN clients c ON sc.client_id = c.client_id " +
                 "WHERE sc.cart_id = ?";
 
-        String itemsSql = "SELECT sci.*, p.name as product_name, p.price as current_price " +
+        String itemsSql = "SELECT sci.*, p.name as product_name, p.iva as product_iva, " +
+                "COALESCE((SELECT pp.price FROM product_prices pp " +
+                "  JOIN price_lists pl ON pp.price_list_id = pl.price_list_id " +
+                "  WHERE pp.product_id = p.product_id AND pl.is_default = 1 AND pp.end_date IS NULL " +
+                "  LIMIT 1), 0.0) AS current_price " +
                 "FROM suspended_cart_items sci " +
                 "JOIN products p ON sci.product_id = p.product_id " +
                 "WHERE sci.cart_id = ?";
@@ -138,6 +142,11 @@ public class JdbcSuspendedCartRepository implements ISuspendedCartRepository {
                             p.setId(rs.getInt("product_id"));
                             p.setName(rs.getString("product_name"));
                             p.setPrice(rs.getDouble("current_price"));
+                            // Read IVA so tax is recalculated correctly when cart is restored
+                            double ivaVal = rs.getDouble("product_iva");
+                            if (!rs.wasNull()) {
+                                p.setIva(ivaVal);
+                            }
                             item.setProduct(p);
 
                             cart.getItems().add(item);

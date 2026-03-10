@@ -26,9 +26,15 @@ public class CartItemRow extends HBox {
 
     private final CartItem cartItem;
 
-    public CartItemRow(CartItem cartItem, Runnable onIncrement, Runnable onDecrement, Runnable onDelete,
+    private final double globalTaxRate;
+    private final boolean pricesIncludeTax;
+
+    public CartItemRow(CartItem cartItem, double globalTaxRate, boolean pricesIncludeTax, Runnable onIncrement,
+            Runnable onDecrement, Runnable onDelete,
             Consumer<Integer> onSetQuantity) {
         this.cartItem = cartItem;
+        this.globalTaxRate = globalTaxRate;
+        this.pricesIncludeTax = pricesIncludeTax;
         Product product = cartItem.getProduct();
 
         this.getStyleClass().add("cart-item");
@@ -107,9 +113,26 @@ public class CartItemRow extends HBox {
         StackPane rightSide = new StackPane();
         rightSide.setMinWidth(100);
 
-        Label priceLabel = new Label(String.format("%.2f €", product.getPrice() * cartItem.getQuantity()));
+        double taxRate = product.resolveEffectiveIva(globalTaxRate);
+        double taxMultiplier = pricesIncludeTax ? 1.0 : (1 + (taxRate / 100.0));
+
+        // Calculamos el precio final (con IVA incluido si procede) de forma reactiva
+        Label priceLabel = new Label();
         priceLabel.getStyleClass().add("cart-item-price");
         StackPane.setAlignment(priceLabel, Pos.CENTER_RIGHT);
+
+        // Este Runnable actualiza la etiqueta cuando cambie precio o cantidad
+        Runnable refreshPrice = () -> {
+            double displayPrice = cartItem.getUnitPrice() * taxMultiplier * cartItem.getQuantity();
+            priceLabel.setText(String.format("%.2f €", displayPrice));
+        };
+        refreshPrice.run(); // Pintar el valor inicial
+
+        // Cuando cambia el precio (por cambio de tarifa)
+        cartItem.unitPriceProperty().addListener((obs, oldVal, newVal) -> refreshPrice.run());
+
+        // Cuando cambia la cantidad
+        cartItem.quantityProperty().addListener((obs, oldVal, newVal) -> refreshPrice.run());
 
         Button deleteBtn = new Button();
         deleteBtn.getStyleClass().add("cart-delete-btn-reveal");
@@ -119,13 +142,8 @@ public class CartItemRow extends HBox {
         deleteBtn.setGraphic(trashIcon);
         StackPane.setAlignment(deleteBtn, Pos.CENTER_RIGHT);
         deleteBtn.setOpacity(0);
-        deleteBtn.setTranslateX(20); // Start slightly outside
+        deleteBtn.setTranslateX(20);
         deleteBtn.setOnAction(e -> onDelete.run());
-
-        // Update price label when quantity changes
-        cartItem.quantityProperty().addListener((obs, oldVal, newVal) -> {
-            priceLabel.setText(String.format("%.2f €", product.getPrice() * newVal.intValue()));
-        });
 
         rightSide.getChildren().addAll(deleteBtn, priceLabel);
 

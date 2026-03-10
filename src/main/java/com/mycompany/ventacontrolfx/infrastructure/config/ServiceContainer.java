@@ -4,6 +4,8 @@ import com.mycompany.ventacontrolfx.application.usecase.*;
 import com.mycompany.ventacontrolfx.domain.repository.*;
 import com.mycompany.ventacontrolfx.infrastructure.persistence.*;
 import com.mycompany.ventacontrolfx.infrastructure.email.SmtpEmailAdapter;
+import com.mycompany.ventacontrolfx.application.ports.IFiscalPdfService;
+import com.mycompany.ventacontrolfx.infrastructure.pdf.OpenPdfFiscalService;
 import com.mycompany.ventacontrolfx.shared.bus.GlobalEventBus;
 import com.mycompany.ventacontrolfx.shared.async.AsyncManager;
 import com.mycompany.ventacontrolfx.util.UserSession;
@@ -32,7 +34,13 @@ public class ServiceContainer {
     private final IPriceRepository priceRepository;
     private final IAuditRepository auditRepository;
     private final IAppSettingsRepository appSettingsRepository;
+    private final IFiscalDocumentRepository fiscalRepository;
+    private final IDocumentSeriesRepository seriesRepository;
+    private final IFiscalPdfService pdfService;
     private final com.mycompany.ventacontrolfx.presentation.theme.ThemeManager themeManager;
+    private final IPriceListRepository priceListRepository;
+    private final ITaxRepository taxRepository;
+    private final IPriceUpdateLogRepository priceLogRepository;
 
     // Use Cases (Application Layer)
     private final ProductUseCase productUseCase;
@@ -48,6 +56,14 @@ public class ServiceContainer {
     private final RoleUseCase roleUseCase;
     private final PriceUseCase priceUseCase;
     private final UserPermissionUseCase userPermissionUseCase;
+    private final GetSaleTicketUseCase getSaleTicketUseCase;
+    private final RestoreSuspendedCartUseCase restoreSuspendedCartUseCase;
+    private final EmitFiscalDocumentUseCase emitFiscalDocumentUseCase;
+    private final QueryFiscalDocumentUseCase queryFiscalDocumentUseCase;
+    private final LoginUseCase loginUseCase;
+    private final PriceListUseCase priceListUseCase;
+    private final ScheduleVatChangeUseCase vatUseCase;
+    private final MassivePriceUpdateUseCase massivePriceUpdateUseCase;
 
     // Shared Components
     private final GlobalEventBus eventBus;
@@ -66,7 +82,7 @@ public class ServiceContainer {
         this.userSession = new UserSession();
         this.authService = new AuthorizationService(userSession);
         // Initialize CartUseCase as a singleton for the session
-        this.cartUseCase = new CartUseCase(new JdbcCompanyConfigRepository());
+        this.cartUseCase = new CartUseCase(new JdbcCompanyConfigRepository(), new JdbcPriceRepository());
 
         // 2. Adapters (Infrastructure Layer)
         this.productRepository = new JdbcProductRepository();
@@ -83,25 +99,47 @@ public class ServiceContainer {
         this.priceRepository = new JdbcPriceRepository();
         this.auditRepository = new JdbcAuditRepository();
         this.appSettingsRepository = new JdbcAppSettingsRepository();
+        this.fiscalRepository = new JdbcFiscalDocumentRepository();
+        this.seriesRepository = new JdbcDocumentSeriesRepository();
+        this.pdfService = new OpenPdfFiscalService();
         this.themeManager = new com.mycompany.ventacontrolfx.presentation.theme.ThemeManager(appSettingsRepository);
+        this.priceListRepository = new JdbcPriceListRepository();
+        this.taxRepository = new JdbcTaxRepository();
+        this.priceLogRepository = new JdbcPriceUpdateLogRepository();
 
         // 3. Wiring Use Cases (Application Layer)
-        this.productUseCase = new ProductUseCase(productRepository);
-        this.categoryUseCase = new CategoryUseCase(categoryRepository);
-        this.clientUseCase = new ClientUseCase(clientRepository);
-        this.saleUseCase = new SaleUseCase(saleRepository, configRepository);
-        this.userUseCase = new UserUseCase(userRepository, emailSender);
-        this.closureUseCase = new CashClosureUseCase(closureRepository);
+        this.productUseCase = new com.mycompany.ventacontrolfx.application.usecase.ProductUseCase(productRepository,
+                authService);
+        this.categoryUseCase = new CategoryUseCase(categoryRepository, authService);
+        this.clientUseCase = new ClientUseCase(clientRepository, authService);
+        this.saleUseCase = new com.mycompany.ventacontrolfx.application.usecase.SaleUseCase(saleRepository,
+                configRepository, authService);
+        this.userUseCase = new com.mycompany.ventacontrolfx.application.usecase.UserUseCase(userRepository, emailSender,
+                authService);
+        this.closureUseCase = new CashClosureUseCase(closureRepository, authService);
         this.configUseCase = new ConfigUseCase(configRepository);
         this.dashboardUseCase = new DashboardUseCase(productRepository, categoryRepository, saleRepository,
                 closureRepository, clientRepository, userRepository);
-        this.permissionUseCase = new PermissionUseCase(permissionRepository);
+        this.permissionUseCase = new PermissionUseCase(permissionRepository, authService);
         this.suspendedCartUseCase = new SuspendedCartUseCase(suspendedCartRepository);
-        this.roleUseCase = new RoleUseCase(roleRepository);
+        this.roleUseCase = new RoleUseCase(roleRepository, authService);
         this.priceUseCase = new PriceUseCase(priceRepository);
         this.userPermissionUseCase = new UserPermissionUseCase(userRepository, auditRepository, userSession);
+        this.emitFiscalDocumentUseCase = new EmitFiscalDocumentUseCase(saleRepository, fiscalRepository,
+                seriesRepository, configRepository);
+        this.emitFiscalDocumentUseCase.setPdfService(pdfService); // Inyectamos el servicio de PDF
+        this.queryFiscalDocumentUseCase = new QueryFiscalDocumentUseCase(fiscalRepository, saleRepository);
+        this.loginUseCase = new LoginUseCase(userRepository, auditRepository, roleUseCase, permissionUseCase);
+        this.priceListUseCase = new PriceListUseCase(priceListRepository, priceRepository);
+        this.vatUseCase = new ScheduleVatChangeUseCase(taxRepository);
+        this.massivePriceUpdateUseCase = new MassivePriceUpdateUseCase(priceRepository, productRepository,
+                priceLogRepository);
+        this.getSaleTicketUseCase = new GetSaleTicketUseCase(saleRepository);
+        this.restoreSuspendedCartUseCase = new RestoreSuspendedCartUseCase(
+                suspendedCartRepository, productRepository, clientRepository, cartUseCase);
 
-        // Cross-wiring: SaleUseCase necesita CashClosureUseCase para registrar devoluciones en caja
+        // Cross-wiring: SaleUseCase necesita CashClosureUseCase para registrar
+        // devoluciones en caja
         this.saleUseCase.setCashClosureUseCase(this.closureUseCase);
     }
 
@@ -114,12 +152,20 @@ public class ServiceContainer {
         return categoryUseCase;
     }
 
+    public ScheduleVatChangeUseCase getVatUseCase() {
+        return vatUseCase;
+    }
+
     public ClientUseCase getClientUseCase() {
         return clientUseCase;
     }
 
     public SaleUseCase getSaleUseCase() {
         return saleUseCase;
+    }
+
+    public GetSaleTicketUseCase getGetSaleTicketUseCase() {
+        return getSaleTicketUseCase;
     }
 
     public UserUseCase getUserUseCase() {
@@ -179,6 +225,10 @@ public class ServiceContainer {
         return suspendedCartUseCase;
     }
 
+    public RestoreSuspendedCartUseCase getRestoreSuspendedCartUseCase() {
+        return restoreSuspendedCartUseCase;
+    }
+
     public RoleUseCase getRoleUseCase() {
         return roleUseCase;
     }
@@ -205,5 +255,33 @@ public class ServiceContainer {
 
     public com.mycompany.ventacontrolfx.presentation.theme.ThemeManager getThemeManager() {
         return themeManager;
+    }
+
+    public EmitFiscalDocumentUseCase getEmitFiscalDocumentUseCase() {
+        return emitFiscalDocumentUseCase;
+    }
+
+    public QueryFiscalDocumentUseCase getQueryFiscalDocumentUseCase() {
+        return queryFiscalDocumentUseCase;
+    }
+
+    public LoginUseCase getLoginUseCase() {
+        return loginUseCase;
+    }
+
+    public ICompanyConfigRepository getICompanyConfigRepository() {
+        return configRepository;
+    }
+
+    public PriceListUseCase getPriceListUseCase() {
+        return priceListUseCase;
+    }
+
+    public MassivePriceUpdateUseCase getMassivePriceUpdateUseCase() {
+        return massivePriceUpdateUseCase;
+    }
+
+    public IPriceUpdateLogRepository getPriceLogRepository() {
+        return priceLogRepository;
     }
 }

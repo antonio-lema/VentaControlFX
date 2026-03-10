@@ -29,7 +29,10 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 
+import com.mycompany.ventacontrolfx.util.PaginationHelper;
 import com.mycompany.ventacontrolfx.util.Searchable;
+import com.mycompany.ventacontrolfx.util.PaginationHelper;
+import com.mycompany.ventacontrolfx.presentation.util.RealTimeSearchBinder;
 
 public class HistoryController implements Injectable, Searchable {
 
@@ -48,6 +51,8 @@ public class HistoryController implements Injectable, Searchable {
     @FXML
     private Label lblTotalSalesCount, lblTotalAmount, lblTotalCash, lblTotalCard, lblCount;
     @FXML
+    private ComboBox<Integer> cmbRowLimit;
+    @FXML
     private VBox detailsPanel, detailsItemsContainer;
     @FXML
     private Label lblSaleId, lblSaleFullDate, lblPaymentMethod, lblTotalAmountDetail, lblReturnBadge;
@@ -56,6 +61,7 @@ public class HistoryController implements Injectable, Searchable {
 
     private SaleUseCase saleUseCase;
     private ServiceContainer container;
+    private PaginationHelper<Sale> paginationHelper;
     private final DateTimeFormatter fullFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
 
     private static final String ACTIVE_CLASS = "active-filter";
@@ -68,6 +74,7 @@ public class HistoryController implements Injectable, Searchable {
         datePickerStart.setValue(LocalDate.now());
         datePickerEnd.setValue(LocalDate.now());
         setupTable();
+        paginationHelper = new PaginationHelper<>(salesTable, cmbRowLimit, lblCount, "tickets");
         setActiveFilter(btnQuickToday);
         loadSalesDirect();
 
@@ -75,6 +82,10 @@ public class HistoryController implements Injectable, Searchable {
             if (newVal != null)
                 showDetails(newVal);
         });
+
+        if (txtSearchId != null) {
+            RealTimeSearchBinder.bind(txtSearchId, query -> handleSearch());
+        }
 
         // Verificación de permisos para Devoluciones
         boolean canReturn = container.getUserSession().hasPermission("venta.devolucion");
@@ -162,8 +173,8 @@ public class HistoryController implements Injectable, Searchable {
                 return;
             }
             List<Sale> sales = saleUseCase.getHistory(start, end);
-            salesTable.setItems(FXCollections.observableArrayList(sales));
-            updateSummaries(sales);
+            paginationHelper.setData(sales);
+            updateSummaries(sales); // Mantener sumatorios sobre el total cargado, no solo lo visible
             handleCloseDetails();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -225,7 +236,7 @@ public class HistoryController implements Injectable, Searchable {
             int id = Integer.parseInt(search);
             Sale s = saleUseCase.getSaleDetails(id);
             if (s != null) {
-                salesTable.setItems(FXCollections.observableArrayList(s));
+                paginationHelper.setData(java.util.Collections.singletonList(s));
                 updateSummaries(java.util.Collections.singletonList(s));
                 salesTable.getSelectionModel().select(s);
             } else {
@@ -437,48 +448,52 @@ public class HistoryController implements Injectable, Searchable {
             return;
         }
 
-        // ── Validar efectivo disponible para devoluciones en efectivo ──────────
-        boolean isCashSale = "Efectivo".equalsIgnoreCase(selected.getPaymentMethod());
-        if (isCashSale) {
-            // Calcular el máximo devolvible (productos aún no devueltos)
-            double maxRefundable = selected.getDetails().stream()
-                    .mapToDouble(d -> (d.getQuantity() - d.getReturnedQuantity()) * d.getUnitPrice())
-                    .sum();
+        // ── Validar efectivo disponible (Todas las devoluciones salen de caja) ──
+        // Calcular el máximo devolvible (productos aún no devueltos) usando el precio
+        // real pagado
+        double maxRefundable = selected.getDetails().stream()
+                .mapToDouble(d -> (d.getQuantity() - d.getReturnedQuantity()) * (d.getLineTotal() / d.getQuantity()))
+                .sum();
 
-            if (maxRefundable > 0) {
-                try {
-                    com.mycompany.ventacontrolfx.application.usecase.CashClosureUseCase closureUseCase = container
-                            .getClosureUseCase();
-                    double cashAvailable = closureUseCase.getCurrentCashInDrawer();
+        if (maxRefundable > 0) {
+            try {
+                com.mycompany.ventacontrolfx.application.usecase.CashClosureUseCase closureUseCase = container
+                        .getClosureUseCase();
+                double cashAvailable = closureUseCase.getCurrentCashInDrawer();
 
-                    if (cashAvailable <= 0) {
-                        AlertUtil.showError("❌ Sin efectivo en caja",
-                                String.format(
-                                        "No hay efectivo disponible en la caja para procesar esta devolución.\n\n" +
-                                                "💵 Efectivo en caja: %.2f €\n" +
-                                                "💰 Importe máximo a devolver: %.2f €\n\n" +
-                                                "Abre la caja con un fondo o verifica el saldo disponible.",
-                                        cashAvailable, maxRefundable));
-                        return;
-                    }
-
-                    if (maxRefundable > cashAvailable) {
-                        // Advertir, pero dejar que el usuario elija cuánto devolver (puede ser parcial)
-                        boolean continuar = AlertUtil.showConfirmation("⚠️ Efectivo limitado",
-                                "Efectivo insuficiente para devolver el total",
-                                String.format(
-                                        "El efectivo en caja (%.2f €) es menor que el importe total del ticket (%.2f €).\n\n"
-                                                +
-                                                "Solo podrás devolver hasta %.2f € en efectivo.\n\n" +
-                                                "¿Deseas continuar con una devolución parcial?",
-                                        cashAvailable, maxRefundable, cashAvailable));
-                        if (!continuar)
-                            return;
-                    }
-                } catch (SQLException e) {
-                    // Si no podemos leer el efectivo, dejar pasar (mejor UX que bloquear)
-                    e.printStackTrace();
+                if (cashAvailable <= 0) {
+                    AlertUtil.showError("❌ Sin efectivo en caja",
+                            String.format(
+                                    "No hay efectivo disponible en la caja para procesar esta devolución.\n\n" +
+                                            "💵 Efectivo en caja: %.2f €\n" +
+                                            "💰 Importe máximo a devolver: %.2f €\n\n" +
+                                            "Abre la caja con un fondo o verifica el saldo disponible.",
+                                    cashAvailable, maxRefundable));
+                    return;
                 }
+
+                if (maxRefundable > cashAvailable) {
+                    String oldTicketHint = selected.getClosureId() != null
+                            ? "\n\n💡 *Recuerda*: Este ticket es de una sesión antigua. " +
+                                    "Asegúrate de tener suficiente 'Fondo de Caja' ingresado hoy para cubrirlo."
+                            : "";
+
+                    // Advertir, pero dejar que el usuario elija cuánto devolver (puede ser parcial)
+                    boolean continuar = AlertUtil.showConfirmation("⚠️ Efectivo limitado",
+                            "Efectivo insuficiente para devolver el total",
+                            String.format(
+                                    "El efectivo en caja (%.2f €) es menor que el importe total del ticket (%.2f €).\n\n"
+                                            +
+                                            "Solo podrás devolver hasta %.2f € en efectivo (las devoluciones siempre son en efectivo).%s\n\n"
+                                            +
+                                            "¿Deseas continuar con una devolución parcial?",
+                                    cashAvailable, maxRefundable, cashAvailable, oldTicketHint));
+                    if (!continuar)
+                        return;
+                }
+            } catch (SQLException e) {
+                // Si no podemos leer el efectivo, dejar pasar (mejor UX que bloquear)
+                e.printStackTrace();
             }
         }
 
@@ -488,18 +503,16 @@ public class HistoryController implements Injectable, Searchable {
                     controller.setOnSuccess((reason, items) -> {
                         try {
                             // Validación final de efectivo justo antes de confirmar
-                            if (isCashSale) {
-                                double refundTotal = selected.getDetails().stream()
-                                        .filter(d -> items.containsKey(d.getDetailId()))
-                                        .mapToDouble(d -> items.get(d.getDetailId()) * d.getUnitPrice())
-                                        .sum();
+                            double refundTotal = selected.getDetails().stream()
+                                    .filter(d -> items.containsKey(d.getDetailId()))
+                                    .mapToDouble(d -> items.get(d.getDetailId()) * (d.getLineTotal() / d.getQuantity()))
+                                    .sum();
 
-                                try {
-                                    container.getClosureUseCase().validateCashAvailableForReturn(refundTotal);
-                                } catch (SQLException cashEx) {
-                                    AlertUtil.showError("❌ Efectivo insuficiente", cashEx.getMessage());
-                                    return;
-                                }
+                            try {
+                                container.getClosureUseCase().validateCashAvailableForReturn(refundTotal);
+                            } catch (SQLException cashEx) {
+                                AlertUtil.showError("❌ Efectivo insuficiente", cashEx.getMessage());
+                                return;
                             }
 
                             int userId = container.getUserSession().getCurrentUser().getUserId();

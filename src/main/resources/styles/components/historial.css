@@ -10,29 +10,29 @@
    TARJETAS DE ESTADÍSTICAS (stat-card)
    ========================================= */
 .stat-card {
-    -fx-background-color: -bg-surface;
+    -fx-background-color: white;
     -fx-background-radius: 15;
     -fx-padding: 18 22;
-    -fx-effect: -shadow-sm;
-    -fx-border-color: -border-light;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.06), 8, 0, 0, 2);
+    -fx-border-color: #f1f5f9;
     -fx-border-width: 1;
     -fx-border-radius: 15;
 }
 
 .stat-card:hover {
-    -fx-effect: -shadow-md;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.12), 12, 0, 0, 4);
     -fx-translate-y: -3;
 }
 
 /* Tarjeta con fondo de color primario (totales destacados) */
 .stat-card-highlight {
-    -fx-background-color: linear-gradient(to bottom right, -color-primary, -color-primary-light);
-    -fx-effect: -shadow-primary;
+    -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #1e88e5 0%, #1565c0 100%);
+    -fx-effect: dropshadow(three-pass-box, rgba(30, 136, 229, 0.25), 15, 0, 0, 5);
     -fx-border-width: 0;
 }
 
 .stat-card-highlight:hover {
-    -fx-effect: -shadow-primary;
+    -fx-effect: dropshadow(three-pass-box, rgba(30, 136, 229, 0.25), 15, 0, 0, 5);
     -fx-translate-y: -3;
 }
 
@@ -62,15 +62,15 @@
 }
 
 .stat-icon-bg-blue {
-    -fx-background-color: -color-primary;
+    -fx-background-color: #1e88e5;
 }
 
 .stat-icon-bg-green {
-    -fx-background-color: -color-success;
+    -fx-background-color: #10b981;
 }
 
 .stat-icon-bg-orange {
-    -fx-background-color: -color-warning;
+    -fx-background-color: #f59e0b;
 }
 
 .stat-icon-bg-purple {
@@ -82,17 +82,17 @@
 }
 
 .stat-icon-bg-red {
-    -fx-background-color: -color-danger;
+    -fx-background-color: #ef4444;
 }
 
 .stat-label {
-    -fx-text-fill: -text-light;
+    -fx-text-fill: #94a3b8;
     -fx-font-size: 12px;
     -fx-font-weight: bold;
 }
 
 .stat-value {
-    -fx-text-fill: -text-main;
+    -fx-text-fill: #1e293b;
     -fx-font-size: 28px;
     -fx-font-weight: bold;
     -fx-padding: 5 0 0 0;
@@ -101,30 +101,30 @@
 /* Vivid Colors for Amounts */
 
 .text-cash {
-    -fx-text-fill: -color-warning;
+    -fx-text-fill: #f59e0b;
 }
 
 .text-card {
-    -fx-text-fill: -color-purple;
+    -fx-text-fill: #9c27b0;
 }
 
 .text-total {
-    -fx-text-fill: -color-success;
+    -fx-text-fill: #10b981;
 }
 
 .text-info {
-    -fx-text-fill: -color-primary;
+    -fx-text-fill: #1e88e5;
 }
 
 /* =========================================
    FILTROS / FILTER CARD
    ========================================= */
 .filter-card {
-    -fx-background-color: -bg-surface;
+    -fx-background-color: white;
     -fx-background-radius: 14;
     -fx-padding: 12 20;
-    -fx-effect: -shadow-sm;
-    -fx-border-color: -border-light;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.06), 8, 0, 0, 2);
+    -fx-border-color: #f1f5f9;
     -fx-border-width: 1;
     -fx-border-radius: 14;
     -fx-spacing: 12;
@@ -133,7 +133,7 @@
 .filter-label-cap {
     -fx-font-size: 9px;
     -fx-font-weight: bold;
-    -fx-text-fill: -text-muted;
+    -fx-text-fill: #64748b;
     -fx-text-transform: uppercase;
 }
 
@@ -145,16 +145,16 @@
 .filter-search-field {
     -fx-background-color: transparent;
     -fx-border-color: transparent;
-    -fx-text-fill: -text-main;
+    -fx-text-fill: #1e293b;
 }
 
 /* =========================================
    QUICK FILTER BUTTONS
    ========================================= */
 .quick-filter-btn {
-    -fx-background-color: -bg-surface;
-    -fx-text-fill: -text-medium;
-    -fx-border-color: -border-light;
+    -fx-background-color: white;
+    -fx-text-fill: #334155;
+    -fx-border-color: #f1f5f9;
     -fx-border-width: 1;
     -fx-border-radius: 25;
     -fx-background-radius: 25;
@@ -165,32 +165,32 @@
 }
 
 .quick-filter-btn:hover {
-    -fx-background-color: -color-primary-bg;
-    -fx-text-fill: -color-primary;
-    -fx-border-color: -color-primary;
+    -fx-background-color: rgba(30, 136, 229, 0.1);
+    -fx-text-fill: #1e88e5;
+    -fx-border-color: #1e88e5;
 }
 
 .active-filter {
-    -fx-background-color: -color-primary;
+    -fx-background-color: #1e88e5;
     -fx-text-fill: white;
-    -fx-border-color: -color-primary;
-    -fx-effect: -shadow-primary;
+    -fx-border-color: #1e88e5;
+    -fx-effect: dropshadow(three-pass-box, rgba(30, 136, 229, 0.25), 15, 0, 0, 5);
 }
 
 /* =========================================
    PANEL DETALLE DE VENTA
    ========================================= */
 .detail-panel {
-    -fx-background-color: -bg-surface;
+    -fx-background-color: white;
     -fx-background-radius: 15;
-    -fx-effect: -shadow-md;
-    -fx-border-color: -border-light;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.12), 12, 0, 0, 4);
+    -fx-border-color: #f1f5f9;
     -fx-border-width: 1;
     -fx-border-radius: 15;
 }
 
 .detail-panel-accent {
-    -fx-background-color: linear-gradient(to right, -color-primary, -color-primary-light);
+    -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #1e88e5 0%, #1565c0 100%);
     -fx-background-radius: 15 15 0 0;
 }
 
@@ -201,25 +201,25 @@
 .detail-sale-id {
     -fx-font-size: 22px;
     -fx-font-weight: bold;
-    -fx-text-fill: -text-main;
+    -fx-text-fill: #1e293b;
 }
 
 .detail-info-value {
     -fx-font-weight: bold;
     -fx-font-size: 13px;
-    -fx-text-fill: -text-main;
+    -fx-text-fill: #1e293b;
 }
 
 .detail-total-label {
     -fx-font-weight: bold;
     -fx-font-size: 16px;
-    -fx-text-fill: -text-main;
+    -fx-text-fill: #1e293b;
 }
 
 .detail-total-value {
     -fx-font-weight: bold;
     -fx-font-size: 22px;
-    -fx-text-fill: -color-primary;
+    -fx-text-fill: #1e88e5;
 }
 
 .detail-scroll {
@@ -236,7 +236,7 @@
    BADGES
    ========================================= */
 .badge-danger {
-    -fx-background-color: -color-danger;
+    -fx-background-color: #ef4444;
     -fx-text-fill: white;
     -fx-font-size: 10px;
     -fx-font-weight: bold;
@@ -245,7 +245,7 @@
 }
 
 .badge-success {
-    -fx-background-color: -color-success;
+    -fx-background-color: #10b981;
     -fx-text-fill: white;
     -fx-font-size: 10px;
     -fx-font-weight: bold;
@@ -254,7 +254,7 @@
 }
 
 .badge-warning {
-    -fx-background-color: -color-warning;
+    -fx-background-color: #f59e0b;
     -fx-text-fill: white;
     -fx-font-size: 10px;
     -fx-font-weight: bold;
@@ -274,12 +274,12 @@
 
 /* Botón de advertencia / devolución */
 .btn-warning {
-    -fx-background-color: linear-gradient(to right, -color-warning, derive(-color-warning, -10%));
+    -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #f59e0b 0%, #fb8c00 100%);
     -fx-text-fill: white;
     -fx-font-weight: bold;
     -fx-padding: 12 24;
     -fx-background-radius: 25;
-    -fx-effect: dropshadow(three-pass-box, rgba(255, 165, 0, 0.3), 10, 0, 0, 4);
+    -fx-effect: dropshadow(three-pass-box, rgba(251, 140, 0, 0.25), 10, 0, 0, 4);
 }
 
 .btn-warning:hover {
@@ -288,8 +288,8 @@
 }
 
 .btn-warning:disabled {
-    -fx-background-color: -bg-subtle;
-    -fx-text-fill: -text-muted;
+    -fx-background-color: #f8fafc;
+    -fx-text-fill: #64748b;
     -fx-opacity: 0.6;
     -fx-effect: none;
 }
@@ -298,28 +298,28 @@
    LABELS REUTILIZABLES
    ========================================= */
 .label-muted {
-    -fx-text-fill: -text-muted;
+    -fx-text-fill: #64748b;
 }
 
 .section-title {
     -fx-font-size: 26px;
     -fx-font-weight: bold;
-    -fx-text-fill: -text-main;
+    -fx-text-fill: #1e293b;
 }
 
 .section-subtitle {
     -fx-font-size: 13px;
-    -fx-text-fill: -text-muted;
+    -fx-text-fill: #64748b;
 }
 
 /* =========================================
    SEARCH BAR (reutilizada en tablas)
    ========================================= */
 .search-bar {
-    -fx-background-color: -bg-main;
+    -fx-background-color: white;
     -fx-background-radius: 10;
     -fx-padding: 8 14;
-    -fx-border-color: -border-light;
+    -fx-border-color: rgba(0, 0, 0, 0.04);
     -fx-border-width: 1;
     -fx-border-radius: 10;
     -fx-spacing: 8;
@@ -328,8 +328,8 @@
 .search-field {
     -fx-background-color: transparent;
     -fx-border-color: transparent;
-    -fx-text-fill: -text-main;
-    -fx-prompt-text-fill: -text-muted;
+    -fx-text-fill: #1e293b;
+    -fx-prompt-text-fill: #64748b;
     -fx-padding: 0;
 }
 
@@ -337,24 +337,24 @@
    CIERRE DE CAJA
    ========================================= */
 .detail-panel-header {
-    -fx-background-color: -bg-surface;
+    -fx-background-color: white;
     -fx-padding: 20 25;
-    -fx-border-color: -border-light;
+    -fx-border-color: rgba(0, 0, 0, 0.04);
     -fx-border-width: 0 0 1 0;
-    -fx-effect: -shadow-sm;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.06), 8, 0, 0, 2);
 }
 
 .closure-user-label {
-    -fx-text-fill: -color-primary;
+    -fx-text-fill: #1e88e5;
     -fx-font-weight: bold;
     -fx-font-size: 14px;
 }
 
 .closure-amount-row {
-    -fx-background-color: -bg-main;
+    -fx-background-color: white;
     -fx-padding: 15;
     -fx-background-radius: 12;
-    -fx-border-color: -border-light;
+    -fx-border-color: rgba(0, 0, 0, 0.04);
     -fx-border-width: 1;
     -fx-border-radius: 12;
 }
@@ -362,17 +362,17 @@
 .closure-amount-cash {
     -fx-font-size: 24px;
     -fx-font-weight: bold;
-    -fx-text-fill: -color-warning;
+    -fx-text-fill: #f59e0b;
 }
 
 .closure-amount-card {
     -fx-font-size: 24px;
     -fx-font-weight: bold;
-    -fx-text-fill: -color-purple;
+    -fx-text-fill: #9c27b0;
 }
 
 .closure-total-highlight {
-    -fx-background-color: linear-gradient(to bottom right, -color-primary, -color-primary-light);
+    -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #1e88e5 0%, #1565c0 100%);
     -fx-padding: 20;
     -fx-background-radius: 12;
 }
@@ -386,19 +386,19 @@
 .closure-stat-value {
     -fx-font-weight: bold;
     -fx-font-size: 14px;
-    -fx-text-fill: -text-main;
+    -fx-text-fill: #1e293b;
 }
 
 .closure-status-pending {
     -fx-font-weight: bold;
     -fx-font-size: 14px;
-    -fx-text-fill: -color-warning;
+    -fx-text-fill: #f59e0b;
 }
 
 .closure-status-done {
     -fx-font-weight: bold;
     -fx-font-size: 14px;
-    -fx-text-fill: -color-success;
+    -fx-text-fill: #10b981;
 }
 
 /* =========================================
@@ -406,26 +406,26 @@
    ========================================= */
 
 .btn-history-print {
-    -fx-background-color: -grad-primary;
+    -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #1e88e5 0%, #1565c0 100%);
     -fx-text-fill: white;
     -fx-font-weight: 800;
     -fx-font-size: 13px;
     -fx-padding: 12 24;
     -fx-background-radius: 10px;
     -fx-cursor: hand;
-    -fx-effect: -shadow-sm;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.06), 8, 0, 0, 2);
     -fx-graphic-text-gap: 10px;
 }
 
 .btn-history-print:hover {
-    -fx-background-color: -color-primary-dark;
-    -fx-effect: -shadow-primary;
+    -fx-background-color: #1565c0;
+    -fx-effect: dropshadow(three-pass-box, rgba(30, 136, 229, 0.25), 15, 0, 0, 5);
     -fx-scale-x: 1.02;
     -fx-scale-y: 1.02;
 }
 
 .btn-history-return {
-    -fx-background-color: linear-gradient(to right, #fb8c00, #f4511e);
+    -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #f59e0b 0%, #fb8c00 100%);
     /* Naranja vibrante */
     -fx-text-fill: white;
     -fx-font-weight: 800;
@@ -433,13 +433,13 @@
     -fx-padding: 12 24;
     -fx-background-radius: 10px;
     -fx-cursor: hand;
-    -fx-effect: dropshadow(three-pass-box, rgba(251, 140, 0, 0.4), 10, 0, 0, 4);
+    -fx-effect: dropshadow(three-pass-box, rgba(245, 158, 11, 0.25), 10, 0, 0, 4);
     -fx-graphic-text-gap: 10px;
 }
 
 .btn-history-return:hover {
-    -fx-background-color: linear-gradient(to right, #f4511e, #e64a19);
-    -fx-effect: dropshadow(three-pass-box, rgba(251, 140, 0, 0.6), 15, 0, 0, 5);
+    -fx-background-color: #fb8c00;
+    -fx-effect: dropshadow(three-pass-box, rgba(245, 158, 11, 0.25), 15, 0, 0, 5);
     -fx-scale-x: 1.02;
     -fx-scale-y: 1.02;
 }
@@ -454,9 +454,9 @@
 }
 
 .btn-history-close {
-    -fx-background-color: -bg-subtle;
-    -fx-text-fill: -text-medium;
-    -fx-border-color: -border-color;
+    -fx-background-color: #f8fafc;
+    -fx-text-fill: #475569;
+    -fx-border-color: #e2e8f0;
     -fx-border-width: 1px;
     -fx-border-radius: 10px;
     -fx-background-radius: 10px;
@@ -467,7 +467,7 @@
 }
 
 .btn-history-close:hover {
-    -fx-background-color: -border-light;
-    -fx-text-fill: -text-main;
-    -fx-border-color: -text-medium;
+    -fx-background-color: rgba(0, 0, 0, 0.04);
+    -fx-text-fill: #1e293b;
+    -fx-border-color: #475569;
 }

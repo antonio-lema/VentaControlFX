@@ -66,8 +66,9 @@ public class PaymentController {
     @FXML
     private void handleCardPayment() {
         handleClose();
-        if (callback != null)
-            callback.onSuccess(totalAmount, 0.0, "Tarjeta");
+        if (callback != null) {
+            Platform.runLater(() -> callback.onSuccess(totalAmount, 0.0, "Tarjeta"));
+        }
     }
 
     @FXML
@@ -76,11 +77,16 @@ public class PaymentController {
             String text = txtGivenAmount.getText().trim().replace(",", ".");
             double given = text.isEmpty() ? totalAmount : Double.parseDouble(text);
 
-            if (given >= totalAmount) {
-                double change = given - totalAmount;
+            // Redondeo preventivo a 2 decimales para evitar errores por milésimas
+            double roundedTotal = Math.round(totalAmount * 100.0) / 100.0;
+            double roundedGiven = Math.round(given * 100.0) / 100.0;
+
+            if (roundedGiven >= roundedTotal) {
+                double change = roundedGiven - roundedTotal;
                 handleClose();
-                if (callback != null)
-                    callback.onSuccess(given, change, "Efectivo");
+                if (callback != null) {
+                    Platform.runLater(() -> callback.onSuccess(given, change, "Efectivo"));
+                }
             } else {
                 txtGivenAmount.setStyle("-fx-border-color: -color-danger; -fx-border-width: 2;");
             }

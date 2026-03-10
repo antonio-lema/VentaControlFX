@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
+<?import java.net.URL?>
+
+<VBox xmlns:fx="http://javafx.com/fxml/1" fx:id="root" spacing="20" styleClass="modern-register-card"
+      prefWidth="450" alignment="TOP_CENTER"
+      fx:controller="com.mycompany.ventacontrolfx.presentation.controller.dialog.CashEntryController">
+
+    <stylesheets>
+        <URL value="@/styles/variables.css" />
+        <URL value="@/styles/components/botones.css" />
+        <URL value="@/styles/components/formularios.css" />
+    </stylesheets>
+
+    <VBox spacing="5" alignment="CENTER" style="-fx-padding: 30 0 10 0;">
+        <StackPane styleClass="estetica-card-icon-wrap, estetica-icon-blue" maxWidth="50" maxHeight="50">
+            <FontAwesomeIconView glyphName="PLUS_CIRCLE" size="24" fill="#3b82f6"/>
+        </StackPane>
+        <Label text="Ingresar Efectivo" styleClass="modern-register-title" />
+        <Label text="Registra una entrada manual en el libro de caja" styleClass="modern-register-subtitle" />
+    </VBox>
+
+    <VBox spacing="15" style="-fx-padding: 0 40 30 40;">
+
+        <!-- Saldo actual informativo -->
+        <HBox spacing="10" alignment="CENTER_LEFT"
+              style="-fx-background-color: #f0fdf4; -fx-padding: 12; -fx-background-radius: 8; -fx-border-color: #bbf7d0; -fx-border-radius: 8;">
+            <FontAwesomeIconView glyphName="INFO_CIRCLE" size="14" fill="#16a34a" />
+            <VBox>
+                <Label text="Efectivo actual en caja:" styleClass="label-muted" />
+                <Label fx:id="lblCurrentCash" text="0,00 €" style="-fx-font-weight: bold; -fx-text-fill: #15803d;" />
+            </VBox>
+        </HBox>
+
+        <!-- Importe -->
+        <VBox spacing="8">
+            <Label text="Importe a Ingresar (€):" styleClass="label" />
+            <HBox spacing="10" alignment="CENTER_LEFT" styleClass="modern-input-container">
+                <FontAwesomeIconView glyphName="MONEY" size="20" fill="#22c55e" />
+                <TextField fx:id="txtAmount" promptText="0,00" HBox.hgrow="ALWAYS" styleClass="modern-input-field"
+                           style="-fx-font-size: 22px; -fx-font-weight: 900;" />
+            </HBox>
+        </VBox>
+
+        <!-- Tipo de ingreso -->
+        <VBox spacing="8">
+            <Label text="Tipo de Ingreso:" styleClass="label" />
+            <ComboBox fx:id="comboType" maxWidth="Infinity" styleClass="modern-combo-box" />
+        </VBox>
+
+        <!-- Motivo -->
+        <VBox spacing="8">
+            <Label text="Motivo / Justificación:" styleClass="label" />
+            <HBox spacing="10" alignment="CENTER_LEFT" styleClass="modern-input-container">
+                <FontAwesomeIconView glyphName="PENCIL" size="14" fill="#94a3b8" />
+                <TextField fx:id="txtReason" promptText="Escribe la justificación..." HBox.hgrow="ALWAYS" styleClass="modern-input-field" />
+            </HBox>
+        </VBox>
+
+        <!-- Botones de Acción -->
+        <HBox spacing="15" alignment="CENTER_RIGHT" style="-fx-padding: 10 0 0 0;">
+            <Button text="CANCELAR" onAction="#handleCancel" styleClass="btn-secondary" prefHeight="45" prefWidth="120" />
+            <Button text="REGISTRAR INGRESO" onAction="#handleConfirm" styleClass="btn-primary" prefHeight="45" HBox.hgrow="ALWAYS" maxWidth="Infinity">
+                <graphic>
+                    <FontAwesomeIconView glyphName="CHECK_CIRCLE" size="16" fill="white" />
+                </graphic>
+            </Button>
+        </HBox>
+    </VBox>
+</VBox>

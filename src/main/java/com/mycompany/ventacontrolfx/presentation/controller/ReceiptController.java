@@ -28,9 +28,9 @@ public class ReceiptController implements Injectable {
 
     @FXML
     private VBox receiptContent, companyHeaderSection, ticketInfoSection, itemsContainer, totalsContainer,
-            barcodeSection, paymentInfoContainer, clientInfoSection;
+            barcodeSection, paymentInfoContainer, clientInfoSection, vatBreakdownContainer;
     @FXML
-    private HBox itemsHeaderHBox;
+    private HBox itemsHeaderHBox, hboxVatTotal;
     @FXML
     private Label lblTicketTitle, lblSuccessMessage, lblDate, lblSubtotal, lblVat, lblTotal, lblPaid, lblChange,
             lblPaymentMethod, lblTotalRight, lblChangeRight, lblGiftIndicator, lblPVPHeader, lblTotalHeader,
@@ -99,18 +99,58 @@ public class ReceiptController implements Injectable {
 
         double totalVatAmount = 0.0;
         double totalSubtotal = 0.0;
+        boolean isInclusive = cfg.isPricesIncludeTax();
+
+        java.util.Map<Double, Double[]> vatBreakdown = new java.util.TreeMap<>();
 
         for (CartItem item : items) {
-            double itemTotal = item.getTotal();
+            double lineTotal = item.getTotal();
             double effectiveRate = item.getProduct().resolveEffectiveIva(cfg.getTaxRate());
-            double itemSubtotal = itemTotal / (1.0 + (effectiveRate / 100.0));
-            totalVatAmount += (itemTotal - itemSubtotal);
+
+            double itemSubtotal;
+            double itemVat;
+            if (isInclusive) {
+                itemSubtotal = lineTotal / (1.0 + (effectiveRate / 100.0));
+                itemVat = lineTotal - itemSubtotal;
+            } else {
+                itemSubtotal = lineTotal;
+                itemVat = lineTotal * (effectiveRate / 100.0);
+            }
+            totalVatAmount += itemVat;
             totalSubtotal += itemSubtotal;
+
+            Double[] vals = vatBreakdown.getOrDefault(effectiveRate, new Double[] { 0.0, 0.0 });
+            vals[0] += itemSubtotal;
+            vals[1] += itemVat;
+            vatBreakdown.put(effectiveRate, vals);
+        }
+
+        // Render breakdown
+        if (vatBreakdownContainer != null) {
+            vatBreakdownContainer.getChildren().clear();
+            for (java.util.Map.Entry<Double, Double[]> entry : vatBreakdown.entrySet()) {
+                HBox row = new HBox();
+                Label lblRate = new Label(String.format("IVA %.0f%%", entry.getKey()));
+                lblRate.setMaxWidth(Double.MAX_VALUE);
+                HBox.setHgrow(lblRate, Priority.ALWAYS);
+                lblRate.setStyle("-fx-font-size: 10; -fx-text-fill: black;");
+
+                Label lblAmount = new Label(String.format(fmt, entry.getValue()[1]));
+                lblAmount.setStyle("-fx-font-size: 10; -fx-text-fill: black;");
+
+                row.getChildren().addAll(lblRate, lblAmount);
+                vatBreakdownContainer.getChildren().add(row);
+            }
+        }
+
+        if (hboxVatTotal != null) {
+            hboxVatTotal.setVisible(vatBreakdown.size() > 1);
+            hboxVatTotal.setManaged(vatBreakdown.size() > 1);
         }
 
         lblSubtotal.setText(String.format(fmt, totalSubtotal));
         lblVat.setText("IVA Incl. " + String.format(fmt, totalVatAmount));
-        lblTotal.setText(String.format(fmt, total));
+        lblTotal.setText(String.format(fmt, currentTotal));
         lblPaid.setText(String.format(fmt, paid));
         lblChange.setText(String.format(fmt, change));
         lblPaymentMethod.setText(paymentMethod);
@@ -232,7 +272,16 @@ public class ReceiptController implements Injectable {
         row.getChildren().addAll(desc, qty);
 
         if (!isGiftMode) {
-            Label price = new Label(String.format("%.2f %s", item.getTotal(), sym));
+            double linePrice = item.getProduct().getPrice();
+            double lineTotal = item.getTotal();
+
+            if (cfg != null && !cfg.isPricesIncludeTax()) {
+                double rate = item.getProduct().resolveEffectiveIva(cfg.getTaxRate());
+                linePrice = linePrice * (1 + (rate / 100.0));
+                lineTotal = lineTotal * (1 + (rate / 100.0));
+            }
+
+            Label price = new Label(String.format("%.2f %s", lineTotal, sym));
             price.setPrefWidth(70);
             price.setAlignment(Pos.CENTER_RIGHT);
             row.getChildren().add(price);

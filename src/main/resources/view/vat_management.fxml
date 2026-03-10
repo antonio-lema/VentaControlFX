@@ -1,0 +1,510 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
+<?import javafx.scene.layout.StackPane?>
+
+<AnchorPane id="AnchorPane" prefHeight="700.0" prefWidth="1000.0" styleClass="main-content-area" stylesheets="@../styles/main.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mycompany.ventacontrolfx.presentation.controller.VatManagementController">
+   <children>
+      <VBox spacing="0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <children>
+            <!-- Header section -->
+            <VBox styleClass="view-header" spacing="0">
+                <children>
+                    <HBox spacing="16" alignment="CENTER_LEFT">
+                        <children>
+                            <StackPane styleClass="view-header-icon-wrap">
+                                <children><FontAwesomeIconView glyphName="PERCENT" size="24" fill="white"/></children>
+                            </StackPane>
+                            <VBox spacing="2">
+                                <children>
+                                    <Label text="Gestión de Impuestos y Precios" styleClass="view-title"/>
+                                    <Label text="Configura las tasas de IVA globales, por categoría, y realiza actualizaciones masivas de precios con múltiples criterios de agrupación." styleClass="view-subtitle"/>
+                                </children>
+                            </VBox>
+                        </children>
+                    </HBox>
+                </children>
+            </VBox>
+            
+            <VBox style="-fx-padding: 25.0;" VBox.vgrow="ALWAYS">
+               <children>
+
+            <TabPane tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS" styleClass="modern-tab-pane">
+              <tabs>
+                <Tab text="Configuración Actual">
+                  <content>
+                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                           <children>
+                              <VBox spacing="25.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="20.0">
+                                 <children>
+                                    <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="info-banner">
+                                       <children>
+                                          <FontAwesomeIconView glyphName="INFO_CIRCLE" size="16" styleClass="text-info" />
+                                          <Label wrapText="true" text="Nota: Los cambios de IVA no afectan a tickets ya emitidos. Los tickets nuevos usarán la tasa vigente en el momento de la venta." styleClass="label-muted" />
+                                       </children>
+                                    </HBox>
+
+                                    <HBox spacing="25.0" VBox.vgrow="ALWAYS">
+                                       <children>
+                                          <!-- Columna Izquierda: Global -->
+                                          <VBox spacing="15.0" HBox.hgrow="ALWAYS" styleClass="config-card">
+                                             <children>
+                                                <Label styleClass="config-card-title" text="Tasa de IVA Global" />
+                                                <HBox alignment="CENTER_LEFT" spacing="15.0">
+                                                   <children>
+                                                      <Label text="Tasa actual:" />
+                                                      <Label fx:id="lblCurrentGlobalVat" styleClass="label-highlight" text="--%" />
+                                                   </children>
+                                                </HBox>
+                                                <VBox spacing="8.0">
+                                                   <children>
+                                                      <Label text="Nueva tasa (%):" />
+                                                      <TextField fx:id="txtGlobalRate" promptText="Ej: 21.0" styleClass="modern-text-field" />
+                                                   </children>
+                                                </VBox>
+                                                <VBox spacing="8.0">
+                                                   <children>
+                                                      <Label text="Motivo del cambio:" />
+                                                      <TextField fx:id="txtGlobalReason" promptText="Obligatorio para auditoría" styleClass="modern-text-field" />
+                                                   </children>
+                                                </VBox>
+                                                <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleUpdateGlobalVat" styleClass="btn-primary" text="Actualizar Global" />
+                                             </children>
+                                          </VBox>
+
+                                          <!-- Columna Derecha: Categoría -->
+                                          <VBox spacing="15.0" HBox.hgrow="ALWAYS" styleClass="config-card">
+                                             <children>
+                                                <Label styleClass="config-card-title" text="Tasa por Categoría" />
+                                                <VBox spacing="8.0">
+                                                   <children>
+                                                      <Label text="Seleccionar categoría:" />
+                                                      <ComboBox fx:id="cmbCategory" maxWidth="1.7976931348623157E308" promptText="Elegir..." styleClass="modern-combo-box" />
+                                                   </children>
+                                                </VBox>
+                                                <VBox spacing="8.0">
+                                                   <children>
+                                                      <Label text="Específica (%):" />
+                                                      <TextField fx:id="txtCategoryRate" promptText="0.0 para heredar global" styleClass="modern-text-field" />
+                                                   </children>
+                                                </VBox>
+                                                <VBox spacing="8.0">
+                                                   <children>
+                                                      <Label text="Motivo:" />
+                                                      <TextField fx:id="txtCategoryReason" promptText="Motivo del cambio" styleClass="modern-text-field" />
+                                                   </children>
+                                                </VBox>
+                                                <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleUpdateCategoryVat" styleClass="config-btn-save" text="Guardar para Categoría" />
+                                             </children>
+                                          </VBox>
+                                       </children>
+                                    </HBox>
+                                 </children>
+                              </VBox>
+                           </children>
+                        </AnchorPane>
+                  </content>
+                </Tab>
+
+                <!-- ═══════════════════════════════════════════════════════════════ -->
+                <!--  PESTAÑA: SUBIDA MASIVA DE PRECIOS — UI DINÁMICA              -->
+                <!-- ═══════════════════════════════════════════════════════════════ -->
+                <Tab text="Subida Masiva de Precios">
+                  <content>
+                    <AnchorPane minHeight="0.0" minWidth="0.0">
+                           <children>
+                              <ScrollPane fitToWidth="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" style="-fx-background-color: transparent; -fx-background: transparent;">
+                                <content>
+                                 <VBox spacing="18.0" style="-fx-padding: 20 30 30 30;">
+                                 <children>
+
+                                     <!-- Top Banner / Header -->
+                                     <HBox styleClass="estetica-header" alignment="CENTER_LEFT" spacing="20">
+                                         <children>
+                                             <VBox styleClass="estetica-header-icon-wrap">
+                                                 <children>
+                                                     <FontAwesomeIconView glyphName="LINE_CHART" size="28" style="-fx-fill: white;" />
+                                                 </children>
+                                             </VBox>
+                                             <VBox spacing="4.0" HBox.hgrow="ALWAYS">
+                                                 <children>
+                                                     <Label styleClass="estetica-title" text="Optimizador de Precios Inteligente" />
+                                                     <Label styleClass="estetica-subtitle" wrapText="true"
+                                                            text="Ajusta tus márgenes de beneficio de forma masiva sobre grupos específicos de productos. Todos los cambios quedan auditados." />
+                                                 </children>
+                                             </VBox>
+                                         </children>
+                                         <VBox.margin>
+                                             <Insets left="-30.0" right="-30.0" top="-20.0" />
+                                         </VBox.margin>
+                                     </HBox>
+
+                                     <!-- ── STEP 1: Selección de Objetivo ─────────────────────────── -->
+                                     <VBox spacing="10.0">
+                                         <children>
+                                             <HBox alignment="CENTER_LEFT" spacing="10">
+                                                 <children>
+                                                     <Label text="1" style="-fx-background-color: -color-primary; -fx-text-fill: white; -fx-background-radius: 50; -fx-min-width: 24; -fx-min-height: 24; -fx-alignment: center; -fx-font-weight: bold;" />
+                                                     <Label styleClass="estetica-card-title" text="Selecciona el grupo de productos" />
+                                                 </children>
+                                             </HBox>
+                                             
+                                             <VBox spacing="16.0" styleClass="estetica-card">
+                                                 <children>
+                                                     <HBox alignment="CENTER_LEFT" spacing="20.0" styleClass="estetica-card-body">
+                                                         <children>
+                                                             <VBox spacing="8.0" HBox.hgrow="ALWAYS">
+                                                                <children>
+                                                                   <Label styleClass="label-bold" text="📋 Tarifa a actualizar:" />
+                                                                   <ComboBox fx:id="cmbPriceListUpdate"
+                                                                             maxWidth="1.7976931348623157E308"
+                                                                             promptText="Selecciona tarifa..."
+                                                                             styleClass="modern-combo-box" />
+                                                                </children>
+                                                             </VBox>
+                                                            <VBox spacing="8.0" HBox.hgrow="ALWAYS">
+                                                               <children>
+                                                                  <Label styleClass="label-bold" text="📦 Criterio de agrupación:" />
+                                                                  <ComboBox fx:id="cmbGroupingType"
+                                                                            maxWidth="1.7976931348623157E308"
+                                                                            promptText="Selecciona cómo agrupar..."
+                                                                            styleClass="modern-combo-box" />
+                                                               </children>
+                                                            </VBox>
+                                                            <VBox spacing="8.0" HBox.hgrow="ALWAYS">
+                                                               <children>
+                                                                  <Label styleClass="label-bold" text="🔧 Tipo de operación:" />
+                                                                  <ComboBox fx:id="cmbPriceUpdateType"
+                                                                            maxWidth="1.7976931348623157E308"
+                                                                            styleClass="modern-combo-box" />
+                                                               </children>
+                                                            </VBox>
+                                                         </children>
+                                                     </HBox>
+                                                 </children>
+                                             </VBox>
+                                         </children>
+                                     </VBox>
+
+                                     <!-- ── STEP 2: Configuración Detallada ─────────────────────────── -->
+                                     <VBox spacing="10.0">
+                                         <children>
+                                             <HBox alignment="CENTER_LEFT" spacing="10">
+                                                 <children>
+                                                     <Label text="2" style="-fx-background-color: -color-primary; -fx-text-fill: white; -fx-background-radius: 50; -fx-min-width: 24; -fx-min-height: 24; -fx-alignment: center; -fx-font-weight: bold;" />
+                                                     <Label styleClass="estetica-card-title" text="Configura los parámetros del filtro" />
+                                                 </children>
+                                             </HBox>
+
+                                             <VBox styleClass="estetica-card">
+                                                <children>
+                                                    <VBox styleClass="estetica-card-body">
+                                                        <children>
+                                                           <!-- Sub-panel: Por CATEGORÍA -->
+                                                           <HBox fx:id="panelCategory" alignment="CENTER_LEFT" spacing="15.0"
+                                                                 visible="true" managed="true"
+                                                                 style="-fx-background-color: -color-primary-bg; -fx-background-radius: 10; -fx-padding: 15;">
+                                                              <children>
+                                                                 <FontAwesomeIconView glyphName="FOLDER_OPEN" size="20" styleClass="text-info" />
+                                                                 <VBox spacing="4.0" HBox.hgrow="ALWAYS">
+                                                                    <children>
+                                                                       <Label styleClass="label-muted" text="Categoría (deja vacío para aplicar a TODAS):" />
+                                                                       <ComboBox fx:id="cmbPriceCategory"
+                                                                                 maxWidth="1.7976931348623157E308"
+                                                                                 promptText="Todas las categorías"
+                                                                                 styleClass="modern-combo-box" />
+                                                                    </children>
+                                                                 </VBox>
+                                                              </children>
+                                                           </HBox>
+
+                                                           <!-- Sub-panel: CLONACIÓN -->
+                                                           <HBox fx:id="panelClone" alignment="CENTER_LEFT" spacing="15.0"
+                                                                 visible="false" managed="false"
+                                                                 style="-fx-background-color: #e3f2fd; -fx-background-radius: 10; -fx-padding: 15;">
+                                                               <children>
+                                                                  <FontAwesomeIconView glyphName="COPY" size="20" style="-fx-fill: #1976d2;" />
+                                                                  <VBox spacing="4.0" HBox.hgrow="ALWAYS">
+                                                                     <children>
+                                                                        <Label styleClass="label-muted" text="Tarifa de ORIGEN (desde la que copiar):" />
+                                                                        <ComboBox fx:id="cmbSourcePriceList"
+                                                                                  maxWidth="1.7976931348623157E308"
+                                                                                  promptText="Selecciona origen..."
+                                                                                  styleClass="modern-combo-box" />
+                                                                     </children>
+                                                                  </VBox>
+                                                                  <VBox spacing="4.0" HBox.hgrow="ALWAYS" alignment="CENTER_LEFT">
+                                                                      <children>
+                                                                         <Label styleClass="label-muted" wrapText="true" style="-fx-font-style: italic;"
+                                                                                text="Se copiarán todos los precios actuales de la tarifa origen a la destino aplicando el % indicado." />
+                                                                      </children>
+                                                                  </VBox>
+                                                               </children>
+                                                           </HBox>
+
+                                                           <!-- Sub-panel: TOP VENDIDOS -->
+                                                           <HBox fx:id="panelTopSellers" alignment="CENTER_LEFT" spacing="20.0"
+                                                                 visible="false" managed="false"
+                                                                 style="-fx-background-color: #fff8e1; -fx-background-radius: 10; -fx-padding: 15;">
+                                                              <children>
+                                                                 <VBox style="-fx-background-color: #f39c12; -fx-background-radius: 8; -fx-padding: 8;">
+                                                                    <children><FontAwesomeIconView glyphName="STAR" size="20" fill="#ffffff" /></children>
+                                                                 </VBox>
+                                                                 <VBox spacing="4.0">
+                                                                    <children>
+                                                                       <Label styleClass="label-muted" text="Top N artículos:" />
+                                                                       <TextField fx:id="txtTopN" prefWidth="100.0" promptText="Ej: 20" styleClass="modern-text-field" />
+                                                                    </children>
+                                                                 </VBox>
+                                                                 <VBox spacing="4.0">
+                                                                    <children>
+                                                                       <Label styleClass="label-muted" text="Análisis últimos días:" />
+                                                                       <TextField fx:id="txtTopDays" prefWidth="120.0" promptText="Ej: 90" styleClass="modern-text-field" />
+                                                                    </children>
+                                                                 </VBox>
+                                                                 <VBox spacing="4.0" HBox.hgrow="ALWAYS" alignment="CENTER_LEFT">
+                                                                    <children>
+                                                                       <Label styleClass="label-muted" wrapText="true" style="-fx-font-style: italic;"
+                                                                              text="Afecta a los productos más exitosos en el periodo." />
+                                                                    </children>
+                                                                 </VBox>
+                                                              </children>
+                                                           </HBox>
+
+                                                           <!-- Sub-panel: MENOS VENDIDOS -->
+                                                           <HBox fx:id="panelBottomSellers" alignment="CENTER_LEFT" spacing="20.0"
+                                                                 visible="false" managed="false"
+                                                                 style="-fx-background-color: #fff3e0; -fx-background-radius: 10; -fx-padding: 15;">
+                                                              <children>
+                                                                 <VBox style="-fx-background-color: #e65100; -fx-background-radius: 8; -fx-padding: 8;">
+                                                                     <children><FontAwesomeIconView glyphName="ARROW_DOWN" size="20" fill="#ffffff" /></children>
+                                                                 </VBox>
+                                                                 <VBox spacing="4.0">
+                                                                    <children>
+                                                                       <Label styleClass="label-muted" text="Artículos (Bottom N):" />
+                                                                       <TextField fx:id="txtBottomN" prefWidth="100.0" promptText="Ej: 5" styleClass="modern-text-field" />
+                                                                    </children>
+                                                                 </VBox>
+                                                                 <VBox spacing="4.0">
+                                                                    <children>
+                                                                       <Label styleClass="label-muted" text="Días sin éxito:" />
+                                                                       <TextField fx:id="txtBottomDays" prefWidth="100.0" promptText="Ej: 90" styleClass="modern-text-field" />
+                                                                    </children>
+                                                                 </VBox>
+                                                                 <VBox spacing="4.0" HBox.hgrow="ALWAYS">
+                                                                    <children>
+                                                                       <Label styleClass="label-muted" wrapText="true"
+                                                                              text="Ideal para promociones sobre stock con baja rotación." />
+                                                                    </children>
+                                                                 </VBox>
+                                                              </children>
+                                                           </HBox>
+
+                                                           <!-- Sub-panel: SIN MOVIMIENTO -->
+                                                           <HBox fx:id="panelSlowMovers" alignment="CENTER_LEFT" spacing="20.0"
+                                                                 visible="false" managed="false"
+                                                                 style="-fx-background-color: #fce4ec; -fx-background-radius: 10; -fx-padding: 15;">
+                                                              <children>
+                                                                 <VBox style="-fx-background-color: #e91e63; -fx-background-radius: 8; -fx-padding: 8;">
+                                                                     <children><FontAwesomeIconView glyphName="CLOCK_ALT" size="20" fill="#ffffff" /></children>
+                                                                 </VBox>
+                                                                 <VBox spacing="4.0">
+                                                                    <children>
+                                                                       <Label styleClass="label-muted" text="Días sin ventas:" />
+                                                                       <TextField fx:id="txtSlowDays" prefWidth="130.0" promptText="Ej: 60" styleClass="modern-text-field" />
+                                                                    </children>
+                                                                 </VBox>
+                                                                 <VBox spacing="4.0" HBox.hgrow="ALWAYS">
+                                                                    <children>
+                                                                       <Label styleClass="label-muted" wrapText="true"
+                                                                              text="Identifica productos 'parados' para liquidación." />
+                                                                    </children>
+                                                                 </VBox>
+                                                              </children>
+                                                           </HBox>
+
+                                                           <!-- Sub-panel: RANGO DE PRECIO -->
+                                                           <HBox fx:id="panelPriceRange" alignment="CENTER_LEFT" spacing="20.0"
+                                                                 visible="false" managed="false"
+                                                                 style="-fx-background-color: #e8f5e9; -fx-background-radius: 10; -fx-padding: 15;">
+                                                              <children>
+                                                                 <VBox style="-fx-background-color: #388e3c; -fx-background-radius: 8; -fx-padding: 8;">
+                                                                     <children><FontAwesomeIconView glyphName="EUR" size="20" fill="#ffffff" /></children>
+                                                                 </VBox>
+                                                                 <VBox spacing="4.0">
+                                                                    <children>
+                                                                       <Label styleClass="label-muted" text="Desde (€):" />
+                                                                       <TextField fx:id="txtMinPrice" prefWidth="110.0" promptText="0.00" styleClass="modern-text-field" />
+                                                                    </children>
+                                                                 </VBox>
+                                                                 <VBox spacing="4.0">
+                                                                    <children>
+                                                                       <Label styleClass="label-muted" text="Hasta (€):" />
+                                                                       <TextField fx:id="txtMaxPrice" prefWidth="110.0" promptText="20.00" styleClass="modern-text-field" />
+                                                                    </children>
+                                                                 </VBox>
+                                                              </children>
+                                                           </HBox>
+
+                                                           <!-- Sub-panel: FAVORITOS -->
+                                                           <HBox fx:id="panelFavorites" alignment="CENTER_LEFT" spacing="20.0"
+                                                                 visible="false" managed="false"
+                                                                 style="-fx-background-color: #fdf3ff; -fx-background-radius: 10; -fx-padding: 15;">
+                                                              <children>
+                                                                 <VBox style="-fx-background-color: #9c27b0; -fx-background-radius: 8; -fx-padding: 8;">
+                                                                     <children><FontAwesomeIconView glyphName="HEART" size="20" fill="#ffffff" /></children>
+                                                                 </VBox>
+                                                                 <Label styleClass="label-muted" wrapText="true" HBox.hgrow="ALWAYS"
+                                                                        text="Se aplicará el ajuste exclusivamente a los productos marcados como favoritos en el catálogo." />
+                                                              </children>
+                                                           </HBox>
+                                                        </children>
+                                                    </VBox>
+                                                </children>
+                                             </VBox>
+                                         </children>
+                                     </VBox>
+
+                                     <!-- ── STEP 3: Aplicación del Reajuste ─────────────────────────── -->
+                                     <VBox spacing="10.0">
+                                         <children>
+                                             <HBox alignment="CENTER_LEFT" spacing="10">
+                                                 <children>
+                                                     <Label text="3" style="-fx-background-color: -color-primary; -fx-text-fill: white; -fx-background-radius: 50; -fx-min-width: 24; -fx-min-height: 24; -fx-alignment: center; -fx-font-weight: bold;" />
+                                                     <Label styleClass="estetica-card-title" text="Define el ajuste y ejecuta" />
+                                                 </children>
+                                             </HBox>
+
+                                             <VBox styleClass="estetica-card">
+                                                <children>
+                                                    <VBox spacing="20.0" styleClass="estetica-card-body">
+                                                        <children>
+                                                           <HBox alignment="CENTER_LEFT" spacing="25.0">
+                                                              <children>
+                                                                 <VBox spacing="6.0" minWidth="150">
+                                                                    <children>
+                                                                       <Label fx:id="lblPriceValue" styleClass="label-bold" text="Valor (%):" />
+                                                                       <TextField fx:id="txtPriceValue" prefWidth="150.0" promptText="Ej: 5 (o -5)" styleClass="modern-text-field" style="-fx-font-size: 16; -fx-font-weight: bold;"/>
+                                                                    </children>
+                                                                 </VBox>
+                                                                 <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+                                                                    <children>
+                                                                       <Label styleClass="label-bold" text="Motivo de la actualización (Auditoría):" />
+                                                                       <TextField fx:id="txtPriceReason"
+                                                                                  promptText="Describe el porqué del cambio (obligatorio)"
+                                                                                  styleClass="modern-text-field" />
+                                                                    </children>
+                                                                 </VBox>
+                                                              </children>
+                                                           </HBox>
+
+                                                           <Button fx:id="btnApplyPriceHike"
+                                                                   maxWidth="1.7976931348623157E308"
+                                                                   mnemonicParsing="false"
+                                                                   onAction="#handleMassivePriceUpdate"
+                                                                   styleClass="estetica-btn-save"
+                                                                   text="🚀  Ejecutar Actualización Masiva">
+                                                              <graphic>
+                                                                  <FontAwesomeIconView glyphName="BOLT" />
+                                                              </graphic>
+                                                           </Button>
+                                                        </children>
+                                                    </VBox>
+                                                </children>
+                                             </VBox>
+                                         </children>
+                                     </VBox>
+                                 </children>
+                                 </VBox>
+                                </content>
+                              </ScrollPane>
+                           </children>
+                        </AnchorPane>
+                  </content>
+                </Tab>
+
+                <!-- ═══════════════════════════════════════════════════════════════ -->
+                <!--  PESTAÑA: HISTORIAL DE REVISIONES                             -->
+                <!-- ═══════════════════════════════════════════════════════════════ -->
+                <Tab text="Historial de Revisiones">
+                  <content>
+                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                           <children>
+                              <VBox spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="10.0">
+                                 <children>
+
+                                    <!-- Filtro de historial IVA -->
+                                    <HBox alignment="CENTER_LEFT" spacing="15.0" styleClass="modern-filter-bar">
+                                       <children>
+                                          <Label styleClass="label-muted" text="Historial de IVA:" />
+                                          <ComboBox fx:id="cmbHistoryScope" prefWidth="200.0" promptText="Seleccionar scope" styleClass="modern-combo-box" />
+                                          <Region HBox.hgrow="ALWAYS" />
+                                          <Button mnemonicParsing="false" onAction="#handleRefreshHistory" styleClass="btn-history-close" text="Refrescar">
+                                             <graphic>
+                                                <FontAwesomeIconView glyphName="REFRESH" />
+                                             </graphic>
+                                          </Button>
+                                       </children>
+                                    </HBox>
+
+                                    <!-- Tabla historial IVA -->
+                                    <TableView fx:id="historyTable" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS" styleClass="modern-table-view">
+                                      <columns>
+                                        <TableColumn fx:id="colDate" prefWidth="150.0" text="FECHA INICIO" />
+                                          <TableColumn fx:id="colEndDate" prefWidth="150.0" text="FECHA CIERRE" />
+                                        <TableColumn fx:id="colScope" prefWidth="120.0" text="ÁMBITO" />
+                                          <TableColumn fx:id="colTarget" prefWidth="150.0" text="AFECTADO" />
+                                          <TableColumn fx:id="colRate" prefWidth="80.0" text="TASA" />
+                                          <TableColumn fx:id="colReason" prefWidth="250.0" text="MOTIVO" />
+                                      </columns>
+                                       <columnResizePolicy>
+                                          <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                                       </columnResizePolicy>
+                                    </TableView>
+
+                                    <!-- Separador -->
+                                    <Label styleClass="section-subtitle" text="▼  Historial de Actualizaciones Masivas de Precios" style="-fx-font-weight:bold; -fx-padding: 10 0 4 0;"/>
+
+                                    <!-- Tabla historial actualizaciones de precio -->
+                                    <TableView fx:id="priceLogTable" prefHeight="180.0" VBox.vgrow="ALWAYS" styleClass="modern-table-view">
+                                       <columns>
+                                          <TableColumn fx:id="colLogDate" prefWidth="150.0" text="FECHA" />
+                                          <TableColumn fx:id="colLogType" prefWidth="160.0" text="TIPO" />
+                                          <TableColumn fx:id="colLogScope" prefWidth="130.0" text="AGRUPACIÓN" />
+                                          <TableColumn fx:id="colLogCategory" prefWidth="150.0" text="DETALLE" />
+                                          <TableColumn fx:id="colLogValue" prefWidth="100.0" text="VALOR" />
+                                          <TableColumn fx:id="colLogProducts" prefWidth="100.0" text="PRODUCTOS" />
+                                          <TableColumn fx:id="colLogReason" prefWidth="250.0" text="MOTIVO" />
+                                       </columns>
+                                       <columnResizePolicy>
+                                          <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                                       </columnResizePolicy>
+                                    </TableView>
+
+                                 </children>
+                              </VBox>
+                           </children></AnchorPane>
+                  </content>
+                </Tab>
+              </tabs>
+            </TabPane>
+         </children>
+      </VBox>
+         </children>
+      </VBox>
+   </children>
+</AnchorPane>

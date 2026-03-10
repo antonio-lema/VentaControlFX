@@ -74,6 +74,16 @@ public class AuthorizationService {
     }
 
     /**
+     * Lanza una excepción si el usuario no tiene el permiso indicado.
+     * Útil para UseCases.
+     */
+    public void checkPermission(String permissionCode) throws SecurityException {
+        if (!hasPermission(permissionCode)) {
+            throw new SecurityException("Acceso denegado: falta el permiso " + permissionCode);
+        }
+    }
+
+    /**
      * Conservado por compatibilidad con código existente.
      * Ahora comprueba el permiso "USUARIOS" en lugar de solo el rol.
      */

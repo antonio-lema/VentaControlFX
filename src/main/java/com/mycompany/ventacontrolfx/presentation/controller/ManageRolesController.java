@@ -18,6 +18,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import com.mycompany.ventacontrolfx.presentation.util.RealTimeSearchBinder;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -43,7 +44,7 @@ public class ManageRolesController implements Injectable {
         loadRoles();
 
         if (txtSearch != null) {
-            txtSearch.textProperty().addListener((observable, oldValue, newValue) -> filterRoles(newValue));
+            RealTimeSearchBinder.bind(txtSearch, query -> filterRoles(query));
         }
     }
 
@@ -109,7 +110,7 @@ public class ManageRolesController implements Injectable {
         btnEdit.setOnAction(e -> handleEditSingleRole(role));
 
         Button btnDelete = new Button();
-        btnDelete.getStyleClass().add("user-action-btn");
+        btnDelete.getStyleClass().addAll("user-action-btn", "btn-trash-small");
         FontAwesomeIconView deleteIcon = new FontAwesomeIconView(FontAwesomeIcon.TRASH);
         deleteIcon.setSize("18");
         btnDelete.setGraphic(deleteIcon);
@@ -139,11 +140,19 @@ public class ManageRolesController implements Injectable {
 
     @FXML
     private void handleNewRole() {
+        if (!container.getUserSession().hasPermission("rol.editar")) {
+            AlertUtil.showError("Acceso Denegado", "No tiene permiso para gestionar roles.");
+            return;
+        }
         ModalService.showTransparentModal("/view/edit_role.fxml", "Nuevo Rol", container, null);
         loadRoles(); // Refresh after modal closes
     }
 
     private void handleEditSingleRole(Role role) {
+        if (!container.getUserSession().hasPermission("rol.editar")) {
+            AlertUtil.showError("Acceso Denegado", "No tiene permiso para gestionar roles.");
+            return;
+        }
         ModalService.showTransparentModal("/view/edit_role.fxml", "Editar Rol", container,
                 (EditRoleController controller) -> {
                     controller.setRole(role);
@@ -152,6 +161,10 @@ public class ManageRolesController implements Injectable {
     }
 
     private void handleDeleteSingleRole(Role role) {
+        if (!container.getUserSession().hasPermission("rol.editar")) {
+            AlertUtil.showError("Acceso Denegado", "No tiene permiso para gestionar roles.");
+            return;
+        }
         if (AlertUtil.showConfirmation("Eliminar Rol", "¿Eliminar rol: " + role.getName() + "?",
                 "Podría afectar a usuarios que dependan de este rol.")) {
             try {

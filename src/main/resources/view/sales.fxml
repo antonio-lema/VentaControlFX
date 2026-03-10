@@ -6,7 +6,7 @@
 <?import javafx.scene.text.Font?>
 <?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
 <?import java.net.URL?>
-
+<?import javafx.scene.layout.StackPane?>
 <AnchorPane id="AnchorPane" prefHeight="750.0" prefWidth="1100.0" styleClass="main-content-area"
             xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="com.mycompany.ventacontrolfx.presentation.controller.HistoryController">
@@ -14,55 +14,62 @@
        <URL value="@/styles/components/historial.css" />
    </stylesheets>
    <children>
-      <VBox spacing="20.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-         <padding>
-            <Insets bottom="10.0" left="25.0" right="25.0" top="25.0" />
-         </padding>
+      <VBox spacing="0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
             <!-- Header Section -->
-            <HBox alignment="CENTER_LEFT" spacing="20.0">
-               <children>
-                  <VBox>
-                     <children>
-                        <Label text="📜 Historial de Ventas" styleClass="section-title"/>
-                        <Label text="Consulta y filtra las ventas por rango de fechas 🔍" styleClass="section-subtitle"/>
-                     </children>
-                  </VBox>
-                  <Region HBox.hgrow="ALWAYS" />
+            <VBox styleClass="view-header" spacing="0">
+                <children>
+                    <HBox spacing="16" alignment="CENTER_LEFT">
+                        <children>
+                            <StackPane styleClass="view-header-icon-wrap">
+                                <children><FontAwesomeIconView glyphName="SHOPPING_CART" size="24" fill="white"/></children>
+                            </StackPane>
+                            <VBox spacing="2">
+                                <children>
+                                    <Label text="Historial de Ventas" styleClass="view-title"/>
+                                    <Label text="Consulta y filtra las ventas por rango de fechas 🔍" styleClass="view-subtitle"/>
+                                </children>
+                            </VBox>
+                            <Region HBox.hgrow="ALWAYS" />
 
-                  <!-- Advanced Range Filter -->
-                  <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="filter-card">
-                     <children>
-                        <VBox spacing="2">
-                           <children>
-                              <Label text="DESDE" styleClass="filter-label-cap" />
-                              <DatePicker fx:id="datePickerStart" onAction="#loadSales" prefWidth="130.0" styleClass="filter-datepicker" />
-                           </children>
-                        </VBox>
-                        <Separator orientation="VERTICAL" prefHeight="30" />
-                        <VBox spacing="2">
-                           <children>
-                              <Label text="HASTA" styleClass="filter-label-cap" />
-                              <DatePicker fx:id="datePickerEnd" onAction="#loadSales" prefWidth="130.0" styleClass="filter-datepicker" />
-                           </children>
-                        </VBox>
-                        <Separator orientation="VERTICAL" prefHeight="30" />
-                        <VBox spacing="2">
-                           <children>
-                              <Label text="BUSCAR TICKET" styleClass="filter-label-cap" />
-                              <TextField fx:id="txtSearchId" promptText="Nº Ticket..." onAction="#handleSearch" prefWidth="100.0" styleClass="filter-search-field" />
-                           </children>
-                        </VBox>
-                        <Button onAction="#loadSales" styleClass="btn-primary" text="Filtrar">
-                           <graphic><FontAwesomeIconView glyphName="SEARCH" fill="WHITE" /></graphic>
-                        </Button>
-                        <Button onAction="#handleClearFilters" styleClass="btn-secondary" text="Limpiar">
-                           <graphic><FontAwesomeIconView glyphName="ERASER" styleClass="sidebar-icon" /></graphic>
-                        </Button>
-                     </children>
-                  </HBox>
-               </children>
-            </HBox>
+                            <!-- Advanced Range Filter -->
+                            <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="filter-card">
+                                <children>
+                                    <VBox spacing="2">
+                                    <children>
+                                        <Label text="DESDE" styleClass="filter-label-cap" />
+                                        <DatePicker fx:id="datePickerStart" onAction="#loadSales" prefWidth="130.0" styleClass="filter-datepicker" />
+                                    </children>
+                                    </VBox>
+                                    <Separator orientation="VERTICAL" prefHeight="30" />
+                                    <VBox spacing="2">
+                                    <children>
+                                        <Label text="HASTA" styleClass="filter-label-cap" />
+                                        <DatePicker fx:id="datePickerEnd" onAction="#loadSales" prefWidth="130.0" styleClass="filter-datepicker" />
+                                    </children>
+                                    </VBox>
+                                    <Separator orientation="VERTICAL" prefHeight="30" />
+                                    <VBox spacing="2">
+                                    <children>
+                                        <Label text="BUSCAR TICKET" styleClass="filter-label-cap" />
+                                        <TextField fx:id="txtSearchId" promptText="Nº Ticket..." onAction="#handleSearch" prefWidth="100.0" styleClass="filter-search-field" />
+                                    </children>
+                                    </VBox>
+                                    <Button onAction="#loadSales" styleClass="btn-primary" text="Filtrar">
+                                    <graphic><FontAwesomeIconView glyphName="SEARCH" fill="WHITE" /></graphic>
+                                    </Button>
+                                    <Button onAction="#handleClearFilters" styleClass="btn-secondary" text="Limpiar">
+                                    <graphic><FontAwesomeIconView glyphName="ERASER" styleClass="sidebar-icon" /></graphic>
+                                    </Button>
+                                </children>
+                            </HBox>
+                        </children>
+                    </HBox>
+                </children>
+            </VBox>
+            
+            <VBox spacing="20.0" VBox.vgrow="ALWAYS" style="-fx-padding: 25;">
+                <children>
 
             <!-- Quick Filters Toolbar -->
             <HBox spacing="10.0" alignment="CENTER_LEFT">
@@ -82,9 +89,9 @@
                         <HBox alignment="CENTER_LEFT" spacing="10.0">
                            <children>
                               <StackPane styleClass="stat-icon-bg stat-icon-bg-blue">
-                                 <children><FontAwesomeIconView glyphName="SHOPPING_CART" size="22" fill="white" /></children>
+                                 <children><FontAwesomeIconView glyphName="SHOPPING_CART" size="22" fill="#ffffff" /></children>
                               </StackPane>
-                              <Label text="🎫 Tickets" styleClass="stat-label" />
+                              <Label text="Tickets" styleClass="stat-label" />
                            </children>
                         </HBox>
                         <Label fx:id="lblTotalSalesCount" text="0" styleClass="stat-value, text-info" />
@@ -95,9 +102,9 @@
                         <HBox alignment="CENTER_LEFT" spacing="10.0">
                            <children>
                               <StackPane styleClass="stat-icon-bg stat-icon-bg-green">
-                                 <children><FontAwesomeIconView glyphName="EURO" size="22" fill="white" /></children>
+                                 <children><FontAwesomeIconView glyphName="EURO" size="22" fill="#ffffff" /></children>
                               </StackPane>
-                              <Label text="💰 Total Recaudado" styleClass="stat-label" />
+                              <Label text="Total Recaudado" styleClass="stat-label" />
                            </children>
                         </HBox>
                         <Label fx:id="lblTotalAmount" text="0,00 €" styleClass="stat-value, text-total" />
@@ -108,9 +115,9 @@
                         <HBox alignment="CENTER_LEFT" spacing="10.0">
                            <children>
                               <StackPane styleClass="stat-icon-bg stat-icon-bg-orange">
-                                 <children><FontAwesomeIconView glyphName="MONEY" size="22" fill="white" /></children>
+                                 <children><FontAwesomeIconView glyphName="MONEY" size="22" fill="#ffffff" /></children>
                               </StackPane>
-                              <Label text="💵 Efectivo" styleClass="stat-label" />
+                              <Label text="Efectivo" styleClass="stat-label" />
                            </children>
                         </HBox>
                         <Label fx:id="lblTotalCash" text="0,00 €" styleClass="stat-value, text-cash" />
@@ -121,9 +128,9 @@
                         <HBox alignment="CENTER_LEFT" spacing="10.0">
                            <children>
                               <StackPane styleClass="stat-icon-bg stat-icon-bg-purple">
-                                 <children><FontAwesomeIconView glyphName="CREDIT_CARD" size="22" fill="white" /></children>
+                                 <children><FontAwesomeIconView glyphName="CREDIT_CARD" size="22" fill="#ffffff" /></children>
                               </StackPane>
-                              <Label text="💳 Tarjeta" styleClass="stat-label" />
+                              <Label text="Tarjeta" styleClass="stat-label" />
                            </children>
                         </HBox>
                         <Label fx:id="lblTotalCard" text="0,00 €" styleClass="stat-value, text-card" />
@@ -149,13 +156,13 @@
                               <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                            </columnResizePolicy>
                         </TableView>
-                        <HBox alignment="CENTER_RIGHT" prefHeight="30.0" spacing="10.0">
+                        <HBox alignment="CENTER_LEFT" prefHeight="30.0" spacing="10.0" style="-fx-padding: 0 10;">
                            <children>
+                              <Label text="Mostrar:" styleClass="label-limit" />
+                              <ComboBox fx:id="cmbRowLimit" prefWidth="90" styleClass="combo-limit" />
+                              <Region HBox.hgrow="ALWAYS" />
                               <Label fx:id="lblCount" text="0 tickets encontrados" styleClass="label-muted" style="-fx-font-weight: bold;" />
                            </children>
-                           <padding>
-                              <Insets right="10.0" />
-                           </padding>
                         </HBox>
                      </children>
                   </VBox>
@@ -232,6 +239,8 @@
                   </VBox>
                </children>
             </HBox>
+            </children>
+            </VBox>
          </children>
       </VBox>
    </children>

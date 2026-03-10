@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
+
+<VBox spacing="15" styleClass="dialog-container, bg-white" prefWidth="450" stylesheets="@../styles/variables.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mycompany.ventacontrolfx.presentation.controller.dialog.PriceListFormController">
+    <padding>
+        <Insets top="24" right="32" bottom="24" left="32"/>
+    </padding>
+
+    <HBox alignment="CENTER_LEFT">
+        <Label fx:id="lblTitle" text="Nueva Tarifa" styleClass="text-2xl, font-bold, text-gray-900"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Button onAction="#handleCancel" styleClass="button-ghost" text="✕" style="-fx-font-size: 16px;"/>
+    </HBox>
+
+    <Separator/>
+
+    <VBox spacing="20">
+        <!-- Campos de la Tarifa -->
+        <VBox spacing="8">
+            <Label text="Nombre de la Tarifa" styleClass="text-sm, font-medium, text-gray-700"/>
+            <TextField fx:id="txtName" promptText="Ej: Tarifa Mayoristas" styleClass="form-control" />
+        </VBox>
+
+        <VBox spacing="8">
+            <Label text="Descripción / Notas" styleClass="text-sm, font-medium, text-gray-700"/>
+            <TextArea fx:id="txtDescription" promptText="Ej: Descuento para distribuidores locales" prefHeight="80" wrapText="true" styleClass="form-control" />
+        </VBox>
+
+        <VBox spacing="8">
+            <CheckBox fx:id="chkIsActive" text="Tarifa Activa" selected="true" styleClass="text-sm, font-medium, text-gray-800"/>
+            <Label text="Si se desactiva, no podrá aplicarse a nuevas ventas o clientes." wrapText="true" styleClass="text-xs, text-gray-500" style="-fx-padding: 0 0 0 25;"/>
+        </VBox>
+
+        <VBox spacing="8" styleClass="bg-gray-50" style="-fx-padding: 15; -fx-background-radius: 8;">
+            <CheckBox fx:id="chkIsDefault" text="Establecer como Tarifa por Defecto" styleClass="text-sm, font-medium, text-gray-800"/>
+            <Label text="Esta será la tarifa base para todos los productos y clientes nuevos." wrapText="true" styleClass="text-xs, text-gray-500" style="-fx-padding: 0 0 0 25;"/>
+        </VBox>
+    </VBox>
+
+    <Region VBox.vgrow="ALWAYS" minHeight="20"/>
+
+    <HBox spacing="10" alignment="CENTER_RIGHT">
+        <Button text="Cancelar" onAction="#handleCancel" styleClass="button-secondary"/>
+        <Button text="Guardar Tarifa" onAction="#handleSave" styleClass="button-primary"/>
+    </HBox>
+</VBox>

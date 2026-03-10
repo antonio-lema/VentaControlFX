@@ -150,7 +150,35 @@
                         </VBox>
                     </VBox>
 
+                    <!-- Tarjeta: Configuración Fiscal -->
+                    <VBox styleClass="config-card" HBox.hgrow="ALWAYS" maxWidth="350">
+                        <HBox styleClass="config-card-header" alignment="CENTER_LEFT" spacing="10">
+                            <StackPane styleClass="config-card-icon-wrap config-icon-orange">
+                                <FontAwesomeIconView glyphName="BALANCE_SCALE" size="16" fill="#fb8c00"/>
+                            </StackPane>
+                            <Label text="Configuración Fiscal" styleClass="config-card-title"/>
+                        </HBox>
+                        <Separator styleClass="config-card-separator"/>
 
+                        <VBox spacing="14" styleClass="config-card-body">
+                            <!-- Impuestos incluidos -->
+                            <VBox spacing="8">
+                                <CheckBox fx:id="chkPricesIncludeTax" text="Los precios ya incluyen IVA"
+                                          styleClass="config-checkbox"/>
+                                <Label text="Marca esta opción si los precios que introduces en el catálogo ya tienen el IVA incluido." 
+                                       styleClass="config-field-hint" wrapText="true"/>
+                            </VBox>
+                            
+                            <Separator styleClass="config-card-separator" style="-fx-opacity: 0.3;"/>
+                            
+                            <VBox spacing="4">
+                                <Label text="Referencia de IVA" styleClass="config-field-label"/>
+                                <Label text="Tasa Global: 21.00%" styleClass="section-title" style="-fx-font-size: 15px;"/>
+                                <Label text="Gestionable desde Administración > IVA" 
+                                       styleClass="config-field-hint" wrapText="true"/>
+                            </VBox>
+                        </VBox>
+                    </VBox>
                 </HBox>
 
                 <!-- ─── FILA 2: Ticket ─── -->

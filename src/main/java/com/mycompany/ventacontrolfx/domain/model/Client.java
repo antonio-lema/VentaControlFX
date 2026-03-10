@@ -14,6 +14,7 @@ public class Client {
     private final StringProperty phone = new SimpleStringProperty();
     private final BooleanProperty isCompany = new SimpleBooleanProperty(false);
     private final StringProperty country = new SimpleStringProperty("España");
+    private final IntegerProperty priceListId = new SimpleIntegerProperty();
 
     public Client() {
     }
@@ -32,6 +33,13 @@ public class Client {
         setCountry(country);
         setEmail(email);
         setPhone(phone);
+        setPriceListId(-1); // Default: use system default
+    }
+
+    public Client(int id, String name, boolean isCompany, String taxId, String address, String postalCode, String city,
+            String province, String country, String email, String phone, int priceListId) {
+        this(id, name, isCompany, taxId, address, postalCode, city, province, country, email, phone);
+        setPriceListId(priceListId);
     }
 
     // ID
@@ -175,5 +183,18 @@ public class Client {
 
     public StringProperty countryProperty() {
         return country;
+    }
+
+    // Price List ID
+    public int getPriceListId() {
+        return priceListId.get();
+    }
+
+    public void setPriceListId(int value) {
+        priceListId.set(value);
+    }
+
+    public IntegerProperty priceListIdProperty() {
+        return priceListId;
     }
 }

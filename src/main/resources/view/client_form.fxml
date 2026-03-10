@@ -24,6 +24,17 @@
         <!-- Form Fields -->
         <VBox spacing="15">
             
+            <!-- Tipo de Cliente -->
+            <VBox styleClass="modern-input-group">
+                <Label text="Tipo de Cliente" styleClass="modern-label" style="-fx-text-fill: #64748b; -fx-font-size: 12px;"/>
+                <HBox styleClass="modern-input-container" alignment="CENTER_LEFT">
+                    <FontAwesomeIconView glyphName="TAGS" size="18" styleClass="sidebar-icon">
+                        <HBox.margin><Insets right="10"/></HBox.margin>
+                    </FontAwesomeIconView>
+                    <javafx.scene.control.ComboBox fx:id="cmbType" promptText="Seleccione tipo..." styleClass="modern-input-field" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+                </HBox>
+            </VBox>
+            
             <!-- Name -->
             <VBox styleClass="modern-input-group">
                 <HBox styleClass="modern-input-container" alignment="CENTER_LEFT">
@@ -110,6 +121,17 @@
                      </HBox>
                 </VBox>
             </HBox>
+
+            <!-- Price List Selector -->
+            <VBox styleClass="modern-input-group">
+                <Label text="Tarifa por Defecto" styleClass="modern-label" style="-fx-text-fill: #64748b; -fx-font-size: 12px;"/>
+                <HBox styleClass="modern-input-container" alignment="CENTER_LEFT">
+                    <FontAwesomeIconView glyphName="MONEY" size="18" styleClass="sidebar-icon">
+                        <HBox.margin><Insets right="10"/></HBox.margin>
+                    </FontAwesomeIconView>
+                    <javafx.scene.control.ComboBox fx:id="cmbPriceList" promptText="Seleccione tarifa por defecto..." styleClass="modern-input-field" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+                </HBox>
+            </VBox>
 
         </VBox>
 

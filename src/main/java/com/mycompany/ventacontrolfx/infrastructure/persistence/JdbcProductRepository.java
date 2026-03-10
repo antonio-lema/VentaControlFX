@@ -10,16 +10,32 @@ public class JdbcProductRepository implements IProductRepository {
 
     @Override
     public List<Product> getAll() throws SQLException {
+        return getAll(-1); // Use default
+    }
+
+    @Override
+    public List<Product> getAll(int priceListId) throws SQLException {
         List<Product> products = new ArrayList<>();
+        String priceSubquery;
+        if (priceListId > 0) {
+            priceSubquery = "COALESCE((SELECT pp.price FROM product_prices pp WHERE pp.product_id = p.product_id AND pp.price_list_id = ? AND pp.end_date IS NULL LIMIT 1), 0.0)";
+        } else {
+            priceSubquery = "COALESCE((SELECT pp.price FROM product_prices pp JOIN price_lists pl ON pp.price_list_id = pl.price_list_id WHERE pp.product_id = p.product_id AND pl.is_default = 1 AND pp.end_date IS NULL LIMIT 1), 0.0)";
+        }
+
         String sql = "SELECT p.*, c.name AS category_name, c.default_iva AS category_iva, " +
-                "COALESCE((SELECT pp.price FROM product_prices pp JOIN price_lists pl ON pp.price_list_id = pl.price_list_id WHERE pp.product_id = p.product_id AND pl.is_default = 1 AND pp.end_date IS NULL LIMIT 1), 0.0) AS current_price "
-                +
+                priceSubquery + " AS current_price " +
                 "FROM products p LEFT JOIN categories c ON p.category_id = c.category_id";
+
         try (Connection conn = DBConnection.getConnection();
-                Statement stmt = conn.createStatement();
-                ResultSet rs = stmt.executeQuery(sql)) {
-            while (rs.next()) {
-                products.add(mapResultSetToProduct(rs));
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            if (priceListId > 0) {
+                pstmt.setInt(1, priceListId);
+            }
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    products.add(mapResultSetToProduct(rs));
+                }
             }
         }
         return products;
@@ -27,16 +43,37 @@ public class JdbcProductRepository implements IProductRepository {
 
     @Override
     public List<Product> getAllVisible() throws SQLException {
+        return getAllVisible(-1);
+    }
+
+    @Override
+    public List<Product> getAllVisible(int priceListId) throws SQLException {
         List<Product> products = new ArrayList<>();
+        String priceSubquery;
+        if (priceListId > 0) {
+            priceSubquery = "COALESCE(" +
+                    "(SELECT pp.price FROM product_prices pp WHERE pp.product_id = p.product_id AND pp.price_list_id = ? AND pp.end_date IS NULL LIMIT 1), "
+                    +
+                    "(SELECT pp.price FROM product_prices pp JOIN price_lists pl ON pp.price_list_id = pl.price_list_id WHERE pp.product_id = p.product_id AND pl.is_default = 1 AND pp.end_date IS NULL LIMIT 1), "
+                    +
+                    "0.0)";
+        } else {
+            priceSubquery = "COALESCE((SELECT pp.price FROM product_prices pp JOIN price_lists pl ON pp.price_list_id = pl.price_list_id WHERE pp.product_id = p.product_id AND pl.is_default = 1 AND pp.end_date IS NULL LIMIT 1), 0.0)";
+        }
+
         String sql = "SELECT p.*, c.name AS category_name, c.default_iva AS category_iva, " +
-                "COALESCE((SELECT pp.price FROM product_prices pp JOIN price_lists pl ON pp.price_list_id = pl.price_list_id WHERE pp.product_id = p.product_id AND pl.is_default = 1 AND pp.end_date IS NULL LIMIT 1), 0.0) AS current_price "
-                +
+                priceSubquery + " AS current_price " +
                 "FROM products p LEFT JOIN categories c ON p.category_id = c.category_id WHERE p.visible = TRUE";
+
         try (Connection conn = DBConnection.getConnection();
-                Statement stmt = conn.createStatement();
-                ResultSet rs = stmt.executeQuery(sql)) {
-            while (rs.next()) {
-                products.add(mapResultSetToProduct(rs));
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            if (priceListId > 0) {
+                pstmt.setInt(1, priceListId);
+            }
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    products.add(mapResultSetToProduct(rs));
+                }
             }
         }
         return products;
@@ -44,16 +81,36 @@ public class JdbcProductRepository implements IProductRepository {
 
     @Override
     public List<Product> getFavorites() throws SQLException {
+        return getFavorites(-1);
+    }
+
+    @Override
+    public List<Product> getFavorites(int priceListId) throws SQLException {
         List<Product> products = new ArrayList<>();
+        String priceSubquery;
+        if (priceListId > 0) {
+            priceSubquery = "COALESCE(" +
+                    "(SELECT pp.price FROM product_prices pp WHERE pp.product_id = p.product_id AND pp.price_list_id = ? AND pp.end_date IS NULL LIMIT 1), "
+                    +
+                    "(SELECT pp.price FROM product_prices pp JOIN price_lists pl ON pp.price_list_id = pl.price_list_id WHERE pp.product_id = p.product_id AND pl.is_default = 1 AND pp.end_date IS NULL LIMIT 1), "
+                    +
+                    "0.0)";
+        } else {
+            priceSubquery = "COALESCE((SELECT pp.price FROM product_prices pp JOIN price_lists pl ON pp.price_list_id = pl.price_list_id WHERE pp.product_id = p.product_id AND pl.is_default = 1 AND pp.end_date IS NULL LIMIT 1), 0.0)";
+        }
+
         String sql = "SELECT p.*, c.name AS category_name, c.default_iva AS category_iva, " +
-                "COALESCE((SELECT pp.price FROM product_prices pp JOIN price_lists pl ON pp.price_list_id = pl.price_list_id WHERE pp.product_id = p.product_id AND pl.is_default = 1 AND pp.end_date IS NULL LIMIT 1), 0.0) AS current_price "
-                +
+                priceSubquery + " AS current_price " +
                 "FROM products p LEFT JOIN categories c ON p.category_id = c.category_id WHERE p.visible = TRUE AND p.is_favorite = TRUE";
         try (Connection conn = DBConnection.getConnection();
-                Statement stmt = conn.createStatement();
-                ResultSet rs = stmt.executeQuery(sql)) {
-            while (rs.next()) {
-                products.add(mapResultSetToProduct(rs));
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            if (priceListId > 0) {
+                pstmt.setInt(1, priceListId);
+            }
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    products.add(mapResultSetToProduct(rs));
+                }
             }
         }
         return products;
@@ -232,6 +289,24 @@ public class JdbcProductRepository implements IProductRepository {
     }
 
     @Override
+    public Product getById(int id) throws SQLException {
+        String sql = "SELECT p.*, c.name AS category_name, c.default_iva AS category_iva, " +
+                "COALESCE((SELECT pp.price FROM product_prices pp JOIN price_lists pl ON pp.price_list_id = pl.price_list_id WHERE pp.product_id = p.product_id AND pl.is_default = 1 AND pp.end_date IS NULL LIMIT 1), 0.0) AS current_price "
+                +
+                "FROM products p LEFT JOIN categories c ON p.category_id = c.category_id WHERE p.product_id = ?";
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, id);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return mapResultSetToProduct(rs);
+                }
+            }
+        }
+        return null;
+    }
+
+    @Override
     public void delete(int id) throws SQLException {
         String sql = "DELETE FROM products WHERE product_id = ?";
         try (Connection conn = DBConnection.getConnection();
@@ -287,6 +362,17 @@ public class JdbcProductRepository implements IProductRepository {
     }
 
     @Override
+    public void updateTaxRateToAll(double taxRate) throws SQLException {
+        String sql = "UPDATE products SET iva = ?, tax_rate = ?";
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setDouble(1, taxRate);
+            pstmt.setDouble(2, taxRate); // Compatibility
+            pstmt.executeUpdate();
+        }
+    }
+
+    @Override
     public int count() throws SQLException {
         String sql = "SELECT COUNT(*) FROM products";
         try (Connection conn = DBConnection.getConnection();
@@ -334,7 +420,7 @@ public class JdbcProductRepository implements IProductRepository {
             // column missing
         }
 
-        return new Product(
+        Product p = new Product(
                 rs.getInt("product_id"),
                 rs.getInt("category_id"),
                 rs.getString("name"),
@@ -345,5 +431,8 @@ public class JdbcProductRepository implements IProductRepository {
                 rs.getString("category_name"),
                 iva,
                 categoryIva);
+        p.setCurrentPrice(calculatedPrice);
+        return p;
     }
+
 }

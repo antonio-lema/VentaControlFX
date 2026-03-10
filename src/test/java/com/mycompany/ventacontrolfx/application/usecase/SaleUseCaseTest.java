@@ -34,7 +34,18 @@ public class SaleUseCaseTest {
         config.setTaxRate(21.0);
         when(configRepository.load()).thenReturn(config);
 
-        saleUseCase = new SaleUseCase(saleRepository, configRepository);
+        com.mycompany.ventacontrolfx.util.AuthorizationService dummyAuth = new com.mycompany.ventacontrolfx.util.AuthorizationService(
+                new com.mycompany.ventacontrolfx.util.UserSession()) {
+            @Override
+            public void checkPermission(String code) {
+            }
+
+            @Override
+            public boolean hasPermission(String code) {
+                return true;
+            }
+        };
+        saleUseCase = new SaleUseCase(saleRepository, configRepository, dummyAuth);
     }
 
     @Test

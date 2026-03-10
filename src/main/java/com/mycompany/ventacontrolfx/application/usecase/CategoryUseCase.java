@@ -7,9 +7,16 @@ import java.util.List;
 
 public class CategoryUseCase {
     private final ICategoryRepository repository;
+    private final com.mycompany.ventacontrolfx.util.AuthorizationService authService;
 
-    public CategoryUseCase(ICategoryRepository repository) {
+    public CategoryUseCase(ICategoryRepository repository,
+            com.mycompany.ventacontrolfx.util.AuthorizationService authService) {
         this.repository = repository;
+        this.authService = authService;
+    }
+
+    public ICategoryRepository getRepository() {
+        return repository;
     }
 
     public List<Category> getAll() throws SQLException {
@@ -25,14 +32,17 @@ public class CategoryUseCase {
     }
 
     public void addCategory(Category category) throws SQLException {
+        authService.checkPermission("PRODUCTOS");
         repository.save(category);
     }
 
     public void updateCategory(Category category) throws SQLException {
+        authService.checkPermission("PRODUCTOS");
         repository.update(category);
     }
 
     public void deleteCategory(int id) throws SQLException {
+        authService.checkPermission("PRODUCTOS");
         repository.delete(id);
     }
 

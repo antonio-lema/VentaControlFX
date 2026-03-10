@@ -23,11 +23,20 @@ public class Sale {
         this.returnedAmount = returnedAmount;
     }
 
+    private Integer closureId; // Connection to cash closure
     private String returnReason;
     private String userName; // New field
     private List<SaleDetail> details = new ArrayList<>();
 
     public Sale() {
+    }
+
+    public Integer getClosureId() {
+        return closureId;
+    }
+
+    public void setClosureId(Integer closureId) {
+        this.closureId = closureId;
     }
 
     public String getUserName() {

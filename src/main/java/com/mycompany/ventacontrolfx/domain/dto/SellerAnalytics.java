@@ -46,4 +46,16 @@ public class SellerAnalytics {
     public void setCardTotal(double cardTotal) { this.cardTotal = cardTotal; }
     public List<Sale> getSales() { return sales; }
     public void setSales(List<Sale> sales) { this.sales = sales; }
+
+    // Nuevas métricas para el Dashboard SaaS Avanzado
+    private double margin;
+    private double goalReachedPercentage;
+    private double returnsTotal;
+
+    public double getMargin() { return margin; }
+    public void setMargin(double margin) { this.margin = margin; }
+    public double getGoalReachedPercentage() { return goalReachedPercentage; }
+    public void setGoalReachedPercentage(double goalReachedPercentage) { this.goalReachedPercentage = goalReachedPercentage; }
+    public double getReturnsTotal() { return returnsTotal; }
+    public void setReturnsTotal(double returnsTotal) { this.returnsTotal = returnsTotal; }
 }

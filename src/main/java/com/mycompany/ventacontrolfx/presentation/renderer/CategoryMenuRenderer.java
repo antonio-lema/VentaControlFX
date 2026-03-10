@@ -6,6 +6,7 @@ import com.mycompany.ventacontrolfx.application.usecase.ProductFilterUseCase.Fil
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.layout.FlowPane;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import java.util.List;
 
 public class CategoryMenuRenderer {
@@ -41,6 +42,18 @@ public class CategoryMenuRenderer {
     private void addSpecialButton(String text, FilterType type) {
         Button btn = new Button(text);
         btn.getStyleClass().add("category-btn");
+
+        FontAwesomeIconView icon = new FontAwesomeIconView();
+        icon.setSize("14");
+        if (type == FilterType.FAVORITES) {
+            icon.setGlyphName("STAR");
+        } else if (type == FilterType.ALL) {
+            icon.setGlyphName("LIST");
+        }
+        icon.setFill(javafx.scene.paint.Color.web("#64748b"));
+        btn.setGraphic(icon);
+        btn.setGraphicTextGap(8);
+
         btn.setUserData(type);
         btn.setOnAction(e -> handler.onSpecialFilterSelected(type));
         categoriesFlowPane.getChildren().add(btn);

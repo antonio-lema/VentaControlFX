@@ -49,6 +49,10 @@ public class SaleConfigController implements Injectable {
     @FXML
     private PasswordField txtEmailPassword;
 
+    // ── Fiscal ────────────────────────────────────────────────────────
+    @FXML
+    private CheckBox chkPricesIncludeTax;
+
     // ── Ticket ────────────────────────────────────────────────────────
     @FXML
     private CheckBox chkShowLogo;
@@ -113,6 +117,11 @@ public class SaleConfigController implements Injectable {
         setComboValue(cmbTicketCopies, cfg.getTicketCopies());
         setComboValue(cmbTicketFormat, cfg.getTicketFormat());
         chkAutoPrint.setSelected(cfg.isAutoPrint());
+
+        // Fiscal
+        if (chkPricesIncludeTax != null) {
+            chkPricesIncludeTax.setSelected(cfg.isPricesIncludeTax());
+        }
 
         // SMTP
         txtSmtpHost.setText(cfg.getSmtpHost());
@@ -185,10 +194,14 @@ public class SaleConfigController implements Injectable {
             cfg.setAppName(txtAppName.getText().trim());
         }
 
-        // Fiscal (Defaults removed from UI)
+        // Fiscal
         cfg.setTaxRate(21.0);
         cfg.setTaxType("IVA General (21%)");
-        cfg.setPricesIncludeTax(true);
+        if (chkPricesIncludeTax != null) {
+            cfg.setPricesIncludeTax(chkPricesIncludeTax.isSelected());
+        } else {
+            cfg.setPricesIncludeTax(true);
+        }
         cfg.setCurrency("EUR — Euro (€)");
         cfg.setDecimals("2 decimales");
 

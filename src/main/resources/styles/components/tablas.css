@@ -4,8 +4,8 @@
 
 .table-view,
 .modern-table-view {
-    -fx-background-color: -bg-surface;
-    -fx-border-color: -border-light;
+    -fx-background-color: #ffffff;
+    -fx-border-color: rgba(0, 0, 0, 0.04);
     -fx-border-width: 1;
     -fx-background-radius: 12;
     -fx-border-radius: 12;
@@ -14,14 +14,14 @@
 
 .table-view:focused,
 .modern-table-view:focused {
-    -fx-background-color: -bg-surface;
+    -fx-background-color: #ffffff;
 }
 
 .table-view .column-header-background,
 .modern-table-view .column-header-background {
-    -fx-background-color: -bg-surface;
+    -fx-background-color: #ffffff;
     -fx-background-radius: 12 12 0 0;
-    -fx-border-color: -border-light;
+    -fx-border-color: rgba(0, 0, 0, 0.04);
     -fx-border-width: 0 0 2 0;
     -fx-padding: 2 0;
 }
@@ -34,7 +34,7 @@
 
 .table-view .column-header .label,
 .modern-table-view .column-header .label {
-    -fx-text-fill: -text-muted;
+    -fx-text-fill: #64748b;
     -fx-font-weight: 800;
     -fx-font-size: 11px;
     -fx-text-transform: uppercase;
@@ -47,8 +47,8 @@
 }
 
 .table-row-cell {
-    -fx-background-color: -bg-surface;
-    -fx-border-color: -border-light;
+    -fx-background-color: #ffffff;
+    -fx-border-color: rgba(0, 0, 0, 0.04);
     -fx-border-width: 0 0 1 0;
     -fx-padding: 8 0;
 }
@@ -59,24 +59,24 @@
 }
 
 .table-row-cell:hover {
-    -fx-background-color: -bg-subtle;
+    -fx-background-color: #f8fafc;
     -fx-cursor: hand;
 }
 
 .table-row-cell:selected {
-    -fx-background-color: -color-primary-bg;
-    -fx-border-color: -color-primary;
+    -fx-background-color: rgba(30, 136, 229, 0.1);
+    -fx-border-color: #1e88e5;
     -fx-border-width: 0 0 0 4;
 }
 
 .table-row-cell:selected .cell {
-    -fx-text-fill: -color-primary-dark;
+    -fx-text-fill: #1565c0;
     -fx-font-weight: bold;
 }
 
 .table-view .cell,
 .modern-table-view .cell {
-    -fx-text-fill: -text-main;
+    -fx-text-fill: #1e293b;
     -fx-font-size: 14px;
     -fx-padding: 8 10;
     -fx-alignment: CENTER_LEFT;
@@ -85,10 +85,10 @@
 
 /* Card contenedor para tablas */
 .table-card {
-    -fx-background-color: -bg-surface;
+    -fx-background-color: white;
     -fx-background-radius: 12;
     -fx-border-radius: 12;
-    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.06), 15, 0, 0, 5);
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.06), 8, 0, 0, 2);
     -fx-padding: 20;
 }
 
@@ -101,8 +101,8 @@
 
 /* Barra de búsqueda contenedor */
 .search-bar {
-    -fx-background-color: -bg-input;
-    -fx-border-color: -border-color;
+    -fx-background-color: white;
+    -fx-border-color: #e2e8f0;
     -fx-border-width: 1.2;
     -fx-border-radius: 10;
     -fx-background-radius: 10;
@@ -112,9 +112,9 @@
 }
 
 .search-bar:focused-within {
-    -fx-border-color: -color-primary;
-    -fx-background-color: -bg-surface;
-    -fx-effect: dropshadow(three-pass-box, rgba(30, 136, 229, 0.15), 8, 0, 0, 2);
+    -fx-border-color: #1e88e5;
+    -fx-background-color: #ffffff;
+    -fx-effect: dropshadow(three-pass-box, rgba(30, 136, 229, 0.25), 15, 0, 0, 5);
 }
 
 /* Campo de texto de búsqueda (sin borde propio, hereda del contenedor) */
@@ -123,20 +123,20 @@
     -fx-border-color: transparent;
     -fx-border-width: 0;
     -fx-background-radius: 0;
-    -fx-text-fill: -text-main;
-    -fx-prompt-text-fill: -text-muted;
+    -fx-text-fill: #1e293b;
+    -fx-prompt-text-fill: #64748b;
     -fx-font-size: 14px;
     -fx-padding: 4 0;
 }
 
 /* row-count-field used in "Ver X filas" */
 .row-count-field {
-    -fx-background-color: -bg-subtle;
+    -fx-background-color: white;
     -fx-background-radius: 8;
-    -fx-border-color: -border-color;
+    -fx-border-color: #e2e8f0;
     -fx-border-width: 1.2;
     -fx-border-radius: 8;
-    -fx-text-fill: -text-main;
+    -fx-text-fill: #1e293b;
     -fx-font-weight: bold;
     -fx-padding: 5 8;
     -fx-alignment: center;
@@ -145,7 +145,7 @@
 }
 
 .row-count-field:focused {
-    -fx-background-color: -bg-surface;
-    -fx-border-color: -color-primary;
-    -fx-effect: dropshadow(three-pass-box, rgba(30, 136, 229, 0.15), 6, 0, 0, 2);
+    -fx-background-color: #ffffff;
+    -fx-border-color: #1e88e5;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.06), 8, 0, 0, 2);
 }

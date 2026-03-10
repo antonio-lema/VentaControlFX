@@ -7,9 +7,12 @@ import java.util.List;
 
 public class ClientUseCase {
     private final IClientRepository repository;
+    private final com.mycompany.ventacontrolfx.util.AuthorizationService authService;
 
-    public ClientUseCase(IClientRepository repository) {
+    public ClientUseCase(IClientRepository repository,
+            com.mycompany.ventacontrolfx.util.AuthorizationService authService) {
         this.repository = repository;
+        this.authService = authService;
     }
 
     public List<Client> getAllClients() throws SQLException {
@@ -21,6 +24,7 @@ public class ClientUseCase {
     }
 
     public void addClient(Client client) throws SQLException {
+        authService.checkPermission("CLIENTES");
         int id = repository.save(client);
         if (id != -1) {
             client.setId(id);
@@ -28,10 +32,12 @@ public class ClientUseCase {
     }
 
     public void updateClient(Client client) throws SQLException {
+        authService.checkPermission("CLIENTES");
         repository.update(client);
     }
 
     public void deleteClient(int id) throws SQLException {
+        authService.checkPermission("CLIENTES");
         repository.delete(id);
     }
 

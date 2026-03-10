@@ -55,7 +55,7 @@ public class PrintPreviewController implements Injectable {
     @FXML
     private HBox barcodeContainer;
     @FXML
-    private VBox totalsContainer;
+    private VBox totalsContainer, vatBreakdownContainer;
     @FXML
     private VBox barcodeSection;
     @FXML
@@ -72,6 +72,8 @@ public class PrintPreviewController implements Injectable {
     private Label lblTotalHeader;
     @FXML
     private VBox paymentInfoContainer;
+    @FXML
+    private HBox hboxVatTotal;
 
     // Labels de cabecera empresa (rellenados desde SaleConfig)
     @FXML
@@ -188,30 +190,66 @@ public class PrintPreviewController implements Injectable {
         }
 
         // Totales con IVA dinámico — agrupado por tasa
+        java.util.Map<Double, Double[]> vatBreakdown = new java.util.TreeMap<>();
+        boolean isInclusive = cfg != null && cfg.isPricesIncludeTax();
         double totalVatAmount = 0.0;
         double totalSubtotal = 0.0;
-        java.util.Map<Double, Double> vatByRate = new java.util.LinkedHashMap<>();
 
         if (currentItems != null) {
             for (CartItem item : currentItems) {
-                double itemTotal = item.getTotal();
-                double effectiveRate = item.getProduct().resolveEffectiveIva(cfg.getTaxRate());
-                double itemSubtotal = itemTotal / (1.0 + (effectiveRate / 100.0));
-                double itemVat = itemTotal - itemSubtotal;
+                double lineTotal = item.getTotal();
+                double effectiveRate = item.getProduct().resolveEffectiveIva(cfg != null ? cfg.getTaxRate() : 21.0);
+
+                double itemBase;
+                double itemVat;
+                if (isInclusive) {
+                    itemBase = lineTotal / (1.0 + (effectiveRate / 100.0));
+                    itemVat = lineTotal - itemBase;
+                } else {
+                    itemBase = lineTotal;
+                    itemVat = lineTotal * (effectiveRate / 100.0);
+                }
+
                 totalVatAmount += itemVat;
-                totalSubtotal += itemSubtotal;
-                vatByRate.merge(effectiveRate, itemVat, Double::sum);
+                totalSubtotal += itemBase;
+
+                Double[] vals = vatBreakdown.getOrDefault(effectiveRate, new Double[] { 0.0, 0.0 });
+                vals[0] += itemBase;
+                vals[1] += itemVat;
+                vatBreakdown.put(effectiveRate, vals);
             }
+        }
+
+        // Render breakdown
+        if (vatBreakdownContainer != null) {
+            vatBreakdownContainer.getChildren().clear();
+            for (java.util.Map.Entry<Double, Double[]> entry : vatBreakdown.entrySet()) {
+                HBox row = new HBox();
+                Label lblRate = new Label(String.format("IVA %.0f%%", entry.getKey()));
+                lblRate.setMaxWidth(Double.MAX_VALUE);
+                HBox.setHgrow(lblRate, Priority.ALWAYS);
+                lblRate.setStyle("-fx-font-size: 10; -fx-text-fill: black;");
+
+                Label lblAmount = new Label(String.format(fmt, entry.getValue()[1]));
+                lblAmount.setStyle("-fx-font-size: 10; -fx-text-fill: black;");
+
+                row.getChildren().addAll(lblRate, lblAmount);
+                vatBreakdownContainer.getChildren().add(row);
+            }
+        }
+
+        if (hboxVatTotal != null) {
+            hboxVatTotal.setVisible(vatBreakdown.size() > 1);
+            hboxVatTotal.setManaged(vatBreakdown.size() > 1);
         }
 
         lblSubtotal.setText(String.format(fmt, totalSubtotal));
         // Construir texto de IVA: si hay varias tasas, mostrar desglose; si hay una
         // sola, mostrar el %
-        if (vatByRate.size() == 1) {
-            double singleRate = vatByRate.keySet().iterator().next();
+        if (vatBreakdown.size() == 1) {
             if (lblVatLabel != null)
-                lblVatLabel.setText("IVA " + String.format("%.0f%%", singleRate));
-        } else if (vatByRate.size() > 1) {
+                lblVatLabel.setText("IVA " + String.format("%.0f%%", vatBreakdown.keySet().iterator().next()));
+        } else if (vatBreakdown.size() > 1) {
             if (lblVatLabel != null)
                 lblVatLabel.setText("IVA (varios tipos)");
         } else {
@@ -424,14 +462,23 @@ public class PrintPreviewController implements Injectable {
             String priceFmt = "%." + dec + "f " + sym;
             String totalFmt = "%." + dec + "f " + sym;
 
-            Label lblPrice = new Label(String.format(priceFmt, item.getProduct().getPrice()));
+            double unitPrice = item.getProduct().getPrice();
+            double lineTotal = item.getTotal();
+
+            if (cfg != null && !cfg.isPricesIncludeTax()) {
+                double rate = item.getProduct().resolveEffectiveIva(cfg.getTaxRate());
+                unitPrice = unitPrice * (1 + (rate / 100.0));
+                lineTotal = lineTotal * (1 + (rate / 100.0));
+            }
+
+            Label lblPrice = new Label(String.format(priceFmt, unitPrice));
             lblPrice.setMinWidth(isA4 ? 100 : 55);
             lblPrice.setPrefWidth(isA4 ? 100 : 55);
             lblPrice.setMaxWidth(isA4 ? 100 : 55);
             lblPrice.setStyle("-fx-alignment: " + (isA4 ? "CENTER" : "CENTER-RIGHT") + "; -fx-font-size: " + fontSize
                     + "; -fx-text-fill: black;");
 
-            Label lblTotal = new Label(String.format(totalFmt, item.getTotal()));
+            Label lblTotal = new Label(String.format(totalFmt, lineTotal));
             lblTotal.setMinWidth(isA4 ? 100 : 55);
             lblTotal.setPrefWidth(isA4 ? 100 : 55);
             lblTotal.setMaxWidth(isA4 ? 100 : 55);

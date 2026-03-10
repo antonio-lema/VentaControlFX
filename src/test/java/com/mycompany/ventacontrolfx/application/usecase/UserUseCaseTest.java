@@ -22,7 +22,18 @@ public class UserUseCaseTest {
     public void setUp() {
         userRepository = mock(IUserRepository.class);
         emailSender = mock(IEmailSender.class);
-        userUseCase = new UserUseCase(userRepository, emailSender);
+        com.mycompany.ventacontrolfx.util.AuthorizationService dummyAuth = new com.mycompany.ventacontrolfx.util.AuthorizationService(
+                new com.mycompany.ventacontrolfx.util.UserSession()) {
+            @Override
+            public void checkPermission(String code) {
+            }
+
+            @Override
+            public boolean hasPermission(String code) {
+                return true;
+            }
+        };
+        userUseCase = new UserUseCase(userRepository, emailSender, dummyAuth);
     }
 
     @Test

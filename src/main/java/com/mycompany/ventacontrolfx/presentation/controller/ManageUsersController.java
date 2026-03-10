@@ -19,6 +19,7 @@ import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import com.mycompany.ventacontrolfx.presentation.util.RealTimeSearchBinder;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -44,7 +45,7 @@ public class ManageUsersController implements Injectable {
         loadUsers();
 
         if (txtSearch != null) {
-            txtSearch.textProperty().addListener((observable, oldValue, newValue) -> filterUsers(newValue));
+            RealTimeSearchBinder.bind(txtSearch, query -> filterUsers(query));
         }
     }
 
@@ -116,7 +117,7 @@ public class ManageUsersController implements Injectable {
         btnEdit.setOnAction(e -> handleEditSingleUser(user));
 
         Button btnDelete = new Button();
-        btnDelete.getStyleClass().add("user-action-btn");
+        btnDelete.getStyleClass().addAll("user-action-btn", "btn-trash-small");
         FontAwesomeIconView deleteIcon = new FontAwesomeIconView(FontAwesomeIcon.TRASH);
         deleteIcon.setSize("18");
         btnDelete.setGraphic(deleteIcon);
@@ -142,11 +143,19 @@ public class ManageUsersController implements Injectable {
 
     @FXML
     private void handleNewUser() {
+        if (!container.getUserSession().hasPermission("usuario.crear")) {
+            AlertUtil.showError("Acceso Denegado", "No tiene permiso para gestionar usuarios.");
+            return;
+        }
         ModalService.showTransparentModal("/view/register_user.fxml", "Registrar Usuario", container, null);
         loadUsers();
     }
 
     private void handleEditSingleUser(User user) {
+        if (!container.getUserSession().hasPermission("usuario.crear")) {
+            AlertUtil.showError("Acceso Denegado", "No tiene permiso para gestionar usuarios.");
+            return;
+        }
         ModalService.showTransparentModal("/view/register_user.fxml", "Editar Usuario", container,
                 (RegisterUserController controller) -> {
                     controller.setUser(user);
@@ -155,6 +164,10 @@ public class ManageUsersController implements Injectable {
     }
 
     private void handleDeleteSingleUser(User user) {
+        if (!container.getUserSession().hasPermission("usuario.crear")) {
+            AlertUtil.showError("Acceso Denegado", "No tiene permiso para gestionar usuarios.");
+            return;
+        }
         if (AlertUtil.showConfirmation("Eliminar Usuario", "¿Eliminar a " + user.getUsername() + "?",
                 "Esta acción es irreversible.")) {
             try {

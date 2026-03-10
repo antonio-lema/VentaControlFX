@@ -23,13 +23,21 @@ import javafx.stage.Stage;
 import java.util.function.Consumer;
 import java.sql.SQLException;
 import java.util.List;
+import javafx.collections.FXCollections;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.scene.input.MouseEvent;
 
 public class ClientsController implements Injectable, com.mycompany.ventacontrolfx.util.Searchable {
 
     @FXML
-    private TextField searchField;
-    @FXML
     private FlowPane clientsListContainer;
+    @FXML
+    private TextField searchField;
     @FXML
     private Label lblCount;
 
@@ -56,7 +64,7 @@ public class ClientsController implements Injectable, com.mycompany.ventacontrol
 
     private void loadClients() {
         try {
-            List<Client> clients = clientUseCase.getAllClients();
+            java.util.List<Client> clients = clientUseCase.getAllClients();
             displayClients(clients);
         } catch (SQLException e) {
             AlertUtil.showError("Error", "No se pudieron cargar los clientes.");
@@ -65,9 +73,6 @@ public class ClientsController implements Injectable, com.mycompany.ventacontrol
 
     @Override
     public void handleSearch(String text) {
-        if (searchField != null) {
-            searchField.setText(text);
-        }
         try {
             displayClients(clientUseCase.searchClients(text));
         } catch (SQLException e) {
@@ -75,105 +80,132 @@ public class ClientsController implements Injectable, com.mycompany.ventacontrol
         }
     }
 
-    private void displayClients(List<Client> clients) {
-        clientsListContainer.getChildren().clear();
-        if (lblCount != null)
-            lblCount.setText(clients.size() + " clientes");
-        if (clients.isEmpty()) {
-            clientsListContainer.getChildren().add(new Label("No se encontraron clientes"));
+    private void displayClients(java.util.List<Client> clients) {
+        if (clientsListContainer == null)
             return;
-        }
+        clientsListContainer.getChildren().clear();
         for (Client client : clients) {
             clientsListContainer.getChildren().add(createClientCard(client));
         }
+        if (lblCount != null)
+            lblCount.setText(clients.size() + " registros encontrados");
     }
 
     private Node createClientCard(Client client) {
         VBox card = new VBox(12);
         card.getStyleClass().add("client-card");
-        card.setStyle("-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 15; " +
-                "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.08), 10, 0, 0, 4); " +
-                "-fx-border-color: #f0f0f0; -fx-border-width: 1; -fx-border-radius: 15;");
         card.setPrefWidth(280);
+        card.setMinWidth(280);
+        card.setStyle("-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 15; " +
+                "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 5); -fx-cursor: hand;");
 
-        // Header with Icon and Name
+        // Cabecera: Icono y Nombre
         HBox header = new HBox(12);
         header.setAlignment(Pos.CENTER_LEFT);
 
-        StackPane iconContainer = new StackPane();
-        iconContainer.setStyle("-fx-background-color: #e3f2fd; -fx-background-radius: 10; -fx-padding: 10;");
-        FontAwesomeIconView userIcon = new FontAwesomeIconView(FontAwesomeIcon.BUILDING);
-        userIcon.setFill(javafx.scene.paint.Color.valueOf("#1e88e5"));
-        userIcon.setSize("20");
-        iconContainer.getChildren().add(userIcon);
+        FontAwesomeIconView icon = new FontAwesomeIconView(
+                client.isIsCompany() ? FontAwesomeIcon.BUILDING : FontAwesomeIcon.USER);
+        icon.setSize("24");
+        icon.setFill(Color.valueOf(client.isIsCompany() ? "#2563eb" : "#64748b"));
 
         VBox nameBox = new VBox(2);
-        Label name = new Label(client.getName());
-        name.setStyle("-fx-font-weight: bold; -fx-font-size: 15; -fx-text-fill: #2c3e50;");
-        name.setWrapText(true);
+        Label nameLabel = new Label(client.getName());
+        nameLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 16; -fx-text-fill: #1e293b;");
+        nameLabel.setWrapText(true);
 
-        Label cif = new Label("CIF: " + client.getTaxId());
-        cif.setStyle("-fx-text-fill: #7f8c8d; -fx-font-size: 12;");
-        nameBox.getChildren().addAll(name, cif);
+        Label typeLabel = new Label(client.isIsCompany() ? "Empresa" : "Particular");
+        typeLabel.setStyle(
+                "-fx-font-size: 11; -fx-text-fill: #94a3b8; -fx-text-transform: uppercase; -fx-letter-spacing: 1;");
 
-        header.getChildren().addAll(iconContainer, nameBox);
+        nameBox.getChildren().addAll(nameLabel, typeLabel);
+        header.getChildren().addAll(icon, nameBox);
 
-        // Separator
-        Separator sep = new Separator();
-        sep.setStyle("-fx-opacity: 0.5;");
+        // Info: CIF, Email, Teléfono
+        VBox info = new VBox(8);
+        info.getChildren().addAll(
+                createDetailItem(FontAwesomeIcon.ID_CARD, client.getTaxId()),
+                createDetailItem(FontAwesomeIcon.ENVELOPE, client.getEmail()),
+                createDetailItem(FontAwesomeIcon.PHONE, client.getPhone()));
 
-        // Actions
-        HBox actions = new HBox(8);
-        actions.setAlignment(Pos.CENTER_RIGHT);
+        // Footer: Ubicación y Botones
+        HBox footer = new HBox();
+        footer.setAlignment(Pos.CENTER_LEFT);
 
-        Button btnSelect = new Button("Seleccionar");
-        btnSelect.setStyle("-fx-background-color: #1e88e5; -fx-text-fill: white; -fx-font-weight: bold; " +
-                "-fx-background-radius: 8; -fx-padding: 8 15; -fx-cursor: hand;");
-        btnSelect.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.CHECK));
-        ((FontAwesomeIconView) btnSelect.getGraphic()).setFill(javafx.scene.paint.Color.WHITE);
-        btnSelect.setOnAction(e -> {
-            if (onClientSelected != null) {
-                onClientSelected.accept(client);
-            } else {
-                container.getCartUseCase().setSelectedClient(client);
-            }
-            handleClose();
-        });
+        Label cityLabel = new Label(client.getCity());
+        cityLabel.setStyle("-fx-font-size: 12; -fx-text-fill: #64748b;");
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, javafx.scene.layout.Priority.ALWAYS);
 
+        HBox actionButtons = new HBox(8);
         Button btnEdit = new Button();
         btnEdit.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.PENCIL));
         btnEdit.setStyle(
-                "-fx-background-color: #f8f9fa; -fx-background-radius: 8; -fx-padding: 8; -fx-cursor: hand; -fx-border-color: #eee; -fx-border-radius: 8;");
-        btnEdit.setOnAction(e -> openClientForm(client));
+                "-fx-background-color: #eff6ff; -fx-text-fill: #1e40af; -fx-background-radius: 5; -fx-padding: 5;");
+        btnEdit.setOnAction(e -> {
+            e.consume();
+            if (container.getUserSession().hasPermission("cliente.editar")) {
+                openClientForm(client);
+            } else {
+                AlertUtil.showError("Acceso Denegado", "No tiene permiso para editar clientes.");
+            }
+        });
 
         Button btnDelete = new Button();
-        btnDelete.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.TRASH));
-        btnDelete.setStyle(
-                "-fx-background-color: #fff5f5; -fx-background-radius: 8; -fx-padding: 8; -fx-cursor: hand; -fx-border-color: #ffe0e0; -fx-border-radius: 8;");
-        ((FontAwesomeIconView) btnDelete.getGraphic()).setFill(javafx.scene.paint.Color.valueOf("#e53935"));
-        btnDelete.setOnAction(e -> handleDelete(client));
+        FontAwesomeIconView trashIcon = new FontAwesomeIconView(FontAwesomeIcon.TRASH);
+        trashIcon.setSize("14");
+        btnDelete.setGraphic(trashIcon);
+        btnDelete.getStyleClass().add("btn-trash-small");
+        btnDelete.setOnAction(e -> {
+            e.consume();
+            handleDelete(client);
+        });
 
-        actions.getChildren().addAll(btnSelect, btnEdit, btnDelete);
-        card.getChildren().addAll(header, sep, actions);
+        actionButtons.getChildren().addAll(btnEdit, btnDelete);
+        footer.getChildren().addAll(cityLabel, spacer, actionButtons);
 
-        // Hover effect
-        card.setOnMouseEntered(e -> card.setStyle(card.getStyle()
-                + "-fx-border-color: #1e88e5; -fx-effect: dropshadow(three-pass-box, rgba(30,136,229,0.2), 15, 0, 0, 6);"));
-        card.setOnMouseExited(
-                e -> card.setStyle(card.getStyle().replace("-fx-border-color: #1e88e5;", "-fx-border-color: #f0f0f0;")
-                        .replace("-fx-effect: dropshadow(three-pass-box, rgba(30,136,229,0.2), 15, 0, 0, 6);",
-                                "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.08), 10, 0, 0, 4);")));
+        card.getChildren().addAll(header, info, footer);
+
+        // Al hacer click en la card (fuera de botones) se selecciona
+        card.setOnMouseClicked(e -> handleSelect(client));
 
         return card;
     }
 
+    private HBox createDetailItem(FontAwesomeIcon glyph, String text) {
+        HBox item = new HBox(10);
+        item.setAlignment(Pos.CENTER_LEFT);
+        FontAwesomeIconView icon = new FontAwesomeIconView(glyph);
+        icon.setSize("14");
+        icon.setFill(Color.valueOf("#94a3b8"));
+        Label label = new Label(text == null || text.isEmpty() ? "---" : text);
+        label.setStyle("-fx-font-size: 13; -fx-text-fill: #475569;");
+        item.getChildren().addAll(icon, label);
+        return item;
+    }
+
+    private void handleSelect(Client client) {
+        if (client == null)
+            return;
+        if (onClientSelected != null) {
+            onClientSelected.accept(client);
+        } else {
+            container.getCartUseCase().setSelectedClient(client);
+        }
+        handleClose();
+    }
+
     @FXML
     private void handleAddClient() {
+        if (!container.getUserSession().hasPermission("cliente.crear")) {
+            AlertUtil.showError("Acceso Denegado", "No tiene permiso para registrar clientes.");
+            return;
+        }
         openClientForm(null);
     }
 
     private void openClientForm(Client client) {
-        ModalService.showTransparentModal("/view/client_form.fxml", client == null ? "Nuevo Cliente" : "Editar Cliente",
+        ModalService.showTransparentModal("/view/client_form.fxml",
+                client == null ? "Nuevo Registro" : "Editar Registro",
                 container, (ClientFormController ctrl) -> {
                     ctrl.init(client);
                 });
@@ -187,7 +219,14 @@ public class ClientsController implements Injectable, com.mycompany.ventacontrol
     }
 
     private void handleDelete(Client client) {
-        if (AlertUtil.showConfirmation("Eliminar", "¿Seguro que desea eliminar a " + client.getName() + "?", "")) {
+        if (client == null)
+            return;
+        if (!container.getUserSession().hasPermission("cliente.eliminar")) {
+            AlertUtil.showError("Acceso Denegado", "No tiene permiso para eliminar clientes.");
+            return;
+        }
+        if (AlertUtil.showConfirmation("Eliminar", "¿Seguro que desea eliminar a " + client.getName() + "?",
+                "Esta acción no se puede deshacer.")) {
             try {
                 clientUseCase.deleteClient(client.getId());
                 loadClients();
@@ -202,12 +241,11 @@ public class ClientsController implements Injectable, com.mycompany.ventacontrol
         if (closeAction != null) {
             closeAction.run();
         } else if (onClientSelected != null) {
-            // Se usa como modal picker
-            if (searchField != null && searchField.getScene() != null && searchField.getScene().getWindow() != null) {
-                ((Stage) searchField.getScene().getWindow()).close();
+            if (clientsListContainer != null && clientsListContainer.getScene() != null
+                    && clientsListContainer.getScene().getWindow() != null) {
+                ((Stage) clientsListContainer.getScene().getWindow()).close();
             }
         } else if (container != null && container.getNavigationService() != null) {
-            // Se usa mediante navegación, volvemos a la vista de venta
             container.getNavigationService().navigateTo("/view/sell_view.fxml");
         }
     }

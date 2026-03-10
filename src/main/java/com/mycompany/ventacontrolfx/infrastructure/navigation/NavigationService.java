@@ -57,11 +57,15 @@ public class NavigationService {
         ACCESS_RULES.put("/view/sales.fxml", "HISTORIAL");
         ACCESS_RULES.put("/view/closure_history.fxml", "CIERRES");
         ACCESS_RULES.put("/view/clients.fxml", "CLIENTES");
-        ACCESS_RULES.put("/view/manage_users.fxml", "USUARIOS");
+        ACCESS_RULES.put("/view/manage_users.fxml", "usuario.crear");
+        ACCESS_RULES.put("/view/manage_roles.fxml", "rol.editar");
         ACCESS_RULES.put("/view/sale_config.fxml", "CONFIGURACION");
-        ACCESS_RULES.put("/view/seller_report.fxml", "HISTORIAL");
-        ACCESS_RULES.put("/view/client_report.fxml", "HISTORIAL");
+        ACCESS_RULES.put("/view/customization_panel.fxml", "CONFIGURACION");
+        ACCESS_RULES.put("/view/seller_report.fxml", "reporte.vendedores");
+        ACCESS_RULES.put("/view/client_report.fxml", "reporte.clientes");
         ACCESS_RULES.put("/view/return_list.fxml", "venta.devolucion");
+        ACCESS_RULES.put("/view/vat_management.fxml", "admin.iva");
+        ACCESS_RULES.put("/view/fiscal_documents.fxml", "HISTORIAL");
     }
 
     /** Vista que debe mostrar el carrito */

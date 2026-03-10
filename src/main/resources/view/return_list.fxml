@@ -6,35 +6,38 @@
 <?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
 
 <VBox xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mycompany.ventacontrolfx.presentation.controller.ReturnListController" 
-      spacing="20" styleClass="main-container">
+      spacing="0" styleClass="main-container">
     <stylesheets>
         <java.net.URL value="@/styles/components/historial.css" />
     </stylesheets>
 
-    <padding>
-        <Insets top="30" right="30" bottom="30" left="30"/>
-    </padding>
-
     <!-- Header Section -->
-    <HBox alignment="CENTER_LEFT" spacing="20">
-        <VBox spacing="5" HBox.hgrow="ALWAYS">
-            <Label text="GESTIÓN DE DEVOLUCIONES" styleClass="title-label"/>
-            <Label text="Control centralizado y auditoría de reembolsos realizados" styleClass="subtitle-label"/>
-        </VBox>
-        <HBox spacing="10" alignment="CENTER_RIGHT">
-             <Button fx:id="btnRefresh" onAction="#loadReturns" styleClass="btn-secondary">
-                <graphic>
-                    <FontAwesomeIconView glyphName="REFRESH" size="14"/>
-                </graphic>
-                <tooltip><Tooltip text="Actualizar lista"/></tooltip>
-            </Button>
-            <Button fx:id="btnExport" onAction="#handleExport" styleClass="btn-info" text="EXPORTAR">
-                <graphic>
-                    <FontAwesomeIconView glyphName="FILE_EXCEL_ALT" size="14" fill="white"/>
-                </graphic>
-            </Button>
-        </HBox>
-    </HBox>
+    <VBox styleClass="view-header" spacing="0" AnchorPane.leftAnchor="-30.0" AnchorPane.rightAnchor="-30.0" AnchorPane.topAnchor="-30.0" style="-fx-margin: -30 -30 0 -30; -fx-padding: 30 35 25 35;">
+        <children>
+            <HBox spacing="16" alignment="CENTER_LEFT">
+                <children>
+                    <StackPane styleClass="view-header-icon-wrap">
+                        <children><FontAwesomeIconView glyphName="REPLY" size="22" fill="white"/></children>
+                    </StackPane>
+                    <VBox spacing="2">
+                        <children>
+                            <Label text="Gestión de Devoluciones" styleClass="view-title"/>
+                            <Label text="Control centralizado y auditoría de reembolsos realizados" styleClass="view-subtitle"/>
+                        </children>
+                    </VBox>
+                    <Region HBox.hgrow="ALWAYS" />
+                    <HBox spacing="10" alignment="CENTER_RIGHT">
+                        <Button fx:id="btnRefresh" onAction="#loadReturns" styleClass="btn-secondary" text="Actualizar">
+                            <graphic><FontAwesomeIconView glyphName="REFRESH" size="14"/></graphic>
+                        </Button>
+                        <Button fx:id="btnExport" onAction="#handleExport" styleClass="btn-info" text="Exportar">
+                            <graphic><FontAwesomeIconView glyphName="FILE_EXCEL_ALT" size="14" fill="white"/></graphic>
+                        </Button>
+                    </HBox>
+                </children>
+            </HBox>
+        </children>
+    </VBox>
 
     <!-- Filters Section -->
     <HBox spacing="15" alignment="CENTER_LEFT" styleClass="filter-card">
@@ -57,7 +60,7 @@
 
         <VBox spacing="5" HBox.hgrow="ALWAYS">
             <Label text="Buscar por motivo o usuario:" styleClass="filter-label-cap"/>
-            <TextField fx:id="txtSearch" promptText="🔍 Escriba para filtrar..." styleClass="modern-textfield"/>
+            <TextField fx:id="txtSearch" promptText="ðŸ” Escriba para filtrar..." styleClass="modern-textfield"/>
         </VBox>
 
         <VBox spacing="5" alignment="BOTTOM_LEFT">
@@ -97,7 +100,7 @@
                     <Label fx:id="lblCount" text="0 registros" styleClass="label-muted"/>
                 </HBox>
                 <Label text="TOTAL REEMBOLSADO:" styleClass="footer-label"/>
-                <Label fx:id="lblTotalRefunded" text="0,00 €" styleClass="footer-value-danger"/>
+                <Label fx:id="lblTotalRefunded" text="0,00 â‚¬" styleClass="footer-value-danger"/>
             </HBox>
         </VBox>
 
@@ -106,9 +109,9 @@
             <HBox prefHeight="6.0" styleClass="detail-panel-accent" />
             <VBox spacing="15.0" styleClass="detail-panel-body" VBox.vgrow="ALWAYS">
                 <VBox alignment="CENTER" spacing="5">
-                    <Label text="📦 DETALLE DE DEVOLUCIÓN" styleClass="filter-label-cap" />
+                    <Label text="ðŸ“¦ DETALLE DE DEVOLUCIÃ“N" styleClass="filter-label-cap" />
                     <HBox spacing="10" alignment="CENTER">
-                        <Label fx:id="lblDetailReturnId" text="Devolución #0000" styleClass="detail-sale-id" />
+                        <Label fx:id="lblDetailReturnId" text="DevoluciÃ³n #0000" styleClass="detail-sale-id" />
                         <Label fx:id="lblDetailSaleId" text="Ticket #0000" styleClass="badge-primary" />
                     </HBox>
                     <Label fx:id="lblDetailDate" text="18/02/2026 15:30" styleClass="label-muted" />
@@ -139,7 +142,7 @@
                     <HBox alignment="CENTER_LEFT" style="-fx-padding: 10 0 0 0;">
                         <Label text="TOTAL ABONADO" styleClass="detail-total-label" />
                         <Region HBox.hgrow="ALWAYS" />
-                        <Label fx:id="lblDetailTotal" text="0,00 €" styleClass="detail-total-value text-danger" />
+                        <Label fx:id="lblDetailTotal" text="0,00 â‚¬" styleClass="detail-total-value text-danger" />
                     </HBox>
                 </VBox>
 

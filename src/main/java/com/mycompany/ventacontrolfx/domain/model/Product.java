@@ -19,6 +19,7 @@ public class Product {
     private String categoryName;
     private Double iva; // Nullable, if null it inherits default_iva from category
     private Double categoryIva; // Inherited from category for resolution logic
+    private double currentPrice; // Precio calculado por la vista según tarifa activa actual
 
     public Product() {
         this.visible = true;
@@ -157,6 +158,14 @@ public class Product {
         this.categoryIva = categoryIva;
     }
 
+    public double getCurrentPrice() {
+        return currentPrice;
+    }
+
+    public void setCurrentPrice(double currentPrice) {
+        this.currentPrice = currentPrice;
+    }
+
     /**
      * Resolves the effective IVA for this product based on the priority:
      * 1. Product IVA (if set)
@@ -166,7 +175,7 @@ public class Product {
     public double resolveEffectiveIva(double globalIva) {
         if (iva != null)
             return iva;
-        if (categoryIva != null)
+        if (categoryIva != null && categoryIva > 0)
             return categoryIva;
         return globalIva;
     }

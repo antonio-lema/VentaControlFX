@@ -21,8 +21,7 @@
 .view-header {
     -fx-background-color: -fx-grad-primary;
     -fx-padding: 28 40;
-    -fx-effect: dropshadow(three-pass-box, rgba(15, 23, 42, 0.2), 15, 0, 0, 5),
-        inset 0 1 0 0 rgba(255, 255, 255, 0.1);
+    -fx-effect: dropshadow(three-pass-box, -fx-shadow-color-subtle, 15, 0, 0, 5);
 }
 
 .view-header-icon-wrap {

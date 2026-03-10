@@ -6,9 +6,9 @@
 /* HEADER                                                                    */
 /* ========================================================================= */
 .config-page-header {
-    -fx-background-color: -grad-primary;
+    -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #1e88e5 0%, #1565c0 100%);
     -fx-padding: 25 35;
-    -fx-effect: -shadow-primary;
+    -fx-effect: dropshadow(three-pass-box, rgba(30, 136, 229, 0.25), 15, 0, 0, 5);
 }
 
 .config-page-title {
@@ -33,26 +33,26 @@
 /* CARDS & CONTAINERS                                                        */
 /* ========================================================================= */
 .config-card {
-    -fx-background-color: -bg-surface;
+    -fx-background-color: #ffffff;
     -fx-background-radius: 12px;
     -fx-border-radius: 12px;
-    -fx-border-color: -border-light;
+    -fx-border-color: rgba(0, 0, 0, 0.04);
     -fx-border-width: 1px;
-    -fx-effect: -shadow-md;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.12), 12, 0, 0, 4);
 }
 
 .config-card-header {
     -fx-padding: 16 20;
-    -fx-background-color: -bg-subtle;
+    -fx-background-color: #f8fafc;
     -fx-background-radius: 12px 12px 0 0;
-    -fx-border-color: -border-light;
+    -fx-border-color: rgba(0, 0, 0, 0.04);
     -fx-border-width: 0 0 1px 0;
 }
 
 .config-card-title {
     -fx-font-size: 16px;
     -fx-font-weight: 800;
-    -fx-text-fill: -text-main;
+    -fx-text-fill: #1e293b;
 }
 
 .config-card-separator {
@@ -71,15 +71,15 @@
 }
 
 .config-icon-blue {
-    -fx-background-color: -color-primary-bg;
+    -fx-background-color: rgba(30, 136, 229, 0.1);
 }
 
 .config-icon-green {
-    -fx-background-color: -color-success-bg;
+    -fx-background-color: rgba(16, 185, 129, 0.1);
 }
 
 .config-icon-orange {
-    -fx-background-color: -color-warning-bg;
+    -fx-background-color: rgba(245, 158, 11, 0.1);
 }
 
 /* ========================================================================= */
@@ -88,20 +88,20 @@
 .config-field-label {
     -fx-font-size: 13px;
     -fx-font-weight: bold;
-    -fx-text-fill: -text-medium;
+    -fx-text-fill: #334155;
     -fx-padding: 0 0 6 0;
 }
 
 .config-field-hint {
     -fx-font-size: 11px;
-    -fx-text-fill: -text-muted;
+    -fx-text-fill: #64748b;
     -fx-padding: 4 0 0 0;
 }
 
 .config-input-container {
-    -fx-background-color: -bg-input;
+    -fx-background-color: #f1f5f9;
     -fx-background-radius: 8px;
-    -fx-border-color: -border-color;
+    -fx-border-color: #e2e8f0;
     -fx-border-radius: 8px;
     -fx-border-width: 1px;
     -fx-padding: 0 12px;
@@ -110,14 +110,14 @@
 }
 
 .config-input-container:focused-within {
-    -fx-background-color: -bg-surface;
-    -fx-border-color: -color-primary;
-    -fx-effect: dropshadow(three-pass-box, rgba(30, 136, 229, 0.2), 5, 0, 0, 0);
+    -fx-background-color: #ffffff;
+    -fx-border-color: #1e88e5;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.06), 8, 0, 0, 2);
 }
 
 .modern-input-field {
     -fx-background-color: transparent;
-    -fx-text-fill: -text-main;
+    -fx-text-fill: #1e293b;
     -fx-font-size: 14px;
     -fx-padding: 8px 5px;
 }
@@ -129,7 +129,7 @@
 }
 
 .modern-combo-box>.list-cell {
-    -fx-text-fill: -text-main;
+    -fx-text-fill: #1e293b;
     -fx-background-color: transparent;
 }
 
@@ -138,20 +138,20 @@
 }
 
 .modern-combo-box>.arrow-button>.arrow {
-    -fx-background-color: -text-muted;
+    -fx-background-color: #64748b;
 }
 
 .config-input-container:focused-within .modern-combo-box>.arrow-button>.arrow {
-    -fx-background-color: -color-primary;
+    -fx-background-color: #1e88e5;
 }
 
 /* Input Icons */
 .sidebar-icon {
-    -fx-fill: -text-muted;
+    -fx-fill: #64748b;
 }
 
 .config-input-container:focused-within .sidebar-icon {
-    -fx-fill: -color-primary;
+    -fx-fill: #1e88e5;
 }
 
 /* Checkboxes */
@@ -160,7 +160,7 @@
 }
 
 .config-checkbox {
-    -fx-text-fill: -text-main;
+    -fx-text-fill: #1e293b;
     -fx-font-size: 14px;
     -fx-font-weight: normal;
 }
@@ -169,25 +169,25 @@
 /* BUTTONS & ACTIONS                                                         */
 /* ========================================================================= */
 .config-btn-save {
-    -fx-background-color: -grad-success;
+    -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #10b981 0%, #059669 100%);
     -fx-text-fill: white;
     -fx-font-weight: bold;
     -fx-font-size: 14px;
     -fx-padding: 10 24;
     -fx-background-radius: 8px;
     -fx-cursor: hand;
-    -fx-effect: -shadow-sm;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.06), 8, 0, 0, 2);
 }
 
 .config-btn-save:hover {
-    -fx-background-color: -color-success-dark;
-    -fx-effect: -shadow-md;
+    -fx-background-color: #059669;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.12), 12, 0, 0, 4);
 }
 
 .btn-secondary {
-    -fx-background-color: -bg-subtle;
-    -fx-text-fill: -text-main;
-    -fx-border-color: -border-color;
+    -fx-background-color: #f8fafc;
+    -fx-text-fill: #1e293b;
+    -fx-border-color: #e2e8f0;
     -fx-border-radius: 6px;
     -fx-background-radius: 6px;
     -fx-padding: 6 12;
@@ -196,12 +196,12 @@
 }
 
 .btn-secondary:hover {
-    -fx-background-color: -border-light;
+    -fx-background-color: rgba(0, 0, 0, 0.04);
 }
 
 .config-btn-reset {
     -fx-background-color: transparent;
-    -fx-text-fill: -text-muted;
+    -fx-text-fill: #64748b;
     -fx-border-color: transparent;
     -fx-cursor: hand;
     -fx-font-size: 14px;
@@ -209,18 +209,18 @@
 }
 
 .config-btn-reset:hover {
-    -fx-text-fill: -color-danger;
+    -fx-text-fill: #ef4444;
 }
 
 .config-btn-reset:hover .glyph-icon {
-    -fx-fill: -color-danger;
+    -fx-fill: #ef4444;
 }
 
 /* ========================================================================= */
 /* FEEDBACK BANNERS                                                          */
 /* ========================================================================= */
 .config-banner-success {
-    -fx-background-color: -color-success-bg;
+    -fx-background-color: rgba(16, 185, 129, 0.1);
     -fx-border-color: rgba(76, 175, 80, 0.4);
     -fx-border-width: 1px;
     -fx-border-radius: 8px;
@@ -229,7 +229,7 @@
 }
 
 .config-banner-text {
-    -fx-text-fill: -color-success-dark;
+    -fx-text-fill: #059669;
     -fx-font-weight: bold;
     -fx-font-size: 14px;
 }
@@ -237,5 +237,21 @@
 /* Scroll area */
 .detail-scroll {
     -fx-background-color: transparent;
-    -fx-background: -bg-main;
+    -fx-background: #f1f5f9;
+}
+
+/* Info Banners */
+.info-banner {
+    -fx-background-color: rgba(30, 136, 229, 0.1);
+    -fx-padding: 15;
+    -fx-background-radius: 10;
+    -fx-border-color: rgba(30, 136, 229, 0.2);
+    -fx-border-width: 1;
+    -fx-border-radius: 10;
+}
+
+.label-highlight {
+    -fx-font-size: 18px;
+    -fx-font-weight: 900;
+    -fx-text-fill: #1565c0;
 }

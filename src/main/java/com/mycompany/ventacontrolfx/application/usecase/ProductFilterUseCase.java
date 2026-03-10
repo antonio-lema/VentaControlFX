@@ -48,6 +48,20 @@ public class ProductFilterUseCase {
                 .collect(Collectors.toList());
     }
 
+    public List<Product> applyCurrentFilter() {
+        switch (currentType) {
+            case FAVORITES:
+                return applyFavorites();
+            case CATEGORY:
+                return applyCategory((Category) currentCriteria);
+            case SEARCH:
+                return applySearch((String) currentCriteria);
+            case ALL:
+            default:
+                return applyAll();
+        }
+    }
+
     public FilterType getCurrentType() {
         return currentType;
     }

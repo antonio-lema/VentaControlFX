@@ -12,10 +12,14 @@ public class ProductGridRenderer {
     private final TilePane productsPane;
     private final Label labelCountProducts;
     private final Consumer<Product> onAddToCart;
+    private final double globalTaxRate;
+    private final boolean pricesIncludeTax;
 
-    public ProductGridRenderer(TilePane productsPane, Label labelCountProducts, Consumer<Product> onAddToCart) {
+    public ProductGridRenderer(TilePane productsPane, Label labelCountProducts, double globalTaxRate, boolean pricesIncludeTax, Consumer<Product> onAddToCart) {
         this.productsPane = productsPane;
         this.labelCountProducts = labelCountProducts;
+        this.globalTaxRate = globalTaxRate;
+        this.pricesIncludeTax = pricesIncludeTax;
         this.onAddToCart = onAddToCart;
     }
 
@@ -25,7 +29,7 @@ public class ProductGridRenderer {
             labelCountProducts.setText(String.valueOf(products.size()));
 
         for (Product p : products) {
-            ProductBox box = new ProductBox(p, onAddToCart);
+            ProductBox box = new ProductBox(p, globalTaxRate, pricesIncludeTax, onAddToCart);
             productsPane.getChildren().add(box);
         }
     }

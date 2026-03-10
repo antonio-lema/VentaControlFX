@@ -37,16 +37,9 @@
                 </HBox>
             </VBox>
             
-            <!-- Price -->
-             <VBox styleClass="modern-input-group">
-                <HBox styleClass="modern-input-container" alignment="CENTER_LEFT">
-                    <FontAwesomeIconView glyphName="MONEY" size="18" styleClass="sidebar-icon">
-                         <HBox.margin>
-                            <Insets right="10"/>
-                        </HBox.margin>
-                    </FontAwesomeIconView> 
-                    <TextField fx:id="txtPrice" promptText="Precio" styleClass="modern-input-field" HBox.hgrow="ALWAYS"/>
-                </HBox>
+            <!-- Dynamic Prices -->
+            <VBox fx:id="vboxPrices" spacing="15" styleClass="modern-input-group">
+                 <!-- Price fields will be injected here dynamically -->
             </VBox>
             
             <!-- Category -->

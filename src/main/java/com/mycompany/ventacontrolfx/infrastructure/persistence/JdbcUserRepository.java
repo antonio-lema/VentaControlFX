@@ -232,4 +232,105 @@ public class JdbcUserRepository implements IUserRepository {
             return ps.executeUpdate() > 0;
         }
     }
+
+    @Override
+    public void saveRecoveryCode(String email, String codeHash, java.time.LocalDateTime expiresAt) throws SQLException {
+        String sql = "INSERT INTO password_recoveries (email, code_hash, expires_at) VALUES (?, ?, ?)";
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, email);
+            ps.setString(2, codeHash);
+            ps.setTimestamp(3, java.sql.Timestamp.valueOf(expiresAt));
+            ps.executeUpdate();
+        }
+    }
+
+    @Override
+    public boolean verifyRecoveryCode(String email, String code) throws SQLException {
+        // 1. Verificar que no se hayan superado los intentos máximos (fix V-01: Rate
+        // Limiting)
+        if (getRecoveryAttempts(email) >= 5) {
+            return false; // Código bloqueado por demasiados intentos
+        }
+
+        String sql = "SELECT code_hash FROM password_recoveries WHERE email = ? AND is_used = FALSE AND expires_at > NOW() ORDER BY created_at DESC LIMIT 1";
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, email);
+            try (java.sql.ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    String storedHash = rs.getString("code_hash");
+                    boolean correct = org.mindrot.jbcrypt.BCrypt.checkpw(code, storedHash);
+                    if (!correct) {
+                        // Incrementar contador de fallos para activar bloqueo progresivo
+                        incrementRecoveryAttempts(email);
+                    }
+                    return correct;
+                }
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public void markRecoveryCodeAsUsed(String email, String code) throws SQLException {
+        String sql = "UPDATE password_recoveries SET is_used = TRUE WHERE email = ? AND is_used = FALSE";
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, email);
+            ps.executeUpdate();
+        }
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // Fix V-01: Métodos de seguridad para recuperación de contraseña
+    // ─────────────────────────────────────────────────────────────
+
+    @Override
+    public String findEmailByUsername(String username) throws SQLException {
+        // Este método NO requiere permisos. Solo devuelve el email, sin datos
+        // sensibles.
+        String sql = "SELECT email FROM users WHERE username = ?";
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, username);
+            try (java.sql.ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getString("email");
+                }
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public int getRecoveryAttempts(String email) throws SQLException {
+        // Cuenta los intentos fallidos en los registros activos (no usados, no
+        // expirados)
+        String sql = "SELECT COALESCE(SUM(attempts), 0) FROM password_recoveries " +
+                "WHERE email = ? AND is_used = FALSE AND expires_at > NOW()";
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, email);
+            try (java.sql.ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        }
+        return 0;
+    }
+
+    @Override
+    public void incrementRecoveryAttempts(String email) throws SQLException {
+        // Incrementa el contador de intentos; si llega a 5, invalida el código
+        String sql = "UPDATE password_recoveries SET attempts = attempts + 1, " +
+                "is_used = CASE WHEN attempts + 1 >= 5 THEN TRUE ELSE FALSE END " +
+                "WHERE email = ? AND is_used = FALSE AND expires_at > NOW()";
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, email);
+            ps.executeUpdate();
+        }
+    }
 }

@@ -44,7 +44,7 @@ public class JdbcSaleRepository implements ISaleRepository {
 
     @Override
     public void saveSaleDetails(List<SaleDetail> details, int saleId) throws SQLException {
-        String sql = "INSERT INTO sale_details (sale_id, product_id, quantity, unit_price, line_total, iva_rate, iva_amount) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO sale_details (sale_id, product_id, quantity, unit_price, line_total, iva_rate, iva_amount, product_name_snapshot) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = DBConnection.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
             for (SaleDetail detail : details) {
@@ -55,6 +55,7 @@ public class JdbcSaleRepository implements ISaleRepository {
                 pstmt.setDouble(5, detail.getLineTotal());
                 pstmt.setDouble(6, detail.getIvaRate());
                 pstmt.setDouble(7, detail.getIvaAmount());
+                pstmt.setString(8, detail.getProductName());
                 pstmt.addBatch();
             }
             pstmt.executeBatch();
@@ -64,7 +65,8 @@ public class JdbcSaleRepository implements ISaleRepository {
     @Override
     public List<SaleDetail> getDetailsBySaleId(int saleId) throws SQLException {
         List<SaleDetail> details = new ArrayList<>();
-        String sql = "SELECT sd.*, COALESCE(p.name, 'Producto No Encontrado') as product_name " +
+        String sql = "SELECT sd.*, COALESCE(sd.product_name_snapshot, p.name, 'Producto No Encontrado') as product_name "
+                +
                 "FROM sale_details sd " +
                 "LEFT JOIN products p ON sd.product_id = p.product_id " +
                 "WHERE sd.sale_id = ?";
@@ -316,6 +318,7 @@ public class JdbcSaleRepository implements ISaleRepository {
         sale.setReturn(rs.getBoolean("is_return"));
         sale.setReturnReason(rs.getString("return_reason"));
         sale.setReturnedAmount(rs.getDouble("returned_amount"));
+        sale.setClosureId((Integer) rs.getObject("closure_id"));
         return sale;
     }
 }

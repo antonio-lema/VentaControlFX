@@ -6,23 +6,23 @@
 <?import javafx.scene.text.*?>
 <?import de.jensd.fx.glyphs.fontawesome.*?>
 
-<VBox spacing="0" styleClass="estetica-root"
+<VBox spacing="0" styleClass="main-content-area" style="-fx-padding: 0;"
       xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="com.mycompany.ventacontrolfx.presentation.controller.CashClosureController"
       maxWidth="Infinity" maxHeight="Infinity">
 
     <!-- Header Area Modernizado -->
-    <VBox styleClass="estetica-header" spacing="0">
+    <VBox styleClass="view-header" spacing="0">
         <HBox alignment="CENTER_LEFT" spacing="20">
-            <StackPane styleClass="estetica-header-icon-wrap">
-                <FontAwesomeIconView glyphName="CALCULATOR" size="22" fill="white"/>
+            <StackPane styleClass="view-header-icon-wrap">
+                <FontAwesomeIconView glyphName="CALCULATOR" size="24" fill="white"/>
             </StackPane>
             <VBox spacing="2">
-                <Label text="Arqueo y Cierre de Caja" styleClass="estetica-title"/>
+                <Label text="Arqueo y Cierre de Caja" styleClass="view-title"/>
                 <HBox spacing="10" alignment="CENTER_LEFT">
-                    <Label fx:id="lblDate" text="20 Feb, 2026" styleClass="estetica-subtitle"/>
-                    <Label text="•" styleClass="estetica-subtitle"/>
-                    <Label fx:id="lblCurrentUser" text="Admin" styleClass="estetica-subtitle" style="-fx-font-weight: bold;"/>
+                    <Label fx:id="lblDate" text="20 Feb, 2026" styleClass="view-subtitle"/>
+                    <Label text="•" styleClass="view-subtitle"/>
+                    <Label fx:id="lblCurrentUser" text="Admin" styleClass="view-subtitle" style="-fx-font-weight: bold;"/>
                 </HBox>
             </VBox>
             <Region HBox.hgrow="ALWAYS"/>
@@ -61,22 +61,22 @@
 
                     <!-- Saldo actual prominente -->
                     <VBox alignment="CENTER" spacing="4" style="-fx-padding: 10 0 6 0;">
-                        <Label fx:id="lblCashInDrawer" text="🏦 Sin sesión"
+                        <Label fx:id="lblCashInDrawer" text="Sin sesión"
                                style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: -text-muted;"/>
-                        <Label fx:id="lblActiveFund" text="⚠️ Sin fondo de caja"
+                        <Label fx:id="lblActiveFund" text="Sin fondo de caja"
                                style="-fx-font-size: 12px; -fx-text-fill: -color-warning; -fx-font-weight: bold;"/>
                     </VBox>
 
                     <!-- Botones de gestión de caja -->
                     <VBox styleClass="estetica-card-body" spacing="8">
                         <Button fx:id="btnOpenFund" onAction="#handleOpenFund"
-                                maxWidth="Infinity" text="💼 ABRIR CAJA CON FONDO"
+                                maxWidth="Infinity" text="ABRIR CAJA CON FONDO"
                                 styleClass="btn-success"/>
                         <Button fx:id="btnWithdrawCash" onAction="#handleWithdrawCash"
-                                maxWidth="Infinity" text="💸 RETIRAR EFECTIVO"
+                                maxWidth="Infinity" text="RETIRAR EFECTIVO"
                                 styleClass="btn-danger" disable="true"/>
                         <Button fx:id="btnRegisterCashEntry" onAction="#handleRegisterCashEntry"
-                                maxWidth="Infinity" text="➕ INGRESAR EFECTIVO"
+                                maxWidth="Infinity" text="INGRESAR EFECTIVO"
                                 styleClass="btn-primary" disable="true"/>
                     </VBox>
                 </VBox>
@@ -94,18 +94,18 @@
                     </HBox>
                     <VBox styleClass="estetica-card-body" spacing="18">
                         <VBox spacing="5" styleClass="closure-amount-row">
-                            <Label text="💵 Efectivo vendido" styleClass="label-muted"/>
+                            <Label text="Efectivo vendido" styleClass="label-muted"/>
                             <Label fx:id="lblTotalCash" text="0,00 €" styleClass="closure-amount-cash" style="-fx-font-size: 20px;"/>
                         </VBox>
 
                         <VBox spacing="5" styleClass="closure-amount-row">
-                            <Label text="💳 Tarjeta" styleClass="label-muted"/>
+                            <Label text="Tarjeta" styleClass="label-muted"/>
                             <Label fx:id="lblTotalCard" text="0,00 €" styleClass="closure-amount-card" style="-fx-font-size: 20px;"/>
                         </VBox>
 
                         <!-- Devoluciones -->
                         <VBox fx:id="containerReturns" spacing="5" styleClass="closure-amount-row" visible="false" managed="false">
-                            <Label text="↩️ Devoluciones" styleClass="label-muted"/>
+                            <Label text="Devoluciones" styleClass="label-muted"/>
                             <Label fx:id="lblTotalReturns" text="0,00 €"
                                    style="-fx-text-fill: -color-danger; -fx-font-weight: bold; -fx-font-size: 20px;"/>
                         </VBox>

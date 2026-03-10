@@ -15,11 +15,14 @@ import java.util.Map;
 public class SaleUseCase {
     private final ISaleRepository saleRepository;
     private final ICompanyConfigRepository configRepository;
+    private final com.mycompany.ventacontrolfx.util.AuthorizationService authService;
     private CashClosureUseCase cashClosureUseCase;
 
-    public SaleUseCase(ISaleRepository saleRepository, ICompanyConfigRepository configRepository) {
+    public SaleUseCase(ISaleRepository saleRepository, ICompanyConfigRepository configRepository,
+            com.mycompany.ventacontrolfx.util.AuthorizationService authService) {
         this.saleRepository = saleRepository;
         this.configRepository = configRepository;
+        this.authService = authService;
     }
 
     /** Inyecta el use case de caja para registrar movimientos de devolución. */
@@ -29,27 +32,48 @@ public class SaleUseCase {
 
     public int processSale(List<CartItem> cartItems, double total, String paymentMethod, Integer clientId, int userId)
             throws SQLException {
+        authService.checkPermission("VENTAS");
+        // ── REGLA DE NEGOCIO: Validar caja abierta ──
+        if (cashClosureUseCase != null && !cashClosureUseCase.hasActiveFund()) {
+            throw new SQLException(
+                    "OPERACION_BLOQUEADA: La caja no ha sido abierta. Debe establecer un fondo de caja antes de realizar ventas.");
+        }
+
         SaleConfig config = configRepository.load();
         double globalTaxRate = config.getTaxRate();
 
         double calculatedTotalIva = 0.0;
         List<SaleDetail> details = new ArrayList<>();
 
+        boolean isInclusive = config.isPricesIncludeTax();
+
         for (CartItem item : cartItems) {
-            double itemTotal = item.getTotal();
+            double lineTotal = Math.round(item.getTotal() * 100.0) / 100.0;
             double effectiveRate = item.getProduct().resolveEffectiveIva(globalTaxRate);
 
-            double itemBase = itemTotal / (1.0 + (effectiveRate / 100.0));
-            double itemIva = itemTotal - itemBase;
+            double itemBase;
+            double itemIva;
+
+            if (isInclusive) {
+                itemBase = Math.round((lineTotal / (1.0 + (effectiveRate / 100.0))) * 100.0) / 100.0;
+                itemIva = Math.round((lineTotal - itemBase) * 100.0) / 100.0;
+            } else {
+                itemIva = Math.round((lineTotal * (effectiveRate / 100.0)) * 100.0) / 100.0;
+                itemBase = lineTotal;
+                lineTotal = Math.round((itemBase + itemIva) * 100.0) / 100.0;
+            }
+
             calculatedTotalIva += itemIva;
 
             SaleDetail d = new SaleDetail();
             d.setProductId(item.getProduct().getId());
             d.setQuantity(item.getQuantity());
             d.setUnitPrice(item.getProduct().getPrice());
-            d.setLineTotal(itemTotal);
+            d.setLineTotal(lineTotal);
             d.setIvaRate(effectiveRate);
             d.setIvaAmount(itemIva);
+            // ── Snapshot fiscal: nombre del producto en el momento de la venta ──
+            d.setProductName(item.getProduct().getName());
             details.add(d);
         }
 
@@ -57,7 +81,7 @@ public class SaleUseCase {
         sale.setSaleDateTime(LocalDateTime.now());
         sale.setUserId(userId);
         sale.setClientId(clientId);
-        sale.setTotal(total); 
+        sale.setTotal(total);
         sale.setPaymentMethod(paymentMethod);
         sale.setIva(calculatedTotalIva);
         sale.setReturn(false);
@@ -70,6 +94,7 @@ public class SaleUseCase {
     }
 
     public List<Sale> getHistory(LocalDate start, LocalDate end) throws SQLException {
+        authService.checkPermission("HISTORIAL");
         return saleRepository.getByRange(start, end);
     }
 
@@ -79,10 +104,12 @@ public class SaleUseCase {
 
     /**
      * Registra una devolución parcial o total de una venta.
-     * Implementa consistencia transaccional: si el registro en caja falla, se revierte todo.
+     * Implementa consistencia transaccional: si el registro en caja falla, se
+     * revierte todo.
      */
     public void registerPartialReturn(int saleId, Map<Integer, Integer> returnItems, String reason,
             int userId) throws SQLException {
+        authService.checkPermission("VENTAS");
         Sale sale = saleRepository.getById(saleId);
         if (sale == null)
             return;
@@ -107,13 +134,15 @@ public class SaleUseCase {
                             saleRepository.updateDetailReturnedQuantity(d.getDetailId(), newTotalReturn, conn);
                             d.setReturnedQuantity(newTotalReturn);
 
-                            double lineRefund = qtyToReturnNow * d.getUnitPrice();
+                            // USAR PRECIO FINAL (CON IVA) PARA LA DEVOLUCIÓN
+                            double unitRefundPrice = d.getLineTotal() / d.getQuantity();
+                            double lineRefund = qtyToReturnNow * unitRefundPrice;
                             refundAmountForThisTransaction += lineRefund;
 
                             ReturnDetail rd = new ReturnDetail();
                             rd.setProductId(d.getProductId());
                             rd.setQuantity(qtyToReturnNow);
-                            rd.setUnitPrice(d.getUnitPrice());
+                            rd.setUnitPrice(unitRefundPrice);
                             rd.setSubtotal(lineRefund);
                             newReturnDetails.add(rd);
                         }
@@ -123,6 +152,11 @@ public class SaleUseCase {
                 }
 
                 if (refundAmountForThisTransaction > 0) {
+                    // Validación de efectivo disponible para la devolución
+                    if (cashClosureUseCase != null) {
+                        cashClosureUseCase.validateCashAvailableForReturn(refundAmountForThisTransaction);
+                    }
+
                     Return newReturn = new Return();
                     newReturn.setSaleId(saleId);
                     newReturn.setUserId(userId);
@@ -135,12 +169,15 @@ public class SaleUseCase {
                     saleRepository.saveReturnDetails(newReturnDetails, returnId, conn);
 
                     double newTotalReturned = sale.getReturnedAmount() + refundAmountForThisTransaction;
-                    saleRepository.updateSaleReturnStatus(saleId, allReturned, allReturned ? reason : reason + " (Parcial)",
+                    saleRepository.updateSaleReturnStatus(saleId, allReturned,
+                            allReturned ? reason : reason + " (Parcial)",
                             newTotalReturned, conn);
 
-                    // Registrar en el libro mayor de caja si la venta original fue en efectivo
-                    if (cashClosureUseCase != null && "Efectivo".equalsIgnoreCase(sale.getPaymentMethod())) {
-                        String cashReason = String.format("[Devolución Ticket #%d] %s", saleId, reason);
+                    // Las devoluciones se hacen SIEMPRE en efectivo, independientemente de cómo se
+                    // pagó
+                    if (cashClosureUseCase != null) {
+                        String cashReason = String.format("[Devolución Ticket #%d - Origen: %s] %s",
+                                saleId, sale.getPaymentMethod(), reason);
                         cashClosureUseCase.registerCashReturn(refundAmountForThisTransaction, cashReason, userId, conn);
                     }
                 }
@@ -148,7 +185,8 @@ public class SaleUseCase {
                 conn.commit();
             } catch (Exception e) {
                 conn.rollback();
-                if (e instanceof SQLException) throw (SQLException) e;
+                if (e instanceof SQLException)
+                    throw (SQLException) e;
                 throw new SQLException("Error durante la transacción de devolución: " + e.getMessage(), e);
             }
         }
@@ -179,6 +217,7 @@ public class SaleUseCase {
     }
 
     public List<Return> getReturnsHistory(LocalDate start, LocalDate end) throws SQLException {
+        authService.checkPermission("HISTORIAL");
         return saleRepository.getReturnsByRange(start, end);
     }
 }

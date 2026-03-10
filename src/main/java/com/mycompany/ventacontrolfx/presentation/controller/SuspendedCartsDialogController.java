@@ -129,7 +129,7 @@ public class SuspendedCartsDialogController implements Injectable {
                 return new TableCell<>() {
                     private final Button btnDelete = new Button();
                     {
-                        btnDelete.getStyleClass().add("btn-remove-line");
+                        btnDelete.getStyleClass().addAll("btn-remove-line", "btn-trash-small");
                         FontAwesomeIconView icon = new FontAwesomeIconView(FontAwesomeIcon.TRASH);
                         icon.setSize("14");
                         btnDelete.setGraphic(icon);

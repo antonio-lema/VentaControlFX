@@ -6,21 +6,47 @@ import com.mycompany.ventacontrolfx.domain.repository.ICashClosureRepository;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 public class CashClosureUseCase {
     private final ICashClosureRepository repository;
+    private final com.mycompany.ventacontrolfx.util.AuthorizationService authService;
 
-    public CashClosureUseCase(ICashClosureRepository repository) {
+    public CashClosureUseCase(ICashClosureRepository repository,
+            com.mycompany.ventacontrolfx.util.AuthorizationService authService) {
         this.repository = repository;
+        this.authService = authService;
     }
 
     public void performClosure(CashClosure closure) throws SQLException {
-        // Permitir múltiples cierres si hay transacciones pendientes.
-        // El repositorio ya se encarga de cerrar solo lo que tiene closure_id IS NULL.
-        if (repository.getPendingTransactionCount() == 0) {
-            throw new SQLException("No hay transacciones pendientes para realizar un cierre.");
+        authService.checkPermission("CIERRES");
+        // Enriquecer el cierre con datos de auditoría antes de guardar
+        Map<String, Double> totals = repository.getPendingTotals();
+
+        double cashSales = totals.getOrDefault("cash", 0.0);
+        double initialFund = repository.getActiveFundAmount();
+        double currentCash = repository.getCurrentCashInDrawer();
+
+        // Populate manual movement totals
+        closure.setCashIn(totals.getOrDefault("manual_in", 0.0));
+        closure.setCashOut(totals.getOrDefault("manual_out", 0.0));
+
+        closure.setInitialFund(initialFund);
+        closure.setExpectedCash(currentCash);
+
+        // Determinamos el estado según la diferencia
+        double diff = closure.getActualCash() - currentCash;
+        closure.setDifference(diff);
+
+        if (Math.abs(diff) < 0.01) {
+            closure.setStatus("CUADRADO");
+        } else {
+            closure.setStatus("DESCUADRE");
         }
+
+        // El repositorio.save usará estos campos para la auditoría
         repository.save(closure);
     }
 
@@ -32,7 +58,7 @@ public class CashClosureUseCase {
         return repository.getProductSummary(closureId);
     }
 
-    public java.util.Map<String, Double> getTodayTotals() throws SQLException {
+    public Map<String, Double> getTodayTotals() throws SQLException {
         return repository.getPendingTotals();
     }
 
@@ -54,14 +80,15 @@ public class CashClosureUseCase {
      * Abre la caja con el fondo inicial indicado.
      * Lanza excepción si ya hay una sesión activa hoy.
      */
-    public void openCashFund(double initialAmount, int userId) throws SQLException {
+    public void openCashFund(double initialAmount, String notes, int userId) throws SQLException {
+        authService.checkPermission("CIERRES");
         if (repository.hasActiveFund()) {
             throw new SQLException("Ya hay un fondo de caja abierto para hoy.");
         }
         if (initialAmount < 0) {
             throw new SQLException("El fondo inicial no puede ser negativo.");
         }
-        repository.openCashFund(initialAmount, userId);
+        repository.openCashFund(initialAmount, notes, userId);
     }
 
     /**
@@ -69,6 +96,7 @@ public class CashClosureUseCase {
      * Valida que haya suficiente efectivo disponible.
      */
     public void withdrawCash(double amount, String reason, int userId) throws SQLException {
+        authService.checkPermission("CIERRES");
         if (amount <= 0) {
             throw new SQLException("El importe de retirada debe ser mayor que cero.");
         }
@@ -112,6 +140,7 @@ public class CashClosureUseCase {
      * @throws SQLException si el efectivo es insuficiente
      */
     public void registerCashEntry(double amount, String reason, int userId) throws SQLException {
+        authService.checkPermission("CIERRES");
         if (amount <= 0) {
             throw new SQLException("El importe de ingreso debe ser mayor que cero.");
         }
@@ -132,9 +161,10 @@ public class CashClosureUseCase {
         double available = repository.getCurrentCashInDrawer();
         if (returnAmount > available) {
             throw new SQLException(String.format(
-                    "No hay suficiente efectivo en caja para esta devolución.\n" +
-                            "Efectivo disponible: %.2f €\nImporte a devolver: %.2f €\n\n" +
-                            "Debe retirar menos dinero o añadir más fondo de caja.",
+                    "❌ No hay suficiente efectivo en caja para esta devolución.\n\n" +
+                            "🏦 Efectivo actual: %.2f €\n" +
+                            "💸 Importe solicitado: %.2f €\n\n" +
+                            "⚠️ Se requiere un fondo de caja mayor para cubrir este reembolso.",
                     available, returnAmount));
         }
     }
@@ -143,29 +173,32 @@ public class CashClosureUseCase {
      * Registra una devolución en efectivo en el libro mayor de caja.
      * Valida el saldo disponible antes de permitir la operación.
      *
-     * @param amount   importe a devolver
-     * @param reason   motivo de la devolución
-     * @param userId   usuario que realiza la devolución
+     * @param amount importe a devolver
+     * @param reason motivo de la devolución
+     * @param userId usuario que realiza la devolución
      * @throws SQLException si el efectivo es insuficiente o falla la BD
      */
     public void registerCashReturn(double amount, String reason, int userId) throws SQLException {
+        authService.checkPermission("CIERRES");
         if (amount <= 0) {
             throw new SQLException("El importe de la devolución debe ser mayor que cero.");
         }
-        double available = repository.getCurrentCashInDrawer();
-        if (amount > available) {
-            throw new SQLException(String.format(
-                    "❌ No hay suficiente efectivo en caja para esta devolución.\n" +
-                            "💵 Disponible en caja: %.2f €\n" +
-                            "💸 Importe a devolver: %.2f €\n\n" +
-                            "Añade más fondo de caja antes de procesar esta devolución.",
-                    available, amount));
-        }
+        validateCashAvailableForReturn(amount);
         repository.registerCashReturn(amount, reason, userId);
     }
 
     public void registerCashReturn(double amount, String reason, int userId, Connection conn) throws SQLException {
-        // En transacciones, asumimos que la validación de saldo ya se hizo o se hará
+        // Validación obligatoria de saldo incluso en transacciones
+        validateCashAvailableForReturn(amount);
         repository.registerCashReturn(amount, reason, userId, conn);
+    }
+
+    public List<ICashClosureRepository.CashMovement> getMovementsByClosure(int closureId) throws SQLException {
+        return repository.getMovementsByClosure(closureId);
+    }
+
+    public void markAsReviewed(int closureId, int reviewerId) throws SQLException {
+        authService.checkPermission("CIERRES");
+        repository.markAsReviewed(closureId, reviewerId);
     }
 }

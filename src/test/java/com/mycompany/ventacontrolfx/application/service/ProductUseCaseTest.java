@@ -28,7 +28,18 @@ public class ProductUseCaseTest {
     @BeforeEach
     public void setUp() {
         mockRepo = Mockito.mock(IProductRepository.class);
-        useCase = new ProductUseCase(mockRepo);
+        com.mycompany.ventacontrolfx.util.AuthorizationService dummyAuth = new com.mycompany.ventacontrolfx.util.AuthorizationService(
+                new com.mycompany.ventacontrolfx.util.UserSession()) {
+            @Override
+            public void checkPermission(String code) {
+            }
+
+            @Override
+            public boolean hasPermission(String code) {
+                return true;
+            }
+        };
+        useCase = new ProductUseCase(mockRepo, dummyAuth);
     }
 
     @Test

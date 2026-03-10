@@ -12,34 +12,35 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
 public class ProductBox extends VBox {
 
-    public ProductBox(Product product, Consumer<Product> onAddToCart) {
+    public ProductBox(Product product, double globalTaxRate, boolean pricesIncludeTax, Consumer<Product> onAddToCart) {
         this.getStyleClass().add("product-box");
         this.setPrefWidth(200); // Antes 180
 
         // Image Container
         StackPane imageContainer = new StackPane();
         imageContainer.getStyleClass().add("product-image-container");
-        imageContainer.setPrefHeight(150); // Antes 140
-        imageContainer.setMinHeight(150);
-        imageContainer.setMaxHeight(150);
+        imageContainer.setPrefHeight(170);
+        imageContainer.setMinHeight(170);
+        imageContainer.setMaxHeight(170);
         imageContainer.setAlignment(Pos.CENTER);
 
         // Clip for top corners
-        Rectangle clip = new Rectangle(200, 150);
-        clip.setArcWidth(15);
-        clip.setArcHeight(15);
+        Rectangle clip = new Rectangle(200, 170);
+        clip.setArcWidth(28);
+        clip.setArcHeight(28);
         imageContainer.setClip(clip);
 
         // Image Logic
         ImageView imageView = new ImageView();
-        imageView.setFitHeight(150);
+        imageView.setFitHeight(170);
         imageView.setFitWidth(200);
-        imageView.setPreserveRatio(true);
+        imageView.setPreserveRatio(false);
 
         if (product.getImagePath() != null && !product.getImagePath().isEmpty()) {
             File file = resolveFile(product.getImagePath());
@@ -54,27 +55,26 @@ public class ProductBox extends VBox {
         }
 
         // Info Container
-        VBox infoBox = new VBox(8);
+        VBox infoBox = new VBox(6);
         infoBox.getStyleClass().add("product-info");
+        infoBox.setAlignment(Pos.TOP_LEFT);
 
         Label nameLabel = new Label(product.getName());
         nameLabel.getStyleClass().add("product-name");
         nameLabel.setWrapText(true);
-        nameLabel.setMinHeight(45); // Antes 40
-        nameLabel.setMaxHeight(45);
+        nameLabel.setMinHeight(40);
+        nameLabel.setMaxHeight(40);
 
-        HBox priceBox = new HBox(10);
-        priceBox.setAlignment(Pos.CENTER_LEFT);
+        double displayPrice = product.getCurrentPrice();
+        if (!pricesIncludeTax) {
+            double rate = product.resolveEffectiveIva(globalTaxRate);
+            displayPrice = product.getCurrentPrice() * (1 + (rate / 100.0));
+        }
 
-        Label priceLabel = new Label(String.format("%.2f €", product.getPrice()));
+        Label priceLabel = new Label(String.format("%.2f €", displayPrice));
         priceLabel.getStyleClass().add("product-price-badge");
 
-        Region spacer = new Region();
-        HBox.setHgrow(spacer, Priority.ALWAYS);
-
-        priceBox.getChildren().addAll(priceLabel, spacer);
-
-        infoBox.getChildren().addAll(nameLabel, priceBox);
+        infoBox.getChildren().addAll(nameLabel, priceLabel);
 
         this.getChildren().addAll(imageContainer, infoBox);
 
@@ -84,6 +84,11 @@ public class ProductBox extends VBox {
                 onAddToCart.accept(product);
             }
         });
+    }
+
+    // Constructor legacy por si acaso
+    public ProductBox(Product product, Consumer<Product> onAddToCart) {
+        this(product, 21.0, true, onAddToCart);
     }
 
     private File resolveFile(String path) {
@@ -109,9 +114,18 @@ public class ProductBox extends VBox {
         return null;
     }
 
-    private Label createPlaceholder() {
-        Label placeholder = new Label("No Image");
-        placeholder.setTextFill(Color.GRAY);
-        return placeholder;
+    private VBox createPlaceholder() {
+        FontAwesomeIconView icon = new FontAwesomeIconView();
+        icon.setGlyphName("IMAGE");
+        icon.setSize("40");
+        icon.setFill(Color.web("#cbd5e1"));
+
+        Label placeholder = new Label("Sin imagen");
+        placeholder
+                .setStyle("-fx-font-size: 11px; -fx-font-weight: bold; -fx-text-fill: #94a3b8; -fx-padding: 8 0 0 0;");
+
+        VBox container = new VBox(icon, placeholder);
+        container.setAlignment(Pos.CENTER);
+        return container;
     }
 }

@@ -1,0 +1,156 @@
+/* TICKET COMPONENT STYLES - Premium POS Design */
+
+.ticket-container {
+    -fx-background-color: #f1f5f9;
+    -fx-border-color: rgba(0, 0, 0, 0.04);
+    -fx-border-width: 1px;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+}
+
+.ticket-modal-header {
+    -fx-background-color: #1565c0;
+    -fx-padding: 15 20;
+}
+
+.ticket-icon-bg {
+    -fx-background-color: rgba(255, 255, 255, 0.15);
+    -fx-background-radius: 8px;
+    -fx-padding: 8px;
+}
+
+.ticket-title-label {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+}
+
+.ticket-subtitle-label {
+    -fx-font-size: 12px;
+    -fx-text-fill: rgba(255, 255, 255, 0.7);
+}
+
+.ticket-scroll-pane {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+}
+
+/* THE RECEIPT PAPER LOOK */
+.receipt-paper {
+    -fx-background-color: white;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.06), 8, 0, 0, 2);
+    -fx-border-color: #e2e8f0;
+    -fx-border-width: 0 1px;
+}
+
+.dark-theme .receipt-paper {
+    -fx-background-color: #f8fafc;
+    /* Keep paper white even in dark theme */
+    -fx-border-color: #cbd5e1;
+}
+
+.receipt-brand {
+    -fx-font-size: 20px;
+    -fx-font-weight: 800;
+    -fx-text-fill: #0f172a;
+    -fx-letter-spacing: 1px;
+}
+
+.receipt-small {
+    -fx-font-size: 11px;
+    -fx-text-fill: #64748b;
+}
+
+.receipt-label-bold {
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #94a3b8;
+}
+
+.receipt-value {
+    -fx-font-size: 12px;
+    -fx-text-fill: #1e293b;
+    -fx-font-weight: bold;
+}
+
+.receipt-divider-dash {
+    -fx-background-color: transparent;
+    -fx-border-color: #e2e8f0;
+    -fx-border-width: 1px 0 0 0;
+    -fx-border-style: dashed;
+}
+
+.receipt-divider-heavy {
+    -fx-background-color: transparent;
+    -fx-border-color: #0f172a;
+    -fx-border-width: 2px 0 0 0;
+}
+
+.receipt-return-badge {
+    -fx-background-color: #fee2e2;
+    -fx-text-fill: #dc2626;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-padding: 10 20;
+    -fx-background-radius: 4px;
+    -fx-alignment: center;
+    -fx-margin: 10 0;
+}
+
+.item-row {
+    -fx-padding: 2 0;
+}
+
+.item-name {
+    -fx-font-size: 13px;
+    -fx-text-fill: #0f172a;
+    -fx-font-weight: 500;
+}
+
+.item-qty {
+    -fx-font-size: 12px;
+    -fx-text-fill: #64748b;
+    -fx-font-family: 'Courier New', monospace;
+}
+
+.item-total {
+    -fx-font-size: 13px;
+    -fx-text-fill: #1e293b;
+    -fx-font-weight: bold;
+}
+
+.receipt-summary-label {
+    -fx-font-size: 13px;
+    -fx-text-fill: #64748b;
+}
+
+.receipt-summary-value {
+    -fx-font-size: 13px;
+    -fx-text-fill: #0f172a;
+    -fx-font-weight: 500;
+}
+
+.receipt-total-label {
+    -fx-font-size: 16px;
+    -fx-font-weight: 800;
+    -fx-text-fill: #0f172a;
+}
+
+.receipt-total-value {
+    -fx-font-size: 22px;
+    -fx-font-weight: 800;
+    -fx-text-fill: #1e88e5;
+}
+
+.receipt-thank-you {
+    -fx-font-size: 14px;
+    -fx-text-fill: #94a3b8;
+    -fx-font-style: italic;
+}
+
+.ticket-modal-footer {
+    -fx-background-color: #ffffff;
+    -fx-padding: 15 25;
+    -fx-border-color: rgba(0, 0, 0, 0.04);
+    -fx-border-width: 1px 0 0 0;
+}

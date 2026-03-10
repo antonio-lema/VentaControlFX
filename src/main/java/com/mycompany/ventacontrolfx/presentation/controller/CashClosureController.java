@@ -7,8 +7,14 @@ import com.mycompany.ventacontrolfx.infrastructure.config.Injectable;
 import com.mycompany.ventacontrolfx.infrastructure.config.ServiceContainer;
 import com.mycompany.ventacontrolfx.util.AlertUtil;
 import com.mycompany.ventacontrolfx.util.UserSession;
+import com.mycompany.ventacontrolfx.presentation.controller.dialog.CashClosingController;
+import com.mycompany.ventacontrolfx.presentation.controller.dialog.CashEntryController;
+import com.mycompany.ventacontrolfx.presentation.controller.dialog.CashOpeningController;
+import com.mycompany.ventacontrolfx.presentation.controller.dialog.CashWithdrawController;
+import com.mycompany.ventacontrolfx.util.ModalService;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
@@ -42,12 +48,14 @@ public class CashClosureController implements Injectable {
     @FXML
     private TableColumn<ProductSummary, Double> colProdTotal;
 
+    private ServiceContainer container;
     private CashClosureUseCase closureUseCase;
     private UserSession userSession;
     private double currentCash = 0, currentCard = 0;
 
     @Override
     public void inject(ServiceContainer container) {
+        this.container = container;
         this.closureUseCase = container.getClosureUseCase();
         this.userSession = container.getUserSession();
 
@@ -154,11 +162,14 @@ public class CashClosureController implements Injectable {
 
                 // Color según saldo
                 if (cashInDrawer < 20) {
-                    lblCashInDrawer.setStyle("-fx-text-fill: -color-danger; -fx-font-weight: bold; -fx-font-size: 22px;");
+                    lblCashInDrawer
+                            .setStyle("-fx-text-fill: -color-danger; -fx-font-weight: bold; -fx-font-size: 22px;");
                 } else if (cashInDrawer < 50) {
-                    lblCashInDrawer.setStyle("-fx-text-fill: -color-warning; -fx-font-weight: bold; -fx-font-size: 22px;");
+                    lblCashInDrawer
+                            .setStyle("-fx-text-fill: -color-warning; -fx-font-weight: bold; -fx-font-size: 22px;");
                 } else {
-                    lblCashInDrawer.setStyle("-fx-text-fill: -color-success; -fx-font-weight: bold; -fx-font-size: 22px;");
+                    lblCashInDrawer
+                            .setStyle("-fx-text-fill: -color-success; -fx-font-weight: bold; -fx-font-size: 22px;");
                 }
 
                 btnOpenFund.setDisable(true);
@@ -199,371 +210,96 @@ public class CashClosureController implements Injectable {
 
     @FXML
     private void handlePerformClosure() {
-        double expectedCash = 0;
-        try {
-            expectedCash = closureUseCase.getCurrentCashInDrawer();
-        } catch (SQLException e) {
-            AlertUtil.showError("Error", "No se pudo obtener el efectivo en caja.");
-            return;
+        CashClosingController ctrl = ModalService.showTransparentModal("/view/dialog/cash_closing_dialog.fxml",
+                "Arqueo y Cierre de Caja", container,
+                (CashClosingController controller) -> {
+                    controller.init(closureUseCase, userSession);
+                });
+
+        if (ctrl != null && ctrl.isConfirmed()) {
+            loadTodayData();
+            refreshCashDrawer();
+            if (container.getNavigationService() != null) {
+                container.getNavigationService().navigateTo("/view/sell_view.fxml");
+            }
         }
-
-        Dialog<CashClosure> dialog = new Dialog<>();
-        dialog.setTitle("Cierre de Caja (Arqueo)");
-        dialog.setHeaderText("🏦 Finalizar jornada y contrastar efectivo");
-
-        // Aplicar tema al diálogo
-        DialogPane dialogPane = dialog.getDialogPane();
-        dialogPane.getStylesheets().add(getClass().getResource("/styles/variables.css").toExternalForm());
-        dialogPane.getStylesheets().add(getClass().getResource("/styles/components/formularios.css").toExternalForm());
-        dialogPane.getStyleClass().add("modern-register-card");
-        dialogPane.setStyle("-fx-background-color: -bg-surface;");
-
-        ButtonType btnTypeCerrar = new ButtonType("REALIZAR CIERRE", ButtonBar.ButtonData.OK_DONE);
-        dialogPane.getButtonTypes().addAll(btnTypeCerrar, ButtonType.CANCEL);
-        
-        // Estilizar botones del diálogo
-        Button okBtn = (Button) dialogPane.lookupButton(btnTypeCerrar);
-        Button cancelBtn = (Button) dialogPane.lookupButton(ButtonType.CANCEL);
-        okBtn.getStyleClass().add("btn-primary");
-        cancelBtn.getStyleClass().add("btn-secondary");
-
-        GridPane grid = new GridPane();
-        grid.setHgap(15);
-        grid.setVgap(15);
-        grid.setPadding(new Insets(25));
-
-        Label lblExpected = new Label(String.format("Efectivo esperado (en caja): %.2f €", expectedCash));
-        lblExpected.setStyle("-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: -text-main;");
-
-        final double finalExpected = expectedCash;
-
-        TextField txtActual = new TextField();
-        txtActual.setPromptText("Efectivo real contado");
-        txtActual.getStyleClass().add("modern-input-field");
-        txtActual.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
-
-        Label lblDiff = new Label("Diferencia: 0,00 €");
-        lblDiff.setStyle("-fx-font-size: 14px; -fx-font-weight: bold;");
-
-        TextArea txtNotes = new TextArea();
-        txtNotes.setPromptText("Observaciones (obligatorio si hay descuadre)");
-        txtNotes.getStyleClass().add("text-field"); // Reutilizamos estilo base
-        txtNotes.setPrefRowCount(3);
-        txtNotes.setWrapText(true);
-
-        txtActual.textProperty().addListener((obs, oldVal, newVal) -> {
-            try {
-                double actual = Double.parseDouble(newVal.replace(",", ".").trim());
-                double diff = actual - finalExpected;
-                lblDiff.setText(String.format("Diferencia: %.2f €", diff));
-                if (Math.abs(diff) < 0.01) {
-                    lblDiff.setStyle("-fx-text-fill: -color-success; -fx-font-weight: bold;");
-                } else {
-                    lblDiff.setStyle("-fx-text-fill: -color-danger; -fx-font-weight: bold;");
-                }
-            } catch (Exception e) {
-                lblDiff.setText("Diferencia: --");
-            }
-        });
-
-        grid.add(lblExpected, 0, 0, 2, 1);
-        grid.add(new Label("Efectivo Real (€):"), 0, 1);
-        grid.add(txtActual, 1, 1);
-        grid.add(lblDiff, 1, 2);
-        grid.add(new Label("Notas:"), 0, 3);
-        grid.add(txtNotes, 1, 3);
-
-        dialog.getDialogPane().setContent(grid);
-        javafx.application.Platform.runLater(txtActual::requestFocus);
-
-        Button okButton = (Button) dialog.getDialogPane().lookupButton(btnTypeCerrar);
-        okButton.addEventFilter(javafx.event.ActionEvent.ACTION, event -> {
-            try {
-                double actual = Double.parseDouble(txtActual.getText().replace(",", ".").trim());
-                double diff = actual - finalExpected;
-                String notes = txtNotes.getText().trim();
-
-                if (Math.abs(diff) > 0.01 && notes.isEmpty()) {
-                    AlertUtil.showWarning("Atención",
-                            "Es obligatorio introducir una nota explicando el descuadre de caja.");
-                    event.consume();
-                }
-            } catch (Exception e) {
-                AlertUtil.showError("Error", "El importe introducido no es válido.");
-                event.consume();
-            }
-        });
-
-        dialog.setResultConverter(btn -> {
-            if (btn == btnTypeCerrar) {
-                try {
-                    double actual = Double.parseDouble(txtActual.getText().replace(",", ".").trim());
-                    CashClosure c = new CashClosure();
-                    c.setClosureDate(LocalDate.now());
-                    c.setUserId(userSession.getCurrentUser() != null ? userSession.getCurrentUser().getUserId() : 1);
-                    c.setTotalCash(finalExpected);
-                    c.setTotalCard(currentCard);
-                    c.setTotalAll(finalExpected + currentCard);
-                    c.setActualCash(actual);
-                    c.setDifference(actual - finalExpected);
-                    c.setNotes(txtNotes.getText().trim());
-                    return c;
-                } catch (Exception ignored) {
-                }
-            }
-            return null;
-        });
-
-        Optional<CashClosure> result = dialog.showAndWait();
-        result.ifPresent(closure -> {
-            try {
-                closureUseCase.performClosure(closure);
-                markAsClosed();
-                AlertUtil.showToast("Cierre realizado con éxito.");
-                refreshCashDrawer();
-            } catch (SQLException e) {
-                AlertUtil.showError("Error", "No se pudo realizar el cierre: " + e.getMessage());
-            }
-        });
     }
 
     @FXML
     private void handleOpenFund() {
-        // Diálogo para introducir el fondo inicial
-        Dialog<Double> dialog = new Dialog<>();
-        dialog.setTitle("Abrir Caja");
-        dialog.setHeaderText("💼 Introduce el fondo de caja inicial");
-
-        DialogPane dialogPane = dialog.getDialogPane();
-        dialogPane.getStylesheets().add(getClass().getResource("/styles/variables.css").toExternalForm());
-        dialogPane.getStylesheets().add(getClass().getResource("/styles/components/formularios.css").toExternalForm());
-        dialogPane.getStyleClass().add("modern-register-card");
-        dialogPane.setStyle("-fx-background-color: -bg-surface;");
-
-        dialogPane.getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
-        ((Button) dialogPane.lookupButton(ButtonType.OK)).getStyleClass().add("btn-primary");
-        ((Button) dialogPane.lookupButton(ButtonType.CANCEL)).getStyleClass().add("btn-secondary");
-
-        GridPane grid = new GridPane();
-        grid.setHgap(15);
-        grid.setVgap(15);
-        grid.setPadding(new Insets(25));
-
-        double lastClosure = 0;
         try {
-            lastClosure = closureUseCase.getLastClosureAmount();
-        } catch (SQLException ignored) {
-        }
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/dialog/cash_opening_dialog.fxml"));
+            VBox pane = loader.load();
+            CashOpeningController controller = loader.getController();
+            controller.init(closureUseCase, userSession);
 
-        Label lblLastClosure = new Label(String.format("Efectivo del cierre anterior: %.2f €", lastClosure));
-        lblLastClosure.setStyle("-fx-text-fill: -color-primary; -fx-font-weight: bold;");
+            Stage stage = new Stage();
+            stage.setTitle("Apertura de Caja");
+            stage.initModality(javafx.stage.Modality.APPLICATION_MODAL);
+            stage.initOwner(lblDate.getScene().getWindow());
+            stage.setScene(new javafx.scene.Scene(pane));
+            stage.showAndWait();
 
-        TextField txtAmount = new TextField(String.format("%.2f", lastClosure).replace(".", ","));
-        txtAmount.setPrefWidth(220);
-        txtAmount.getStyleClass().add("modern-input-field");
-        txtAmount.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
-        txtAmount.setPromptText("Importe en euros");
-
-        grid.add(lblLastClosure, 0, 0, 2, 1);
-        grid.add(new Label("¿Cuánto dejas en caja? (€):"), 0, 1);
-        grid.add(txtAmount, 1, 1);
-
-        dialog.getDialogPane().setContent(grid);
-
-        // Poner foco en el campo
-        javafx.application.Platform.runLater(txtAmount::requestFocus);
-
-        dialog.setResultConverter(btn -> {
-            if (btn == ButtonType.OK) {
-                try {
-                    return Double.parseDouble(txtAmount.getText().replace(",", ".").trim());
-                } catch (NumberFormatException e) {
-                    AlertUtil.showError("Error", "Importe inválido. Por favor introduce un número.");
-                    return null;
-                }
-            }
-            return null;
-        });
-
-        Optional<Double> result = dialog.showAndWait();
-        result.ifPresent(amount -> {
-            try {
-                int userId = userSession.getCurrentUser() != null ? userSession.getCurrentUser().getUserId() : 1;
-                closureUseCase.openCashFund(amount, userId);
+            if (controller.isConfirmed()) {
                 refreshCashDrawer();
-                AlertUtil.showInfo("✅ Caja Abierta",
-                        String.format("Fondo inicial establecido en %.2f €.\n¡La caja está lista!", amount));
-            } catch (SQLException e) {
-                AlertUtil.showError("Error", e.getMessage());
+                AlertUtil.showToast("Caja abierta correctamente.");
             }
-        });
+        } catch (java.io.IOException e) {
+            e.printStackTrace();
+            AlertUtil.showError("Error", "No se pudo cargar el diálogo de apertura.");
+        }
     }
 
     @FXML
     private void handleWithdrawCash() {
-        Dialog<double[]> dialog = new Dialog<>();
-        dialog.setTitle("Retirada de Efectivo");
-        dialog.setHeaderText("💸 Registrar retirada de efectivo de caja");
-
-        DialogPane dialogPane = dialog.getDialogPane();
-        dialogPane.getStylesheets().add(getClass().getResource("/styles/variables.css").toExternalForm());
-        dialogPane.getStylesheets().add(getClass().getResource("/styles/components/formularios.css").toExternalForm());
-        dialogPane.getStyleClass().add("modern-register-card");
-        dialogPane.setStyle("-fx-background-color: -bg-surface;");
-
-        dialogPane.getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
-        ((Button) dialogPane.lookupButton(ButtonType.OK)).getStyleClass().add("btn-danger");
-        ((Button) dialogPane.lookupButton(ButtonType.CANCEL)).getStyleClass().add("btn-secondary");
-
-        GridPane grid = new GridPane();
-        grid.setHgap(10);
-        grid.setVgap(10);
-        grid.setPadding(new Insets(20));
-
         try {
-            double available = closureUseCase.getCurrentCashInDrawer();
-            Label lblAvailable = new Label(String.format("Efectivo disponible: %.2f €", available));
-            lblAvailable.setStyle("-fx-text-fill: -color-success; -fx-font-weight: bold; -fx-font-size: 13px;");
-            grid.add(lblAvailable, 0, 0, 2, 1);
-        } catch (SQLException ignored) {
-        }
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/dialog/cash_withdraw_dialog.fxml"));
+            javafx.scene.layout.VBox pane = loader.load();
+            CashWithdrawController controller = loader.getController();
+            controller.init(closureUseCase, userSession);
 
-        TextField txtAmount = new TextField();
-        txtAmount.setPromptText("0,00 €");
-        txtAmount.getStyleClass().add("modern-input-field");
-        txtAmount.setPrefWidth(200);
+            javafx.stage.Stage stage = new javafx.stage.Stage();
+            stage.setTitle("Retirar Efectivo");
+            stage.initModality(javafx.stage.Modality.APPLICATION_MODAL);
+            stage.initOwner(lblDate.getScene().getWindow());
+            stage.setScene(new javafx.scene.Scene(pane));
+            stage.showAndWait();
 
-        TextField txtReason = new TextField();
-        txtReason.setPromptText("Especifique motivo...");
-        txtReason.getStyleClass().add("modern-input-field");
-        txtReason.setPrefWidth(200);
-
-        grid.add(new Label("Importe (€):"), 0, 1);
-        grid.add(txtAmount, 1, 1);
-        grid.add(new Label("Motivo:"), 0, 2);
-        grid.add(txtReason, 1, 2);
-
-        dialog.getDialogPane().setContent(grid);
-        javafx.application.Platform.runLater(txtAmount::requestFocus);
-
-        Button okButton = (Button) dialog.getDialogPane().lookupButton(ButtonType.OK);
-        okButton.addEventFilter(javafx.event.ActionEvent.ACTION, event -> {
-            try {
-                double amount = Double.parseDouble(txtAmount.getText().replace(",", ".").trim());
-                String reason = txtReason.getText().trim();
-
-                if (amount <= 0) {
-                    AlertUtil.showError("Error", "El importe debe ser mayor que cero.");
-                    event.consume();
-                    return;
-                }
-                if (reason.isEmpty()) {
-                    AlertUtil.showWarning("Aviso", "Debes indicar el motivo de la retirada.");
-                    event.consume();
-                    return;
-                }
-
-                int userId = userSession.getCurrentUser() != null ? userSession.getCurrentUser().getUserId() : 1;
-                closureUseCase.withdrawCash(amount, reason, userId);
+            if (controller.isConfirmed()) {
                 refreshCashDrawer();
-                AlertUtil.showInfo("✅ Retirada registrada",
-                        String.format("Se han retirado %.2f € de la caja.\nMotivo: %s", amount, reason));
-
-            } catch (NumberFormatException e) {
-                AlertUtil.showError("Error", "Importe inválido.");
-                event.consume();
-            } catch (SQLException e) {
-                AlertUtil.showError("❌ Sin efectivo suficiente", e.getMessage());
-                event.consume();
+                loadTodayData();
+                AlertUtil.showToast("Retirada registrada correctamente.");
             }
-        });
-
-        dialog.showAndWait();
+        } catch (java.io.IOException e) {
+            e.printStackTrace();
+            AlertUtil.showError("Error", "No se pudo cargar el diálogo de retirada.");
+        }
     }
 
     @FXML
     private void handleRegisterCashEntry() {
-        Dialog<Void> dialog = new Dialog<>();
-        dialog.setTitle("Ingresar Efectivo");
-        dialog.setHeaderText("➕ Registrar entrada manual de efectivo a caja");
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/dialog/cash_entry_dialog.fxml"));
+            javafx.scene.layout.VBox pane = loader.load();
+            CashEntryController controller = loader.getController();
+            controller.init(closureUseCase, userSession);
 
-        DialogPane dialogPane = dialog.getDialogPane();
-        dialogPane.getStylesheets().add(getClass().getResource("/styles/variables.css").toExternalForm());
-        dialogPane.getStylesheets().add(getClass().getResource("/styles/components/formularios.css").toExternalForm());
-        dialogPane.getStyleClass().add("modern-register-card");
-        dialogPane.setStyle("-fx-background-color: -bg-surface;");
+            javafx.stage.Stage stage = new javafx.stage.Stage();
+            stage.setTitle("Ingresar Efectivo");
+            stage.initModality(javafx.stage.Modality.APPLICATION_MODAL);
+            stage.initOwner(lblDate.getScene().getWindow());
+            stage.setScene(new javafx.scene.Scene(pane));
+            stage.showAndWait();
 
-        dialogPane.getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
-        ((Button) dialogPane.lookupButton(ButtonType.OK)).getStyleClass().add("btn-primary");
-        ((Button) dialogPane.lookupButton(ButtonType.CANCEL)).getStyleClass().add("btn-secondary");
-
-        GridPane grid = new GridPane();
-        grid.setHgap(10);
-        grid.setVgap(10);
-        grid.setPadding(new Insets(20));
-
-        TextField txtAmount = new TextField();
-        txtAmount.setPromptText("0,00 €");
-        txtAmount.getStyleClass().add("modern-input-field");
-        txtAmount.setPrefWidth(200);
-
-        ComboBox<String> comboType = new ComboBox<>(FXCollections.observableArrayList(
-                "Cambio banco", "Ajuste manual", "Ingreso extraordinario", "Otro"));
-        comboType.setValue("Cambio banco");
-        comboType.getStyleClass().add("modern-combo-box");
-        comboType.setPrefWidth(200);
-
-        TextField txtReason = new TextField();
-        txtReason.setPromptText("Justificación...");
-        txtReason.getStyleClass().add("modern-input-field");
-        txtReason.setPrefWidth(200);
-
-        grid.add(new Label("Importe (€):"), 0, 0);
-        grid.add(txtAmount, 1, 0);
-        grid.add(new Label("Tipo:"), 0, 1);
-        grid.add(comboType, 1, 1);
-        grid.add(new Label("Motivo:"), 0, 2);
-        grid.add(txtReason, 1, 2);
-
-        dialog.getDialogPane().setContent(grid);
-        javafx.application.Platform.runLater(txtAmount::requestFocus);
-
-        Button okButton = (Button) dialog.getDialogPane().lookupButton(ButtonType.OK);
-        okButton.addEventFilter(javafx.event.ActionEvent.ACTION, event -> {
-            try {
-                double amount = Double.parseDouble(txtAmount.getText().replace(",", ".").trim());
-                String type = comboType.getValue();
-                String reason = txtReason.getText().trim();
-
-                if (amount <= 0) {
-                    AlertUtil.showError("Error", "El importe debe ser mayor que cero.");
-                    event.consume();
-                    return;
-                }
-                if (reason.isEmpty()) {
-                    AlertUtil.showWarning("Aviso", "Es obligatorio introducir un motivo justificado.");
-                    event.consume();
-                    return;
-                }
-
-                int userId = userSession.getCurrentUser() != null ? userSession.getCurrentUser().getUserId() : 1;
-                String fullReason = "[" + type + "] " + reason;
-
-                closureUseCase.registerCashEntry(amount, fullReason, userId);
+            if (controller.isConfirmed()) {
                 refreshCashDrawer();
-                AlertUtil.showInfo("✅ Ingreso registrado",
-                        String.format("Se han ingresado %.2f € en la caja.\nMotivo: %s", amount, fullReason));
-
-            } catch (NumberFormatException e) {
-                AlertUtil.showError("Error", "Importe inválido.");
-                event.consume();
-            } catch (SQLException e) {
-                AlertUtil.showError("Error", "No se pudo registrar el ingreso: " + e.getMessage());
-                event.consume();
+                loadTodayData();
+                AlertUtil.showToast("Ingreso registrado correctamente.");
             }
-        });
-
-        dialog.showAndWait();
+        } catch (java.io.IOException e) {
+            e.printStackTrace();
+            AlertUtil.showError("Error", "No se pudo cargar el diálogo de ingreso.");
+        }
     }
 
     @FXML

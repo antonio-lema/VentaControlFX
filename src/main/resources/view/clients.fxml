@@ -4,25 +4,39 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
 <?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
+<?import javafx.scene.layout.StackPane?>
 
 <VBox xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="com.mycompany.ventacontrolfx.presentation.controller.ClientsController"
-      spacing="20" styleClass="main-content-area" style="-fx-padding: 25 25 10 25;">
+      spacing="0" styleClass="main-content-area" style="-fx-padding: 0;">
 
-    <!-- Header -->
-    <HBox alignment="CENTER_LEFT" spacing="20">
-        <VBox HBox.hgrow="ALWAYS">
-            <Label text="Gestión de Empresas" styleClass="section-title"/>
-            <Label text="Selecciona o añade una empresa para la factura" styleClass="section-subtitle"/>
-        </VBox>
+    <!-- Header Section -->
+    <VBox styleClass="view-header" spacing="0">
+        <children>
+            <HBox spacing="16" alignment="CENTER_LEFT">
+                <children>
+                    <StackPane styleClass="view-header-icon-wrap">
+                        <children><FontAwesomeIconView glyphName="USERS" size="24" fill="white"/></children>
+                    </StackPane>
+                    <VBox spacing="2">
+                        <children>
+                            <Label text="Clientes y Empresas" styleClass="view-title"/>
+                            <Label text="Gestión centralizada de clientes particulares y empresas" styleClass="view-subtitle"/>
+                        </children>
+                    </VBox>
+                    <Region HBox.hgrow="ALWAYS" />
+                    <Button fx:id="btnToggleForm" text=" Nuevo Registro" onAction="#handleAddClient"
+                            styleClass="btn-primary">
+                        <graphic>
+                            <FontAwesomeIconView glyphName="PLUS" size="14" fill="WHITE"/>
+                        </graphic>
+                    </Button>
+                </children>
+            </HBox>
+        </children>
+    </VBox>
 
-        <Button fx:id="btnToggleForm" text=" Nueva Empresa" onAction="#handleAddClient"
-                styleClass="btn-primary">
-            <graphic>
-                <FontAwesomeIconView glyphName="PLUS" size="14" fill="WHITE"/>
-            </graphic>
-        </Button>
-    </HBox>
+    <VBox spacing="20.0" VBox.vgrow="ALWAYS" style="-fx-padding: 25 25 10 25;">
 
     <HBox VBox.vgrow="ALWAYS" spacing="25">
 
@@ -38,19 +52,20 @@
                 </Button>
             </HBox>
 
-            <!-- Clients List Container -->
+            <!-- Clients Card Container -->
             <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" styleClass="detail-scroll" hbarPolicy="NEVER">
-                <FlowPane fx:id="clientsListContainer" hgap="20" vgap="20" style="-fx-padding: 10; -fx-background-color: transparent;"/>
+                <FlowPane fx:id="clientsListContainer" hgap="25" vgap="25" style="-fx-padding: 15; -fx-background-color: transparent;"/>
             </ScrollPane>
-
+            
             <!-- Count Section -->
-            <HBox alignment="CENTER_RIGHT" style="-fx-padding: 5 10;">
+            <HBox alignment="CENTER_RIGHT" style="-fx-padding: 10 15;">
                 <children>
-                    <Label fx:id="lblCount" text="0 empresas encontradas" styleClass="label-muted" style="-fx-font-weight: bold;"/>
+                    <Label fx:id="lblCount" text="0 registros encontrados" styleClass="label-muted" style="-fx-font-weight: bold; -fx-font-size: 14;"/>
                 </children>
             </HBox>
         </VBox>
 
         <!-- Form Section (Right) - populated dynamically -->
     </HBox>
+</VBox>
 </VBox>

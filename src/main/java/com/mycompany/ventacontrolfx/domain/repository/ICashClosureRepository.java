@@ -5,6 +5,7 @@ import com.mycompany.ventacontrolfx.domain.model.ProductSummary;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface ICashClosureRepository {
@@ -26,7 +27,7 @@ public interface ICashClosureRepository {
 
     // ── Gestión de fondo de caja ────────────────────────────────────────
     /** Abre una sesión de caja con el fondo inicial indicado. */
-    void openCashFund(double initialAmount, int userId) throws SQLException;
+    void openCashFund(double initialAmount, String notes, int userId) throws SQLException;
 
     enum MovementType {
         APERTURA, VENTA, RETIRADA, INGRESO, CIERRE, DEVOLUCION
@@ -66,4 +67,56 @@ public interface ICashClosureRepository {
 
     /** Comprueba si hay sesiones de días anteriores sin cerrar. */
     boolean hasUnclosedPreviousSession() throws SQLException;
+
+    /**
+     * Obtiene los movimientos (ingresos/retiradas) asociados a un cierre concreto.
+     */
+    List<CashMovement> getMovementsByClosure(int closureId) throws SQLException;
+
+    /** Marca un cierre como revisado por un administrador. */
+    void markAsReviewed(int closureId, int reviewerId) throws SQLException;
+
+    /** Representa un movimiento de efectivo con detalles para auditoría. */
+    class CashMovement {
+        public int movementId;
+        public String type;
+        public double amount;
+        public String reason;
+        public LocalDateTime createdAt;
+        public String username;
+
+        public CashMovement(int id, String type, double amount, String reason, LocalDateTime createdAt,
+                String username) {
+            this.movementId = id;
+            this.type = type;
+            this.amount = amount;
+            this.reason = reason;
+            this.createdAt = createdAt;
+            this.username = username;
+        }
+
+        public int getMovementId() {
+            return movementId;
+        }
+
+        public String getType() {
+            return type;
+        }
+
+        public double getAmount() {
+            return amount;
+        }
+
+        public String getReason() {
+            return reason;
+        }
+
+        public LocalDateTime getCreatedAt() {
+            return createdAt;
+        }
+
+        public String getUsername() {
+            return username;
+        }
+    }
 }

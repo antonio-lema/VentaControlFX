@@ -2,11 +2,13 @@ package com.mycompany.ventacontrolfx.presentation.controller;
 
 import com.mycompany.ventacontrolfx.domain.model.Product;
 import com.mycompany.ventacontrolfx.application.usecase.ProductUseCase;
+import com.mycompany.ventacontrolfx.application.usecase.ScheduleVatChangeUseCase;
 import com.mycompany.ventacontrolfx.infrastructure.config.Injectable;
 import com.mycompany.ventacontrolfx.infrastructure.config.ServiceContainer;
 import com.mycompany.ventacontrolfx.shared.async.AsyncManager;
 import com.mycompany.ventacontrolfx.util.AlertUtil;
 import com.mycompany.ventacontrolfx.util.ModalService;
+import com.mycompany.ventacontrolfx.util.PaginationHelper;
 import com.mycompany.ventacontrolfx.component.ToggleSwitch;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
@@ -42,7 +44,7 @@ public class ProductController implements Injectable, com.mycompany.ventacontrol
     @FXML
     private TextField searchField;
     @FXML
-    private TextField rowsPerPageField;
+    private ComboBox<Integer> cmbRowLimit;
     @FXML
     private Button btnAdd;
     @FXML
@@ -51,15 +53,28 @@ public class ProductController implements Injectable, com.mycompany.ventacontrol
     private ProductUseCase productUseCase;
     private ServiceContainer container;
     private AsyncManager asyncManager;
+    private PaginationHelper<Product> paginationHelper;
     private final WeakHashMap<String, Image> imageCache = new WeakHashMap<>();
+    private ScheduleVatChangeUseCase vatUseCase;
+    private double globalIva = 21.0;
 
     @Override
     public void inject(ServiceContainer container) {
         this.container = container;
         this.productUseCase = container.getProductUseCase();
         this.asyncManager = container.getAsyncManager();
+        this.vatUseCase = container.getVatUseCase();
+
+        try {
+            globalIva = vatUseCase.getCurrentGlobalRate()
+                    .map(com.mycompany.ventacontrolfx.domain.model.TaxRevision::getRate)
+                    .orElse(21.0);
+        } catch (Exception e) {
+            globalIva = 21.0;
+        }
 
         setupTable();
+        paginationHelper = new PaginationHelper<>(productsTable, cmbRowLimit, lblCount, "productos");
         loadProducts();
         setupSearch();
     }
@@ -149,6 +164,10 @@ public class ProductController implements Injectable, com.mycompany.ventacontrol
                 toggle.setOnMouseClicked(e -> {
                     Product p = getTableRow().getItem();
                     if (p != null) {
+                        if (!container.getUserSession().hasPermission("producto.editar")) {
+                            AlertUtil.showError("Acceso Denegado", "No tiene permiso para editar productos.");
+                            return;
+                        }
                         try {
                             boolean newState = !toggle.isSwitchedOn();
                             toggle.setSwitchedOn(newState);
@@ -185,17 +204,40 @@ public class ProductController implements Injectable, com.mycompany.ventacontrol
             {
                 pane.setAlignment(Pos.CENTER);
                 btnEdit.setGraphic(createIcon(FontAwesomeIcon.PENCIL, "#1e88e5"));
-                btnDelete.setGraphic(createIcon(FontAwesomeIcon.TRASH, "#e53935"));
+                FontAwesomeIconView trashIcon = new FontAwesomeIconView(FontAwesomeIcon.TRASH);
+                trashIcon.setSize("16");
+                btnDelete.setGraphic(trashIcon);
+                btnDelete.getStyleClass().add("btn-trash-small");
                 btnEdit.setStyle("-fx-background-color: transparent; -fx-cursor: hand;");
-                btnDelete.setStyle("-fx-background-color: transparent; -fx-cursor: hand;");
-                btnEdit.setOnAction(e -> openProductDialog(getTableRow().getItem()));
-                btnDelete.setOnAction(e -> handleDeleteProduct(getTableRow().getItem()));
+                btnEdit.setOnAction(e -> {
+                    if (container.getUserSession().hasPermission("producto.editar")) {
+                        openProductDialog(getTableRow().getItem());
+                    } else {
+                        AlertUtil.showError("Acceso Denegado", "No tiene permiso para editar productos.");
+                    }
+                });
+                btnDelete.setOnAction(e -> {
+                    if (container.getUserSession().hasPermission("producto.eliminar")) {
+                        handleDeleteProduct(getTableRow().getItem());
+                    } else {
+                        AlertUtil.showError("Acceso Denegado", "No tiene permiso para eliminar productos.");
+                    }
+                });
             }
 
             @Override
             protected void updateItem(Void item, boolean empty) {
                 super.updateItem(item, empty);
-                setGraphic(empty ? null : pane);
+                if (empty || getTableRow() == null || getTableRow().getItem() == null) {
+                    setGraphic(null);
+                } else {
+                    Product p = getTableRow().getItem();
+                    double effectiveIva = p.resolveEffectiveIva(globalIva);
+                    btnEdit.setText(String.format("%.1f%%", effectiveIva));
+                    btnEdit.setGraphic(createIcon(FontAwesomeIcon.PENCIL, "#1e88e5"));
+                    btnEdit.setContentDisplay(ContentDisplay.LEFT);
+                    setGraphic(pane);
+                }
             }
         });
     }
@@ -209,8 +251,7 @@ public class ProductController implements Injectable, com.mycompany.ventacontrol
 
     private void loadProducts() {
         asyncManager.runAsyncTask(() -> productUseCase.getAllProducts(), products -> {
-            productsTable.setItems(FXCollections.observableArrayList(products));
-            updateCount(products.size());
+            paginationHelper.setData(products);
         }, null);
     }
 
@@ -235,23 +276,17 @@ public class ProductController implements Injectable, com.mycompany.ventacontrol
                     .filter(p -> p.getName().toLowerCase().contains(query) ||
                             (p.getCategoryName() != null && p.getCategoryName().toLowerCase().contains(query)))
                     .toList();
-            productsTable.setItems(FXCollections.observableArrayList(filtered));
-            updateCount(filtered.size());
+            paginationHelper.setData(filtered);
         }, null);
     }
 
     @FXML
     private void handleAddProduct() {
+        if (!container.getUserSession().hasPermission("producto.crear")) {
+            AlertUtil.showError("Acceso Denegado", "No tiene permiso para crear nuevos productos.");
+            return;
+        }
         openProductDialog(null);
-    }
-
-    @FXML
-    private void handleMassivePriceUpdate() {
-        ModalService.showStandardModal("/view/massive_price_update.fxml", "Actualización Masiva de Precios",
-                container, (MassivePriceUpdateController controller) -> {
-                    // No setup needed before showing
-                });
-        loadProducts(); // Recargar productos al cerrar
     }
 
     private void openProductDialog(Product p) {
@@ -264,6 +299,10 @@ public class ProductController implements Injectable, com.mycompany.ventacontrol
     }
 
     private void handleDeleteProduct(Product p) {
+        if (!container.getUserSession().hasPermission("producto.eliminar")) {
+            AlertUtil.showError("Acceso Denegado", "No tiene permiso para eliminar productos.");
+            return;
+        }
         if (AlertUtil.showConfirmation("Eliminar", "¿Seguro que desea eliminar " + p.getName() + "?", "")) {
             try {
                 productUseCase.deleteProduct(p.getId());

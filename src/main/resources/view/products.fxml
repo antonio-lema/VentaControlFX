@@ -2,6 +2,7 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
@@ -12,38 +13,37 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 <?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
+<?import javafx.scene.layout.StackPane?>
 
 <AnchorPane id="AnchorPane" prefHeight="600.0" prefWidth="900.0" styleClass="main-content-area" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mycompany.ventacontrolfx.presentation.controller.ProductController">
    <children>
-      <VBox spacing="20.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-         <padding>
-            <Insets bottom="10.0" left="25.0" right="25.0" top="25.0" />
-         </padding>
+      <VBox spacing="0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
             <!-- Header Section -->
-            <HBox alignment="CENTER_LEFT" spacing="15.0">
-               <children>
-                  <VBox>
-                     <children>
-                        <Label text="Gestión de Productos" styleClass="section-title"/>
-                        <Label text="Administra el inventario de tu negocio" styleClass="section-subtitle"/>
-                     </children>
-                  </VBox>
-                  <Region HBox.hgrow="ALWAYS" />
-                  <HBox spacing="10.0" alignment="CENTER_RIGHT">
-                     <children>
-                        <Button fx:id="btnMassivePriceUpdate" onAction="#handleMassivePriceUpdate" styleClass="btn-secondary" style="-fx-base: #f39c12; -fx-text-fill: white;">
-                           <graphic><FontAwesomeIconView glyphName="PERCENT" size="14" fill="WHITE"/></graphic>
-                           <text> Actualizar Precios</text>
-                        </Button>
-                        <Button fx:id="btnAdd" onAction="#handleAddProduct" styleClass="btn-primary">
-                           <graphic><FontAwesomeIconView glyphName="PLUS" size="14" fill="WHITE"/></graphic>
-                           <text> Nuevo Producto</text>
-                        </Button>
-                     </children>
-                  </HBox>
-               </children>
-            </HBox>
+            <VBox styleClass="view-header" spacing="0">
+                <children>
+                    <HBox spacing="16" alignment="CENTER_LEFT">
+                        <children>
+                            <StackPane styleClass="view-header-icon-wrap">
+                                <children><FontAwesomeIconView glyphName="CUBES" size="24" fill="white"/></children>
+                            </StackPane>
+                            <VBox spacing="2">
+                                <children>
+                                    <Label text="Gestión de Productos" styleClass="view-title"/>
+                                    <Label text="Administra el inventario de tu negocio" styleClass="view-subtitle"/>
+                                </children>
+                            </VBox>
+                            <Region HBox.hgrow="ALWAYS" />
+                            <Button fx:id="btnAdd" onAction="#handleAddProduct" styleClass="btn-primary" text=" Nuevo Producto">
+                                <graphic><FontAwesomeIconView glyphName="PLUS" size="14" fill="WHITE"/></graphic>
+                            </Button>
+                        </children>
+                    </HBox>
+                </children>
+            </VBox>
+            
+            <VBox spacing="20.0" VBox.vgrow="ALWAYS" style="-fx-padding: 25;">
+                <children>
 
             <!-- Table Card -->
             <VBox spacing="0" styleClass="table-card" VBox.vgrow="ALWAYS">
@@ -59,11 +59,10 @@
                            </children>
                         </HBox>
                         <Region HBox.hgrow="ALWAYS" />
-                        <HBox alignment="CENTER_LEFT" spacing="10">
+                        <HBox alignment="CENTER_LEFT" spacing="10" styleClass="row-limit-container">
                            <children>
-                              <Label text="Ver" textFill="#7f8c8d" />
-                              <TextField fx:id="rowsPerPageField" prefWidth="45.0" text="10" styleClass="row-count-field" />
-                              <Label text="filas" textFill="#7f8c8d" />
+                              <Label text="Mostrar:" styleClass="label-limit" />
+                              <ComboBox fx:id="cmbRowLimit" prefWidth="90" styleClass="combo-limit" />
                            </children>
                         </HBox>
                      </children>
@@ -92,6 +91,8 @@
                   </HBox>
                </children>
             </VBox>
+         </children>
+      </VBox>
          </children>
       </VBox>
    </children>
