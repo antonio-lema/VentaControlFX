@@ -5,6 +5,8 @@ import javafx.scene.Scene;
 import javafx.scene.Parent;
 import java.sql.SQLException;
 import java.util.Map;
+import java.util.List;
+import java.lang.String;
 import java.util.Base64;
 import java.nio.charset.StandardCharsets;
 import java.net.URL;
@@ -20,6 +22,7 @@ public class ThemeManager {
 
     private static final String[] STYLE_FILES = {
             "/styles/variables.css",
+            "/styles/main.css",
             "/styles/layout/sidebar.css",
             "/styles/layout/topbar.css",
             "/styles/layout/status_bar.css",
@@ -123,25 +126,51 @@ public class ThemeManager {
 
         // 1. Bloque principal .root
         sb.append(".root {\n");
-        
+
         // Colores de Marca
-        String primary = settings.get("ui.primary_color");
+        java.lang.String primary = settings.get("ui.primary_color");
         if (primary != null) {
-            sb.append("  -color-primary: ").append(primary).append(";\n");
-            sb.append("  -color-primary-dark: ").append(primary).append("CC;\n");
-            sb.append("  -color-primary-light: ").append(primary).append("99;\n");
-            sb.append("  -color-primary-bg: ").append(primary).append("1A;\n");
-            sb.append("  -color-primary-hover: ").append(primary).append("33;\n");
-            sb.append("  -shadow-primary: dropshadow(three-pass-box, ").append(primary).append("4D, 15, 0, 0, 5);\n");
-            sb.append("  -grad-primary: linear-gradient(to right, ").append(primary).append(", derive(").append(primary).append(", 20%));\n");
+            sb.append("  -fx-custom-color-primary: ").append(primary).append(";\n");
+            sb.append("  -fx-custom-color-primary-dark: ").append(primary).append(";\n");
+            sb.append("  -fx-custom-color-primary-light: ").append(primary).append(";\n");
+            sb.append("  -fx-custom-color-primary-bg: ").append(primary).append("1A;\n");
+            sb.append("  -fx-custom-color-primary-hover: ").append(primary).append("33;\n");
+            sb.append("  -fx-custom-color-primary-alpha40: ").append(primary).append("66;\n");
+            sb.append("  -fx-custom-color-primary-alpha60: ").append(primary).append("99;\n");
+
+            // Sombras dinámicas - Look Premium
+            String shadowColor = primary + "66"; // 40% alpha
+            sb.append("  -fx-shadow-color-primary: ").append(shadowColor).append(";\n");
+            sb.append("  -fx-shadow-primary: dropshadow(three-pass-box, ").append(shadowColor)
+                    .append(", 25, 0, 0, 10);\n");
+
+            // Variantes de sombras
+            sb.append("  -fx-shadow-success: dropshadow(three-pass-box, rgba(16, 185, 129, 0.4), 15, 0, 0, 5);\n");
+            sb.append("  -fx-shadow-danger: dropshadow(three-pass-box, rgba(239, 68, 68, 0.4), 15, 0, 0, 5);\n");
+            sb.append("  -fx-shadow-warning: dropshadow(three-pass-box, rgba(245, 158, 11, 0.4), 15, 0, 0, 5);\n");
+
+            // Gradientes dinámicos
+            sb.append("  -fx-grad-primary: linear-gradient(to bottom, ").append(primary).append(", ").append(primary)
+                    .append("CC);\n");
+            sb.append("  -fx-grad-primary-soft: linear-gradient(to bottom right, ").append(primary).append("4D, ")
+                    .append(primary).append("26);\n");
+
+            sb.append("  -fx-grad-success: linear-gradient(to bottom, #10b981, #059669);\n");
+            sb.append("  -fx-grad-danger: linear-gradient(to bottom, #ef4444, #dc2626);\n");
+            sb.append("  -fx-grad-warning: linear-gradient(to bottom, #f59e0b, #d97706);\n");
         }
-        
-        appendVar(sb, "-color-secondary", settings.get("ui.secondary_color"));
-        
+
+        String secondary = settings.get("ui.secondary_color");
+        if (secondary != null && !secondary.isEmpty()) {
+            sb.append("  -fx-custom-color-secondary: ").append(secondary).append(";\n");
+        }
+
         String text = settings.get("ui.text_main");
         if (text != null) {
-            sb.append("  -text-main: ").append(text).append(";\n");
-            sb.append("  -text-muted: derive(").append(text).append(", 30%);\n");
+            sb.append("  -fx-text-custom-main: ").append(text).append(";\n");
+            sb.append("  -fx-text-custom-medium: ").append(text).append(";\n");
+            sb.append("  -fx-text-custom-muted: ").append(text).append("B3;\n");
+            sb.append("  -fx-text-custom-on-primary: #ffffff;\n");
         }
 
         // Font Sizes
@@ -149,11 +178,12 @@ public class ThemeManager {
         if (fontSize != null) {
             try {
                 int base = (int) Double.parseDouble(fontSize);
-                sb.append("  -font-size-base: ").append(base).append("px;\n");
-                sb.append("  -font-size-large: ").append(base + 4).append("px;\n");
-                sb.append("  -font-size-xl: ").append(base + 12).append("px;\n");
-                sb.append("  -font-size-small: ").append(base - 2).append("px;\n");
-            } catch (Exception ignored) {}
+                sb.append("  -fx-font-size-base: ").append(base).append("px;\n");
+                sb.append("  -fx-font-size-large: ").append(base + 4).append("px;\n");
+                sb.append("  -fx-font-size-xl: ").append(base + 12).append("px;\n");
+                sb.append("  -fx-font-size-small: ").append(base - 2).append("px;\n");
+            } catch (Exception ignored) {
+            }
         }
 
         // Border Radii
@@ -161,35 +191,65 @@ public class ThemeManager {
         if (borderRadius != null) {
             try {
                 int br = (int) Double.parseDouble(borderRadius);
-                sb.append("  -border-radius-sm: ").append(br / 2).append("px;\n");
-                sb.append("  -border-radius-md: ").append(br).append("px;\n");
-                sb.append("  -border-radius-lg: ").append(br * 2).append("px;\n");
-                sb.append("  -border-radius-xl: ").append(br * 3).append("px;\n");
-            } catch (Exception ignored) {}
+                sb.append("  -fx-radius-sm: ").append(br / 2).append("px;\n");
+                sb.append("  -fx-radius-md: ").append(br).append("px;\n");
+                sb.append("  -fx-radius-lg: ").append(br * 2).append("px;\n");
+                sb.append("  -fx-radius-xl: ").append(br * 3).append("px;\n");
+            } catch (Exception ignored) {
+            }
         }
-        
+
         // Card Scale & Shadow (Variables)
         String cardScale = settings.getOrDefault("ui.card_scale", "1.0");
         String cardShadow = settings.getOrDefault("ui.card_shadow", "15");
         String cardBorderWidth = settings.getOrDefault("ui.card_border_width", "1.5");
-        
-        sb.append("  -card-scale: ").append(cardScale).append(";\n");
-        sb.append("  -card-shadow-size: ").append(cardShadow).append("px;\n");
-        sb.append("  -card-border-width: ").append(cardBorderWidth).append("px;\n");
-        
+        String cardHoverLift = settings.getOrDefault("ui.card_hover_lift", "8");
+        String cardHoverScale = settings.getOrDefault("ui.card_hover_scale", "1.02");
+
+        sb.append("  -fx-card-scale: ").append(cardScale).append(";\n");
+        sb.append("  -fx-card-shadow-size: ").append(cardShadow).append("px;\n");
+        sb.append("  -fx-card-border-width: ").append(cardBorderWidth).append("px;\n");
+        sb.append("  -fx-card-hover-lift: -").append(cardHoverLift).append("px;\n");
+        sb.append("  -fx-card-hover-scale: ").append(cardHoverScale).append(";\n");
         sb.append("}\n\n");
 
-        // 2. Tema Claro
-        sb.append(".light-theme {\n");
+        // Dynamic Grid Sizing
+        try {
+            double scale = java.lang.Double.parseDouble(cardScale);
+            int tileW = (int) (200 * scale) + 15;
+            int tileH = (int) (280 * scale) + 15;
+            sb.append(".products-grid {\n");
+            sb.append("  -fx-tile-width: ").append(tileW).append("px;\n");
+            sb.append("  -fx-tile-height: ").append(tileH).append("px;\n");
+            sb.append("}\n\n");
+
+            sb.append(".user-card {\n");
+            sb.append("  -fx-pref-width: ").append((int) (280 * scale)).append("px;\n");
+            sb.append("}\n\n");
+        } catch (java.lang.Exception ignored) {
+        }
+
+        // 2. Tema Claro/Oscuro dinámico
         String bg = settings.get("ui.bg_main");
         if (bg != null) {
-            sb.append("  -bg-main: ").append(bg).append(";\n");
-            sb.append("  -bg-surface: derive(").append(bg).append(", 5%);\n");
-            sb.append("  -bg-sidebar: ").append(bg).append(";\n");
-            sb.append("  -bg-topbar: ").append(bg).append(";\n");
-            sb.append("  -border-subtle: derive(").append(bg).append(", -10%);\n");
+            // Aplicar fondos al .root para que afecte fuera de clases de tema si es
+            // necesario
+            sb.append(".root {\n");
+            sb.append("  -fx-bg-main: ").append(bg).append(";\n");
+            sb.append("  -fx-bg-surface: #ffffff;\n");
+            sb.append("  -fx-bg-sidebar: ").append(bg).append(";\n");
+            sb.append("  -fx-bg-topbar: #ffffff;\n");
+            sb.append("  -fx-grad-sidebar: ").append(bg).append(";\n");
+            sb.append("}\n\n");
+
+            sb.append(".light-theme {\n");
+            sb.append("  -fx-bg-main: ").append(bg).append(";\n");
+            sb.append("  -fx-bg-surface: #ffffff;\n");
+            sb.append("  -fx-bg-sidebar: ").append(bg).append(";\n");
+            sb.append("  -fx-bg-topbar: #ffffff;\n");
+            sb.append("  -fx-grad-sidebar: ").append(bg).append(";\n");
+            sb.append("}\n\n");
         }
-        sb.append("}\n\n");
 
         // 3. Overrides de componentes para asegurar consistencia
         if (fontSize != null || borderRadius != null) {
@@ -202,12 +262,13 @@ public class ThemeManager {
                 sb.append("  -fx-background-radius: ").append(bRadius).append("px;\n");
                 sb.append("  -fx-border-radius: ").append(bRadius).append("px;\n");
                 sb.append("}\n\n");
-                
+
                 sb.append(".modern-btn-primary, .modern-btn-secondary {\n");
                 sb.append("  -fx-background-radius: ").append(bRadius * 1.5).append("px;\n");
                 sb.append("  -fx-border-radius: ").append(bRadius * 1.5).append("px;\n");
                 sb.append("}\n");
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+            }
         }
 
         return sb.toString();

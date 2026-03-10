@@ -265,6 +265,15 @@ public class DatabaseInitializer {
                     "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)");
 
             String[] closureCols = {
+                    "opening_time DATETIME DEFAULT CURRENT_TIMESTAMP",
+                    "initial_fund DECIMAL(10,2) NOT NULL DEFAULT 0.00",
+                    "cash_in DECIMAL(10,2) NOT NULL DEFAULT 0.00",
+                    "cash_out DECIMAL(10,2) NOT NULL DEFAULT 0.00",
+                    "expected_cash DECIMAL(10,2) NOT NULL DEFAULT 0.00",
+                    "counted_cash DECIMAL(10,2) NOT NULL DEFAULT 0.00",
+                    "status VARCHAR(20) NOT NULL DEFAULT 'CUADRADO'",
+                    "reviewed_by INT DEFAULT NULL",
+                    "reviewed_at DATETIME DEFAULT NULL",
                     "actual_cash DECIMAL(10,2) DEFAULT 0",
                     "difference DECIMAL(10,2) DEFAULT 0",
                     "notes TEXT"
@@ -668,7 +677,7 @@ public class DatabaseInitializer {
                     "movement_id INT AUTO_INCREMENT PRIMARY KEY, " +
                     "session_id INT, " +
                     "user_id INT NOT NULL, " +
-                    "type ENUM('APERTURA', 'VENTA', 'RETIRADA', 'INGRESO', 'CIERRE') NOT NULL, " +
+                    "type ENUM('APERTURA', 'VENTA', 'RETIRADA', 'INGRESO', 'CIERRE', 'DEVOLUCION') NOT NULL, " +
                     "amount DECIMAL(10,2) NOT NULL, " +
                     "reason VARCHAR(255), " +
                     "closure_id INT DEFAULT NULL, " +

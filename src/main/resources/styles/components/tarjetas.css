@@ -1,96 +1,109 @@
 /*
- * TARJETAS.CSS
+ * TARJETAS.CSS - Premium Styling
  */
 
 /* Tarjetas de Producto */
 .product-box {
-    -fx-background-color: -bg-surface;
-    -fx-background-radius: 12px;
-    -fx-border-color: -border-subtle;
-    -fx-border-width: 1.5px;
-    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.06), 15, 0, 0, 8);
+    -fx-background-color: white;
+    -fx-background-radius: 16px;
+    -fx-border-color: rgba(0, 0, 0, 0.04);
+    -fx-border-width: 1px;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.12), 12, 0, 0, 4);
     -fx-padding: 0;
     -fx-cursor: hand;
 }
 
 .product-box:hover {
-    -fx-effect: -shadow-primary;
-    -fx-translate-y: -8px;
-    -fx-border-color: -color-primary-light;
+    -fx-effect: -fx-shadow-primary;
+    -fx-translate-y: -5px;
+    -fx-border-color: -fx-custom-color-primary;
+    -fx-border-width: 1px;
+    -fx-scale-x: 1.02;
+    -fx-scale-y: 1.02;
+    -fx-background-color: white;
+}
+
+/* Image Container in Product Card */
+.product-image-container {
+    -fx-background-color: transparent;
+    -fx-background-radius: 16 16 0 0;
+    -fx-border-color: transparent transparent rgba(0, 0, 0, 0.04) transparent;
+    -fx-border-width: 0 0 1 0;
+}
+
+.product-box:hover .product-image-container {
+    -fx-background-color: -fx-custom-color-primary-bg;
 }
 
 .product-info {
-    -fx-padding: 15;
+    -fx-padding: 18;
     -fx-spacing: 12;
 }
 
 .product-name {
-    -fx-font-size: 15px;
-    -fx-text-fill: -text-main;
-    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+    -fx-text-fill: -fx-text-custom-on-primary;
+    -fx-font-weight: 700;
+    -fx-line-spacing: 1.2;
 }
 
 .product-price-badge {
-    -fx-background-color: -color-primary-bg;
-    -fx-text-fill: -color-primary;
-    -fx-font-weight: 700;
-    -fx-padding: 6 12;
-    -fx-background-radius: 8px;
+    -fx-background-color: -fx-grad-primary;
+    -fx-text-fill: white;
+    -fx-font-weight: 800;
+    -fx-font-size: 13px;
+    -fx-padding: 6 14;
+    -fx-background-radius: 10px;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.06), 8, 0, 0, 2);
 }
 
 /* Tarjetas de Usuario */
 .user-card {
-    -fx-background-color: -bg-surface;
-    -fx-background-radius: 12px;
+    -fx-background-color: white;
+    -fx-background-radius: 20px;
     -fx-padding: 30;
-    /* Aumentado de 25 */
-    -fx-effect: -shadow-md;
-    -fx-border-color: -border-light;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.12), 40, 0, 0, 15);
+    -fx-border-color: rgba(0, 0, 0, 0.04);
     -fx-border-width: 1;
 }
 
 .user-card:hover {
-    -fx-translate-y: -8;
-    -fx-effect: -shadow-lg;
-    -fx-background-color: -color-primary-bg;
+    -fx-translate-y: -4;
+    -fx-effect: -fx-shadow-primary;
 }
 
 .user-card-avatar {
-    -fx-background-color: -bg-subtle;
-    -fx-text-fill: -color-primary;
+    -fx-background-color: -fx-grad-primary;
+    -fx-text-fill: white;
     -fx-font-weight: bold;
-    -fx-font-size: 26px;
-    /* Aumentado de 28 */
-    -fx-background-radius: 60px;
-    /* Ajustado para ser redondo */
+    -fx-font-size: 28px;
+    -fx-background-radius: 40px;
     -fx-min-width: 80;
-    /* Aumentado de 65 */
     -fx-min-height: 80;
-    /* Aumentado de 65 */
     -fx-alignment: center;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.12), 12, 0, 0, 4);
 }
 
 .user-name-label {
-    -fx-text-fill: -text-main;
-    -fx-font-weight: bold;
-    -fx-font-size: 20px;
-    /* Aumentado de 18 */
+    -fx-text-fill: #1e293b;
+    -fx-font-weight: 800;
+    -fx-font-size: 22px;
 }
 
 .user-username-label {
-    -fx-text-fill: -text-muted;
+    -fx-text-fill: #64748b;
     -fx-font-size: 13px;
 }
 
 .user-email-label {
-    -fx-text-fill: -text-medium;
+    -fx-text-fill: #94a3b8;
     -fx-font-size: 13px;
 }
 
-/* Badges de rol */
+/* Badges */
 .user-card-badge-admin {
-    -fx-background-color: -color-primary-bg;
-    -fx-text-fill: -color-primary;
+    -fx-background-color: -fx-grad-primary;
+    -fx-text-fill: white;
     -fx-padding: 5 15;
     -fx-background-radius: 25px;
     -fx-font-size: 11px;
@@ -98,25 +111,12 @@
 }
 
 .user-card-badge-user {
-    -fx-background-color: -bg-subtle;
-    -fx-text-fill: -text-medium;
+    -fx-background-color: #f8fafc;
+    -fx-text-fill: #334155;
     -fx-padding: 5 15;
     -fx-background-radius: 25px;
     -fx-font-size: 11px;
     -fx-font-weight: bold;
-    -fx-border-color: -border-color;
+    -fx-border-color: #e2e8f0;
     -fx-border-width: 1;
-}
-
-.user-action-btn {
-    -fx-background-color: transparent;
-    -fx-background-radius: 10px;
-    -fx-padding: 8;
-    -fx-cursor: hand;
-}
-
-.user-action-btn:hover {
-    -fx-background-color: -border-light;
-    -fx-scale-x: 1.1;
-    -fx-scale-y: 1.1;
 }

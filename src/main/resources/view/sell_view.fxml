@@ -13,17 +13,27 @@
         <VBox spacing="0">
             <HBox alignment="CENTER_LEFT" styleClass="view-header-bar">
                 <StackPane styleClass="filter-icon-container">
-                     <FontAwesomeIconView glyphName="FILTER" size="18" fill="WHITE"/>
+                     <FontAwesomeIconView glyphName="FILTER" size="18" fill="#ffffff"/>
                 </StackPane>
                 <VBox alignment="CENTER_LEFT" spacing="2">
                      <Label text="Mostrando en este momento:" styleClass="label-muted" style="-fx-font-size: 11px;"/>
                      <Label fx:id="filterLabel" text="Todos los productos" styleClass="section-title" style="-fx-font-size: 18px;"/>
                 </VBox>
+                
+                <Region HBox.hgrow="ALWAYS" />
+                
+                <VBox alignment="CENTER_RIGHT" spacing="2">
+                    <Label text="Tarifa activa:" styleClass="label-muted" style="-fx-font-size: 11px;"/>
+                    <ComboBox fx:id="comboPriceList" prefWidth="200" styleClass="price-list-selector" />
+                </VBox>
+                <padding>
+                    <Insets right="20" left="0" />
+                </padding>
             </HBox>
             
             <StackPane VBox.vgrow="ALWAYS">
                 <ScrollPane fitToHeight="true" fitToWidth="true" styleClass="products-scroll-pane">
-                    <TilePane fx:id="productsPane" hgap="20" vgap="20" prefColumns="4">
+                    <TilePane fx:id="productsPane" hgap="20" vgap="20" styleClass="products-grid">
                         <padding>
                             <Insets top="25" right="25" bottom="25" left="25"/>
                         </padding>
@@ -47,7 +57,7 @@
             </ScrollPane>
             <Button fx:id="btnExpandCategories" onAction="#handleExpandCategories" styleClass="btn-icon">
                 <graphic>
-                    <FontAwesomeIconView fx:id="expandIcon" glyphName="CHEVRON_UP" size="16" fill="#1e88e5"/>
+                    <FontAwesomeIconView fx:id="expandIcon" glyphName="CHEVRON_UP" size="16" styleClass="icon-primary"/>
                 </graphic>
             </Button>
         </HBox>

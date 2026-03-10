@@ -17,17 +17,36 @@ public class JdbcCashClosureRepository implements ICashClosureRepository {
     public void save(CashClosure closure) throws SQLException {
         try (Connection connection = DBConnection.getConnection()) {
             DatabaseInitializer.initialize(connection);
-            String sql = "INSERT INTO cash_closures (closure_date, user_id, total_cash, total_card, total_all, actual_cash, difference, notes, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            String sql = "INSERT INTO cash_closures (closure_date, user_id, total_cash, total_card, total_all, actual_cash, difference, notes, created_at, opening_time, initial_fund, cash_in, cash_out, expected_cash, counted_cash, status, reviewed_by, reviewed_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
             try (PreparedStatement pstmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
                 pstmt.setDate(1, Date.valueOf(closure.getClosureDate()));
                 pstmt.setInt(2, closure.getUserId());
                 pstmt.setDouble(3, closure.getTotalCash());
                 pstmt.setDouble(4, closure.getTotalCard());
                 pstmt.setDouble(5, closure.getTotalAll());
-                pstmt.setDouble(6, closure.getActualCash());
+                double actual = closure.getActualCash();
+                pstmt.setDouble(6, actual);
                 pstmt.setDouble(7, closure.getDifference());
                 pstmt.setString(8, closure.getNotes());
                 pstmt.setTimestamp(9, Timestamp.valueOf(LocalDateTime.now()));
+
+                // NEW AUDIT FIELDS
+                pstmt.setTimestamp(10, closure.getOpeningTime() != null ? Timestamp.valueOf(closure.getOpeningTime())
+                        : Timestamp.valueOf(LocalDateTime.now()));
+                pstmt.setDouble(11, closure.getInitialFund());
+                pstmt.setDouble(12, closure.getCashIn());
+                pstmt.setDouble(13, closure.getCashOut());
+                pstmt.setDouble(14, closure.getExpectedCash());
+                pstmt.setDouble(15, actual); // counted_cash equivalent to actual_cash
+                pstmt.setString(16, closure.getStatus() != null ? closure.getStatus() : "CUADRADO");
+                if (closure.getReviewedBy() != null) {
+                    pstmt.setInt(17, closure.getReviewedBy());
+                } else {
+                    pstmt.setNull(17, java.sql.Types.INTEGER);
+                }
+                pstmt.setTimestamp(18,
+                        closure.getReviewedAt() != null ? Timestamp.valueOf(closure.getReviewedAt()) : null);
+
                 pstmt.executeUpdate();
 
                 try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
@@ -79,6 +98,25 @@ public class JdbcCashClosureRepository implements ICashClosureRepository {
                     c.setNotes(rs.getString("notes"));
                     c.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
                     c.setUsername(rs.getString("username"));
+
+                    // NEW AUDIT FIELDS
+                    if (rs.getTimestamp("opening_time") != null) {
+                        c.setOpeningTime(rs.getTimestamp("opening_time").toLocalDateTime());
+                    }
+                    c.setInitialFund(rs.getDouble("initial_fund"));
+                    c.setCashIn(rs.getDouble("cash_in"));
+                    c.setCashOut(rs.getDouble("cash_out"));
+                    c.setExpectedCash(rs.getDouble("expected_cash"));
+                    c.setStatus(rs.getString("status"));
+
+                    int revBy = rs.getInt("reviewed_by");
+                    if (!rs.wasNull()) {
+                        c.setReviewedBy(revBy);
+                    }
+                    if (rs.getTimestamp("reviewed_at") != null) {
+                        c.setReviewedAt(rs.getTimestamp("reviewed_at").toLocalDateTime());
+                    }
+
                     closures.add(c);
                 }
             }

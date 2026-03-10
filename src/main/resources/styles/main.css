@@ -1,0 +1,47 @@
+/* Main Entry Point for Stylesheets - Global Utilities only */
+/* Note: ThemeManager.java programmatically loads specific component files, do not use @import here to avoid JavaFX duplicate CSS bugs */
+
+/* General Utilities */
+.main-content-area {
+    -fx-background-color: -fx-bg-main;
+}
+
+.section-title {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -fx-text-custom-main;
+}
+
+.section-subtitle {
+    -fx-font-size: 14px;
+    -fx-text-fill: -fx-text-custom-muted;
+}
+
+/* Global View Headers */
+.view-header {
+    -fx-background-color: -fx-grad-primary;
+    -fx-padding: 28 40;
+    -fx-effect: dropshadow(three-pass-box, rgba(15, 23, 42, 0.2), 15, 0, 0, 5),
+        inset 0 1 0 0 rgba(255, 255, 255, 0.1);
+}
+
+.view-header-icon-wrap {
+    -fx-background-color: rgba(255, 255, 255, 0.2);
+    -fx-background-radius: 12px;
+    -fx-padding: 12px;
+    -fx-min-width: 48px;
+    -fx-min-height: 48px;
+    -fx-alignment: center;
+}
+
+.view-title {
+    -fx-font-size: 24px;
+    -fx-font-weight: 800;
+    -fx-text-fill: -fx-text-custom-on-primary;
+}
+
+.view-subtitle {
+    -fx-font-size: 14px;
+    -fx-text-fill: derive(-fx-text-custom-on-primary, -15%);
+    -fx-padding: 2 0 0 0;
+}
