@@ -124,6 +124,7 @@ public class ClientsController implements Injectable, com.mycompany.ventacontrol
         VBox info = new VBox(8);
         info.getChildren().addAll(
                 createDetailItem(FontAwesomeIcon.ID_CARD, client.getTaxId()),
+                createDetailItem(FontAwesomeIcon.TAGS, getPriceListName(client.getPriceListId())),
                 createDetailItem(FontAwesomeIcon.ENVELOPE, client.getEmail()),
                 createDetailItem(FontAwesomeIcon.PHONE, client.getPhone()));
 
@@ -192,6 +193,22 @@ public class ClientsController implements Injectable, com.mycompany.ventacontrol
             container.getCartUseCase().setSelectedClient(client);
         }
         handleClose();
+    }
+
+    private String getPriceListName(int priceListId) {
+        if (priceListId <= 0)
+            return "Tarifa Estándar";
+        try {
+            List<com.mycompany.ventacontrolfx.domain.model.PriceList> lists = container.getPriceListUseCase()
+                    .getAll();
+            return lists.stream()
+                    .filter(l -> l.getId() == priceListId)
+                    .findFirst()
+                    .map(com.mycompany.ventacontrolfx.domain.model.PriceList::getName)
+                    .orElse("Tarifa Estándar");
+        } catch (Exception e) {
+            return "Tarifa Estándar";
+        }
     }
 
     @FXML

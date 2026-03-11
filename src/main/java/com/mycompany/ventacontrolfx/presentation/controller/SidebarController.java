@@ -18,7 +18,7 @@ public class SidebarController implements Injectable {
 
     @FXML
     private Button btnSell, btnProducts, btnHistory, btnReturns, btnClosures, btnBilling,
-            btnClients, btnConfig, btnLock, btnThemeSettings, btnReports;
+            btnClients, btnConfig, btnLock, btnThemeSettings, btnReports, btnPriceLists, btnVat;
 
     @FXML
     private Label lblAppName;
@@ -76,7 +76,7 @@ public class SidebarController implements Injectable {
         Button[] btns = {
                 btnSell, btnHistory, btnReturns, btnProducts,
                 btnClients, btnReports, btnClosures, btnBilling,
-                btnConfig, btnThemeSettings, btnLock
+                btnConfig, btnThemeSettings, btnLock, btnPriceLists, btnVat
         };
         for (Button b : btns) {
             if (b != null)
@@ -99,6 +99,8 @@ public class SidebarController implements Injectable {
         setVisible(btnReports,
                 authService.hasPermission("reporte.vendedores") || authService.hasPermission("reporte.clientes"));
         setVisible(btnBilling, authService.hasPermission("HISTORIAL"));
+        setVisible(btnPriceLists, authService.hasPermission("PRODUCTOS"));
+        setVisible(btnVat, authService.hasPermission("admin.iva"));
     }
 
     private void setVisible(Button btn, boolean visible) {
@@ -112,7 +114,7 @@ public class SidebarController implements Injectable {
         Button[] btns = {
                 btnSell, btnHistory, btnReturns, btnProducts,
                 btnClients, btnReports, btnClosures, btnBilling,
-                btnConfig, btnThemeSettings, btnLock
+                btnConfig, btnThemeSettings, btnLock, btnPriceLists, btnVat
         };
         for (Button b : btns) {
             if (b != null)
@@ -170,6 +172,18 @@ public class SidebarController implements Injectable {
     private void handleShowBilling() {
         setActiveButton(btnBilling);
         navigationService.navigateTo("/view/fiscal_documents.fxml");
+    }
+
+    @FXML
+    private void handleShowPriceLists() {
+        setActiveButton(btnPriceLists);
+        navigationService.navigateTo("/view/price_lists.fxml");
+    }
+
+    @FXML
+    private void handleShowVat() {
+        setActiveButton(btnVat);
+        navigationService.navigateTo("/view/vat_management.fxml");
     }
 
     // ─── ADMINISTRACIÓN ──────────────────────────────────────

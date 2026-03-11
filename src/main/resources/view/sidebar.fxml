@@ -80,6 +80,18 @@
                 </graphic>
             </Button>
 
+            <Button fx:id="btnPriceLists" styleClass="sidebar-button" onAction="#handleShowPriceLists" contentDisplay="TOP" maxWidth="Infinity" text="Tarifas">
+                <graphic>
+                    <FontAwesomeIconView glyphName="MONEY" size="22" styleClass="sidebar-icon"/>
+                </graphic>
+            </Button>
+
+            <Button fx:id="btnVat" styleClass="sidebar-button" onAction="#handleShowVat" contentDisplay="TOP" maxWidth="Infinity" text="IVA">
+                <graphic>
+                    <FontAwesomeIconView glyphName="PERCENT" size="22" styleClass="sidebar-icon"/>
+                </graphic>
+            </Button>
+
             <Button fx:id="btnConfig" styleClass="sidebar-button" onAction="#handleShowConfig" contentDisplay="TOP" maxWidth="Infinity" text="Configuración">
                 <graphic>
                     <FontAwesomeIconView glyphName="COG" size="22" styleClass="sidebar-icon"/>

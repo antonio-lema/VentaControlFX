@@ -50,18 +50,18 @@ public class CartUseCase {
         this.cartItems.addListener((ListChangeListener.Change<? extends CartItem> c) -> updateTotals());
 
         this.selectedClient.addListener((obs, oldClient, newClient) -> {
-            if (newClient != null && newClient.getPriceListId() > 0) {
-                setPriceListId(newClient.getPriceListId());
-            } else if (newClient == null) {
-                // When client is removed, if we want to go back to default:
-                try {
+            try {
+                if (newClient != null && newClient.getPriceListId() > 0) {
+                    setPriceListId(newClient.getPriceListId());
+                } else {
+                    // Si el cliente no tiene tarifa o es nulo, volvemos a la por defecto
                     PriceList defaultList = priceRepository.getDefaultPriceList();
                     if (defaultList != null) {
                         setPriceListId(defaultList.getId());
                     }
-                } catch (SQLException e) {
-                    e.printStackTrace();
                 }
+            } catch (SQLException e) {
+                e.printStackTrace();
             }
         });
 

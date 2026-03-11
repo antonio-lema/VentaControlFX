@@ -65,6 +65,7 @@ public class NavigationService {
         ACCESS_RULES.put("/view/client_report.fxml", "reporte.clientes");
         ACCESS_RULES.put("/view/return_list.fxml", "venta.devolucion");
         ACCESS_RULES.put("/view/vat_management.fxml", "admin.iva");
+        ACCESS_RULES.put("/view/price_lists.fxml", "PRODUCTOS");
         ACCESS_RULES.put("/view/fiscal_documents.fxml", "HISTORIAL");
     }
 

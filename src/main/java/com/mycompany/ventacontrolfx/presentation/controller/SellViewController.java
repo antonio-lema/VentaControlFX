@@ -76,15 +76,24 @@ public class SellViewController implements Injectable, CategoryMenuRenderer.Cate
         // Listen for price list changes from other sources (like CartUseCase reacting
         // to client changes)
         container.getCartUseCase().priceListIdProperty().addListener((obs, oldVal, newVal) -> {
-            if (newVal != null && (comboPriceList.getSelectionModel().getSelectedItem() == null ||
-                    comboPriceList.getSelectionModel().getSelectedItem().getId() != newVal.intValue())) {
+            if (newVal != null) {
+                int newId = newVal.intValue();
 
-                // Find matching price list in combo and select it
-                for (PriceList pl : comboPriceList.getItems()) {
-                    if (pl.getId() == newVal.intValue()) {
-                        comboPriceList.getSelectionModel().select(pl);
-                        break;
+                // 1. Sincronizar el ComboBox
+                PriceList selectedInCombo = comboPriceList.getSelectionModel().getSelectedItem();
+                if (selectedInCombo == null || selectedInCombo.getId() != newId) {
+                    for (PriceList pl : comboPriceList.getItems()) {
+                        if (pl.getId() == newId) {
+                            comboPriceList.getSelectionModel().select(pl);
+                            break;
+                        }
                     }
+                }
+
+                // 2. Sincronizar el estado interno y refrescar si es necesario
+                if (selectedPriceListId != newId) {
+                    selectedPriceListId = newId;
+                    refreshProductsWithNewPriceList();
                 }
             }
         });
@@ -103,6 +112,9 @@ public class SellViewController implements Injectable, CategoryMenuRenderer.Cate
 
     private void loadInitialData() {
         loadingOverlay.setVisible(true);
+        // Usamos el ID de tarifa del CartUseCase como fuente de verdad inicial
+        this.selectedPriceListId = container.getCartUseCase().getPriceListId();
+
         container.getAsyncManager().runAsyncTask(() -> productUseCase.getVisibleProducts(selectedPriceListId),
                 products -> {
                     filterUseCase.updateSourceData(products);
@@ -213,19 +225,44 @@ public class SellViewController implements Injectable, CategoryMenuRenderer.Cate
 
         container.getAsyncManager().runAsyncTask(() -> priceListUseCase.getAll(), priceLists -> {
             comboPriceList.getItems().setAll(priceLists);
-            PriceList defaultList = priceLists.stream().filter(PriceList::isDefault).findFirst()
-                    .orElse(!priceLists.isEmpty() ? priceLists.get(0) : null);
-            if (defaultList != null) {
-                comboPriceList.getSelectionModel().select(defaultList);
-                selectedPriceListId = defaultList.getId();
-                container.getCartUseCase().setPriceListId(selectedPriceListId);
+
+            // Determinar la tarifa a seleccionar:
+            // 1. La que ya tiene el CartUseCase (ej. por el cliente seleccionado)
+            // 2. La marcada como default en la BD
+            // 3. La primera de la lista
+            int currentId = container.getCartUseCase().getPriceListId();
+            PriceList toSelect = null;
+
+            if (currentId > 0) {
+                toSelect = priceLists.stream().filter(pl -> pl.getId() == currentId).findFirst().orElse(null);
+            }
+
+            if (toSelect == null) {
+                toSelect = priceLists.stream().filter(PriceList::isDefault).findFirst()
+                        .orElse(!priceLists.isEmpty() ? priceLists.get(0) : null);
+            }
+
+            if (toSelect != null) {
+                comboPriceList.getSelectionModel().select(toSelect);
+                selectedPriceListId = toSelect.getId();
+                // Sincronizamos por si acaso veníamos de un ID <= 0
+                if (container.getCartUseCase().getPriceListId() != selectedPriceListId) {
+                    container.getCartUseCase().setPriceListId(selectedPriceListId);
+                }
             }
 
             comboPriceList.valueProperty().addListener((obs, oldVal, newVal) -> {
-                if (newVal != null && newVal.getId() != selectedPriceListId) {
-                    selectedPriceListId = newVal.getId();
-                    container.getCartUseCase().setPriceListId(selectedPriceListId);
-                    refreshProductsWithNewPriceList();
+                if (newVal != null) {
+                    // Si el cambio viene de la UI, lo propagamos al CartUseCase
+                    if (newVal.getId() != container.getCartUseCase().getPriceListId()) {
+                        container.getCartUseCase().setPriceListId(newVal.getId());
+                    }
+
+                    // Si el ID cambió respecto a lo que tenemos renderizado, refrescamos
+                    if (newVal.getId() != selectedPriceListId) {
+                        selectedPriceListId = newVal.getId();
+                        refreshProductsWithNewPriceList();
+                    }
                 }
             });
         }, null);
