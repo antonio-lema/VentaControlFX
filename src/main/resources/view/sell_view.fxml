@@ -12,7 +12,7 @@
     <center>
         <VBox spacing="0">
             <!-- Replaced legacy header with professional view-header -->
-            <VBox styleClass="view-header" spacing="0">
+            <VBox styleClass="view-header, sell-view-header" spacing="0">
                 <children>
                     <HBox spacing="16" alignment="CENTER_LEFT">
                         <children>
@@ -36,7 +36,22 @@
                                     <VBox spacing="2">
                                         <children>
                                             <Label text="TARIFA ACTIVA" styleClass="filter-label-cap" />
-                                            <ComboBox fx:id="comboPriceList" prefWidth="200" styleClass="price-list-selector" />
+                                            <ComboBox fx:id="comboPriceList" prefWidth="180" styleClass="price-list-selector" />
+                                        </children>
+                                    </VBox>
+                                    <Separator orientation="VERTICAL" style="-fx-padding: 5 0;"/>
+                                    <VBox spacing="2">
+                                        <children>
+                                            <Label text="CATEGORÍA" styleClass="filter-label-cap" />
+                                            <Button fx:id="btnCategorySelector" onAction="#handleToggleCategoryMenu" styleClass="btn-category-trigger" prefWidth="180">
+                                                <graphic>
+                                                    <HBox spacing="10" alignment="CENTER_LEFT">
+                                                        <Label fx:id="lblSelectedCategory" text="Todas las categorías" styleClass="label-selector-text" />
+                                                        <Region HBox.hgrow="ALWAYS" />
+                                                        <FontAwesomeIconView glyphName="CHEVRON_DOWN" size="12" styleClass="icon-muted"/>
+                                                    </HBox>
+                                                </graphic>
+                                            </Button>
                                         </children>
                                     </VBox>
                                 </children>
@@ -54,6 +69,23 @@
                         </padding>
                     </TilePane>
                 </ScrollPane>
+                
+                <!-- NEW: Category Mega Menu Overlay -->
+                <VBox fx:id="categoryMenuContainer" visible="false" managed="false" styleClass="category-mega-menu">
+                    <children>
+                        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="mega-menu-scroll">
+                            <content>
+                                <FlowPane fx:id="categoriesMegaFlowPane" hgap="15" vgap="15" styleClass="mega-menu-flow">
+                                    <padding>
+                                        <Insets top="25" right="25" bottom="25" left="25"/>
+                                    </padding>
+                                </FlowPane>
+                            </content>
+                        </ScrollPane>
+                        <Region VBox.vgrow="ALWAYS" onMouseClicked="#handleToggleCategoryMenu" style="-fx-background-color: rgba(0,0,0,0.1);"/>
+                    </children>
+                </VBox>
+
                 <VBox fx:id="loadingOverlay" visible="false" alignment="CENTER" styleClass="loading-overlay">
                     <ProgressIndicator />
                     <Label text="Cargando productos..." styleClass="label-muted"/>
@@ -61,20 +93,4 @@
             </StackPane>
         </VBox>
     </center>
-    <bottom>
-        <HBox alignment="CENTER_LEFT" spacing="15" styleClass="categories-bar">
-            <ScrollPane fx:id="categoriesScrollPane" hbarPolicy="NEVER" vbarPolicy="NEVER" fitToWidth="true" styleClass="categories-scroll-pane" prefHeight="110" maxHeight="110" HBox.hgrow="ALWAYS">
-                <FlowPane fx:id="categoriesFlowPane" hgap="15" vgap="15" styleClass="categories-flow-pane">
-                    <padding>
-                        <Insets top="10" right="10" bottom="10" left="10"/>
-                    </padding>
-                </FlowPane>
-            </ScrollPane>
-            <Button fx:id="btnExpandCategories" onAction="#handleExpandCategories" styleClass="btn-icon">
-                <graphic>
-                    <FontAwesomeIconView fx:id="expandIcon" glyphName="CHEVRON_UP" size="16" styleClass="icon-primary"/>
-                </graphic>
-            </Button>
-        </HBox>
-    </bottom>
 </BorderPane>

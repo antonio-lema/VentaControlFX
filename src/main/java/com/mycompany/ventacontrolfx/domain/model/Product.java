@@ -17,8 +17,9 @@ public class Product {
     private String imagePath;
     private boolean visible;
     private String categoryName;
-    private Double iva; // Nullable, if null it inherits default_iva from category
-    private Double categoryIva; // Inherited from category for resolution logic
+    private Double iva; // Legacy fallback
+    private Double categoryIva; // Legacy fallback
+    private Integer taxGroupId; // Tax Engine V2
     private double currentPrice; // Precio calculado por la vista según tarifa activa actual
 
     public Product() {
@@ -139,6 +140,14 @@ public class Product {
 
     public void setIva(Double iva) {
         this.iva = iva;
+    }
+
+    public Integer getTaxGroupId() {
+        return taxGroupId;
+    }
+
+    public void setTaxGroupId(Integer taxGroupId) {
+        this.taxGroupId = taxGroupId;
     }
 
     // Keep legacy support for templates/older code if needed

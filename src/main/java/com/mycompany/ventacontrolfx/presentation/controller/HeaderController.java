@@ -21,12 +21,6 @@ import java.io.File;
 public class HeaderController implements Injectable {
 
     @FXML
-    private ImageView imgLogo;
-    @FXML
-    private de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView defaultLogoIcon;
-    @FXML
-    private Label lblAppName;
-    @FXML
     private Label lblHeaderUsername;
     @FXML
     private TextField searchField;
@@ -44,35 +38,8 @@ public class HeaderController implements Injectable {
         this.container = container;
         this.configUseCase = container.getConfigUseCase();
         this.navigationService = container.getNavigationService();
-        loadLogo();
         setupUserMenu();
         setupSearch();
-    }
-
-    private void loadLogo() {
-        SaleConfig cfg = configUseCase.getConfig();
-        String path = cfg.getLogoPath();
-
-        // Fallback to app icon if logo is not set
-        if (path == null || path.isEmpty()) {
-            path = cfg.getAppIconPath();
-        }
-
-        if (path != null && !path.isEmpty()) {
-            File file = new File(path);
-            if (file.exists()) {
-                imgLogo.setImage(new Image(file.toURI().toString()));
-                imgLogo.setVisible(true);
-                imgLogo.setManaged(true);
-                if (defaultLogoIcon != null) {
-                    defaultLogoIcon.setVisible(false);
-                    defaultLogoIcon.setManaged(false);
-                }
-                return;
-            }
-        }
-        if (lblAppName != null)
-            lblAppName.setText(cfg.getAppName());
     }
 
     private void setupUserMenu() {

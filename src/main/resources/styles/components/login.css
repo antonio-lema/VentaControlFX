@@ -10,12 +10,12 @@
 .login-card,
 .lock-screen-glass {
     -fx-background-color: rgba(255, 255, 255, 0.95);
-    -fx-background-radius: 20;
+    -fx-background-radius: -fx-radius-xl;
     -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.12), 40, 0, 0, 15);
     -fx-padding: 40;
     -fx-border-color: rgba(255, 255, 255, 0.3);
     -fx-border-width: 1;
-    -fx-border-radius: 20;
+    -fx-border-radius: -fx-radius-xl;
 }
 
 /* Modo oscuro para el glass */
@@ -30,12 +30,12 @@
 .lock-title {
     -fx-font-size: 26px;
     -fx-font-weight: 800;
-    -fx-text-fill: #1e293b;
+    -fx-text-fill: -fx-text-custom-main;
 }
 
 .login-subtitle {
     -fx-font-size: 14px;
-    -fx-text-fill: #64748b;
+    -fx-text-fill: -fx-text-custom-light;
 }
 
 .lock-username {
@@ -61,27 +61,25 @@
     -fx-fill: white;
 }
 
-/* Labels de entrada */
 .lock-input-label,
 .login-input-label {
     -fx-font-size: 11px;
     -fx-font-weight: 800;
-    -fx-text-fill: #64748b;
+    -fx-text-fill: -fx-text-custom-light;
     -fx-text-transform: uppercase;
     -fx-padding: 0 0 5 2;
 }
 
-/* Campos de entrada estilo "lock" */
 .lock-field,
 .login-field {
     -fx-background-color: #f8fafc;
-    -fx-background-radius: 10;
+    -fx-background-radius: -fx-radius-md;
     -fx-border-color: #e2e8f0;
     -fx-border-width: 1.2;
-    -fx-border-radius: 10;
+    -fx-border-radius: -fx-radius-md;
     -fx-padding: 12 15;
     -fx-font-size: 14px;
-    -fx-text-fill: #0f172a;
+    -fx-text-fill: -fx-text-custom-main;
 }
 
 .lock-field:focused,
@@ -97,7 +95,7 @@
     -fx-text-fill: white;
     -fx-font-weight: bold;
     -fx-padding: 14;
-    -fx-background-radius: 25;
+    -fx-background-radius: -fx-radius-xl;
     -fx-cursor: hand;
     -fx-effect: dropshadow(three-pass-box, rgba(30, 136, 229, 0.25), 15, 0, 0, 5);
 }

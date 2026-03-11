@@ -14,7 +14,7 @@ public class JdbcSaleRepository implements ISaleRepository {
 
     @Override
     public int saveSale(Sale sale) throws SQLException {
-        String sql = "INSERT INTO sales (user_id, client_id, total, payment_method, iva, sale_datetime, is_return) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO sales (user_id, client_id, total, payment_method, iva, sale_datetime, is_return, doc_type, doc_series, doc_number, doc_status, control_hash) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = DBConnection.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             pstmt.setInt(1, sale.getUserId());
@@ -28,6 +28,15 @@ public class JdbcSaleRepository implements ISaleRepository {
             pstmt.setDouble(5, sale.getIva());
             pstmt.setTimestamp(6, Timestamp.valueOf(sale.getSaleDateTime()));
             pstmt.setBoolean(7, sale.isReturn());
+            pstmt.setString(8, sale.getDocType() != null ? sale.getDocType() : "TICKET");
+            pstmt.setString(9, sale.getDocSeries());
+            if (sale.getDocNumber() != null) {
+                pstmt.setInt(10, sale.getDocNumber());
+            } else {
+                pstmt.setNull(10, Types.INTEGER);
+            }
+            pstmt.setString(11, sale.getDocStatus() != null ? sale.getDocStatus() : "ISSUED");
+            pstmt.setString(12, sale.getControlHash());
             pstmt.executeUpdate();
 
             try (ResultSet rs = pstmt.getGeneratedKeys()) {
@@ -44,7 +53,7 @@ public class JdbcSaleRepository implements ISaleRepository {
 
     @Override
     public void saveSaleDetails(List<SaleDetail> details, int saleId) throws SQLException {
-        String sql = "INSERT INTO sale_details (sale_id, product_id, quantity, unit_price, line_total, iva_rate, iva_amount, product_name_snapshot) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO sale_details (sale_id, product_id, quantity, unit_price, line_total, iva_rate, iva_amount, product_name_snapshot, net_unit_price, tax_basis, tax_amount, gross_total, applied_tax_group) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = DBConnection.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
             for (SaleDetail detail : details) {
@@ -56,6 +65,32 @@ public class JdbcSaleRepository implements ISaleRepository {
                 pstmt.setDouble(6, detail.getIvaRate());
                 pstmt.setDouble(7, detail.getIvaAmount());
                 pstmt.setString(8, detail.getProductName());
+                pstmt.setDouble(9, detail.getNetUnitPrice());
+                pstmt.setDouble(10, detail.getTaxBasis());
+                pstmt.setDouble(11, detail.getTaxAmount());
+                pstmt.setDouble(12, detail.getGrossTotal());
+                pstmt.setString(13, detail.getAppliedTaxGroup());
+                pstmt.addBatch();
+            }
+            pstmt.executeBatch();
+        }
+    }
+
+    @Override
+    public void saveSaleTaxSummaries(List<com.mycompany.ventacontrolfx.domain.model.SaleTaxSummary> summaries,
+            int saleId) throws SQLException {
+        if (summaries == null || summaries.isEmpty())
+            return;
+        String sql = "INSERT INTO sale_tax_summary (sale_id, tax_rate_id, tax_name, tax_rate, tax_basis, tax_amount) VALUES (?, ?, ?, ?, ?, ?)";
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            for (com.mycompany.ventacontrolfx.domain.model.SaleTaxSummary summary : summaries) {
+                pstmt.setInt(1, saleId);
+                pstmt.setInt(2, summary.getTaxRateId());
+                pstmt.setString(3, summary.getTaxName());
+                pstmt.setDouble(4, summary.getTaxRate());
+                pstmt.setDouble(5, summary.getTaxBasis());
+                pstmt.setDouble(6, summary.getTaxAmount());
                 pstmt.addBatch();
             }
             pstmt.executeBatch();
@@ -65,11 +100,7 @@ public class JdbcSaleRepository implements ISaleRepository {
     @Override
     public List<SaleDetail> getDetailsBySaleId(int saleId) throws SQLException {
         List<SaleDetail> details = new ArrayList<>();
-        String sql = "SELECT sd.*, COALESCE(sd.product_name_snapshot, p.name, 'Producto No Encontrado') as product_name "
-                +
-                "FROM sale_details sd " +
-                "LEFT JOIN products p ON sd.product_id = p.product_id " +
-                "WHERE sd.sale_id = ?";
+        String sql = "SELECT * FROM sale_details WHERE sale_id = ?";
         try (Connection conn = DBConnection.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, saleId);
@@ -84,13 +115,44 @@ public class JdbcSaleRepository implements ISaleRepository {
                     detail.setLineTotal(rs.getDouble("line_total"));
                     detail.setIvaRate(rs.getDouble("iva_rate"));
                     detail.setIvaAmount(rs.getDouble("iva_amount"));
-                    detail.setProductName(rs.getString("product_name"));
+                    detail.setProductName(rs.getString("product_name_snapshot"));
                     detail.setReturnedQuantity(rs.getInt("returned_quantity"));
+                    // Snapshots fiscales
+                    detail.setNetUnitPrice(rs.getDouble("net_unit_price"));
+                    detail.setTaxBasis(rs.getDouble("tax_basis"));
+                    detail.setTaxAmount(rs.getDouble("tax_amount"));
+                    detail.setGrossTotal(rs.getDouble("gross_total"));
+                    detail.setAppliedTaxGroup(rs.getString("applied_tax_group"));
                     details.add(detail);
                 }
             }
         }
         return details;
+    }
+
+    @Override
+    public List<com.mycompany.ventacontrolfx.domain.model.SaleTaxSummary> getTaxSummariesBySaleId(int saleId)
+            throws SQLException {
+        List<com.mycompany.ventacontrolfx.domain.model.SaleTaxSummary> summaries = new ArrayList<>();
+        String sql = "SELECT * FROM sale_tax_summary WHERE sale_id = ?";
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, saleId);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    com.mycompany.ventacontrolfx.domain.model.SaleTaxSummary summary = new com.mycompany.ventacontrolfx.domain.model.SaleTaxSummary();
+                    summary.setId(rs.getInt("summary_id"));
+                    summary.setSaleId(rs.getInt("sale_id"));
+                    summary.setTaxRateId(rs.getInt("tax_rate_id"));
+                    summary.setTaxName(rs.getString("tax_name"));
+                    summary.setTaxRate(rs.getDouble("tax_rate"));
+                    summary.setTaxBasis(rs.getDouble("tax_basis"));
+                    summary.setTaxAmount(rs.getDouble("tax_amount"));
+                    summaries.add(summary);
+                }
+            }
+        }
+        return summaries;
     }
 
     @Override
@@ -103,6 +165,7 @@ public class JdbcSaleRepository implements ISaleRepository {
                 if (rs.next()) {
                     Sale sale = mapResultSetToSale(rs);
                     sale.setDetails(getDetailsBySaleId(sale.getSaleId()));
+                    sale.setTaxSummaries(getTaxSummariesBySaleId(sale.getSaleId()));
                     return sale;
                 }
             }
@@ -319,6 +382,14 @@ public class JdbcSaleRepository implements ISaleRepository {
         sale.setReturnReason(rs.getString("return_reason"));
         sale.setReturnedAmount(rs.getDouble("returned_amount"));
         sale.setClosureId((Integer) rs.getObject("closure_id"));
+
+        // Atributos fiscales
+        sale.setDocType(rs.getString("doc_type"));
+        sale.setDocSeries(rs.getString("doc_series"));
+        sale.setDocNumber((Integer) rs.getObject("doc_number"));
+        sale.setDocStatus(rs.getString("doc_status"));
+        sale.setControlHash(rs.getString("control_hash"));
+
         return sale;
     }
 }

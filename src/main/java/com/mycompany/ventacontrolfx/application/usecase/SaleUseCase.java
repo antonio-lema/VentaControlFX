@@ -16,13 +16,19 @@ public class SaleUseCase {
     private final ISaleRepository saleRepository;
     private final ICompanyConfigRepository configRepository;
     private final com.mycompany.ventacontrolfx.util.AuthorizationService authService;
+    private final com.mycompany.ventacontrolfx.domain.service.TaxEngineService taxEngineService;
+    private final com.mycompany.ventacontrolfx.domain.repository.IClientRepository clientRepository;
     private CashClosureUseCase cashClosureUseCase;
 
     public SaleUseCase(ISaleRepository saleRepository, ICompanyConfigRepository configRepository,
-            com.mycompany.ventacontrolfx.util.AuthorizationService authService) {
+            com.mycompany.ventacontrolfx.util.AuthorizationService authService,
+            com.mycompany.ventacontrolfx.domain.service.TaxEngineService taxEngineService,
+            com.mycompany.ventacontrolfx.domain.repository.IClientRepository clientRepository) {
         this.saleRepository = saleRepository;
         this.configRepository = configRepository;
         this.authService = authService;
+        this.taxEngineService = taxEngineService;
+        this.clientRepository = clientRepository;
     }
 
     /** Inyecta el use case de caja para registrar movimientos de devolución. */
@@ -40,40 +46,59 @@ public class SaleUseCase {
         }
 
         SaleConfig config = configRepository.load();
-        double globalTaxRate = config.getTaxRate();
+
+        // 1. Obtener cliente (si existe) para considerar exenciones
+        Client client = null;
+        if (clientId != null && clientId > 0 && clientRepository != null) {
+            client = clientRepository.getById(clientId);
+        }
 
         double calculatedTotalIva = 0.0;
         List<SaleDetail> details = new ArrayList<>();
+        List<TaxCalculationResult> lineResults = new ArrayList<>();
 
         boolean isInclusive = config.isPricesIncludeTax();
 
         for (CartItem item : cartItems) {
-            double lineTotal = Math.round(item.getTotal() * 100.0) / 100.0;
-            double effectiveRate = item.getProduct().resolveEffectiveIva(globalTaxRate);
+            Product product = item.getProduct();
 
-            double itemBase;
-            double itemIva;
+            // Usar el motor fiscal para calcular impuestos de esta línea
+            TaxCalculationResult result = taxEngineService.calculateLine(
+                    product, client, product.getPrice(), item.getQuantity(), isInclusive);
 
-            if (isInclusive) {
-                itemBase = Math.round((lineTotal / (1.0 + (effectiveRate / 100.0))) * 100.0) / 100.0;
-                itemIva = Math.round((lineTotal - itemBase) * 100.0) / 100.0;
-            } else {
-                itemIva = Math.round((lineTotal * (effectiveRate / 100.0)) * 100.0) / 100.0;
-                itemBase = lineTotal;
-                lineTotal = Math.round((itemBase + itemIva) * 100.0) / 100.0;
-            }
-
-            calculatedTotalIva += itemIva;
+            lineResults.add(result);
+            calculatedTotalIva += result.getTotalTaxAmount();
 
             SaleDetail d = new SaleDetail();
-            d.setProductId(item.getProduct().getId());
+            d.setProductId(product.getId());
             d.setQuantity(item.getQuantity());
-            d.setUnitPrice(item.getProduct().getPrice());
-            d.setLineTotal(lineTotal);
-            d.setIvaRate(effectiveRate);
-            d.setIvaAmount(itemIva);
-            // ── Snapshot fiscal: nombre del producto en el momento de la venta ──
-            d.setProductName(item.getProduct().getName());
+            d.setUnitPrice(product.getPrice());
+
+            // Tax Engine V2 fields
+            d.setNetUnitPrice(result.getNetTotal() / item.getQuantity());
+            d.setTaxBasis(result.getNetTotal());
+            d.setTaxAmount(result.getTotalTaxAmount());
+            d.setGrossTotal(result.getGrossTotal());
+            d.setLineTotal(result.getGrossTotal()); // Mantenemos lineTotal compatible
+
+            // Guardamos el snapshot descriptivo de los impuestos aplicados
+            String appliedGroups = result.getAppliedTaxes().stream()
+                    .map(AppliedTax::toString)
+                    .reduce((a, b) -> a + ", " + b)
+                    .orElse("Exento/0%");
+            d.setAppliedTaxGroup(appliedGroups);
+
+            // Legacy fallbacks (to maintain backward compatibility with old UI while
+            // transitioning)
+            d.setIvaAmount(result.getTotalTaxAmount());
+            if (result.getAppliedTaxes().size() == 1) {
+                d.setIvaRate(result.getAppliedTaxes().get(0).getTaxRate());
+            } else {
+                d.setIvaRate(0); // Mixed or 0
+            }
+
+            // Snapshot fiscal: nombre del producto en el momento de la venta
+            d.setProductName(product.getName());
             details.add(d);
         }
 
@@ -81,14 +106,20 @@ public class SaleUseCase {
         sale.setSaleDateTime(LocalDateTime.now());
         sale.setUserId(userId);
         sale.setClientId(clientId);
-        sale.setTotal(total);
+        sale.setTotal(total); // En el futuro se validará con la suma de grossTotals
         sale.setPaymentMethod(paymentMethod);
         sale.setIva(calculatedTotalIva);
         sale.setReturn(false);
         sale.setDetails(details);
 
+        // 2. Generar el sumario fiscal (Tax Summary) de toda la venta
+        List<SaleTaxSummary> taxSummaries = taxEngineService.summarizeTaxes(lineResults);
+        sale.setTaxSummaries(taxSummaries);
+
+        // 3. Persistir en la base de datos (Sale, SaleDetails y sale_tax_summary)
         int saleId = saleRepository.saveSale(sale);
         saleRepository.saveSaleDetails(details, saleId);
+        saleRepository.saveSaleTaxSummaries(taxSummaries, saleId);
 
         return saleId;
     }
@@ -135,7 +166,7 @@ public class SaleUseCase {
                             d.setReturnedQuantity(newTotalReturn);
 
                             // USAR PRECIO FINAL (CON IVA) PARA LA DEVOLUCIÓN
-                            double unitRefundPrice = d.getLineTotal() / d.getQuantity();
+                            double unitRefundPrice = d.getGrossTotal() / d.getQuantity();
                             double lineRefund = qtyToReturnNow * unitRefundPrice;
                             refundAmountForThisTransaction += lineRefund;
 

@@ -12,6 +12,7 @@ import com.mycompany.ventacontrolfx.domain.repository.IPriceRepository;
 import com.mycompany.ventacontrolfx.domain.repository.IProductRepository;
 import com.mycompany.ventacontrolfx.domain.repository.ITaxRepository;
 import com.mycompany.ventacontrolfx.domain.repository.IPriceUpdateLogRepository;
+import com.mycompany.ventacontrolfx.domain.model.TaxGroup;
 import com.mycompany.ventacontrolfx.util.AlertUtil;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -26,6 +27,8 @@ import java.sql.SQLException;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
+import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 import com.mycompany.ventacontrolfx.infrastructure.config.Injectable;
 import com.mycompany.ventacontrolfx.infrastructure.config.ServiceContainer;
@@ -50,17 +53,17 @@ public class VatManagementController implements Injectable {
         postInject();
     }
 
-    // ── IVA CONFIG ────────────────────────────────────────────────────────────
+    // ── TAX GROUP CONFIG (V2.0) ───────────────────────────────────────────────
     @FXML
-    private Label lblCurrentGlobalVat;
+    private Label lblCurrentGlobalTaxGroup;
     @FXML
-    private TextField txtGlobalRate;
+    private ComboBox<TaxGroup> cmbGlobalTaxGroup;
     @FXML
     private TextField txtGlobalReason;
     @FXML
     private ComboBox<Category> cmbCategory;
     @FXML
-    private TextField txtCategoryRate;
+    private ComboBox<TaxGroup> cmbCategoryTaxGroup;
     @FXML
     private TextField txtCategoryReason;
 
@@ -188,13 +191,31 @@ public class VatManagementController implements Injectable {
             this.priceListUseCase = container.getPriceListUseCase();
             this.vatUseCase = container.getVatUseCase();
             this.priceUpdateUseCase = container.getMassivePriceUpdateUseCase();
-            this.categoryRepository = container.getCategoryUseCase().getRepository(); // Assuming getter exists or
-                                                                                      // getting from container
+            this.categoryRepository = container.getCategoryUseCase().getRepository();
+            this.taxRepository = container.getTaxRepository(); // Inyectar repositorio de impuestos
             this.priceLogRepository = container.getPriceLogRepository();
 
+            setupTaxGroupComboBoxes();
             loadInitialData();
             setupHistoryFilter();
         }
+    }
+
+    private void setupTaxGroupComboBoxes() {
+        // Configurar cómo se muestran los grupos en los combos
+        javafx.util.StringConverter<TaxGroup> converter = new javafx.util.StringConverter<>() {
+            @Override
+            public String toString(TaxGroup group) {
+                return group == null ? "—" : group.getName();
+            }
+
+            @Override
+            public TaxGroup fromString(String string) {
+                return null;
+            }
+        };
+        cmbGlobalTaxGroup.setConverter(converter);
+        cmbCategoryTaxGroup.setConverter(converter);
     }
 
     // ══════════════════════════════════════════════════════════════════════════
@@ -269,22 +290,27 @@ public class VatManagementController implements Injectable {
     }
 
     private void setupTaxHistoryTable() {
-        colDate.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getStartDate().format(formatter)));
-        colEndDate.setCellValueFactory(cell -> cell.getValue().getEndDate() == null
-                ? new SimpleStringProperty("Vigente")
-                : new SimpleStringProperty(cell.getValue().getEndDate().format(formatter)));
-        colScope.setCellValueFactory(new PropertyValueFactory<>("scope"));
-        colTarget.setCellValueFactory(cell -> {
-            TaxRevision r = cell.getValue();
-            return new SimpleStringProperty(switch (r.getScope()) {
-                case GLOBAL -> "Global";
-                case CATEGORY -> "Cat. ID: " + r.getCategoryId();
-                case PRODUCT -> "Prod. ID: " + r.getProductId();
-            });
-        });
-        colRate.setCellValueFactory(
-                cell -> new SimpleStringProperty(String.format("%.2f%%", cell.getValue().getRate())));
-        colReason.setCellValueFactory(new PropertyValueFactory<>("reason"));
+        // Obsoleto en V2: Se reimplementará en la fase de UI.
+        /*
+         * colDate.setCellValueFactory(cell -> new
+         * SimpleStringProperty(cell.getValue().getStartDate().format(formatter)));
+         * colEndDate.setCellValueFactory(cell -> cell.getValue().getEndDate() == null
+         * ? new SimpleStringProperty("Vigente")
+         * : new SimpleStringProperty(cell.getValue().getEndDate().format(formatter)));
+         * colScope.setCellValueFactory(new PropertyValueFactory<>("scope"));
+         * colTarget.setCellValueFactory(cell -> {
+         * TaxRevision r = cell.getValue();
+         * return new SimpleStringProperty(switch (r.getScope()) {
+         * case GLOBAL -> "Global";
+         * case CATEGORY -> "Cat. ID: " + r.getCategoryId();
+         * case PRODUCT -> "Prod. ID: " + r.getProductId();
+         * });
+         * });
+         * colRate.setCellValueFactory(
+         * cell -> new SimpleStringProperty(String.format("%.2f%%",
+         * cell.getValue().getRate())));
+         * colReason.setCellValueFactory(new PropertyValueFactory<>("reason"));
+         */
     }
 
     private void setupPriceLogTable() {
@@ -323,9 +349,18 @@ public class VatManagementController implements Injectable {
 
     private void loadInitialData() {
         try {
-            Optional<TaxRevision> global = vatUseCase.getCurrentGlobalRate();
-            global.ifPresent(r -> lblCurrentGlobalVat.setText(String.format("%.2f%%", r.getRate())));
+            // Cargar Grupo de Impuestos Global actual
+            Optional<TaxGroup> defaultGroup = taxRepository.getDefaultTaxGroup();
+            lblCurrentGlobalTaxGroup.setText(defaultGroup.map(TaxGroup::getName).orElse("No definido"));
 
+            // Cargar todos los grupos para los combos
+            List<TaxGroup> taxGroups = taxRepository.getAllTaxGroups();
+            cmbGlobalTaxGroup.setItems(FXCollections.observableArrayList(taxGroups));
+            cmbCategoryTaxGroup.setItems(FXCollections.observableArrayList(taxGroups));
+
+            defaultGroup.ifPresent(dg -> cmbGlobalTaxGroup.getSelectionModel().select(dg));
+
+            // Categorías
             List<Category> categories = categoryRepository.getAll();
             cmbCategory.setItems(FXCollections.observableArrayList(categories));
 
@@ -364,48 +399,48 @@ public class VatManagementController implements Injectable {
     // ══════════════════════════════════════════════════════════════════════════
 
     @FXML
-    void handleUpdateGlobalVat(ActionEvent event) {
+    void handleUpdateGlobalTaxGroup(ActionEvent event) {
         if (container != null && !container.getUserSession().hasPermission("admin.iva")) {
             AlertUtil.showError("Acceso Denegado", "No tiene permiso para modificar el IVA global.");
             return;
         }
+        TaxGroup selected = cmbGlobalTaxGroup.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            showWarning("Selecciona un grupo de impuestos.");
+            return;
+        }
         try {
-            double rate = Double.parseDouble(txtGlobalRate.getText());
-            String reason = txtGlobalReason.getText();
-            vatUseCase.applyGlobalRateChange(rate, null, reason);
-            showInfo("Tasa global actualizada con éxito.");
-            txtGlobalRate.clear();
-            txtGlobalReason.clear();
-            loadInitialData();
-            refreshHistory();
-        } catch (NumberFormatException e) {
-            showWarning("Por favor ingresa una tasa válida.");
+            taxRepository.setDefaultTaxGroup(selected.getTaxGroupId());
+            showInfo("Grupo de impuestos global actualizado con éxito. Los nuevos productos heredarán este grupo.");
+            lblCurrentGlobalTaxGroup.setText(selected.getName());
         } catch (Exception e) {
             showError("Error: " + e.getMessage());
         }
     }
 
     @FXML
-    void handleUpdateCategoryVat(ActionEvent event) {
+    void handleUpdateCategoryTaxGroup(ActionEvent event) {
         if (container != null && !container.getUserSession().hasPermission("admin.iva")) {
             AlertUtil.showError("Acceso Denegado", "No tiene permiso para modificar el IVA por categoría.");
             return;
         }
-        Category selected = cmbCategory.getSelectionModel().getSelectedItem();
-        if (selected == null) {
+        Category category = cmbCategory.getSelectionModel().getSelectedItem();
+        TaxGroup taxGroup = cmbCategoryTaxGroup.getSelectionModel().getSelectedItem();
+
+        if (category == null) {
             showWarning("Selecciona una categoría.");
             return;
         }
+        if (taxGroup == null) {
+            showWarning("Selecciona un grupo de impuestos.");
+            return;
+        }
+
         try {
-            double rate = Double.parseDouble(txtCategoryRate.getText());
-            String reason = txtCategoryReason.getText();
-            vatUseCase.applyCategoryRateChange(selected.getId(), rate, null, reason);
-            showInfo("IVA de categoría actualizado con éxito.");
-            txtCategoryRate.clear();
-            txtCategoryReason.clear();
-            refreshHistory();
-        } catch (NumberFormatException e) {
-            showWarning("Por favor ingresa una tasa válida.");
+            category.setTaxGroupId(taxGroup.getTaxGroupId());
+            container.getCategoryUseCase().update(category);
+
+            showInfo("Grupo de impuestos para la categoría '" + category.getName() + "' actualizado con éxito.");
         } catch (Exception e) {
             showError("Error: " + e.getMessage());
         }
@@ -652,9 +687,9 @@ public class VatManagementController implements Injectable {
 
     private void refreshHistory() {
         try {
-            List<TaxRevision> history = vatUseCase.getGlobalHistory();
-            historyTable.setItems(FXCollections.observableArrayList(history));
-        } catch (SQLException e) {
+            // List<TaxRevision> history = vatUseCase.getGlobalHistory();
+            // historyTable.setItems(FXCollections.observableArrayList(history));
+        } catch (Exception e) {
             showError("Error al refrescar historial: " + e.getMessage());
         }
         refreshPriceLog();

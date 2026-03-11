@@ -32,7 +32,7 @@
         </columnResizePolicy>
     </TableView>
 
-    <VBox spacing="10" style="-fx-background-color: #f8fafc; -fx-padding: 15; -fx-background-radius: 8;">
+    <VBox spacing="10" style="-fx-background-color: #f8fafc; -fx-padding: 15; -fx-background-radius: -fx-radius-md;">
         <Label text="MOTIVO REGISTRADO:" style="-fx-font-size: 11; -fx-font-weight: bold; -fx-text-fill: #64748b;"/>
         <Label fx:id="lblReason" wrapText="true" style="-fx-font-size: 13; -fx-text-fill: #1e293b;"/>
     </VBox>

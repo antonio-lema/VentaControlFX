@@ -47,10 +47,10 @@
                             <Button onAction="#applyClassicBlue" styleClass="palette-chip">
                                 <tooltip><Tooltip text="Clásico Azul"/></tooltip>
                                 <graphic>
-                                    <VBox styleClass="palette-inner" style="-fx-background-color: #f0f7ff; -fx-background-radius: 10px;" spacing="6" alignment="CENTER">
-                                        <HBox spacing="5" alignment="CENTER">
-                                            <Region style="-fx-background-color: #1e88e5; -fx-background-radius: 50; -fx-min-width: 18; -fx-min-height: 18;" styleClass="palette-preview-dot"/>
-                                            <Region style="-fx-background-color: #64748b; -fx-background-radius: 50; -fx-min-width: 18; -fx-min-height: 18;" styleClass="palette-preview-dot"/>
+                                    <VBox styleClass="palette-inner" style="-fx-background-color: #f0f7ff; -fx-background-radius: -fx-radius-md;" spacing="6" alignment="CENTER">
+                                        <HBox spacing="4" alignment="CENTER">
+                                            <Region style="-fx-background-color: #1e88e5; -fx-background-radius: -fx-radius-xl; -fx-min-width: 18; -fx-min-height: 18;" styleClass="palette-preview-dot"/>
+                                            <Region style="-fx-background-color: #64748b; -fx-background-radius: -fx-radius-xl; -fx-min-width: 18; -fx-min-height: 18;" styleClass="palette-preview-dot"/>
                                         </HBox>
                                         <Label text="Azul" styleClass="palette-name"/>
                                     </VBox>
@@ -59,10 +59,10 @@
                             <Button onAction="#applyEmeraldGreen" styleClass="palette-chip">
                                 <tooltip><Tooltip text="Verde Esmeralda"/></tooltip>
                                 <graphic>
-                                    <VBox styleClass="palette-inner" style="-fx-background-color: #f0fdf4; -fx-background-radius: 10px;" spacing="6" alignment="CENTER">
-                                        <HBox spacing="5" alignment="CENTER">
-                                            <Region style="-fx-background-color: #2e7d32; -fx-background-radius: 50; -fx-min-width: 18; -fx-min-height: 18;" styleClass="palette-preview-dot"/>
-                                            <Region style="-fx-background-color: #455a64; -fx-background-radius: 50; -fx-min-width: 18; -fx-min-height: 18;" styleClass="palette-preview-dot"/>
+                                    <VBox styleClass="palette-inner" style="-fx-background-color: #f0fdf4; -fx-background-radius: -fx-radius-md;" spacing="6" alignment="CENTER">
+                                        <HBox spacing="4" alignment="CENTER">
+                                            <Region style="-fx-background-color: #2e7d32; -fx-background-radius: -fx-radius-xl; -fx-min-width: 18; -fx-min-height: 18;" styleClass="palette-preview-dot"/>
+                                            <Region style="-fx-background-color: #455a64; -fx-background-radius: -fx-radius-xl; -fx-min-width: 18; -fx-min-height: 18;" styleClass="palette-preview-dot"/>
                                         </HBox>
                                         <Label text="Verde" styleClass="palette-name"/>
                                     </VBox>
@@ -71,10 +71,10 @@
                             <Button onAction="#applyMidnightPurple" styleClass="palette-chip">
                                 <tooltip><Tooltip text="Púrpura Profundo"/></tooltip>
                                 <graphic>
-                                    <VBox styleClass="palette-inner" style="-fx-background-color: #faf5ff; -fx-background-radius: 10px;" spacing="6" alignment="CENTER">
-                                        <HBox spacing="5" alignment="CENTER">
-                                            <Region style="-fx-background-color: #6a1b9a; -fx-background-radius: 50; -fx-min-width: 18; -fx-min-height: 18;" styleClass="palette-preview-dot"/>
-                                            <Region style="-fx-background-color: #37474f; -fx-background-radius: 50; -fx-min-width: 18; -fx-min-height: 18;" styleClass="palette-preview-dot"/>
+                                    <VBox styleClass="palette-inner" style="-fx-background-color: #faf5ff; -fx-background-radius: -fx-radius-md;" spacing="6" alignment="CENTER">
+                                        <HBox spacing="4" alignment="CENTER">
+                                            <Region style="-fx-background-color: #6a1b9a; -fx-background-radius: -fx-radius-xl; -fx-min-width: 18; -fx-min-height: 18;" styleClass="palette-preview-dot"/>
+                                            <Region style="-fx-background-color: #37474f; -fx-background-radius: -fx-radius-xl; -fx-min-width: 18; -fx-min-height: 18;" styleClass="palette-preview-dot"/>
                                         </HBox>
                                         <Label text="Púrpura" styleClass="palette-name"/>
                                     </VBox>
@@ -174,9 +174,49 @@
                                     </StackPane>
                                     <VBox HBox.hgrow="ALWAYS">
                                         <Label text="Color de Texto" styleClass="color-row-label"/>
-                                        <Label text="Texto principal en toda la app" styleClass="color-row-hint"/>
+                                        <Label text="Texto principal en la app" styleClass="color-row-hint"/>
                                     </VBox>
                                     <ColorPicker fx:id="cpText" maxWidth="140" prefHeight="36"/>
+                                </HBox>
+                                <HBox styleClass="color-row" alignment="CENTER_LEFT" spacing="12">
+                                    <StackPane style="-fx-background-color: rgba(139,92,246,0.1); -fx-background-radius: 8; -fx-padding: 7;">
+                                        <FontAwesomeIconView glyphName="TH_LARGE" size="14" fill="#8b5cf6"/>
+                                    </StackPane>
+                                    <VBox HBox.hgrow="ALWAYS">
+                                        <Label text="Texto Tarjetas/Carrito" styleClass="color-row-label"/>
+                                        <Label text="Color del texto interior" styleClass="color-row-hint"/>
+                                    </VBox>
+                                    <ColorPicker fx:id="cpTextCards" maxWidth="140" prefHeight="36"/>
+                                </HBox>
+                                <HBox styleClass="color-row" alignment="CENTER_LEFT" spacing="12">
+                                    <StackPane style="-fx-background-color: rgba(16,185,129,0.1); -fx-background-radius: 8; -fx-padding: 7;">
+                                        <FontAwesomeIconView glyphName="DOLLAR" size="14" fill="#10b981"/>
+                                    </StackPane>
+                                    <VBox HBox.hgrow="ALWAYS">
+                                        <Label text="Color Texto Precio" styleClass="color-row-label"/>
+                                        <Label text="Color de los precios (tarjetas y carrito)" styleClass="color-row-hint"/>
+                                    </VBox>
+                                    <ColorPicker fx:id="cpTextPrice" maxWidth="140" prefHeight="36"/>
+                                </HBox>
+                                <HBox styleClass="color-row" alignment="CENTER_LEFT" spacing="12">
+                                    <StackPane style="-fx-background-color: rgba(15,23,42,0.12); -fx-background-radius: 8; -fx-padding: 7;">
+                                        <FontAwesomeIconView glyphName="BARS" size="14" fill="#0f172a"/>
+                                    </StackPane>
+                                    <VBox HBox.hgrow="ALWAYS">
+                                        <Label text="Color del Sidebar" styleClass="color-row-label"/>
+                                        <Label text="Fondo de la barra lateral de navegación" styleClass="color-row-hint"/>
+                                    </VBox>
+                                    <ColorPicker fx:id="cpSidebar" maxWidth="140" prefHeight="36"/>
+                                </HBox>
+                                <HBox styleClass="color-row" alignment="CENTER_LEFT" spacing="12">
+                                    <StackPane style="-fx-background-color: rgba(15,23,42,0.12); -fx-background-radius: 8; -fx-padding: 7;">
+                                        <FontAwesomeIconView glyphName="FONT" size="14" fill="#0f172a"/>
+                                    </StackPane>
+                                    <VBox HBox.hgrow="ALWAYS">
+                                        <Label text="Color Letra Sidebar" styleClass="color-row-label"/>
+                                        <Label text="Texto e iconos del menú lateral" styleClass="color-row-hint"/>
+                                    </VBox>
+                                    <ColorPicker fx:id="cpSidebarText" maxWidth="140" prefHeight="36"/>
                                 </HBox>
                             </VBox>
                         </VBox>

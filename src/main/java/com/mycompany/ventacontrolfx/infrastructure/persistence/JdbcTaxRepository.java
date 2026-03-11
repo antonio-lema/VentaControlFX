@@ -1,6 +1,7 @@
 package com.mycompany.ventacontrolfx.infrastructure.persistence;
 
-import com.mycompany.ventacontrolfx.domain.model.TaxRevision;
+import com.mycompany.ventacontrolfx.domain.model.TaxGroup;
+import com.mycompany.ventacontrolfx.domain.model.TaxRate;
 import com.mycompany.ventacontrolfx.domain.repository.ITaxRepository;
 
 import java.sql.*;
@@ -10,237 +11,143 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Implementación JDBC del repositorio de historial de IVA.
- *
- * Asume la existencia de la tabla 'tax_rates' en la base de datos con la
- * siguiente estructura mínima:
- *
- * CREATE TABLE IF NOT EXISTS tax_rates (
- * tax_rate_id INT AUTO_INCREMENT PRIMARY KEY,
- * product_id INT NULL,
- * category_id INT NULL,
- * scope VARCHAR(10) NOT NULL, -- 'PRODUCT', 'CATEGORY', 'GLOBAL'
- * rate DECIMAL(5,2) NOT NULL,
- * label VARCHAR(50),
- * start_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
- * end_date DATETIME NULL,
- * reason VARCHAR(255)
- * );
+ * Implementación JDBC para el nuevo Tax Engine V2.
  */
 public class JdbcTaxRepository implements ITaxRepository {
 
-    // -------------------------------------------------------------------------
-    // CONSULTA DE TASA EFECTIVA
-    // -------------------------------------------------------------------------
+    // =========================================================================
+    // TAX RATES
+    // =========================================================================
 
     @Override
-    public double resolveActiveRate(int productId, int categoryId, LocalDateTime at)
-            throws SQLException {
-        Timestamp atTs = Timestamp.valueOf(at);
-
-        // 1. Buscar tasa propia del producto (mayor prioridad)
-        String productSql = "SELECT rate FROM tax_rates "
-                + "WHERE scope = 'PRODUCT' AND product_id = ? "
-                + "AND start_date <= ? AND (end_date IS NULL OR end_date > ?) "
-                + "ORDER BY start_date DESC LIMIT 1";
-        try (Connection conn = DBConnection.getConnection();
-                PreparedStatement ps = conn.prepareStatement(productSql)) {
-            ps.setInt(1, productId);
-            ps.setTimestamp(2, atTs);
-            ps.setTimestamp(3, atTs);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next())
-                    return rs.getDouble("rate");
-            }
-        }
-
-        // 2. Buscar tasa de la categoría (segunda prioridad)
-        String categorySql = "SELECT rate FROM tax_rates "
-                + "WHERE scope = 'CATEGORY' AND category_id = ? "
-                + "AND start_date <= ? AND (end_date IS NULL OR end_date > ?) "
-                + "ORDER BY start_date DESC LIMIT 1";
-        try (Connection conn = DBConnection.getConnection();
-                PreparedStatement ps = conn.prepareStatement(categorySql)) {
-            ps.setInt(1, categoryId);
-            ps.setTimestamp(2, atTs);
-            ps.setTimestamp(3, atTs);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next())
-                    return rs.getDouble("rate");
-            }
-        }
-
-        // 3. Buscar tasa global (fallback)
-        String globalSql = "SELECT rate FROM tax_rates "
-                + "WHERE scope = 'GLOBAL' "
-                + "AND start_date <= ? AND (end_date IS NULL OR end_date > ?) "
-                + "ORDER BY start_date DESC LIMIT 1";
-        try (Connection conn = DBConnection.getConnection();
-                PreparedStatement ps = conn.prepareStatement(globalSql)) {
-            ps.setTimestamp(1, atTs);
-            ps.setTimestamp(2, atTs);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next())
-                    return rs.getDouble("rate");
-            }
-        }
-
-        // 4. Si no hay nada configurado, devolver 21% por defecto (IVA general español)
-        return 21.0;
+    public List<TaxRate> getAllTaxRates() throws SQLException {
+        String sql = "SELECT * FROM tax_rates";
+        return queryTaxRates(sql, null);
     }
 
-    // -------------------------------------------------------------------------
-    // PERSISTENCIA
-    // -------------------------------------------------------------------------
+    @Override
+    public List<TaxRate> getActiveTaxRates() throws SQLException {
+        String sql = "SELECT * FROM tax_rates WHERE active = TRUE AND valid_from <= CURRENT_TIMESTAMP AND (valid_to IS NULL OR valid_to > CURRENT_TIMESTAMP)";
+        return queryTaxRates(sql, null);
+    }
 
     @Override
-    public void save(TaxRevision revision) throws SQLException {
-        String sql = "INSERT INTO tax_rates "
-                + "(product_id, category_id, scope, rate, label, start_date, end_date, reason) "
-                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+    public Optional<TaxRate> getTaxRateById(int taxRateId) throws SQLException {
+        String sql = "SELECT * FROM tax_rates WHERE tax_rate_id = ?";
+        List<TaxRate> results = queryTaxRates(sql, ps -> ps.setInt(1, taxRateId));
+        return results.isEmpty() ? Optional.empty() : Optional.of(results.get(0));
+    }
+
+    @Override
+    public void saveTaxRate(TaxRate rate) throws SQLException {
+        String sql = "INSERT INTO tax_rates (name, rate, country, region, valid_from, valid_to, active) VALUES (?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = DBConnection.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            bindRevision(ps, revision);
+            bindTaxRate(ps, rate);
             ps.executeUpdate();
             try (ResultSet keys = ps.getGeneratedKeys()) {
-                if (keys.next())
-                    revision.setId(keys.getInt(1));
-            }
-        }
-    }
-
-    @Override
-    public void closeCurrentAndSave(TaxRevision newRevision) throws SQLException {
-        try (Connection conn = DBConnection.getConnection()) {
-            conn.setAutoCommit(false);
-            try {
-                // 1. Cerrar la revisión actual del mismo scope
-                closeCurrent(conn, newRevision);
-
-                // 2. Insertar la nueva revisión
-                String insertSql = "INSERT INTO tax_rates "
-                        + "(product_id, category_id, scope, rate, label, start_date, end_date, reason) "
-                        + "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-                try (PreparedStatement ps = conn.prepareStatement(insertSql, Statement.RETURN_GENERATED_KEYS)) {
-                    bindRevision(ps, newRevision);
-                    ps.executeUpdate();
-                    try (ResultSet keys = ps.getGeneratedKeys()) {
-                        if (keys.next())
-                            newRevision.setId(keys.getInt(1));
-                    }
+                if (keys.next()) {
+                    rate.setTaxRateId(keys.getInt(1));
                 }
-                conn.commit();
-            } catch (SQLException e) {
-                conn.rollback();
-                throw e;
-            } finally {
-                conn.setAutoCommit(true);
             }
         }
     }
 
-    // -------------------------------------------------------------------------
-    // HISTORIAL
-    // -------------------------------------------------------------------------
-
     @Override
-    public List<TaxRevision> findProductHistory(int productId) throws SQLException {
-        String sql = "SELECT * FROM tax_rates WHERE scope = 'PRODUCT' AND product_id = ? "
-                + "ORDER BY start_date DESC";
-        return queryList(sql, ps -> ps.setInt(1, productId));
+    public void updateTaxRate(TaxRate rate) throws SQLException {
+        String sql = "UPDATE tax_rates SET name = ?, rate = ?, country = ?, region = ?, valid_from = ?, valid_to = ?, active = ? WHERE tax_rate_id = ?";
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+            bindTaxRate(ps, rate);
+            ps.setInt(8, rate.getTaxRateId());
+            ps.executeUpdate();
+        }
     }
 
     @Override
-    public List<TaxRevision> findCategoryHistory(int categoryId) throws SQLException {
-        String sql = "SELECT * FROM tax_rates WHERE scope = 'CATEGORY' AND category_id = ? "
-                + "ORDER BY start_date DESC";
-        return queryList(sql, ps -> ps.setInt(1, categoryId));
+    public void deleteTaxRate(int taxRateId) throws SQLException {
+        String sql = "DELETE FROM tax_rates WHERE tax_rate_id = ?";
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, taxRateId);
+            ps.executeUpdate();
+        }
     }
 
-    @Override
-    public List<TaxRevision> findGlobalHistory() throws SQLException {
-        String sql = "SELECT * FROM tax_rates WHERE scope = 'GLOBAL' ORDER BY start_date DESC";
-        return queryList(sql, ps -> {
-        });
-    }
+    // =========================================================================
+    // TAX GROUPS
+    // =========================================================================
 
     @Override
-    public Optional<TaxRevision> getActiveGlobalRate() throws SQLException {
-        String sql = "SELECT * FROM tax_rates WHERE scope = 'GLOBAL' "
-                + "AND start_date <= CURRENT_TIMESTAMP "
-                + "AND (end_date IS NULL OR end_date > CURRENT_TIMESTAMP) "
-                + "ORDER BY start_date DESC LIMIT 1";
+    public List<TaxGroup> getAllTaxGroups() throws SQLException {
+        String sql = "SELECT * FROM tax_groups";
+        List<TaxGroup> groups = new ArrayList<>();
         try (Connection conn = DBConnection.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);
                 ResultSet rs = ps.executeQuery()) {
-            if (rs.next())
-                return Optional.of(mapTaxRevision(rs));
+            while (rs.next()) {
+                TaxGroup group = mapTaxGroup(rs);
+                group.setTaxRates(getTaxRatesForGroup(conn, group.getTaxGroupId()));
+                groups.add(group);
+            }
+        }
+        return groups;
+    }
+
+    @Override
+    public Optional<TaxGroup> getTaxGroupById(int taxGroupId) throws SQLException {
+        String sql = "SELECT * FROM tax_groups WHERE tax_group_id = ?";
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, taxGroupId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    TaxGroup group = mapTaxGroup(rs);
+                    group.setTaxRates(getTaxRatesForGroup(conn, group.getTaxGroupId()));
+                    return Optional.of(group);
+                }
+            }
         }
         return Optional.empty();
     }
 
-    // -------------------------------------------------------------------------
-    // OPERACIONES MASIVAS
-    // -------------------------------------------------------------------------
+    @Override
+    public Optional<TaxGroup> getDefaultTaxGroup() throws SQLException {
+        String sql = "SELECT * FROM tax_groups WHERE is_default = TRUE LIMIT 1";
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                TaxGroup group = mapTaxGroup(rs);
+                group.setTaxRates(getTaxRatesForGroup(conn, group.getTaxGroupId()));
+                return Optional.of(group);
+            }
+        }
+        return Optional.empty();
+    }
 
     @Override
-    public int applyBulkVatChangeToCategory(int categoryId, double newRate,
-            LocalDateTime effectiveFrom, String reason) throws SQLException {
-        int updated = 0;
-        LocalDateTime startDate = (effectiveFrom != null) ? effectiveFrom : LocalDateTime.now();
-        Timestamp startTs = Timestamp.valueOf(startDate);
-
-        // Obtener productos afectados: los que NO tienen IVA propio activo
-        String selectSql = "SELECT p.product_id FROM products p "
-                + "WHERE p.category_id = ? "
-                + "AND NOT EXISTS ("
-                + "  SELECT 1 FROM tax_rates tr "
-                + "  WHERE tr.scope = 'PRODUCT' AND tr.product_id = p.product_id "
-                + "  AND tr.end_date IS NULL"
-                + ")";
-
+    public void saveTaxGroup(TaxGroup group) throws SQLException {
+        String sql = "INSERT INTO tax_groups (name, is_default) VALUES (?, ?)";
         try (Connection conn = DBConnection.getConnection()) {
             conn.setAutoCommit(false);
-            try {
-                // 1. Cerrar la tasa de categoría actual
-                String closeCategorySql = "UPDATE tax_rates SET end_date = ? "
-                        + "WHERE scope = 'CATEGORY' AND category_id = ? AND end_date IS NULL";
-                try (PreparedStatement closePs = conn.prepareStatement(closeCategorySql)) {
-                    closePs.setTimestamp(1, startTs);
-                    closePs.setInt(2, categoryId);
-                    closePs.executeUpdate();
+            try (PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+
+                if (group.isDefault()) {
+                    clearOtherDefaults(conn);
                 }
 
-                // 2. Insertar nueva tasa de categoría
-                String insertCategorySql = "INSERT INTO tax_rates "
-                        + "(category_id, scope, rate, label, start_date, reason) "
-                        + "VALUES (?, 'CATEGORY', ?, ?, ?, ?)";
-                try (PreparedStatement insertPs = conn.prepareStatement(insertCategorySql)) {
-                    insertPs.setInt(1, categoryId);
-                    insertPs.setDouble(2, newRate);
-                    insertPs.setString(3, "IVA " + newRate + "%");
-                    insertPs.setTimestamp(4, startTs);
-                    insertPs.setString(5, reason);
-                    insertPs.executeUpdate();
-                    updated++;
+                ps.setString(1, group.getName());
+                ps.setBoolean(2, group.isDefault());
+                ps.executeUpdate();
+
+                try (ResultSet keys = ps.getGeneratedKeys()) {
+                    if (keys.next()) {
+                        group.setTaxGroupId(keys.getInt(1));
+                    }
                 }
 
-                // 3. Actualizar también el campo denormalizado de la tabla categories y
-                // productos
-                // Limpiamos products.iva para que hereden el nuevo default_iva de la categoría
-                String updateCatSql = "UPDATE categories SET default_iva = ?, tax_rate = ? WHERE category_id = ?";
-                try (PreparedStatement updateCatPs = conn.prepareStatement(updateCatSql)) {
-                    updateCatPs.setDouble(1, newRate);
-                    updateCatPs.setDouble(2, newRate); // Legacy compat
-                    updateCatPs.setInt(3, categoryId);
-                    updateCatPs.executeUpdate();
-                }
-
-                String clearProdIvaSql = "UPDATE products SET iva = NULL, tax_rate = NULL WHERE category_id = ?";
-                try (PreparedStatement clearPs = conn.prepareStatement(clearProdIvaSql)) {
-                    clearPs.setInt(1, categoryId);
-                    clearPs.executeUpdate();
-                }
+                assignRatesToGroup(conn, group.getTaxGroupId(), group.getTaxRates());
 
                 conn.commit();
             } catch (SQLException e) {
@@ -250,53 +157,114 @@ public class JdbcTaxRepository implements ITaxRepository {
                 conn.setAutoCommit(true);
             }
         }
-        return updated;
     }
 
     @Override
-    public void applyGlobalVatChange(double newRate, LocalDateTime effectiveFrom, String reason)
-            throws SQLException {
-        LocalDateTime startDate = (effectiveFrom != null) ? effectiveFrom : LocalDateTime.now();
-        TaxRevision globalRevision = new TaxRevision(
-                null, null, TaxRevision.Scope.GLOBAL,
-                newRate, "IVA Global " + newRate + "%",
-                startDate, reason);
-        closeCurrentAndSave(globalRevision);
+    public void updateTaxGroup(TaxGroup group) throws SQLException {
+        String sql = "UPDATE tax_groups SET name = ?, is_default = ? WHERE tax_group_id = ?";
+        try (Connection conn = DBConnection.getConnection()) {
+            conn.setAutoCommit(false);
+            try (PreparedStatement ps = conn.prepareStatement(sql)) {
 
-        // --- Sincronización con legacy system_config ---
-        String syncSql = "INSERT INTO system_config (config_key, config_value) VALUES ('taxRate', ?) " +
-                "ON DUPLICATE KEY UPDATE config_value = ?";
+                if (group.isDefault()) {
+                    clearOtherDefaults(conn);
+                }
+
+                ps.setString(1, group.getName());
+                ps.setBoolean(2, group.isDefault());
+                ps.setInt(3, group.getTaxGroupId());
+                ps.executeUpdate();
+
+                // Limpiar items antiguos y asignar nuevos
+                clearGroupRates(conn, group.getTaxGroupId());
+                assignRatesToGroup(conn, group.getTaxGroupId(), group.getTaxRates());
+
+                conn.commit();
+            } catch (SQLException e) {
+                conn.rollback();
+                throw e;
+            } finally {
+                conn.setAutoCommit(true);
+            }
+        }
+    }
+
+    @Override
+    public void deleteTaxGroup(int taxGroupId) throws SQLException {
+        String sql = "DELETE FROM tax_groups WHERE tax_group_id = ?";
         try (Connection conn = DBConnection.getConnection();
-                PreparedStatement ps = conn.prepareStatement(syncSql)) {
-            ps.setString(1, String.valueOf(newRate));
-            ps.setString(2, String.valueOf(newRate));
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, taxGroupId);
             ps.executeUpdate();
         }
     }
 
-    // -------------------------------------------------------------------------
+    @Override
+    public void setDefaultTaxGroup(int taxGroupId) throws SQLException {
+        try (Connection conn = DBConnection.getConnection()) {
+            conn.setAutoCommit(false);
+            try {
+                clearOtherDefaults(conn);
+                String sql = "UPDATE tax_groups SET is_default = TRUE WHERE tax_group_id = ?";
+                try (PreparedStatement ps = conn.prepareStatement(sql)) {
+                    ps.setInt(1, taxGroupId);
+                    ps.executeUpdate();
+                }
+                conn.commit();
+            } catch (SQLException e) {
+                conn.rollback();
+                throw e;
+            } finally {
+                conn.setAutoCommit(true);
+            }
+        }
+    }
+
+    // =========================================================================
     // HELPERS PRIVADOS
-    // -------------------------------------------------------------------------
+    // =========================================================================
 
-    /** Cierra la revisión activa vigente para el mismo scope/producto/categoría. */
-    private void closeCurrent(Connection conn, TaxRevision newRevision) throws SQLException {
-        StringBuilder sql = new StringBuilder(
-                "UPDATE tax_rates SET end_date = ? WHERE scope = ? AND end_date IS NULL");
-        if (newRevision.getProductId() != null)
-            sql.append(" AND product_id = ?");
-        if (newRevision.getCategoryId() != null)
-            sql.append(" AND category_id = ?");
-
-        try (PreparedStatement ps = conn.prepareStatement(sql.toString())) {
-            ps.setTimestamp(1, Timestamp.valueOf(newRevision.getStartDate()));
-            ps.setString(2, newRevision.getScope().name());
-            int paramIdx = 3;
-            if (newRevision.getProductId() != null)
-                ps.setInt(paramIdx++, newRevision.getProductId());
-            if (newRevision.getCategoryId() != null)
-                ps.setInt(paramIdx, newRevision.getCategoryId());
+    private void clearOtherDefaults(Connection conn) throws SQLException {
+        try (PreparedStatement ps = conn.prepareStatement("UPDATE tax_groups SET is_default = FALSE")) {
             ps.executeUpdate();
         }
+    }
+
+    private void clearGroupRates(Connection conn, int taxGroupId) throws SQLException {
+        try (PreparedStatement ps = conn.prepareStatement("DELETE FROM tax_group_items WHERE tax_group_id = ?")) {
+            ps.setInt(1, taxGroupId);
+            ps.executeUpdate();
+        }
+    }
+
+    private void assignRatesToGroup(Connection conn, int taxGroupId, List<TaxRate> rates) throws SQLException {
+        if (rates == null || rates.isEmpty())
+            return;
+        String sql = "INSERT INTO tax_group_items (tax_group_id, tax_rate_id) VALUES (?, ?)";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            for (TaxRate rate : rates) {
+                ps.setInt(1, taxGroupId);
+                ps.setInt(2, rate.getTaxRateId());
+                ps.addBatch();
+            }
+            ps.executeBatch();
+        }
+    }
+
+    private List<TaxRate> getTaxRatesForGroup(Connection conn, int taxGroupId) throws SQLException {
+        String sql = "SELECT tr.* FROM tax_rates tr " +
+                "JOIN tax_group_items tgi ON tr.tax_rate_id = tgi.tax_rate_id " +
+                "WHERE tgi.tax_group_id = ?";
+        List<TaxRate> result = new ArrayList<>();
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, taxGroupId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    result.add(mapTaxRate(rs));
+                }
+            }
+        }
+        return result;
     }
 
     @FunctionalInterface
@@ -304,57 +272,69 @@ public class JdbcTaxRepository implements ITaxRepository {
         void set(PreparedStatement ps) throws SQLException;
     }
 
-    private List<TaxRevision> queryList(String sql, PreparedStatementSetter setter)
-            throws SQLException {
-        List<TaxRevision> result = new ArrayList<>();
+    private List<TaxRate> queryTaxRates(String sql, PreparedStatementSetter setter) throws SQLException {
+        List<TaxRate> result = new ArrayList<>();
         try (Connection conn = DBConnection.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
-            setter.set(ps);
+            if (setter != null) {
+                setter.set(ps);
+            }
             try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next())
-                    result.add(mapTaxRevision(rs));
+                while (rs.next()) {
+                    result.add(mapTaxRate(rs));
+                }
             }
         }
         return result;
     }
 
-    private void bindRevision(PreparedStatement ps, TaxRevision r) throws SQLException {
-        if (r.getProductId() != null)
-            ps.setInt(1, r.getProductId());
-        else
-            ps.setNull(1, Types.INTEGER);
-        if (r.getCategoryId() != null)
-            ps.setInt(2, r.getCategoryId());
-        else
-            ps.setNull(2, Types.INTEGER);
-        ps.setString(3, r.getScope().name());
-        ps.setDouble(4, r.getRate());
-        ps.setString(5, r.getLabel());
-        ps.setTimestamp(6, Timestamp.valueOf(r.getStartDate()));
-        if (r.getEndDate() != null)
-            ps.setTimestamp(7, Timestamp.valueOf(r.getEndDate()));
-        else
-            ps.setNull(7, Types.TIMESTAMP);
-        ps.setString(8, r.getReason());
+    private void bindTaxRate(PreparedStatement ps, TaxRate rate) throws SQLException {
+        ps.setString(1, rate.getName());
+        ps.setDouble(2, rate.getRate());
+        ps.setString(3, rate.getCountry() != null ? rate.getCountry() : "España");
+
+        if (rate.getRegion() != null) {
+            ps.setString(4, rate.getRegion());
+        } else {
+            ps.setNull(4, Types.VARCHAR);
+        }
+
+        // valid_from by default is now if null
+        LocalDateTime vf = rate.getValidFrom() != null ? rate.getValidFrom() : LocalDateTime.now();
+        ps.setTimestamp(5, Timestamp.valueOf(vf));
+
+        if (rate.getValidTo() != null) {
+            ps.setTimestamp(6, Timestamp.valueOf(rate.getValidTo()));
+        } else {
+            ps.setNull(6, Types.TIMESTAMP);
+        }
+
+        ps.setBoolean(7, rate.isActive());
     }
 
-    private TaxRevision mapTaxRevision(ResultSet rs) throws SQLException {
-        TaxRevision t = new TaxRevision();
-        t.setId(rs.getInt("tax_rate_id"));
-        int productId = rs.getInt("product_id");
-        if (!rs.wasNull())
-            t.setProductId(productId);
-        int categoryId = rs.getInt("category_id");
-        if (!rs.wasNull())
-            t.setCategoryId(categoryId);
-        t.setScope(TaxRevision.Scope.valueOf(rs.getString("scope")));
+    private TaxRate mapTaxRate(ResultSet rs) throws SQLException {
+        TaxRate t = new TaxRate();
+        t.setTaxRateId(rs.getInt("tax_rate_id"));
+        t.setName(rs.getString("name"));
         t.setRate(rs.getDouble("rate"));
-        t.setLabel(rs.getString("label"));
-        t.setStartDate(rs.getTimestamp("start_date").toLocalDateTime());
-        Timestamp endTs = rs.getTimestamp("end_date");
-        if (endTs != null)
-            t.setEndDate(endTs.toLocalDateTime());
-        t.setReason(rs.getString("reason"));
+        t.setCountry(rs.getString("country"));
+        t.setRegion(rs.getString("region"));
+        t.setValidFrom(rs.getTimestamp("valid_from").toLocalDateTime());
+
+        Timestamp vt = rs.getTimestamp("valid_to");
+        if (vt != null) {
+            t.setValidTo(vt.toLocalDateTime());
+        }
+
+        t.setActive(rs.getBoolean("active"));
         return t;
+    }
+
+    private TaxGroup mapTaxGroup(ResultSet rs) throws SQLException {
+        TaxGroup g = new TaxGroup();
+        g.setTaxGroupId(rs.getInt("tax_group_id"));
+        g.setName(rs.getString("name"));
+        g.setDefault(rs.getBoolean("is_default"));
+        return g;
     }
 }

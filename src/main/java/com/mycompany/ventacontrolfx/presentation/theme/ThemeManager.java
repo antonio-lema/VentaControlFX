@@ -6,10 +6,10 @@ import javafx.scene.Parent;
 import java.sql.SQLException;
 import java.util.Map;
 import java.util.List;
-import java.lang.String;
 import java.util.Base64;
 import java.nio.charset.StandardCharsets;
 import java.net.URL;
+import javafx.scene.paint.Color;
 
 /**
  * Gestor dinámico de la estética de la aplicación.
@@ -38,7 +38,8 @@ public class ThemeManager {
             "/styles/components/historial.css",
             "/styles/components/pago.css",
             "/styles/components/devoluciones.css",
-            "/styles/components/informes.css"
+            "/styles/components/informes.css",
+            "/styles/components/vender.css"
     };
 
     public ThemeManager(IAppSettingsRepository settingsRepository) {
@@ -128,32 +129,39 @@ public class ThemeManager {
         sb.append(".root {\n");
 
         // Colores de Marca
-        java.lang.String primary = settings.get("ui.primary_color");
+        String primary = settings.get("ui.primary_color");
         if (primary != null) {
+            String primaryLight = brighten(primary, 0.3);
+            String primaryDark = darken(primary, 0.1);
+            String primaryGlow = primary + "99"; // 60% alpha
+
             sb.append("  -fx-custom-color-primary: ").append(primary).append(";\n");
-            sb.append("  -fx-custom-color-primary-dark: ").append(primary).append(";\n");
-            sb.append("  -fx-custom-color-primary-light: ").append(primary).append(";\n");
+            sb.append("  -fx-custom-color-primary-dark: ").append(primaryDark).append(";\n");
+            sb.append("  -fx-custom-color-primary-light: ").append(primaryLight).append(";\n");
             sb.append("  -fx-custom-color-primary-bg: ").append(primary).append("1A;\n");
             sb.append("  -fx-custom-color-primary-hover: ").append(primary).append("33;\n");
             sb.append("  -fx-custom-color-primary-alpha40: ").append(primary).append("66;\n");
             sb.append("  -fx-custom-color-primary-alpha60: ").append(primary).append("99;\n");
 
-            // Sombras dinámicas - Look Premium
-            String shadowColor = primary + "66"; // 40% alpha
-            sb.append("  -fx-shadow-color-primary: ").append(shadowColor).append(";\n");
-            sb.append("  -fx-shadow-primary: dropshadow(three-pass-box, ").append(shadowColor)
-                    .append(", 25, 0, 0, 10);\n");
+            // Sombras dinámicas - Look Premium (Glow Effect)
+            sb.append("  -fx-shadow-color-primary: ").append(primaryGlow).append(";\n");
+            sb.append("  -fx-shadow-primary: dropshadow(three-pass-box, ").append(primaryGlow)
+                    .append(", 40, 0.0, 0, 12);\n");
+            sb.append("  -fx-shadow-primary-intense: dropshadow(three-pass-box, ").append(primary)
+                    .append("CC, 20, 0.0, 0, 6);\n");
 
-            // Variantes de sombras
+            // Gradientes dinámicos - Reales (Light -> Dark)
+            sb.append("  -fx-grad-primary: linear-gradient(to bottom right, ").append(primaryLight).append(", ")
+                    .append(primaryDark).append(");\n");
+            sb.append("  -fx-grad-primary-soft: linear-gradient(to bottom right, ").append(primary).append("4D, ")
+                    .append(primary).append("26);\n");
+            sb.append("  -fx-grad-sidebar-active: linear-gradient(to bottom right, ").append(primaryLight)
+                    .append("E6, ").append(primaryDark).append(");\n");
+
+            // Variantes de sombras fijas
             sb.append("  -fx-shadow-success: dropshadow(three-pass-box, rgba(16, 185, 129, 0.4), 15, 0, 0, 5);\n");
             sb.append("  -fx-shadow-danger: dropshadow(three-pass-box, rgba(239, 68, 68, 0.4), 15, 0, 0, 5);\n");
             sb.append("  -fx-shadow-warning: dropshadow(three-pass-box, rgba(245, 158, 11, 0.4), 15, 0, 0, 5);\n");
-
-            // Gradientes dinámicos
-            sb.append("  -fx-grad-primary: linear-gradient(to bottom, ").append(primary).append(", ").append(primary)
-                    .append("CC);\n");
-            sb.append("  -fx-grad-primary-soft: linear-gradient(to bottom right, ").append(primary).append("4D, ")
-                    .append(primary).append("26);\n");
 
             sb.append("  -fx-grad-success: linear-gradient(to bottom, #10b981, #059669);\n");
             sb.append("  -fx-grad-danger: linear-gradient(to bottom, #ef4444, #dc2626);\n");
@@ -169,8 +177,44 @@ public class ThemeManager {
         if (text != null) {
             sb.append("  -fx-text-custom-main: ").append(text).append(";\n");
             sb.append("  -fx-text-custom-medium: ").append(text).append(";\n");
-            sb.append("  -fx-text-custom-muted: ").append(text).append("B3;\n");
+            sb.append("  -fx-text-custom-light: ").append(text).append("B3;\n"); // 70% alpha
+            sb.append("  -fx-text-custom-muted: ").append(text).append("80;\n"); // 50% alpha
             sb.append("  -fx-text-custom-on-primary: #ffffff;\n");
+        }
+
+        String textCards = settings.getOrDefault("ui.text_cards", text);
+        if (textCards != null) {
+            sb.append("  -fx-text-custom-cards: ").append(textCards).append(";\n");
+            sb.append("  -fx-text-custom-cards-muted: ").append(textCards).append("80;\n"); // 50% alpha
+        }
+
+        String textPrice = settings.getOrDefault("ui.text_price", textCards);
+        if (textPrice != null) {
+            sb.append("  -fx-text-custom-price: ").append(textPrice).append(";\n");
+        }
+
+        // El color elegido por el usuario ES el color SUPERIOR del gradiente.
+        // Gradiente: vibrante (top) → 35% más oscuro (mid) → 65% más oscuro (bot)
+        // Así, con sidebar = #1e88e5 (azul) se verá: azul → azul medio → azul casi
+        // negro
+        final String sidebarTop = settings.getOrDefault("ui.sidebar_bg", "#0f172a");
+        final String sidebarMid = darken(sidebarTop, 0.35);
+        final String sidebarBot = darken(sidebarTop, 0.65);
+        sb.append("  -fx-bg-sidebar: ").append(sidebarTop).append(";\n");
+
+        // Nuevo color de texto del sidebar (por defecto blanco) y sus versiones con transparencia
+        final String sidebarText = settings.getOrDefault("ui.sidebar_text_color", "#ffffff");
+        sb.append("  -fx-custom-color-sidebar-text: ").append(sidebarText).append(";\n");
+        sb.append("  -fx-custom-color-sidebar-text-a70: ").append(sidebarText).append("B3;\n"); // 70% alpha
+        sb.append("  -fx-custom-color-sidebar-text-a60: ").append(sidebarText).append("99;\n"); // 60% alpha
+
+        // GLOBAL TEXT COLOR OVERRIDES (Phase 4)
+        if (text != null) {
+            sb.append("}\n\n");
+            sb.append(".root, .label, .text, .button, .toggle-button, .text-field, .text-area, .combo-box {\n");
+            sb.append("  -fx-text-fill: -fx-text-custom-main;\n");
+            sb.append("}\n\n");
+            sb.append(".root {\n");
         }
 
         // Font Sizes
@@ -195,6 +239,7 @@ public class ThemeManager {
                 sb.append("  -fx-radius-md: ").append(br).append("px;\n");
                 sb.append("  -fx-radius-lg: ").append(br * 2).append("px;\n");
                 sb.append("  -fx-radius-xl: ").append(br * 3).append("px;\n");
+                sb.append("  -fx-layout-radius: ").append(br * 2).append("px;\n");
             } catch (Exception ignored) {
             }
         }
@@ -264,11 +309,80 @@ public class ThemeManager {
                 sb.append("}\n\n");
 
                 sb.append(".modern-btn-primary, .modern-btn-secondary {\n");
-                sb.append("  -fx-background-radius: ").append(bRadius * 1.5).append("px;\n");
-                sb.append("  -fx-border-radius: ").append(bRadius * 1.5).append("px;\n");
+                sb.append("  -fx-background-radius: ").append((int) (bRadius * 1.5)).append("px;\n");
+                sb.append("  -fx-border-radius: ").append((int) (bRadius * 1.5)).append("px;\n");
+                sb.append("}\n\n");
+
+                // HARD OVERRIDES FOR CARDS & CLIPS (Phase 3)
+                sb.append(
+                        ".cart-panel, .product-box, .client-card, .user-card, .stat-card, .filter-card, .detail-panel, .view-header-icon-wrap {\n");
+                sb.append("  -fx-background-radius: ").append(bRadius * 2).append("px !important;\n");
+                sb.append("  -fx-border-radius: ").append(bRadius * 2).append("px !important;\n");
+                sb.append("}\n\n");
+
+                sb.append(".product-image-container {\n");
+                sb.append("  -fx-background-radius: ").append(bRadius * 2).append("px ").append(bRadius * 2)
+                        .append("px 0 0 !important;\n");
+                sb.append("  -fx-border-radius: ").append(bRadius * 2).append("px ").append(bRadius * 2)
+                        .append("px 0 0 !important;\n");
+                sb.append("}\n\n");
+
+                sb.append(".product-image-display {\n");
+                sb.append("  -fx-background-radius: ").append((int) (bRadius * 1.5)).append("px !important;\n");
+                sb.append("  -fx-border-radius: ").append((int) (bRadius * 1.5)).append("px !important;\n");
+                sb.append("}\n\n");
+
+                sb.append(".alert-root, .toast-root {\n");
+                sb.append("  -fx-background-radius: ").append(bRadius * 3).append("px !important;\n");
+                sb.append("  -fx-border-radius: ").append(bRadius * 3).append("px !important;\n");
+                sb.append("}\n\n");
+
+                sb.append(".alert-button {\n");
+                sb.append("  -fx-background-radius: ").append(bRadius * 1.2).append("px !important;\n");
+                sb.append("}\n\n");
+
+                sb.append(".product-price-badge {\n");
+                sb.append("  -fx-background-radius: 0px ").append((int) (bRadius * 1.5)).append("px 0px ")
+                        .append((int) (bRadius * 1.5))
+                        .append("px !important;\n");
+                sb.append("}\n\n");
+
+                sb.append(".product-add-btn {\n");
+                sb.append("  -fx-background-radius: 0 0 ").append(bRadius * 2).append("px ").append(bRadius * 2)
+                        .append("px !important;\n");
+                sb.append("  -fx-border-radius: 0 0 ").append(bRadius * 2).append("px ").append(bRadius * 2)
+                        .append("px !important;\n");
                 sb.append("}\n");
             } catch (Exception ignored) {
             }
+        }
+
+        // ── BLOQUE .sidebar con gradiente directo ────────────────────────────
+        // JavaFX NO puede resolver variables CSS que contienen linear-gradient.
+        // Por eso escribimos el valor del gradiente directamente en la regla CSS.
+        // El color elegido (sidebarTop) es el vibrante de arriba;
+        // sidebarMid y sidebarBot son versiones progresivamente más oscuras.
+        sb.append(".sidebar {\n");
+        sb.append("  -fx-background-color: linear-gradient(to bottom, ")
+                .append(sidebarTop).append(" 0%, ")
+                .append(sidebarMid).append(" 55%, ")
+                .append(sidebarBot).append(" 100%);\n");
+        sb.append("}\n");
+
+        // ── BLOQUE .search-bar con tinte del color primario ──────────────────
+        // La barra de búsqueda usa un tinte muy sutil del color primario.
+        // En reposo: 5% de tinte. Al hacer foco: borde del color primario.
+        if (primary != null) {
+            String searchBg = blendColors("#f8fafc", primary, 0.06); // tinte muy sutil
+            String searchBgFocus = blendColors("#ffffff", primary, 0.04); // fondo en foco
+            sb.append(".search-bar {\n");
+            sb.append("  -fx-background-color: ").append(searchBg).append(";\n");
+            sb.append("  -fx-border-color: ").append(blendColors("#e2e8f0", primary, 0.20)).append(";\n");
+            sb.append("}\n");
+            sb.append(".search-bar:focus-within {\n");
+            sb.append("  -fx-background-color: ").append(searchBgFocus).append(";\n");
+            sb.append("  -fx-border-color: ").append(primary).append(";\n");
+            sb.append("}\n");
         }
 
         return sb.toString();
@@ -278,6 +392,57 @@ public class ThemeManager {
         if (value != null && !value.isEmpty()) {
             sb.append("  ").append(varName).append(": ").append(value).append(";\n");
         }
+    }
+
+    // --- Helpers de Manipulación de Color ---
+
+    private String brighten(String hex, double factor) {
+        try {
+            Color c = Color.valueOf(hex);
+            Color b = c.deriveColor(0, 1.0, 1.0 + factor, 1.0);
+            return toHex(b);
+        } catch (Exception e) {
+            return hex;
+        }
+    }
+
+    private String darken(String hex, double factor) {
+        try {
+            Color c = Color.valueOf(hex);
+            Color d = c.deriveColor(0, 1.0, 1.0 - factor, 1.0);
+            return toHex(d);
+        } catch (Exception e) {
+            return hex;
+        }
+    }
+
+    /**
+     * Mezcla dos colores hexadecimales.
+     * 
+     * @param base  Color base (hex)
+     * @param blend Color a mezclar (hex)
+     * @param ratio Proporción del color blend (0.0 = solo base, 1.0 = solo blend)
+     */
+    private String blendColors(String base, String blend, double ratio) {
+        try {
+            Color c1 = Color.valueOf(base);
+            Color c2 = Color.valueOf(blend);
+            double r = c1.getRed() + (c2.getRed() - c1.getRed()) * ratio;
+            double g = c1.getGreen() + (c2.getGreen() - c1.getGreen()) * ratio;
+            double b = c1.getBlue() + (c2.getBlue() - c1.getBlue()) * ratio;
+            r = Math.max(0.0, Math.min(1.0, r));
+            g = Math.max(0.0, Math.min(1.0, g));
+            b = Math.max(0.0, Math.min(1.0, b));
+            return String.format("#%02X%02X%02X",
+                    (int) (r * 255), (int) (g * 255), (int) (b * 255));
+        } catch (Exception e) {
+            return base;
+        }
+    }
+
+    private String toHex(Color c) {
+        return String.format("#%02X%02X%02X",
+                (int) (c.getRed() * 255), (int) (c.getGreen() * 255), (int) (c.getBlue() * 255));
     }
 
     public void saveAndApply(String key, String value, Scene scene) throws SQLException {

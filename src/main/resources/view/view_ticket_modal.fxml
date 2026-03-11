@@ -95,6 +95,11 @@
                     </HBox>
                 </VBox>
 
+                <!-- Tax Breakdown (V2) -->
+                <VBox fx:id="taxDetailsContainer" spacing="4" style="-fx-padding: 15 0 0 0;">
+                    <!-- Dynamically populated -->
+                </VBox>
+
                 <Separator styleClass="receipt-divider-dash">
                     <padding><Insets top="25" bottom="20"/></padding>
                 </Separator>

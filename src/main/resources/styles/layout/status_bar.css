@@ -11,11 +11,11 @@
 
 .status-badge {
     -fx-background-color: #ffffff;
-    -fx-background-radius: 20;
+    -fx-background-radius: -fx-radius-xl;
     -fx-padding: 4 12;
     -fx-border-color: rgba(0, 0, 0, 0.04);
     -fx-border-width: 1;
-    -fx-border-radius: 20;
+    -fx-border-radius: -fx-radius-xl;
 }
 
 .status-badge-label {
@@ -55,7 +55,7 @@
 }
 
 .status-badge StackPane {
-    -fx-background-radius: 50;
+    -fx-background-radius: -fx-radius-xl;
     -fx-min-width: 18;
     -fx-min-height: 18;
     -fx-max-width: 18;

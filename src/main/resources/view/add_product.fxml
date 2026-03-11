@@ -54,7 +54,19 @@
                 </HBox>
             </VBox>
 
-            <!-- IVA -->
+            <!-- Tax Group (V2) -->
+            <VBox styleClass="modern-input-group">
+                <HBox styleClass="modern-input-container" alignment="CENTER_LEFT">
+                    <FontAwesomeIconView glyphName="SHIELD" size="18" styleClass="sidebar-icon">
+                        <HBox.margin>
+                            <Insets right="10"/>
+                        </HBox.margin>
+                    </FontAwesomeIconView> 
+                    <ComboBox fx:id="cmbTaxGroup" promptText="Grupo de Impuestos (Recomendado)" styleClass="modern-input-field" maxWidth="Infinity" HBox.hgrow="ALWAYS" style="-fx-background-color: transparent;"/>
+                </HBox>
+            </VBox>
+
+            <!-- IVA Legacy -->
             <VBox styleClass="modern-input-group">
                 <HBox styleClass="modern-input-container" alignment="CENTER_LEFT">
                     <FontAwesomeIconView glyphName="PERCENT" size="18" styleClass="sidebar-icon">

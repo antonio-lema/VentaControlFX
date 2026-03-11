@@ -41,6 +41,10 @@ public class CategoryUseCase {
         repository.update(category);
     }
 
+    public void update(Category category) throws SQLException {
+        updateCategory(category);
+    }
+
     public void deleteCategory(int id) throws SQLException {
         authService.checkPermission("PRODUCTOS");
         repository.delete(id);

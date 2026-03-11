@@ -1,0 +1,172 @@
+/* Vender View Specific Styles — Premium Mega Menu */
+
+.btn-category-trigger {
+    -fx-background-color: -fx-bg-surface;
+    -fx-background-radius: -fx-radius-md;
+    -fx-border-color: -fx-color-border-subtle;
+    -fx-border-radius: -fx-radius-md;
+    -fx-border-width: 1px;
+    -fx-padding: 10 15;
+    -fx-cursor: hand;
+    -fx-effect: null;
+}
+
+.btn-category-trigger:hover {
+    -fx-border-color: -fx-custom-color-primary;
+    -fx-background-color: -fx-bg-main;
+}
+
+.btn-category-trigger:focused {
+    -fx-border-color: -fx-custom-color-primary;
+    -fx-border-width: 1.5;
+    -fx-background-color: -fx-bg-surface;
+}
+
+.label-selector-text {
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -fx-text-custom-main;
+}
+
+/* Mega Menu Container Overlay */
+.category-mega-menu {
+    -fx-background-color: -fx-bg-surface;
+    -fx-effect: dropshadow(three-pass-box, -fx-shadow-color-large, 30, 0, 0, 10);
+}
+
+.dark-theme .category-mega-menu {
+    -fx-background-color: -fx-bg-surface;
+}
+
+.mega-menu-scroll {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+}
+
+.mega-menu-scroll .viewport {
+    -fx-background-color: transparent;
+}
+
+.mega-menu-flow {
+    /* Layout logic is primarily in FXML padding/gap */
+}
+
+/* Mega Menu Buttons (Cards) */
+/* =========================================
+   SELL VIEW HEADER (Transparent Style)
+   ========================================= */
+.sell-view-header {
+    -fx-background-color: transparent;
+    -fx-effect: none;
+    -fx-padding: 25 40 10 40;
+    /* Adjusted padding for cleaner look */
+}
+
+.sell-view-header .view-title {
+    -fx-text-fill: -fx-text-custom-main;
+}
+
+.sell-view-header .view-subtitle {
+    -fx-text-fill: -fx-text-custom-muted;
+}
+
+.sell-view-header .view-header-icon-wrap {
+    -fx-background-color: -fx-custom-color-primary-bg;
+}
+
+.sell-view-header .view-header-icon-wrap .glyph-icon {
+    -fx-fill: -fx-custom-color-primary;
+}
+
+.category-mega-button {
+    -fx-background-color: -fx-bg-surface;
+    -fx-background-radius: -fx-radius-md;
+    -fx-border-radius: -fx-radius-md;
+    -fx-border-color: -fx-color-border-main;
+    -fx-border-width: 1.5px;
+    -fx-font-size: 13.5px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -fx-text-custom-main;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(three-pass-box, -fx-shadow-color-subtle, 8, 0, 0, 2);
+}
+
+.category-mega-button:hover {
+    -fx-background-color: linear-gradient(to bottom right, -fx-custom-color-primary, -fx-custom-color-primary-dark);
+    -fx-text-fill: white;
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
+    -fx-border-color: transparent;
+    -fx-effect: dropshadow(three-pass-box, -fx-shadow-color-primary, 15, 0, 0, 5);
+}
+
+/* Specific styling for Special categories */
+.category-mega-button[text^="★"] {
+    -fx-text-fill: -fx-custom-color-warning-dark;
+}
+
+.category-mega-button[text^="★"]:hover {
+    -fx-text-fill: white;
+    -fx-background-color: linear-gradient(to bottom right, -fx-custom-color-warning, -fx-custom-color-warning-dark);
+    -fx-effect: dropshadow(three-pass-box, rgba(245, 158, 11, 0.4), 15, 0, 0, 5);
+}
+
+/* Price List Selector (PVP General) - Consistent with categories */
+.price-list-selector {
+    -fx-background-color: -fx-bg-surface;
+    -fx-background-radius: -fx-radius-md;
+    -fx-border-color: -fx-color-border-subtle;
+    -fx-border-radius: -fx-radius-md;
+    -fx-border-width: 1px;
+    -fx-padding: 2;
+    -fx-cursor: hand;
+}
+
+.price-list-selector .label {
+    -fx-text-fill: -fx-text-custom-main;
+    -fx-font-weight: bold;
+    -fx-font-size: 12px;
+}
+
+.price-list-selector:hover {
+    -fx-border-color: -fx-custom-color-primary;
+    -fx-background-color: -fx-bg-main;
+}
+
+.price-list-selector .arrow-button {
+    -fx-background-color: transparent;
+}
+
+.price-list-selector .arrow {
+    -fx-background-color: -fx-text-custom-muted;
+}
+
+/* Price List Selector (PVP General) */
+.price-list-selector {
+    -fx-background-color: -fx-bg-surface;
+    -fx-background-radius: -fx-radius-md;
+    -fx-border-color: -fx-color-border-subtle;
+    -fx-border-radius: -fx-radius-md;
+    -fx-border-width: 1px;
+    -fx-padding: 2;
+    -fx-cursor: hand;
+}
+
+.price-list-selector .label {
+    -fx-text-fill: -fx-text-custom-main;
+    -fx-font-weight: bold;
+    -fx-font-size: 12px;
+}
+
+.price-list-selector:hover {
+    -fx-border-color: -fx-custom-color-primary;
+    -fx-background-color: -fx-bg-main;
+}
+
+.price-list-selector .arrow-button {
+    -fx-background-color: transparent;
+}
+
+.price-list-selector .arrow {
+    -fx-background-color: -fx-text-custom-muted;
+}

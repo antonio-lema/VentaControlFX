@@ -66,9 +66,10 @@ public class ProductController implements Injectable, com.mycompany.ventacontrol
         this.vatUseCase = container.getVatUseCase();
 
         try {
-            globalIva = vatUseCase.getCurrentGlobalRate()
-                    .map(com.mycompany.ventacontrolfx.domain.model.TaxRevision::getRate)
-                    .orElse(21.0);
+            // globalIva = vatUseCase.getCurrentGlobalRate()
+            // .map(com.mycompany.ventacontrolfx.domain.model.TaxRevision::getRate)
+            // .orElse(21.0);
+            globalIva = 21.0;
         } catch (Exception e) {
             globalIva = 21.0;
         }

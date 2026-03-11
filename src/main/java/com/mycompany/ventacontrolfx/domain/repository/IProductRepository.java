@@ -37,4 +37,8 @@ public interface IProductRepository {
 
     void updateTaxRateToAll(double taxRate) throws SQLException;
 
+    void updateTaxGroupByCategory(int categoryId, int taxGroupId) throws SQLException;
+
+    void updateTaxGroupToAll(int taxGroupId) throws SQLException;
+
 }

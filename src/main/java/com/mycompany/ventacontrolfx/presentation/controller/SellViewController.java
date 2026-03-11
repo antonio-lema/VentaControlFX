@@ -14,14 +14,15 @@ import com.mycompany.ventacontrolfx.domain.model.PriceList;
 import com.mycompany.ventacontrolfx.shared.async.AsyncManager;
 import com.mycompany.ventacontrolfx.application.usecase.ProductFilterUseCase.FilterType;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
-import javafx.scene.layout.Region;
 import javafx.util.StringConverter;
+import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -32,19 +33,17 @@ public class SellViewController implements Injectable, CategoryMenuRenderer.Cate
     @FXML
     private TilePane productsPane;
     @FXML
-    private FlowPane categoriesFlowPane;
+    private ComboBox<PriceList> comboPriceList;
     @FXML
-    private ScrollPane categoriesScrollPane;
+    private VBox categoryMenuContainer;
+    @FXML
+    private FlowPane categoriesMegaFlowPane;
+    @FXML
+    private Label lblSelectedCategory;
     @FXML
     private Label filterLabel;
     @FXML
     private VBox loadingOverlay;
-    @FXML
-    private javafx.scene.control.Button btnExpandCategories;
-    @FXML
-    private de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView expandIcon;
-    @FXML
-    private ComboBox<PriceList> comboPriceList;
 
     private ServiceContainer container;
     private ProductUseCase productUseCase;
@@ -52,7 +51,6 @@ public class SellViewController implements Injectable, CategoryMenuRenderer.Cate
     private PriceListUseCase priceListUseCase;
     private ProductFilterUseCase filterUseCase;
     private ProductGridRenderer productRenderer;
-    private CategoryMenuRenderer categoryRenderer;
 
     private int selectedPriceListId = -1;
 
@@ -72,9 +70,8 @@ public class SellViewController implements Injectable, CategoryMenuRenderer.Cate
                 config.isPricesIncludeTax(),
                 container.getCartUseCase()::addItem);
 
-        this.categoryRenderer = new CategoryMenuRenderer(categoriesFlowPane, filterUseCase, this);
-
         setupPriceListSelector();
+        setupCategorySelector();
 
         // Listen for price list changes from other sources (like CartUseCase reacting
         // to client changes)
@@ -92,15 +89,14 @@ public class SellViewController implements Injectable, CategoryMenuRenderer.Cate
             }
         });
 
-        if (btnExpandCategories != null) {
-            btnExpandCategories.setVisible(false);
-            btnExpandCategories.setManaged(false);
-            categoriesFlowPane.heightProperty().addListener((obs, oldVal, newVal) -> {
-                boolean needsExpansion = newVal.doubleValue() > 110;
-                btnExpandCategories.setVisible(needsExpansion);
-                btnExpandCategories.setManaged(needsExpansion);
-            });
-        }
+        // Listen for category changes from Cart
+        container.getCartUseCase().selectedCategoryIdProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal != null) {
+                int catId = newVal.intValue();
+                updateCategoryLabelFromId(catId);
+                applyCategoryFilterById(catId);
+            }
+        });
 
         loadInitialData();
     }
@@ -110,18 +106,93 @@ public class SellViewController implements Injectable, CategoryMenuRenderer.Cate
         container.getAsyncManager().runAsyncTask(() -> productUseCase.getVisibleProducts(selectedPriceListId),
                 products -> {
                     filterUseCase.updateSourceData(products);
-                    try {
-                        categoryRenderer.render(categoryUseCase.getFavorites());
-                        onSpecialFilterSelected(FilterType.FAVORITES);
-
-                        // We will rely on the FlowPane height to show/hide the button
-                        // It will be handled in the inject() or initialized block,
-                        // but we can set up the bindings here or in inject.
-                    } catch (SQLException e) {
-                        e.printStackTrace();
-                    }
+                    applyCategoryFilterById(container.getCartUseCase().getSelectedCategoryId());
                     loadingOverlay.setVisible(false);
                 }, null);
+    }
+
+    private void applyCategoryFilterById(int catId) {
+        if (catId == -1)
+            renderProducts(filterUseCase.applyAll());
+        else if (catId == -2)
+            renderProducts(filterUseCase.applyFavorites());
+        else {
+            // Buscamos la categoría para aplicar el filtro específico
+            container.getAsyncManager().runAsyncTask(() -> categoryUseCase.getAll(), cats -> {
+                cats.stream().filter(c -> c.getId() == catId).findFirst()
+                        .ifPresent(c -> renderProducts(filterUseCase.applyCategory(c)));
+            }, null);
+        }
+    }
+
+    private void setupCategorySelector() {
+        if (categoriesMegaFlowPane == null)
+            return;
+
+        container.getAsyncManager().runAsyncTask(() -> {
+            List<Category> cats = categoryUseCase.getAll();
+            Category all = new Category();
+            all.setName("Todas las categorías");
+            all.setId(-1);
+            Category favs = new Category();
+            favs.setName("★ Favoritos");
+            favs.setId(-2);
+
+            java.util.List<Category> result = new java.util.ArrayList<>();
+            result.add(all);
+            result.add(favs);
+            result.addAll(cats);
+            return result;
+        }, categories -> {
+            renderCategoryMegaMenu(categories);
+            updateCategoryLabelFromId(container.getCartUseCase().getSelectedCategoryId());
+        }, null);
+    }
+
+    private void renderCategoryMegaMenu(List<Category> categories) {
+        categoriesMegaFlowPane.getChildren().clear();
+        for (Category cat : categories) {
+            Button btn = new Button(cat.getName());
+            btn.getStyleClass().add("category-mega-button");
+            // Set a more compact size for the cards
+            btn.setPrefWidth(160);
+            btn.setPrefHeight(48);
+
+            btn.setOnAction(e -> {
+                if (cat.getId() == -1)
+                    onSpecialFilterSelected(FilterType.ALL);
+                else if (cat.getId() == -2)
+                    onSpecialFilterSelected(FilterType.FAVORITES);
+                else
+                    onCategorySelected(cat);
+
+                // Actualizar estado global y cerrar menú
+                container.getCartUseCase().setSelectedCategoryId(cat.getId());
+                handleToggleCategoryMenu();
+            });
+            categoriesMegaFlowPane.getChildren().add(btn);
+        }
+    }
+
+    private void updateCategoryLabelFromId(int catId) {
+        if (catId == -1)
+            lblSelectedCategory.setText("Todas las categorías");
+        else if (catId == -2)
+            lblSelectedCategory.setText("★ Favoritos");
+        else {
+            // Intentar buscar nombre en cache o servicio (aquí simplificado)
+            container.getAsyncManager().runAsyncTask(() -> categoryUseCase.getAll(), cats -> {
+                cats.stream().filter(c -> c.getId() == catId).findFirst()
+                        .ifPresent(c -> lblSelectedCategory.setText(c.getName()));
+            }, null);
+        }
+    }
+
+    @FXML
+    private void handleToggleCategoryMenu() {
+        boolean isVisible = categoryMenuContainer.isVisible();
+        categoryMenuContainer.setVisible(!isVisible);
+        categoryMenuContainer.setManaged(!isVisible);
     }
 
     private void setupPriceListSelector() {
@@ -217,26 +288,5 @@ public class SellViewController implements Injectable, CategoryMenuRenderer.Cate
             lbl = ((Category) criteria).getName();
 
         filterLabel.setText(lbl + " (" + products.size() + ")");
-        categoryRenderer.updateStyles();
-    }
-
-    private boolean categoriesExpanded = false;
-
-    @FXML
-    private void handleExpandCategories() {
-        categoriesExpanded = !categoriesExpanded;
-        if (categoriesExpanded) {
-            categoriesScrollPane.setPrefHeight(Region.USE_COMPUTED_SIZE);
-            categoriesScrollPane.setMaxHeight(Region.USE_COMPUTED_SIZE);
-            if (expandIcon != null) {
-                expandIcon.setGlyphName("CHEVRON_DOWN");
-            }
-        } else {
-            categoriesScrollPane.setPrefHeight(110);
-            categoriesScrollPane.setMaxHeight(110);
-            if (expandIcon != null) {
-                expandIcon.setGlyphName("CHEVRON_UP");
-            }
-        }
     }
 }

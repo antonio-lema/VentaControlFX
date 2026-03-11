@@ -4,30 +4,15 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.*?>
 <?import javafx.scene.shape.*?>
-<?import javafx.scene.image.ImageView?>
 <?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
 
 <HBox xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="com.mycompany.ventacontrolfx.presentation.controller.HeaderController"
       spacing="0" alignment="CENTER_LEFT" styleClass="top-bar">
 
-    <!-- ====== LOGO / MARCA ====== -->
-    <HBox alignment="CENTER_LEFT" spacing="10" styleClass="logo-container">
-        <StackPane styleClass="top-bar-action-btn">
-            <ImageView fx:id="imgLogo" fitHeight="28" preserveRatio="true" managed="false" visible="false"/>
-            <FontAwesomeIconView fx:id="defaultLogoIcon" glyphName="SHOPPING_BAG" size="20" fill="#1e88e5" />
-        </StackPane>
-        <HBox spacing="4" alignment="CENTER_LEFT">
-            <Label fx:id="lblAppPrefix" text="Venta" styleClass="logo-text"/>
-            <Label fx:id="lblAppName"   text="Control" styleClass="brand-text"/>
-        </HBox>
-    </HBox>
-
-    <!-- Separador flexible izquierdo -->
-    <Region HBox.hgrow="ALWAYS"/>
-
-    <!-- ====== BARRA DE BÚSQUEDA ====== -->
-    <HBox fx:id="searchBarContainer" alignment="CENTER_LEFT" spacing="10" styleClass="search-bar">
+    <!-- ====== BARRA DE BÚSQUEDA (izquierda) ====== -->
+    <HBox fx:id="searchBarContainer" alignment="CENTER_LEFT" spacing="10" styleClass="search-bar"
+          HBox.hgrow="ALWAYS" maxWidth="480">
         <FontAwesomeIconView glyphName="SEARCH" size="16" fill="#adb5bd"/>
         <TextField fx:id="searchField"
                    promptText="Buscar productos, clientes o códigos..."
@@ -35,11 +20,14 @@
                    HBox.hgrow="ALWAYS"/>
     </HBox>
 
-    <!-- Separador flexible derecho -->
+    <!-- Separador flexible -->
     <Region HBox.hgrow="ALWAYS"/>
 
-    <!-- ====== ZONA DERECHA: NOTIFICACIÓN + USUARIO ====== -->
+    <!-- ====== ZONA DERECHA: USUARIO ====== -->
     <HBox spacing="12" alignment="CENTER_LEFT">
+        <padding>
+            <Insets right="8"/>
+        </padding>
 
         <!-- Menú de usuario -->
         <MenuButton fx:id="userMenuButton" styleClass="user-menu-button">

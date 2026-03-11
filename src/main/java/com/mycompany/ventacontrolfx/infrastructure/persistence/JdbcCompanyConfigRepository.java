@@ -36,6 +36,7 @@ public class JdbcCompanyConfigRepository implements ICompanyConfigRepository {
     private static final String K_CHECK = "check";
     private static final String K_CREDIT = "credit";
     private static final String K_ROUNDING = "rounding";
+    private static final String K_ROUNDING_METHOD = "roundingMethod"; // Tax Engine V2
     private static final String K_ALLOW_DISCOUNT = "allowDiscount";
     private static final String K_ALLOW_GLOB_DISC = "allowGlobalDiscount";
     private static final String K_REQUIRE_CLIENT = "requireClient";
@@ -80,6 +81,7 @@ public class JdbcCompanyConfigRepository implements ICompanyConfigRepository {
         cfg.setCheck(getBoolean(K_CHECK, d.isCheck()));
         cfg.setCredit(getBoolean(K_CREDIT, d.isCredit()));
         cfg.setRounding(getString(K_ROUNDING, d.getRounding()));
+        cfg.setRoundingMethod(getString(K_ROUNDING_METHOD, d.getRoundingMethod()));
         cfg.setAllowDiscount(getBoolean(K_ALLOW_DISCOUNT, d.isAllowDiscount()));
         cfg.setAllowGlobalDiscount(getBoolean(K_ALLOW_GLOB_DISC, d.isAllowGlobalDiscount()));
         cfg.setRequireClient(getBoolean(K_REQUIRE_CLIENT, d.isRequireClient()));
@@ -124,6 +126,7 @@ public class JdbcCompanyConfigRepository implements ICompanyConfigRepository {
         setValue(K_CHECK, String.valueOf(cfg.isCheck()));
         setValue(K_CREDIT, String.valueOf(cfg.isCredit()));
         setValue(K_ROUNDING, orEmpty(cfg.getRounding()));
+        setValue(K_ROUNDING_METHOD, orEmpty(cfg.getRoundingMethod()));
         setValue(K_ALLOW_DISCOUNT, String.valueOf(cfg.isAllowDiscount()));
         setValue(K_ALLOW_GLOB_DISC, String.valueOf(cfg.isAllowGlobalDiscount()));
         setValue(K_REQUIRE_CLIENT, String.valueOf(cfg.isRequireClient()));

@@ -37,6 +37,7 @@ public class CartUseCase {
     private final IntegerProperty itemCount = new SimpleIntegerProperty(0);
     private final ObjectProperty<Client> selectedClient = new SimpleObjectProperty<>(null);
     private final IntegerProperty priceListId = new SimpleIntegerProperty(-1);
+    private final IntegerProperty selectedCategoryId = new SimpleIntegerProperty(-2);
 
     private final ICompanyConfigRepository configRepository;
     private final IPriceRepository priceRepository;
@@ -184,6 +185,18 @@ public class CartUseCase {
 
     public int getPriceListId() {
         return priceListId.get();
+    }
+
+    public IntegerProperty selectedCategoryIdProperty() {
+        return selectedCategoryId;
+    }
+
+    public int getSelectedCategoryId() {
+        return selectedCategoryId.get();
+    }
+
+    public void setSelectedCategoryId(int id) {
+        this.selectedCategoryId.set(id);
     }
 
     public void addItem(Product product) {

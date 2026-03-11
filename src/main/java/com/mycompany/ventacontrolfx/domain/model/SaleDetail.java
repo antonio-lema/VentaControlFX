@@ -7,8 +7,15 @@ public class SaleDetail {
     private int quantity;
     private double unitPrice;
     private double lineTotal;
-    private double ivaRate;
-    private double ivaAmount;
+    private double ivaRate; // Legacy
+    private double ivaAmount; // Legacy
+
+    // Tax Engine V2 (Snapshot Fiscal)
+    private double netUnitPrice;
+    private double taxBasis;
+    private double taxAmount;
+    private double grossTotal;
+    private String appliedTaxGroup;
 
     // Auxiliary field for UI display
     private String productName;
@@ -79,6 +86,47 @@ public class SaleDetail {
 
     public void setIvaAmount(double ivaAmount) {
         this.ivaAmount = ivaAmount;
+    }
+
+    // Tax Engine V2 Getters and Setters
+    public double getNetUnitPrice() {
+        return netUnitPrice;
+    }
+
+    public void setNetUnitPrice(double netUnitPrice) {
+        this.netUnitPrice = netUnitPrice;
+    }
+
+    public double getTaxBasis() {
+        return taxBasis;
+    }
+
+    public void setTaxBasis(double taxBasis) {
+        this.taxBasis = taxBasis;
+    }
+
+    public double getTaxAmount() {
+        return taxAmount;
+    }
+
+    public void setTaxAmount(double taxAmount) {
+        this.taxAmount = taxAmount;
+    }
+
+    public double getGrossTotal() {
+        return grossTotal;
+    }
+
+    public void setGrossTotal(double grossTotal) {
+        this.grossTotal = grossTotal;
+    }
+
+    public String getAppliedTaxGroup() {
+        return appliedTaxGroup;
+    }
+
+    public void setAppliedTaxGroup(String appliedTaxGroup) {
+        this.appliedTaxGroup = appliedTaxGroup;
     }
 
     public String getProductName() {

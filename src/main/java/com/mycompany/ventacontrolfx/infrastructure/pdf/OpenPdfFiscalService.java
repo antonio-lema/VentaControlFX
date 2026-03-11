@@ -178,19 +178,26 @@ public class OpenPdfFiscalService implements IFiscalPdfService {
         nestedTotals.setWidthPercentage(100);
         addTotalLine(nestedTotals, "Base Imponible:", String.format("%.2f €", data.document.getBaseAmount()));
 
-        // ─── DESGLOSE DE IVA POR TIPO ───
-        java.util.Map<Double, Double[]> breakdown = new java.util.TreeMap<>();
-        for (SaleDetail line : data.lines) {
-            double rate = line.getIvaRate();
-            Double[] vals = breakdown.getOrDefault(rate, new Double[] { 0.0, 0.0 });
-            vals[0] += (line.getLineTotal() - line.getIvaAmount()); // Base
-            vals[1] += line.getIvaAmount(); // Cuota
-            breakdown.put(rate, vals);
-        }
-
-        for (java.util.Map.Entry<Double, Double[]> entry : breakdown.entrySet()) {
-            addTotalLine(nestedTotals, String.format("IVA %.0f%%:", entry.getKey()),
-                    String.format("%.2f €", entry.getValue()[1]));
+        // ─── DESGLOSE DE IVA DESDE EL SNAPSHOT FISCAL (V2.0) ───
+        if (data.sale.getTaxSummaries() != null && !data.sale.getTaxSummaries().isEmpty()) {
+            for (com.mycompany.ventacontrolfx.domain.model.SaleTaxSummary summary : data.sale.getTaxSummaries()) {
+                addTotalLine(nestedTotals, String.format("%s (%.1f%%):", summary.getTaxName(), summary.getTaxRate()),
+                        String.format("%.2f €", summary.getTaxAmount()));
+            }
+        } else {
+            // Fallback para ventas históricas sin snapshot V2.0 (Cálculo simplificado)
+            java.util.Map<Double, Double[]> breakdown = new java.util.TreeMap<>();
+            for (SaleDetail line : data.lines) {
+                double rate = line.getIvaRate();
+                Double[] vals = breakdown.getOrDefault(rate, new Double[] { 0.0, 0.0 });
+                vals[0] += (line.getLineTotal() - line.getIvaAmount()); // Base
+                vals[1] += line.getIvaAmount(); // Cuota
+                breakdown.put(rate, vals);
+            }
+            for (java.util.Map.Entry<Double, Double[]> entry : breakdown.entrySet()) {
+                addTotalLine(nestedTotals, String.format("IVA %.0f%%:", entry.getKey()),
+                        String.format("%.2f €", entry.getValue()[1]));
+            }
         }
 
         addTotalLine(nestedTotals, "Total Impuestos:", String.format("%.2f €", data.document.getVatAmount()));

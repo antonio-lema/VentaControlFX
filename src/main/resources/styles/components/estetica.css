@@ -30,13 +30,13 @@
 .estetica-title {
     -fx-font-size: 22px;
     -fx-font-weight: bold;
-    -fx-text-fill: white;
+    -fx-text-fill: white !important;
     -fx-font-family: 'Segoe UI', Roboto, sans-serif;
 }
 
 .estetica-subtitle {
     -fx-font-size: 13px;
-    -fx-text-fill: rgba(255, 255, 255, 0.82);
+    -fx-text-fill: rgba(255, 255, 255, 0.82) !important;
     -fx-padding: 3 0 0 0;
 }
 
@@ -356,7 +356,7 @@
 
 .estetica-btn-save {
     -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #1e88e5 0%, #1565c0 100%);
-    -fx-text-fill: white;
+    -fx-text-fill: white !important;
     -fx-font-weight: bold;
     -fx-font-size: 14px;
     -fx-padding: 11 28;

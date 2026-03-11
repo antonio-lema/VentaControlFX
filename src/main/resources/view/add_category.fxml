@@ -33,6 +33,18 @@
                 </HBox>
             </VBox>
 
+            <!-- Default Tax Group (V2) -->
+            <VBox styleClass="modern-input-group">
+                <HBox styleClass="modern-input-container" alignment="CENTER_LEFT">
+                    <FontAwesomeIconView glyphName="BALANCE_SCALE" size="18" styleClass="sidebar-icon">
+                        <HBox.margin>
+                            <Insets right="10"/>
+                        </HBox.margin>
+                    </FontAwesomeIconView> 
+                    <ComboBox fx:id="cmbTaxGroup" promptText="Grupo de Impuestos (V2)" styleClass="modern-combo-box" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+                </HBox>
+            </VBox>
+
             <!-- Default IVA -->
             <VBox styleClass="modern-input-group">
                 <HBox styleClass="modern-input-container" alignment="CENTER_LEFT">

@@ -74,6 +74,7 @@ public class ServiceContainer {
     // State / Use Cases
     private final CartUseCase cartUseCase;
     private NavigationService navigationService;
+    private final com.mycompany.ventacontrolfx.domain.service.TaxEngineService taxEngineService;
 
     public ServiceContainer() {
         // 1. Shared Infrastructure
@@ -106,14 +107,16 @@ public class ServiceContainer {
         this.priceListRepository = new JdbcPriceListRepository();
         this.taxRepository = new JdbcTaxRepository();
         this.priceLogRepository = new JdbcPriceUpdateLogRepository();
+        // 3. Domain Services
+        this.taxEngineService = new com.mycompany.ventacontrolfx.domain.service.TaxEngineService(taxRepository);
 
-        // 3. Wiring Use Cases (Application Layer)
+        // 4. Wiring Use Cases (Application Layer)
         this.productUseCase = new com.mycompany.ventacontrolfx.application.usecase.ProductUseCase(productRepository,
                 authService);
         this.categoryUseCase = new CategoryUseCase(categoryRepository, authService);
         this.clientUseCase = new ClientUseCase(clientRepository, authService);
         this.saleUseCase = new com.mycompany.ventacontrolfx.application.usecase.SaleUseCase(saleRepository,
-                configRepository, authService);
+                configRepository, authService, taxEngineService, clientRepository);
         this.userUseCase = new com.mycompany.ventacontrolfx.application.usecase.UserUseCase(userRepository, emailSender,
                 authService);
         this.closureUseCase = new CashClosureUseCase(closureRepository, authService);
@@ -138,12 +141,19 @@ public class ServiceContainer {
         this.restoreSuspendedCartUseCase = new RestoreSuspendedCartUseCase(
                 suspendedCartRepository, productRepository, clientRepository, cartUseCase);
 
+        // 4. Domain Services
+        // taxEngineService is now initialized above
+
         // Cross-wiring: SaleUseCase necesita CashClosureUseCase para registrar
         // devoluciones en caja
         this.saleUseCase.setCashClosureUseCase(this.closureUseCase);
     }
 
     // --- Getters ---
+    public com.mycompany.ventacontrolfx.domain.service.TaxEngineService getTaxEngineService() {
+        return taxEngineService;
+    }
+
     public ProductUseCase getProductUseCase() {
         return productUseCase;
     }
@@ -283,5 +293,9 @@ public class ServiceContainer {
 
     public IPriceUpdateLogRepository getPriceLogRepository() {
         return priceLogRepository;
+    }
+
+    public ITaxRepository getTaxRepository() {
+        return taxRepository;
     }
 }

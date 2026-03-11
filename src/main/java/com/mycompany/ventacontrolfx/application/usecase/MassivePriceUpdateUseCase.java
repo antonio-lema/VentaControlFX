@@ -244,8 +244,27 @@ public class MassivePriceUpdateUseCase {
     public int applyTaxToCategory(int categoryId, double taxRate, String reason) throws SQLException {
         productRepository.updateTaxRateByCategory(categoryId, taxRate);
         // Aquí no tenemos un count exacto fácil sin query extra, pero guardamos el log.
-        saveLog("tax_change", "Por Categoría", taxRate, -1, categoryId, reason);
+        saveLog("tax_change_legacy", "Por Categoría", taxRate, -1, categoryId, reason);
         return 1; // Indicativo
+    }
+
+    /**
+     * Aplica un grupo de impuestos V2 (TaxEngine) a todos los productos.
+     */
+    public int applyTaxGroupToAll(int taxGroupId, String reason) throws SQLException {
+        productRepository.updateTaxGroupToAll(taxGroupId);
+        int updated = productRepository.count();
+        saveLog("tax_group_change", "Todos los Artículos (V2)", taxGroupId, updated, null, reason);
+        return updated;
+    }
+
+    /**
+     * Aplica un grupo de impuestos V2 (TaxEngine) a una categoría.
+     */
+    public int applyTaxGroupToCategory(int categoryId, int taxGroupId, String reason) throws SQLException {
+        productRepository.updateTaxGroupByCategory(categoryId, taxGroupId);
+        saveLog("tax_group_change", "Por Categoría (V2)", taxGroupId, -1, categoryId, reason);
+        return 1;
     }
 
     /**

@@ -123,7 +123,7 @@ public class JdbcProductRepository implements IProductRepository {
             conn = DBConnection.getConnection();
             conn.setAutoCommit(false); // Transacción para doble escritura
 
-            String sql = "INSERT INTO products (category_id, name, is_favorite, image_path, visible, iva, tax_rate) VALUES (?, ?, ?, ?, ?, ?, ?)";
+            String sql = "INSERT INTO products (category_id, name, is_favorite, image_path, visible, iva, tax_rate, tax_group_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
             try (PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
                 pstmt.setInt(1, product.getCategoryId());
                 pstmt.setString(2, product.getName());
@@ -138,6 +138,11 @@ public class JdbcProductRepository implements IProductRepository {
                 } else {
                     pstmt.setNull(6, Types.DOUBLE);
                     pstmt.setNull(7, Types.DOUBLE);
+                }
+                if (product.getTaxGroupId() != null && product.getTaxGroupId() > 0) {
+                    pstmt.setInt(8, product.getTaxGroupId());
+                } else {
+                    pstmt.setNull(8, Types.INTEGER);
                 }
                 pstmt.executeUpdate();
 
@@ -198,7 +203,7 @@ public class JdbcProductRepository implements IProductRepository {
             conn = DBConnection.getConnection();
             conn.setAutoCommit(false); // Transacción para doble escritura
 
-            String sql = "UPDATE products SET category_id = ?, name = ?, is_favorite = ?, image_path = ?, visible = ?, iva = ?, tax_rate = ? WHERE product_id = ?";
+            String sql = "UPDATE products SET category_id = ?, name = ?, is_favorite = ?, image_path = ?, visible = ?, iva = ?, tax_rate = ?, tax_group_id = ? WHERE product_id = ?";
             try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
                 pstmt.setInt(1, product.getCategoryId());
                 pstmt.setString(2, product.getName());
@@ -214,7 +219,12 @@ public class JdbcProductRepository implements IProductRepository {
                     pstmt.setNull(6, Types.DOUBLE);
                     pstmt.setNull(7, Types.DOUBLE);
                 }
-                pstmt.setInt(8, product.getId());
+                if (product.getTaxGroupId() != null && product.getTaxGroupId() > 0) {
+                    pstmt.setInt(8, product.getTaxGroupId());
+                } else {
+                    pstmt.setNull(8, Types.INTEGER);
+                }
+                pstmt.setInt(9, product.getId());
                 pstmt.executeUpdate();
             }
 
@@ -373,6 +383,27 @@ public class JdbcProductRepository implements IProductRepository {
     }
 
     @Override
+    public void updateTaxGroupByCategory(int categoryId, int taxGroupId) throws SQLException {
+        String sql = "UPDATE products SET tax_group_id = ? WHERE category_id = ?";
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, taxGroupId);
+            pstmt.setInt(2, categoryId);
+            pstmt.executeUpdate();
+        }
+    }
+
+    @Override
+    public void updateTaxGroupToAll(int taxGroupId) throws SQLException {
+        String sql = "UPDATE products SET tax_group_id = ?";
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, taxGroupId);
+            pstmt.executeUpdate();
+        }
+    }
+
+    @Override
     public int count() throws SQLException {
         String sql = "SELECT COUNT(*) FROM products";
         try (Connection conn = DBConnection.getConnection();
@@ -432,6 +463,14 @@ public class JdbcProductRepository implements IProductRepository {
                 iva,
                 categoryIva);
         p.setCurrentPrice(calculatedPrice);
+
+        try {
+            int taxGroupId = rs.getInt("tax_group_id");
+            if (!rs.wasNull())
+                p.setTaxGroupId(taxGroupId);
+        } catch (SQLException e) {
+        }
+
         return p;
     }
 

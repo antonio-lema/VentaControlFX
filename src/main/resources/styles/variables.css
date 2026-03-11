@@ -1,4 +1,4 @@
-﻿.root {
+.root {
     /* Tipografía Global */
     -fx-font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     -fx-font-size-base: 14px;
@@ -17,6 +17,18 @@
     -fx-fixed-red: #ef4444;
     -fx-fixed-red-dark: #dc2626;
     -fx-fixed-red-bg: rgba(239, 68, 68, 0.1);
+
+    /* ===================================================
+       LAYOUT & SPACING TOKENS (Scalability)
+       =================================================== */
+    -fx-layout-gap: 15px;
+    -fx-layout-radius: -fx-radius-xl;
+    -fx-layout-margin: 15px;
+
+    /* --- SIDEBAR TOKENS --- */
+    -fx-sidebar-width: 245px;
+    -fx-sidebar-btn-width: 144px;
+    -fx-sidebar-btn-active-width: 187px;
 
     /* --- PALETA DE COLORES BASE --- */
     -fx-custom-color-primary: #1e88e5;

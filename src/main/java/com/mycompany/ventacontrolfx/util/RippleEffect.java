@@ -1,6 +1,5 @@
 package com.mycompany.ventacontrolfx.util;
 
-import javafx.animation.FadeTransition;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
@@ -8,8 +7,10 @@ import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
@@ -18,63 +19,65 @@ import javafx.util.Duration;
 public class RippleEffect {
 
     public static void applyTo(Button button) {
-        // Force button adjustments to allow full ripple coverage and left alignment
-        // We override padding to 0 so the Graphic (holding the ripple) fills the entire
-        // button.
+        // Force button adjustments to allow full ripple coverage
         String currentStyle = button.getStyle() != null ? button.getStyle() : "";
         button.setStyle(currentStyle + "; -fx-padding: 0;");
-        button.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+
+        // Preserve original settings
+        ContentDisplay originalDisplay = button.getContentDisplay();
+        Node originalGraphic = button.getGraphic();
+        String originalText = button.getText();
 
         // Create a Pane to hold the ripples (overlay)
         Pane rippleContainer = new Pane();
-        rippleContainer.setMouseTransparent(true); // Ensure ripple doesn't block interactions
+        rippleContainer.setMouseTransparent(true);
 
         // Clip the ripple container to the button's bounds
         Rectangle clip = new Rectangle();
         clip.widthProperty().bind(button.widthProperty());
         clip.heightProperty().bind(button.heightProperty());
-        clip.setArcWidth(5); // Match CSS radius
-        clip.setArcHeight(5);
+        clip.setArcWidth(20); // More rounded for premium look
+        clip.setArcHeight(20);
         rippleContainer.setClip(clip);
 
-        // Prepare the content
-        Node originalGraphic = button.getGraphic();
-        String originalText = button.getText();
+        // Create content container based on ContentDisplay
+        Pane contentPane;
+        if (originalDisplay == ContentDisplay.TOP) {
+            VBox vbox = new VBox(10); // Match original spacing
+            vbox.setAlignment(javafx.geometry.Pos.CENTER);
+            contentPane = vbox;
+            contentPane.setPadding(new javafx.geometry.Insets(12, 10, 12, 10));
+        } else {
+            HBox hbox = new HBox(12);
+            hbox.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+            contentPane = hbox;
+            contentPane.setPadding(new javafx.geometry.Insets(12, 15, 12, 15));
+        }
 
-        StackPane contentPane = new StackPane();
+        contentPane.setMouseTransparent(true);
         contentPane.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-        contentPane.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
-        // Restore padding here (moved from Button to inner Content)
-        contentPane.setPadding(new javafx.geometry.Insets(12, 15, 12, 15));
 
-        // If button has text, wrap it in a Label
+        // Add Graphic first
+        if (originalGraphic != null) {
+            contentPane.getChildren().add(originalGraphic);
+        }
+
+        // Add Text as Label
         if (originalText != null && !originalText.isEmpty()) {
             Label textLabel = new Label(originalText);
             textLabel.getStyleClass().add("label");
-            // textLabel.setStyle(button.getStyle()); // Avoid copying the padding:0 style
-            // back
-
+            textLabel.setStyle("-fx-text-fill: inherit; -fx-font-weight: inherit; -fx-font-size: inherit;");
             contentPane.getChildren().add(textLabel);
-            button.setText(""); // clear text from button proper
-        }
-
-        if (originalGraphic != null) {
-            contentPane.getChildren().add(originalGraphic);
+            button.setText("");
         }
 
         // Combine Content + Ripple Overlay
         StackPane root = new StackPane(contentPane, rippleContainer);
         root.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-        root.setAlignment(javafx.geometry.Pos.CENTER_LEFT); // Ensure root aligns left too
+        root.setAlignment(javafx.geometry.Pos.CENTER);
 
-        // Mouse listener on the button (or root) to spawn ripples
-        // We attach to button to capture clicks anywhere on the button surface
         button.setOnMousePressed(e -> {
-            double x = e.getX();
-            double y = e.getY();
-
-            // Spawn ripple
-            createRipple(rippleContainer, x, y, button.getWidth());
+            createRipple(rippleContainer, e.getX(), e.getY(), button.getWidth());
         });
 
         button.setGraphic(root);

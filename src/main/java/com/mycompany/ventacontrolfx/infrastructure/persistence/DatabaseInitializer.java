@@ -58,9 +58,10 @@ public class DatabaseInitializer {
                     "city VARCHAR(100)",
                     "province VARCHAR(100)",
                     "country VARCHAR(100) DEFAULT 'Spain'",
-                    "email VARCHAR(255)",
                     "phone VARCHAR(50)",
-                    "price_list_id INT DEFAULT NULL"
+                    "price_list_id INT DEFAULT NULL",
+                    "tax_exempt BOOLEAN DEFAULT FALSE",
+                    "tax_regime VARCHAR(50) DEFAULT 'NORMAL'"
             };
             for (String col : clientCols) {
                 try {
@@ -79,6 +80,16 @@ public class DatabaseInitializer {
             try {
                 // iva en productos (sobrescribe categoría)
                 stmt.execute("ALTER TABLE products ADD COLUMN iva DECIMAL(5,2) DEFAULT NULL");
+            } catch (SQLException e) {
+            }
+            try {
+                // tax_group_id para el Tax Engine V2
+                stmt.execute("ALTER TABLE products ADD COLUMN tax_group_id INT DEFAULT NULL");
+            } catch (SQLException e) {
+            }
+            try {
+                // tax_group_id en categorías (para herencia)
+                stmt.execute("ALTER TABLE categories ADD COLUMN tax_group_id INT DEFAULT NULL");
             } catch (SQLException e) {
             }
 
@@ -255,6 +266,21 @@ public class DatabaseInitializer {
             } catch (SQLException e) {
             }
 
+            // --- Campos para Snapshot Fiscal V2 (Tax Engine) ---
+            String[] v2SaleDetailCols = {
+                    "net_unit_price DECIMAL(10,4) DEFAULT 0.00",
+                    "tax_basis DECIMAL(10,2) DEFAULT 0.00",
+                    "tax_amount DECIMAL(10,2) DEFAULT 0.00",
+                    "gross_total DECIMAL(10,2) DEFAULT 0.00",
+                    "applied_tax_group VARCHAR(100) DEFAULT NULL"
+            };
+            for (String col : v2SaleDetailCols) {
+                try {
+                    stmt.execute("ALTER TABLE sale_details ADD COLUMN " + col);
+                } catch (SQLException e) {
+                }
+            }
+
             // 3. Closures Table
             stmt.execute("CREATE TABLE IF NOT EXISTS cash_closures (" +
                     "closure_id INT AUTO_INCREMENT PRIMARY KEY, " +
@@ -375,7 +401,8 @@ public class DatabaseInitializer {
                     { "phone", "912 345 678" },
                     { "email", "info@miempresa.com" },
                     { "logoPath", "" },
-                    { "currency", "EUR" }
+                    { "currency", "EUR" },
+                    { "roundingMethod", "LINE" } // LINE or GLOBAL
             };
             for (String[] row : companyDefaults) {
                 stmt.execute(String.format(
@@ -913,35 +940,111 @@ public class DatabaseInitializer {
                 }
             }
 
-            // ─── SISTEMA DE HISTORIAL DE IVA ───────────────────────────────
-            // Tabla para versionado de tasas de IVA por producto, categoría o global.
-            // Nunca se borran registros — solo se cierran (end_date).
+            // ─── SISTEMA DE HISTORIAL DE IVA (V2) ─────────────────────────
             stmt.execute("CREATE TABLE IF NOT EXISTS tax_rates ("
                     + "tax_rate_id  INT AUTO_INCREMENT PRIMARY KEY, "
-                    + "product_id   INT NULL, "
-                    + "category_id  INT NULL, "
-                    + "scope        VARCHAR(10) NOT NULL, " // 'PRODUCT', 'CATEGORY', 'GLOBAL'
+                    + "name         VARCHAR(100) NOT NULL, "
                     + "rate         DECIMAL(5,2) NOT NULL, "
-                    + "label        VARCHAR(100), "
-                    + "start_date   DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, "
-                    + "end_date     DATETIME NULL, "
-                    + "reason       VARCHAR(255), "
-                    + "FOREIGN KEY (product_id)  REFERENCES products(product_id)  ON DELETE CASCADE, "
-                    + "FOREIGN KEY (category_id) REFERENCES categories(category_id) ON DELETE CASCADE"
+                    + "country      VARCHAR(50) DEFAULT 'España', "
+                    + "region       VARCHAR(50) DEFAULT NULL, "
+                    + "valid_from   DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, "
+                    + "valid_to     DATETIME NULL, "
+                    + "active       BOOLEAN DEFAULT TRUE"
                     + ")");
 
-            // Índice para acelerar las consultas de tasa vigente
-            tryIndex(stmt, "CREATE INDEX idx_tax_rates_scope_active "
-                    + "ON tax_rates (scope, product_id, category_id, start_date, end_date)");
+            stmt.execute("CREATE TABLE IF NOT EXISTS tax_groups ("
+                    + "tax_group_id INT AUTO_INCREMENT PRIMARY KEY, "
+                    + "name         VARCHAR(100) NOT NULL, "
+                    + "is_default   BOOLEAN DEFAULT FALSE"
+                    + ")");
 
-            // Insertar tasa global inicial (21% IVA General) solo si no hay ninguna
+            stmt.execute("CREATE TABLE IF NOT EXISTS tax_group_items ("
+                    + "tax_group_id INT NOT NULL, "
+                    + "tax_rate_id  INT NOT NULL, "
+                    + "PRIMARY KEY (tax_group_id, tax_rate_id), "
+                    + "FOREIGN KEY (tax_group_id) REFERENCES tax_groups(tax_group_id) ON DELETE CASCADE, "
+                    + "FOREIGN KEY (tax_rate_id) REFERENCES tax_rates(tax_rate_id) ON DELETE RESTRICT"
+                    + ")");
+
+            stmt.execute("CREATE TABLE IF NOT EXISTS sale_tax_summary ("
+                    + "summary_id   INT AUTO_INCREMENT PRIMARY KEY, "
+                    + "sale_id      INT NOT NULL, "
+                    + "tax_rate_id  INT NOT NULL DEFAULT 1, "
+                    + "tax_name     VARCHAR(100) NOT NULL DEFAULT 'IVA', "
+                    + "tax_rate     DECIMAL(5,2) NOT NULL DEFAULT 21.0, "
+                    + "tax_basis    DECIMAL(10,2) NOT NULL DEFAULT 0.00, "
+                    + "tax_amount   DECIMAL(10,2) NOT NULL DEFAULT 0.00, "
+                    + "FOREIGN KEY (sale_id) REFERENCES sales(sale_id) ON DELETE CASCADE"
+                    + ")");
+
+            // Ensure columns exist for older installations
+            String[] summaryCols = {
+                    "tax_rate_id INT NOT NULL DEFAULT 1",
+                    "tax_name VARCHAR(100) DEFAULT 'IVA'",
+                    "tax_rate DECIMAL(5,2) DEFAULT 21.0"
+            };
+            for (String col : summaryCols) {
+                try {
+                    stmt.execute("ALTER TABLE sale_tax_summary ADD COLUMN " + col);
+                } catch (SQLException e) {
+                }
+            }
+
+            // Migración de tax_id a tax_rate_id si existiera la columna antigua
             try {
-                stmt.execute("INSERT INTO tax_rates (scope, rate, label, reason) "
-                        + "SELECT 'GLOBAL', 21.00, 'IVA General (21%)', 'Configuración inicial' "
-                        + "FROM DUAL "
-                        + "WHERE NOT EXISTS (SELECT 1 FROM tax_rates WHERE scope = 'GLOBAL')");
+                stmt.execute(
+                        "UPDATE sale_tax_summary SET tax_rate_id = tax_id WHERE tax_rate_id = 1 AND tax_id IS NOT NULL");
+                // Limpieza de IDs 0 que rompen la FK
+                stmt.execute(
+                        "UPDATE sale_tax_summary SET tax_rate_id = 1 WHERE tax_rate_id = 0 OR tax_rate_id IS NULL");
             } catch (SQLException e) {
-                // Algunos motores no soportan DUAL; ignorar si ya existe
+            }
+
+            // Insertar datos por defecto (Tax Engine V2) si es primera ejecución
+            try {
+                // Crear tasas base
+                stmt.execute("INSERT INTO tax_rates (tax_rate_id, name, rate) "
+                        + "SELECT 1, 'IVA General (21%)', 21.00 "
+                        + "FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tax_rates WHERE tax_rate_id = 1)");
+                stmt.execute("INSERT INTO tax_rates (tax_rate_id, name, rate) "
+                        + "SELECT 2, 'IVA Reducido (10%)', 10.00 "
+                        + "FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tax_rates WHERE tax_rate_id = 2)");
+                stmt.execute("INSERT INTO tax_rates (tax_rate_id, name, rate) "
+                        + "SELECT 3, 'IVA Superreducido (4%)', 4.00 "
+                        + "FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tax_rates WHERE tax_rate_id = 3)");
+                stmt.execute("INSERT INTO tax_rates (tax_rate_id, name, rate) "
+                        + "SELECT 4, 'Exento (0%)', 0.00 "
+                        + "FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tax_rates WHERE tax_rate_id = 4)");
+
+                // Crear grupos base
+                stmt.execute("INSERT INTO tax_groups (tax_group_id, name, is_default) "
+                        + "SELECT 1, 'Normal (IVA 21%)', 1 "
+                        + "FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tax_groups WHERE tax_group_id = 1)");
+                stmt.execute("INSERT INTO tax_groups (tax_group_id, name, is_default) "
+                        + "SELECT 2, 'Reducido (IVA 10%)', 0 "
+                        + "FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tax_groups WHERE tax_group_id = 2)");
+                stmt.execute("INSERT INTO tax_groups (tax_group_id, name, is_default) "
+                        + "SELECT 3, 'Superreducido (IVA 4%)', 0 "
+                        + "FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tax_groups WHERE tax_group_id = 3)");
+                stmt.execute("INSERT INTO tax_groups (tax_group_id, name, is_default) "
+                        + "SELECT 4, 'Exento', 0 "
+                        + "FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tax_groups WHERE tax_group_id = 4)");
+
+                // Mapeo grupo -> tasas
+                stmt.execute(
+                        "INSERT IGNORE INTO tax_group_items (tax_group_id, tax_rate_id) VALUES (1, 1), (2, 2), (3, 3), (4, 4)");
+
+                // Migrar productos hacia el grupo 1 si tienen iva nulo o 21
+                stmt.execute(
+                        "UPDATE products SET tax_group_id = 1 WHERE tax_group_id IS NULL AND (iva IS NULL OR iva = 21.0)");
+                stmt.execute("UPDATE products SET tax_group_id = 2 WHERE tax_group_id IS NULL AND iva = 10.0");
+                stmt.execute("UPDATE products SET tax_group_id = 3 WHERE tax_group_id IS NULL AND iva = 4.0");
+                stmt.execute("UPDATE products SET tax_group_id = 4 WHERE tax_group_id IS NULL AND iva = 0.0");
+                // Para productos con ivas raros, asignamos el default de momento para la
+                // migración
+                stmt.execute("UPDATE products SET tax_group_id = 1 WHERE tax_group_id IS NULL");
+            } catch (SQLException e) {
+                // Ignorar si duplicado
             }
 
             // ═══════════════════════════════════════════════════════════════

@@ -51,10 +51,11 @@ public class AlertUtil {
         toastStage.setAlwaysOnTop(true);
 
         HBox root = new HBox(15);
+        root.getStyleClass().add("toast-root");
         root.setAlignment(Pos.CENTER_LEFT);
         root.setPadding(new Insets(12, 25, 12, 20));
         root.setStyle(
-                "-fx-background-color: #333333; -fx-background-radius: 30; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.4), 10, 0, 0, 4);");
+                "-fx-background-color: #333333; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.4), 10, 0, 0, 4);");
 
         FontAwesomeIconView icon = new FontAwesomeIconView(FontAwesomeIcon.CHECK_CIRCLE);
         icon.setFill(Color.web(APP_SUCCESS));
@@ -132,8 +133,9 @@ public class AlertUtil {
         buttons.setPadding(new Insets(10, 0, 0, 0));
 
         Button btnCancel = new Button("CANCELAR");
+        btnCancel.getStyleClass().add("alert-button");
         btnCancel.setStyle(
-                "-fx-background-color: #f5f5f5; -fx-text-fill: #666666; -fx-background-radius: 20; -fx-font-weight: bold; -fx-padding: 10 25; -fx-cursor: hand;");
+                "-fx-background-color: #f5f5f5; -fx-text-fill: #666666; -fx-font-weight: bold; -fx-padding: 10 25; -fx-cursor: hand;");
         btnCancel.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent e) {
@@ -142,8 +144,9 @@ public class AlertUtil {
         });
 
         Button btnOk = new Button("ACEPTAR");
+        btnOk.getStyleClass().add("alert-button");
         btnOk.setStyle("-fx-background-color: " + APP_PRIMARY
-                + "; -fx-text-fill: white; -fx-background-radius: 20; -fx-font-weight: bold; -fx-padding: 10 25; -fx-cursor: hand;");
+                + "; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 25; -fx-cursor: hand;");
         btnOk.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent e) {
@@ -174,8 +177,9 @@ public class AlertUtil {
         if (type == CustomAlertType.WARNING)
             btnColor = APP_WARNING;
 
+        btnOk.getStyleClass().add("alert-button");
         btnOk.setStyle("-fx-background-color: " + btnColor
-                + "; -fx-text-fill: white; -fx-background-radius: 20; -fx-font-weight: bold; -fx-padding: 10 35; -fx-cursor: hand;");
+                + "; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 35; -fx-cursor: hand;");
         btnOk.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent e) {
@@ -190,10 +194,11 @@ public class AlertUtil {
 
     private static VBox createBaseContainer(Stage stage, CustomAlertType type, String header, String content) {
         VBox root = new VBox(20);
+        root.getStyleClass().add("alert-root");
         root.setAlignment(Pos.CENTER);
         root.setPadding(new Insets(30));
         root.setStyle(
-                "-fx-background-color: white; -fx-background-radius: 20; -fx-border-color: #eeeeee; -fx-border-width: 1; -fx-border-radius: 20; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 30, 0, 0, 10);");
+                "-fx-background-color: white; -fx-border-color: #eeeeee; -fx-border-width: 1; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 30, 0, 0, 10);");
 
         FontAwesomeIcon icon;
         String color;

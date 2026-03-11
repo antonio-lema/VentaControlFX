@@ -6,6 +6,7 @@ public class Category {
     private boolean visible;
     private boolean favorite;
     private double defaultIva = 21.0;
+    private Integer taxGroupId; // Tax Engine V2
 
     public Category() {
         this.visible = true;
@@ -80,6 +81,14 @@ public class Category {
 
     public void setDefaultIva(double defaultIva) {
         this.defaultIva = defaultIva;
+    }
+
+    public Integer getTaxGroupId() {
+        return taxGroupId;
+    }
+
+    public void setTaxGroupId(Integer taxGroupId) {
+        this.taxGroupId = taxGroupId;
     }
 
     @Override

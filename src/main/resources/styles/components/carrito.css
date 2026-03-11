@@ -3,16 +3,21 @@
  */
 
 .cart-panel {
-    -fx-background-color: white;
-    -fx-border-color: -fx-neutral-200;
-    -fx-border-width: 0 0 0 1;
+    -fx-background-color: -fx-bg-surface;
+    -fx-background-radius: -fx-layout-radius;
+    -fx-border-radius: -fx-layout-radius;
+    -fx-border-color: -fx-color-border-main;
+    -fx-border-width: 1.5;
+    -fx-effect: dropshadow(three-pass-box, -fx-shadow-color-large, 25, 0, 0, 10);
 }
 
 .cart-customer-header {
     -fx-padding: 15 20;
-    -fx-background-color: #f6faff;
-    -fx-border-color: #e3f2fd;
+    -fx-background-color: -fx-bg-main;
+    -fx-border-color: -fx-color-border-main;
     -fx-border-width: 0 0 1 0;
+    -fx-background-radius: -fx-layout-radius -fx-layout-radius 0 0;
+    -fx-background-insets: 3 3 0 3;
 }
 
 .cart-items-header {
@@ -20,6 +25,7 @@
     -fx-background-color: -fx-neutral-50;
     -fx-border-color: -fx-neutral-200;
     -fx-border-width: 0 0 1 0;
+    -fx-background-insets: 0 3 0 3;
 }
 
 .cart-pricelist-header {
@@ -27,22 +33,23 @@
     -fx-background-color: derive(#4caf50, 95%);
     -fx-border-color: derive(#4caf50, 85%);
     -fx-border-width: 0 0 1 0;
+    -fx-background-insets: 0 3 0 3;
 }
 
 .cart-pricelist-title {
     -fx-font-size: 14px;
     -fx-font-weight: bold;
-    -fx-text-fill: #1e293b;
+    -fx-text-fill: -fx-text-custom-cards;
 }
 
 .btn-change-pricelist {
     -fx-background-color: white;
-    -fx-background-radius: 8;
+    -fx-background-radius: -fx-radius-md;
     -fx-padding: 6;
     -fx-cursor: hand;
     -fx-border-color: rgba(0, 0, 0, 0.04);
     -fx-border-width: 1;
-    -fx-border-radius: 8;
+    -fx-border-radius: -fx-radius-md;
 }
 
 .btn-change-pricelist:hover {
@@ -53,18 +60,18 @@
 .cart-customer-title {
     -fx-font-size: 16px;
     -fx-font-weight: bold;
-    -fx-text-fill: #1e293b;
+    -fx-text-fill: -fx-text-custom-cards;
 }
 
 .btn-add-customer {
     -fx-background-color: -fx-custom-color-primary-bg;
-    -fx-background-radius: 10;
+    -fx-background-radius: -fx-radius-md;
     -fx-min-width: 38px;
     -fx-min-height: 38px;
     -fx-cursor: hand;
     -fx-border-color: -fx-custom-color-primary-light;
     -fx-border-width: 1;
-    -fx-border-radius: 10;
+    -fx-border-radius: -fx-radius-md;
     -fx-effect: -fx-shadow-soft;
 }
 
@@ -83,43 +90,61 @@
 }
 
 .cart-item {
-    -fx-background-color: #ffffff;
+    -fx-background-color: -fx-bg-surface;
     -fx-padding: 15;
-    -fx-border-color: #f8fafc;
+    -fx-border-color: -fx-color-border-light;
     -fx-border-width: 0 0 1 0;
 }
 
 .cart-item:hover {
     -fx-background-color: #f1f5f9;
+    -fx-background-radius: -fx-radius-md;
 }
 
 .cart-item-name {
     -fx-font-size: 14px;
     -fx-font-weight: bold;
-    -fx-text-fill: #1e293b;
+    -fx-text-fill: -fx-text-custom-cards;
 }
 
 .cart-item-price {
     -fx-font-size: 14px;
     -fx-font-weight: bold;
-    -fx-text-fill: #475569;
+    -fx-text-fill: -fx-text-custom-price !important;
 }
 
 .quantity-field-modern {
     -fx-background-color: transparent;
-    -fx-text-fill: #1e293b;
+    -fx-text-fill: -fx-text-custom-cards;
     -fx-font-weight: bold;
     -fx-padding: 0;
     -fx-alignment: center;
+    -fx-pref-width: 32px;
+    -fx-min-width: 32px;
+    -fx-max-width: 32px;
 }
 
 .quantity-selector-pill {
     -fx-background-color: #f1f5f9;
-    -fx-background-radius: 20;
+    -fx-background-radius: -fx-radius-xl;
     -fx-border-color: rgba(0, 0, 0, 0.04);
     -fx-border-width: 1;
-    -fx-border-radius: 20;
-    -fx-padding: 3 6;
+    -fx-border-radius: -fx-radius-xl;
+    -fx-padding: 2 4;
+}
+
+.quantity-btn {
+    -fx-background-color: transparent;
+    -fx-padding: 4 8;
+    -fx-background-radius: -fx-radius-xl;
+    -fx-min-width: 28px;
+    -fx-min-height: 28px;
+    -fx-pref-width: 28px;
+    -fx-pref-height: 28px;
+}
+
+.quantity-btn:hover {
+    -fx-background-color: rgba(0, 0, 0, 0.05);
 }
 
 /* =========================================
@@ -127,28 +152,30 @@
    ========================================= */
 .checkout-summary {
     -fx-padding: 25;
-    -fx-background-color: white;
-    -fx-border-color: -fx-neutral-200;
+    -fx-background-color: -fx-bg-surface;
+    -fx-border-color: -fx-color-border-main;
     -fx-border-width: 1 0 0 0;
     -fx-spacing: 12;
     -fx-effect: -fx-shadow-premium-lg;
+    -fx-background-radius: 0 0 -fx-layout-radius -fx-layout-radius;
+    -fx-background-insets: 0 3 3 3;
 }
 
 .summary-label {
     -fx-font-size: 14px;
-    -fx-text-fill: #64748b;
+    -fx-text-fill: -fx-text-custom-cards-muted;
 }
 
 .summary-value {
     -fx-font-size: 15px;
     -fx-font-weight: bold;
-    -fx-text-fill: #1e293b;
+    -fx-text-fill: -fx-text-custom-cards;
 }
 
 .total-label {
     -fx-font-size: 16px;
     -fx-font-weight: 800;
-    -fx-text-fill: -fx-neutral-500;
+    -fx-text-fill: -fx-text-custom-cards-muted;
     -fx-padding: 10 0 0 0;
 }
 
@@ -165,7 +192,7 @@
     -fx-font-size: 18px;
     -fx-font-weight: bold;
     -fx-padding: 18 0;
-    -fx-background-radius: 12;
+    -fx-background-radius: -fx-radius-lg;
     -fx-cursor: hand;
     -fx-effect: -fx-shadow-primary;
 }
@@ -202,19 +229,19 @@
 }
 
 .view-header-bar .section-title {
-    -fx-text-fill: -fx-neutral-800;
+    -fx-text-fill: -fx-text-custom-cards;
     -fx-font-size: 19px;
     -fx-font-weight: 800;
 }
 
 .filter-icon-container {
     -fx-background-color: white;
-    -fx-background-radius: 10;
+    -fx-background-radius: -fx-radius-md;
     -fx-padding: 10;
     -fx-effect: -fx-shadow-premium-sm;
     -fx-border-color: -fx-neutral-100;
     -fx-border-width: 1;
-    -fx-border-radius: 10;
+    -fx-border-radius: -fx-radius-md;
 }
 
 .filter-icon-container .glyph-icon {
@@ -246,7 +273,7 @@
    CART PANEL - CLASES ADICIONALES
    ========================================= */
 .cart-items-pane {
-    -fx-background-color: #ffffff;
+    -fx-background-color: transparent;
 }
 
 
@@ -261,15 +288,15 @@
 
 .table-col-header {
     -fx-font-weight: bold;
-    -fx-text-fill: #64748b;
+    -fx-text-fill: -fx-text-custom-cards-muted;
     -fx-font-size: 11px;
 }
 
 .return-reason-area {
     -fx-background-color: #f1f5f9;
     -fx-border-color: rgba(0, 0, 0, 0.04);
-    -fx-border-radius: 8;
-    -fx-background-radius: 8;
+    -fx-border-radius: -fx-radius-md;
+    -fx-background-radius: -fx-radius-md;
     -fx-padding: 10;
 }
 
@@ -313,7 +340,7 @@
 
 .cart-delete-btn-reveal {
     -fx-background-color: #ef4444;
-    -fx-background-radius: 20;
+    -fx-background-radius: -fx-radius-xl;
     -fx-border-width: 0;
     -fx-padding: 6 10;
     -fx-cursor: hand;
@@ -343,12 +370,12 @@
    ========================================= */
 .btn-clear-cart {
     -fx-background-color: transparent;
-    -fx-background-radius: 12;
+    -fx-background-radius: -fx-radius-lg;
     -fx-padding: 9 18;
     -fx-cursor: hand;
     -fx-border-color: #e2e8f0;
     -fx-border-width: 1.5;
-    -fx-border-radius: 12;
+    -fx-border-radius: -fx-radius-lg;
     -fx-transition: all 0.2s;
     -fx-effect: dropshadow(two-pass-box, rgba(0, 0, 0, 0.04), 3, 0, 0, 1);
 }
@@ -384,12 +411,12 @@
 .btn-suspend-cart,
 .btn-resume-cart {
     -fx-background-color: #ffffff;
-    -fx-background-radius: 12;
+    -fx-background-radius: -fx-radius-lg;
     -fx-padding: 10;
     -fx-cursor: hand;
     -fx-border-color: rgba(0, 0, 0, 0.04);
     -fx-border-width: 1.5;
-    -fx-border-radius: 12;
+    -fx-border-radius: -fx-radius-lg;
     -fx-effect: dropshadow(two-pass-box, rgba(0, 0, 0, 0.04), 4, 0, 0, 1);
 }
 
@@ -418,8 +445,8 @@
    ========================================= */
 .custom-modal-root {
     -fx-background-color: #ffffff;
-    -fx-background-radius: 20;
-    -fx-border-radius: 20;
+    -fx-background-radius: -fx-radius-xl;
+    -fx-border-radius: -fx-radius-xl;
     -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.3), 40, 0, 0, 15);
 }
 
@@ -446,10 +473,10 @@
 
 .input-field-modern {
     -fx-background-color: #f1f5f9;
-    -fx-background-radius: 12;
+    -fx-background-radius: -fx-radius-lg;
     -fx-border-color: rgba(0, 0, 0, 0.04);
     -fx-border-width: 1.5;
-    -fx-border-radius: 12;
+    -fx-border-radius: -fx-radius-lg;
     -fx-padding: 12 15;
     -fx-font-size: 14px;
     -fx-text-fill: #1e293b;

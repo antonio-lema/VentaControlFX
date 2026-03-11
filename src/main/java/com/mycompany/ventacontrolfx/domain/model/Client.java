@@ -16,6 +16,10 @@ public class Client {
     private final StringProperty country = new SimpleStringProperty("España");
     private final IntegerProperty priceListId = new SimpleIntegerProperty();
 
+    // Tax Engine V2
+    private final BooleanProperty taxExempt = new SimpleBooleanProperty(false);
+    private final StringProperty taxRegime = new SimpleStringProperty("NORMAL");
+
     public Client() {
     }
 
@@ -196,5 +200,30 @@ public class Client {
 
     public IntegerProperty priceListIdProperty() {
         return priceListId;
+    }
+
+    // Tax Engine V2
+    public boolean isTaxExempt() {
+        return taxExempt.get();
+    }
+
+    public void setTaxExempt(boolean value) {
+        taxExempt.set(value);
+    }
+
+    public BooleanProperty taxExemptProperty() {
+        return taxExempt;
+    }
+
+    public String getTaxRegime() {
+        return taxRegime.get();
+    }
+
+    public void setTaxRegime(String value) {
+        taxRegime.set(value);
+    }
+
+    public StringProperty taxRegimeProperty() {
+        return taxRegime;
     }
 }

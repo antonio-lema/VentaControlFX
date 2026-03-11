@@ -58,7 +58,7 @@ public class CartItemRow extends HBox {
         quantityBox.getStyleClass().add("quantity-selector-pill");
 
         Button decreaseBtn = new Button();
-        decreaseBtn.getStyleClass().add("quantity-btn");
+        decreaseBtn.getStyleClass().addAll("quantity-btn", "quantity-btn-minus");
         FontAwesomeIconView minusIcon = new FontAwesomeIconView(FontAwesomeIcon.MINUS);
         minusIcon.setSize("10");
         minusIcon.getStyleClass().add("cart-icon-minus");
@@ -95,7 +95,7 @@ public class CartItemRow extends HBox {
         });
 
         Button increaseBtn = new Button();
-        increaseBtn.getStyleClass().add("quantity-btn");
+        increaseBtn.getStyleClass().addAll("quantity-btn", "quantity-btn-plus");
         FontAwesomeIconView plusIcon = new FontAwesomeIconView(FontAwesomeIcon.PLUS);
         plusIcon.setSize("10");
         plusIcon.getStyleClass().add("cart-icon-plus");

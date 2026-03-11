@@ -30,18 +30,22 @@
         </HBox>
     </HBox>
 
-    <HBox alignment="CENTER_LEFT" styleClass="cart-pricelist-header">
-        <HBox spacing="10" alignment="CENTER_LEFT">
+    <HBox spacing="10" alignment="CENTER_LEFT" styleClass="cart-pricelist-header">
+        <!-- Sección Tarifa -->
+        <HBox spacing="8" alignment="CENTER_LEFT" HBox.hgrow="ALWAYS">
             <StackPane styleClass="icon-container-small" style="-fx-background-color: #e8f5e9;">
-                <FontAwesomeIconView glyphName="TAGS" size="14" style="-fx-fill: #2e7d32;"/>
+                <FontAwesomeIconView glyphName="TAGS" size="12" style="-fx-fill: #2e7d32;"/>
             </StackPane>
-            <Label fx:id="lblCurrentPriceList" text="Tarifa General" styleClass="cart-pricelist-title"/>
+            <VBox spacing="0">
+                <Label text="Tarifa" style="-fx-font-size: 10px; -fx-text-fill: #666;"/>
+                <Label fx:id="lblCurrentPriceList" text="General" styleClass="cart-pricelist-title"/>
+            </VBox>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button onAction="#handleChangePriceList" styleClass="btn-change-pricelist">
+                <tooltip><Tooltip text="Cambiar tarifa"/></tooltip>
+                <graphic><FontAwesomeIconView glyphName="EDIT" size="12" styleClass="icon-primary"/></graphic>
+            </Button>
         </HBox>
-        <Region HBox.hgrow="ALWAYS"/>
-        <Button onAction="#handleChangePriceList" styleClass="btn-change-pricelist">
-            <tooltip><Tooltip text="Cambiar tarifa aplicada"/></tooltip>
-            <graphic><FontAwesomeIconView glyphName="EDIT" size="14" styleClass="icon-primary"/></graphic>
-        </Button>
     </HBox>
     
     <HBox alignment="CENTER_LEFT" styleClass="cart-items-header">

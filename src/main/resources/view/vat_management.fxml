@@ -63,52 +63,52 @@
                                           <!-- Columna Izquierda: Global -->
                                           <VBox spacing="15.0" HBox.hgrow="ALWAYS" styleClass="config-card">
                                              <children>
-                                                <Label styleClass="config-card-title" text="Tasa de IVA Global" />
-                                                <HBox alignment="CENTER_LEFT" spacing="15.0">
-                                                   <children>
-                                                      <Label text="Tasa actual:" />
-                                                      <Label fx:id="lblCurrentGlobalVat" styleClass="label-highlight" text="--%" />
-                                                   </children>
-                                                </HBox>
-                                                <VBox spacing="8.0">
-                                                   <children>
-                                                      <Label text="Nueva tasa (%):" />
-                                                      <TextField fx:id="txtGlobalRate" promptText="Ej: 21.0" styleClass="modern-text-field" />
-                                                   </children>
-                                                </VBox>
-                                                <VBox spacing="8.0">
-                                                   <children>
-                                                      <Label text="Motivo del cambio:" />
-                                                      <TextField fx:id="txtGlobalReason" promptText="Obligatorio para auditoría" styleClass="modern-text-field" />
-                                                   </children>
-                                                </VBox>
-                                                <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleUpdateGlobalVat" styleClass="btn-primary" text="Actualizar Global" />
+                                                 <Label styleClass="config-card-title" text="Grupo de Impuestos Global" />
+                                                 <HBox alignment="CENTER_LEFT" spacing="15.0">
+                                                    <children>
+                                                       <Label text="Grupo actual:" />
+                                                       <Label fx:id="lblCurrentGlobalTaxGroup" styleClass="label-highlight" text="Cargando..." />
+                                                    </children>
+                                                 </HBox>
+                                                 <VBox spacing="8.0">
+                                                    <children>
+                                                       <Label text="Cambiar grupo global:" />
+                                                       <ComboBox fx:id="cmbGlobalTaxGroup" maxWidth="1.7976931348623157E308" promptText="Seleccionar grupo..." styleClass="modern-combo-box" />
+                                                    </children>
+                                                 </VBox>
+                                                 <VBox spacing="8.0" visible="false" managed="false">
+                                                    <children>
+                                                       <Label text="Motivo del cambio:" />
+                                                       <TextField fx:id="txtGlobalReason" promptText="Obligatorio para auditoría" styleClass="modern-text-field" />
+                                                    </children>
+                                                 </VBox>
+                                                 <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleUpdateGlobalTaxGroup" styleClass="btn-primary" text="Establecer como Global" />
                                              </children>
                                           </VBox>
 
                                           <!-- Columna Derecha: Categoría -->
                                           <VBox spacing="15.0" HBox.hgrow="ALWAYS" styleClass="config-card">
                                              <children>
-                                                <Label styleClass="config-card-title" text="Tasa por Categoría" />
-                                                <VBox spacing="8.0">
-                                                   <children>
-                                                      <Label text="Seleccionar categoría:" />
-                                                      <ComboBox fx:id="cmbCategory" maxWidth="1.7976931348623157E308" promptText="Elegir..." styleClass="modern-combo-box" />
-                                                   </children>
-                                                </VBox>
-                                                <VBox spacing="8.0">
-                                                   <children>
-                                                      <Label text="Específica (%):" />
-                                                      <TextField fx:id="txtCategoryRate" promptText="0.0 para heredar global" styleClass="modern-text-field" />
-                                                   </children>
-                                                </VBox>
-                                                <VBox spacing="8.0">
-                                                   <children>
-                                                      <Label text="Motivo:" />
-                                                      <TextField fx:id="txtCategoryReason" promptText="Motivo del cambio" styleClass="modern-text-field" />
-                                                   </children>
-                                                </VBox>
-                                                <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleUpdateCategoryVat" styleClass="config-btn-save" text="Guardar para Categoría" />
+                                                 <Label styleClass="config-card-title" text="Grupo por Categoría" />
+                                                 <VBox spacing="8.0">
+                                                    <children>
+                                                       <Label text="Seleccionar categoría:" />
+                                                       <ComboBox fx:id="cmbCategory" maxWidth="1.7976931348623157E308" promptText="Elegir..." styleClass="modern-combo-box" />
+                                                    </children>
+                                                 </VBox>
+                                                 <VBox spacing="8.0">
+                                                    <children>
+                                                       <Label text="Grupo para categoría:" />
+                                                       <ComboBox fx:id="cmbCategoryTaxGroup" maxWidth="1.7976931348623157E308" promptText="Heredar global" styleClass="modern-combo-box" />
+                                                    </children>
+                                                 </VBox>
+                                                 <VBox spacing="8.0" visible="false" managed="false">
+                                                    <children>
+                                                       <Label text="Motivo:" />
+                                                       <TextField fx:id="txtCategoryReason" promptText="Motivo del cambio" styleClass="modern-text-field" />
+                                                    </children>
+                                                 </VBox>
+                                                 <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleUpdateCategoryTaxGroup" styleClass="config-btn-save" text="Asignar a Categoría" />
                                              </children>
                                           </VBox>
                                        </children>
@@ -158,7 +158,7 @@
                                          <children>
                                              <HBox alignment="CENTER_LEFT" spacing="10">
                                                  <children>
-                                                     <Label text="1" style="-fx-background-color: -color-primary; -fx-text-fill: white; -fx-background-radius: 50; -fx-min-width: 24; -fx-min-height: 24; -fx-alignment: center; -fx-font-weight: bold;" />
+                                                     <Label text="1" style="-fx-background-color: -color-primary; -fx-text-fill: white; -fx-background-radius: -fx-radius-xl; -fx-min-width: 24; -fx-min-height: 24; -fx-alignment: center; -fx-font-weight: bold;" />
                                                      <Label styleClass="estetica-card-title" text="Selecciona el grupo de productos" />
                                                  </children>
                                              </HBox>
@@ -205,7 +205,7 @@
                                          <children>
                                              <HBox alignment="CENTER_LEFT" spacing="10">
                                                  <children>
-                                                     <Label text="2" style="-fx-background-color: -color-primary; -fx-text-fill: white; -fx-background-radius: 50; -fx-min-width: 24; -fx-min-height: 24; -fx-alignment: center; -fx-font-weight: bold;" />
+                                                     <Label text="2" style="-fx-background-color: -color-primary; -fx-text-fill: white; -fx-background-radius: -fx-radius-xl; -fx-min-width: 24; -fx-min-height: 24; -fx-alignment: center; -fx-font-weight: bold;" />
                                                      <Label styleClass="estetica-card-title" text="Configura los parámetros del filtro" />
                                                  </children>
                                              </HBox>
@@ -217,7 +217,7 @@
                                                            <!-- Sub-panel: Por CATEGORÍA -->
                                                            <HBox fx:id="panelCategory" alignment="CENTER_LEFT" spacing="15.0"
                                                                  visible="true" managed="true"
-                                                                 style="-fx-background-color: -color-primary-bg; -fx-background-radius: 10; -fx-padding: 15;">
+                                                                 style="-fx-background-color: -color-primary-bg; -fx-background-radius: -fx-radius-md; -fx-padding: 15;">
                                                               <children>
                                                                  <FontAwesomeIconView glyphName="FOLDER_OPEN" size="20" styleClass="text-info" />
                                                                  <VBox spacing="4.0" HBox.hgrow="ALWAYS">
@@ -235,7 +235,7 @@
                                                            <!-- Sub-panel: CLONACIÓN -->
                                                            <HBox fx:id="panelClone" alignment="CENTER_LEFT" spacing="15.0"
                                                                  visible="false" managed="false"
-                                                                 style="-fx-background-color: #e3f2fd; -fx-background-radius: 10; -fx-padding: 15;">
+                                                                 style="-fx-background-color: #e3f2fd; -fx-background-radius: -fx-radius-md; -fx-padding: 15;">
                                                                <children>
                                                                   <FontAwesomeIconView glyphName="COPY" size="20" style="-fx-fill: #1976d2;" />
                                                                   <VBox spacing="4.0" HBox.hgrow="ALWAYS">
@@ -261,7 +261,7 @@
                                                                  visible="false" managed="false"
                                                                  style="-fx-background-color: #fff8e1; -fx-background-radius: 10; -fx-padding: 15;">
                                                               <children>
-                                                                 <VBox style="-fx-background-color: #f39c12; -fx-background-radius: 8; -fx-padding: 8;">
+                                                                 <VBox style="-fx-background-color: #f39c12; -fx-background-radius: -fx-radius-sm; -fx-padding: 8;">
                                                                     <children><FontAwesomeIconView glyphName="STAR" size="20" fill="#ffffff" /></children>
                                                                  </VBox>
                                                                  <VBox spacing="4.0">
@@ -384,7 +384,7 @@
                                          <children>
                                              <HBox alignment="CENTER_LEFT" spacing="10">
                                                  <children>
-                                                     <Label text="3" style="-fx-background-color: -color-primary; -fx-text-fill: white; -fx-background-radius: 50; -fx-min-width: 24; -fx-min-height: 24; -fx-alignment: center; -fx-font-weight: bold;" />
+                                                     <Label text="3" style="-fx-background-color: -color-primary; -fx-text-fill: white; -fx-background-radius: -fx-radius-xl; -fx-min-width: 24; -fx-min-height: 24; -fx-alignment: center; -fx-font-weight: bold;" />
                                                      <Label styleClass="estetica-card-title" text="Define el ajuste y ejecuta" />
                                                  </children>
                                              </HBox>

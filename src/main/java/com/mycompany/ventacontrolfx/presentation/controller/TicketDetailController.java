@@ -2,6 +2,7 @@ package com.mycompany.ventacontrolfx.presentation.controller;
 
 import com.mycompany.ventacontrolfx.domain.model.Sale;
 import com.mycompany.ventacontrolfx.domain.model.SaleDetail;
+import com.mycompany.ventacontrolfx.domain.model.SaleTaxSummary;
 import com.mycompany.ventacontrolfx.domain.model.Client;
 import com.mycompany.ventacontrolfx.application.usecase.ClientUseCase;
 import com.mycompany.ventacontrolfx.application.usecase.GetSaleTicketUseCase;
@@ -33,6 +34,8 @@ public class TicketDetailController implements Injectable {
     private Label lblTicketId, lblDate, lblClient, lblUser, lblPayment, lblSubtotal, lblIva, lblTotal, lblReturnBadge;
     @FXML
     private VBox itemsContainer;
+    @FXML
+    private VBox taxDetailsContainer;
 
     private ClientUseCase clientUseCase;
     private GetSaleTicketUseCase getSaleTicketUseCase;
@@ -94,6 +97,9 @@ public class TicketDetailController implements Injectable {
             // Construcción dinámica de la lista de productos ( Receipt Look )
             renderItems(sale);
 
+            // Desglose de impuestos detallado (V2)
+            renderTaxDetails(sale);
+
         } catch (Exception e) {
             e.printStackTrace();
             AlertUtil.showError("Error", "No se pudo renderizar el ticket: " + e.getMessage());
@@ -143,6 +149,49 @@ public class TicketDetailController implements Injectable {
             }
 
             itemsContainer.getChildren().add(itemRow);
+        }
+    }
+
+    /**
+     * Renderiza el desglose de impuestos en el ticket.
+     */
+    private void renderTaxDetails(Sale sale) {
+        if (taxDetailsContainer == null)
+            return;
+        taxDetailsContainer.getChildren().clear();
+
+        if (sale.getTaxSummaries() == null || sale.getTaxSummaries().isEmpty()) {
+            taxDetailsContainer.setManaged(false);
+            taxDetailsContainer.setVisible(false);
+            return;
+        }
+
+        taxDetailsContainer.setManaged(true);
+        taxDetailsContainer.setVisible(true);
+
+        for (SaleTaxSummary summary : sale.getTaxSummaries()) {
+            HBox row = new HBox();
+            row.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+            row.setSpacing(10);
+
+            Label nameLabel = new Label(summary.getTaxName());
+            nameLabel.getStyleClass().add("tax-detail-name");
+
+            Region spacer = new Region();
+            HBox.setHgrow(spacer, Priority.ALWAYS);
+
+            Label basisLabel = new Label(String.format("Base: %.2f€", summary.getTaxBasis()));
+            basisLabel.getStyleClass().add("tax-detail-basis");
+            basisLabel.setMinWidth(90);
+            basisLabel.setAlignment(javafx.geometry.Pos.CENTER_RIGHT);
+
+            Label amountLabel = new Label(String.format("Cuota: %.2f€", summary.getTaxAmount()));
+            amountLabel.getStyleClass().add("tax-detail-amount");
+            amountLabel.setMinWidth(90);
+            amountLabel.setAlignment(javafx.geometry.Pos.CENTER_RIGHT);
+
+            row.getChildren().addAll(nameLabel, spacer, basisLabel, amountLabel);
+            taxDetailsContainer.getChildren().add(row);
         }
     }
 

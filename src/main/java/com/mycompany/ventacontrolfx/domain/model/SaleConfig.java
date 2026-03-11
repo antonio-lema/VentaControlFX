@@ -25,6 +25,7 @@ public class SaleConfig {
     private boolean pricesIncludeTax = false;
     private String currency = "EUR — Euro (€)";
     private String decimals = "2 decimales";
+    private String roundingMethod = "LINE"; // Tax Engine V2: 'LINE' o 'GLOBAL'
 
     // ── Ticket ────────────────────────────────────────────────────────
     private boolean showLogo = true;
@@ -190,6 +191,14 @@ public class SaleConfig {
 
     public void setDecimals(String v) {
         this.decimals = v;
+    }
+
+    public String getRoundingMethod() {
+        return roundingMethod;
+    }
+
+    public void setRoundingMethod(String roundingMethod) {
+        this.roundingMethod = roundingMethod;
     }
 
     public boolean isShowLogo() {

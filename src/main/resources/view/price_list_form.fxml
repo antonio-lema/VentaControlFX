@@ -34,7 +34,7 @@
             <Label text="Si se desactiva, no podrá aplicarse a nuevas ventas o clientes." wrapText="true" styleClass="text-xs, text-gray-500" style="-fx-padding: 0 0 0 25;"/>
         </VBox>
 
-        <VBox spacing="8" styleClass="bg-gray-50" style="-fx-padding: 15; -fx-background-radius: 8;">
+        <VBox spacing="8" styleClass="bg-gray-50" style="-fx-padding: 15; -fx-background-radius: -fx-radius-md;">
             <CheckBox fx:id="chkIsDefault" text="Establecer como Tarifa por Defecto" styleClass="text-sm, font-medium, text-gray-800"/>
             <Label text="Esta será la tarifa base para todos los productos y clientes nuevos." wrapText="true" styleClass="text-xs, text-gray-500" style="-fx-padding: 0 0 0 25;"/>
         </VBox>

@@ -15,6 +15,13 @@ public class Sale {
     private boolean isReturn;
     private double returnedAmount; // NEW
 
+    // Campos Fiscales (Documento)
+    private String docType;
+    private String docSeries;
+    private Integer docNumber;
+    private String docStatus;
+    private String controlHash;
+
     public double getReturnedAmount() {
         return returnedAmount;
     }
@@ -27,6 +34,7 @@ public class Sale {
     private String returnReason;
     private String userName; // New field
     private List<SaleDetail> details = new ArrayList<>();
+    private List<SaleTaxSummary> taxSummaries = new ArrayList<>(); // Tax Engine V2
 
     public Sale() {
     }
@@ -125,5 +133,53 @@ public class Sale {
 
     public void setDetails(List<SaleDetail> details) {
         this.details = details;
+    }
+
+    public List<SaleTaxSummary> getTaxSummaries() {
+        return taxSummaries;
+    }
+
+    public void setTaxSummaries(List<SaleTaxSummary> taxSummaries) {
+        this.taxSummaries = taxSummaries;
+    }
+
+    public String getDocType() {
+        return docType;
+    }
+
+    public void setDocType(String docType) {
+        this.docType = docType;
+    }
+
+    public String getDocSeries() {
+        return docSeries;
+    }
+
+    public void setDocSeries(String docSeries) {
+        this.docSeries = docSeries;
+    }
+
+    public Integer getDocNumber() {
+        return docNumber;
+    }
+
+    public void setDocNumber(Integer docNumber) {
+        this.docNumber = docNumber;
+    }
+
+    public String getDocStatus() {
+        return docStatus;
+    }
+
+    public void setDocStatus(String docStatus) {
+        this.docStatus = docStatus;
+    }
+
+    public String getControlHash() {
+        return controlHash;
+    }
+
+    public void setControlHash(String controlHash) {
+        this.controlHash = controlHash;
     }
 }

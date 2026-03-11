@@ -9,6 +9,8 @@ import com.mycompany.ventacontrolfx.application.usecase.CategoryUseCase;
 import com.mycompany.ventacontrolfx.application.usecase.PriceListUseCase;
 import com.mycompany.ventacontrolfx.application.usecase.PriceUseCase;
 import com.mycompany.ventacontrolfx.application.dto.PriceInfoDTO;
+import com.mycompany.ventacontrolfx.domain.model.TaxGroup;
+import com.mycompany.ventacontrolfx.domain.service.TaxEngineService;
 import com.mycompany.ventacontrolfx.domain.exception.BusinessException;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import javafx.application.Platform;
@@ -45,6 +47,8 @@ public class AddProductController implements Injectable {
     @FXML
     private ComboBox<Category> cmbCategory;
     @FXML
+    private ComboBox<TaxGroup> cmbTaxGroup;
+    @FXML
     private CheckBox chkFavorite;
     @FXML
     private ImageView ivProductImage;
@@ -55,6 +59,7 @@ public class AddProductController implements Injectable {
     private CategoryUseCase categoryUseCase;
     private PriceListUseCase priceListUseCase;
     private PriceUseCase priceUseCase;
+    private TaxEngineService taxEngineService;
     private Product productToEdit;
     private File selectedImageFile;
 
@@ -68,9 +73,12 @@ public class AddProductController implements Injectable {
         this.categoryUseCase = container.getCategoryUseCase();
         this.priceListUseCase = container.getPriceListUseCase();
         this.priceUseCase = container.getPriceUseCase();
+        this.taxEngineService = container.getTaxEngineService();
         setupCategoryComboBox();
+        setupTaxGroupComboBox();
         loadCategories();
         loadPriceLists();
+        loadTaxGroups();
     }
 
     private void loadPriceLists() {
@@ -191,6 +199,41 @@ public class AddProductController implements Injectable {
                 return null;
             }
         });
+
+        cmbCategory.getSelectionModel().selectedItemProperty().addListener((obs, old, nv) -> {
+            if (nv != null && nv.getTaxGroupId() != null) {
+                // Heredar grupo de impuestos de la categoría de forma inteligente
+                for (TaxGroup tg : cmbTaxGroup.getItems()) {
+                    if (tg.getId().equals(nv.getTaxGroupId())) {
+                        cmbTaxGroup.setValue(tg);
+                        break;
+                    }
+                }
+            }
+        });
+    }
+
+    private void setupTaxGroupComboBox() {
+        cmbTaxGroup.setConverter(new StringConverter<>() {
+            @Override
+            public String toString(TaxGroup t) {
+                return t != null ? t.getName() : "Sin Grupo (Usar IVA Legacy)";
+            }
+
+            @Override
+            public TaxGroup fromString(String s) {
+                return null;
+            }
+        });
+    }
+
+    private void loadTaxGroups() {
+        try {
+            List<TaxGroup> groups = taxEngineService.getAllGroups();
+            cmbTaxGroup.setItems(FXCollections.observableArrayList(groups));
+        } catch (Exception e) {
+            // No interrumpir si falla el tax engine
+        }
     }
 
     private void loadCategories() {
@@ -219,6 +262,18 @@ public class AddProductController implements Injectable {
                 cmbCategory.setValue(c);
                 break;
             }
+        }
+
+        // Select correct tax group
+        if (product.getTaxGroupId() != null) {
+            for (TaxGroup tg : cmbTaxGroup.getItems()) {
+                if (tg.getId() == product.getTaxGroupId()) {
+                    cmbTaxGroup.setValue(tg);
+                    break;
+                }
+            }
+        } else {
+            cmbTaxGroup.setValue(null);
         }
 
         if (product.getImagePath() != null) {
@@ -296,6 +351,12 @@ public class AddProductController implements Injectable {
                     AlertUtil.showWarning("Validación", "IVA inválido. Se usará el defecto de categoría.");
                     productToEdit.setIva(null);
                 }
+            }
+
+            if (cmbTaxGroup.getValue() != null) {
+                productToEdit.setTaxGroupId(cmbTaxGroup.getValue().getId());
+            } else {
+                productToEdit.setTaxGroupId(null);
             }
 
             if (selectedImageFile != null) {

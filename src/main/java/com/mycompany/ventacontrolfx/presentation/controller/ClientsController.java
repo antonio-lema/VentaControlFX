@@ -96,7 +96,7 @@ public class ClientsController implements Injectable, com.mycompany.ventacontrol
         card.getStyleClass().add("client-card");
         card.setPrefWidth(280);
         card.setMinWidth(280);
-        card.setStyle("-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 15; " +
+        card.setStyle("-fx-background-color: white; -fx-padding: 20; " +
                 "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 5); -fx-cursor: hand;");
 
         // Cabecera: Icono y Nombre
@@ -140,7 +140,7 @@ public class ClientsController implements Injectable, com.mycompany.ventacontrol
         Button btnEdit = new Button();
         btnEdit.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.PENCIL));
         btnEdit.setStyle(
-                "-fx-background-color: #eff6ff; -fx-text-fill: #1e40af; -fx-background-radius: 5; -fx-padding: 5;");
+                "-fx-background-color: #eff6ff; -fx-text-fill: #1e40af; -fx-padding: 5;");
         btnEdit.setOnAction(e -> {
             e.consume();
             if (container.getUserSession().hasPermission("cliente.editar")) {
