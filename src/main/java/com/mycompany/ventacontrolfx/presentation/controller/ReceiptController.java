@@ -28,7 +28,7 @@ public class ReceiptController implements Injectable {
 
     @FXML
     private VBox receiptContent, companyHeaderSection, ticketInfoSection, itemsContainer, totalsContainer,
-            barcodeSection, paymentInfoContainer, clientInfoSection, vatBreakdownContainer;
+            barcodeSection, paymentInfoContainer, clientInfoSection, vatBreakdownContainer, hboxSavings;
     @FXML
     private HBox itemsHeaderHBox, hboxVatTotal;
     @FXML
@@ -36,7 +36,7 @@ public class ReceiptController implements Injectable {
             lblPaymentMethod, lblTotalRight, lblChangeRight, lblGiftIndicator, lblPVPHeader, lblTotalHeader,
             lblClientName, lblClientTaxId, lblClientAddress, lblCompanyBrand, lblCompanyName, lblCompanyAddress,
             lblCompanyPhone, lblCompanyCif, lblFooterMessage, lblSuccessIcon, lblGiftIcon, lblCompanyIcon,
-            lblAttendedBy, lblWebsiteUrl;
+            lblAttendedBy, lblWebsiteUrl, lblSavings;
     @FXML
     private ImageView imgCompanyLogo, imgAppLogoRight;
     @FXML
@@ -87,8 +87,24 @@ public class ReceiptController implements Injectable {
 
         applyCompanyHeader();
         itemsContainer.getChildren().clear();
-        for (CartItem item : items)
+        double totalSavings = 0;
+        for (CartItem item : items) {
             addItemRow(item, sym);
+            double disc = item.getDiscountAmount();
+            if (!cfg.isPricesIncludeTax()) {
+                double rate = item.getProduct().resolveEffectiveIva(cfg.getTaxRate());
+                disc *= (1 + (rate / 100.0));
+            }
+            totalSavings += disc;
+        }
+
+        if (lblSavings != null) {
+            lblSavings.setText(String.format("- " + fmt, totalSavings));
+            if (hboxSavings != null) {
+                hboxSavings.setVisible(totalSavings > 0);
+                hboxSavings.setManaged(totalSavings > 0);
+            }
+        }
 
         totalsContainer.setVisible(!isGiftMode);
         totalsContainer.setManaged(!isGiftMode);
@@ -272,21 +288,46 @@ public class ReceiptController implements Injectable {
         row.getChildren().addAll(desc, qty);
 
         if (!isGiftMode) {
-            double linePrice = item.getProduct().getPrice();
-            double lineTotal = item.getTotal();
+            double originalUnitPrice = item.getUnitPrice();
+            double originalLineTotal = originalUnitPrice * item.getQuantity();
 
             if (cfg != null && !cfg.isPricesIncludeTax()) {
                 double rate = item.getProduct().resolveEffectiveIva(cfg.getTaxRate());
-                linePrice = linePrice * (1 + (rate / 100.0));
-                lineTotal = lineTotal * (1 + (rate / 100.0));
+                originalLineTotal = originalLineTotal * (1 + (rate / 100.0));
             }
 
-            Label price = new Label(String.format("%.2f %s", lineTotal, sym));
+            Label price = new Label(String.format("%.2f %s", originalLineTotal, sym));
             price.setPrefWidth(70);
             price.setAlignment(Pos.CENTER_RIGHT);
             row.getChildren().add(price);
         }
         itemsContainer.getChildren().add(row);
+
+        // Si hay descuento, añadir una línea extra negativa justo debajo
+        if (!isGiftMode && item.getDiscountAmount() > 0) {
+            HBox discountRow = new HBox(10);
+            discountRow.setAlignment(Pos.CENTER_LEFT);
+            discountRow.setStyle("-fx-padding: 2 0 5 15;"); // Indentación
+
+            Label discDesc = new Label("[DESC] Ahorro Promoción");
+            discDesc.setStyle("-fx-font-size: 10; -fx-text-fill: #666; -fx-font-style: italic;");
+            HBox.setHgrow(discDesc, Priority.ALWAYS);
+            discDesc.setMaxWidth(Double.MAX_VALUE);
+
+            double discountAmount = item.getDiscountAmount();
+            if (cfg != null && !cfg.isPricesIncludeTax()) {
+                double rate = item.getProduct().resolveEffectiveIva(cfg.getTaxRate());
+                discountAmount *= (1 + (rate / 100.0));
+            }
+
+            Label discPrice = new Label(String.format("-%.2f %s", discountAmount, sym));
+            discPrice.setStyle("-fx-font-size: 10; -fx-text-fill: #666; -fx-font-style: italic;");
+            discPrice.setPrefWidth(70);
+            discPrice.setAlignment(Pos.CENTER_RIGHT);
+
+            discountRow.getChildren().addAll(discDesc, discPrice);
+            itemsContainer.getChildren().add(discountRow);
+        }
     }
 
     private void applyPaperFormat() {

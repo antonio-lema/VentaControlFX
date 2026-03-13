@@ -1,6 +1,7 @@
 package com.mycompany.ventacontrolfx.domain.service;
 
 import com.mycompany.ventacontrolfx.domain.model.*;
+import com.mycompany.ventacontrolfx.domain.repository.ICategoryRepository;
 import com.mycompany.ventacontrolfx.domain.repository.ITaxRepository;
 
 import java.sql.SQLException;
@@ -18,9 +19,11 @@ import java.util.Optional;
 public class TaxEngineService {
 
     private final ITaxRepository taxRepository;
+    private final ICategoryRepository categoryRepository;
 
-    public TaxEngineService(ITaxRepository taxRepository) {
+    public TaxEngineService(ITaxRepository taxRepository, ICategoryRepository categoryRepository) {
         this.taxRepository = taxRepository;
+        this.categoryRepository = categoryRepository;
     }
 
     /**
@@ -83,9 +86,13 @@ public class TaxEngineService {
     }
 
     /**
-     * Resuelve el grupo de impuestos aplicable al producto.
+     * Resuelve el grupo de impuestos aplicable al producto con herencia:
+     * 1. Grupo asignado directamente al Producto.
+     * 2. Grupo asignado a la Categoría del producto.
+     * 3. Grupo predeterminado del sistema.
      */
     private TaxGroup resolveTaxGroup(Product product) throws SQLException {
+        // 1. Grupo directo del producto
         if (product.getTaxGroupId() != null && product.getTaxGroupId() > 0) {
             Optional<TaxGroup> group = taxRepository.getTaxGroupById(product.getTaxGroupId());
             if (group.isPresent()) {
@@ -93,7 +100,18 @@ public class TaxEngineService {
             }
         }
 
-        // Si no tiene grupo específico, usar el predeterminado del sistema.
+        // 2. Grupo de la Categoría
+        if (product.getCategoryId() > 0 && categoryRepository != null) {
+            Category category = categoryRepository.getById(product.getCategoryId());
+            if (category != null && category.getTaxGroupId() != null && category.getTaxGroupId() > 0) {
+                Optional<TaxGroup> group = taxRepository.getTaxGroupById(category.getTaxGroupId());
+                if (group.isPresent()) {
+                    return group.get();
+                }
+            }
+        }
+
+        // 3. Predeterminado del sistema
         return taxRepository.getDefaultTaxGroup().orElse(null);
     }
 

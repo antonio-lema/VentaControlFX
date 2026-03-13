@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.*?>
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
+
+<VBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" 
+      fx:controller="com.mycompany.ventacontrolfx.presentation.controller.PromotionsController"
+      spacing="0" styleClass="main-content-area" stylesheets="@../styles/main.css">
+    
+    <!-- Header -->
+    <VBox styleClass="view-header" spacing="0">
+        <children>
+            <HBox spacing="16" alignment="CENTER_LEFT">
+                <children>
+                    <StackPane styleClass="view-header-icon-wrap" style="-fx-background-color: -color-primary;">
+                        <children><FontAwesomeIconView glyphName="TAG" size="24" fill="white"/></children>
+                    </StackPane>
+                    <VBox spacing="2">
+                        <children>
+                            <Label text="Promociones y Descuentos" styleClass="view-title"/>
+                            <Label text="Gestiona ofertas temporales, descuentos por volumen y promociones especiales." styleClass="view-subtitle"/>
+                        </children>
+                    </VBox>
+                    <Region HBox.hgrow="ALWAYS" />
+                    <Button onAction="#handleNewPromotion" styleClass="btn-primary" text=" Nueva Promoción">
+                        <graphic>
+                            <FontAwesomeIconView glyphName="PLUS" size="14" fill="WHITE"/>
+                        </graphic>
+                    </Button>
+                </children>
+            </HBox>
+        </children>
+    </VBox>
+
+    <VBox spacing="20" VBox.vgrow="ALWAYS" style="-fx-padding: 25;">
+        <children>
+            <!-- Filter Bar -->
+            <HBox spacing="15" alignment="CENTER_LEFT" styleClass="modern-filter-bar">
+                <children>
+                    <HBox spacing="10" alignment="CENTER_LEFT" styleClass="search-bar" HBox.hgrow="ALWAYS" maxWidth="400">
+                        <FontAwesomeIconView glyphName="SEARCH" size="16" styleClass="sidebar-icon"/>
+                        <TextField fx:id="searchField" promptText="Buscar promoción..." HBox.hgrow="ALWAYS" styleClass="search-field"/>
+                    </HBox>
+                    <Region HBox.hgrow="ALWAYS" />
+                    <Button onAction="#handleRefresh" styleClass="btn-icon">
+                        <graphic><FontAwesomeIconView glyphName="REFRESH" size="14" /></graphic>
+                    </Button>
+                </children>
+            </HBox>
+
+            <!-- Promotions Table -->
+            <TableView fx:id="promotionsTable" VBox.vgrow="ALWAYS" styleClass="modern-table-view">
+                <columns>
+                    <TableColumn fx:id="colName" prefWidth="200.0" text="NOMBRE" />
+                    <TableColumn fx:id="colType" prefWidth="120.0" text="TIPO" />
+                    <TableColumn fx:id="colValue" prefWidth="100.0" text="VALOR" />
+                    <TableColumn fx:id="colScope" prefWidth="120.0" text="ÁMBITO" />
+                    <TableColumn fx:id="colDates" prefWidth="200.0" text="VIGENCIA" />
+                    <TableColumn fx:id="colStatus" prefWidth="100.0" text="ESTADO" />
+                    <TableColumn fx:id="colActions" prefWidth="120.0" text="ACCIONES" />
+                </columns>
+                <columnResizePolicy>
+                    <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                </columnResizePolicy>
+            </TableView>
+        </children>
+    </VBox>
+</VBox>

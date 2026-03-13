@@ -80,6 +80,12 @@
                                        <Label fx:id="lblSubtotal" style="-fx-font-size: 10; -fx-alignment: CENTER_RIGHT; -fx-text-fill: black;" text="0,00 €" />
                                     </HBox>
                                      <VBox fx:id="vatBreakdownContainer" spacing="2.0" />
+                                     <VBox fx:id="hboxSavings" managed="false" visible="false">
+                                         <HBox>
+                                            <Label maxWidth="Infinity" style="-fx-font-size: 10; -fx-text-fill: #2e7d32; -fx-font-weight: bold;" text="Descuento aplicado" HBox.hgrow="ALWAYS" />
+                                            <Label fx:id="lblSavings" style="-fx-font-size: 10; -fx-text-fill: #2e7d32; -fx-font-weight: bold;" text="0,00 €" />
+                                         </HBox>
+                                     </VBox>
                                      <HBox fx:id="hboxVatTotal" managed="false" visible="false">
                                         <Label maxWidth="Infinity" style="-fx-font-size: 10; -fx-text-fill: black;" text="IVA Total" HBox.hgrow="ALWAYS" />
                                         <Label fx:id="lblVat" style="-fx-font-size: 10; -fx-text-fill: black;" text="0,00 €" />
