@@ -1,9 +1,15 @@
 package com.mycompany.ventacontrolfx.application.usecase;
 
 import com.mycompany.ventacontrolfx.domain.model.*;
+import com.mycompany.ventacontrolfx.domain.repository.IProductRepository;
 import com.mycompany.ventacontrolfx.domain.repository.ISaleRepository;
 import com.mycompany.ventacontrolfx.domain.repository.ICompanyConfigRepository;
+import com.mycompany.ventacontrolfx.domain.repository.IClientRepository;
 import com.mycompany.ventacontrolfx.infrastructure.persistence.DBConnection;
+import com.mycompany.ventacontrolfx.util.AuthorizationService;
+import com.mycompany.ventacontrolfx.domain.service.TaxEngineService;
+import com.mycompany.ventacontrolfx.application.service.PromotionService;
+
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.LocalDate;
@@ -12,23 +18,39 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Caso de uso para la gestión de ventas, incluyendo el procesamiento de nuevas
+ * ventas,
+ * historial, detalles y devoluciones.
+ */
 public class SaleUseCase {
+
     private final ISaleRepository saleRepository;
     private final ICompanyConfigRepository configRepository;
-    private final com.mycompany.ventacontrolfx.util.AuthorizationService authService;
-    private final com.mycompany.ventacontrolfx.domain.service.TaxEngineService taxEngineService;
-    private final com.mycompany.ventacontrolfx.domain.repository.IClientRepository clientRepository;
+    private final AuthorizationService authService;
+    private final TaxEngineService taxEngineService;
+    private final IClientRepository clientRepository;
+    private final PromotionService promotionService;
+    private final com.mycompany.ventacontrolfx.application.service.PromotionEngine promotionEngine;
+    private final IProductRepository productRepository;
     private CashClosureUseCase cashClosureUseCase;
 
-    public SaleUseCase(ISaleRepository saleRepository, ICompanyConfigRepository configRepository,
-            com.mycompany.ventacontrolfx.util.AuthorizationService authService,
-            com.mycompany.ventacontrolfx.domain.service.TaxEngineService taxEngineService,
-            com.mycompany.ventacontrolfx.domain.repository.IClientRepository clientRepository) {
+    public SaleUseCase(ISaleRepository saleRepository,
+            ICompanyConfigRepository configRepository,
+            AuthorizationService authService,
+            TaxEngineService taxEngineService,
+            IClientRepository clientRepository,
+            PromotionService promotionService,
+            com.mycompany.ventacontrolfx.application.service.PromotionEngine promotionEngine,
+            IProductRepository productRepository) {
         this.saleRepository = saleRepository;
         this.configRepository = configRepository;
         this.authService = authService;
         this.taxEngineService = taxEngineService;
         this.clientRepository = clientRepository;
+        this.promotionService = promotionService;
+        this.promotionEngine = promotionEngine;
+        this.productRepository = productRepository;
     }
 
     /** Inyecta el use case de caja para registrar movimientos de devolución. */
@@ -38,7 +60,13 @@ public class SaleUseCase {
 
     public int processSale(List<CartItem> cartItems, double total, String paymentMethod, Integer clientId, int userId)
             throws SQLException {
+        return processSale(cartItems, total, paymentMethod, clientId, userId, 0.0, null);
+    }
+
+    public int processSale(List<CartItem> cartItems, double total, String paymentMethod, Integer clientId, int userId,
+            double discountAmount, String discountReason) throws SQLException {
         authService.checkPermission("VENTAS");
+
         // ── REGLA DE NEGOCIO: Validar caja abierta ──
         if (cashClosureUseCase != null && !cashClosureUseCase.hasActiveFund()) {
             throw new SQLException(
@@ -56,16 +84,32 @@ public class SaleUseCase {
         double calculatedTotalIva = 0.0;
         List<SaleDetail> details = new ArrayList<>();
         List<TaxCalculationResult> lineResults = new ArrayList<>();
-
         boolean isInclusive = config.isPricesIncludeTax();
+
+        // APLICAR MOTOR DE PROMOCIONES (PIPELINE) - Consistent with CartUseCase
+        com.mycompany.ventacontrolfx.application.service.PromotionResult promoResult = promotionEngine
+                .process(cartItems);
+        double autoDiscount = promoResult.getTotalDiscount();
 
         for (CartItem item : cartItems) {
             Product product = item.getProduct();
 
-            // Usar el motor fiscal para calcular impuestos de esta línea
-            TaxCalculationResult result = taxEngineService.calculateLine(
-                    product, client, product.getPrice(), item.getQuantity(), isInclusive);
+            // Obtener descuento específico para este producto desde el motor
+            double lineDiscount = promoResult.getItemDiscounts().getOrDefault(product.getId(), 0.0);
 
+            // Precio unitario original (con tarifa de cliente ya aplicada)
+            double unitPrice = item.getUnitPrice();
+
+            // Calculamos el total de la línea YA con descuento para que el TaxEngine
+            // recalcule la base e IVA
+            double grossLineTotal = (unitPrice * item.getQuantity()) - lineDiscount;
+
+            // Simulamos un precio unitario efectivo para el motor de impuestos
+            double effectiveUnitPrice = item.getQuantity() > 0 ? (grossLineTotal / item.getQuantity()) : 0.0;
+
+            // Usar el motor fiscal para calcular impuestos de esta línea
+            TaxCalculationResult result = taxEngineService.calculateLine(product, client, effectiveUnitPrice,
+                    item.getQuantity(), isInclusive);
             lineResults.add(result);
             calculatedTotalIva += result.getTotalTaxAmount();
 
@@ -79,19 +123,21 @@ public class SaleUseCase {
             d.setTaxBasis(result.getNetTotal());
             d.setTaxAmount(result.getTotalTaxAmount());
             d.setGrossTotal(result.getGrossTotal());
-            d.setLineTotal(result.getGrossTotal()); // Mantenemos lineTotal compatible
+            d.setLineTotal(result.getGrossTotal());
 
             // Guardamos el snapshot descriptivo de los impuestos aplicados
-            String appliedGroups = result.getAppliedTaxes().stream()
-                    .map(AppliedTax::toString)
-                    .reduce((a, b) -> a + ", " + b)
-                    .orElse("Exento/0%");
+            String appliedGroups = (result.getAppliedTaxes() != null)
+                    ? result.getAppliedTaxes().stream()
+                            .map(AppliedTax::toString)
+                            .reduce((a, b) -> a + ", " + b)
+                            .orElse("Exento/0%")
+                    : "Exento/0%";
             d.setAppliedTaxGroup(appliedGroups);
 
             // Legacy fallbacks (to maintain backward compatibility with old UI while
             // transitioning)
             d.setIvaAmount(result.getTotalTaxAmount());
-            if (result.getAppliedTaxes().size() == 1) {
+            if (result.getAppliedTaxes() != null && result.getAppliedTaxes().size() == 1) {
                 d.setIvaRate(result.getAppliedTaxes().get(0).getTaxRate());
             } else {
                 d.setIvaRate(0); // Mixed or 0
@@ -99,16 +145,29 @@ public class SaleUseCase {
 
             // Snapshot fiscal: nombre del producto en el momento de la venta
             d.setProductName(product.getName());
+            d.setSkuSnapshot(product.getSku());
+            d.setCategoryNameSnapshot(product.getCategoryName());
             details.add(d);
         }
+
+        // Total auto-discount already calculated at the beginning of the method
+
+        double finalTotalTax = calculatedTotalIva;
+        double finalTotalNet = total - finalTotalTax;
 
         Sale sale = new Sale();
         sale.setSaleDateTime(LocalDateTime.now());
         sale.setUserId(userId);
         sale.setClientId(clientId);
-        sale.setTotal(total); // En el futuro se validará con la suma de grossTotals
+        sale.setTotal(total - autoDiscount - discountAmount); // Descuento total = Auto + Manual
         sale.setPaymentMethod(paymentMethod);
         sale.setIva(calculatedTotalIva);
+        sale.setTotalNet(finalTotalNet);
+        sale.setTotalTax(finalTotalTax);
+        sale.setCustomerNameSnapshot(client != null ? client.getName() : "Consumidor Final");
+        sale.setDiscountAmount(autoDiscount + discountAmount);
+        sale.setDiscountReason(((discountReason != null ? discountReason : "") + " "
+                + String.join(", ", promoResult.getAppliedPromos())).trim());
         sale.setReturn(false);
         sale.setDetails(details);
 
@@ -120,6 +179,29 @@ public class SaleUseCase {
         int saleId = saleRepository.saveSale(sale);
         saleRepository.saveSaleDetails(details, saleId);
         saleRepository.saveSaleTaxSummaries(taxSummaries, saleId);
+
+        // 4. Actualizar stock de productos (SOLO si gestionan stock)
+        try (Connection conn = DBConnection.getConnection()) {
+            conn.setAutoCommit(false);
+            try {
+                for (CartItem item : cartItems) {
+                    if (item.getProduct().isManageStock()) {
+                        int newStock = productRepository.updateStock(item.getProduct().getId(), -item.getQuantity(),
+                                conn);
+
+                        // Notificar si el stock ha bajado del mínimo (opcional: lanzar evento o log)
+                        if (newStock <= item.getProduct().getMinStock()) {
+                            System.out.println("ALERTA STOCK: El producto " + item.getProduct().getName() +
+                                    " ha alcanzado el stock mínimo (" + newStock + ")");
+                        }
+                    }
+                }
+                conn.commit();
+            } catch (SQLException e) {
+                conn.rollback();
+                throw e;
+            }
+        }
 
         return saleId;
     }
@@ -135,11 +217,9 @@ public class SaleUseCase {
 
     /**
      * Registra una devolución parcial o total de una venta.
-     * Implementa consistencia transaccional: si el registro en caja falla, se
-     * revierte todo.
      */
-    public void registerPartialReturn(int saleId, Map<Integer, Integer> returnItems, String reason,
-            int userId) throws SQLException {
+    public void registerPartialReturn(int saleId, Map<Integer, Integer> returnItems, String reason, int userId)
+            throws SQLException {
         authService.checkPermission("VENTAS");
         Sale sale = saleRepository.getById(saleId);
         if (sale == null)
@@ -176,6 +256,10 @@ public class SaleUseCase {
                             rd.setUnitPrice(unitRefundPrice);
                             rd.setSubtotal(lineRefund);
                             newReturnDetails.add(rd);
+
+                            // INCREMENTAR STOCK AL DEVOLVER
+                            com.mycompany.ventacontrolfx.infrastructure.persistence.JdbcProductRepository productRepo = new com.mycompany.ventacontrolfx.infrastructure.persistence.JdbcProductRepository();
+                            productRepo.updateStock(d.getProductId(), qtyToReturnNow, conn);
                         }
                     }
                     if (d.getReturnedQuantity() < d.getQuantity())
@@ -201,14 +285,12 @@ public class SaleUseCase {
 
                     double newTotalReturned = sale.getReturnedAmount() + refundAmountForThisTransaction;
                     saleRepository.updateSaleReturnStatus(saleId, allReturned,
-                            allReturned ? reason : reason + " (Parcial)",
-                            newTotalReturned, conn);
+                            allReturned ? reason : reason + " (Parcial)", newTotalReturned, conn);
 
-                    // Las devoluciones se hacen SIEMPRE en efectivo, independientemente de cómo se
-                    // pagó
+                    // Las devoluciones se hacen SIEMPRE en efectivo
                     if (cashClosureUseCase != null) {
-                        String cashReason = String.format("[Devolución Ticket #%d - Origen: %s] %s",
-                                saleId, sale.getPaymentMethod(), reason);
+                        String cashReason = String.format("[Devolución Ticket #%d - Origen: %s] %s", saleId,
+                                sale.getPaymentMethod(), reason);
                         cashClosureUseCase.registerCashReturn(refundAmountForThisTransaction, cashReason, userId, conn);
                     }
                 }

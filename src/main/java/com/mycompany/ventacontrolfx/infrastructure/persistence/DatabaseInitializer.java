@@ -112,6 +112,43 @@ public class DatabaseInitializer {
             } catch (SQLException e) {
             }
 
+            try {
+                stmt.execute("ALTER TABLE products ADD COLUMN sku VARCHAR(50) UNIQUE DEFAULT NULL");
+            } catch (SQLException e) {
+            }
+            try {
+                stmt.execute("ALTER TABLE products ADD COLUMN cost_price DECIMAL(10,4) DEFAULT 0.00");
+            } catch (SQLException e) {
+            }
+            try {
+                stmt.execute("ALTER TABLE products ADD COLUMN is_active BOOLEAN DEFAULT TRUE");
+            } catch (SQLException e) {
+            }
+
+            // --- Control de Stock ---
+            try {
+                stmt.execute("ALTER TABLE products ADD COLUMN stock_quantity INT DEFAULT 0");
+            } catch (SQLException e) {
+            }
+            try {
+                stmt.execute("ALTER TABLE products ADD COLUMN min_stock INT DEFAULT 0");
+            } catch (SQLException e) {
+            }
+            try {
+                stmt.execute("ALTER TABLE products ADD COLUMN manage_stock BOOLEAN DEFAULT FALSE");
+            } catch (SQLException e) {
+            }
+
+            try {
+                stmt.execute("ALTER TABLE price_lists ADD COLUMN priority INT DEFAULT 0");
+            } catch (SQLException e) {
+            }
+
+            try {
+                stmt.execute("ALTER TABLE categories ADD COLUMN parent_category_id INT DEFAULT NULL");
+            } catch (SQLException e) {
+            }
+
             // 1. Sales Table
             stmt.execute("CREATE TABLE IF NOT EXISTS sales (" +
                     "sale_id INT AUTO_INCREMENT PRIMARY KEY, " +
@@ -217,6 +254,28 @@ public class DatabaseInitializer {
             } catch (SQLException e) {
             }
 
+            // --- Snapshots Fiscales e Inmutabilidad (Fase 3) ---
+            try {
+                stmt.execute("ALTER TABLE sales ADD COLUMN total_net DECIMAL(10,2) DEFAULT 0.00");
+            } catch (SQLException e) {
+            }
+            try {
+                stmt.execute("ALTER TABLE sales ADD COLUMN total_tax DECIMAL(10,2) DEFAULT 0.00");
+            } catch (SQLException e) {
+            }
+            try {
+                stmt.execute("ALTER TABLE sales ADD COLUMN customer_name_snapshot VARCHAR(255) DEFAULT NULL");
+            } catch (SQLException e) {
+            }
+            try {
+                stmt.execute("ALTER TABLE sales ADD COLUMN discount_amount DECIMAL(10,2) DEFAULT 0.00");
+            } catch (SQLException e) {
+            }
+            try {
+                stmt.execute("ALTER TABLE sales ADD COLUMN discount_reason VARCHAR(255) DEFAULT NULL");
+            } catch (SQLException e) {
+            }
+
             // 2. Sale Details Table
             stmt.execute("CREATE TABLE IF NOT EXISTS sale_details (" +
                     "detail_id INT AUTO_INCREMENT PRIMARY KEY, " +
@@ -279,6 +338,15 @@ public class DatabaseInitializer {
                     stmt.execute("ALTER TABLE sale_details ADD COLUMN " + col);
                 } catch (SQLException e) {
                 }
+            }
+
+            try {
+                stmt.execute("ALTER TABLE sale_details ADD COLUMN sku_snapshot VARCHAR(50) DEFAULT NULL");
+            } catch (SQLException e) {
+            }
+            try {
+                stmt.execute("ALTER TABLE sale_details ADD COLUMN category_name_snapshot VARCHAR(100) DEFAULT NULL");
+            } catch (SQLException e) {
             }
 
             // 3. Closures Table
@@ -393,7 +461,15 @@ public class DatabaseInitializer {
             } catch (SQLException ignored) {
                 /* Ya existe */ }
 
-            // Seed default company config
+            // 8. Promotions table check
+            try {
+                stmt.execute("ALTER TABLE promotions ADD COLUMN buy_qty INT DEFAULT 0");
+            } catch (SQLException e) {
+            }
+            try {
+                stmt.execute("ALTER TABLE promotions ADD COLUMN free_qty INT DEFAULT 0");
+            } catch (SQLException e) {
+            }
             String[][] companyDefaults = {
                     { "companyName", "MI EMPRESA S.L." },
                     { "cif", "B12345678" },
@@ -908,6 +984,12 @@ public class DatabaseInitializer {
             tryIndex(stmt, "CREATE INDEX IF NOT EXISTS idx_prod_name           ON products(name)");
             tryIndex(stmt, "CREATE INDEX IF NOT EXISTS idx_prod_visible        ON products(visible)");
             tryIndex(stmt, "CREATE INDEX IF NOT EXISTS idx_prod_favorite       ON products(is_favorite)");
+            tryIndex(stmt, "CREATE INDEX IF NOT EXISTS idx_product_sku         ON products(sku)");
+            tryIndex(stmt, "CREATE INDEX IF NOT EXISTS idx_product_active      ON products(is_active)");
+
+            // --- product_prices ---
+            tryIndex(stmt,
+                    "CREATE INDEX IF NOT EXISTS idx_active_price        ON product_prices(product_id, price_list_id, start_date, end_date)");
 
             // --- categories ---
             tryIndex(stmt, "CREATE INDEX IF NOT EXISTS idx_cat_name            ON categories(name)");
@@ -965,6 +1047,34 @@ public class DatabaseInitializer {
                     + "FOREIGN KEY (tax_group_id) REFERENCES tax_groups(tax_group_id) ON DELETE CASCADE, "
                     + "FOREIGN KEY (tax_rate_id) REFERENCES tax_rates(tax_rate_id) ON DELETE RESTRICT"
                     + ")");
+
+            // Ensure columns exist for tax_rates and tax_groups (Fix for "name not found")
+            String[] taxRateCols = {
+                    "name VARCHAR(100) NOT NULL",
+                    "rate DECIMAL(5,2) NOT NULL",
+                    "country VARCHAR(50) DEFAULT 'España'",
+                    "region VARCHAR(50) DEFAULT NULL",
+                    "valid_from DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP",
+                    "valid_to DATETIME NULL",
+                    "active BOOLEAN DEFAULT TRUE"
+            };
+            for (String col : taxRateCols) {
+                try {
+                    stmt.execute("ALTER TABLE tax_rates ADD COLUMN " + col);
+                } catch (SQLException e) {
+                }
+            }
+
+            String[] taxGroupCols = {
+                    "name VARCHAR(100) NOT NULL",
+                    "is_default BOOLEAN DEFAULT FALSE"
+            };
+            for (String col : taxGroupCols) {
+                try {
+                    stmt.execute("ALTER TABLE tax_groups ADD COLUMN " + col);
+                } catch (SQLException e) {
+                }
+            }
 
             stmt.execute("CREATE TABLE IF NOT EXISTS sale_tax_summary ("
                     + "summary_id   INT AUTO_INCREMENT PRIMARY KEY, "
@@ -1140,6 +1250,33 @@ public class DatabaseInitializer {
 
             // ── 7. Migración de seguridad: BCrypt ───────────────────────────
             BCryptMigrationService.migratePasswords(conn);
+
+            // ── 8. Sincronización de impuestos (Motor V2) ──────────────────
+            // Esto asegura que cualquier cambio programado que ya deba estar activo
+            // se refleje en los campos espejo (mirrored fields) al arrancar.
+            try {
+                new JdbcTaxRepository().syncMirroredValues();
+            } catch (Exception e) {
+                // Si las tablas nuevas no existen aún (primera ejecución), ignorar
+            }
+
+            // ── 9. Promotions Module ───────────────────────────────────────
+            stmt.execute("CREATE TABLE IF NOT EXISTS promotions (" +
+                    "promotion_id INT AUTO_INCREMENT PRIMARY KEY, " +
+                    "name VARCHAR(255) NOT NULL, " +
+                    "description TEXT, " +
+                    "type VARCHAR(50) NOT NULL, " +
+                    "value DOUBLE NOT NULL, " +
+                    "start_date DATETIME, " +
+                    "end_date DATETIME, " +
+                    "active BOOLEAN DEFAULT TRUE, " +
+                    "scope VARCHAR(50) NOT NULL)");
+
+            stmt.execute("CREATE TABLE IF NOT EXISTS promotion_items (" +
+                    "promotion_id INT NOT NULL, " +
+                    "item_id INT NOT NULL, " +
+                    "PRIMARY KEY (promotion_id, item_id), " +
+                    "FOREIGN KEY (promotion_id) REFERENCES promotions(promotion_id) ON DELETE CASCADE)");
         }
     }
 

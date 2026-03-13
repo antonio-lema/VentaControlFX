@@ -11,6 +11,9 @@ import com.mycompany.ventacontrolfx.shared.async.AsyncManager;
 import com.mycompany.ventacontrolfx.util.UserSession;
 import com.mycompany.ventacontrolfx.util.AuthorizationService;
 import com.mycompany.ventacontrolfx.infrastructure.navigation.NavigationService;
+import com.mycompany.ventacontrolfx.application.service.PromotionEngine;
+import com.mycompany.ventacontrolfx.application.service.PromotionService;
+import com.mycompany.ventacontrolfx.presentation.ai.*;
 // CartService removed, replaced by CartUseCase
 
 /**
@@ -41,6 +44,9 @@ public class ServiceContainer {
     private final IPriceListRepository priceListRepository;
     private final ITaxRepository taxRepository;
     private final IPriceUpdateLogRepository priceLogRepository;
+    private final IPromotionRepository promotionRepository;
+    private final PromotionEngine promotionEngine;
+    private final IAiIntentRepository aiIntentRepository;
 
     // Use Cases (Application Layer)
     private final ProductUseCase productUseCase;
@@ -64,6 +70,9 @@ public class ServiceContainer {
     private final PriceListUseCase priceListUseCase;
     private final ScheduleVatChangeUseCase vatUseCase;
     private final MassivePriceUpdateUseCase massivePriceUpdateUseCase;
+    private final TaxManagementUseCase taxManagementUseCase;
+    private final PromotionUseCase promotionUseCase;
+    private final com.mycompany.ventacontrolfx.application.service.PromotionService promotionService;
 
     // Shared Components
     private final GlobalEventBus eventBus;
@@ -75,6 +84,10 @@ public class ServiceContainer {
     private final CartUseCase cartUseCase;
     private NavigationService navigationService;
     private final com.mycompany.ventacontrolfx.domain.service.TaxEngineService taxEngineService;
+    private final com.mycompany.ventacontrolfx.domain.service.PriceResolutionService priceResolutionService;
+    private final AiSkillDispatcher aiSkillDispatcher;
+    private final AiToolDefinitionGenerator aiToolGenerator;
+    private final AiIntentRouter aiIntentRouter;
 
     public ServiceContainer() {
         // 1. Shared Infrastructure
@@ -82,9 +95,6 @@ public class ServiceContainer {
         this.asyncManager = new AsyncManager();
         this.userSession = new UserSession();
         this.authService = new AuthorizationService(userSession);
-        // Initialize CartUseCase as a singleton for the session
-        this.cartUseCase = new CartUseCase(new JdbcCompanyConfigRepository(), new JdbcPriceRepository());
-
         // 2. Adapters (Infrastructure Layer)
         this.productRepository = new JdbcProductRepository();
         this.categoryRepository = new JdbcCategoryRepository();
@@ -107,16 +117,29 @@ public class ServiceContainer {
         this.priceListRepository = new JdbcPriceListRepository();
         this.taxRepository = new JdbcTaxRepository();
         this.priceLogRepository = new JdbcPriceUpdateLogRepository();
-        // 3. Domain Services
-        this.taxEngineService = new com.mycompany.ventacontrolfx.domain.service.TaxEngineService(taxRepository);
+        this.promotionRepository = new JdbcPromotionRepository();
+        this.aiIntentRepository = new JdbcAiIntentRepository();
 
-        // 4. Wiring Use Cases (Application Layer)
+        // 3. Domain Services
+        this.taxEngineService = new com.mycompany.ventacontrolfx.domain.service.TaxEngineService(taxRepository,
+                categoryRepository);
+        this.priceResolutionService = new com.mycompany.ventacontrolfx.domain.service.PriceResolutionService(
+                priceRepository, clientRepository);
+        this.promotionService = new PromotionService(promotionRepository);
+        this.promotionEngine = new PromotionEngine(promotionRepository);
+
+        // 4. Cart Initialized after TaxEngineService and PromotionService
+        this.cartUseCase = new CartUseCase(configRepository, priceResolutionService, taxEngineService, promotionService,
+                promotionEngine, priceRepository);
+
+        // 5. Wiring Use Cases (Application Layer)
         this.productUseCase = new com.mycompany.ventacontrolfx.application.usecase.ProductUseCase(productRepository,
                 authService);
-        this.categoryUseCase = new CategoryUseCase(categoryRepository, authService);
+        this.categoryUseCase = new CategoryUseCase(categoryRepository, productRepository, authService);
         this.clientUseCase = new ClientUseCase(clientRepository, authService);
         this.saleUseCase = new com.mycompany.ventacontrolfx.application.usecase.SaleUseCase(saleRepository,
-                configRepository, authService, taxEngineService, clientRepository);
+                configRepository, authService, taxEngineService, clientRepository, promotionService, promotionEngine,
+                productRepository);
         this.userUseCase = new com.mycompany.ventacontrolfx.application.usecase.UserUseCase(userRepository, emailSender,
                 authService);
         this.closureUseCase = new CashClosureUseCase(closureRepository, authService);
@@ -140,6 +163,8 @@ public class ServiceContainer {
         this.getSaleTicketUseCase = new GetSaleTicketUseCase(saleRepository);
         this.restoreSuspendedCartUseCase = new RestoreSuspendedCartUseCase(
                 suspendedCartRepository, productRepository, clientRepository, cartUseCase);
+        this.taxManagementUseCase = new TaxManagementUseCase(taxRepository, authService);
+        this.promotionUseCase = new PromotionUseCase(promotionRepository);
 
         // 4. Domain Services
         // taxEngineService is now initialized above
@@ -147,6 +172,11 @@ public class ServiceContainer {
         // Cross-wiring: SaleUseCase necesita CashClosureUseCase para registrar
         // devoluciones en caja
         this.saleUseCase.setCashClosureUseCase(this.closureUseCase);
+
+        // AI Engine Initialization
+        this.aiSkillDispatcher = new AiSkillDispatcher(this);
+        this.aiToolGenerator = new AiToolDefinitionGenerator();
+        this.aiIntentRouter = new AiIntentRouter(this);
     }
 
     // --- Getters ---
@@ -297,5 +327,17 @@ public class ServiceContainer {
 
     public ITaxRepository getTaxRepository() {
         return taxRepository;
+    }
+
+    public TaxManagementUseCase getTaxManagementUseCase() {
+        return taxManagementUseCase;
+    }
+
+    public PromotionUseCase getPromotionUseCase() {
+        return promotionUseCase;
+    }
+
+    public PromotionEngine getPromotionEngine() {
+        return promotionEngine;
     }
 }

@@ -1,9 +1,7 @@
 package com.mycompany.ventacontrolfx.presentation.controller;
 
-import com.mycompany.ventacontrolfx.domain.model.SaleConfig;
 import com.mycompany.ventacontrolfx.infrastructure.config.Injectable;
 import com.mycompany.ventacontrolfx.infrastructure.config.ServiceContainer;
-import com.mycompany.ventacontrolfx.application.usecase.ConfigUseCase;
 import com.mycompany.ventacontrolfx.infrastructure.navigation.NavigationService;
 import com.mycompany.ventacontrolfx.util.AlertUtil;
 import com.mycompany.ventacontrolfx.util.ModalService;
@@ -11,35 +9,60 @@ import com.mycompany.ventacontrolfx.util.SceneNavigator;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 
-import java.io.File;
-
 public class HeaderController implements Injectable {
 
-    @FXML
-    private Label lblHeaderUsername;
     @FXML
     private TextField searchField;
     @FXML
     private MenuButton userMenuButton;
     @FXML
-    private HBox searchBarContainer;
+    private HBox searchBarContainer, btnStockAlerts;
+    @FXML
+    private Label lblHeaderUsername, lblStockAlertCount;
 
     private ServiceContainer container;
     private NavigationService navigationService;
-    private ConfigUseCase configUseCase;
+    private com.mycompany.ventacontrolfx.shared.bus.GlobalEventBus.DataChangeListener stockRefreshListener;
 
     @Override
     public void inject(ServiceContainer container) {
         this.container = container;
-        this.configUseCase = container.getConfigUseCase();
         this.navigationService = container.getNavigationService();
         setupUserMenu();
         setupSearch();
+        checkStockAlerts();
+
+        // Suscribirse a cambios globales para refrescar alertas (ej: después de una
+        // venta)
+        if (container.getEventBus() != null) {
+            this.stockRefreshListener = this::refreshStockAlerts;
+            container.getEventBus().subscribe(this.stockRefreshListener);
+        }
+    }
+
+    public void refreshStockAlerts() {
+        checkStockAlerts();
+    }
+
+    private void checkStockAlerts() {
+        if (container == null || container.getDashboardUseCase() == null)
+            return;
+
+        com.mycompany.ventacontrolfx.shared.async.AsyncManager.execute(
+                container.getDashboardUseCase().getLowStockProductsTask(),
+                (java.util.List<com.mycompany.ventacontrolfx.domain.model.Product> lowStock) -> {
+                    if (lowStock != null && !lowStock.isEmpty()) {
+                        btnStockAlerts.setVisible(true);
+                        btnStockAlerts.setManaged(true);
+                        lblStockAlertCount.setText(String.valueOf(lowStock.size()));
+                    } else {
+                        btnStockAlerts.setVisible(false);
+                        btnStockAlerts.setManaged(false);
+                    }
+                });
     }
 
     private void setupUserMenu() {
@@ -53,18 +76,22 @@ public class HeaderController implements Injectable {
                 lblHeaderUsername.setText(name != null ? name : "Usuario");
             }
         }
-        userMenuButton.setOnMouseEntered(e -> {
-            if (!userMenuButton.isShowing())
-                userMenuButton.show();
-        });
+        if (userMenuButton != null) {
+            userMenuButton.setOnMouseEntered(e -> {
+                if (!userMenuButton.isShowing())
+                    userMenuButton.show();
+            });
+        }
     }
 
     private void setupSearch() {
-        searchField.textProperty().addListener((obs, oldVal, newVal) -> {
-            if (navigationService != null) {
-                navigationService.search(newVal);
-            }
-        });
+        if (searchField != null) {
+            searchField.textProperty().addListener((obs, oldVal, newVal) -> {
+                if (navigationService != null) {
+                    navigationService.search(newVal);
+                }
+            });
+        }
 
         // Evitar que el campo de búsqueda robe el foco al arrancar
         Platform.runLater(() -> {
@@ -93,5 +120,10 @@ public class HeaderController implements Injectable {
             Stage stage = (Stage) userMenuButton.getScene().getWindow();
             SceneNavigator.loadScene(stage, "/view/login.fxml", "Login", 900, 600, false, container);
         }
+    }
+
+    @FXML
+    private void handleShowStockAlerts() {
+        ModalService.showStandardModal("/view/low_stock_dialog.fxml", "Alertas de Stock Bajo", container, null);
     }
 }
