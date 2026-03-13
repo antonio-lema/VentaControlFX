@@ -77,6 +77,31 @@
                     <TextField fx:id="txtIva" promptText="IVA específico (vacio = defecto cat)" styleClass="modern-input-field" HBox.hgrow="ALWAYS"/>
                 </HBox>
             </VBox>
+
+            <!-- Stock Management -->
+            <VBox spacing="10" style="-fx-background-color: #f1f5f9; -fx-padding: 15; -fx-background-radius: 8;">
+                <CheckBox fx:id="chkManageStock" text="Gestionar Inventario / Stock" styleClass="modern-checkbox" style="-fx-font-weight: bold;"/>
+                <HBox spacing="15" fx:id="hboxStockDetails">
+                    <VBox HBox.hgrow="ALWAYS" spacing="5">
+                        <Label text="Stock Actual" style="-fx-font-size: 11px; -fx-text-fill: #64748b;"/>
+                        <HBox styleClass="modern-input-container" alignment="CENTER_LEFT">
+                            <FontAwesomeIconView glyphName="CUBE" size="16" styleClass="sidebar-icon">
+                                <HBox.margin><Insets right="5"/></HBox.margin>
+                            </FontAwesomeIconView>
+                            <TextField fx:id="txtStockQuantity" promptText="0" styleClass="modern-input-field" prefWidth="80"/>
+                        </HBox>
+                    </VBox>
+                    <VBox HBox.hgrow="ALWAYS" spacing="5">
+                        <Label text="Aviso Stock Bajo" style="-fx-font-size: 11px; -fx-text-fill: #64748b;"/>
+                        <HBox styleClass="modern-input-container" alignment="CENTER_LEFT">
+                            <FontAwesomeIconView glyphName="BELL" size="16" styleClass="sidebar-icon">
+                                <HBox.margin><Insets right="5"/></HBox.margin>
+                            </FontAwesomeIconView>
+                            <TextField fx:id="txtMinStock" promptText="0" styleClass="modern-input-field" prefWidth="80"/>
+                        </HBox>
+                    </VBox>
+                </HBox>
+            </VBox>
             
             <!-- Image & Favorite Row -->
             <HBox spacing="15" alignment="CENTER_LEFT">

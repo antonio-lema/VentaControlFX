@@ -59,7 +59,7 @@ public class PriceListUseCase {
                 : "";
 
         // 2. Crear la nueva lista
-        PriceList newList = new PriceList(0, newName, description, false, true);
+        PriceList newList = new PriceList(0, newName, description, false, true, 0);
         int targetId = repository.save(newList);
 
         // 3. Clonar los precios con el multiplicador
@@ -67,7 +67,7 @@ public class PriceListUseCase {
         priceRepository.cloneAndAdjustPriceList(sourceId, targetId, multiplier,
                 "Clonación con ajuste del " + percentage + "%");
 
-        return new PriceList(targetId, newName, description, false, true);
+        return new PriceList(targetId, newName, description, false, true, 0);
     }
 
     public void updateProductPrice(int productId, int priceListId, double newPriceValue, String reason)

@@ -34,6 +34,13 @@ public class JdbcPriceListRepository implements IPriceListRepository {
                 stmt.executeUpdate(
                         "ALTER TABLE price_lists ADD COLUMN is_active BOOLEAN DEFAULT TRUE AFTER is_default");
             }
+
+            // Revisa si existe columna priority
+            try {
+                stmt.executeQuery("SELECT priority FROM price_lists LIMIT 1");
+            } catch (SQLException e) {
+                stmt.executeUpdate("ALTER TABLE price_lists ADD COLUMN priority INT DEFAULT 0 AFTER is_active");
+            }
         } catch (SQLException e) {
             // Error al verificar o alterar, probablemente por inexistencia de la tabla o
             // permisos
@@ -97,12 +104,13 @@ public class JdbcPriceListRepository implements IPriceListRepository {
                 resetDefault(conn);
             }
 
-            String sql = "INSERT INTO price_lists (name, description, is_default, is_active) VALUES (?, ?, ?, ?)";
+            String sql = "INSERT INTO price_lists (name, description, is_default, is_active, priority) VALUES (?, ?, ?, ?, ?)";
             try (PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
                 pstmt.setString(1, priceList.getName());
                 pstmt.setString(2, priceList.getDescription());
                 pstmt.setBoolean(3, priceList.isDefault());
                 pstmt.setBoolean(4, priceList.isActive());
+                pstmt.setInt(5, priceList.getPriority());
                 pstmt.executeUpdate();
 
                 try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
@@ -142,13 +150,14 @@ public class JdbcPriceListRepository implements IPriceListRepository {
                 preventRemoveLastDefault(conn, priceList.getId());
             }
 
-            String sql = "UPDATE price_lists SET name = ?, description = ?, is_default = ?, is_active = ? WHERE price_list_id = ?";
+            String sql = "UPDATE price_lists SET name = ?, description = ?, is_default = ?, is_active = ?, priority = ? WHERE price_list_id = ?";
             try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
                 pstmt.setString(1, priceList.getName());
                 pstmt.setString(2, priceList.getDescription());
                 pstmt.setBoolean(3, priceList.isDefault());
                 pstmt.setBoolean(4, priceList.isActive());
-                pstmt.setInt(5, priceList.getId());
+                pstmt.setInt(5, priceList.getPriority());
+                pstmt.setInt(6, priceList.getId());
                 pstmt.executeUpdate();
             }
             conn.commit();
@@ -230,6 +239,7 @@ public class JdbcPriceListRepository implements IPriceListRepository {
                 rs.getString("name"),
                 rs.getString("description"),
                 rs.getBoolean("is_default"),
-                rs.getBoolean("is_active"));
+                rs.getBoolean("is_active"),
+                rs.getInt("priority"));
     }
 }

@@ -34,9 +34,9 @@ public class CashClosureController implements Injectable {
 
     @FXML
     private Label lblDate, lblTotalCash, lblTotalCard, lblTotalAll, lblSalesCount,
-            lblCurrentUser, lblStatus, lblCashInDrawer, lblActiveFund, lblTotalReturns;
+            lblCurrentUser, lblStatus, lblCashInDrawer, lblActiveFund, lblTotalReturns, lblTotalDiscounts;
     @FXML
-    private VBox containerReturns;
+    private VBox containerReturns, containerDiscounts;
     @FXML
     private Button btnPerformClosure, btnWithdrawCash, btnRegisterCashEntry, btnOpenFund, btnRefreshCash;
     @FXML
@@ -133,6 +133,23 @@ public class CashClosureController implements Injectable {
 
             List<ProductSummary> summary = closureUseCase.getPendingSummary();
             tableProductSummary.setItems(FXCollections.observableArrayList(summary));
+
+            // Descuentos aplicados
+            double totalDiscounts = totals.getOrDefault("total_discounts", 0.0);
+            if (lblTotalDiscounts != null) {
+                if (totalDiscounts > 0) {
+                    lblTotalDiscounts.setText(String.format("-%.2f €", totalDiscounts));
+                    if (containerDiscounts != null) {
+                        containerDiscounts.setVisible(true);
+                        containerDiscounts.setManaged(true);
+                    }
+                } else {
+                    if (containerDiscounts != null) {
+                        containerDiscounts.setVisible(false);
+                        containerDiscounts.setManaged(false);
+                    }
+                }
+            }
 
             if (closureUseCase.isClosureDoneToday() && !closureUseCase.hasActiveFund()
                     && closureUseCase.getTodayTransactionCount() == 0)

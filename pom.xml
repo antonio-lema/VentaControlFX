@@ -102,6 +102,11 @@
         <version>3.24.2</version>
         <scope>test</scope>
     </dependency>
+    <dependency>
+        <groupId>com.google.code.gson</groupId>
+        <artifactId>gson</artifactId>
+        <version>2.10.1</version>
+    </dependency>
     </dependencies>
 
     <build>
@@ -170,6 +175,16 @@
                         </configuration>
                     </execution>
                 </executions>
+            </plugin>
+
+            <!-- Exec Maven Plugin for diagnostic scripts -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.1.0</version>
+                <configuration>
+                    <mainClass>com.mycompany.ventacontrolfx.Launcher</mainClass>
+                </configuration>
             </plugin>
 
         </plugins>

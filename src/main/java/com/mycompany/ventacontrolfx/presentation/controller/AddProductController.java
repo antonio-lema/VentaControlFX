@@ -41,15 +41,17 @@ import java.util.Optional;
 public class AddProductController implements Injectable {
 
     @FXML
-    private TextField txtName, txtIva;
+    private TextField txtName, txtIva, txtStockQuantity, txtMinStock;
     @FXML
     private VBox vboxPrices;
+    @FXML
+    private HBox hboxStockDetails;
     @FXML
     private ComboBox<Category> cmbCategory;
     @FXML
     private ComboBox<TaxGroup> cmbTaxGroup;
     @FXML
-    private CheckBox chkFavorite;
+    private CheckBox chkFavorite, chkManageStock;
     @FXML
     private ImageView ivProductImage;
     @FXML
@@ -79,6 +81,13 @@ public class AddProductController implements Injectable {
         loadCategories();
         loadPriceLists();
         loadTaxGroups();
+        setupStockControls();
+    }
+
+    private void setupStockControls() {
+        hboxStockDetails.disableProperty().bind(chkManageStock.selectedProperty().not());
+        txtStockQuantity.setText("0");
+        txtMinStock.setText("0");
     }
 
     private void loadPriceLists() {
@@ -225,6 +234,26 @@ public class AddProductController implements Injectable {
                 return null;
             }
         });
+
+        // Listener para sincronización espejo (Mirrored Sync)
+        cmbTaxGroup.valueProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal != null) {
+                // Modo V2: Calcular tasa total y sincronizar con campo IVA
+                double totalRate = newVal.getRates().stream()
+                        .mapToDouble(com.mycompany.ventacontrolfx.domain.model.TaxRate::getRate)
+                        .sum();
+                txtIva.setText(String.valueOf(totalRate));
+                txtIva.setDisable(true);
+            } else {
+                // Modo Legacy: Habilitar edición manual
+                txtIva.setDisable(false);
+                if (productToEdit != null && productToEdit.getIva() != null) {
+                    txtIva.setText(String.valueOf(productToEdit.getIva()));
+                } else {
+                    txtIva.setText("21.0");
+                }
+            }
+        });
     }
 
     private void loadTaxGroups() {
@@ -256,6 +285,10 @@ public class AddProductController implements Injectable {
             txtIva.setText("");
         }
 
+        chkManageStock.setSelected(product.isManageStock());
+        txtStockQuantity.setText(String.valueOf(product.getStockQuantity()));
+        txtMinStock.setText(String.valueOf(product.getMinStock()));
+
         // Select correct category
         for (Category c : cmbCategory.getItems()) {
             if (c.getId() == product.getCategoryId()) {
@@ -269,11 +302,19 @@ public class AddProductController implements Injectable {
             for (TaxGroup tg : cmbTaxGroup.getItems()) {
                 if (tg.getId() == product.getTaxGroupId()) {
                     cmbTaxGroup.setValue(tg);
+                    // Sincronización inicial
+                    double totalRate = tg.getRates().stream().mapToDouble(r -> r.getRate()).sum();
+                    txtIva.setText(String.valueOf(totalRate));
+                    txtIva.setDisable(true);
                     break;
                 }
             }
         } else {
             cmbTaxGroup.setValue(null);
+            txtIva.setDisable(false);
+            if (product.getIva() != null) {
+                txtIva.setText(String.valueOf(product.getIva()));
+            }
         }
 
         if (product.getImagePath() != null) {
@@ -340,6 +381,18 @@ public class AddProductController implements Injectable {
             productToEdit.setPrice(mainPrice);
             productToEdit.setCategoryId(cmbCategory.getValue().getId());
             productToEdit.setFavorite(chkFavorite.isSelected());
+
+            productToEdit.setManageStock(chkManageStock.isSelected());
+            try {
+                productToEdit.setStockQuantity(Integer.parseInt(txtStockQuantity.getText().trim()));
+            } catch (NumberFormatException e) {
+                productToEdit.setStockQuantity(0);
+            }
+            try {
+                productToEdit.setMinStock(Integer.parseInt(txtMinStock.getText().trim()));
+            } catch (NumberFormatException e) {
+                productToEdit.setMinStock(0);
+            }
 
             String ivaStr = txtIva.getText();
             if (ivaStr == null || ivaStr.trim().isEmpty()) {

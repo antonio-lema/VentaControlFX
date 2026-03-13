@@ -71,7 +71,8 @@ public class PriceListFormController implements Injectable {
                         txtName.getText().trim(),
                         txtDescription.getText() != null ? txtDescription.getText().trim() : "",
                         chkIsDefault.isSelected(),
-                        chkIsActive.isSelected());
+                        chkIsActive.isSelected(),
+                        currentPriceList != null ? currentPriceList.getPriority() : 0);
                 priceListUseCase.save(newPL);
                 AlertUtil.showInfo("Éxito", "Tarifa creada correctamente.");
             } else {

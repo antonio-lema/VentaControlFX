@@ -7,9 +7,10 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.ComboBox?>
 <?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
 
-<StackPane fx:id="rootStackPane" styleClass="register-popup-background" onMousePressed="#handleMousePressed" onMouseDragged="#handleMouseDragged" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mycompany.ventacontrolfx.presentation.controller.AddCategoryController">
+<StackPane fx:id="rootStackPane" styleClass="register-popup-background" onMousePressed="#handleMousePressed" onMouseDragged="#handleMouseDragged" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mycompany.ventacontrolfx.presentation.controller.AddCategoryController">
     <VBox maxWidth="450" spacing="0" alignment="CENTER" styleClass="modern-register-card">
         <padding>
             <Insets top="40" right="40" bottom="40" left="40"/>
@@ -41,7 +42,7 @@
                             <Insets right="10"/>
                         </HBox.margin>
                     </FontAwesomeIconView> 
-                    <ComboBox fx:id="cmbTaxGroup" promptText="Grupo de Impuestos (V2)" styleClass="modern-combo-box" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+                    <ComboBox fx:id="cmbTaxGroup" promptText="Grupo de Impuestos (V2)" styleClass="modern-combo-box" HBox.hgrow="ALWAYS" maxWidth="1.7976931348623157E308"/>
                 </HBox>
             </VBox>
 

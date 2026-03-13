@@ -103,11 +103,17 @@
                             <Label fx:id="lblTotalCard" text="0,00 €" styleClass="closure-amount-card" style="-fx-font-size: 20px;"/>
                         </VBox>
 
-                        <!-- Devoluciones -->
                         <VBox fx:id="containerReturns" spacing="5" styleClass="closure-amount-row" visible="false" managed="false">
                             <Label text="Devoluciones" styleClass="label-muted"/>
                             <Label fx:id="lblTotalReturns" text="0,00 €"
                                    style="-fx-text-fill: -color-danger; -fx-font-weight: bold; -fx-font-size: 20px;"/>
+                        </VBox>
+
+                        <!-- Descuentos Aplicados -->
+                        <VBox fx:id="containerDiscounts" spacing="5" styleClass="closure-amount-row" visible="false" managed="false">
+                            <Label text="Descuentos Aplicados" styleClass="label-muted"/>
+                            <Label fx:id="lblTotalDiscounts" text="0,00 €"
+                                   style="-fx-text-fill: #16a34a; -fx-font-weight: bold; -fx-font-size: 20px;"/>
                         </VBox>
 
                         <!-- Highlighted total -->

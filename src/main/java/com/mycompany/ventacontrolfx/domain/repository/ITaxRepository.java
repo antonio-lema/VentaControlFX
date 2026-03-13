@@ -40,4 +40,11 @@ public interface ITaxRepository {
         void deleteTaxGroup(int taxGroupId) throws SQLException;
 
         void setDefaultTaxGroup(int taxGroupId) throws SQLException;
+
+        /**
+         * Sincroniza los valores numéricos de IVA (mirrored fields) en categorías y
+         * productos
+         * basándose en la configuración actual de los Grupos de Impuestos.
+         */
+        void syncMirroredValues() throws SQLException;
 }

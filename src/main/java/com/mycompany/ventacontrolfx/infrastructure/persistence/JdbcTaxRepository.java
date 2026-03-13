@@ -337,4 +337,62 @@ public class JdbcTaxRepository implements ITaxRepository {
         g.setDefault(rs.getBoolean("is_default"));
         return g;
     }
+
+    @Override
+    public void syncMirroredValues() throws SQLException {
+        // 1. Actualizar categorías que tienen un grupo asignado
+        // Solo sumamos tasas que estén ACTIVAS hoy (valid_from <= NOW y valid_to > NOW)
+        String sqlCategories = "UPDATE categories c SET " +
+                "c.default_iva = COALESCE((SELECT SUM(tr.rate) FROM tax_rates tr " +
+                "JOIN tax_group_items tgi ON tr.tax_rate_id = tgi.tax_rate_id " +
+                "WHERE tgi.tax_group_id = c.tax_group_id " +
+                "AND tr.active = TRUE " +
+                "AND tr.valid_from <= CURRENT_TIMESTAMP " +
+                "AND (tr.valid_to IS NULL OR tr.valid_to > CURRENT_TIMESTAMP)), 0.0), " +
+                "c.tax_rate = COALESCE((SELECT SUM(tr.rate) FROM tax_rates tr " +
+                "JOIN tax_group_items tgi ON tr.tax_rate_id = tgi.tax_rate_id " +
+                "WHERE tgi.tax_group_id = c.tax_group_id " +
+                "AND tr.active = TRUE " +
+                "AND tr.valid_from <= CURRENT_TIMESTAMP " +
+                "AND (tr.valid_to IS NULL OR tr.valid_to > CURRENT_TIMESTAMP)), 0.0) " +
+                "WHERE c.tax_group_id IS NOT NULL";
+ 
+        // 2. Actualizar productos que tienen un grupo asignado directamente
+        String sqlProductsWithGroup = "UPDATE products p SET " +
+                "p.iva = COALESCE((SELECT SUM(tr.rate) FROM tax_rates tr " +
+                "JOIN tax_group_items tgi ON tr.tax_rate_id = tgi.tax_rate_id " +
+                "WHERE tgi.tax_group_id = p.tax_group_id " +
+                "AND tr.active = TRUE " +
+                "AND tr.valid_from <= CURRENT_TIMESTAMP " +
+                "AND (tr.valid_to IS NULL OR tr.valid_to > CURRENT_TIMESTAMP)), 0.0), " +
+                "p.tax_rate = COALESCE((SELECT SUM(tr.rate) FROM tax_rates tr " +
+                "JOIN tax_group_items tgi ON tr.tax_rate_id = tgi.tax_rate_id " +
+                "WHERE tgi.tax_group_id = p.tax_group_id " +
+                "AND tr.active = TRUE " +
+                "AND tr.valid_from <= CURRENT_TIMESTAMP " +
+                "AND (tr.valid_to IS NULL OR tr.valid_to > CURRENT_TIMESTAMP)), 0.0) " +
+                "WHERE p.tax_group_id IS NOT NULL";
+
+        // 3. Propagar IVA de categoría a productos que NO tienen grupo propio (Herencia)
+        String sqlProductsInherited = "UPDATE products p " +
+                "JOIN categories c ON p.category_id = c.category_id " +
+                "SET p.iva = c.default_iva, p.tax_rate = c.tax_rate " +
+                "WHERE p.tax_group_id IS NULL";
+
+        try (Connection conn = DBConnection.getConnection();
+                Statement stmt = conn.createStatement()) {
+            conn.setAutoCommit(false);
+            try {
+                stmt.executeUpdate(sqlCategories);
+                stmt.executeUpdate(sqlProductsWithGroup);
+                stmt.executeUpdate(sqlProductsInherited);
+                conn.commit();
+            } catch (SQLException e) {
+                conn.rollback();
+                throw e;
+            } finally {
+                conn.setAutoCommit(true);
+            }
+        }
+    }
 }

@@ -18,4 +18,6 @@ public interface ICategoryRepository {
     void delete(int id) throws SQLException;
 
     int count() throws SQLException;
+
+    Category getById(int id) throws SQLException;
 }

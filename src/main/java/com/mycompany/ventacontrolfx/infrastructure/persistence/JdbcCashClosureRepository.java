@@ -101,7 +101,19 @@ public class JdbcCashClosureRepository implements ICashClosureRepository {
         totals.put("returns_card", returnsCard);
         totals.put("returns_total", returnsCash + returnsCard);
         totals.put("manual_in", manualIn);
+        totals.put("manual_in", manualIn);
         totals.put("manual_out", manualOut);
+
+        // Discounts tracking
+        String sqlDiscounts = "SELECT SUM(discount_amount) FROM sales WHERE closure_id IS NULL";
+        try (Connection connection = DBConnection.getConnection();
+                Statement stmt = connection.createStatement();
+                ResultSet rs = stmt.executeQuery(sqlDiscounts)) {
+            if (rs.next()) {
+                totals.put("total_discounts", rs.getDouble(1));
+            }
+        }
+
         return totals;
     }
 

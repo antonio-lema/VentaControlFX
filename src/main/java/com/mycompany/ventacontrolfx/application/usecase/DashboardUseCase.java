@@ -43,4 +43,13 @@ public class DashboardUseCase {
             }
         };
     }
+
+    public javafx.concurrent.Task<java.util.List<com.mycompany.ventacontrolfx.domain.model.Product>> getLowStockProductsTask() {
+        return new javafx.concurrent.Task<>() {
+            @Override
+            protected java.util.List<com.mycompany.ventacontrolfx.domain.model.Product> call() throws Exception {
+                return productRepo.getLowStock();
+            }
+        };
+    }
 }

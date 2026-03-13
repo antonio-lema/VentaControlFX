@@ -42,6 +42,26 @@ public class AddCategoryController implements Injectable {
         this.taxEngineService = container.getTaxEngineService();
         setupTaxGroupComboBox();
         loadTaxGroups();
+
+        // Listener para exclusión mutua y sincronización espejo
+        cmbTaxGroup.valueProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal != null) {
+                // Modo V2: Sincronizar campo IVA con el total del grupo
+                double totalRate = newVal.getRates().stream()
+                        .mapToDouble(com.mycompany.ventacontrolfx.domain.model.TaxRate::getRate)
+                        .sum();
+                txtIva.setText(String.valueOf(totalRate));
+                txtIva.setDisable(true);
+            } else {
+                // Modo Legacy: Habilitar edición manual
+                txtIva.setDisable(false);
+                if (categoryToEdit != null) {
+                    txtIva.setText(String.valueOf(categoryToEdit.getDefaultIva()));
+                } else {
+                    txtIva.setText("21.0");
+                }
+            }
+        });
     }
 
     public void setCategory(Category category) {
@@ -55,13 +75,26 @@ public class AddCategoryController implements Injectable {
             // Seleccionar grupo de impuestos si existe
             if (category.getTaxGroupId() != null) {
                 for (TaxGroup tg : cmbTaxGroup.getItems()) {
-                    if (tg.getId() == category.getTaxGroupId()) {
+                    if (java.util.Objects.equals(tg.getId(), category.getTaxGroupId())) {
                         cmbTaxGroup.setValue(tg);
                         break;
                     }
                 }
             } else {
                 cmbTaxGroup.setValue(null);
+            }
+
+            // Forzar actualización de estado y sincronización del campo IVA
+            if (category.getTaxGroupId() != null) {
+                TaxGroup currentGroup = cmbTaxGroup.getValue();
+                if (currentGroup != null) {
+                    double totalRate = currentGroup.getRates().stream().mapToDouble(r -> r.getRate()).sum();
+                    txtIva.setText(String.valueOf(totalRate));
+                }
+                txtIva.setDisable(true);
+            } else {
+                txtIva.setDisable(false);
+                txtIva.setText(String.valueOf(category.getDefaultIva()));
             }
         } else {
             lblTitle.setText("Nueva Categoría");
@@ -83,7 +116,9 @@ public class AddCategoryController implements Injectable {
 
         double iva = 21.0;
         try {
-            iva = Double.parseDouble(ivaStr);
+            if (ivaStr != null && !ivaStr.trim().isEmpty()) {
+                iva = Double.parseDouble(ivaStr.replace(",", "."));
+            }
         } catch (NumberFormatException e) {
             AlertUtil.showWarning("Validación", "IVA inválido. Se usará 21.0%.");
         }

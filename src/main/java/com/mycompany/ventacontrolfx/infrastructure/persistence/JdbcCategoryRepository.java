@@ -19,7 +19,7 @@ public class JdbcCategoryRepository implements ICategoryRepository {
     @Override
     public List<Category> getAll() throws SQLException {
         List<Category> categories = new ArrayList<>();
-        String sql = "SELECT * FROM categories";
+        String sql = "SELECT c.*, tg.name as tax_group_name FROM categories c LEFT JOIN tax_groups tg ON c.tax_group_id = tg.tax_group_id";
 
         try (Connection connection = DBConnection.getConnection()) {
             ensureFavoriteColumnExists(connection);
@@ -30,7 +30,6 @@ public class JdbcCategoryRepository implements ICategoryRepository {
                     try {
                         isFavorite = rs.getBoolean("is_favorite");
                     } catch (SQLException e) {
-                        // ignore if column issue, default false
                     }
 
                     double defaultIva = 21.0;
@@ -39,16 +38,23 @@ public class JdbcCategoryRepository implements ICategoryRepository {
                     } catch (SQLException e) {
                     }
 
+                    Integer parentCategoryId = rs.getInt("parent_category_id");
+                    if (rs.wasNull())
+                        parentCategoryId = null;
+
                     Category category = new Category(
                             rs.getInt("category_id"),
                             rs.getString("name"),
                             rs.getBoolean("visible"),
                             isFavorite,
                             defaultIva);
+                    category.setParentCategoryId(parentCategoryId);
                     try {
                         int taxGroupId = rs.getInt("tax_group_id");
-                        if (!rs.wasNull())
+                        if (!rs.wasNull()) {
                             category.setTaxGroupId(taxGroupId);
+                            category.setTaxGroupName(rs.getString("tax_group_name"));
+                        }
                     } catch (SQLException e) {
                     }
                     categories.add(category);
@@ -61,7 +67,7 @@ public class JdbcCategoryRepository implements ICategoryRepository {
     @Override
     public List<Category> getAllVisible() throws SQLException {
         List<Category> categories = new ArrayList<>();
-        String sql = "SELECT * FROM categories WHERE visible = TRUE";
+        String sql = "SELECT c.*, tg.name as tax_group_name FROM categories c LEFT JOIN tax_groups tg ON c.tax_group_id = tg.tax_group_id WHERE c.visible = TRUE";
         try (Connection connection = DBConnection.getConnection();
                 Statement stmt = connection.createStatement();
                 ResultSet rs = stmt.executeQuery(sql)) {
@@ -78,16 +84,23 @@ public class JdbcCategoryRepository implements ICategoryRepository {
                 } catch (SQLException e) {
                 }
 
+                Integer parentCategoryId = rs.getInt("parent_category_id");
+                if (rs.wasNull())
+                    parentCategoryId = null;
+
                 Category category = new Category(
                         rs.getInt("category_id"),
                         rs.getString("name"),
                         rs.getBoolean("visible"),
                         isFavorite,
                         defaultIva);
+                category.setParentCategoryId(parentCategoryId);
                 try {
                     int taxGroupId = rs.getInt("tax_group_id");
-                    if (!rs.wasNull())
+                    if (!rs.wasNull()) {
                         category.setTaxGroupId(taxGroupId);
+                        category.setTaxGroupName(rs.getString("tax_group_name"));
+                    }
                 } catch (SQLException e) {
                 }
                 categories.add(category);
@@ -99,7 +112,7 @@ public class JdbcCategoryRepository implements ICategoryRepository {
     @Override
     public List<Category> getFavorites() throws SQLException {
         List<Category> categories = new ArrayList<>();
-        String sql = "SELECT * FROM categories WHERE visible = 1 AND is_favorite = 1";
+        String sql = "SELECT c.*, tg.name as tax_group_name FROM categories c LEFT JOIN tax_groups tg ON c.tax_group_id = tg.tax_group_id WHERE c.visible = 1 AND c.is_favorite = 1";
         try (Connection connection = DBConnection.getConnection()) {
             ensureFavoriteColumnExists(connection);
             try (Statement stmt = connection.createStatement();
@@ -117,10 +130,17 @@ public class JdbcCategoryRepository implements ICategoryRepository {
                             rs.getBoolean("visible"),
                             rs.getBoolean("is_favorite"),
                             defaultIva);
+
+                    Integer parentCategoryId = rs.getInt("parent_category_id");
+                    if (!rs.wasNull()) {
+                        category.setParentCategoryId(parentCategoryId);
+                    }
                     try {
                         int taxGroupId = rs.getInt("tax_group_id");
-                        if (!rs.wasNull())
+                        if (!rs.wasNull()) {
                             category.setTaxGroupId(taxGroupId);
+                            category.setTaxGroupName(rs.getString("tax_group_name"));
+                        }
                     } catch (SQLException e) {
                     }
                     categories.add(category);
@@ -132,7 +152,7 @@ public class JdbcCategoryRepository implements ICategoryRepository {
 
     @Override
     public void save(Category category) throws SQLException {
-        String sql = "INSERT INTO categories (name, visible, is_favorite, default_iva, tax_rate, tax_group_id) VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO categories (name, visible, is_favorite, default_iva, tax_rate, tax_group_id, parent_category_id) VALUES (?, ?, ?, ?, ?, ?, ?)";
         try (Connection connection = DBConnection.getConnection();
                 PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setString(1, category.getName());
@@ -144,6 +164,11 @@ public class JdbcCategoryRepository implements ICategoryRepository {
                 pstmt.setInt(6, category.getTaxGroupId());
             } else {
                 pstmt.setNull(6, Types.INTEGER);
+            }
+            if (category.getParentCategoryId() != null) {
+                pstmt.setInt(7, category.getParentCategoryId());
+            } else {
+                pstmt.setNull(7, Types.INTEGER);
             }
             pstmt.executeUpdate();
         }
@@ -151,7 +176,7 @@ public class JdbcCategoryRepository implements ICategoryRepository {
 
     @Override
     public void update(Category category) throws SQLException {
-        String sql = "UPDATE categories SET name = ?, visible = ?, is_favorite = ?, default_iva = ?, tax_rate = ?, tax_group_id = ? WHERE category_id = ?";
+        String sql = "UPDATE categories SET name = ?, visible = ?, is_favorite = ?, default_iva = ?, tax_rate = ?, tax_group_id = ?, parent_category_id = ? WHERE category_id = ?";
         try (Connection connection = DBConnection.getConnection();
                 PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setString(1, category.getName());
@@ -164,7 +189,12 @@ public class JdbcCategoryRepository implements ICategoryRepository {
             } else {
                 pstmt.setNull(6, Types.INTEGER);
             }
-            pstmt.setInt(7, category.getId());
+            if (category.getParentCategoryId() != null) {
+                pstmt.setInt(7, category.getParentCategoryId());
+            } else {
+                pstmt.setNull(7, Types.INTEGER);
+            }
+            pstmt.setInt(8, category.getId());
             pstmt.executeUpdate();
         }
     }
@@ -190,5 +220,51 @@ public class JdbcCategoryRepository implements ICategoryRepository {
             }
         }
         return 0;
+    }
+
+    @Override
+    public Category getById(int id) throws SQLException {
+        String sql = "SELECT c.*, tg.name as tax_group_name FROM categories c LEFT JOIN tax_groups tg ON c.tax_group_id = tg.tax_group_id WHERE c.category_id = ?";
+        try (Connection connection = DBConnection.getConnection();
+                PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setInt(1, id);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    boolean isFavorite = false;
+                    try {
+                        isFavorite = rs.getBoolean("is_favorite");
+                    } catch (SQLException e) {
+                    }
+
+                    double defaultIva = 21.0;
+                    try {
+                        defaultIva = rs.getDouble("default_iva");
+                    } catch (SQLException e) {
+                    }
+
+                    Integer parentCategoryId = rs.getInt("parent_category_id");
+                    if (rs.wasNull())
+                        parentCategoryId = null;
+
+                    Category category = new Category(
+                            rs.getInt("category_id"),
+                            rs.getString("name"),
+                            rs.getBoolean("visible"),
+                            isFavorite,
+                            defaultIva);
+                    category.setParentCategoryId(parentCategoryId);
+                    try {
+                        int taxGroupId = rs.getInt("tax_group_id");
+                        if (!rs.wasNull()) {
+                            category.setTaxGroupId(taxGroupId);
+                            category.setTaxGroupName(rs.getString("tax_group_name"));
+                        }
+                    } catch (SQLException e) {
+                    }
+                    return category;
+                }
+            }
+        }
+        return null;
     }
 }

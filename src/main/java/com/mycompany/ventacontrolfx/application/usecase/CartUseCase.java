@@ -11,17 +11,16 @@ import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 
+import com.mycompany.ventacontrolfx.application.service.PromotionService;
 import com.mycompany.ventacontrolfx.domain.model.Price;
 import com.mycompany.ventacontrolfx.domain.model.PriceList;
 import com.mycompany.ventacontrolfx.domain.repository.IPriceRepository;
+import com.mycompany.ventacontrolfx.domain.service.TaxEngineService;
+import com.mycompany.ventacontrolfx.domain.service.PriceResolutionService;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import javafx.beans.Observable;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.collections.ListChangeListener;
 
 /**
  * Use case for managing the shopping cart.
@@ -34,17 +33,27 @@ public class CartUseCase {
     private final DoubleProperty subtotal = new SimpleDoubleProperty(0.0);
     private final DoubleProperty tax = new SimpleDoubleProperty(0.0);
     private final DoubleProperty grandTotal = new SimpleDoubleProperty(0.0);
+    private final DoubleProperty totalSavings = new SimpleDoubleProperty(0.0);
     private final IntegerProperty itemCount = new SimpleIntegerProperty(0);
     private final ObjectProperty<Client> selectedClient = new SimpleObjectProperty<>(null);
     private final IntegerProperty priceListId = new SimpleIntegerProperty(-1);
     private final IntegerProperty selectedCategoryId = new SimpleIntegerProperty(-2);
 
     private final ICompanyConfigRepository configRepository;
-    private final IPriceRepository priceRepository;
+    private final com.mycompany.ventacontrolfx.domain.service.PriceResolutionService priceResolutionService;
+    private final TaxEngineService taxEngineService;
+    private final com.mycompany.ventacontrolfx.application.service.PromotionEngine promotionEngine;
 
-    public CartUseCase(ICompanyConfigRepository configRepository, IPriceRepository priceRepository) {
+    public CartUseCase(ICompanyConfigRepository configRepository,
+            PriceResolutionService priceResolutionService,
+            TaxEngineService taxEngineService,
+            PromotionService promotionService, // Kept in constructor for compatibility but not used as field
+            com.mycompany.ventacontrolfx.application.service.PromotionEngine promotionEngine,
+            IPriceRepository priceRepository) { // priceRepository still needed for legacy listener fallback
         this.configRepository = configRepository;
-        this.priceRepository = priceRepository;
+        this.taxEngineService = taxEngineService;
+        this.promotionEngine = promotionEngine;
+        this.priceResolutionService = priceResolutionService;
         this.cartItems = FXCollections
                 .observableArrayList((CartItem item) -> new Observable[] { item.quantityProperty() });
         this.cartItems.addListener((ListChangeListener.Change<? extends CartItem> c) -> updateTotals());
@@ -85,7 +94,7 @@ public class CartUseCase {
             List<Runnable> uiUpdates = new ArrayList<>();
             for (CartItem item : snapshot) {
                 try {
-                    Optional<Price> price = priceRepository.getActivePrice(
+                    Optional<Price> price = priceResolutionService.resolvePrice(
                             item.getProduct().getId(), newListId);
                     System.out.println("[CartUseCase]   Producto ID=" + item.getProduct().getId()
                             + " - precio encontrado: " + price.isPresent()
@@ -126,27 +135,77 @@ public class CartUseCase {
         double totalInclusive = 0.0;
         double totalBase = 0.0;
         boolean isInclusive = config.isPricesIncludeTax();
+        Client client = selectedClient.get();
+
+        // APLICAR MOTOR DE PROMOCIONES (PIPELINE)
+        com.mycompany.ventacontrolfx.application.service.PromotionResult promoResult = promotionEngine
+                .process(new ArrayList<>(cartItems));
+
+        double grossSavingsTotal = 0.0;
 
         for (CartItem item : cartItems) {
-            double lineTotal = Math.round(item.getTotal() * 100.0) / 100.0; // Este es qty * price
-            double effectiveRate = item.getProduct().resolveEffectiveIva(config.getTaxRate());
+            Product product = item.getProduct();
+            try {
+                // Obtener descuento específico para este producto desde el motor
+                double lineDiscount = promoResult.getItemDiscounts().getOrDefault(product.getId(), 0.0);
+                item.setDiscountAmount(lineDiscount);
 
-            if (isInclusive) {
-                // El precio ya tiene el IVA. Extraemos la base de forma estricta.
-                double lineBase = Math.round((lineTotal / (1.0 + (effectiveRate / 100.0))) * 100.0) / 100.0;
-                totalBase += lineBase;
-                totalInclusive += lineTotal;
-            } else {
-                // El precio es la base. Calculamos el IVA y lo sumamos.
-                double lineTax = Math.round((lineTotal * (effectiveRate / 100.0)) * 100.0) / 100.0;
-                totalBase += lineTotal;
-                totalInclusive += (lineTotal + lineTax);
+                // Acumular ahorros para la etiqueta (gross-up si es necesario)
+                double taxRate = product.resolveEffectiveIva(config.getTaxRate());
+                double taxMultiplier = isInclusive ? 1.0 : (1.0 + (taxRate / 100.0));
+                grossSavingsTotal += lineDiscount * taxMultiplier;
+
+                // Precio unitario original (con tarifa de cliente ya aplicada)
+                double unitPrice = item.getUnitPrice();
+
+                // Calculamos el total de la línea YA con descuento para que el TaxEngine
+                // recalcule la base e IVA
+                double grossLineTotal = (unitPrice * item.getQuantity()) - lineDiscount;
+
+                // Simulamos un precio unitario efectivo para el motor de impuestos
+                // (grossLineTotal / quantity) nos da el precio unitario real pagado
+                double effectiveUnitPrice = item.getQuantity() > 0 ? (grossLineTotal / item.getQuantity()) : 0.0;
+
+                com.mycompany.ventacontrolfx.domain.model.TaxCalculationResult result = taxEngineService.calculateLine(
+                        product, client, effectiveUnitPrice, item.getQuantity(), isInclusive);
+
+                totalBase += result.getNetTotal();
+                totalInclusive += result.getGrossTotal();
+            } catch (SQLException e) {
+                // Fallback en caso de error en el motor de impuestos
+                double lineDiscount = promoResult.getItemDiscounts().getOrDefault(product.getId(), 0.0);
+
+                double taxRate = product.resolveEffectiveIva(config.getTaxRate());
+                double taxMultiplier = isInclusive ? 1.0 : (1.0 + (taxRate / 100.0));
+                grossSavingsTotal += lineDiscount * taxMultiplier;
+
+                double lineTotal = (Math.round(item.getTotal() * 100.0) / 100.0); // CartItem.getTotal() ya descuenta
+                double effectiveRate = product.resolveEffectiveIva(config.getTaxRate());
+
+                if (isInclusive) {
+                    double lineBase = Math.round((lineTotal / (1.0 + (effectiveRate / 100.0))) * 100.0) / 100.0;
+                    totalBase += lineBase;
+                    totalInclusive += lineTotal;
+                } else {
+                    double lineTax = Math.round((lineTotal * (effectiveRate / 100.0)) * 100.0) / 100.0;
+                    totalBase += lineTotal;
+                    totalInclusive += (lineTotal + lineTax);
+                }
             }
+        }
+
+        // Manejar descuentos globales (ID -1 en el mapa de ahorros)
+        double globalDiscount = promoResult.getItemDiscounts().getOrDefault(-1, 0.0);
+        if (globalDiscount > 0) {
+            // Si hay descuento global, lo aplicamos al final.
+            totalInclusive -= globalDiscount;
+            grossSavingsTotal += globalDiscount;
         }
 
         subtotal.set(Math.round(totalBase * 100.0) / 100.0);
         tax.set(Math.round((totalInclusive - totalBase) * 100.0) / 100.0);
         grandTotal.set(Math.round(totalInclusive * 100.0) / 100.0);
+        totalSavings.set(Math.round(grossSavingsTotal * 100.0) / 100.0);
 
         itemCount.set(cartItems.stream().mapToInt(CartItem::getQuantity).sum());
     }
@@ -169,6 +228,14 @@ public class CartUseCase {
 
     public IntegerProperty itemCountProperty() {
         return itemCount;
+    }
+
+    public DoubleProperty totalSavingsProperty() {
+        return totalSavings;
+    }
+
+    public double getTotalSavings() {
+        return totalSavings.get();
     }
 
     public ObjectProperty<Client> selectedClientProperty() {

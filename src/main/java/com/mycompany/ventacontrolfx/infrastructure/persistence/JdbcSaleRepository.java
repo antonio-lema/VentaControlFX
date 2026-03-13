@@ -14,7 +14,7 @@ public class JdbcSaleRepository implements ISaleRepository {
 
     @Override
     public int saveSale(Sale sale) throws SQLException {
-        String sql = "INSERT INTO sales (user_id, client_id, total, payment_method, iva, sale_datetime, is_return, doc_type, doc_series, doc_number, doc_status, control_hash) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO sales (user_id, client_id, total, payment_method, iva, sale_datetime, is_return, doc_type, doc_series, doc_number, doc_status, control_hash, total_net, total_tax, customer_name_snapshot, discount_amount, discount_reason) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = DBConnection.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             pstmt.setInt(1, sale.getUserId());
@@ -37,6 +37,11 @@ public class JdbcSaleRepository implements ISaleRepository {
             }
             pstmt.setString(11, sale.getDocStatus() != null ? sale.getDocStatus() : "ISSUED");
             pstmt.setString(12, sale.getControlHash());
+            pstmt.setDouble(13, sale.getTotalNet());
+            pstmt.setDouble(14, sale.getTotalTax());
+            pstmt.setString(15, sale.getCustomerNameSnapshot());
+            pstmt.setDouble(16, sale.getDiscountAmount());
+            pstmt.setString(17, sale.getDiscountReason());
             pstmt.executeUpdate();
 
             try (ResultSet rs = pstmt.getGeneratedKeys()) {
@@ -53,7 +58,7 @@ public class JdbcSaleRepository implements ISaleRepository {
 
     @Override
     public void saveSaleDetails(List<SaleDetail> details, int saleId) throws SQLException {
-        String sql = "INSERT INTO sale_details (sale_id, product_id, quantity, unit_price, line_total, iva_rate, iva_amount, product_name_snapshot, net_unit_price, tax_basis, tax_amount, gross_total, applied_tax_group) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO sale_details (sale_id, product_id, quantity, unit_price, line_total, iva_rate, iva_amount, product_name_snapshot, net_unit_price, tax_basis, tax_amount, gross_total, applied_tax_group, sku_snapshot, category_name_snapshot) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = DBConnection.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
             for (SaleDetail detail : details) {
@@ -70,6 +75,8 @@ public class JdbcSaleRepository implements ISaleRepository {
                 pstmt.setDouble(11, detail.getTaxAmount());
                 pstmt.setDouble(12, detail.getGrossTotal());
                 pstmt.setString(13, detail.getAppliedTaxGroup());
+                pstmt.setString(14, detail.getSkuSnapshot());
+                pstmt.setString(15, detail.getCategoryNameSnapshot());
                 pstmt.addBatch();
             }
             pstmt.executeBatch();
@@ -123,6 +130,8 @@ public class JdbcSaleRepository implements ISaleRepository {
                     detail.setTaxAmount(rs.getDouble("tax_amount"));
                     detail.setGrossTotal(rs.getDouble("gross_total"));
                     detail.setAppliedTaxGroup(rs.getString("applied_tax_group"));
+                    detail.setSkuSnapshot(rs.getString("sku_snapshot"));
+                    detail.setCategoryNameSnapshot(rs.getString("category_name_snapshot"));
                     details.add(detail);
                 }
             }
@@ -389,6 +398,11 @@ public class JdbcSaleRepository implements ISaleRepository {
         sale.setDocNumber((Integer) rs.getObject("doc_number"));
         sale.setDocStatus(rs.getString("doc_status"));
         sale.setControlHash(rs.getString("control_hash"));
+
+        // Snapshots de inmutabilidad
+        sale.setTotalNet(rs.getDouble("total_net"));
+        sale.setTotalTax(rs.getDouble("total_tax"));
+        sale.setCustomerNameSnapshot(rs.getString("customer_name_snapshot"));
 
         return sale;
     }
