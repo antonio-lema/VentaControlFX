@@ -2,7 +2,6 @@ package com.mycompany.ventacontrolfx.application.usecase;
 
 import com.mycompany.ventacontrolfx.domain.model.CartItem;
 import com.mycompany.ventacontrolfx.domain.model.Sale;
-import com.mycompany.ventacontrolfx.domain.model.SaleConfig;
 import com.mycompany.ventacontrolfx.domain.model.Product;
 import com.mycompany.ventacontrolfx.domain.repository.ISaleRepository;
 import com.mycompany.ventacontrolfx.domain.repository.ICompanyConfigRepository;
@@ -23,16 +22,28 @@ public class SaleUseCaseTest {
 
     private ISaleRepository saleRepository;
     private ICompanyConfigRepository configRepository;
+    private com.mycompany.ventacontrolfx.domain.service.TaxEngineService taxEngineService;
+    private com.mycompany.ventacontrolfx.domain.repository.IClientRepository clientRepository;
+    private com.mycompany.ventacontrolfx.application.service.PromotionService promotionService;
+    private com.mycompany.ventacontrolfx.application.service.PromotionEngine promotionEngine;
     private SaleUseCase saleUseCase;
 
     @BeforeEach
-    public void setUp() {
+    public void setUp() throws Exception {
         saleRepository = mock(ISaleRepository.class);
         configRepository = mock(ICompanyConfigRepository.class);
 
-        SaleConfig config = new SaleConfig();
-        config.setTaxRate(21.0);
-        when(configRepository.load()).thenReturn(config);
+        taxEngineService = mock(com.mycompany.ventacontrolfx.domain.service.TaxEngineService.class);
+        clientRepository = mock(com.mycompany.ventacontrolfx.domain.repository.IClientRepository.class);
+        promotionService = mock(com.mycompany.ventacontrolfx.application.service.PromotionService.class);
+        promotionEngine = mock(com.mycompany.ventacontrolfx.application.service.PromotionEngine.class);
+        when(promotionEngine.process(any()))
+                .thenReturn(new com.mycompany.ventacontrolfx.application.service.PromotionResult());
+
+        // Mock TaxEngineService to return a basic result
+        com.mycompany.ventacontrolfx.domain.model.TaxCalculationResult mockResult = new com.mycompany.ventacontrolfx.domain.model.TaxCalculationResult(
+                100.0, 121.0, new ArrayList<>());
+        when(taxEngineService.calculateLine(any(), any(), anyDouble(), anyInt(), anyBoolean())).thenReturn(mockResult);
 
         com.mycompany.ventacontrolfx.util.AuthorizationService dummyAuth = new com.mycompany.ventacontrolfx.util.AuthorizationService(
                 new com.mycompany.ventacontrolfx.util.UserSession()) {
@@ -45,7 +56,8 @@ public class SaleUseCaseTest {
                 return true;
             }
         };
-        saleUseCase = new SaleUseCase(saleRepository, configRepository, dummyAuth);
+        saleUseCase = new SaleUseCase(saleRepository, configRepository, dummyAuth, taxEngineService, clientRepository,
+                promotionService, promotionEngine);
     }
 
     @Test

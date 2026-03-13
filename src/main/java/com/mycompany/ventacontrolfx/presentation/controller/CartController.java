@@ -41,7 +41,10 @@ public class CartController implements Injectable {
     @FXML
     private VBox cartItemsContainer, emptyCartView;
     @FXML
-    private Label subtotalLabel, taxLabel, itemsCountLabel, totalButtonLabel, lblSelectedClient, lblCurrentPriceList;
+    private Label subtotalLabel, taxLabel, savingsLabel, itemsCountLabel, totalButtonLabel, lblSelectedClient,
+            lblCurrentPriceList;
+    @FXML
+    private HBox hboxSavings;
     @FXML
     private Button btnClearCart, payButton, btnRemoveClient;
 
@@ -89,6 +92,14 @@ public class CartController implements Injectable {
         taxLabel.textProperty().bind(Bindings.createStringBinding(
                 () -> String.format("📑 %.2f €", cartUseCase.getTax()),
                 cartUseCase.taxProperty()));
+
+        savingsLabel.textProperty().bind(Bindings.createStringBinding(
+                () -> String.format("🎉 -%.2f €", cartUseCase.getTotalSavings()),
+                cartUseCase.totalSavingsProperty()));
+
+        hboxSavings.visibleProperty().bind(cartUseCase.totalSavingsProperty().greaterThan(0));
+        hboxSavings.managedProperty().bind(hboxSavings.visibleProperty());
+
         totalButtonLabel.textProperty().bind(Bindings.createStringBinding(
                 () -> String.format("%.2f €", cartUseCase.getGrandTotal()),
                 cartUseCase.grandTotalProperty()));

@@ -26,7 +26,9 @@ public class CategoryController implements Injectable, com.mycompany.ventacontro
     @FXML
     private TableView<Category> categoriesTable;
     @FXML
-    private TableColumn<Category, String> colName;
+    private TableColumn<Category, String> colName, colTaxGroup;
+    @FXML
+    private TableColumn<Category, Double> colIva;
     @FXML
     private TableColumn<Category, Boolean> colVisible, colFavorite;
     @FXML
@@ -61,6 +63,8 @@ public class CategoryController implements Injectable, com.mycompany.ventacontro
 
     private void setupColumns() {
         colName.setCellValueFactory(new PropertyValueFactory<>("name"));
+        colTaxGroup.setCellValueFactory(new PropertyValueFactory<>("taxGroupName"));
+        colIva.setCellValueFactory(new PropertyValueFactory<>("defaultIva"));
 
         setupToggleColumn(colVisible, "visible");
         setupToggleColumn(colFavorite, "favorite");

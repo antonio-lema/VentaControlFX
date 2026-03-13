@@ -52,6 +52,10 @@ public class TaxGroup {
         return getTaxRates();
     }
 
+    public void setRates(List<TaxRate> rates) {
+        setTaxRates(rates);
+    }
+
     public void addTaxRate(TaxRate rate) {
         this.taxRates.add(rate);
     }

@@ -94,6 +94,11 @@
             <Region HBox.hgrow="ALWAYS"/>
             <Label fx:id="taxLabel" text="0,00 €" styleClass="summary-value"/>
         </HBox>
+        <HBox fx:id="hboxSavings" alignment="CENTER_LEFT" style="-fx-text-fill: -color-success;">
+            <Label text="Ahorros por promociones" styleClass="summary-label" style="-fx-text-fill: -color-success;"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Label fx:id="savingsLabel" text="0,00 €" styleClass="summary-value" style="-fx-text-fill: -color-success; -fx-font-weight: bold;"/>
+        </HBox>
         <Separator/>
         <HBox alignment="CENTER_LEFT">
             <Label text="TOTAL COBRAR" styleClass="total-label"/>

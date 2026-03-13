@@ -6,21 +6,23 @@ public class PriceList {
     private String description;
     private boolean isDefault;
     private boolean isActive;
+    private int priority;
 
     public PriceList() {
         this.isActive = true;
     }
 
     public PriceList(int id, String name, boolean isDefault) {
-        this(id, name, "", isDefault, true);
+        this(id, name, "", isDefault, true, 0);
     }
 
-    public PriceList(int id, String name, String description, boolean isDefault, boolean isActive) {
+    public PriceList(int id, String name, String description, boolean isDefault, boolean isActive, int priority) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.isDefault = isDefault;
         this.isActive = isActive;
+        this.priority = priority;
     }
 
     public int getId() {
@@ -61,6 +63,14 @@ public class PriceList {
 
     public void setActive(boolean active) {
         isActive = active;
+    }
+
+    public int getPriority() {
+        return priority;
+    }
+
+    public void setPriority(int priority) {
+        this.priority = priority;
     }
 
     @Override

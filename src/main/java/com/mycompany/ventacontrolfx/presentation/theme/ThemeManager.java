@@ -39,7 +39,8 @@ public class ThemeManager {
             "/styles/components/pago.css",
             "/styles/components/devoluciones.css",
             "/styles/components/informes.css",
-            "/styles/components/vender.css"
+            "/styles/components/vender.css",
+            "/styles/components/alertas.css"
     };
 
     public ThemeManager(IAppSettingsRepository settingsRepository) {
@@ -202,7 +203,8 @@ public class ThemeManager {
         final String sidebarBot = darken(sidebarTop, 0.65);
         sb.append("  -fx-bg-sidebar: ").append(sidebarTop).append(";\n");
 
-        // Nuevo color de texto del sidebar (por defecto blanco) y sus versiones con transparencia
+        // Nuevo color de texto del sidebar (por defecto blanco) y sus versiones con
+        // transparencia
         final String sidebarText = settings.getOrDefault("ui.sidebar_text_color", "#ffffff");
         sb.append("  -fx-custom-color-sidebar-text: ").append(sidebarText).append(";\n");
         sb.append("  -fx-custom-color-sidebar-text-a70: ").append(sidebarText).append("B3;\n"); // 70% alpha

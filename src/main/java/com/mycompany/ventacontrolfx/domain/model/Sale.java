@@ -22,6 +22,53 @@ public class Sale {
     private String docStatus;
     private String controlHash;
 
+    // Global Snapshots (Inmutabilidad)
+    private String customerNameSnapshot;
+    private double totalNet;
+    private double totalTax;
+    private double discountAmount;
+    private String discountReason;
+
+    public double getDiscountAmount() {
+        return discountAmount;
+    }
+
+    public void setDiscountAmount(double discountAmount) {
+        this.discountAmount = discountAmount;
+    }
+
+    public String getDiscountReason() {
+        return discountReason;
+    }
+
+    public void setDiscountReason(String discountReason) {
+        this.discountReason = discountReason;
+    }
+
+    public String getCustomerNameSnapshot() {
+        return customerNameSnapshot;
+    }
+
+    public void setCustomerNameSnapshot(String customerNameSnapshot) {
+        this.customerNameSnapshot = customerNameSnapshot;
+    }
+
+    public double getTotalNet() {
+        return totalNet;
+    }
+
+    public void setTotalNet(double totalNet) {
+        this.totalNet = totalNet;
+    }
+
+    public double getTotalTax() {
+        return totalTax;
+    }
+
+    public void setTotalTax(double totalTax) {
+        this.totalTax = totalTax;
+    }
+
     public double getReturnedAmount() {
         return returnedAmount;
     }

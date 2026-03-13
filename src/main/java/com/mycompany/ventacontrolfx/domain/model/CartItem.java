@@ -9,6 +9,7 @@ public class CartItem {
     private Product product;
     private IntegerProperty quantity;
     private final DoubleProperty unitPrice = new SimpleDoubleProperty(0.0);
+    private final DoubleProperty discountAmount = new SimpleDoubleProperty(0.0);
 
     public CartItem(Product product, int quantity) {
         this.product = product;
@@ -61,7 +62,19 @@ public class CartItem {
         return unitPrice;
     }
 
+    public double getDiscountAmount() {
+        return discountAmount.get();
+    }
+
+    public void setDiscountAmount(double discountAmount) {
+        this.discountAmount.set(discountAmount);
+    }
+
+    public DoubleProperty discountAmountProperty() {
+        return discountAmount;
+    }
+
     public double getTotal() {
-        return unitPrice.get() * quantity.get();
+        return Math.max(0, (unitPrice.get() * quantity.get()) - discountAmount.get());
     }
 }

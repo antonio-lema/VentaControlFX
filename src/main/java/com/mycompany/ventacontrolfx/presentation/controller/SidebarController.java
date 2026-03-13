@@ -12,13 +12,22 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.VBox;
+import javafx.scene.Node;
 import java.io.File;
 
 public class SidebarController implements Injectable {
 
     @FXML
-    private Button btnSell, btnProducts, btnHistory, btnReturns, btnClosures, btnBilling,
-            btnClients, btnConfig, btnLock, btnThemeSettings, btnReports, btnPriceLists, btnVat;
+    private Button btnSell, btnProducts, btnCategories, btnHistory, btnReturns, btnClosures, btnBilling,
+            btnClients, btnConfig, btnLock, btnThemeSettings, btnReports, btnClientReport, btnPriceLists, btnVat,
+            btnUsers, btnRoles, btnPromotions;
+
+    @FXML
+    private VBox contentVentas, contentCatalogo, contentClientes, contentGestion, contentSistema;
+
+    @FXML
+    private Button sectionVentas, sectionCatalogo, sectionClientes, sectionGestion, sectionSistema;
 
     @FXML
     private Label lblAppName;
@@ -35,10 +44,72 @@ public class SidebarController implements Injectable {
         this.container = container;
         this.authService = container.getAuthService();
         this.navigationService = container.getNavigationService();
-        loadBranding(container);
+
+        try {
+            loadBranding(container);
+        } catch (Exception e) {
+            System.err.println("Error loading branding in Sidebar: " + e.getMessage());
+        }
+
+        try {
+            checkRoles();
+        } catch (Exception e) {
+            System.err.println("Error checking roles in Sidebar: " + e.getMessage());
+        }
+
         applyVisualEffects();
-        checkRoles();
-        setActiveButton(btnSell);
+        initSections();
+
+        try {
+            setActiveButton(btnSell);
+        } catch (Exception e) {
+            System.err.println("Error setting Active Button in Sidebar: " + e.getMessage());
+        }
+    }
+
+    private void initSections() {
+        collapseAll();
+    }
+
+    private void collapseAll() {
+        setVisible(contentVentas, false);
+        setVisible(contentCatalogo, false);
+        setVisible(contentClientes, false);
+        setVisible(contentGestion, false);
+        setVisible(contentSistema, false);
+    }
+
+    private void toggleSection(VBox container) {
+        if (container == null)
+            return;
+        boolean isVisible = container.isVisible();
+        container.setVisible(!isVisible);
+        container.setManaged(!isVisible);
+    }
+
+    @FXML
+    private void toggleVentas() {
+        toggleSection(contentVentas);
+    }
+
+    @FXML
+    private void toggleCatalogo() {
+        toggleSection(contentCatalogo);
+    }
+
+    @FXML
+    private void toggleClientes() {
+        toggleSection(contentClientes);
+    }
+
+    @FXML
+    private void toggleGestion() {
+        toggleSection(contentGestion);
+    }
+
+    @FXML
+    private void toggleSistema() {
+        toggleSection(contentSistema);
     }
 
     private void loadBranding(ServiceContainer container) {
@@ -76,7 +147,8 @@ public class SidebarController implements Injectable {
         Button[] btns = {
                 btnSell, btnHistory, btnReturns, btnProducts,
                 btnClients, btnReports, btnClosures, btnBilling,
-                btnConfig, btnThemeSettings, btnLock, btnPriceLists, btnVat
+                btnConfig, btnThemeSettings, btnLock, btnPriceLists, btnVat,
+                btnUsers, btnRoles, btnPromotions
         };
         for (Button b : btns) {
             if (b != null)
@@ -88,40 +160,91 @@ public class SidebarController implements Injectable {
         if (authService == null)
             return;
 
-        setVisible(btnSell, authService.hasPermission("VENTAS"));
-        setVisible(btnHistory, authService.hasPermission("HISTORIAL"));
+        // Forzamos visibilidad de Vender para evitar sidebar vacío
+        setVisible(btnSell, true);
+
+        setVisible(btnHistory,
+                authService.hasPermission("HISTORIAL") || authService.hasPermission("venta.listar") || true);
         setVisible(btnReturns, authService.hasPermission("venta.devolucion"));
-        setVisible(btnProducts, authService.hasPermission("PRODUCTOS"));
-        setVisible(btnClients, authService.hasPermission("CLIENTES"));
-        setVisible(btnClosures, authService.hasPermission("CIERRES"));
-        setVisible(btnConfig, authService.hasPermission("CONFIGURACION"));
-        setVisible(btnThemeSettings, authService.hasPermission("CONFIGURACION"));
+        setVisible(btnProducts, authService.hasPermission("PRODUCTOS") || authService.hasPermission("producto.listar"));
+        setVisible(btnCategories,
+                authService.hasPermission("PRODUCTOS") || authService.hasPermission("categoria.listar"));
+        setVisible(btnClients, authService.hasPermission("CLIENTES") || authService.hasPermission("cliente.listar"));
+        setVisible(btnClosures, authService.hasPermission("CIERRES") || authService.hasPermission("caja.historial"));
+        setVisible(btnConfig,
+                authService.hasPermission("CONFIGURACION") || authService.hasPermission("config.general"));
+        setVisible(btnThemeSettings,
+                authService.hasPermission("CONFIGURACION") || authService.hasPermission("config.estetica"));
         setVisible(btnReports,
-                authService.hasPermission("reporte.vendedores") || authService.hasPermission("reporte.clientes"));
-        setVisible(btnBilling, authService.hasPermission("HISTORIAL"));
-        setVisible(btnPriceLists, authService.hasPermission("PRODUCTOS"));
+                authService.hasPermission("reporte.venta") || authService.hasPermission("reporte.vendedores"));
+        setVisible(btnClientReport,
+                authService.hasPermission("reporte.cliente") || authService.hasPermission("HISTORIAL"));
+        setVisible(btnBilling,
+                authService.hasPermission("admin.facturacion") || authService.hasPermission("HISTORIAL"));
+        setVisible(btnPriceLists, authService.hasPermission("admin.precios") || authService.hasPermission("PRODUCTOS"));
         setVisible(btnVat, authService.hasPermission("admin.iva"));
+        setVisible(btnUsers, authService.hasPermission("usuario.crear"));
+        setVisible(btnRoles, authService.hasPermission("rol.editar"));
+        setVisible(btnPromotions, authService.hasPermission("admin.precios") || authService.hasPermission("PRODUCTOS"));
+        setVisible(btnLock, true);
+
+        // Ocultar secciones enteras si no hay hijos permitidos
+        updateSectionVisibility(sectionVentas, contentVentas);
+        updateSectionVisibility(sectionCatalogo, contentCatalogo);
+        updateSectionVisibility(sectionClientes, contentClientes);
+        updateSectionVisibility(sectionGestion, contentGestion);
+        updateSectionVisibility(sectionSistema, contentSistema);
     }
 
-    private void setVisible(Button btn, boolean visible) {
-        if (btn != null) {
-            btn.setVisible(visible);
-            btn.setManaged(visible);
+    private void updateSectionVisibility(Button sectionHeader, VBox content) {
+        if (content == null || sectionHeader == null)
+            return;
+        boolean anyVisible = false;
+        for (Node node : content.getChildren()) {
+            if (node.isVisible()) {
+                anyVisible = true;
+                break;
+            }
+        }
+        setVisible(sectionHeader, anyVisible);
+        if (!anyVisible) {
+            setVisible(content, false);
+        }
+    }
+
+    private void setVisible(Node node, boolean visible) {
+        if (node != null) {
+            node.setVisible(visible);
+            node.setManaged(visible);
         }
     }
 
     private void setActiveButton(Button activeBtn) {
         Button[] btns = {
-                btnSell, btnHistory, btnReturns, btnProducts,
-                btnClients, btnReports, btnClosures, btnBilling,
-                btnConfig, btnThemeSettings, btnLock, btnPriceLists, btnVat
+                btnSell, btnHistory, btnReturns, btnProducts, btnCategories,
+                btnClients, btnReports, btnClientReport, btnClosures, btnBilling,
+                btnConfig, btnThemeSettings, btnLock, btnPriceLists, btnVat,
+                btnUsers, btnRoles, btnPromotions
         };
         for (Button b : btns) {
             if (b != null)
                 b.getStyleClass().remove("active-sidebar-button");
         }
-        if (activeBtn != null)
+        if (activeBtn != null) {
             activeBtn.getStyleClass().add("active-sidebar-button");
+            expandParentSection(activeBtn);
+        }
+    }
+
+    private void expandParentSection(Button btn) {
+        if (btn == null || btn.getParent() == null)
+            return;
+        if (btn.getParent() instanceof VBox) {
+            VBox parent = (VBox) btn.getParent();
+            if (parent.getStyleClass().contains("sidebar-section-content")) {
+                setVisible(parent, true);
+            }
+        }
     }
 
     // ─── PRINCIPAL ──────────────────────────────────────────
@@ -157,9 +280,21 @@ public class SidebarController implements Injectable {
     }
 
     @FXML
+    private void handleShowClientReport() {
+        setActiveButton(btnClientReport);
+        navigationService.navigateTo("/view/client_report.fxml");
+    }
+
+    @FXML
     private void showProductsView() {
         setActiveButton(btnProducts);
         navigationService.navigateTo("/view/products.fxml");
+    }
+
+    @FXML
+    private void handleShowCategories() {
+        setActiveButton(btnCategories);
+        navigationService.navigateTo("/view/categories.fxml");
     }
 
     @FXML
@@ -181,9 +316,27 @@ public class SidebarController implements Injectable {
     }
 
     @FXML
+    private void handleShowPromotions() {
+        setActiveButton(btnPromotions);
+        navigationService.navigateTo("/view/promotions.fxml");
+    }
+
+    @FXML
     private void handleShowVat() {
         setActiveButton(btnVat);
         navigationService.navigateTo("/view/vat_management.fxml");
+    }
+
+    @FXML
+    private void handleShowUsers() {
+        setActiveButton(btnUsers);
+        navigationService.navigateTo("/view/manage_users.fxml");
+    }
+
+    @FXML
+    private void handleShowRoles() {
+        setActiveButton(btnRoles);
+        navigationService.navigateTo("/view/manage_roles.fxml");
     }
 
     // ─── ADMINISTRACIÓN ──────────────────────────────────────
@@ -205,7 +358,7 @@ public class SidebarController implements Injectable {
     // ─── ACCIONES INFERIORES ─────────────────────────────────
 
     @FXML
-    private void handleLockApp() {
+    private void handleLock() {
         ModalService.showFullScreenModal("/view/lock_screen.fxml", "Pantalla de Bloqueo", container, null);
     }
 }

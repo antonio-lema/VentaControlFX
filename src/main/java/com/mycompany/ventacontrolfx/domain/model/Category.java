@@ -7,6 +7,8 @@ public class Category {
     private boolean favorite;
     private double defaultIva = 21.0;
     private Integer taxGroupId; // Tax Engine V2
+    private String taxGroupName;
+    private Integer parentCategoryId; // Jerarquías (Subcategorías)
 
     public Category() {
         this.visible = true;
@@ -89,6 +91,22 @@ public class Category {
 
     public void setTaxGroupId(Integer taxGroupId) {
         this.taxGroupId = taxGroupId;
+    }
+
+    public String getTaxGroupName() {
+        return taxGroupName;
+    }
+
+    public void setTaxGroupName(String taxGroupName) {
+        this.taxGroupName = taxGroupName;
+    }
+
+    public Integer getParentCategoryId() {
+        return parentCategoryId;
+    }
+
+    public void setParentCategoryId(Integer parentCategoryId) {
+        this.parentCategoryId = parentCategoryId;
     }
 
     @Override

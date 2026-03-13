@@ -129,6 +129,77 @@
     -fx-text-fill: -fx-custom-color-sidebar-text !important;
 }
 
+/* ─── NAVEGACIÓN AGRUPADA (ESTÉTICA PRESERVADA) ─── */
+
+.sidebar-section-header {
+    -fx-background-color: rgba(255, 255, 255, 0.04);
+    -fx-padding: 10 15;
+    -fx-alignment: CENTER;
+    -fx-cursor: hand;
+    -fx-max-width: Infinity;
+    -fx-text-fill: #94a3b8;
+    -fx-font-size: 10px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 0;
+    -fx-border-width: 0 0 1 0;
+    -fx-border-color: rgba(255, 255, 255, 0.06);
+}
+
+.sidebar-section-header:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.08);
+    -fx-text-fill: white;
+}
+
+.sidebar-section-content {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+}
+
+/* Botones del Sidebar (Mantener idénticos) */
+.sidebar-button {
+    -fx-background-color: transparent;
+    -fx-padding: 12 15;
+    -fx-alignment: CENTER;
+    -fx-cursor: hand;
+    -fx-content-display: TOP;
+    -fx-max-width: Infinity;
+    -fx-text-fill: white;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 0;
+    -fx-border-width: 0 0 1 0;
+    -fx-border-color: rgba(255, 255, 255, 0.05);
+}
+
+.sidebar-button:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.1);
+}
+
+.active-sidebar-button {
+    -fx-background-color: linear-gradient(to right, #6366f1, #a855f7);
+    -fx-text-fill: white;
+    -fx-effect: dropshadow(three-pass-box, rgba(99, 102, 241, 0.4), 10, 0, 0, 0);
+}
+
+.sidebar-icon {
+    -fx-fill: white;
+    -fx-opacity: 0.9;
+}
+
+.active-sidebar-button .sidebar-icon {
+    -fx-opacity: 1.0;
+}
+
+.sidebar-divider {
+    -fx-background-color: rgba(255, 255, 255, 0.1);
+    -fx-max-height: 1;
+    -fx-pref-height: 1;
+}
+
+.sidebar-section-arrow {
+    -fx-fill: -fx-custom-color-sidebar-text-a40 !important;
+}
+
 /* ─── ScrollPane Styling (Transparent) ──────────────────────────── */
 .sidebar-scroll-pane {
     -fx-background-color: transparent;

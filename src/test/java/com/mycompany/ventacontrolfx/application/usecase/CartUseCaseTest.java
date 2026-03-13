@@ -6,6 +6,7 @@ import com.mycompany.ventacontrolfx.domain.repository.ICompanyConfigRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import com.mycompany.ventacontrolfx.domain.repository.IPriceRepository;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
@@ -13,17 +14,63 @@ import static org.mockito.Mockito.when;
 public class CartUseCaseTest {
 
     private ICompanyConfigRepository configRepository;
+    private com.mycompany.ventacontrolfx.domain.service.TaxEngineService taxEngineService;
+    private com.mycompany.ventacontrolfx.application.service.PromotionService promotionService;
+    private com.mycompany.ventacontrolfx.application.service.PromotionEngine promotionEngine;
     private CartUseCase cartUseCase;
 
     @BeforeEach
-    public void setUp() {
+    public void setUp() throws java.sql.SQLException {
         configRepository = Mockito.mock(ICompanyConfigRepository.class);
+        taxEngineService = Mockito.mock(com.mycompany.ventacontrolfx.domain.service.TaxEngineService.class);
+        promotionService = Mockito.mock(com.mycompany.ventacontrolfx.application.service.PromotionService.class);
+        promotionEngine = Mockito.mock(com.mycompany.ventacontrolfx.application.service.PromotionEngine.class);
+        when(promotionEngine.process(Mockito.any()))
+                .thenReturn(new com.mycompany.ventacontrolfx.application.service.PromotionResult());
+
         SaleConfig config = new SaleConfig();
         config.setTaxRate(21.0); // 21% IVA
+        config.setPricesIncludeTax(true);
         when(configRepository.load()).thenReturn(config);
 
+        // Simple mock for calculateLine that handles the 21% IVA case for tests
+        Mockito.lenient().when(taxEngineService.calculateLine(
+                Mockito.any(), Mockito.any(), Mockito.anyDouble(), Mockito.anyDouble(), Mockito.anyBoolean()))
+                .thenAnswer(invocation -> {
+                    double price = invocation.getArgument(2);
+                    double qty = invocation.getArgument(3);
+                    boolean inclusive = invocation.getArgument(4);
+
+                    double net, gross;
+                    if (inclusive) {
+                        gross = price * qty;
+                        net = gross / 1.21;
+                    } else {
+                        net = price * qty;
+                        gross = net * 1.21;
+                    }
+
+                    return new com.mycompany.ventacontrolfx.domain.model.TaxCalculationResult(
+                            Math.round(net * 100.0) / 100.0,
+                            Math.round(gross * 100.0) / 100.0,
+                            new java.util.ArrayList<>());
+                });
+
+        // Mock PromotionService to return same price by default
+        Mockito.lenient()
+                .when(promotionService.applyPromotions(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyDouble()))
+                .thenAnswer(invocation -> (Double) invocation.getArgument(2));
+
+        com.mycompany.ventacontrolfx.domain.service.PriceResolutionService priceResolutionService = Mockito
+                .mock(com.mycompany.ventacontrolfx.domain.service.PriceResolutionService.class);
+        IPriceRepository priceRepository = Mockito.mock(IPriceRepository.class);
+
         cartUseCase = new CartUseCase(configRepository,
-                Mockito.mock(com.mycompany.ventacontrolfx.domain.repository.IPriceRepository.class));
+                priceResolutionService,
+                taxEngineService,
+                promotionService,
+                promotionEngine,
+                priceRepository);
     }
 
     @Test

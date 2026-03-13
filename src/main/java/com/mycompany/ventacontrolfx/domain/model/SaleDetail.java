@@ -17,6 +17,26 @@ public class SaleDetail {
     private double grossTotal;
     private String appliedTaxGroup;
 
+    // Product Snapshots (Inmutabilidad)
+    private String skuSnapshot;
+    private String categoryNameSnapshot;
+
+    public String getSkuSnapshot() {
+        return skuSnapshot;
+    }
+
+    public void setSkuSnapshot(String skuSnapshot) {
+        this.skuSnapshot = skuSnapshot;
+    }
+
+    public String getCategoryNameSnapshot() {
+        return categoryNameSnapshot;
+    }
+
+    public void setCategoryNameSnapshot(String categoryNameSnapshot) {
+        this.categoryNameSnapshot = categoryNameSnapshot;
+    }
+
     // Auxiliary field for UI display
     private String productName;
     private int returnedQuantity;

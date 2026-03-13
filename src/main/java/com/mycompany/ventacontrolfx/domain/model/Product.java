@@ -12,6 +12,8 @@ public class Product {
     private int id;
     private int categoryId;
     private String name;
+    private String sku; // Identificador único / Código de Barras
+    private double costPrice; // Precio de coste base para márgenes
     private double price;
     private boolean isFavorite;
     private String imagePath;
@@ -21,14 +23,21 @@ public class Product {
     private Double categoryIva; // Legacy fallback
     private Integer taxGroupId; // Tax Engine V2
     private double currentPrice; // Precio calculado por la vista según tarifa activa actual
+    private boolean isActive = true;
+
+    // Stock Management
+    private int stockQuantity;
+    private int minStock;
+    private boolean manageStock = false;
 
     public Product() {
         this.visible = true;
     }
 
-    // Modified constructor to include categoryName
+    // Master constructor for all fields
     public Product(int id, int categoryId, String name, double price, boolean isFavorite, boolean visible,
-            String imagePath, String categoryName, Double iva, Double categoryIva) {
+            String imagePath, String categoryName, Double iva, Double categoryIva, String sku, double costPrice,
+            boolean isActive, int stockQuantity, int minStock, boolean manageStock) {
         this.id = id;
         this.categoryId = categoryId;
         this.name = name;
@@ -39,6 +48,19 @@ public class Product {
         this.categoryName = categoryName;
         this.iva = iva;
         this.categoryIva = categoryIva;
+        this.sku = sku;
+        this.costPrice = costPrice;
+        this.isActive = isActive;
+        this.stockQuantity = stockQuantity;
+        this.minStock = minStock;
+        this.manageStock = manageStock;
+    }
+
+    // Overload for specific features
+    public Product(int id, int categoryId, String name, double price, boolean isFavorite, boolean visible,
+            String imagePath, String categoryName, Double iva, Double categoryIva) {
+        this(id, categoryId, name, price, isFavorite, visible, imagePath, categoryName, iva, categoryIva, null, 0.0,
+                true, 0, 0, false);
     }
 
     public Product(int id, int categoryId, String name, double price, boolean isFavorite, boolean visible,
@@ -134,6 +156,30 @@ public class Product {
         this.categoryName = categoryName;
     }
 
+    public String getSku() {
+        return sku;
+    }
+
+    public void setSku(String sku) {
+        this.sku = sku;
+    }
+
+    public double getCostPrice() {
+        return costPrice;
+    }
+
+    public void setCostPrice(double costPrice) {
+        this.costPrice = costPrice;
+    }
+
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setActive(boolean active) {
+        isActive = active;
+    }
+
     public Double getIva() {
         return iva;
     }
@@ -173,6 +219,30 @@ public class Product {
 
     public void setCurrentPrice(double currentPrice) {
         this.currentPrice = currentPrice;
+    }
+
+    public int getStockQuantity() {
+        return stockQuantity;
+    }
+
+    public void setStockQuantity(int stockQuantity) {
+        this.stockQuantity = stockQuantity;
+    }
+
+    public int getMinStock() {
+        return minStock;
+    }
+
+    public void setMinStock(int minStock) {
+        this.minStock = minStock;
+    }
+
+    public boolean isManageStock() {
+        return manageStock;
+    }
+
+    public void setManageStock(boolean manageStock) {
+        this.manageStock = manageStock;
     }
 
     /**

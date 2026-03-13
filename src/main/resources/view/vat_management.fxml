@@ -438,6 +438,102 @@
                 </Tab>
 
                 <!-- ═══════════════════════════════════════════════════════════════ -->
+                <!--  PESTAÑA: CATÁLOGO DE IMPUESTOS (MANTENIMIENTO)                -->
+                <!-- ═══════════════════════════════════════════════════════════════ -->
+                <Tab text="Catálogo de Impuestos">
+                  <content>
+                    <AnchorPane minHeight="0.0" minWidth="0.0">
+                       <children>
+                          <ScrollPane fitToWidth="true" style="-fx-background-color: transparent; -fx-background: transparent;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                             <content>
+                                <VBox spacing="25.0" style="-fx-padding: 30;">
+                                   <children>
+                                      <!-- Sección 1: Tasas Impositivas -->
+                                      <VBox spacing="15.0" styleClass="config-card">
+                                         <children>
+                                            <HBox alignment="CENTER_LEFT" spacing="15.0">
+                                               <children>
+                                                  <VBox styleClass="view-header-icon-wrap" style="-fx-background-color: -color-primary;">
+                                                     <children>
+                                                        <FontAwesomeIconView fill="WHITE" glyphName="PERCENT" size="20" />
+                                                     </children>
+                                                  </VBox>
+                                                  <VBox HBox.hgrow="ALWAYS">
+                                                     <children>
+                                                        <Label styleClass="config-card-title" text="Tipos Impositivos (Tasas)" />
+                                                        <Label styleClass="label-muted" text="Define los porcentajes individuales de impuestos (ej: IVA 21%, RE 5.2%)." />
+                                                     </children>
+                                                  </VBox>
+                                                  <Button mnemonicParsing="false" onAction="#handleAddTaxRate" styleClass="btn-primary" text="Nueva Tasa">
+                                                     <graphic>
+                                                        <FontAwesomeIconView glyphName="PLUS" size="14" />
+                                                     </graphic>
+                                                  </Button>
+                                               </children>
+                                            </HBox>
+                                            
+                                            <TableView fx:id="taxRatesTable" prefHeight="200.0" styleClass="modern-table-view">
+                                               <columns>
+                                                  <TableColumn fx:id="colRateName" prefWidth="150.0" text="NOMBRE" />
+                                                  <TableColumn fx:id="colRateValue" prefWidth="100.0" text="TASA (%)" />
+                                                  <TableColumn fx:id="colRateCountry" prefWidth="120.0" text="PAÍS" />
+                                                  <TableColumn fx:id="colRateStatus" prefWidth="100.0" text="ESTADO" />
+                                                  <TableColumn fx:id="colRateActions" prefWidth="120.0" text="ACCIONES" />
+                                               </columns>
+                                               <columnResizePolicy>
+                                                  <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                                               </columnResizePolicy>
+                                            </TableView>
+                                         </children>
+                                      </VBox>
+
+                                      <!-- Sección 2: Grupos Fiscales -->
+                                      <VBox spacing="15.0" styleClass="config-card">
+                                         <children>
+                                            <HBox alignment="CENTER_LEFT" spacing="15.0">
+                                               <children>
+                                                  <VBox styleClass="view-header-icon-wrap" style="-fx-background-color: -color-success;">
+                                                     <children>
+                                                        <FontAwesomeIconView fill="WHITE" glyphName="TAGS" size="20" />
+                                                     </children>
+                                                  </VBox>
+                                                  <VBox HBox.hgrow="ALWAYS">
+                                                     <children>
+                                                        <Label styleClass="config-card-title" text="Grupos de Impuestos" />
+                                                        <Label styleClass="label-muted" text="Agrupa varias tasas para aplicarlas a productos (ej: IVA General + Recargo)." />
+                                                     </children>
+                                                  </VBox>
+                                                  <Button mnemonicParsing="false" onAction="#handleAddTaxGroup" styleClass="btn-success" text="Nuevo Grupo">
+                                                     <graphic>
+                                                        <FontAwesomeIconView glyphName="PLUS" size="14" />
+                                                     </graphic>
+                                                  </Button>
+                                               </children>
+                                            </HBox>
+                                            
+                                            <TableView fx:id="taxGroupsTable" prefHeight="220.0" styleClass="modern-table-view">
+                                               <columns>
+                                                  <TableColumn fx:id="colGroupName" prefWidth="200.0" text="NOMBRE DEL GRUPO" />
+                                                  <TableColumn fx:id="colGroupDefault" prefWidth="120.0" text="POR DEFECTO" />
+                                                  <TableColumn fx:id="colGroupRates" prefWidth="300.0" text="TASAS INCLUIDAS" />
+                                                  <TableColumn fx:id="colGroupActions" prefWidth="150.0" text="ACCIONES" />
+                                               </columns>
+                                               <columnResizePolicy>
+                                                  <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                                               </columnResizePolicy>
+                                            </TableView>
+                                         </children>
+                                      </VBox>
+                                   </children>
+                                </VBox>
+                             </content>
+                          </ScrollPane>
+                       </children>
+                    </AnchorPane>
+                  </content>
+                </Tab>
+
+                <!-- ═══════════════════════════════════════════════════════════════ -->
                 <!--  PESTAÑA: HISTORIAL DE REVISIONES                             -->
                 <!-- ═══════════════════════════════════════════════════════════════ -->
                 <Tab text="Historial de Revisiones">

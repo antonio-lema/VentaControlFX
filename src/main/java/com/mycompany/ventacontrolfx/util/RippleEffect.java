@@ -66,7 +66,7 @@ public class RippleEffect {
         if (originalText != null && !originalText.isEmpty()) {
             Label textLabel = new Label(originalText);
             textLabel.getStyleClass().add("label");
-            textLabel.setStyle("-fx-text-fill: inherit; -fx-font-weight: inherit; -fx-font-size: inherit;");
+            textLabel.setStyle("-fx-text-fill: inherit;");
             contentPane.getChildren().add(textLabel);
             button.setText("");
         }

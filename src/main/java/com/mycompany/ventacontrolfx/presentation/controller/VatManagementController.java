@@ -3,7 +3,9 @@ package com.mycompany.ventacontrolfx.presentation.controller;
 import com.mycompany.ventacontrolfx.application.usecase.PriceListUseCase;
 import com.mycompany.ventacontrolfx.application.usecase.ScheduleVatChangeUseCase;
 import com.mycompany.ventacontrolfx.application.usecase.MassivePriceUpdateUseCase;
+import com.mycompany.ventacontrolfx.application.usecase.TaxManagementUseCase;
 import com.mycompany.ventacontrolfx.domain.model.Category;
+import com.mycompany.ventacontrolfx.domain.model.TaxRate;
 import com.mycompany.ventacontrolfx.domain.model.PriceList;
 import com.mycompany.ventacontrolfx.domain.model.PriceUpdateLog;
 import com.mycompany.ventacontrolfx.domain.model.TaxRevision;
@@ -22,6 +24,11 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.scene.layout.GridPane;
+import javafx.geometry.Insets;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 
 import java.sql.SQLException;
 import java.time.format.DateTimeFormatter;
@@ -138,6 +145,32 @@ public class VatManagementController implements Injectable {
     @FXML
     private TableColumn<TaxRevision, String> colReason;
 
+    // ── MANTENIMIENTO: TAX RATES ──────────────────────────────────────────────
+    @FXML
+    private TableView<TaxRate> taxRatesTable;
+    @FXML
+    private TableColumn<TaxRate, String> colRateName;
+    @FXML
+    private TableColumn<TaxRate, String> colRateValue;
+    @FXML
+    private TableColumn<TaxRate, String> colRateCountry;
+    @FXML
+    private TableColumn<TaxRate, String> colRateStatus;
+    @FXML
+    private TableColumn<TaxRate, Void> colRateActions;
+
+    // ── MANTENIMIENTO: TAX GROUPS ─────────────────────────────────────────────
+    @FXML
+    private TableView<TaxGroup> taxGroupsTable;
+    @FXML
+    private TableColumn<TaxGroup, String> colGroupName;
+    @FXML
+    private TableColumn<TaxGroup, String> colGroupDefault;
+    @FXML
+    private TableColumn<TaxGroup, String> colGroupRates;
+    @FXML
+    private TableColumn<TaxGroup, Void> colGroupActions;
+
     // ── HISTORIAL ACTUALIZACIONES DE PRECIO ───────────────────────────────────
     @FXML
     private TableView<PriceUpdateLog> priceLogTable;
@@ -165,6 +198,7 @@ public class VatManagementController implements Injectable {
     private IProductRepository productRepository;
     private PriceListUseCase priceListUseCase;
     private IPriceUpdateLogRepository priceLogRepository;
+    private TaxManagementUseCase taxManagementUseCase;
 
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
@@ -184,6 +218,7 @@ public class VatManagementController implements Injectable {
         setupPriceLogTable();
         setupGroupingSelector();
         setupOperationTypeSelector();
+        setupTaxCatalogTables();
     }
 
     private void postInject() {
@@ -192,8 +227,9 @@ public class VatManagementController implements Injectable {
             this.vatUseCase = container.getVatUseCase();
             this.priceUpdateUseCase = container.getMassivePriceUpdateUseCase();
             this.categoryRepository = container.getCategoryUseCase().getRepository();
-            this.taxRepository = container.getTaxRepository(); // Inyectar repositorio de impuestos
+            this.taxRepository = container.getTaxRepository();
             this.priceLogRepository = container.getPriceLogRepository();
+            this.taxManagementUseCase = container.getTaxManagementUseCase();
 
             setupTaxGroupComboBoxes();
             loadInitialData();
@@ -384,6 +420,95 @@ public class VatManagementController implements Injectable {
         } catch (SQLException e) {
             showError("No se pudo cargar la información inicial: " + e.getMessage());
         }
+        loadTaxCatalogData();
+    }
+
+    private void setupTaxCatalogTables() {
+        // --- Tax Rates Table ---
+        colRateName.setCellValueFactory(new PropertyValueFactory<>("name"));
+        colRateValue.setCellValueFactory(
+                cell -> new SimpleStringProperty(String.format("%.2f%%", cell.getValue().getRate())));
+        colRateCountry.setCellValueFactory(new PropertyValueFactory<>("country"));
+        colRateStatus.setCellValueFactory(
+                cell -> new SimpleStringProperty(cell.getValue().isActive() ? "Activo" : "Inactivo"));
+
+        setupTaxRateActionsColumn();
+
+        // --- Tax Groups Table ---
+        colGroupName.setCellValueFactory(new PropertyValueFactory<>("name"));
+        colGroupDefault.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().isDefault() ? "SÍ" : "—"));
+        colGroupRates.setCellValueFactory(cell -> {
+            List<TaxRate> rates = cell.getValue().getRates();
+            if (rates == null || rates.isEmpty())
+                return new SimpleStringProperty("Sin tasas");
+            return new SimpleStringProperty(rates.stream()
+                    .map(r -> r.getName() + " (" + r.getRate() + "%)")
+                    .collect(Collectors.joining(", ")));
+        });
+
+        setupTaxGroupActionsColumn();
+    }
+
+    private void loadTaxCatalogData() {
+        try {
+            if (taxManagementUseCase != null) {
+                List<TaxRate> rates = taxManagementUseCase.getAllTaxRates();
+                taxRatesTable.setItems(FXCollections.observableArrayList(rates));
+
+                List<TaxGroup> groups = taxManagementUseCase.getAllTaxGroups();
+                taxGroupsTable.setItems(FXCollections.observableArrayList(groups));
+            }
+        } catch (SQLException e) {
+            showError("Error al cargar el catálogo de impuestos: " + e.getMessage());
+        }
+    }
+
+    private void setupTaxRateActionsColumn() {
+        colRateActions.setCellFactory(param -> new TableCell<>() {
+            private final Button editBtn = new Button();
+            private final Button deleteBtn = new Button();
+            private final HBox container = new HBox(8, editBtn, deleteBtn);
+
+            {
+                editBtn.getStyleClass().addAll("btn-sm", "btn-secondary");
+                editBtn.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.EDIT));
+                editBtn.setOnAction(e -> handleEditTaxRate(getTableView().getItems().get(getIndex())));
+
+                deleteBtn.getStyleClass().addAll("btn-sm", "btn-danger");
+                deleteBtn.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.TRASH));
+                deleteBtn.setOnAction(e -> handleDeleteTaxRate(getTableView().getItems().get(getIndex())));
+            }
+
+            @Override
+            protected void updateItem(Void item, boolean empty) {
+                super.updateItem(item, empty);
+                setGraphic(empty ? null : container);
+            }
+        });
+    }
+
+    private void setupTaxGroupActionsColumn() {
+        colGroupActions.setCellFactory(param -> new TableCell<>() {
+            private final Button editBtn = new Button();
+            private final Button deleteBtn = new Button();
+            private final HBox container = new HBox(8, editBtn, deleteBtn);
+
+            {
+                editBtn.getStyleClass().addAll("btn-sm", "btn-secondary");
+                editBtn.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.EDIT));
+                editBtn.setOnAction(e -> handleEditTaxGroup(getTableView().getItems().get(getIndex())));
+
+                deleteBtn.getStyleClass().addAll("btn-sm", "btn-danger");
+                deleteBtn.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.TRASH));
+                deleteBtn.setOnAction(e -> handleDeleteTaxGroup(getTableView().getItems().get(getIndex())));
+            }
+
+            @Override
+            protected void updateItem(Void item, boolean empty) {
+                super.updateItem(item, empty);
+                setGraphic(empty ? null : container);
+            }
+        });
     }
 
     private void setupHistoryFilter() {
@@ -679,6 +804,221 @@ public class VatManagementController implements Injectable {
     // ══════════════════════════════════════════════════════════════════════════
     // HISTORIAL
     // ══════════════════════════════════════════════════════════════════════════
+
+    @FXML
+    void handleAddTaxRate(ActionEvent event) {
+        TaxRate newRate = new TaxRate();
+        newRate.setActive(true);
+        newRate.setCountry("ES");
+        showTaxRateDialog(newRate).ifPresent(rate -> {
+            try {
+                taxManagementUseCase.saveTaxRate(rate);
+                loadTaxCatalogData();
+                showInfo("Tasa impositiva guardada con éxito.");
+            } catch (SQLException e) {
+                showError("Error al guardar tasa: " + e.getMessage());
+            }
+        });
+    }
+
+    private void handleEditTaxRate(TaxRate rate) {
+        showTaxRateDialog(rate).ifPresent(updated -> {
+            try {
+                taxManagementUseCase.updateTaxRate(updated);
+                loadTaxCatalogData();
+                showInfo("Tasa impositiva actualizada.");
+            } catch (SQLException e) {
+                showError("Error al actualizar tasa: " + e.getMessage());
+            }
+        });
+    }
+
+    private void handleDeleteTaxRate(TaxRate rate) {
+        boolean confirmed = AlertUtil.showConfirmation("Eliminar Tasa", "Confirmar eliminación",
+                "¿Está seguro de que desea eliminar la tasa '" + rate.getName()
+                        + "'?\nEsta acción no se puede deshacer.");
+        if (confirmed) {
+            try {
+                taxManagementUseCase.deleteTaxRate(rate.getTaxRateId());
+                loadTaxCatalogData();
+                showInfo("Tasa eliminada correctamente.");
+            } catch (SQLException e) {
+                showError("No se pudo eliminar la tasa. Es posible que esté en uso.");
+            }
+        }
+    }
+
+    @FXML
+    void handleAddTaxGroup(ActionEvent event) {
+        TaxGroup newGroup = new TaxGroup();
+        newGroup.setRates(new ArrayList<>());
+        showTaxGroupDialog(newGroup).ifPresent(group -> {
+            try {
+                taxManagementUseCase.saveTaxGroup(group);
+                loadTaxCatalogData();
+                loadInitialData(); // Refresh combos
+                showInfo("Grupo de impuestos creado con éxito.");
+            } catch (SQLException e) {
+                showError("Error al crear grupo: " + e.getMessage());
+            }
+        });
+    }
+
+    private void handleEditTaxGroup(TaxGroup group) {
+        showTaxGroupDialog(group).ifPresent(updated -> {
+            try {
+                taxManagementUseCase.updateTaxGroup(updated);
+                loadTaxCatalogData();
+                loadInitialData(); // Refresh combos
+                showInfo("Grupo de impuestos actualizado.");
+            } catch (SQLException e) {
+                showError("Error al actualizar grupo: " + e.getMessage());
+            }
+        });
+    }
+
+    private void handleDeleteTaxGroup(TaxGroup group) {
+        boolean confirmed = AlertUtil.showConfirmation("Eliminar Grupo", "Confirmar eliminación",
+                "¿Está seguro de que desea eliminar el grupo '" + group.getName()
+                        + "'?\nEsta acción no se puede deshacer.");
+        if (confirmed) {
+            try {
+                taxManagementUseCase.deleteTaxGroup(group.getTaxGroupId());
+                loadTaxCatalogData();
+                loadInitialData(); // Refresh combos
+                showInfo("Grupo eliminado correctamente.");
+            } catch (SQLException e) {
+                showError("No se pudo eliminar el grupo. Es posible que esté en uso en productos o categorías.");
+            }
+        }
+    }
+
+    private Optional<TaxRate> showTaxRateDialog(TaxRate rate) {
+        Dialog<TaxRate> dialog = new Dialog<>();
+        dialog.setTitle(rate.getTaxRateId() == 0 ? "Nueva Tasa Impositiva" : "Editar Tasa Impositiva");
+        dialog.setHeaderText("Configure los detalles de la tasa impositiva.");
+
+        ButtonType saveButtonType = new ButtonType("Guardar", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(saveButtonType, ButtonType.CANCEL);
+
+        javafx.scene.layout.GridPane grid = new javafx.scene.layout.GridPane();
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new javafx.geometry.Insets(20, 150, 10, 10));
+
+        TextField name = new TextField(rate.getName());
+        name.setPromptText("Nombre (ej: IVA 21%)");
+        TextField value = new TextField(String.valueOf(rate.getRate()));
+        value.setPromptText("Tasa (ej: 21.0)");
+        TextField country = new TextField(rate.getCountry());
+        country.setPromptText("País (ej: ES)");
+        CheckBox active = new CheckBox("Activa");
+        active.setSelected(rate.isActive());
+
+        DatePicker startDate = new DatePicker();
+        if (rate.getValidFrom() != null) {
+            startDate.setValue(rate.getValidFrom().toLocalDate());
+        } else {
+            startDate.setValue(java.time.LocalDate.now());
+        }
+
+        grid.add(new Label("Nombre:"), 0, 0);
+        grid.add(name, 1, 0);
+        grid.add(new Label("Tasa (%):"), 0, 1);
+        grid.add(value, 1, 1);
+        grid.add(new Label("País (ISO):"), 0, 2);
+        grid.add(country, 1, 2);
+        grid.add(new Label("Fecha Inicio:"), 0, 3);
+        grid.add(startDate, 1, 3);
+        grid.add(active, 1, 4);
+
+        dialog.getDialogPane().setContent(grid);
+
+        dialog.setResultConverter(dialogButton -> {
+            if (dialogButton == saveButtonType) {
+                try {
+                    rate.setName(name.getText());
+                    rate.setRate(Double.parseDouble(value.getText().replace(",", ".")));
+                    rate.setCountry(country.getText());
+                    rate.setActive(active.isSelected());
+
+                    if (startDate.getValue() != null) {
+                        rate.setValidFrom(startDate.getValue().atStartOfDay());
+                    }
+                    return rate;
+                } catch (NumberFormatException e) {
+                    AlertUtil.showWarning("Valor Inválido", "Por favor, introduce una tasa numérica válida.");
+                    return null;
+                }
+            }
+            return null;
+        });
+
+        return dialog.showAndWait();
+    }
+
+    private Optional<TaxGroup> showTaxGroupDialog(TaxGroup group) {
+        Dialog<TaxGroup> dialog = new Dialog<>();
+        dialog.setTitle(group.getTaxGroupId() == 0 ? "Nuevo Grupo de Impuestos" : "Editar Grupo de Impuestos");
+        dialog.setHeaderText("Configure el grupo y seleccione las tasas que lo componen.");
+
+        ButtonType saveButtonType = new ButtonType("Guardar", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(saveButtonType, ButtonType.CANCEL);
+
+        VBox content = new VBox(15);
+        content.setPadding(new javafx.geometry.Insets(20));
+
+        TextField name = new TextField(group.getName());
+        name.setPromptText("Nombre del grupo (ej: IVA General)");
+        CheckBox isDefault = new CheckBox("Grupo por defecto para nuevos productos");
+        isDefault.setSelected(group.isDefault());
+
+        Label lblRates = new Label("Seleccionar tasas incluidas:");
+        lblRates.setStyle("-fx-font-weight: bold;");
+
+        ListView<TaxRate> ratesListView = new ListView<>();
+        try {
+            List<TaxRate> allRates = taxManagementUseCase.getActiveTaxRates();
+            ratesListView.setItems(FXCollections.observableArrayList(allRates));
+            ratesListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+
+            // Pre-seleccionar las tasas actuales
+            if (group.getRates() != null) {
+                for (TaxRate r : group.getRates()) {
+                    allRates.stream()
+                            .filter(ar -> ar.getTaxRateId() == r.getTaxRateId())
+                            .findFirst()
+                            .ifPresent(ar -> ratesListView.getSelectionModel().select(ar));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        ratesListView.setCellFactory(lv -> new ListCell<>() {
+            @Override
+            protected void updateItem(TaxRate item, boolean empty) {
+                super.updateItem(item, empty);
+                setText(empty ? null : item.getName() + " (" + item.getRate() + "%)");
+            }
+        });
+
+        content.getChildren().addAll(new Label("Nombre:"), name, isDefault, lblRates, ratesListView);
+        dialog.getDialogPane().setContent(content);
+        dialog.getDialogPane().setPrefWidth(400);
+
+        dialog.setResultConverter(dialogButton -> {
+            if (dialogButton == saveButtonType) {
+                group.setName(name.getText());
+                group.setDefault(isDefault.isSelected());
+                group.setRates(new ArrayList<>(ratesListView.getSelectionModel().getSelectedItems()));
+                return group;
+            }
+            return null;
+        });
+
+        return dialog.showAndWait();
+    }
 
     @FXML
     void handleRefreshHistory(ActionEvent event) {
