@@ -24,7 +24,7 @@
                     <HBox spacing="16" alignment="CENTER_LEFT">
                         <children>
                             <StackPane styleClass="view-header-icon-wrap">
-                                <children><FontAwesomeIconView glyphName="TAGS" size="22" fill="white"/></children>
+                                <children><FontAwesomeIconView glyphName="TAG" size="22" fill="white"/></children>
                             </StackPane>
                             <VBox spacing="2">
                                 <children>

@@ -54,6 +54,21 @@
     -fx-effect: dropshadow(three-pass-box, -fx-shadow-color-primary, 8, 0, 0, 2);
 }
 
+/* ─── Badge de promoción/descuento (sobre la imagen) ─── */
+.product-discount-badge {
+    -fx-background-color: linear-gradient(to bottom right, #ff416c, #ff4b2b);
+    /* Gradiente Vibrante */
+    -fx-text-fill: white !important;
+    -fx-font-weight: 900;
+    -fx-font-size: 11px;
+    -fx-padding: 4px 10px;
+    -fx-background-radius: 4px 15px 15px 4px;
+    /* Ribbon elegante */
+    -fx-effect: dropshadow(three-pass-box, rgba(255, 75, 108, 0.45), 12, 0, 0, 3);
+    -fx-rotate: -4deg;
+    /* Pequeño ángulo para look "oferta" */
+}
+
 /* ─── Zona de info (nombre + descripción) ────────────── */
 .product-info {
     -fx-padding: 12px 14px 8px 14px;

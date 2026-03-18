@@ -18,12 +18,12 @@
         </HBox>
         <Region HBox.hgrow="ALWAYS"/>
         <HBox spacing="5" alignment="CENTER_RIGHT">
-            <Button fx:id="btnRemoveClient" onAction="#handleRemoveSelectedClient" visible="false" managed="false" styleClass="btn-remove-client">
+            <Button fx:id="btnRemoveClient" onAction="#handleRemoveSelectedClient" styleClass="btn-remove-client">
                 <graphic>
-                <FontAwesomeIconView glyphName="TRASH" size="12" styleClass="icon-danger"/>
+                <FontAwesomeIconView glyphName="TRASH" size="14" fill="#ef4444" styleClass="icon-danger"/>
                 </graphic>
             </Button>
-            <Button onAction="#showAddClientDialog" styleClass="btn-add-customer">
+            <Button fx:id="showAddClientDialog" onAction="#showAddClientDialog" styleClass="btn-add-customer">
                 <tooltip><Tooltip text="Añadir nueva empresa"/></tooltip>
                 <graphic><FontAwesomeIconView glyphName="PLUS" size="14" styleClass="add-customer-icon"/></graphic>
             </Button>
@@ -34,7 +34,7 @@
         <!-- Sección Tarifa -->
         <HBox spacing="8" alignment="CENTER_LEFT" HBox.hgrow="ALWAYS">
             <StackPane styleClass="icon-container-small" style="-fx-background-color: -fx-custom-color-primary-bg;">
-                <FontAwesomeIconView glyphName="TAGS" size="12" style="-fx-fill: -fx-custom-color-primary;"/>
+                <FontAwesomeIconView glyphName="TAG" size="12" style="-fx-fill: -fx-custom-color-primary;"/>
             </StackPane>
             <VBox spacing="0">
                 <Label text="Tarifa" style="-fx-font-size: 10px; -fx-text-fill: -fx-text-custom-muted;"/>
