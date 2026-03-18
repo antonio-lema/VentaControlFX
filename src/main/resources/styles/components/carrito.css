@@ -66,19 +66,47 @@
 .btn-add-customer {
     -fx-background-color: -fx-custom-color-primary-bg;
     -fx-background-radius: -fx-radius-md;
-    -fx-min-width: 38px;
-    -fx-min-height: 38px;
+    -fx-min-width: 32px;
+    -fx-min-height: 32px;
+    -fx-pref-width: 32px;
+    -fx-pref-height: 32px;
+    -fx-max-width: 32px;
+    -fx-max-height: 32px;
+    -fx-padding: 0;
     -fx-cursor: hand;
     -fx-border-color: -fx-custom-color-primary-light;
     -fx-border-width: 1;
     -fx-border-radius: -fx-radius-md;
-    -fx-effect: -fx-shadow-soft;
+    -fx-alignment: center;
+    -fx-content-display: graphic-only;
+}
+
+.btn-remove-client {
+    -fx-background-color: #f3f4f6;
+    -fx-background-radius: -fx-radius-md;
+    -fx-min-width: 32px;
+    -fx-min-height: 32px;
+    -fx-pref-width: 32px;
+    -fx-pref-height: 32px;
+    -fx-max-width: 32px;
+    -fx-max-height: 32px;
+    -fx-padding: 0;
+    -fx-cursor: hand;
+    -fx-border-color: #d1d5db;
+    -fx-border-width: 1;
+    -fx-border-radius: -fx-radius-md;
+    -fx-alignment: center;
+    -fx-content-display: graphic-only;
+}
+
+.btn-remove-client:hover {
+    -fx-background-color: #fee2e2;
+    -fx-border-color: #fca5a5;
 }
 
 .btn-add-customer:hover {
     -fx-background-color: -fx-custom-color-primary;
     -fx-border-color: -fx-custom-color-primary-dark;
-    -fx-effect: -fx-shadow-primary;
 }
 
 .add-customer-icon {

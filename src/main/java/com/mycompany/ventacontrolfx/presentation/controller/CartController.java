@@ -16,12 +16,10 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.control.TextInputDialog;
 import javafx.scene.layout.VBox;
 import javafx.scene.layout.HBox;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.scene.control.ButtonBar;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import javafx.stage.Modality;
@@ -31,7 +29,6 @@ import javafx.animation.ScaleTransition;
 import javafx.util.Duration;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
-import com.mycompany.ventacontrolfx.presentation.theme.ThemeManager;
 
 import java.util.List;
 import java.sql.SQLException;
@@ -46,7 +43,7 @@ public class CartController implements Injectable {
     @FXML
     private HBox hboxSavings;
     @FXML
-    private Button btnClearCart, payButton, btnRemoveClient;
+    private Button btnClearCart, payButton, btnRemoveClient, showAddClientDialog;
 
     private ServiceContainer container;
     private NavigationService navigationService;
@@ -71,6 +68,7 @@ public class CartController implements Injectable {
         initBindings();
         initListeners();
         refreshPriceListLabel();
+        updateClientUI(cartUseCase.getSelectedClient());
     }
 
     private void initBindings() {
@@ -117,7 +115,14 @@ public class CartController implements Injectable {
                 .addListener((obs, oldId, newId) -> {
                     if (newId != null) {
                         refreshPriceListLabel();
-                        // Esperamos a que el hilo de fondo de CartUseCase actualice los precios
+                        // Esperamos- [x] Investigar el estado de `CartController` para asegurar que la
+                        // funcionalidad de borrado existe
+                        // - [x] Corregir lógica de visibilidad en `CartController.java` (añadidos logs)
+                        // - [x] Añadir `fx:id` en `cart_panel.fxml`
+                        // - [x] Restaurar y simplificar estilos en `carrito.css`
+                        // - [x] Forzar visibilidad y color en FXML para diagnóstico
+                        // - [x] Verificar la visibilidad del icono de papelera
+                        // a que el hilo de fondo de CartUseCase actualice los precios
                         // y luego forzamos un re-render completo de las filas del carrito.
                         // Esto garantiza que la UI siempre muestre el precio correcto
                         // (incluye el caso donde el precio es el mismo entre tarifas).
@@ -147,6 +152,7 @@ public class CartController implements Injectable {
     }
 
     private void updateClientUI(Client client) {
+        System.out.println("[CartController] updateClientUI: client=" + (client != null ? client.getName() : "null"));
         if (client != null) {
             lblSelectedClient.setText(client.getName());
             lblSelectedClient.setStyle("-fx-text-fill: #1e88e5; -fx-font-weight: bold;");
@@ -156,6 +162,8 @@ public class CartController implements Injectable {
         }
         btnRemoveClient.setVisible(client != null);
         btnRemoveClient.setManaged(client != null);
+        showAddClientDialog.setVisible(client == null);
+        showAddClientDialog.setManaged(client == null);
     }
 
     @FXML
