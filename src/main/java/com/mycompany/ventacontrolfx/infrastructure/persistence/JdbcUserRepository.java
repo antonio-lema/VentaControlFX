@@ -253,20 +253,22 @@ public class JdbcUserRepository implements IUserRepository {
             return false; // Código bloqueado por demasiados intentos
         }
 
-        String sql = "SELECT code_hash FROM password_recoveries WHERE email = ? AND is_used = FALSE AND expires_at > NOW() ORDER BY created_at DESC LIMIT 1";
+        String sql = "SELECT code_hash FROM password_recoveries WHERE email = ? AND is_used = FALSE AND expires_at > ? ORDER BY created_at DESC";
         try (Connection conn = DBConnection.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, email);
+            ps.setTimestamp(2, java.sql.Timestamp.valueOf(java.time.LocalDateTime.now()));
             try (java.sql.ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
+                while (rs.next()) {
                     String storedHash = rs.getString("code_hash");
                     boolean correct = org.mindrot.jbcrypt.BCrypt.checkpw(code, storedHash);
-                    if (!correct) {
-                        // Incrementar contador de fallos para activar bloqueo progresivo
-                        incrementRecoveryAttempts(email);
+                    if (correct) {
+                        return true;
                     }
-                    return correct;
                 }
+
+                // Si salimos del bucle y nada coincidió, sumamos intento fallido
+                incrementRecoveryAttempts(email);
             }
         }
         return false;
@@ -308,10 +310,11 @@ public class JdbcUserRepository implements IUserRepository {
         // Cuenta los intentos fallidos en los registros activos (no usados, no
         // expirados)
         String sql = "SELECT COALESCE(SUM(attempts), 0) FROM password_recoveries " +
-                "WHERE email = ? AND is_used = FALSE AND expires_at > NOW()";
+                "WHERE email = ? AND is_used = FALSE AND expires_at > ?";
         try (Connection conn = DBConnection.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, email);
+            ps.setTimestamp(2, java.sql.Timestamp.valueOf(java.time.LocalDateTime.now()));
             try (java.sql.ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     return rs.getInt(1);
@@ -326,10 +329,11 @@ public class JdbcUserRepository implements IUserRepository {
         // Incrementa el contador de intentos; si llega a 5, invalida el código
         String sql = "UPDATE password_recoveries SET attempts = attempts + 1, " +
                 "is_used = CASE WHEN attempts + 1 >= 5 THEN TRUE ELSE FALSE END " +
-                "WHERE email = ? AND is_used = FALSE AND expires_at > NOW()";
+                "WHERE email = ? AND is_used = FALSE AND expires_at > ?";
         try (Connection conn = DBConnection.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, email);
+            ps.setTimestamp(2, java.sql.Timestamp.valueOf(java.time.LocalDateTime.now()));
             ps.executeUpdate();
         }
     }
