@@ -7,6 +7,7 @@ import com.mycompany.ventacontrolfx.infrastructure.config.Injectable;
 import com.mycompany.ventacontrolfx.util.RippleEffect;
 import com.mycompany.ventacontrolfx.util.ModalService;
 import com.mycompany.ventacontrolfx.domain.model.SaleConfig;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -62,6 +63,12 @@ public class SidebarController implements Injectable {
 
         try {
             setActiveButton(btnSell);
+            // Asegurar que el foco inicial no caiga en el botón de bloquear al final del
+            // VBox
+            Platform.runLater(() -> {
+                if (btnSell != null)
+                    btnSell.requestFocus();
+            });
         } catch (Exception e) {
             System.err.println("Error setting Active Button in Sidebar: " + e.getMessage());
         }

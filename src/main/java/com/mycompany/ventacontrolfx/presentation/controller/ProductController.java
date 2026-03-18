@@ -29,7 +29,8 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.WeakHashMap;
 
-public class ProductController implements Injectable, com.mycompany.ventacontrolfx.util.Searchable {
+public class ProductController implements Injectable, com.mycompany.ventacontrolfx.util.Searchable,
+        com.mycompany.ventacontrolfx.shared.bus.GlobalEventBus.DataChangeListener {
 
     @FXML
     private TableView<Product> productsTable;
@@ -78,6 +79,13 @@ public class ProductController implements Injectable, com.mycompany.ventacontrol
         paginationHelper = new PaginationHelper<>(productsTable, cmbRowLimit, lblCount, "productos");
         loadProducts();
         setupSearch();
+
+        container.getEventBus().subscribe(this);
+    }
+
+    @Override
+    public void onDataChanged() {
+        javafx.application.Platform.runLater(this::loadProducts);
     }
 
     private void setupTable() {

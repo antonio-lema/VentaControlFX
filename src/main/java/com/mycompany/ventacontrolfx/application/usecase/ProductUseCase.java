@@ -2,17 +2,21 @@ package com.mycompany.ventacontrolfx.application.usecase;
 
 import com.mycompany.ventacontrolfx.domain.model.Product;
 import com.mycompany.ventacontrolfx.domain.repository.IProductRepository;
+import com.mycompany.ventacontrolfx.shared.bus.GlobalEventBus;
 import java.sql.SQLException;
 import java.util.List;
 
 public class ProductUseCase {
     private final IProductRepository repository;
     private final com.mycompany.ventacontrolfx.util.AuthorizationService authService;
+    private final GlobalEventBus eventBus;
 
     public ProductUseCase(IProductRepository repository,
-            com.mycompany.ventacontrolfx.util.AuthorizationService authService) {
+            com.mycompany.ventacontrolfx.util.AuthorizationService authService,
+            GlobalEventBus eventBus) {
         this.repository = repository;
         this.authService = authService;
+        this.eventBus = eventBus;
     }
 
     public List<Product> getAllProducts() throws SQLException {
@@ -46,20 +50,28 @@ public class ProductUseCase {
         } else {
             repository.update(product);
         }
+        if (eventBus != null)
+            eventBus.publishDataChange();
     }
 
     public void deleteProduct(int id) throws SQLException {
         authService.checkPermission("PRODUCTOS");
         repository.delete(id);
+        if (eventBus != null)
+            eventBus.publishDataChange();
     }
 
     public void toggleFavorite(int productId, boolean favorite) throws SQLException {
         authService.checkPermission("PRODUCTOS");
         repository.updateFavorite(productId, favorite);
+        if (eventBus != null)
+            eventBus.publishDataChange();
     }
 
     public void toggleVisibility(int productId, boolean visible) throws SQLException {
         authService.checkPermission("PRODUCTOS");
         repository.updateVisibility(productId, visible);
+        if (eventBus != null)
+            eventBus.publishDataChange();
     }
 }

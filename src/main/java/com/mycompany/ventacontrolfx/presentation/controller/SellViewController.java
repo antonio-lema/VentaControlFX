@@ -28,7 +28,8 @@ import java.sql.SQLException;
 import java.util.List;
 
 public class SellViewController implements Injectable, CategoryMenuRenderer.CategorySelectionHandler,
-        com.mycompany.ventacontrolfx.util.Searchable {
+        com.mycompany.ventacontrolfx.util.Searchable,
+        com.mycompany.ventacontrolfx.shared.bus.GlobalEventBus.DataChangeListener {
 
     @FXML
     private TilePane productsPane;
@@ -53,6 +54,7 @@ public class SellViewController implements Injectable, CategoryMenuRenderer.Cate
     private ProductGridRenderer productRenderer;
 
     private int selectedPriceListId = -1;
+    private java.util.List<com.mycompany.ventacontrolfx.domain.model.Promotion> activePromotions = new java.util.ArrayList<>();
 
     @Override
     public void inject(ServiceContainer container) {
@@ -68,6 +70,7 @@ public class SellViewController implements Injectable, CategoryMenuRenderer.Cate
                 null,
                 config.getTaxRate(),
                 config.isPricesIncludeTax(),
+                this::getDiscountDescription,
                 p -> {
                     try {
                         container.getCartUseCase().addItem(p);
@@ -113,20 +116,35 @@ public class SellViewController implements Injectable, CategoryMenuRenderer.Cate
             }
         });
 
+        container.getEventBus().subscribe(this);
+
         loadInitialData();
+    }
+
+    @Override
+    public void onDataChanged() {
+        javafx.application.Platform.runLater(this::refreshProductsWithNewPriceList);
     }
 
     private void loadInitialData() {
         loadingOverlay.setVisible(true);
-        // Usamos el ID de tarifa del CartUseCase como fuente de verdad inicial
         this.selectedPriceListId = container.getCartUseCase().getPriceListId();
 
-        container.getAsyncManager().runAsyncTask(() -> productUseCase.getVisibleProducts(selectedPriceListId),
-                products -> {
-                    filterUseCase.updateSourceData(products);
-                    applyCategoryFilterById(container.getCartUseCase().getSelectedCategoryId());
-                    loadingOverlay.setVisible(false);
-                }, null);
+        container.getAsyncManager().runAsyncTask(() -> {
+            try {
+                return container.getPromotionUseCase().getActivePromotions();
+            } catch (Exception e) {
+                return new java.util.ArrayList<com.mycompany.ventacontrolfx.domain.model.Promotion>();
+            }
+        }, promos -> {
+            this.activePromotions = promos;
+            container.getAsyncManager().runAsyncTask(() -> productUseCase.getVisibleProducts(selectedPriceListId),
+                    products -> {
+                        filterUseCase.updateSourceData(products);
+                        applyCategoryFilterById(container.getCartUseCase().getSelectedCategoryId());
+                        loadingOverlay.setVisible(false);
+                    }, null);
+        }, null);
     }
 
     private void applyCategoryFilterById(int catId) {
@@ -134,6 +152,8 @@ public class SellViewController implements Injectable, CategoryMenuRenderer.Cate
             renderProducts(filterUseCase.applyAll());
         else if (catId == -2)
             renderProducts(filterUseCase.applyFavorites());
+        else if (catId == -3)
+            renderProducts(filterUseCase.applyPromotions(activePromotions));
         else {
             // Buscamos la categoría para aplicar el filtro específico
             container.getAsyncManager().runAsyncTask(() -> categoryUseCase.getAll(), cats -> {
@@ -155,10 +175,14 @@ public class SellViewController implements Injectable, CategoryMenuRenderer.Cate
             Category favs = new Category();
             favs.setName("★ Favoritos");
             favs.setId(-2);
+            Category promos = new Category();
+            promos.setName("% Promociones");
+            promos.setId(-3);
 
             java.util.List<Category> result = new java.util.ArrayList<>();
             result.add(all);
             result.add(favs);
+            result.add(promos);
             result.addAll(cats);
             return result;
         }, categories -> {
@@ -181,6 +205,8 @@ public class SellViewController implements Injectable, CategoryMenuRenderer.Cate
                     onSpecialFilterSelected(FilterType.ALL);
                 else if (cat.getId() == -2)
                     onSpecialFilterSelected(FilterType.FAVORITES);
+                else if (cat.getId() == -3)
+                    onSpecialFilterSelected(FilterType.PROMOTIONS);
                 else
                     onCategorySelected(cat);
 
@@ -197,6 +223,8 @@ public class SellViewController implements Injectable, CategoryMenuRenderer.Cate
             lblSelectedCategory.setText("Todas las categorías");
         else if (catId == -2)
             lblSelectedCategory.setText("★ Favoritos");
+        else if (catId == -3)
+            lblSelectedCategory.setText("% Promociones");
         else {
             // Intentar buscar nombre en cache o servicio (aquí simplificado)
             container.getAsyncManager().runAsyncTask(() -> categoryUseCase.getAll(), cats -> {
@@ -294,6 +322,8 @@ public class SellViewController implements Injectable, CategoryMenuRenderer.Cate
     public void onSpecialFilterSelected(FilterType type) {
         if (type == FilterType.FAVORITES)
             renderProducts(filterUseCase.applyFavorites());
+        else if (type == FilterType.PROMOTIONS)
+            renderProducts(filterUseCase.applyPromotions(activePromotions));
         else
             renderProducts(filterUseCase.applyAll());
     }
@@ -327,9 +357,41 @@ public class SellViewController implements Injectable, CategoryMenuRenderer.Cate
         String lbl = "Todos los productos";
         if (type == FilterType.FAVORITES)
             lbl = "Favoritos";
+        else if (type == FilterType.PROMOTIONS)
+            lbl = "Promociones";
         else if (type == FilterType.CATEGORY)
             lbl = ((Category) criteria).getName();
 
         filterLabel.setText(lbl + " (" + products.size() + ")");
+    }
+
+    private String getDiscountDescription(Product p) {
+        if (activePromotions == null)
+            return null;
+        for (com.mycompany.ventacontrolfx.domain.model.Promotion promo : activePromotions) {
+            if (promo.getScope() == com.mycompany.ventacontrolfx.domain.model.PromotionScope.GLOBAL) {
+                return formatPromo(promo);
+            }
+            if (promo.getScope() == com.mycompany.ventacontrolfx.domain.model.PromotionScope.PRODUCT
+                    && promo.getAffectedIds().contains(p.getId())) {
+                return formatPromo(promo);
+            }
+            if (promo.getScope() == com.mycompany.ventacontrolfx.domain.model.PromotionScope.CATEGORY
+                    && promo.getAffectedIds().contains(p.getCategoryId())) {
+                return formatPromo(promo);
+            }
+        }
+        return null;
+    }
+
+    private String formatPromo(com.mycompany.ventacontrolfx.domain.model.Promotion p) {
+        if (p.getType() == com.mycompany.ventacontrolfx.domain.model.PromotionType.PERCENTAGE) {
+            return String.format("%.0f%% DTO", p.getValue());
+        } else if (p.getType() == com.mycompany.ventacontrolfx.domain.model.PromotionType.FIXED_DISCOUNT) {
+            return String.format("%.2f€ DTO", p.getValue());
+        } else if (p.getType() == com.mycompany.ventacontrolfx.domain.model.PromotionType.VOLUME_DISCOUNT) {
+            return (p.getBuyQty() + p.getFreeQty()) + "x" + p.getBuyQty();
+        }
+        return p.getName();
     }
 }

@@ -12,7 +12,7 @@
 <?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
 
 <StackPane fx:id="rootPane" styleClass="login-background" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mycompany.ventacontrolfx.presentation.controller.LoginController">
-    <VBox alignment="CENTER" spacing="25" styleClass="lock-screen-glass" maxWidth="400" maxHeight="-Infinity">
+    <VBox fx:id="loginCard" alignment="CENTER" spacing="25" styleClass="lock-screen-glass" maxWidth="400" maxHeight="-Infinity">
         <padding>
             <Insets bottom="50" left="45" right="45" top="50" />
         </padding>

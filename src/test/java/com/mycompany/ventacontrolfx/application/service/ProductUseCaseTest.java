@@ -39,7 +39,7 @@ public class ProductUseCaseTest {
                 return true;
             }
         };
-        useCase = new ProductUseCase(mockRepo, dummyAuth);
+        useCase = new ProductUseCase(mockRepo, dummyAuth, null);
     }
 
     @Test

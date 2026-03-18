@@ -59,7 +59,7 @@ public class SaleUseCaseTest {
             }
         };
         saleUseCase = new SaleUseCase(saleRepository, configRepository, dummyAuth, taxEngineService, clientRepository,
-                promotionService, promotionEngine, productRepository);
+                promotionService, promotionEngine, productRepository, null);
     }
 
     @Test

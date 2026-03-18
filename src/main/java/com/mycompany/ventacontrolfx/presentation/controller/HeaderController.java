@@ -102,10 +102,11 @@ public class HeaderController implements Injectable {
             });
         }
 
-        // Evitar que el campo de búsqueda robe el foco al arrancar
+        // Evitar que el campo de búsqueda robe el foco al arrancar, pero asegurar que
+        // el foco esté en el campo de texto real
         Platform.runLater(() -> {
-            if (searchBarContainer != null) {
-                searchBarContainer.requestFocus();
+            if (searchField != null) {
+                searchField.requestFocus();
             }
         });
     }

@@ -9,6 +9,7 @@ import com.mycompany.ventacontrolfx.infrastructure.persistence.DBConnection;
 import com.mycompany.ventacontrolfx.util.AuthorizationService;
 import com.mycompany.ventacontrolfx.domain.service.TaxEngineService;
 import com.mycompany.ventacontrolfx.application.service.PromotionService;
+import com.mycompany.ventacontrolfx.shared.bus.GlobalEventBus;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -33,6 +34,7 @@ public class SaleUseCase {
     private final PromotionService promotionService;
     private final com.mycompany.ventacontrolfx.application.service.PromotionEngine promotionEngine;
     private final IProductRepository productRepository;
+    private final GlobalEventBus eventBus;
     private CashClosureUseCase cashClosureUseCase;
 
     public SaleUseCase(ISaleRepository saleRepository,
@@ -42,7 +44,8 @@ public class SaleUseCase {
             IClientRepository clientRepository,
             PromotionService promotionService,
             com.mycompany.ventacontrolfx.application.service.PromotionEngine promotionEngine,
-            IProductRepository productRepository) {
+            IProductRepository productRepository,
+            GlobalEventBus eventBus) {
         this.saleRepository = saleRepository;
         this.configRepository = configRepository;
         this.authService = authService;
@@ -51,6 +54,7 @@ public class SaleUseCase {
         this.promotionService = promotionService;
         this.promotionEngine = promotionEngine;
         this.productRepository = productRepository;
+        this.eventBus = eventBus;
     }
 
     /** Inyecta el use case de caja para registrar movimientos de devolución. */
@@ -184,15 +188,20 @@ public class SaleUseCase {
         List<SaleTaxSummary> taxSummaries = taxEngineService.summarizeTaxes(lineResults);
         sale.setTaxSummaries(taxSummaries);
 
-        // 3. Persistir en la base de datos (Sale, SaleDetails y sale_tax_summary)
-        int saleId = saleRepository.saveSale(sale);
-        saleRepository.saveSaleDetails(details, saleId);
-        saleRepository.saveSaleTaxSummaries(taxSummaries, saleId);
-
-        // 4. Actualizar stock de productos (SOLO si gestionan stock)
+        // ── PROCESAMIENTO ATÓMICO EN UNA SOLA TRANSACCIÓN ──
         try (Connection conn = DBConnection.getConnection()) {
             conn.setAutoCommit(false);
             try {
+                // 1. Guardar Cabecera
+                int saleId = saleRepository.saveSale(sale, conn);
+
+                // 2. Guardar Detalles
+                saleRepository.saveSaleDetails(details, saleId, conn);
+
+                // 3. Guardar Resúmenes de Impuestos
+                saleRepository.saveSaleTaxSummaries(taxSummaries, saleId, conn);
+
+                // 4. Actualizar Stock
                 for (CartItem item : cartItems) {
                     if (item.getProduct().isManageStock()) {
                         int newStock = productRepository.updateStock(item.getProduct().getId(), -item.getQuantity(),
@@ -205,14 +214,22 @@ public class SaleUseCase {
                         }
                     }
                 }
+
                 conn.commit();
+
+                // Notificar cambio de datos (para refrescar stock en UI si es necesario)
+                if (eventBus != null) {
+                    eventBus.publishDataChange();
+                }
+
+                return saleId;
             } catch (SQLException e) {
                 conn.rollback();
                 throw e;
+            } finally {
+                conn.setAutoCommit(true);
             }
         }
-
-        return saleId;
     }
 
     public List<Sale> getHistory(LocalDate start, LocalDate end) throws SQLException {

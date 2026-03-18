@@ -12,10 +12,17 @@ import java.util.List;
 public interface ISaleRepository {
         int saveSale(Sale sale) throws SQLException;
 
+        int saveSale(Sale sale, Connection conn) throws SQLException;
+
         void saveSaleDetails(List<SaleDetail> details, int saleId) throws SQLException;
+
+        void saveSaleDetails(List<SaleDetail> details, int saleId, Connection conn) throws SQLException;
 
         void saveSaleTaxSummaries(List<com.mycompany.ventacontrolfx.domain.model.SaleTaxSummary> summaries, int saleId)
                         throws SQLException;
+
+        void saveSaleTaxSummaries(List<com.mycompany.ventacontrolfx.domain.model.SaleTaxSummary> summaries, int saleId,
+                        Connection conn) throws SQLException;
 
         List<SaleDetail> getDetailsBySaleId(int saleId) throws SQLException;
 

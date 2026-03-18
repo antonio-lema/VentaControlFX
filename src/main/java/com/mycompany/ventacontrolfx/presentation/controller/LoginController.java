@@ -12,7 +12,10 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.animation.TranslateTransition;
+import javafx.util.Duration;
 
 import java.sql.SQLException;
 
@@ -26,6 +29,8 @@ public class LoginController implements Injectable {
     private Button btnLogin;
     @FXML
     private Label lblMessage;
+    @FXML
+    private VBox loginCard;
 
     private ServiceContainer container;
     private UserUseCase userUseCase;
@@ -42,7 +47,7 @@ public class LoginController implements Injectable {
     private void checkIfUsersExist() {
         try {
             if (userUseCase.getUserCount() == 0) {
-                lblMessage.setText("No hay usuarios registrados. Redirigiendo...");
+                showErrorMessage("No hay usuarios registrados. Redirigiendo...");
                 Platform.runLater(() -> SceneNavigator.loadScene(
                         (Stage) btnLogin.getScene().getWindow(),
                         "/view/register_user.fxml",
@@ -62,7 +67,7 @@ public class LoginController implements Injectable {
         String password = txtPassword.getText();
 
         if (username.isEmpty() || password.isEmpty()) {
-            lblMessage.setText("Por favor, rellene todos los campos ⚠️");
+            showErrorMessage("Por favor, rellene todos los campos ⚠️");
             return;
         }
 
@@ -83,15 +88,31 @@ public class LoginController implements Injectable {
                     container);
 
         } catch (com.mycompany.ventacontrolfx.domain.exception.UserNotFoundException ex) {
-            lblMessage.setText("El usuario no existe ❌");
+            showErrorMessage("El usuario no existe ❌");
         } catch (com.mycompany.ventacontrolfx.domain.exception.InvalidPasswordException ex) {
-            lblMessage.setText("Contraseña incorrecta 🔑");
+            showErrorMessage("Contraseña incorrecta 🔑");
         } catch (SQLException ex) {
             ex.printStackTrace();
-            lblMessage.setText("Error crítico de base de datos 💥");
+            showErrorMessage("Error crítico de base de datos 💥");
         } catch (Exception ex) {
             ex.printStackTrace();
-            lblMessage.setText("Error inesperado: " + ex.getMessage());
+            showErrorMessage("Error inesperado: " + ex.getMessage());
+        }
+    }
+
+    private void showErrorMessage(String message) {
+        lblMessage.setText(message);
+        lblMessage.setVisible(true);
+        lblMessage.setManaged(true);
+
+        // Shake animation
+        if (loginCard != null) {
+            TranslateTransition tt = new TranslateTransition(Duration.millis(50), loginCard);
+            tt.setFromX(0);
+            tt.setByX(10);
+            tt.setCycleCount(6);
+            tt.setAutoReverse(true);
+            tt.play();
         }
     }
 

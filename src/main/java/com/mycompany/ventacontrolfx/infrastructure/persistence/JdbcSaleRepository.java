@@ -14,9 +14,15 @@ public class JdbcSaleRepository implements ISaleRepository {
 
     @Override
     public int saveSale(Sale sale) throws SQLException {
+        try (Connection conn = DBConnection.getConnection()) {
+            return saveSale(sale, conn);
+        }
+    }
+
+    @Override
+    public int saveSale(Sale sale, Connection conn) throws SQLException {
         String sql = "INSERT INTO sales (user_id, client_id, total, payment_method, iva, sale_datetime, is_return, doc_type, doc_series, doc_number, doc_status, control_hash, total_net, total_tax, customer_name_snapshot, discount_amount, discount_reason) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        try (Connection conn = DBConnection.getConnection();
-                PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        try (PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             pstmt.setInt(1, sale.getUserId());
             if (sale.getClientId() != null && sale.getClientId() > 0) {
                 pstmt.setInt(2, sale.getClientId());
@@ -58,9 +64,15 @@ public class JdbcSaleRepository implements ISaleRepository {
 
     @Override
     public void saveSaleDetails(List<SaleDetail> details, int saleId) throws SQLException {
+        try (Connection conn = DBConnection.getConnection()) {
+            saveSaleDetails(details, saleId, conn);
+        }
+    }
+
+    @Override
+    public void saveSaleDetails(List<SaleDetail> details, int saleId, Connection conn) throws SQLException {
         String sql = "INSERT INTO sale_details (sale_id, product_id, quantity, unit_price, line_total, iva_rate, iva_amount, product_name_snapshot, net_unit_price, tax_basis, tax_amount, gross_total, applied_tax_group, sku_snapshot, category_name_snapshot) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        try (Connection conn = DBConnection.getConnection();
-                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             for (SaleDetail detail : details) {
                 pstmt.setInt(1, saleId);
                 pstmt.setInt(2, detail.getProductId());
@@ -86,11 +98,18 @@ public class JdbcSaleRepository implements ISaleRepository {
     @Override
     public void saveSaleTaxSummaries(List<com.mycompany.ventacontrolfx.domain.model.SaleTaxSummary> summaries,
             int saleId) throws SQLException {
+        try (Connection conn = DBConnection.getConnection()) {
+            saveSaleTaxSummaries(summaries, saleId, conn);
+        }
+    }
+
+    @Override
+    public void saveSaleTaxSummaries(List<com.mycompany.ventacontrolfx.domain.model.SaleTaxSummary> summaries,
+            int saleId, Connection conn) throws SQLException {
         if (summaries == null || summaries.isEmpty())
             return;
         String sql = "INSERT INTO sale_tax_summary (sale_id, tax_rate_id, tax_name, tax_rate, tax_basis, tax_amount) VALUES (?, ?, ?, ?, ?, ?)";
-        try (Connection conn = DBConnection.getConnection();
-                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             for (com.mycompany.ventacontrolfx.domain.model.SaleTaxSummary summary : summaries) {
                 pstmt.setInt(1, saleId);
                 pstmt.setInt(2, summary.getTaxRateId());

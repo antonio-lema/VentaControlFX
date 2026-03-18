@@ -21,6 +21,10 @@ public class PromotionUseCase {
         return repository.getAll();
     }
 
+    public List<Promotion> getActivePromotions() throws SQLException {
+        return repository.getActive();
+    }
+
     public void savePromotion(Promotion promotion) throws SQLException {
         if (promotion.getId() == null) {
             repository.save(promotion);

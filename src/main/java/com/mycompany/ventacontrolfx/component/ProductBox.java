@@ -20,7 +20,8 @@ import javafx.scene.shape.Rectangle;
 
 public class ProductBox extends VBox {
 
-    public ProductBox(Product product, double globalTaxRate, boolean pricesIncludeTax, Consumer<Product> onAddToCart) {
+    public ProductBox(Product product, double globalTaxRate, boolean pricesIncludeTax, String discountDesc,
+            Consumer<Product> onAddToCart) {
         this.getStyleClass().add("product-box");
         this.setPrefWidth(200);
 
@@ -35,7 +36,8 @@ public class ProductBox extends VBox {
         // Clip dinámico: se ajusta al ancho del contenedor y solo redondea arriba
         Rectangle clip = new Rectangle();
         clip.widthProperty().bind(imageContainer.widthProperty());
-        clip.heightProperty().bind(imageContainer.heightProperty().add(30)); // Altura extra para que el redondeo inferior no se vea
+        clip.heightProperty().bind(imageContainer.heightProperty().add(30)); // Altura extra para que el redondeo
+                                                                             // inferior no se vea
         clip.setArcWidth(28);
         clip.setArcHeight(28);
         imageContainer.setClip(clip);
@@ -45,7 +47,7 @@ public class ProductBox extends VBox {
             if (file != null && file.exists()) {
                 StackPane imageDisplay = new StackPane();
                 imageDisplay.getStyleClass().add("product-image-display");
-                
+
                 // Margen interno elegante para que la imagen no toque los bordes si se desea
                 double margin = 8.0;
                 StackPane.setMargin(imageDisplay, new Insets(margin));
@@ -59,7 +61,8 @@ public class ProductBox extends VBox {
                                 "-fx-background-repeat: no-repeat; " +
                                 "-fx-border-color: rgba(0,0,0,0.05); " +
                                 "-fx-border-width: 1px; " +
-                                "-fx-background-color: rgba(255,255,255,0.4);"); // Fondo sutil para imágenes transparentes
+                                "-fx-background-color: rgba(255,255,255,0.4);"); // Fondo sutil para imágenes
+                                                                                 // transparentes
 
                 imageContainer.getChildren().add(imageDisplay);
             } else {
@@ -81,6 +84,14 @@ public class ProductBox extends VBox {
         StackPane.setAlignment(priceBadge, Pos.TOP_RIGHT);
         StackPane.setMargin(priceBadge, new Insets(10, 10, 0, 0));
         imageContainer.getChildren().add(priceBadge);
+
+        if (discountDesc != null && !discountDesc.isEmpty()) {
+            Label discountBadge = new Label(discountDesc);
+            discountBadge.getStyleClass().add("product-discount-badge");
+            StackPane.setAlignment(discountBadge, Pos.TOP_LEFT);
+            StackPane.setMargin(discountBadge, new Insets(10, 0, 0, 10));
+            imageContainer.getChildren().add(discountBadge);
+        }
 
         // ── INFO SECTION ──
         VBox infoBox = new VBox(4);
@@ -136,7 +147,7 @@ public class ProductBox extends VBox {
     }
 
     public ProductBox(Product product, Consumer<Product> onAddToCart) {
-        this(product, 21.0, true, onAddToCart);
+        this(product, 21.0, true, null, onAddToCart);
     }
 
     private File resolveFile(String path) {
