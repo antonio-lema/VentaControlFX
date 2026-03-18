@@ -1,0 +1,188 @@
+/*
+ * PAYMENT.CSS
+ * Estilos modernos para la pantalla de desglose de pago.
+ */
+
+.payment-root {
+    -fx-background-color: -fx-bg-subtle;
+    -fx-border-color: -fx-color-border-main;
+    -fx-border-width: 1.5px;
+    -fx-background-radius: -fx-radius-xl;
+    -fx-border-radius: -fx-radius-xl;
+}
+
+.payment-header {
+    -fx-padding: 20px;
+    -fx-background-color: -fx-grad-primary !important;
+    -fx-border-color: -fx-custom-color-primary-dark;
+    -fx-border-width: 0 0 1px 0;
+    -fx-background-radius: -fx-radius-xl -fx-radius-xl 0 0;
+}
+
+.payment-header-title {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+}
+
+.btn-icon {
+    -fx-background-color: transparent;
+    -fx-cursor: hand;
+    -fx-padding: 5;
+}
+
+.payment-body {
+    -fx-padding: 25px;
+    -fx-background-color: transparent;
+}
+
+.payment-total-amount {
+    -fx-font-size: 40px;
+    -fx-font-weight: 800;
+    -fx-text-fill: -fx-custom-color-primary;
+}
+
+.label-muted {
+    -fx-text-fill: -fx-text-custom-cards-muted;
+    -fx-font-size: 13px;
+}
+
+.payment-method-card {
+    -fx-background-color: -fx-bg-surface;
+    -fx-background-radius: -fx-radius-lg;
+    -fx-border-radius: -fx-radius-lg;
+    -fx-border-color: -fx-color-border-main;
+    -fx-border-width: -fx-card-border-width;
+    -fx-effect: -fx-card-shadow;
+    -fx-transition: all 0.2s;
+}
+
+.payment-method-active {
+    -fx-border-color: -fx-custom-color-primary;
+    -fx-effect: -fx-card-shadow-hover;
+}
+
+.payment-method-header {
+    -fx-padding: 18px 20px;
+    -fx-border-color: -fx-color-border-light;
+    -fx-border-width: 0 0 1px 0;
+}
+
+.payment-method-label {
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -fx-text-custom-cards;
+}
+
+.badge-primary {
+    -fx-background-color: -fx-custom-color-primary-bg;
+    -fx-text-fill: -fx-custom-color-primary;
+    -fx-padding: 6px 14px;
+    -fx-background-radius: -fx-radius-xl;
+    -fx-font-weight: 800;
+    -fx-font-size: 14px;
+}
+
+.modern-input-field {
+    -fx-background-color: -fx-color-border-light;
+    -fx-background-radius: -fx-radius-md;
+    -fx-border-color: -fx-color-border-subtle;
+    -fx-border-width: 1.5;
+    -fx-border-radius: -fx-radius-md;
+    -fx-padding: 12px 16px;
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -fx-text-custom-cards;
+}
+
+.modern-input-field:focused {
+    -fx-border-color: -fx-custom-color-primary;
+    -fx-background-color: -fx-bg-surface;
+}
+
+.btn-primary {
+    -fx-background-color: -fx-grad-primary;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: -fx-radius-md;
+    -fx-cursor: hand;
+    -fx-effect: -fx-shadow-primary;
+}
+
+.btn-primary:hover {
+    -fx-background-color: -fx-custom-color-primary-dark;
+    -fx-effect: -fx-shadow-primary;
+}
+
+.btn-lg {
+    -fx-font-size: 16px;
+    -fx-padding: 12px 24px;
+}
+
+/* Quick money buttons box */
+.quick-money-grid .btn-primary {
+    -fx-background-color: -fx-bg-surface;
+    -fx-border-color: -fx-custom-color-primary-light;
+    -fx-border-width: 1.5;
+    -fx-border-radius: -fx-radius-md;
+    -fx-text-fill: -fx-custom-color-primary;
+    -fx-effect: none;
+    -fx-font-size: 14px;
+}
+
+.quick-money-grid .btn-primary:hover {
+    -fx-background-color: -fx-custom-color-primary;
+    -fx-text-fill: white;
+}
+
+/* Card Button Method */
+.payment-method-btn {
+    -fx-padding: 18px 20px;
+    -fx-cursor: hand;
+}
+
+.payment-method-btn:hover {
+    -fx-background-color: -fx-color-border-light;
+    -fx-border-color: -fx-custom-color-primary;
+}
+
+.payment-footer {
+    -fx-padding: 15px 25px;
+    -fx-border-color: -fx-color-border-main;
+    -fx-border-width: 1px 0 0 0;
+    -fx-background-color: -fx-bg-surface;
+}
+
+.btn-secondary {
+    -fx-background-color: transparent;
+    -fx-border-color: -fx-color-border-subtle;
+    -fx-border-width: 1.5;
+    -fx-border-radius: -fx-radius-md;
+    -fx-text-fill: -fx-text-custom-cards-muted;
+    -fx-padding: 10px 22px;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+}
+
+.btn-secondary:hover {
+    -fx-background-color: -fx-color-border-light;
+    -fx-border-color: -fx-color-border-main;
+}
+
+.detail-scroll {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+}
+
+/* Icon Utilities */
+.icon-white {
+    -fx-fill: white !important;
+}
+
+.icon-primary {
+    -fx-fill: -fx-custom-color-primary !important;
+}
+
+.icon-muted {
+    -fx-fill: -fx-text-custom-cards-muted !important;
+}

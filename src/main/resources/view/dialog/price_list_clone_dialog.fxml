@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
+
+<VBox spacing="15" styleClass="modal-container" prefWidth="440" stylesheets="@../styles/variables.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mycompany.ventacontrolfx.presentation.controller.dialog.PriceListCloneController">
+    <padding>
+        <Insets top="24" right="32" bottom="24" left="32"/>
+    </padding>
+
+    <HBox alignment="CENTER_LEFT" spacing="12">
+        <StackPane style="-fx-background-color: #fdf2f8; -fx-padding: 10; -fx-background-radius: 8;">
+            <FontAwesomeIconView glyphName="COPY" size="18" fill="#9d174d"/>
+        </StackPane>
+        <VBox spacing="2">
+            <Label fx:id="lblTitle" text="Clonar Tarifa de Precios" styleClass="modal-title" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+            <Label text="Crea una copia ajustando porcentajes" style="-fx-text-fill: #6b7280; -fx-font-size: 12px;"/>
+        </VBox>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Button onAction="#handleCancel" styleClass="button-ghost" text="✕" style="-fx-font-size: 16px;"/>
+    </HBox>
+
+    <Separator/>
+
+    <VBox spacing="18" style="-fx-padding: 10 0;">
+        <VBox spacing="6">
+            <Label text="Nombre de la Nueva Tarifa" styleClass="text-sm, font-medium, text-gray-700"/>
+            <TextField fx:id="txtName" promptText="Ej: Tarifa Mayoristas - CLON" styleClass="form-control" />
+        </VBox>
+
+        <VBox spacing="6">
+            <Label text="Ajuste de Precios (%)" styleClass="text-sm, font-medium, text-gray-700"/>
+            <TextField fx:id="txtPercentage" promptText="Ej: 10 para +10%, -5 para -5%" styleClass="form-control" text="0"/>
+            <Label text="Se recalcularán los precios de venta de la copia aplicando este porcentaje." wrapText="true" style="-fx-text-fill: #9ca3af; -fx-font-size: 11px;"/>
+        </VBox>
+    </VBox>
+
+    <Region VBox.vgrow="ALWAYS" minHeight="15"/>
+
+    <HBox spacing="10" alignment="CENTER_RIGHT">
+        <Button text="Cancelar" onAction="#handleCancel" styleClass="btn-secondary"/>
+        <Button text="🚀 Clonar Tarifa" onAction="#handleConfirm" styleClass="btn-primary" style="-fx-background-color: #be185d; -fx-text-fill: white;"/>
+    </HBox>
+</VBox>

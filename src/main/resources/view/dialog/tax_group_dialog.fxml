@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
+<?import java.net.URL?>
+
+<VBox xmlns:fx="http://javafx.com/fxml/1" fx:id="root" spacing="20" styleClass="modern-register-card" 
+      prefWidth="500" alignment="TOP_CENTER"
+      fx:controller="com.mycompany.ventacontrolfx.presentation.controller.dialog.TaxGroupDialogController">
+    
+    <stylesheets>
+        <URL value="@/styles/variables.css" />
+        <URL value="@/styles/components/botones.css" />
+        <URL value="@/styles/components/formularios.css" />
+    </stylesheets>
+
+    <!-- Header -->
+    <VBox spacing="5" alignment="CENTER" style="-fx-padding: 30 0 10 0;">
+        <StackPane styleClass="estetica-card-icon-wrap, estetica-icon-blue" maxWidth="50" maxHeight="50">
+            <FontAwesomeIconView glyphName="PERCENT" size="24" fill="#3b82f6"/>
+        </StackPane>
+        <Label text="Grupo de Impuestos" styleClass="modern-register-title" />
+        <Label text="Crea o edita agrupaciones de tasas" styleClass="modern-register-subtitle" />
+    </VBox>
+
+    <!-- Body -->
+    <VBox spacing="18" style="-fx-padding: 0 40 30 40;">
+        
+        <!-- Nombre Grupo -->
+        <VBox spacing="8">
+            <Label text="Nombre del Grupo:" styleClass="label" />
+            <HBox spacing="10" alignment="CENTER_LEFT" styleClass="modern-input-container">
+                <FontAwesomeIconView glyphName="TAG" size="16" fill="#64748b" />
+                <TextField fx:id="txtName" promptText="Ej: IVA General, Exento..." HBox.hgrow="ALWAYS" styleClass="modern-input-field" />
+            </HBox>
+        </VBox>
+
+        <!-- Por Defecto -->
+        <CheckBox fx:id="chkDefault" text="Grupo por defecto para nuevos productos" styleClass="permission-checkbox" />
+
+        <!-- Lista de Tasas -->
+        <VBox spacing="8" VBox.vgrow="ALWAYS">
+            <Label text="Tasas impositivas incluidas:" styleClass="label" style="-fx-font-weight: bold;" />
+            <ScrollPane fitToWidth="true" minHeight="200" maxHeight="300" style="-fx-background-color: transparent; -fx-background: transparent;">
+                <VBox fx:id="ratesListContainer" spacing="10" style="-fx-padding: 10; -fx-background-color: -fx-bg-main; -fx-background-radius: 8; -fx-border-color: #e2e8f0; -fx-border-radius: 8;">
+                    <!-- Los items de CheckBox se generarán dinámicamente -->
+                </VBox>
+            </ScrollPane>
+        </VBox>
+
+        <!-- Barra de acciones -->
+        <HBox spacing="15" alignment="CENTER_RIGHT" style="-fx-padding: 10 0 0 0;">
+            <Button text="CANCELAR" onAction="#handleCancel" styleClass="btn-secondary" prefHeight="45" prefWidth="120" />
+            <Button text="GUARDAR" onAction="#handleSave" styleClass="btn-primary" prefHeight="45" HBox.hgrow="ALWAYS" maxWidth="Infinity">
+                <graphic>
+                    <FontAwesomeIconView glyphName="CHECK_CIRCLE" size="18" fill="white" />
+                </graphic>
+            </Button>
+        </HBox>
+    </VBox>
+</VBox>
