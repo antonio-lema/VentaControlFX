@@ -56,7 +56,7 @@
                 </HBox>
             </graphic>
             <items>
-                <MenuItem text="Cerrar caja" onAction="#handleCashClosure">
+                <MenuItem fx:id="menuItemCashClosure" text="Cerrar caja" onAction="#handleCashClosure">
                     <graphic><FontAwesomeIconView glyphName="MONEY" size="14"/></graphic>
                 </MenuItem>
                 <SeparatorMenuItem />

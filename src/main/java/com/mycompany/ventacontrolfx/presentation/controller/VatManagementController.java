@@ -1,7 +1,6 @@
 package com.mycompany.ventacontrolfx.presentation.controller;
 
 import com.mycompany.ventacontrolfx.application.usecase.PriceListUseCase;
-import com.mycompany.ventacontrolfx.application.usecase.ScheduleVatChangeUseCase;
 import com.mycompany.ventacontrolfx.application.usecase.MassivePriceUpdateUseCase;
 import com.mycompany.ventacontrolfx.application.usecase.TaxManagementUseCase;
 import com.mycompany.ventacontrolfx.domain.model.Category;
@@ -10,11 +9,11 @@ import com.mycompany.ventacontrolfx.domain.model.PriceList;
 import com.mycompany.ventacontrolfx.domain.model.PriceUpdateLog;
 import com.mycompany.ventacontrolfx.domain.model.TaxRevision;
 import com.mycompany.ventacontrolfx.domain.repository.ICategoryRepository;
-import com.mycompany.ventacontrolfx.domain.repository.IPriceRepository;
 import com.mycompany.ventacontrolfx.domain.repository.IProductRepository;
 import com.mycompany.ventacontrolfx.domain.repository.ITaxRepository;
 import com.mycompany.ventacontrolfx.domain.repository.IPriceUpdateLogRepository;
 import com.mycompany.ventacontrolfx.domain.model.TaxGroup;
+import com.mycompany.ventacontrolfx.domain.exception.BusinessException;
 import com.mycompany.ventacontrolfx.util.AlertUtil;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -24,9 +23,9 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
+import java.util.List;
+import java.util.stream.Collectors;
 import javafx.scene.layout.VBox;
-import javafx.scene.layout.GridPane;
-import javafx.geometry.Insets;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 
@@ -68,7 +67,7 @@ public class VatManagementController implements Injectable {
     @FXML
     private TextField txtGlobalReason;
     @FXML
-    private ComboBox<Category> cmbCategory;
+    private MenuButton cmbCategory;
     @FXML
     private ComboBox<TaxGroup> cmbCategoryTaxGroup;
     @FXML
@@ -125,6 +124,17 @@ public class VatManagementController implements Injectable {
     private TextField txtMaxPrice;
 
     @FXML
+    private VBox panelProducts;
+    @FXML
+    private TextField txtProductSearch;
+    @FXML
+    private ListView<com.mycompany.ventacontrolfx.domain.model.Product> listSelectedProducts;
+    @FXML
+    private Label lblSelectedCount;
+    @FXML
+    private DatePicker dpPriceStartDate;
+
+    @FXML
     private HBox panelFavorites;
 
     // ── HISTORIAL IVA ─────────────────────────────────────────────────────────
@@ -144,6 +154,19 @@ public class VatManagementController implements Injectable {
     private TableColumn<TaxRevision, String> colRate;
     @FXML
     private TableColumn<TaxRevision, String> colReason;
+
+    // ── IVA POR PRODUCTO ─────────────────────────────────────────────────────
+    @FXML
+    private TextField txtVatProductSearch;
+    @FXML
+    private ListView<com.mycompany.ventacontrolfx.domain.model.Product> listVatSelectedProducts;
+    @FXML
+    private ComboBox<TaxGroup> cmbProductTaxGroup;
+    @FXML
+    private MenuButton btnVatProductExplorer;
+
+    private ObservableList<com.mycompany.ventacontrolfx.domain.model.Product> vatSelectedProducts = FXCollections
+            .observableArrayList();
 
     // ── MANTENIMIENTO: TAX RATES ──────────────────────────────────────────────
     @FXML
@@ -190,15 +213,18 @@ public class VatManagementController implements Injectable {
     private TableColumn<PriceUpdateLog, String> colLogReason;
 
     // ── Servicios ─────────────────────────────────────────────────────────────
-    private ScheduleVatChangeUseCase vatUseCase;
     private MassivePriceUpdateUseCase priceUpdateUseCase;
     private ICategoryRepository categoryRepository;
     private ITaxRepository taxRepository;
-    private IPriceRepository priceRepository;
     private IProductRepository productRepository;
     private PriceListUseCase priceListUseCase;
     private IPriceUpdateLogRepository priceLogRepository;
     private TaxManagementUseCase taxManagementUseCase;
+
+    private ObservableList<com.mycompany.ventacontrolfx.domain.model.Product> allVisibleProducts = FXCollections
+            .observableArrayList();
+    private ObservableList<com.mycompany.ventacontrolfx.domain.model.Product> selectedProducts = FXCollections
+            .observableArrayList();
 
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
@@ -209,6 +235,7 @@ public class VatManagementController implements Injectable {
     private static final String GROUP_SLOW = "Sin Movimiento (Slow-movers)";
     private static final String GROUP_RANGE = "Por Rango de Precio";
     private static final String GROUP_FAVORITES = "Favoritos ★";
+    private static final String GROUP_PRODUCTS = "Productos Específicos";
     private static final String GROUP_ALL = "Todos los Artículos";
     private static final String GROUP_CLONE = "Clonar de otra Tarifa (Sincronizar)";
 
@@ -219,21 +246,77 @@ public class VatManagementController implements Injectable {
         setupGroupingSelector();
         setupOperationTypeSelector();
         setupTaxCatalogTables();
+        setupVatProductCard();
+    }
+
+    private void setupVatProductCard() {
+        listVatSelectedProducts.setItems(vatSelectedProducts);
+        listVatSelectedProducts.setCellFactory(lv -> new ListCell<>() {
+            @Override
+            protected void updateItem(com.mycompany.ventacontrolfx.domain.model.Product item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                    setGraphic(null);
+                } else {
+                    String sku = item.getSku();
+                    String displayText = item.getName()
+                            + (sku != null && !sku.trim().isEmpty() ? " (" + sku + ")" : "");
+                    setText(displayText);
+                    Button btnRemove = new Button();
+                    btnRemove.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.TRASH));
+                    btnRemove.getStyleClass().add("estetica-btn-icon-danger");
+                    btnRemove.setOnAction(e -> vatSelectedProducts.remove(item));
+                    setGraphic(btnRemove);
+                    setContentDisplay(ContentDisplay.RIGHT);
+                }
+            }
+        });
+
+        txtVatProductSearch.setOnAction(e -> {
+            String query = txtVatProductSearch.getText().toLowerCase();
+            if (query.isEmpty())
+                return;
+
+            if (allVisibleProducts.isEmpty()) {
+                try {
+                    allVisibleProducts.setAll(productRepository.getAllVisible());
+                } catch (SQLException ex) {
+                    AlertUtil.showError("Error al cargar productos", ex.getMessage());
+                }
+            }
+
+            Optional<com.mycompany.ventacontrolfx.domain.model.Product> found = allVisibleProducts.stream()
+                    .filter(p -> p.getName().toLowerCase().contains(query) || p.getSku().toLowerCase().contains(query))
+                    .findFirst();
+
+            if (found.isPresent()) {
+                if (!vatSelectedProducts.contains(found.get())) {
+                    vatSelectedProducts.add(found.get());
+                    txtVatProductSearch.clear();
+                }
+            } else {
+                AlertUtil.showWarning("No encontrado", "No se encontró ningún producto con ese nombre o SKU.");
+            }
+        });
     }
 
     private void postInject() {
         if (container != null) {
             this.priceListUseCase = container.getPriceListUseCase();
-            this.vatUseCase = container.getVatUseCase();
             this.priceUpdateUseCase = container.getMassivePriceUpdateUseCase();
             this.categoryRepository = container.getCategoryUseCase().getRepository();
             this.taxRepository = container.getTaxRepository();
             this.priceLogRepository = container.getPriceLogRepository();
             this.taxManagementUseCase = container.getTaxManagementUseCase();
+            this.productRepository = container.getProductRepository();
 
             setupTaxGroupComboBoxes();
             loadInitialData();
             setupHistoryFilter();
+            cmbProductTaxGroup.setItems(cmbGlobalTaxGroup.getItems());
+            cmbProductTaxGroup.setConverter(cmbGlobalTaxGroup.getConverter());
+            setupVatProductExplorer();
         }
     }
 
@@ -258,6 +341,69 @@ public class VatManagementController implements Injectable {
     // SETUP
     // ══════════════════════════════════════════════════════════════════════════
 
+    private void setupVatProductExplorer() {
+        try {
+            List<Category> categories = categoryRepository.getAll();
+            if (allVisibleProducts.isEmpty()) {
+                allVisibleProducts.setAll(productRepository.getAllVisible());
+            }
+
+            btnVatProductExplorer.getItems().clear();
+
+            for (Category cat : categories) {
+                Menu catMenu = new Menu(cat.getName());
+
+                List<com.mycompany.ventacontrolfx.domain.model.Product> catProds = allVisibleProducts.stream()
+                        .filter(p -> p.getCategoryId() == cat.getId())
+                        .collect(Collectors.toList());
+
+                for (com.mycompany.ventacontrolfx.domain.model.Product prod : catProds) {
+                    String sku = prod.getSku();
+                    String labelText = prod.getName() + (sku != null && !sku.trim().isEmpty() ? " [" + sku + "]" : "");
+                    CheckBox cb = new CheckBox(labelText);
+                    cb.getStyleClass().add("permission-checkbox");
+                    cb.setPadding(new javafx.geometry.Insets(5, 10, 5, 10));
+                    cb.setMaxWidth(Double.MAX_VALUE);
+
+                    // Sync state from list to checkbox
+                    cb.setSelected(vatSelectedProducts.contains(prod));
+
+                    cb.selectedProperty().addListener((obs, old, nv) -> {
+                        if (nv) {
+                            if (!vatSelectedProducts.contains(prod)) {
+                                vatSelectedProducts.add(prod);
+                            }
+                        } else {
+                            vatSelectedProducts.remove(prod);
+                        }
+                    });
+
+                    // Sync state from checkbox to list (when list changes externally)
+                    vatSelectedProducts.addListener(
+                            (javafx.collections.ListChangeListener<com.mycompany.ventacontrolfx.domain.model.Product>) c -> {
+                                while (c.next()) {
+                                    if (c.wasRemoved() && c.getRemoved().contains(prod)) {
+                                        cb.setSelected(false);
+                                    } else if (c.wasAdded() && c.getAddedSubList().contains(prod)) {
+                                        cb.setSelected(true);
+                                    }
+                                }
+                            });
+
+                    CustomMenuItem item = new CustomMenuItem(cb, false);
+                    item.setHideOnClick(false);
+                    catMenu.getItems().add(item);
+                }
+
+                if (!catMenu.getItems().isEmpty()) {
+                    btnVatProductExplorer.getItems().add(catMenu);
+                }
+            }
+        } catch (SQLException e) {
+            showError("Error al cargar el explorador: " + e.getMessage());
+        }
+    }
+
     private void setupGroupingSelector() {
         cmbGroupingType.setItems(FXCollections.observableArrayList(
                 GROUP_CATEGORY,
@@ -280,6 +426,7 @@ public class VatManagementController implements Injectable {
             boolean isRange = GROUP_RANGE.equals(nv);
             boolean isFav = GROUP_FAVORITES.equals(nv);
             boolean isClone = GROUP_CLONE.equals(nv);
+            boolean isProd = GROUP_PRODUCTS.equals(nv);
 
             setPanel(panelCategory, isCat);
             setPanel(panelTopSellers, isTop);
@@ -288,14 +435,86 @@ public class VatManagementController implements Injectable {
             setPanel(panelPriceRange, isRange);
             setPanel(panelFavorites, isFav);
             setPanel(panelClone, isClone);
+            setPanel(panelProducts, isProd);
+
+            if (isProd) {
+                setupProductSearch();
+            }
         });
     }
 
-    private void setPanel(HBox panel, boolean visible) {
+    private void setPanel(javafx.scene.layout.Region panel, boolean visible) {
         if (panel != null) {
             panel.setVisible(visible);
             panel.setManaged(visible);
         }
+    }
+
+    private void setupProductSearch() {
+        if (allVisibleProducts.isEmpty()) {
+            try {
+                allVisibleProducts.setAll(productRepository.getAllVisible());
+            } catch (SQLException e) {
+                AlertUtil.showError("Error al cargar productos", e.getMessage());
+            }
+        }
+
+        listSelectedProducts.setItems(selectedProducts);
+        listSelectedProducts.setCellFactory(lv -> new ListCell<>() {
+            @Override
+            protected void updateItem(com.mycompany.ventacontrolfx.domain.model.Product item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                    setGraphic(null);
+                } else {
+                    String sku = item.getSku();
+                    String displayText = item.getName()
+                            + (sku != null && !sku.trim().isEmpty() ? " (" + sku + ")" : "");
+                    setText(displayText);
+                    // Botón para eliminar de la selección
+                    Button btnRemove = new Button();
+                    btnRemove.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.TRASH));
+                    btnRemove.getStyleClass().add("estetica-btn-icon-danger");
+                    btnRemove.setOnAction(e -> selectedProducts.remove(item));
+                    setGraphic(btnRemove);
+                    setContentDisplay(ContentDisplay.RIGHT);
+                }
+            }
+        });
+
+        // Configurar el autocompletado/búsqueda
+        txtProductSearch.textProperty().addListener((obs, old, nv) -> {
+            if (nv == null || nv.trim().isEmpty())
+                return;
+            // Podríamos usar un ContextMenu o un Popup para mostrar resultados
+        });
+
+        // Por simplicidad en esta fase, usaremos un diálogo de búsqueda al presionar
+        // ENTER o un botón
+        txtProductSearch.setOnAction(e -> {
+            String query = txtProductSearch.getText().toLowerCase();
+            if (query.isEmpty())
+                return;
+
+            Optional<com.mycompany.ventacontrolfx.domain.model.Product> found = allVisibleProducts.stream()
+                    .filter(p -> p.getName().toLowerCase().contains(query) || p.getSku().toLowerCase().contains(query))
+                    .findFirst();
+
+            if (found.isPresent()) {
+                if (!selectedProducts.contains(found.get())) {
+                    selectedProducts.add(found.get());
+                    txtProductSearch.clear();
+                    updateSelectedCountText();
+                }
+            } else {
+                AlertUtil.showWarning("No encontrado", "No se encontró ningún producto con ese nombre o SKU.");
+            }
+        });
+    }
+
+    private void updateSelectedCountText() {
+        lblSelectedCount.setText(selectedProducts.size() + " artículos seleccionados");
     }
 
     private void setupOperationTypeSelector() {
@@ -326,27 +545,23 @@ public class VatManagementController implements Injectable {
     }
 
     private void setupTaxHistoryTable() {
-        // Obsoleto en V2: Se reimplementará en la fase de UI.
-        /*
-         * colDate.setCellValueFactory(cell -> new
-         * SimpleStringProperty(cell.getValue().getStartDate().format(formatter)));
-         * colEndDate.setCellValueFactory(cell -> cell.getValue().getEndDate() == null
-         * ? new SimpleStringProperty("Vigente")
-         * : new SimpleStringProperty(cell.getValue().getEndDate().format(formatter)));
-         * colScope.setCellValueFactory(new PropertyValueFactory<>("scope"));
-         * colTarget.setCellValueFactory(cell -> {
-         * TaxRevision r = cell.getValue();
-         * return new SimpleStringProperty(switch (r.getScope()) {
-         * case GLOBAL -> "Global";
-         * case CATEGORY -> "Cat. ID: " + r.getCategoryId();
-         * case PRODUCT -> "Prod. ID: " + r.getProductId();
-         * });
-         * });
-         * colRate.setCellValueFactory(
-         * cell -> new SimpleStringProperty(String.format("%.2f%%",
-         * cell.getValue().getRate())));
-         * colReason.setCellValueFactory(new PropertyValueFactory<>("reason"));
-         */
+        colDate.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getStartDate().format(formatter)));
+        colEndDate.setCellValueFactory(cell -> cell.getValue().getEndDate() == null
+                ? new SimpleStringProperty("Vigente")
+                : new SimpleStringProperty(cell.getValue().getEndDate().format(formatter)));
+        colScope.setCellValueFactory(new PropertyValueFactory<>("scope"));
+        colTarget.setCellValueFactory(cell -> {
+            TaxRevision r = cell.getValue();
+            return new SimpleStringProperty(switch (r.getScope()) {
+                case GLOBAL -> "Global";
+                case CATEGORY -> "Cat. ID: " + r.getCategoryId();
+                case PRODUCT -> "Prod. ID: " + r.getProductId();
+            });
+        });
+        colRate.setCellValueFactory(
+                cell -> new SimpleStringProperty(String.format("%.2f%%",
+                        cell.getValue().getRate())));
+        colReason.setCellValueFactory(new PropertyValueFactory<>("reason"));
     }
 
     private void setupPriceLogTable() {
@@ -398,7 +613,24 @@ public class VatManagementController implements Injectable {
 
             // Categorías
             List<Category> categories = categoryRepository.getAll();
-            cmbCategory.setItems(FXCollections.observableArrayList(categories));
+            cmbCategory.getItems().clear();
+            for (Category cat : categories) {
+                CheckBox cb = new CheckBox(cat.getName());
+                cb.getStyleClass().add("permission-checkbox");
+                cb.setMaxWidth(Double.MAX_VALUE);
+                cb.setUserData(cat);
+
+                cb.selectedProperty().addListener((obs, old, nv) -> {
+                    long count = cmbCategory.getItems().stream()
+                            .map(m -> ((CustomMenuItem) m).getContent())
+                            .filter(n -> n instanceof CheckBox && ((CheckBox) n).isSelected())
+                            .count();
+                    cmbCategory.setText(count == 0 ? "Elegir..." : count + " seleccionadas");
+                });
+
+                CustomMenuItem item = new CustomMenuItem(cb, false);
+                cmbCategory.getItems().add(item);
+            }
 
             Category allOption = new Category(0, "Todas las categorías", true, false, 0.0);
             ObservableList<Category> priceCategories = FXCollections.observableArrayList();
@@ -535,9 +767,10 @@ public class VatManagementController implements Injectable {
             return;
         }
         try {
-            taxRepository.setDefaultTaxGroup(selected.getTaxGroupId());
+            taxManagementUseCase.setDefaultTaxGroup(selected.getTaxGroupId());
             showInfo("Grupo de impuestos global actualizado con éxito. Los nuevos productos heredarán este grupo.");
             lblCurrentGlobalTaxGroup.setText(selected.getName());
+            refreshHistory();
         } catch (Exception e) {
             showError("Error: " + e.getMessage());
         }
@@ -549,11 +782,20 @@ public class VatManagementController implements Injectable {
             AlertUtil.showError("Acceso Denegado", "No tiene permiso para modificar el IVA por categoría.");
             return;
         }
-        Category category = cmbCategory.getSelectionModel().getSelectedItem();
+        List<Category> selectedCategories = new ArrayList<>();
+        for (javafx.scene.control.MenuItem item : cmbCategory.getItems()) {
+            if (item instanceof CustomMenuItem) {
+                javafx.scene.Node content = ((CustomMenuItem) item).getContent();
+                if (content instanceof CheckBox && ((CheckBox) content).isSelected()) {
+                    selectedCategories.add((Category) content.getUserData());
+                }
+            }
+        }
+
         TaxGroup taxGroup = cmbCategoryTaxGroup.getSelectionModel().getSelectedItem();
 
-        if (category == null) {
-            showWarning("Selecciona una categoría.");
+        if (selectedCategories.isEmpty()) {
+            showWarning("Selecciona al menos una categoría.");
             return;
         }
         if (taxGroup == null) {
@@ -562,10 +804,27 @@ public class VatManagementController implements Injectable {
         }
 
         try {
-            category.setTaxGroupId(taxGroup.getTaxGroupId());
-            container.getCategoryUseCase().update(category);
+            int updatedCount = 0;
+            for (Category cat : selectedCategories) {
+                cat.setTaxGroupId(taxGroup.getTaxGroupId());
+                container.getCategoryUseCase().update(cat);
+                taxManagementUseCase.logCategoryTaxChange(cat.getId(), taxGroup.getTaxGroupId(),
+                        txtCategoryReason.getText());
+                updatedCount++;
+            }
 
-            showInfo("Grupo de impuestos para la categoría '" + category.getName() + "' actualizado con éxito.");
+            container.getTaxRepository().syncMirroredValues();
+            showInfo("Grupo de impuestos aplicado con éxito a " + updatedCount + " categorías.");
+            refreshHistory();
+
+            // Limpiar selección
+            cmbCategory.getItems().forEach(item -> {
+                javafx.scene.Node n = ((CustomMenuItem) item).getContent();
+                if (n instanceof CheckBox)
+                    ((CheckBox) n).setSelected(false);
+            });
+            cmbCategory.setText("Elegir...");
+
         } catch (Exception e) {
             showError("Error: " + e.getMessage());
         }
@@ -603,7 +862,6 @@ public class VatManagementController implements Injectable {
         try {
             double value = Double.parseDouble(valueStr.replace(",", "."));
             int updatedCount;
-            String updateTypeKey;
 
             PriceList targetPriceList = cmbPriceListUpdate.getSelectionModel().getSelectedItem();
             if (targetPriceList == null) {
@@ -612,37 +870,32 @@ public class VatManagementController implements Injectable {
             }
             int priceListId = targetPriceList.getId();
 
+            java.time.LocalDateTime startDate = (dpPriceStartDate.getValue() != null)
+                    ? dpPriceStartDate.getValue().atStartOfDay()
+                    : java.time.LocalDateTime.now();
+
             // ── Resolver operación (porcentaje / fijo / redondeo) ──────────────
             if (GROUP_CLONE.equals(grouping)) {
-                updateTypeKey = "clonacion";
                 PriceList source = cmbSourcePriceList.getSelectionModel().getSelectedItem();
                 if (source == null) {
                     showWarning("Selecciona la tarifa de origen.");
                     return;
                 }
-                priceUpdateUseCase.cloneAndAdjustPrices(source.getId(), priceListId, value, reason);
-                updatedCount = -1; // No lo sabemos exactamente sin otra query, pondremos -1 o un valor simbólico
+                priceUpdateUseCase.cloneAndAdjustPrices(source.getId(), priceListId, value, reason, startDate);
+                updatedCount = -1;
             } else if ("Porcentaje (%)".equals(opType)) {
-                updateTypeKey = "percentage";
-                updatedCount = applyByGroupingPercentage(priceListId, grouping, value, reason);
+                updatedCount = applyByGroupingPercentage(priceListId, grouping, value, reason, startDate);
             } else if ("Importe Fijo (€)".equals(opType)) {
-                updateTypeKey = "fixed";
-                updatedCount = applyByGroupingFixed(priceListId, grouping, value, reason);
+                updatedCount = applyByGroupingFixed(priceListId, grouping, value, reason, startDate);
             } else if ("Redondear a (.99, .50...)".equals(opType)) {
-                updateTypeKey = "rounding";
-                updatedCount = applyByGroupingRounding(priceListId, grouping, value, reason);
+                updatedCount = applyByGroupingRounding(priceListId, grouping, value, reason, startDate);
             } else {
                 showWarning("Tipo de operación no reconocido.");
                 return;
             }
 
-            // ── Guardar en historial ───────────────────────────────────────────
-            // ELIMINADO: Ahora lo hace automáticamente el Use Case delegando en el
-            // Repositorio de Auditoría
-            // saveLog(updateTypeKey, grouping, value, updatedCount, reason);
-
             AlertUtil.showInfo("Éxito",
-                    "Se han actualizado " + updatedCount + " productos.\n" +
+                    "Se han actualizado " + (updatedCount == -1 ? "(Clonado)" : updatedCount) + " productos.\n" +
                             "Agrupación: " + grouping + " | Operación registrada en el historial.");
 
             clearPriceFields();
@@ -657,120 +910,137 @@ public class VatManagementController implements Injectable {
     }
 
     /** Aplica un porcentaje según la agrupación seleccionada. */
-    private int applyByGroupingPercentage(int priceListId, String grouping, double pct, String reason)
+    private int applyByGroupingPercentage(int priceListId, String grouping, double pct, String reason,
+            java.time.LocalDateTime startDate)
             throws Exception {
         return switch (grouping) {
-            case GROUP_ALL -> priceUpdateUseCase.applyPercentageIncreaseToAll(priceListId, pct, reason);
+            case GROUP_ALL -> priceUpdateUseCase.applyPercentageIncreaseToAll(priceListId, pct, reason, startDate);
             case GROUP_CATEGORY -> {
                 Integer catId = getCategoryIdFromPanel();
                 yield catId != null
                         ? priceUpdateUseCase.applyPercentageIncreaseToCategory(priceListId, catId, pct,
-                                reason)
-                        : priceUpdateUseCase.applyPercentageIncreaseToAll(priceListId, pct, reason);
+                                reason, startDate)
+                        : priceUpdateUseCase.applyPercentageIncreaseToAll(priceListId, pct, reason, startDate);
+            }
+            case GROUP_PRODUCTS -> {
+                List<Integer> ids = selectedProducts.stream().map(p -> p.getId()).collect(Collectors.toList());
+                if (ids.isEmpty())
+                    throw new BusinessException("No se han seleccionado productos.");
+                yield priceUpdateUseCase.applyPercentageIncreaseToProducts(priceListId, ids, pct, reason, startDate);
             }
             case GROUP_TOP -> {
                 int topN = parseIntField(txtTopN, "Número de artículos Top");
                 int topDays = parseIntField(txtTopDays, "Días de análisis");
-                yield priceUpdateUseCase.applyToTopSellers(priceListId, topN, topDays, pct, reason, true);
+                yield priceUpdateUseCase.applyToTopSellers(priceListId, topN, topDays, pct, reason, true, startDate);
             }
             case GROUP_BOTTOM -> {
                 int bottomN = parseIntField(txtBottomN, "Número de artículos");
                 int bottomDays = parseIntField(txtBottomDays, "Días de análisis");
                 yield priceUpdateUseCase.applyToBottomSellers(priceListId, bottomN, bottomDays, pct, reason,
-                        true);
+                        true, startDate);
             }
             case GROUP_SLOW -> {
                 int slowDays = parseIntField(txtSlowDays, "Días sin venta");
-                yield priceUpdateUseCase.applyToSlowMovers(priceListId, slowDays, pct, reason, true);
+                yield priceUpdateUseCase.applyToSlowMovers(priceListId, slowDays, pct, reason, true, startDate);
             }
             case GROUP_RANGE -> {
                 double min = parseDoubleField(txtMinPrice, "Precio mínimo");
                 double max = parseDoubleField(txtMaxPrice, "Precio máximo");
-                yield priceUpdateUseCase.applyToPriceRange(priceListId, min, max, pct, reason, true);
+                yield priceUpdateUseCase.applyToPriceRange(priceListId, min, max, pct, reason, true, startDate);
             }
-            case GROUP_FAVORITES -> priceUpdateUseCase.applyToFavorites(priceListId, pct, reason, true);
+            case GROUP_FAVORITES -> priceUpdateUseCase.applyToFavorites(priceListId, pct, reason, true, startDate);
             default -> throw new IllegalStateException("Agrupación no reconocida: " + grouping);
         };
     }
 
     /** Aplica importe fijo según la agrupación seleccionada. */
-    private int applyByGroupingFixed(int priceListId, String grouping, double amount, String reason) throws Exception {
+    private int applyByGroupingFixed(int priceListId, String grouping, double amount, String reason,
+            java.time.LocalDateTime startDate) throws Exception {
         return switch (grouping) {
             case GROUP_ALL ->
-                priceUpdateUseCase.applyFixedAmountIncreaseToAll(priceListId, amount, reason);
+                priceUpdateUseCase.applyFixedAmountIncreaseToAll(priceListId, amount, reason, startDate);
             case GROUP_CATEGORY -> {
                 Integer catId = getCategoryIdFromPanel();
                 yield catId != null
                         ? priceUpdateUseCase.applyFixedAmountIncreaseToCategory(priceListId, catId, amount,
-                                reason)
-                        : priceUpdateUseCase.applyFixedAmountIncreaseToAll(priceListId, amount, reason);
+                                reason, startDate)
+                        : priceUpdateUseCase.applyFixedAmountIncreaseToAll(priceListId, amount, reason, startDate);
+            }
+            case GROUP_PRODUCTS -> {
+                List<Integer> ids = selectedProducts.stream().map(p -> p.getId()).collect(Collectors.toList());
+                if (ids.isEmpty())
+                    throw new BusinessException("No se han seleccionado productos.");
+                yield priceUpdateUseCase.applyFixedAmountIncreaseToProducts(priceListId, ids, amount, reason,
+                        startDate);
             }
             case GROUP_TOP -> {
                 int topN = parseIntField(txtTopN, "Número de artículos Top");
                 int topDays = parseIntField(txtTopDays, "Días de análisis");
-                // Para importe fijo sobre top sellers: aplicamos porcentaje proporcional aprox,
-                // pero lo más correcto es usar el propio método con multiplier = amount como
-                // incremento absoluto.
-                // La implementación del use case aplica el valor directamente como porcentaje
-                // (mal diseño previo).
-                // Aqui usamos el método applyFixedAmountIncreaseToAll limitado a top sellers
-                // via SQL:
-                yield priceUpdateUseCase.applyToTopSellers(priceListId, topN, topDays, amount, reason, false);
+                yield priceUpdateUseCase.applyToTopSellers(priceListId, topN, topDays, amount, reason, false,
+                        startDate);
             }
             case GROUP_BOTTOM -> {
                 int bottomN = parseIntField(txtBottomN, "Número de artículos");
                 int bottomDays = parseIntField(txtBottomDays, "Días de análisis");
                 yield priceUpdateUseCase.applyToBottomSellers(priceListId, bottomN, bottomDays, amount,
-                        reason, false);
+                        reason, false, startDate);
             }
             case GROUP_SLOW -> {
                 int slowDays = parseIntField(txtSlowDays, "Días sin venta");
-                yield priceUpdateUseCase.applyToSlowMovers(priceListId, slowDays, amount, reason, false);
+                yield priceUpdateUseCase.applyToSlowMovers(priceListId, slowDays, amount, reason, false, startDate);
             }
             case GROUP_RANGE -> {
                 double min = parseDoubleField(txtMinPrice, "Precio mínimo");
                 double max = parseDoubleField(txtMaxPrice, "Precio máximo");
-                yield priceUpdateUseCase.applyToPriceRange(priceListId, min, max, amount, reason, false);
+                yield priceUpdateUseCase.applyToPriceRange(priceListId, min, max, amount, reason, false, startDate);
             }
-            case GROUP_FAVORITES -> priceUpdateUseCase.applyToFavorites(priceListId, amount, reason, false);
+            case GROUP_FAVORITES -> priceUpdateUseCase.applyToFavorites(priceListId, amount, reason, false, startDate);
             default -> throw new IllegalStateException("Agrupación no reconocida: " + grouping);
         };
     }
 
     /** Aplica redondeo según la agrupación seleccionada. */
-    private int applyByGroupingRounding(int priceListId, String grouping, double target, String reason)
+    private int applyByGroupingRounding(int priceListId, String grouping, double target, String reason,
+            java.time.LocalDateTime startDate)
             throws Exception {
         return switch (grouping) {
-            case GROUP_ALL -> priceUpdateUseCase.applyRoundingToAll(priceListId, target, reason);
+            case GROUP_ALL -> priceUpdateUseCase.applyRoundingToAll(priceListId, target, reason, startDate);
             case GROUP_CATEGORY -> {
                 Integer catId = getCategoryIdFromPanel();
                 yield catId != null
-                        ? priceUpdateUseCase.applyRoundingToCategory(priceListId, catId, target, reason)
-                        : priceUpdateUseCase.applyRoundingToAll(priceListId, target, reason);
+                        ? priceUpdateUseCase.applyRoundingToCategory(priceListId, catId, target, reason, startDate)
+                        : priceUpdateUseCase.applyRoundingToAll(priceListId, target, reason, startDate);
+            }
+            case GROUP_PRODUCTS -> {
+                List<Integer> ids = selectedProducts.stream().map(p -> p.getId()).collect(Collectors.toList());
+                if (ids.isEmpty())
+                    throw new BusinessException("No se han seleccionado productos.");
+                yield priceUpdateUseCase.applyRoundingToProducts(priceListId, ids, target, reason, startDate);
             }
             case GROUP_TOP -> {
                 int topN = parseIntField(txtTopN, "Número de artículos Top");
                 int topDays = parseIntField(txtTopDays, "Días de análisis");
-                yield priceUpdateUseCase.applyRoundingToTopSellers(priceListId, topN, topDays, target, reason);
+                yield priceUpdateUseCase.applyRoundingToTopSellers(priceListId, topN, topDays, target, reason,
+                        startDate);
             }
             case GROUP_BOTTOM -> {
                 int bottomN = parseIntField(txtBottomN, "Número de artículos");
                 int bottomDays = parseIntField(txtBottomDays, "Días de análisis");
                 yield priceUpdateUseCase.applyRoundingToBottomSellers(priceListId, bottomN, bottomDays, target,
-                        reason);
+                        reason, startDate);
             }
             case GROUP_SLOW -> {
                 int slowDays = parseIntField(txtSlowDays, "Días sin venta");
-                yield priceUpdateUseCase.applyRoundingToSlowMovers(priceListId, slowDays, target, reason);
+                yield priceUpdateUseCase.applyRoundingToSlowMovers(priceListId, slowDays, target, reason, startDate);
             }
             case GROUP_RANGE -> {
                 double min = parseDoubleField(txtMinPrice, "Precio mínimo");
                 double max = parseDoubleField(txtMaxPrice, "Precio máximo");
-                yield priceUpdateUseCase.applyRoundingToPriceRange(priceListId, min, max, target, reason);
+                yield priceUpdateUseCase.applyRoundingToPriceRange(priceListId, min, max, target, reason, startDate);
             }
-            case GROUP_FAVORITES -> priceUpdateUseCase.applyRoundingToFavorites(priceListId, target, reason);
+            case GROUP_FAVORITES -> priceUpdateUseCase.applyRoundingToFavorites(priceListId, target, reason, startDate);
             default -> throw new UnsupportedOperationException(
-                    "Redondeo no soportado para agrupación: " + grouping);
+                    "Operación de redondeo no soportada para agrupación: " + grouping);
         };
     }
 
@@ -806,31 +1076,57 @@ public class VatManagementController implements Injectable {
     // ══════════════════════════════════════════════════════════════════════════
 
     @FXML
+    private void handleUpdateProductTaxGroup(ActionEvent event) {
+        if (vatSelectedProducts.isEmpty()) {
+            AlertUtil.showWarning("Sin selección", "Por favor, seleccione al menos un producto.");
+            return;
+        }
+
+        TaxGroup selectedGroup = cmbProductTaxGroup.getSelectionModel().getSelectedItem();
+        if (selectedGroup == null) {
+            AlertUtil.showWarning("Grupo no seleccionado", "Por favor, seleccione el nuevo grupo de IVA.");
+            return;
+        }
+
+        try {
+            List<Integer> ids = vatSelectedProducts.stream()
+                    .map(p -> p.getId())
+                    .collect(Collectors.toList());
+            taxManagementUseCase.updateTaxGroupForProducts(ids, selectedGroup.getTaxGroupId(),
+                    "Cambio manual por producto");
+
+            AlertUtil.showInfo("Éxito", "IVA actualizado para " + ids.size() + " productos.");
+            vatSelectedProducts.clear();
+            refreshHistory();
+        } catch (SQLException e) {
+            AlertUtil.showError("Error al actualizar IVA", e.getMessage());
+        }
+    }
+
+    @FXML
     void handleAddTaxRate(ActionEvent event) {
         TaxRate newRate = new TaxRate();
         newRate.setActive(true);
         newRate.setCountry("ES");
-        showTaxRateDialog(newRate).ifPresent(rate -> {
-            try {
-                taxManagementUseCase.saveTaxRate(rate);
-                loadTaxCatalogData();
-                showInfo("Tasa impositiva guardada con éxito.");
-            } catch (SQLException e) {
-                showError("Error al guardar tasa: " + e.getMessage());
-            }
-        });
+        com.mycompany.ventacontrolfx.util.ModalService.showTransparentModal(
+                "/view/dialog/tax_rate_dialog.fxml",
+                "Nueva Tasa Impositiva",
+                container,
+                (com.mycompany.ventacontrolfx.presentation.controller.dialog.TaxRateDialogController ctrl) -> {
+                    ctrl.init(newRate);
+                });
+        loadTaxCatalogData();
     }
 
     private void handleEditTaxRate(TaxRate rate) {
-        showTaxRateDialog(rate).ifPresent(updated -> {
-            try {
-                taxManagementUseCase.updateTaxRate(updated);
-                loadTaxCatalogData();
-                showInfo("Tasa impositiva actualizada.");
-            } catch (SQLException e) {
-                showError("Error al actualizar tasa: " + e.getMessage());
-            }
-        });
+        com.mycompany.ventacontrolfx.util.ModalService.showTransparentModal(
+                "/view/dialog/tax_rate_dialog.fxml",
+                "Editar Tasa Impositiva",
+                container,
+                (com.mycompany.ventacontrolfx.presentation.controller.dialog.TaxRateDialogController ctrl) -> {
+                    ctrl.init(rate);
+                });
+        loadTaxCatalogData();
     }
 
     private void handleDeleteTaxRate(TaxRate rate) {
@@ -850,31 +1146,27 @@ public class VatManagementController implements Injectable {
 
     @FXML
     void handleAddTaxGroup(ActionEvent event) {
-        TaxGroup newGroup = new TaxGroup();
-        newGroup.setRates(new ArrayList<>());
-        showTaxGroupDialog(newGroup).ifPresent(group -> {
-            try {
-                taxManagementUseCase.saveTaxGroup(group);
-                loadTaxCatalogData();
-                loadInitialData(); // Refresh combos
-                showInfo("Grupo de impuestos creado con éxito.");
-            } catch (SQLException e) {
-                showError("Error al crear grupo: " + e.getMessage());
-            }
-        });
+        com.mycompany.ventacontrolfx.util.ModalService.showTransparentModal(
+                "/view/dialog/tax_group_dialog.fxml",
+                "Nuevo Grupo de Impuestos",
+                container,
+                (com.mycompany.ventacontrolfx.presentation.controller.dialog.TaxGroupDialogController ctrl) -> {
+                    ctrl.init(new TaxGroup());
+                });
+        loadTaxCatalogData();
+        loadInitialData();
     }
 
     private void handleEditTaxGroup(TaxGroup group) {
-        showTaxGroupDialog(group).ifPresent(updated -> {
-            try {
-                taxManagementUseCase.updateTaxGroup(updated);
-                loadTaxCatalogData();
-                loadInitialData(); // Refresh combos
-                showInfo("Grupo de impuestos actualizado.");
-            } catch (SQLException e) {
-                showError("Error al actualizar grupo: " + e.getMessage());
-            }
-        });
+        com.mycompany.ventacontrolfx.util.ModalService.showTransparentModal(
+                "/view/dialog/tax_group_dialog.fxml",
+                "Editar Grupo de Impuestos",
+                container,
+                (com.mycompany.ventacontrolfx.presentation.controller.dialog.TaxGroupDialogController ctrl) -> {
+                    ctrl.init(group);
+                });
+        loadTaxCatalogData();
+        loadInitialData();
     }
 
     private void handleDeleteTaxGroup(TaxGroup group) {
@@ -893,133 +1185,6 @@ public class VatManagementController implements Injectable {
         }
     }
 
-    private Optional<TaxRate> showTaxRateDialog(TaxRate rate) {
-        Dialog<TaxRate> dialog = new Dialog<>();
-        dialog.setTitle(rate.getTaxRateId() == 0 ? "Nueva Tasa Impositiva" : "Editar Tasa Impositiva");
-        dialog.setHeaderText("Configure los detalles de la tasa impositiva.");
-
-        ButtonType saveButtonType = new ButtonType("Guardar", ButtonBar.ButtonData.OK_DONE);
-        dialog.getDialogPane().getButtonTypes().addAll(saveButtonType, ButtonType.CANCEL);
-
-        javafx.scene.layout.GridPane grid = new javafx.scene.layout.GridPane();
-        grid.setHgap(10);
-        grid.setVgap(10);
-        grid.setPadding(new javafx.geometry.Insets(20, 150, 10, 10));
-
-        TextField name = new TextField(rate.getName());
-        name.setPromptText("Nombre (ej: IVA 21%)");
-        TextField value = new TextField(String.valueOf(rate.getRate()));
-        value.setPromptText("Tasa (ej: 21.0)");
-        TextField country = new TextField(rate.getCountry());
-        country.setPromptText("País (ej: ES)");
-        CheckBox active = new CheckBox("Activa");
-        active.setSelected(rate.isActive());
-
-        DatePicker startDate = new DatePicker();
-        if (rate.getValidFrom() != null) {
-            startDate.setValue(rate.getValidFrom().toLocalDate());
-        } else {
-            startDate.setValue(java.time.LocalDate.now());
-        }
-
-        grid.add(new Label("Nombre:"), 0, 0);
-        grid.add(name, 1, 0);
-        grid.add(new Label("Tasa (%):"), 0, 1);
-        grid.add(value, 1, 1);
-        grid.add(new Label("País (ISO):"), 0, 2);
-        grid.add(country, 1, 2);
-        grid.add(new Label("Fecha Inicio:"), 0, 3);
-        grid.add(startDate, 1, 3);
-        grid.add(active, 1, 4);
-
-        dialog.getDialogPane().setContent(grid);
-
-        dialog.setResultConverter(dialogButton -> {
-            if (dialogButton == saveButtonType) {
-                try {
-                    rate.setName(name.getText());
-                    rate.setRate(Double.parseDouble(value.getText().replace(",", ".")));
-                    rate.setCountry(country.getText());
-                    rate.setActive(active.isSelected());
-
-                    if (startDate.getValue() != null) {
-                        rate.setValidFrom(startDate.getValue().atStartOfDay());
-                    }
-                    return rate;
-                } catch (NumberFormatException e) {
-                    AlertUtil.showWarning("Valor Inválido", "Por favor, introduce una tasa numérica válida.");
-                    return null;
-                }
-            }
-            return null;
-        });
-
-        return dialog.showAndWait();
-    }
-
-    private Optional<TaxGroup> showTaxGroupDialog(TaxGroup group) {
-        Dialog<TaxGroup> dialog = new Dialog<>();
-        dialog.setTitle(group.getTaxGroupId() == 0 ? "Nuevo Grupo de Impuestos" : "Editar Grupo de Impuestos");
-        dialog.setHeaderText("Configure el grupo y seleccione las tasas que lo componen.");
-
-        ButtonType saveButtonType = new ButtonType("Guardar", ButtonBar.ButtonData.OK_DONE);
-        dialog.getDialogPane().getButtonTypes().addAll(saveButtonType, ButtonType.CANCEL);
-
-        VBox content = new VBox(15);
-        content.setPadding(new javafx.geometry.Insets(20));
-
-        TextField name = new TextField(group.getName());
-        name.setPromptText("Nombre del grupo (ej: IVA General)");
-        CheckBox isDefault = new CheckBox("Grupo por defecto para nuevos productos");
-        isDefault.setSelected(group.isDefault());
-
-        Label lblRates = new Label("Seleccionar tasas incluidas:");
-        lblRates.setStyle("-fx-font-weight: bold;");
-
-        ListView<TaxRate> ratesListView = new ListView<>();
-        try {
-            List<TaxRate> allRates = taxManagementUseCase.getActiveTaxRates();
-            ratesListView.setItems(FXCollections.observableArrayList(allRates));
-            ratesListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-
-            // Pre-seleccionar las tasas actuales
-            if (group.getRates() != null) {
-                for (TaxRate r : group.getRates()) {
-                    allRates.stream()
-                            .filter(ar -> ar.getTaxRateId() == r.getTaxRateId())
-                            .findFirst()
-                            .ifPresent(ar -> ratesListView.getSelectionModel().select(ar));
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        ratesListView.setCellFactory(lv -> new ListCell<>() {
-            @Override
-            protected void updateItem(TaxRate item, boolean empty) {
-                super.updateItem(item, empty);
-                setText(empty ? null : item.getName() + " (" + item.getRate() + "%)");
-            }
-        });
-
-        content.getChildren().addAll(new Label("Nombre:"), name, isDefault, lblRates, ratesListView);
-        dialog.getDialogPane().setContent(content);
-        dialog.getDialogPane().setPrefWidth(400);
-
-        dialog.setResultConverter(dialogButton -> {
-            if (dialogButton == saveButtonType) {
-                group.setName(name.getText());
-                group.setDefault(isDefault.isSelected());
-                group.setRates(new ArrayList<>(ratesListView.getSelectionModel().getSelectedItems()));
-                return group;
-            }
-            return null;
-        });
-
-        return dialog.showAndWait();
-    }
-
     @FXML
     void handleRefreshHistory(ActionEvent event) {
         refreshHistory();
@@ -1027,8 +1192,21 @@ public class VatManagementController implements Injectable {
 
     private void refreshHistory() {
         try {
-            // List<TaxRevision> history = vatUseCase.getGlobalHistory();
-            // historyTable.setItems(FXCollections.observableArrayList(history));
+            if (taxManagementUseCase != null) {
+                // Determine scope from combo
+                TaxRevision.Scope scope = null;
+                String scopeStr = cmbHistoryScope.getSelectionModel().getSelectedItem();
+                if ("Global".equals(scopeStr))
+                    scope = TaxRevision.Scope.GLOBAL;
+                else if ("Categoría (Todo)".equals(scopeStr))
+                    scope = TaxRevision.Scope.CATEGORY;
+                else if ("Producto (Todo)".equals(scopeStr))
+                    scope = TaxRevision.Scope.PRODUCT;
+
+                final TaxRevision.Scope finalScope = scope;
+                List<TaxRevision> history = taxManagementUseCase.getTaxHistory(finalScope);
+                historyTable.setItems(FXCollections.observableArrayList(history));
+            }
         } catch (Exception e) {
             showError("Error al refrescar historial: " + e.getMessage());
         }

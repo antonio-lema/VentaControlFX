@@ -2,6 +2,7 @@ package com.mycompany.ventacontrolfx.domain.repository;
 
 import com.mycompany.ventacontrolfx.domain.model.TaxGroup;
 import com.mycompany.ventacontrolfx.domain.model.TaxRate;
+import com.mycompany.ventacontrolfx.domain.model.TaxRevision;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -47,4 +48,9 @@ public interface ITaxRepository {
          * basándose en la configuración actual de los Grupos de Impuestos.
          */
         void syncMirroredValues() throws SQLException;
+
+        // --- Historial de IVA (V2) ---
+        List<TaxRevision> getTaxHistory(TaxRevision.Scope scope) throws SQLException;
+
+        void saveTaxRevision(TaxRevision revision) throws SQLException;
 }

@@ -10,19 +10,19 @@
     -fx-background-color: -fx-bg-surface;
     -fx-background-radius: -fx-radius-lg;
     -fx-border-color: -fx-color-border-main;
-    -fx-border-width: 1px;
+    -fx-border-width: -fx-card-border-width;
     -fx-border-radius: -fx-radius-lg;
     -fx-padding: 0px;
     -fx-cursor: hand;
-    -fx-effect: dropshadow(three-pass-box, -fx-shadow-color-medium, 12, 0, 0, 3);
+    -fx-effect: -fx-card-shadow;
 }
 
 .product-box:hover {
-    -fx-translate-y: -4px;
+    -fx-translate-y: -fx-card-hover-lift;
     -fx-border-color: -fx-custom-color-primary;
-    -fx-effect: dropshadow(three-pass-box, -fx-shadow-color-primary, 20, 0, 0, 6);
-    -fx-scale-x: 1.01;
-    -fx-scale-y: 1.01;
+    -fx-effect: -fx-card-shadow-hover;
+    -fx-scale-x: -fx-card-hover-scale;
+    -fx-scale-y: -fx-card-hover-scale;
 }
 
 /* ─── Zona de imagen (parte superior) ─────────────────── */
@@ -115,14 +115,16 @@
     -fx-background-radius: -fx-radius-xl;
     -fx-border-radius: -fx-radius-xl;
     -fx-border-color: -fx-color-border-main;
-    -fx-border-width: 1px;
+    -fx-border-width: -fx-card-border-width;
     -fx-padding: 30px;
-    -fx-effect: dropshadow(three-pass-box, -fx-shadow-color-subtle, 40, 0, 0, 15);
+    -fx-effect: -fx-card-shadow;
 }
 
 .user-card:hover {
-    -fx-translate-y: -4px;
-    -fx-effect: -fx-shadow-primary;
+    -fx-translate-y: -fx-card-hover-lift;
+    -fx-scale-x: -fx-card-hover-scale;
+    -fx-scale-y: -fx-card-hover-scale;
+    -fx-effect: -fx-card-shadow-hover;
 }
 
 .user-card-avatar {
@@ -135,7 +137,7 @@
     -fx-min-width: 80px;
     -fx-min-height: 80px;
     -fx-alignment: center;
-    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.12), 12, 0, 0, 4);
+    -fx-effect: dropshadow(three-pass-box, -fx-shadow-color-medium, 12, 0, 0, 4);
 }
 
 .user-name-label {

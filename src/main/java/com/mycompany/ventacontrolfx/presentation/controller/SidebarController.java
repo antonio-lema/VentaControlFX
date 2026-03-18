@@ -82,9 +82,14 @@ public class SidebarController implements Injectable {
     private void toggleSection(VBox container) {
         if (container == null)
             return;
-        boolean isVisible = container.isVisible();
-        container.setVisible(!isVisible);
-        container.setManaged(!isVisible);
+        boolean wasVisible = container.isVisible();
+
+        collapseAll(); // Colapsar todo primero
+
+        if (!wasVisible) {
+            container.setVisible(true);
+            container.setManaged(true);
+        }
     }
 
     @FXML
@@ -164,7 +169,7 @@ public class SidebarController implements Injectable {
         setVisible(btnSell, true);
 
         setVisible(btnHistory,
-                authService.hasPermission("HISTORIAL") || authService.hasPermission("venta.listar") || true);
+                authService.hasPermission("HISTORIAL") || authService.hasPermission("venta.listar"));
         setVisible(btnReturns, authService.hasPermission("venta.devolucion"));
         setVisible(btnProducts, authService.hasPermission("PRODUCTOS") || authService.hasPermission("producto.listar"));
         setVisible(btnCategories,

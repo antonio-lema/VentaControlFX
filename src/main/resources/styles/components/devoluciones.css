@@ -4,21 +4,21 @@
 
 .return-table-header {
     -fx-padding: 10 15;
-    -fx-background-color: #f8fafc;
+    -fx-background-color: -fx-bg-main;
     -fx-background-radius: 8;
 }
 
 .table-col-header {
-    -fx-text-fill: #64748b;
+    -fx-text-fill: -fx-text-custom-light;
     -fx-font-weight: bold;
     -fx-font-size: 11px;
 }
 
 .return-item-row {
     -fx-padding: 12 15;
-    -fx-background-color: #ffffff;
+    -fx-background-color: -fx-bg-surface;
     -fx-background-radius: 12;
-    -fx-border-color: #e2e8f0;
+    -fx-border-color: -fx-color-border-main;
     -fx-border-width: 1;
     -fx-border-radius: 12;
     -fx-transition: all 0.2s;
@@ -26,7 +26,7 @@
 
 .return-item-row:hover {
     -fx-border-color: #64b5f6;
-    -fx-background-color: #f1f5f9;
+    -fx-background-color: -fx-color-border-light;
 }
 
 .return-item-row.row-selected {
@@ -35,18 +35,18 @@
 }
 
 .return-product-name {
-    -fx-text-fill: #1e293b;
+    -fx-text-fill: -fx-text-custom-main;
     -fx-font-weight: bold;
     -fx-font-size: 14px;
 }
 
 .return-product-price {
-    -fx-text-fill: #64748b;
+    -fx-text-fill: -fx-text-custom-light;
     -fx-font-size: 12px;
 }
 
 .return-count-label {
-    -fx-text-fill: #334155;
+    -fx-text-fill: -fx-text-custom-main;
     -fx-font-weight: bold;
     -fx-font-size: 13px;
     -fx-alignment: center;

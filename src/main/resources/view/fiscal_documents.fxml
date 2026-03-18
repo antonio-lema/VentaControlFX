@@ -114,9 +114,9 @@
             <VBox spacing="5">
                 <Label text="Rango de Fechas" styleClass="filter-label"/>
                 <HBox spacing="10" alignment="CENTER_LEFT">
-                    <DatePicker fx:id="dpFrom" prefWidth="150" promptText="Desde" onAction="#applyFilters"/>
+                    <DatePicker fx:id="dpFrom" prefWidth="150" promptText="Desde" onAction="#applyFilters" styleClass="modern-datepicker"/>
                     <Label text="a" style="-fx-text-fill: #94a3b8;"/>
-                    <DatePicker fx:id="dpTo" prefWidth="150" promptText="Hasta" onAction="#applyFilters"/>
+                    <DatePicker fx:id="dpTo" prefWidth="150" promptText="Hasta" onAction="#applyFilters" styleClass="modern-datepicker"/>
                 </HBox>
             </VBox>
 

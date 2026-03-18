@@ -4,12 +4,12 @@
 
 /* Fondo del diálogo */
 .dialog-pane {
-    -fx-background-color: #ffffff;
-    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.15), 30, 0, 0, 15);
+    -fx-background-color: -fx-bg-surface;
+    -fx-effect: dropshadow(three-pass-box, -fx-shadow-color-medium, 30, 0, 0, 15);
     -fx-border-radius: 20px;
     -fx-background-radius: 20px;
     -fx-padding: 0;
-    -fx-border-color: rgba(0, 0, 0, 0.04);
+    -fx-border-color: -fx-color-border-subtle;
     -fx-border-width: 1px;
 }
 
@@ -22,7 +22,7 @@
 .dialog-pane .button-bar {
     -fx-padding: 0 25 20 25;
     -fx-background-radius: 0 0 20 20;
-    -fx-background-color: #ffffff;
+    -fx-background-color: -fx-bg-surface;
 }
 
 /* Botón de confirmación (OK / Aceptar) */
@@ -48,11 +48,11 @@
 /* Botón de cancelar */
 .dialog-pane .button-bar .button:cancel,
 .dialog-pane .button-bar .button.cancel {
-    -fx-background-color: #f8fafc;
-    -fx-text-fill: #334155;
+    -fx-background-color: -fx-bg-main;
+    -fx-text-fill: -fx-text-custom-main;
     -fx-font-size: 14px;
     -fx-padding: 11 24;
-    -fx-border-color: #e2e8f0;
+    -fx-border-color: -fx-color-border-main;
     -fx-border-width: 1;
     -fx-border-radius: 20;
     -fx-background-radius: 20;
@@ -61,17 +61,17 @@
 
 .dialog-pane .button-bar .button:cancel:hover,
 .dialog-pane .button-bar .button.cancel:hover {
-    -fx-background-color: #e2e8f0;
-    -fx-text-fill: #1e293b;
+    -fx-background-color: -fx-color-border-main;
+    -fx-text-fill: -fx-text-custom-main;
 }
 
 /* Botones genéricos dentro del button-bar */
 .dialog-pane .button-bar .button {
-    -fx-background-color: #f8fafc;
-    -fx-text-fill: #334155;
+    -fx-background-color: -fx-bg-main;
+    -fx-text-fill: -fx-text-custom-main;
     -fx-font-size: 14px;
     -fx-padding: 11 24;
-    -fx-border-color: #e2e8f0;
+    -fx-border-color: -fx-color-border-main;
     -fx-border-width: 1;
     -fx-border-radius: 20;
     -fx-background-radius: 20;
@@ -79,8 +79,8 @@
 }
 
 .dialog-pane .button-bar .button:hover {
-    -fx-background-color: #e2e8f0;
-    -fx-text-fill: #1e293b;
+    -fx-background-color: -fx-color-border-main;
+    -fx-text-fill: -fx-text-custom-main;
     -fx-scale-x: 1.02;
     -fx-scale-y: 1.02;
 }
@@ -94,7 +94,7 @@
 
 .modern-alert .content {
     -fx-padding: 0;
-    -fx-background-color: #ffffff;
+    -fx-background-color: -fx-bg-surface;
 }
 
 /* Estilos para los botones de las alertas modernas */
@@ -113,10 +113,10 @@
 
 .modern-alert .button-bar .button:cancel,
 .modern-alert .button-bar .button.cancel-button {
-    -fx-background-color: #f8fafc;
-    -fx-text-fill: #334155;
+    -fx-background-color: -fx-bg-main;
+    -fx-text-fill: -fx-text-custom-main;
     -fx-background-radius: 12;
-    -fx-border-color: #e2e8f0;
+    -fx-border-color: -fx-color-border-main;
     -fx-border-width: 1;
     -fx-padding: 10 25;
 }
@@ -128,23 +128,23 @@
 
 /* === Custom Modal Layouts (usados en FXMLs) === */
 .modal-container {
-    -fx-background-color: #ffffff;
+    -fx-background-color: -fx-bg-surface;
     -fx-background-radius: 20;
     -fx-border-radius: 20;
-    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.12), 25, 0, 0, 10);
-    -fx-border-color: #e2e8f0;
+    -fx-effect: dropshadow(three-pass-box, -fx-shadow-color-medium, 25, 0, 0, 10);
+    -fx-border-color: -fx-color-border-main;
     -fx-border-width: 1;
 }
 
 .modal-title {
     -fx-font-size: 22px;
     -fx-font-weight: bold;
-    -fx-text-fill: #1e293b;
+    -fx-text-fill: -fx-text-custom-main;
 }
 
 .modal-subtitle {
     -fx-font-size: 14px;
-    -fx-text-fill: #64748b;
+    -fx-text-fill: -fx-text-custom-light;
 }
 
 .btn-close-modal {
@@ -155,7 +155,7 @@
 }
 
 .btn-close-modal:hover {
-    -fx-background-color: #f8fafc;
+    -fx-background-color: -fx-bg-main;
     -fx-scale-x: 1.1;
     -fx-scale-y: 1.1;
 }

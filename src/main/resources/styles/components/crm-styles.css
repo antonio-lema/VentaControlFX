@@ -5,8 +5,8 @@
 }
 
 .table-view .column-header-background {
-    -fx-background-color: #f8fafc;
-    -fx-border-color: #e2e8f0;
+    -fx-background-color: -fx-bg-main;
+    -fx-border-color: -fx-color-border-main;
     -fx-border-width: 0 0 1 0;
 }
 
@@ -15,7 +15,7 @@
 }
 
 .table-view .column-header .label {
-    -fx-text-fill: #64748b;
+    -fx-text-fill: -fx-text-custom-light;
     -fx-font-size: 11px;
     -fx-font-weight: bold;
 }
@@ -26,7 +26,7 @@
 }
 
 .table-row-cell:hover {
-    -fx-background-color: #f8fafc;
+    -fx-background-color: -fx-bg-main;
 }
 
 .table-row-cell:selected {

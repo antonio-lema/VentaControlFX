@@ -22,6 +22,8 @@ public class HeaderController implements Injectable {
     private HBox searchBarContainer, btnStockAlerts;
     @FXML
     private Label lblHeaderUsername, lblStockAlertCount;
+    @FXML
+    private MenuItem menuItemCashClosure;
 
     private ServiceContainer container;
     private NavigationService navigationService;
@@ -81,6 +83,13 @@ public class HeaderController implements Injectable {
                 if (!userMenuButton.isShowing())
                     userMenuButton.show();
             });
+        }
+
+        // Restringir Cierre de Caja por permisos
+        if (menuItemCashClosure != null && container.getUserSession() != null) {
+            boolean canClose = container.getUserSession().hasPermission("caja.cerrar")
+                    || container.getUserSession().hasPermission("CIERRES");
+            menuItemCashClosure.setVisible(canClose);
         }
     }
 

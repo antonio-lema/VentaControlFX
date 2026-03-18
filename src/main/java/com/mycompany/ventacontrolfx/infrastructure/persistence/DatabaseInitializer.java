@@ -1100,6 +1100,24 @@ public class DatabaseInitializer {
                 }
             }
 
+            // ─── TAX REVISIONS TABLE (V2) ───────────────────────────────────
+            stmt.execute("CREATE TABLE IF NOT EXISTS tax_revisions (" +
+                    "revision_id INT AUTO_INCREMENT PRIMARY KEY, " +
+                    "product_id INT DEFAULT NULL, " +
+                    "category_id INT DEFAULT NULL, " +
+                    "scope VARCHAR(20) NOT NULL, " +
+                    "rate DECIMAL(5,2) NOT NULL, " +
+                    "label VARCHAR(100), " +
+                    "start_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, " +
+                    "end_date DATETIME DEFAULT NULL, " +
+                    "reason VARCHAR(255), " +
+                    "FOREIGN KEY (product_id) REFERENCES products(product_id) ON DELETE CASCADE, " +
+                    "FOREIGN KEY (category_id) REFERENCES categories(category_id) ON DELETE CASCADE)");
+
+            tryIndex(stmt, "CREATE INDEX IF NOT EXISTS idx_tax_rev_scope ON tax_revisions(scope)");
+            tryIndex(stmt, "CREATE INDEX IF NOT EXISTS idx_tax_rev_product ON tax_revisions(product_id)");
+            tryIndex(stmt, "CREATE INDEX IF NOT EXISTS idx_tax_rev_category ON tax_revisions(category_id)");
+
             // Migración de tax_id a tax_rate_id si existiera la columna antigua
             try {
                 stmt.execute(

@@ -5,9 +5,9 @@
 }
 
 .kpi-card {
-    -fx-background-color: white;
-    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.12), 12, 0, 0, 4);
-    -fx-border-color: rgba(0, 0, 0, 0.04);
+    -fx-background-color: -fx-bg-surface;
+    -fx-effect: dropshadow(three-pass-box, -fx-shadow-color-medium, 12, 0, 0, 4);
+    -fx-border-color: -fx-color-border-subtle;
     -fx-border-width: 1;
     -fx-border-radius: 12;
     -fx-background-radius: 12;
@@ -47,24 +47,24 @@
 .section-title {
     -fx-font-size: 15px;
     -fx-font-weight: bold;
-    -fx-text-fill: #1e293b;
+    -fx-text-fill: -fx-text-custom-main;
 }
 
 .empty-icon {
-    -fx-fill: #64748b;
+    -fx-fill: -fx-text-custom-light;
     -fx-opacity: 0.4;
 }
 
 .empty-label {
     -fx-font-size: 13px;
-    -fx-text-fill: #64748b;
+    -fx-text-fill: -fx-text-custom-light;
 }
 
 /* ── Header filtros ──────────────────────────────────────────────────────── */
 
 .filter-label {
     -fx-font-size: 12px;
-    -fx-text-fill: #64748b;
+    -fx-text-fill: -fx-text-custom-light;
 }
 
 .badge-info {
@@ -98,7 +98,7 @@
 }
 
 .trend-neutral {
-    -fx-text-fill: #64748b;
+    -fx-text-fill: -fx-text-custom-light;
 }
 
 .trend-blue {
@@ -138,12 +138,12 @@
 /* Bronze */
 .rank-other {
     -fx-background-color: rgba(148, 163, 184, 0.2);
-    -fx-text-fill: #64748b;
+    -fx-text-fill: -fx-text-custom-light;
 }
 
 .chart-container {
-    -fx-background-color: #ffffff;
-    -fx-border-color: #e2e8f0;
+    -fx-background-color: -fx-bg-surface;
+    -fx-border-color: -fx-color-border-main;
     -fx-border-width: 1;
     -fx-border-radius: 12;
     -fx-background-radius: 12;
@@ -151,9 +151,9 @@
 }
 
 .export-btn {
-    -fx-background-color: #f1f5f9;
-    -fx-text-fill: #475569;
-    -fx-border-color: #e2e8f0;
+    -fx-background-color: -fx-color-border-light;
+    -fx-text-fill: -fx-text-custom-light;
+    -fx-border-color: -fx-color-border-main;
     -fx-border-radius: 8;
     -fx-background-radius: 8;
     -fx-padding: 8 12;
@@ -162,7 +162,7 @@
 }
 
 .export-btn:hover {
-    -fx-background-color: #e2e8f0;
+    -fx-background-color: -fx-color-border-main;
 }
 
 /* ── SaaS Executive Dashboard Styles ─────────────────────────────────────── */
@@ -192,8 +192,8 @@
 }
 
 .btn-secondary-saas {
-    -fx-background-color: #ffffff;
-    -fx-text-fill: #475569;
+    -fx-background-color: -fx-bg-surface;
+    -fx-text-fill: -fx-text-custom-light;
     -fx-border-color: #cbd5e1;
     -fx-border-radius: 6;
     -fx-background-radius: 6;
@@ -203,14 +203,14 @@
 }
 
 .btn-secondary-saas:hover {
-    -fx-background-color: #f8fafc;
+    -fx-background-color: -fx-bg-main;
 }
 
 .btn-toggle-saas {
     -fx-background-color: transparent;
     -fx-border-color: #cbd5e1;
     -fx-border-radius: 6;
-    -fx-text-fill: #64748b;
+    -fx-text-fill: -fx-text-custom-light;
     -fx-padding: 8 16;
     -fx-cursor: hand;
 }
@@ -222,7 +222,7 @@
 }
 
 .input-saas {
-    -fx-background-color: #ffffff;
+    -fx-background-color: -fx-bg-surface;
     -fx-border-color: #cbd5e1;
     -fx-border-radius: 6;
     -fx-background-radius: 6;
@@ -230,30 +230,30 @@
 }
 
 .kpi-card-saas {
-    -fx-background-color: white;
-    -fx-border-color: #e2e8f0;
+    -fx-background-color: -fx-bg-surface;
+    -fx-border-color: -fx-color-border-main;
     -fx-border-radius: 12;
     -fx-background-radius: 12;
     -fx-padding: 20;
     -fx-spacing: 12;
-    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.12), 12, 0, 0, 4);
+    -fx-effect: dropshadow(three-pass-box, -fx-shadow-color-medium, 12, 0, 0, 4);
 }
 
 .kpi-label-saas {
     -fx-font-size: 13px;
-    -fx-text-fill: #64748b;
+    -fx-text-fill: -fx-text-custom-light;
     -fx-font-weight: bold;
 }
 
 .kpi-value-saas {
     -fx-font-size: 28px;
     -fx-font-weight: bold;
-    -fx-text-fill: #0f172a;
+    -fx-text-fill: -fx-text-custom-main;
 }
 
 /* Colores Dinámicos para KPIs SaaS */
 .kpi-card-green {
-    -fx-background-color: white;
+    -fx-background-color: -fx-bg-surface;
     -fx-border-color: #10b981;
 }
 
@@ -266,7 +266,7 @@
 }
 
 .kpi-card-purple {
-    -fx-background-color: white;
+    -fx-background-color: -fx-bg-surface;
     -fx-border-color: #a855f7;
 }
 
@@ -279,7 +279,7 @@
 }
 
 .kpi-card-blue {
-    -fx-background-color: white;
+    -fx-background-color: -fx-bg-surface;
     -fx-border-color: #1e88e5;
 }
 
@@ -292,7 +292,7 @@
 }
 
 .kpi-card-gold {
-    -fx-background-color: white;
+    -fx-background-color: -fx-bg-surface;
     -fx-border-color: #f59e0b;
 }
 
@@ -305,7 +305,7 @@
 }
 
 .kpi-card-red {
-    -fx-background-color: white;
+    -fx-background-color: -fx-bg-surface;
     -fx-border-color: #ef4444;
 }
 
@@ -318,8 +318,8 @@
 }
 
 .kpi-card-gray {
-    -fx-background-color: white;
-    -fx-border-color: #e2e8f0;
+    -fx-background-color: -fx-bg-surface;
+    -fx-border-color: -fx-color-border-main;
 }
 
 .icon-bg-green {
@@ -341,7 +341,7 @@
 }
 
 .icon-bg-gray {
-    -fx-background-color: #f1f5f9;
+    -fx-background-color: -fx-color-border-light;
     -fx-padding: 8;
     -fx-background-radius: 8;
 }
@@ -386,8 +386,8 @@
 }
 
 .trend-badge-neutral {
-    -fx-background-color: #f1f5f9;
-    -fx-text-fill: #475569;
+    -fx-background-color: -fx-color-border-light;
+    -fx-text-fill: -fx-text-custom-light;
     -fx-padding: 2 6;
     -fx-background-radius: 12;
     -fx-font-size: 11px;
@@ -400,29 +400,29 @@
 }
 
 .widget-panel {
-    -fx-background-color: #ffffff;
-    -fx-border-color: #e2e8f0;
+    -fx-background-color: -fx-bg-surface;
+    -fx-border-color: -fx-color-border-main;
     -fx-border-radius: 12;
     -fx-background-radius: 12;
     -fx-padding: 20;
-    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.06), 8, 0, 0, 2);
+    -fx-effect: dropshadow(three-pass-box, -fx-shadow-color-subtle, 8, 0, 0, 2);
 }
 
 .widget-title {
     -fx-font-size: 16px;
     -fx-font-weight: bold;
-    -fx-text-fill: #0f172a;
+    -fx-text-fill: -fx-text-custom-main;
 }
 
 .table-saas {
     -fx-background-color: transparent;
-    -fx-border-color: #e2e8f0;
+    -fx-border-color: -fx-color-border-main;
     -fx-border-radius: 8;
 }
 
 .table-saas .column-header {
-    -fx-background-color: #f8fafc;
-    -fx-border-color: transparent transparent #e2e8f0 transparent;
+    -fx-background-color: -fx-bg-main;
+    -fx-border-color: transparent transparent -fx-color-border-main transparent;
 }
 
 .table-saas .table-row-cell {
@@ -438,8 +438,8 @@
 }
 
 .search-box-saas {
-    -fx-background-color: #f8fafc;
-    -fx-border-color: #e2e8f0;
+    -fx-background-color: -fx-bg-main;
+    -fx-border-color: -fx-color-border-main;
     -fx-border-radius: 8;
     -fx-background-radius: 8;
 }
@@ -448,6 +448,31 @@
     -fx-background-color: transparent;
     -fx-border-width: 0;
     -fx-padding: 8 12 8 36;
+}
+
+/* Fix para DatePicker dentro de search-box-saas */
+.search-box-saas .date-picker {
+    -fx-background-color: transparent;
+    -fx-border-width: 0;
+    -fx-padding: 0;
+}
+
+.search-box-saas .date-picker>.text-field {
+    -fx-background-color: transparent;
+    -fx-border-width: 0;
+    -fx-padding: 8 4 8 4;
+    -fx-text-fill: -fx-text-custom-main;
+    -fx-prompt-text-fill: -fx-text-custom-light;
+}
+
+.search-box-saas .date-picker>.button {
+    -fx-background-color: transparent;
+    -fx-padding: 0 4 0 0;
+    -fx-cursor: hand;
+}
+
+.search-box-saas .date-picker>.button>.arrow {
+    -fx-background-color: #64748b;
 }
 
 .dot-cash {
@@ -470,17 +495,17 @@
 
 .pie-label {
     -fx-font-size: 13px;
-    -fx-text-fill: #64748b;
+    -fx-text-fill: -fx-text-custom-light;
 }
 
 .pie-value {
     -fx-font-size: 16px;
     -fx-font-weight: bold;
-    -fx-text-fill: #0f172a;
+    -fx-text-fill: -fx-text-custom-main;
 }
 
 .progress-saas .track {
-    -fx-background-color: #f1f5f9;
+    -fx-background-color: -fx-color-border-light;
     -fx-background-radius: 10;
 }
 

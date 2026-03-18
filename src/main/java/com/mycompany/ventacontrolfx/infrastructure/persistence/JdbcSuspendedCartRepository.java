@@ -111,8 +111,10 @@ public class JdbcSuspendedCartRepository implements ISuspendedCartRepository {
         String itemsSql = "SELECT sci.*, p.name as product_name, p.iva as product_iva, " +
                 "COALESCE((SELECT pp.price FROM product_prices pp " +
                 "  JOIN price_lists pl ON pp.price_list_id = pl.price_list_id " +
-                "  WHERE pp.product_id = p.product_id AND pl.is_default = 1 AND pp.end_date IS NULL " +
-                "  LIMIT 1), 0.0) AS current_price " +
+                "  WHERE pp.product_id = p.product_id AND pl.is_default = 1 " +
+                "  AND pp.start_date <= CURRENT_TIMESTAMP AND (pp.end_date IS NULL OR pp.end_date > CURRENT_TIMESTAMP) "
+                +
+                "  ORDER BY pp.start_date DESC LIMIT 1), 0.0) AS current_price " +
                 "FROM suspended_cart_items sci " +
                 "JOIN products p ON sci.product_id = p.product_id " +
                 "WHERE sci.cart_id = ?";

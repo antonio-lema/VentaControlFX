@@ -13,6 +13,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 <?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
+<?import java.net.URL?>
 
 <BorderPane prefHeight="700.0" prefWidth="500.0" styleClass="payment-root"
             xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
@@ -23,7 +24,7 @@
          <Region HBox.hgrow="ALWAYS" />
          <Button onAction="#handleClose" styleClass="btn-icon" cancelButton="true">
             <graphic>
-                <FontAwesomeIconView glyphName="CLOSE" size="20" fill="white" />
+                <FontAwesomeIconView glyphName="CLOSE" size="20" styleClass="icon-white" />
             </graphic>
          </Button>
       </HBox>
@@ -43,7 +44,7 @@
                <VBox styleClass="payment-method-card payment-method-active">
                   <!-- Header -->
                   <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="payment-method-header">
-                     <FontAwesomeIconView glyphName="MONEY" size="16" fill="#1e88e5" />
+                     <FontAwesomeIconView glyphName="MONEY" size="16" styleClass="icon-primary" />
                      <Label text="Efectivo" styleClass="payment-method-label" />
                      <Region HBox.hgrow="ALWAYS" />
                      <Label fx:id="lblCashAmount" text="34.99 €" styleClass="badge-primary" />
@@ -56,7 +57,11 @@
                                    styleClass="modern-input-field payment-amount-field"
                                    HBox.hgrow="ALWAYS" />
                         <Button text="Cobrar" onAction="#handleCashPayment"
-                                styleClass="btn-primary btn-lg" defaultButton="true" />
+                                styleClass="btn-primary btn-lg" defaultButton="true" graphicTextGap="8">
+                            <graphic>
+                                <FontAwesomeIconView glyphName="CHECK_CIRCLE" size="18" fill="white" />
+                            </graphic>
+                        </Button>
                      </HBox>
 
                      <!-- Quick Buttons -->
@@ -68,7 +73,7 @@
                          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                        </columnConstraints>
                        <rowConstraints>
-                         <RowConstraints minHeight="10.0" prefHeight="40.0" vgrow="SOMETIMES" />
+                         <RowConstraints minHeight="35.0" vgrow="SOMETIMES" />
                        </rowConstraints>
                         <Button fx:id="btnQuick1" text="35 €" maxWidth="Infinity" maxHeight="Infinity"
                                 onAction="#handleQuickMoney" styleClass="btn-primary" />
@@ -87,10 +92,10 @@
                        alignment="CENTER_LEFT" styleClass="payment-method-card payment-method-btn">
                    <graphic>
                        <HBox alignment="CENTER_LEFT" spacing="15" maxWidth="Infinity">
-                           <FontAwesomeIconView glyphName="CREDIT_CARD" size="16" fill="#1e88e5" />
+                           <FontAwesomeIconView glyphName="CREDIT_CARD" size="16" styleClass="icon-primary" />
                            <Label text="Tarjeta de Crédito" styleClass="payment-method-label" />
                            <Region HBox.hgrow="ALWAYS" />
-                           <FontAwesomeIconView glyphName="ANGLE_RIGHT" size="16" fill="#64748b" />
+                           <FontAwesomeIconView glyphName="ANGLE_RIGHT" size="16" styleClass="icon-muted" />
                        </HBox>
                    </graphic>
                </Button>

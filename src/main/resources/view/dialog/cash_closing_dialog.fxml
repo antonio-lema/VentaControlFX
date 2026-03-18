@@ -43,7 +43,7 @@
                 <Label text="Efectivo Real Contado (€):" styleClass="label" />
                 <HBox spacing="10" alignment="CENTER_LEFT" styleClass="modern-input-container">
                     <FontAwesomeIconView glyphName="MONEY" size="20" fill="#22c55e" />
-                    <TextField fx:id="txtActualAmount" promptText="0,00" HBox.hgrow="ALWAYS" styleClass="modern-input-field" style="-fx-font-size: 22px; -fx-font-weight: 900; -fx-text-fill: #1e293b;" />
+                    <TextField fx:id="txtActualAmount" promptText="0,00" HBox.hgrow="ALWAYS" styleClass="modern-input-field" style="-fx-font-size: 22px; -fx-font-weight: 900; -fx-text-fill: -fx-text-custom-main;" />
                 </HBox>
             </VBox>
 

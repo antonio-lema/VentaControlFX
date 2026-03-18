@@ -11,7 +11,7 @@
 .lock-screen-glass {
     -fx-background-color: rgba(255, 255, 255, 0.95);
     -fx-background-radius: -fx-radius-xl;
-    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.12), 40, 0, 0, 15);
+    -fx-effect: dropshadow(three-pass-box, -fx-shadow-color-medium, 40, 0, 0, 15);
     -fx-padding: 40;
     -fx-border-color: rgba(255, 255, 255, 0.3);
     -fx-border-width: 1;
@@ -47,7 +47,7 @@
 /* Avatar de usuario */
 .user-avatar-circle {
     -fx-fill: #f8fafc;
-    -fx-stroke: #f1f5f9;
+    -fx-stroke: -fx-color-border-light;
     -fx-stroke-width: 2;
 }
 
@@ -72,9 +72,9 @@
 
 .lock-field,
 .login-field {
-    -fx-background-color: #f8fafc;
+    -fx-background-color: -fx-bg-main;
     -fx-background-radius: -fx-radius-md;
-    -fx-border-color: #e2e8f0;
+    -fx-border-color: -fx-color-border-main;
     -fx-border-width: 1.2;
     -fx-border-radius: -fx-radius-md;
     -fx-padding: 12 15;
@@ -84,7 +84,7 @@
 
 .lock-field:focused,
 .login-field:focused {
-    -fx-background-color: white;
+    -fx-background-color: -fx-bg-surface;
     -fx-border-color: #1e88e5;
 }
 

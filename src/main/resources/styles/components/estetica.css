@@ -6,7 +6,7 @@
    CONTENEDOR RAÍZ
    ============================================================ */
 .estetica-root {
-    -fx-background-color: #f1f5f9;
+    -fx-background-color: -fx-color-border-light;
 }
 
 /* ============================================================
@@ -15,7 +15,7 @@
 .estetica-header {
     -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #1e88e5 0%, #1565c0 100%);
     -fx-padding: 28 32 24 32;
-    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.12), 12, 0, 0, 4);
+    -fx-effect: dropshadow(three-pass-box, -fx-shadow-color-medium, 12, 0, 0, 4);
 }
 
 .estetica-header-icon-wrap {
@@ -44,8 +44,8 @@
    TAB NAVIGATION
    ============================================================ */
 .estetica-tab-bar {
-    -fx-background-color: #ffffff;
-    -fx-border-color: rgba(0, 0, 0, 0.04);
+    -fx-background-color: -fx-bg-surface;
+    -fx-border-color: -fx-color-border-subtle;
     -fx-border-width: 0 0 1.5 0;
     -fx-padding: 0 20;
     -fx-spacing: 4;
@@ -53,7 +53,7 @@
 
 .estetica-tab-btn {
     -fx-background-color: transparent;
-    -fx-text-fill: #64748b;
+    -fx-text-fill: -fx-text-custom-light;
     -fx-font-size: 13px;
     -fx-font-weight: bold;
     -fx-padding: 14 20;
@@ -64,7 +64,7 @@
 }
 
 .estetica-tab-btn:hover {
-    -fx-text-fill: #1e293b;
+    -fx-text-fill: -fx-text-custom-main;
     -fx-background-color: rgba(30, 136, 229, 0.1);
     -fx-border-color: #64b5f6;
 }
@@ -91,7 +91,7 @@
 .estetica-content-area {
     -fx-padding: 20 24 24 24;
     -fx-spacing: 18;
-    -fx-background-color: #f1f5f9;
+    -fx-background-color: -fx-color-border-light;
     -fx-pref-width: 1200;
     -fx-max-width: 5000;
 }
@@ -100,18 +100,18 @@
    SECTION CARDS
    ============================================================ */
 .estetica-card {
-    -fx-background-color: #ffffff;
+    -fx-background-color: -fx-bg-surface;
     -fx-background-radius: 14px;
     -fx-border-radius: 14px;
-    -fx-border-color: rgba(0, 0, 0, 0.04);
+    -fx-border-color: -fx-color-border-subtle;
     -fx-border-width: 1px;
-    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.06), 8, 0, 0, 2);
+    -fx-effect: dropshadow(three-pass-box, -fx-shadow-color-subtle, 8, 0, 0, 2);
 }
 
 .estetica-card-header {
     -fx-padding: 16 20 14 20;
     -fx-background-color: transparent;
-    -fx-border-color: rgba(0, 0, 0, 0.04);
+    -fx-border-color: -fx-color-border-subtle;
     -fx-border-width: 0 0 1 0;
     -fx-alignment: center-left;
     -fx-spacing: 12;
@@ -148,12 +148,12 @@
 .estetica-card-title {
     -fx-font-size: 15px;
     -fx-font-weight: bold;
-    -fx-text-fill: #1e293b;
+    -fx-text-fill: -fx-text-custom-main;
 }
 
 .estetica-card-desc {
     -fx-font-size: 11.5px;
-    -fx-text-fill: #64748b;
+    -fx-text-fill: -fx-text-custom-light;
     -fx-padding: 1 0 0 0;
 }
 
@@ -177,7 +177,7 @@
 
 .palette-chip:hover {
     -fx-border-color: #1e88e5;
-    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.06), 8, 0, 0, 2);
+    -fx-effect: dropshadow(three-pass-box, -fx-shadow-color-subtle, 8, 0, 0, 2);
 }
 
 .palette-inner {
@@ -195,7 +195,7 @@
 .palette-name {
     -fx-font-size: 11px;
     -fx-font-weight: bold;
-    -fx-text-fill: #64748b;
+    -fx-text-fill: -fx-text-custom-light;
     -fx-alignment: center;
 }
 
@@ -203,7 +203,7 @@
    COLOR PICKER ROWS
    ============================================================ */
 .color-row {
-    -fx-background-color: #f8fafc;
+    -fx-background-color: -fx-bg-main;
     -fx-background-radius: 10px;
     -fx-padding: 10 14;
     -fx-alignment: center-left;
@@ -213,12 +213,12 @@
 .color-row-label {
     -fx-font-size: 13px;
     -fx-font-weight: bold;
-    -fx-text-fill: #1e293b;
+    -fx-text-fill: -fx-text-custom-main;
 }
 
 .color-row-hint {
     -fx-font-size: 11px;
-    -fx-text-fill: #64748b;
+    -fx-text-fill: -fx-text-custom-light;
 }
 
 /* ============================================================
@@ -233,13 +233,13 @@
 .estetica-slider-label {
     -fx-font-size: 13px;
     -fx-font-weight: bold;
-    -fx-text-fill: #1e293b;
+    -fx-text-fill: -fx-text-custom-main;
     -fx-min-width: 160;
 }
 
 .estetica-slider-hint {
     -fx-font-size: 11px;
-    -fx-text-fill: #64748b;
+    -fx-text-fill: -fx-text-custom-light;
 }
 
 .estetica-slider-value {
@@ -259,7 +259,7 @@
 }
 
 .estetica-slider .track {
-    -fx-background-color: #e2e8f0;
+    -fx-background-color: -fx-color-border-main;
     -fx-background-radius: 10;
     -fx-pref-height: 5;
 }
@@ -286,7 +286,7 @@
     -fx-min-width: 52;
     -fx-min-height: 28;
     -fx-background-radius: 14;
-    -fx-background-color: #e2e8f0;
+    -fx-background-color: -fx-color-border-main;
 }
 
 .dark-mode-track.on {
@@ -297,10 +297,10 @@
    LIVE PREVIEW CARD
    ============================================================ */
 .estetica-preview-wrapper {
-    -fx-background-color: #f8fafc;
+    -fx-background-color: -fx-bg-main;
     -fx-background-radius: 14px;
     -fx-padding: 16 20;
-    -fx-border-color: rgba(0, 0, 0, 0.04);
+    -fx-border-color: -fx-color-border-subtle;
     -fx-border-radius: 14px;
     -fx-border-width: 1;
 }
@@ -308,18 +308,18 @@
 .estetica-preview-title {
     -fx-font-size: 10px;
     -fx-font-weight: bold;
-    -fx-text-fill: #64748b;
+    -fx-text-fill: -fx-text-custom-light;
     -fx-padding: 0 0 10 0;
     -fx-letter-spacing: 1px;
 }
 
 .estetica-mini-card {
-    -fx-background-color: #ffffff;
+    -fx-background-color: -fx-bg-surface;
     -fx-background-radius: 12px;
     -fx-padding: 14;
-    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.06), 8, 0, 0, 2);
+    -fx-effect: dropshadow(three-pass-box, -fx-shadow-color-subtle, 8, 0, 0, 2);
     -fx-border-radius: 12px;
-    -fx-border-color: rgba(0, 0, 0, 0.04);
+    -fx-border-color: -fx-color-border-subtle;
     -fx-border-width: 1;
 }
 
@@ -333,12 +333,12 @@
 .estetica-mini-title {
     -fx-font-size: 13px;
     -fx-font-weight: bold;
-    -fx-text-fill: #1e293b;
+    -fx-text-fill: -fx-text-custom-main;
 }
 
 .estetica-mini-sub {
     -fx-font-size: 11px;
-    -fx-text-fill: #64748b;
+    -fx-text-fill: -fx-text-custom-light;
     -fx-padding: 2 0 0 0;
 }
 
@@ -346,8 +346,8 @@
    ACTION BAR
    ============================================================ */
 .estetica-action-bar {
-    -fx-background-color: #ffffff;
-    -fx-border-color: rgba(0, 0, 0, 0.04);
+    -fx-background-color: -fx-bg-surface;
+    -fx-border-color: -fx-color-border-subtle;
     -fx-border-width: 1 0 0 0;
     -fx-padding: 16 24;
     -fx-alignment: center-right;
@@ -377,8 +377,8 @@
 
 .estetica-btn-reset {
     -fx-background-color: transparent;
-    -fx-text-fill: #64748b;
-    -fx-border-color: #e2e8f0;
+    -fx-text-fill: -fx-text-custom-light;
+    -fx-border-color: -fx-color-border-main;
     -fx-border-radius: 10px;
     -fx-background-radius: 10px;
     -fx-font-size: 13px;
@@ -394,8 +394,8 @@
 
 .estetica-btn-secondary {
     -fx-background-color: transparent;
-    -fx-text-fill: #64748b;
-    -fx-border-color: #e2e8f0;
+    -fx-text-fill: -fx-text-custom-light;
+    -fx-border-color: -fx-color-border-main;
     -fx-border-radius: 10px;
     -fx-background-radius: 10px;
     -fx-font-size: 13px;
@@ -411,7 +411,7 @@
 }
 
 .estetica-btn-secondary .glyph-icon {
-    -fx-fill: #64748b;
+    -fx-fill: -fx-text-custom-light;
 }
 
 .estetica-btn-secondary:hover .glyph-icon {
@@ -422,10 +422,10 @@
    DARK MODE SECTION - Toggle visual
    ============================================================ */
 .theme-option-card {
-    -fx-background-color: #f8fafc;
+    -fx-background-color: -fx-bg-main;
     -fx-background-radius: 12px;
     -fx-border-radius: 12px;
-    -fx-border-color: rgba(0, 0, 0, 0.04);
+    -fx-border-color: -fx-color-border-subtle;
     -fx-border-width: 1.5;
     -fx-padding: 14 18;
     -fx-cursor: hand;
@@ -446,7 +446,7 @@
 .theme-option-label {
     -fx-font-size: 12px;
     -fx-font-weight: bold;
-    -fx-text-fill: #1e293b;
+    -fx-text-fill: -fx-text-custom-main;
     -fx-padding: 6 0 0 0;
     -fx-alignment: center;
 }

@@ -37,9 +37,9 @@
                                 <padding><Insets left="15" right="15"/></padding>
                                 <children>
                                     <FontAwesomeIconView glyphName="CALENDAR" fill="#94a3b8" size="14" />
-                                    <DatePicker fx:id="datePickerStart" onAction="#loadClosures" promptText="Desde" styleClass="input-search" prefWidth="130"/>
+                                    <DatePicker fx:id="datePickerStart" onAction="#loadClosures" promptText="Desde" prefWidth="145"/>
                                     <Label text="—" textFill="#94a3b8"/>
-                                    <DatePicker fx:id="datePickerEnd" onAction="#loadClosures" promptText="Hasta" styleClass="input-search" prefWidth="130"/>
+                                    <DatePicker fx:id="datePickerEnd" onAction="#loadClosures" promptText="Hasta" prefWidth="145"/>
                                 </children>
                             </HBox>
                             
@@ -152,7 +152,7 @@
                                     </VBox>
                                     
                                     <!-- DETAIL AUDIT PANEL -->
-                                    <VBox fx:id="detailsPanel" prefWidth="450.0" minWidth="420.0" spacing="20" visible="false" managed="false" styleClass="widget-panel" style="-fx-border-color: #1e88e5; -fx-border-width: 0 0 0 4; -fx-padding: 20; -fx-background-color: white;">
+                                    <VBox fx:id="detailsPanel" prefWidth="450.0" minWidth="420.0" spacing="20" visible="false" managed="false" styleClass="widget-panel" style="-fx-border-color: #1e88e5; -fx-border-width: 0 0 0 4; -fx-padding: 20; -fx-background-color: -fx-bg-surface;">
                                         <children>
                                             <!-- CABECERA -->
                                             <HBox alignment="CENTER_LEFT" spacing="10">
@@ -169,7 +169,7 @@
                                             <!-- DESGLOSE -->
                                             <VBox spacing="10" style="-fx-background-color: #f8fafc; -fx-padding: 15; -fx-background-radius: 8; -fx-border-color: #e2e8f0; -fx-border-radius: 8;">
                                                 <children>
-                                                    <Label text="DESGLOSE DE ARQUEO" style="-fx-font-weight: bold; -fx-font-size: 13px; -fx-text-fill: #1e293b;" />
+                                                    <Label text="DESGLOSE DE ARQUEO" style="-fx-font-weight: bold; -fx-font-size: 13px; -fx-text-fill: -fx-text-custom-main;" />
                                                     <GridPane vgap="10" hgap="15">
                                                         <columnConstraints>
                                                             <ColumnConstraints hgrow="ALWAYS" />
@@ -194,7 +194,7 @@
                                                             <Separator GridPane.rowIndex="5" GridPane.columnSpan="2" style="-fx-padding: 5 0;"/>
                                                             
                                                             <Label text="Total contado (Arqueo):" GridPane.rowIndex="6" style="-fx-font-weight: bold;"/>
-                                                            <Label fx:id="lblDetActual" text="0.00 €" GridPane.rowIndex="6" GridPane.columnIndex="1" style="-fx-font-weight: bold; -fx-font-size: 16px; -fx-text-fill: #0f172a;"/>
+                                                            <Label fx:id="lblDetActual" text="0.00 €" GridPane.rowIndex="6" GridPane.columnIndex="1" style="-fx-font-weight: bold; -fx-font-size: 16px; -fx-text-fill: -fx-text-custom-main;"/>
                                                         </children>
                                                     </GridPane>
                                                 </children>
@@ -203,7 +203,7 @@
                                             <!-- MOVIMIENTOS CON SCROLL HORIZONTAL -->
                                             <VBox spacing="10" VBox.vgrow="ALWAYS">
                                                 <children>
-                                                    <Label text="MOVIMIENTOS MANUALES" style="-fx-font-weight: bold; -fx-font-size: 13px; -fx-text-fill: #1e293b;" />
+                                                    <Label text="MOVIMIENTOS MANUALES" style="-fx-font-weight: bold; -fx-font-size: 13px; -fx-text-fill: -fx-text-custom-main;" />
                                                     <!-- Quitamos la constrained policy para que aparezca el scroll horizontal -->
                                                     <TableView fx:id="tableMovements" prefHeight="250" styleClass="table-saas">
                                                         <columns>
@@ -220,7 +220,7 @@
                                             <!-- OBSERVACIONES -->
                                             <VBox spacing="8">
                                                 <children>
-                                                    <Label text="OBSERVACIONES DEL CAJERO" style="-fx-font-weight: bold; -fx-font-size: 13px; -fx-text-fill: #1e293b;" />
+                                                    <Label text="OBSERVACIONES DEL CAJERO" style="-fx-font-weight: bold; -fx-font-size: 13px; -fx-text-fill: -fx-text-custom-main;" />
                                                     <Label fx:id="lblDetNotes" text="..." wrapText="true" style="-fx-background-color: #fffbeb; -fx-padding: 12; -fx-background-radius: 8; -fx-border-color: #fef3c7; -fx-text-fill: #92400e; -fx-font-size: 13px;" maxWidth="Infinity"/>
                                                 </children>
                                             </VBox>

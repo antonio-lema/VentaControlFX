@@ -33,11 +33,11 @@
     <HBox spacing="10" alignment="CENTER_LEFT" styleClass="cart-pricelist-header">
         <!-- Sección Tarifa -->
         <HBox spacing="8" alignment="CENTER_LEFT" HBox.hgrow="ALWAYS">
-            <StackPane styleClass="icon-container-small" style="-fx-background-color: #e8f5e9;">
-                <FontAwesomeIconView glyphName="TAGS" size="12" style="-fx-fill: #2e7d32;"/>
+            <StackPane styleClass="icon-container-small" style="-fx-background-color: -fx-custom-color-primary-bg;">
+                <FontAwesomeIconView glyphName="TAGS" size="12" style="-fx-fill: -fx-custom-color-primary;"/>
             </StackPane>
             <VBox spacing="0">
-                <Label text="Tarifa" style="-fx-font-size: 10px; -fx-text-fill: #666;"/>
+                <Label text="Tarifa" style="-fx-font-size: 10px; -fx-text-fill: -fx-text-custom-muted;"/>
                 <Label fx:id="lblCurrentPriceList" text="General" styleClass="cart-pricelist-title"/>
             </VBox>
             <Region HBox.hgrow="ALWAYS"/>
@@ -105,6 +105,10 @@
             <Region HBox.hgrow="ALWAYS"/>
             <Label fx:id="totalButtonLabel" text="0,00 €" styleClass="total-value"/>
         </HBox>
-        <Button fx:id="payButton" text="REALIZAR PAGO" onAction="#handlePayButton" styleClass="btn-pay" maxWidth="Infinity"/>
+        <Button fx:id="payButton" text="REALIZAR PAGO" onAction="#handlePayButton" styleClass="btn-pay" maxWidth="Infinity" graphicTextGap="12">
+            <graphic>
+                <FontAwesomeIconView glyphName="CHECK_CIRCLE" size="20" fill="white" />
+            </graphic>
+        </Button>
     </VBox>
 </VBox>

@@ -57,7 +57,8 @@ public interface IPriceRepository {
          * @param reason      Motivo del cambio para trazabilidad.
          * @return Número de productos actualizados.
          */
-        int applyBulkMultiplier(int priceListId, Integer categoryId, double multiplier, String reason)
+        int applyBulkMultiplier(int priceListId, Integer categoryId, double multiplier, String reason,
+                        java.time.LocalDateTime startDate)
                         throws SQLException;
 
         /**
@@ -71,7 +72,8 @@ public interface IPriceRepository {
          * @param reason      Motivo del cambio.
          * @return Número de productos actualizados.
          */
-        int applyBulkFixedAmount(int priceListId, Integer categoryId, double amount, String reason)
+        int applyBulkFixedAmount(int priceListId, Integer categoryId, double amount, String reason,
+                        java.time.LocalDateTime startDate)
                         throws SQLException;
 
         /**
@@ -84,7 +86,8 @@ public interface IPriceRepository {
          * @param reason         Motivo del cambio.
          * @return Número de productos actualizados.
          */
-        int applyBulkRounding(int priceListId, Integer categoryId, double roundingTarget, String reason)
+        int applyBulkRounding(int priceListId, Integer categoryId, double roundingTarget, String reason,
+                        java.time.LocalDateTime startDate)
                         throws SQLException;
 
         /**
@@ -102,21 +105,21 @@ public interface IPriceRepository {
          * @return Número de productos actualizados.
          */
         int applyBulkMultiplierToTopSellers(int priceListId, int topN, int daysBack, double value, String reason,
-                        boolean isPercentage)
+                        boolean isPercentage, java.time.LocalDateTime startDate)
                         throws SQLException;
 
         /**
          * Aplica un ajuste a productos sin ventas (slow-movers).
          */
         int applyBulkMultiplierToSlowMovers(int priceListId, int daysWithoutSale, double value, String reason,
-                        boolean isPercentage)
+                        boolean isPercentage, java.time.LocalDateTime startDate)
                         throws SQLException;
 
         /**
          * Aplica un ajuste a los N productos MENOS vendidos (Bottom N).
          */
         int applyBulkMultiplierToBottomSellers(int priceListId, int bottomN, int daysBack, double value, String reason,
-                        boolean isPercentage)
+                        boolean isPercentage, java.time.LocalDateTime startDate)
                         throws SQLException;
 
         /**
@@ -124,43 +127,47 @@ public interface IPriceRepository {
          * maxPrice].
          */
         int applyBulkMultiplierToPriceRange(int priceListId, double minPrice, double maxPrice, double value,
-                        String reason, boolean isPercentage)
+                        String reason, boolean isPercentage, java.time.LocalDateTime startDate)
                         throws SQLException;
 
         /**
          * Aplica un ajuste sólo a los productos marcados como favoritos.
          */
-        int applyBulkMultiplierToFavorites(int priceListId, double value, String reason, boolean isPercentage)
+        int applyBulkMultiplierToFavorites(int priceListId, double value, String reason, boolean isPercentage,
+                        java.time.LocalDateTime startDate)
                         throws SQLException;
 
         /**
          * Redondea precios de los N productos más vendidos.
          */
-        int applyBulkRoundingToTopSellers(int priceListId, int topN, int daysBack, double roundingTarget, String reason)
+        int applyBulkRoundingToTopSellers(int priceListId, int topN, int daysBack, double roundingTarget, String reason,
+                        java.time.LocalDateTime startDate)
                         throws SQLException;
 
         /**
          * Redondea precios de los N productos menos vendidos.
          */
         int applyBulkRoundingToBottomSellers(int priceListId, int bottomN, int daysBack, double roundingTarget,
-                        String reason) throws SQLException;
+                        String reason, java.time.LocalDateTime startDate) throws SQLException;
 
         /**
          * Redondea precios de productos sin ventas.
          */
-        int applyBulkRoundingToSlowMovers(int priceListId, int daysWithoutSale, double roundingTarget, String reason)
+        int applyBulkRoundingToSlowMovers(int priceListId, int daysWithoutSale, double roundingTarget, String reason,
+                        java.time.LocalDateTime startDate)
                         throws SQLException;
 
         /**
          * Redondea precios dentro de un rango.
          */
         int applyBulkRoundingToPriceRange(int priceListId, double minPrice, double maxPrice, double roundingTarget,
-                        String reason) throws SQLException;
+                        String reason, java.time.LocalDateTime startDate) throws SQLException;
 
         /**
          * Redondea precios de favoritos.
          */
-        int applyBulkRoundingToFavorites(int priceListId, double roundingTarget, String reason) throws SQLException;
+        int applyBulkRoundingToFavorites(int priceListId, double roundingTarget, String reason,
+                        java.time.LocalDateTime startDate) throws SQLException;
 
         void clonePriceList(int sourceId, int targetId) throws SQLException;
 
@@ -168,10 +175,20 @@ public interface IPriceRepository {
          * Clona precios de una lista a otra aplicando un multiplicador (ej. 0.90 para
          * -10%).
          */
-        void cloneAndAdjustPriceList(int sourceId, int targetId, double multiplier, String reason) throws SQLException;
+        void cloneAndAdjustPriceList(int sourceId, int targetId, double multiplier, String reason,
+                        java.time.LocalDateTime startDate) throws SQLException;
 
         List<com.mycompany.ventacontrolfx.domain.dto.ProductPriceDTO> findPricesByList(int priceListId)
                         throws SQLException;
 
         String getAveragePercentageDifference(int priceListId) throws SQLException;
+
+        int applyBulkMultiplierToProducts(int priceListId, java.util.List<Integer> productIds, double multiplier,
+                        String reason, java.time.LocalDateTime startDate) throws SQLException;
+
+        int applyBulkFixedAmountToProducts(int priceListId, java.util.List<Integer> productIds, double amount,
+                        String reason, java.time.LocalDateTime startDate) throws SQLException;
+
+        int applyBulkRoundingToProducts(int priceListId, java.util.List<Integer> productIds, double targetDecimal,
+                        String reason, java.time.LocalDateTime startDate) throws SQLException;
 }

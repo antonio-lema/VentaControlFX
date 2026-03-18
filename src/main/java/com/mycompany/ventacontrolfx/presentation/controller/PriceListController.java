@@ -120,34 +120,24 @@ public class PriceListController implements Injectable {
             }
         }
 
-        HBox actionBox = new HBox(10);
+        FlowPane actionBox = new FlowPane(8, 8);
         actionBox.setAlignment(Pos.CENTER_RIGHT);
 
-        Button btnEdit = new Button("Editar");
-        btnEdit.setStyle(
-                "-fx-background-color: #eff6ff; -fx-text-fill: #1e40af; -fx-background-radius: 5; -fx-padding: 5 10;");
+        Button btnEdit = createIconButton("Editar", "PENCIL", "#eff6ff", "#1e40af");
         btnEdit.setOnAction(e -> openPriceListForm(pl));
 
-        Button btnDelete = new Button("Eliminar");
-        btnDelete.setStyle(
-                "-fx-background-color: #fef2f2; -fx-text-fill: #b91c1c; -fx-background-radius: 5; -fx-padding: 5 10;");
+        Button btnDelete = createIconButton("Eliminar", "TRASH", "#fef2f2", "#b91c1c");
         btnDelete.setDisable(pl.isDefault() || pl.getId() == 1);
         btnDelete.setOnAction(e -> deletePriceList(pl));
 
-        Button btnMakeDefault = new Button("Fijar por defecto");
-        btnMakeDefault.setStyle(
-                "-fx-background-color: #f3f4f6; -fx-text-fill: #374151; -fx-background-radius: 5; -fx-padding: 5 10;");
+        Button btnMakeDefault = createIconButton("Fijar por defecto", "STAR", "#f3f4f6", "#374151");
         btnMakeDefault.setDisable(pl.isDefault());
         btnMakeDefault.setOnAction(e -> makeDefault(pl));
 
-        Button btnClone = new Button("Clonar");
-        btnClone.setStyle(
-                "-fx-background-color: #fdf2f8; -fx-text-fill: #9d174d; -fx-background-radius: 5; -fx-padding: 5 10;");
+        Button btnClone = createIconButton("Clonar", "COPY", "#fdf2f8", "#9d174d");
         btnClone.setOnAction(e -> handleClone(pl));
 
-        Button btnViewTable = new Button("Ver Precios");
-        btnViewTable.setStyle(
-                "-fx-background-color: #ecfdf5; -fx-text-fill: #065f46; -fx-background-radius: 5; -fx-padding: 5 10;");
+        Button btnViewTable = createIconButton("Ver Precios", "EYE", "#ecfdf5", "#065f46");
         btnViewTable.setOnAction(e -> openPriceTableView(pl));
 
         actionBox.getChildren().addAll(btnViewTable, btnClone, btnMakeDefault, btnEdit, btnDelete);
@@ -157,22 +147,15 @@ public class PriceListController implements Injectable {
     }
 
     private void handleClone(PriceList source) {
-        String newName = AlertUtil.showInput("Clonar Tarifa", "Nombre de la nueva tarifa",
-                "Clon de " + source.getName());
-        if (newName != null && !newName.trim().isEmpty()) {
-            String pctStr = AlertUtil.showInput("Ajuste de Precios",
-                    "Porcentaje de ajuste (ej: 10 para +10%, -5 para -5%)", "0");
-            double percentage = 0;
-            try {
-                if (pctStr != null)
-                    percentage = Double.parseDouble(pctStr);
-            } catch (NumberFormatException e) {
-                AlertUtil.showError("Error", "El porcentaje debe ser un número válido.");
-                return;
-            }
+        com.mycompany.ventacontrolfx.presentation.controller.dialog.PriceListCloneController ctrl = ModalService
+                .showTransparentModal("/view/dialog/price_list_clone_dialog.fxml", "Clonar Tarifa", container,
+                        (com.mycompany.ventacontrolfx.presentation.controller.dialog.PriceListCloneController c) -> {
+                            c.initData("Clon de " + source.getName());
+                        });
 
+        if (ctrl != null && ctrl.isConfirmed()) {
             try {
-                priceListUseCase.clone(source.getId(), newName.trim(), percentage);
+                priceListUseCase.clone(source.getId(), ctrl.getName(), ctrl.getPercentage());
                 AlertUtil.showInfo("Éxito", "Tarifa clonada y precios ajustados correctamente.");
                 loadPriceLists();
             } catch (SQLException e) {
@@ -230,5 +213,18 @@ public class PriceListController implements Injectable {
         } catch (SQLException ex) {
             AlertUtil.showError("Error", "No se pudo actualizar la tarifa: " + ex.getMessage());
         }
+    }
+
+    private Button createIconButton(String text, String glyphName, String bgColor, String textColor) {
+        Button btn = new Button(text);
+        btn.setStyle("-fx-background-color: " + bgColor + "; -fx-text-fill: " + textColor
+                + "; -fx-background-radius: 6; -fx-padding: 6 12; -fx-cursor: hand; -fx-font-weight: bold; -fx-font-size: 12px;");
+
+        FontAwesomeIconView icon = new FontAwesomeIconView();
+        icon.setGlyphName(glyphName);
+        icon.setSize("14");
+        icon.setStyle("-fx-fill: " + textColor + ";");
+        btn.setGraphic(icon);
+        return btn;
     }
 }

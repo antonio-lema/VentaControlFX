@@ -95,9 +95,9 @@ public class ThemeManager {
         scene.getStylesheets().add(newUrl);
         this.dynamicStylesheetUrl = newUrl;
 
-        // Aplicar clase de modo oscuro si es necesario
-        String mode = settings.getOrDefault("ui.theme_mode", "LIGHT");
-        setTheme(scene.getRoot(), "DARK".equals(mode));
+        // Aplicar clase de modo oscuro automáticamente si es necesario
+        String bg = settings.get("ui.bg_main");
+        setTheme(scene.getRoot(), bg != null && !isLightColor(bg));
     }
 
     /**
@@ -125,6 +125,10 @@ public class ThemeManager {
      */
     private String generateCss(Map<String, String> settings) {
         StringBuilder sb = new StringBuilder();
+        String bg = settings.get("ui.bg_main");
+        // Calcular si es oscuro automáticamente según el color de fondo para evitar
+        // mezclas
+        boolean isDark = bg != null && !isLightColor(bg);
 
         // 1. Bloque principal .root
         sb.append(".root {\n");
@@ -175,7 +179,7 @@ public class ThemeManager {
         }
 
         String text = settings.get("ui.text_main");
-        if (text != null) {
+        if (text != null && (!isDark || isLightColor(text))) {
             sb.append("  -fx-text-custom-main: ").append(text).append(";\n");
             sb.append("  -fx-text-custom-medium: ").append(text).append(";\n");
             sb.append("  -fx-text-custom-light: ").append(text).append("B3;\n"); // 70% alpha
@@ -184,13 +188,13 @@ public class ThemeManager {
         }
 
         String textCards = settings.getOrDefault("ui.text_cards", text);
-        if (textCards != null) {
+        if (textCards != null && (!isDark || isLightColor(textCards))) {
             sb.append("  -fx-text-custom-cards: ").append(textCards).append(";\n");
             sb.append("  -fx-text-custom-cards-muted: ").append(textCards).append("80;\n"); // 50% alpha
         }
 
-        String textPrice = settings.getOrDefault("ui.text_price", textCards);
-        if (textPrice != null) {
+        String textPrice = settings.getOrDefault("ui.text_price", text);
+        if (textPrice != null && (!isDark || isLightColor(textPrice))) {
             sb.append("  -fx-text-custom-price: ").append(textPrice).append(";\n");
         }
 
@@ -212,11 +216,19 @@ public class ThemeManager {
 
         // GLOBAL TEXT COLOR OVERRIDES (Phase 4)
         if (text != null) {
-            sb.append("}\n\n");
-            sb.append(".root, .label, .text, .button, .toggle-button, .text-field, .text-area, .combo-box {\n");
-            sb.append("  -fx-text-fill: -fx-text-custom-main;\n");
-            sb.append("}\n\n");
-            sb.append(".root {\n");
+            boolean useTextOverride = !isDark || isLightColor(text);
+            if (useTextOverride) {
+                String themeClass = isDark ? ".dark-theme" : ".light-theme";
+                sb.append("}\n\n");
+                sb.append(themeClass).append(", ").append(themeClass).append(" .label, ").append(themeClass)
+                        .append(" .text, ")
+                        .append(themeClass).append(" .button, ").append(themeClass).append(" .toggle-button, ")
+                        .append(themeClass).append(" .text-field, ").append(themeClass).append(" .text-area, ")
+                        .append(themeClass).append(" .combo-box {\n");
+                sb.append("  -fx-text-fill: -fx-text-custom-main;\n");
+                sb.append("}\n\n");
+                sb.append(".root {\n");
+            }
         }
 
         // Font Sizes
@@ -253,8 +265,17 @@ public class ThemeManager {
         String cardHoverLift = settings.getOrDefault("ui.card_hover_lift", "8");
         String cardHoverScale = settings.getOrDefault("ui.card_hover_scale", "1.02");
 
+        double shadowSize = 15;
+        try {
+            shadowSize = Double.parseDouble(cardShadow);
+        } catch (Exception ignored) {
+        }
+
         sb.append("  -fx-card-scale: ").append(cardScale).append(";\n");
-        sb.append("  -fx-card-shadow-size: ").append(cardShadow).append("px;\n");
+        sb.append("  -fx-card-shadow: dropshadow(three-pass-box, -fx-shadow-color-medium, ")
+                .append(shadowSize).append(", 0, 0, 3);\n");
+        sb.append("  -fx-card-shadow-hover: dropshadow(three-pass-box, -fx-shadow-color-primary, ")
+                .append(shadowSize * 1.5).append(", 0, 0, 6);\n");
         sb.append("  -fx-card-border-width: ").append(cardBorderWidth).append("px;\n");
         sb.append("  -fx-card-hover-lift: -").append(cardHoverLift).append("px;\n");
         sb.append("  -fx-card-hover-scale: ").append(cardHoverScale).append(";\n");
@@ -277,25 +298,25 @@ public class ThemeManager {
         }
 
         // 2. Tema Claro/Oscuro dinámico
-        String bg = settings.get("ui.bg_main");
-        if (bg != null) {
-            // Aplicar fondos al .root para que afecte fuera de clases de tema si es
-            // necesario
-            sb.append(".root {\n");
-            sb.append("  -fx-bg-main: ").append(bg).append(";\n");
-            sb.append("  -fx-bg-surface: #ffffff;\n");
-            sb.append("  -fx-bg-sidebar: ").append(bg).append(";\n");
-            sb.append("  -fx-bg-topbar: #ffffff;\n");
-            sb.append("  -fx-grad-sidebar: ").append(bg).append(";\n");
-            sb.append("}\n\n");
+        // String bg ya declarada arriba
 
-            sb.append(".light-theme {\n");
-            sb.append("  -fx-bg-main: ").append(bg).append(";\n");
-            sb.append("  -fx-bg-surface: #ffffff;\n");
-            sb.append("  -fx-bg-sidebar: ").append(bg).append(";\n");
-            sb.append("  -fx-bg-topbar: #ffffff;\n");
-            sb.append("  -fx-grad-sidebar: ").append(bg).append(";\n");
-            sb.append("}\n\n");
+        if (bg != null) {
+            // Solo sobreescribimos si el color encaja con el modo (evita forzar fondos
+            // claros en modo oscuro)
+            boolean fitsMode = !isDark || !isLightColor(bg);
+
+            if (fitsMode) {
+                String themeClass = isDark ? ".dark-theme" : ".light-theme";
+                sb.append(themeClass).append(" {\n");
+                sb.append("  -fx-bg-main: ").append(bg).append(";\n");
+                sb.append("  -fx-bg-sidebar: ").append(bg).append(";\n");
+                sb.append("  -fx-grad-sidebar: ").append(bg).append(";\n");
+                // Asegurar que las tarjetas (surface) no se queden blancas si el fondo es
+                // oscuro
+                String surface = isDark ? brighten(bg, 0.08) : "#ffffff";
+                sb.append("  -fx-bg-surface: ").append(surface).append(";\n");
+                sb.append("}\n\n");
+            }
         }
 
         // 3. Overrides de componentes para asegurar consistencia
@@ -375,11 +396,16 @@ public class ThemeManager {
         // La barra de búsqueda usa un tinte muy sutil del color primario.
         // En reposo: 5% de tinte. Al hacer foco: borde del color primario.
         if (primary != null) {
-            String searchBg = blendColors("#f8fafc", primary, 0.06); // tinte muy sutil
-            String searchBgFocus = blendColors("#ffffff", primary, 0.04); // fondo en foco
+            String baseBg = isDark ? "#0f172a" : "#f8fafc";
+            String baseBgFocus = isDark ? "#1e293b" : "#ffffff";
+            String baseBorder = isDark ? "#1e293b" : "#e2e8f0";
+
+            String searchBg = blendColors(baseBg, primary, 0.06); // tinte muy sutil
+            String searchBgFocus = blendColors(baseBgFocus, primary, 0.04); // fondo en foco
+
             sb.append(".search-bar {\n");
             sb.append("  -fx-background-color: ").append(searchBg).append(";\n");
-            sb.append("  -fx-border-color: ").append(blendColors("#e2e8f0", primary, 0.20)).append(";\n");
+            sb.append("  -fx-border-color: ").append(blendColors(baseBorder, primary, 0.20)).append(";\n");
             sb.append("}\n");
             sb.append(".search-bar:focus-within {\n");
             sb.append("  -fx-background-color: ").append(searchBgFocus).append(";\n");
@@ -439,6 +465,16 @@ public class ThemeManager {
                     (int) (r * 255), (int) (g * 255), (int) (b * 255));
         } catch (Exception e) {
             return base;
+        }
+    }
+
+    private boolean isLightColor(String hex) {
+        try {
+            Color c = Color.valueOf(hex);
+            double brightness = c.getRed() * 0.299 + c.getGreen() * 0.587 + c.getBlue() * 0.114;
+            return brightness > 0.5;
+        } catch (Exception e) {
+            return false;
         }
     }
 

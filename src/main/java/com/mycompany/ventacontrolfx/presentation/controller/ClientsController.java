@@ -96,7 +96,7 @@ public class ClientsController implements Injectable, com.mycompany.ventacontrol
         card.getStyleClass().add("client-card");
         card.setPrefWidth(280);
         card.setMinWidth(280);
-        card.setStyle("-fx-background-color: white; -fx-padding: 20; " +
+        card.setStyle("-fx-background-color: -fx-bg-surface; -fx-padding: 20; " +
                 "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 5); -fx-cursor: hand;");
 
         // Cabecera: Icono y Nombre
@@ -110,7 +110,7 @@ public class ClientsController implements Injectable, com.mycompany.ventacontrol
 
         VBox nameBox = new VBox(2);
         Label nameLabel = new Label(client.getName());
-        nameLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 16; -fx-text-fill: #1e293b;");
+        nameLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 16; -fx-text-fill: -fx-text-custom-main;");
         nameLabel.setWrapText(true);
 
         Label typeLabel = new Label(client.isIsCompany() ? "Empresa" : "Particular");
@@ -179,7 +179,7 @@ public class ClientsController implements Injectable, com.mycompany.ventacontrol
         icon.setSize("14");
         icon.setFill(Color.valueOf("#94a3b8"));
         Label label = new Label(text == null || text.isEmpty() ? "---" : text);
-        label.setStyle("-fx-font-size: 13; -fx-text-fill: #475569;");
+        label.setStyle("-fx-font-size: 13; -fx-text-fill: -fx-text-custom-light;");
         item.getChildren().addAll(icon, label);
         return item;
     }

@@ -78,10 +78,6 @@ public class CustomizationController implements Injectable {
     // ─────────────────────────────────────────
     // FXML: Tema (Light / Dark cards)
     // ─────────────────────────────────────────
-    @FXML
-    private VBox cardLightMode;
-    @FXML
-    private VBox cardDarkMode;
 
     private boolean isDarkMode = false;
 
@@ -183,7 +179,8 @@ public class CustomizationController implements Injectable {
             trySetColor(cpBackground, settings.get("ui.bg_main"));
             trySetColor(cpText, settings.get("ui.text_main"));
             trySetColor(cpTextCards, settings.getOrDefault("ui.text_cards", settings.get("ui.text_main")));
-            trySetColor(cpTextPrice, settings.getOrDefault("ui.text_price", settings.getOrDefault("ui.text_cards", settings.get("ui.text_main"))));
+            trySetColor(cpTextPrice, settings.getOrDefault("ui.text_price",
+                    settings.getOrDefault("ui.text_cards", settings.get("ui.text_main"))));
             trySetColor(cpSidebar, settings.getOrDefault("ui.sidebar_bg", "#0f172a"));
             trySetColor(cpSidebarText, settings.getOrDefault("ui.sidebar_text_color", "#ffffff"));
 
@@ -196,7 +193,6 @@ public class CustomizationController implements Injectable {
             trySetSlider(sldCardHoverScale, settings.getOrDefault("ui.card_hover_scale", "1.02"));
 
             isDarkMode = "DARK".equals(settings.getOrDefault("ui.theme_mode", "LIGHT"));
-            applyThemeSelection();
 
         } catch (SQLException | IllegalArgumentException e) {
             System.err.println("Error cargando ajustes estéticos: " + e.getMessage());
@@ -271,31 +267,6 @@ public class CustomizationController implements Injectable {
     // ─────────────────────────────────────────
     // Selección de tema visual
     // ─────────────────────────────────────────
-    @FXML
-    private void selectLightMode() {
-        isDarkMode = false;
-        applyThemeSelection();
-        updatePreview();
-    }
-
-    @FXML
-    private void selectDarkMode() {
-        isDarkMode = true;
-        applyThemeSelection();
-        updatePreview();
-    }
-
-    private void applyThemeSelection() {
-        if (cardLightMode == null || cardDarkMode == null)
-            return;
-        if (isDarkMode) {
-            cardDarkMode.getStyleClass().add("selected");
-            cardLightMode.getStyleClass().remove("selected");
-        } else {
-            cardLightMode.getStyleClass().add("selected");
-            cardDarkMode.getStyleClass().remove("selected");
-        }
-    }
 
     // ─────────────────────────────────────────
     // Guardar
@@ -331,14 +302,19 @@ public class CustomizationController implements Injectable {
         trySetSlider(sldCardHoverLift, "8");
         trySetSlider(sldCardBorderWidth, "1.5");
         trySetSlider(sldCardHoverScale, "1.02");
-        isDarkMode = false;
-        applyThemeSelection();
+
         updatePreview();
     }
 
     // ─────────────────────────────────────────
     // Paletas predefinidas
     // ─────────────────────────────────────────
+    @FXML
+    private void applyPremiumDark() {
+        // Indigo, Muted, Bg, Text, TextCards, TextPrice, Sidebar
+        applyPalette("#6366f1", "#71717a", "#09090b", "#fafafa", "#fafafa", "#6366f1", "#09090b");
+    }
+
     @FXML
     private void applyClassicBlue() {
         // Sidebar = azul eléctrico. Gradiente: #1e88e5 → azul oscuro → azul casi negro

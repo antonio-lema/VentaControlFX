@@ -37,10 +37,22 @@ public class CartListRenderer {
                 item,
                 globalTaxRate,
                 pricesIncludeTax,
-                () -> cartUseCase.incrementQuantity(item.getProduct()),
+                () -> {
+                    try {
+                        cartUseCase.incrementQuantity(item.getProduct());
+                    } catch (IllegalArgumentException ex) {
+                        com.mycompany.ventacontrolfx.util.AlertUtil.showWarning("Stock Insuficiente", ex.getMessage());
+                    }
+                },
                 () -> cartUseCase.decrementQuantity(item.getProduct()),
                 () -> cartUseCase.removeItem(item.getProduct()),
-                (newQty) -> cartUseCase.updateQuantity(item.getProduct(), newQty));
+                (newQty) -> {
+                    try {
+                        cartUseCase.updateQuantity(item.getProduct(), newQty);
+                    } catch (IllegalArgumentException ex) {
+                        com.mycompany.ventacontrolfx.util.AlertUtil.showWarning("Stock Insuficiente", ex.getMessage());
+                    }
+                });
         container.getChildren().add(row);
     }
 
@@ -53,10 +65,24 @@ public class CartListRenderer {
                                 item,
                                 globalTaxRate,
                                 pricesIncludeTax,
-                                () -> cartUseCase.incrementQuantity(item.getProduct()),
+                                () -> {
+                                    try {
+                                        cartUseCase.incrementQuantity(item.getProduct());
+                                    } catch (IllegalArgumentException ex) {
+                                        com.mycompany.ventacontrolfx.util.AlertUtil.showWarning("Stock Insuficiente",
+                                                ex.getMessage());
+                                    }
+                                },
                                 () -> cartUseCase.decrementQuantity(item.getProduct()),
                                 () -> cartUseCase.removeItem(item.getProduct()),
-                                (newQty) -> cartUseCase.updateQuantity(item.getProduct(), newQty));
+                                (newQty) -> {
+                                    try {
+                                        cartUseCase.updateQuantity(item.getProduct(), newQty);
+                                    } catch (IllegalArgumentException ex) {
+                                        com.mycompany.ventacontrolfx.util.AlertUtil.showWarning("Stock Insuficiente",
+                                                ex.getMessage());
+                                    }
+                                });
                         container.getChildren().add(row);
                     }
                 }

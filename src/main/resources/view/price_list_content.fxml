@@ -4,7 +4,7 @@
 <?import javafx.geometry.Insets?>
 <?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
 
-<VBox spacing="20" styleClass="card-view" stylesheets="@../css/styles.css"
+<VBox spacing="20" styleClass="modal-container"
       xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="com.mycompany.ventacontrolfx.presentation.controller.dialog.PriceListContentController"
       prefWidth="750" prefHeight="550">

@@ -36,7 +36,7 @@ public class CashClosureController implements Injectable {
     private Label lblDate, lblTotalCash, lblTotalCard, lblTotalAll, lblSalesCount,
             lblCurrentUser, lblStatus, lblCashInDrawer, lblActiveFund, lblTotalReturns, lblTotalDiscounts;
     @FXML
-    private VBox containerReturns, containerDiscounts;
+    private VBox containerReturns, containerDiscounts, cardCash, cardAccounting;
     @FXML
     private Button btnPerformClosure, btnWithdrawCash, btnRegisterCashEntry, btnOpenFund, btnRefreshCash;
     @FXML
@@ -68,6 +68,18 @@ public class CashClosureController implements Injectable {
             if (btnRegisterCashEntry != null) {
                 btnRegisterCashEntry.setVisible(canEnterCash);
                 btnRegisterCashEntry.setManaged(canEnterCash);
+            }
+
+            // Verificación de permisos para ver totales financieros
+            boolean canSeeTotals = userSession.hasPermission("caja.ver_totales")
+                    || userSession.hasPermission("USUARIOS");
+            if (cardCash != null) {
+                cardCash.setVisible(canSeeTotals);
+                cardCash.setManaged(canSeeTotals);
+            }
+            if (cardAccounting != null) {
+                cardAccounting.setVisible(canSeeTotals);
+                cardAccounting.setManaged(canSeeTotals);
             }
         }
 

@@ -177,30 +177,19 @@ public class PromotionsController implements Injectable {
 
     private void showPromotionForm(Promotion promotion) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/promotion_form.fxml"));
-            VBox root = loader.load();
-            PromotionFormController controller = loader.getController();
+            PromotionFormController controller = com.mycompany.ventacontrolfx.util.ModalService.showTransparentModal(
+                "/view/promotion_form.fxml", 
+                promotion == null ? "Nueva Promoción" : "Editar Promoción", 
+                container, 
+                c -> c.setPromotion(promotion)
+            );
 
-            // Inject container (since NavigationService does it for main views, we do it
-            // manually for dialogs)
-            ServiceContainer container = ((ServiceContainer) promotionsTable.getScene().getUserData());
-            // Wait, how do I get the container? Usually I can pass it from this controller.
-            controller.inject(this.container);
-            controller.setPromotion(promotion);
-
-            Stage stage = new Stage();
-            stage.setTitle(promotion == null ? "Nueva Promoción" : "Editar Promoción");
-            stage.initModality(Modality.WINDOW_MODAL);
-            stage.initOwner(promotionsTable.getScene().getWindow());
-            stage.setScene(new Scene(root));
-            stage.showAndWait();
-
-            if (controller.isSaved()) {
+            if (controller != null && controller.isSaved()) {
                 Promotion p = controller.getPromotion();
                 promotionUseCase.savePromotion(p);
                 loadData();
             }
-        } catch (IOException | SQLException e) {
+        } catch (SQLException e) {
             e.printStackTrace();
             showError("Error al abrir el formulario", e.getMessage());
         }

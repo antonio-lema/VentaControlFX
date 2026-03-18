@@ -23,7 +23,7 @@
                   <StackPane style="-fx-padding: 30; -fx-background-color: #525659;">
                      <children>
                         <!-- PAPER SHEET -->
-                        <VBox fx:id="paperSheet" maxHeight="-Infinity" style="-fx-background-color: white; -fx-padding: 20; -fx-font-family: 'Arial'; -fx-text-fill: black;" spacing="0">
+                        <VBox fx:id="paperSheet" maxHeight="-Infinity" style="-fx-background-color: -fx-bg-surface; -fx-padding: 20; -fx-font-family: 'Arial'; -fx-text-fill: black;" spacing="0">
                            <children>
                                 <!-- Header -->
                                 <VBox fx:id="companyHeaderSection" alignment="TOP_CENTER" spacing="5.0">
@@ -142,7 +142,7 @@
       </StackPane>
 
       <!-- SETTINGS SIDEBAR (Right) -->
-      <VBox prefWidth="350.0" style="-fx-background-color: white; -fx-padding: 25 30 25 30;" spacing="20">
+      <VBox prefWidth="350.0" style="-fx-background-color: -fx-bg-surface; -fx-padding: 25 30 25 30;" spacing="20">
          <children>
             <HBox alignment="CENTER_LEFT">
                 <Label text="Imprimir" style="-fx-font-size: 18; -fx-font-weight: normal; -fx-text-fill: #333;" />
@@ -156,25 +156,25 @@
                 <!-- Destino -->
                 <HBox alignment="CENTER_LEFT" spacing="20">
                     <Label text="Destino" style="-fx-font-weight: bold; -fx-text-fill: #555; -fx-font-size: 12;" prefWidth="60" />
-                    <ComboBox fx:id="cmbPrinters" maxWidth="Infinity" HBox.hgrow="ALWAYS" style="-fx-background-color: white; -fx-border-color: #ddd; -fx-border-radius: -fx-radius-sm;" />
+                    <ComboBox fx:id="cmbPrinters" maxWidth="Infinity" HBox.hgrow="ALWAYS" style="-fx-background-color: -fx-bg-surface; -fx-border-color: #ddd; -fx-border-radius: -fx-radius-sm;" />
                 </HBox>
                 
                 <!-- Paginas -->
                 <HBox alignment="CENTER_LEFT" spacing="20">
                     <Label text="Páginas" style="-fx-font-weight: bold; -fx-text-fill: #555; -fx-font-size: 12;" prefWidth="60" />
-                    <ComboBox maxWidth="Infinity" promptText="Todas" HBox.hgrow="ALWAYS" style="-fx-background-color: white; -fx-border-color: #ddd; -fx-border-radius: -fx-radius-sm;" />
+                    <ComboBox maxWidth="Infinity" promptText="Todas" HBox.hgrow="ALWAYS" style="-fx-background-color: -fx-bg-surface; -fx-border-color: #ddd; -fx-border-radius: -fx-radius-sm;" />
                 </HBox>
                 
                 <!-- Copias -->
                 <HBox alignment="CENTER_LEFT" spacing="20">
                     <Label text="Copias" style="-fx-font-weight: bold; -fx-text-fill: #555; -fx-font-size: 12;" prefWidth="60" />
-                    <TextField text="1" maxWidth="100" style="-fx-background-color: white; -fx-border-color: #ddd; -fx-border-radius: -fx-radius-sm;" />
+                    <TextField text="1" maxWidth="100" style="-fx-background-color: -fx-bg-surface; -fx-border-color: #ddd; -fx-border-radius: -fx-radius-sm;" />
                 </HBox>
                 
                  <!-- Diseño -->
                 <HBox alignment="CENTER_LEFT" spacing="20">
                     <Label text="Diseño" style="-fx-font-weight: bold; -fx-text-fill: #555; -fx-font-size: 12;" prefWidth="60" />
-                    <ComboBox maxWidth="Infinity" promptText="Vertical" HBox.hgrow="ALWAYS" style="-fx-background-color: white; -fx-border-color: #ddd; -fx-border-radius: -fx-radius-sm;" />
+                    <ComboBox maxWidth="Infinity" promptText="Vertical" HBox.hgrow="ALWAYS" style="-fx-background-color: -fx-bg-surface; -fx-border-color: #ddd; -fx-border-radius: -fx-radius-sm;" />
                 </HBox>
                 
                 <!-- More Settings -->
@@ -193,7 +193,7 @@
                         <Label text="⎙" style="-fx-text-fill: white; -fx-font-size: 16;" />
                     </graphic>
                 </Button>
-                <Button fx:id="btnGiftTicket" style="-fx-background-color: white; -fx-text-fill: #1a73e8; -fx-border-color: #1a73e8; -fx-border-radius: -fx-radius-xl; -fx-border-width: 1; -fx-font-weight: bold; -fx-padding: 8 20; -fx-background-radius: -fx-radius-xl; -fx-cursor: hand;" text="Ticket regalo">
+                <Button fx:id="btnGiftTicket" style="-fx-background-color: -fx-bg-surface; -fx-text-fill: #1a73e8; -fx-border-color: #1a73e8; -fx-border-radius: -fx-radius-xl; -fx-border-width: 1; -fx-font-weight: bold; -fx-padding: 8 20; -fx-background-radius: -fx-radius-xl; -fx-cursor: hand;" text="Ticket regalo">
                     <graphic>
                         <Label fx:id="lblGiftIcon" style="-fx-font-size: 16; -fx-text-fill: #1a73e8;" text="🎁" />
                     </graphic>

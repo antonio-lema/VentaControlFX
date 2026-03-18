@@ -120,10 +120,10 @@
    MENÚ DE USUARIO (MenuButton)
    =================================================== */
 .user-menu-button {
-    -fx-background-color: -fx-neutral-50;
+    -fx-background-color: -fx-bg-surface;
     -fx-background-radius: -fx-radius-xl;
     -fx-border-radius: -fx-radius-xl;
-    -fx-border-color: -fx-neutral-300;
+    -fx-border-color: -fx-color-border-main;
     -fx-border-width: 1.5;
     -fx-padding: 5 12 5 8;
     -fx-cursor: hand;
@@ -132,7 +132,7 @@
 .user-menu-button:hover {
     -fx-background-color: -fx-custom-color-primary-bg;
     -fx-border-color: -fx-custom-color-primary;
-    -fx-effect: dropshadow(three-pass-box, -fx-shadow-color-primary, 15, 0, 0, 2);
+    -fx-effect: dropshadow(three-pass-box, -fx-shadow-color-subtle, 15, 0, 0, 2);
 }
 
 .user-menu-button:showing {
@@ -142,7 +142,7 @@
 
 /* Texto del usuario dentro del menú */
 .user-menu-button .label {
-    -fx-text-fill: -fx-neutral-800;
+    -fx-text-fill: -fx-text-custom-main;
     -fx-font-weight: 600;
     -fx-font-size: 13px;
 }
@@ -166,7 +166,7 @@
 }
 
 .user-menu-button .arrow-button .arrow {
-    -fx-background-color: -fx-neutral-500;
+    -fx-background-color: -fx-text-custom-light;
 }
 
 /* ===================================================
@@ -201,14 +201,14 @@
 }
 
 .menu-item .label {
-    -fx-text-fill: -fx-neutral-800;
+    -fx-text-fill: -fx-text-custom-main;
     -fx-font-size: 14px;
     -fx-font-weight: 500;
 }
 
 .menu-item:focused .label,
 .menu-item:hover .label {
-    -fx-text-fill: -fx-custom-color-primary;
+    -fx-text-fill: -color-primary;
     -fx-font-weight: 600;
 }
 

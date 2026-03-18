@@ -4,13 +4,13 @@
 <?import javafx.geometry.Insets?>
 <?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
 
-<VBox spacing="15" styleClass="dialog-container, bg-white" prefWidth="450" stylesheets="@../styles/variables.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mycompany.ventacontrolfx.presentation.controller.dialog.PriceListFormController">
+<VBox spacing="15" styleClass="modal-container" prefWidth="450" stylesheets="@../styles/variables.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mycompany.ventacontrolfx.presentation.controller.dialog.PriceListFormController">
     <padding>
         <Insets top="24" right="32" bottom="24" left="32"/>
     </padding>
 
     <HBox alignment="CENTER_LEFT">
-        <Label fx:id="lblTitle" text="Nueva Tarifa" styleClass="text-2xl, font-bold, text-gray-900"/>
+        <Label fx:id="lblTitle" text="Nueva Tarifa" styleClass="modal-title"/>
         <Region HBox.hgrow="ALWAYS"/>
         <Button onAction="#handleCancel" styleClass="button-ghost" text="✕" style="-fx-font-size: 16px;"/>
     </HBox>
@@ -43,7 +43,7 @@
     <Region VBox.vgrow="ALWAYS" minHeight="20"/>
 
     <HBox spacing="10" alignment="CENTER_RIGHT">
-        <Button text="Cancelar" onAction="#handleCancel" styleClass="button-secondary"/>
-        <Button text="Guardar Tarifa" onAction="#handleSave" styleClass="button-primary"/>
+        <Button text="Cancelar" onAction="#handleCancel" styleClass="btn-secondary"/>
+        <Button text="Guardar Tarifa" onAction="#handleSave" styleClass="btn-primary"/>
     </HBox>
 </VBox>

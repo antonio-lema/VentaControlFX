@@ -26,15 +26,33 @@ public class PromotionEngine {
         try {
             List<Promotion> activePromos = promotionRepository.getActive();
 
-            // 1. Aplicar promociones por PRODUCTO/CATEGORÍA (Nivel de ítem)
+            // 1. Simular promociones por PRODUCTO/CATEGORÍA (Nivel de ítem: % o fijo)
+            PromotionResult itemResult = new PromotionResult();
             for (CartItem item : items) {
-                applyItemLevelPromos(item, activePromos, result);
+                applyItemLevelPromos(item, activePromos, itemResult);
             }
 
-            // 2. Aplicar promociones de VOLUMEN (2x1, 3x2, etc.)
-            applyVolumePromos(items, activePromos, result);
+            // 2. Simular promociones de VOLUMEN (2x1, 3x2, etc.)
+            PromotionResult volumeResult = new PromotionResult();
+            applyVolumePromos(items, activePromos, volumeResult);
 
-            // 3. Aplicar promociones GLOBALES
+            // 3. Fusionar: El mayor descuento por producto GANA (No acumulable)
+            java.util.Set<Integer> allProductIds = new java.util.HashSet<>();
+            allProductIds.addAll(itemResult.getItemDiscounts().keySet());
+            allProductIds.addAll(volumeResult.getItemDiscounts().keySet());
+
+            for (int prodId : allProductIds) {
+                double itemD = itemResult.getItemDiscounts().getOrDefault(prodId, 0.0);
+                double volD = volumeResult.getItemDiscounts().getOrDefault(prodId, 0.0);
+
+                if (itemD >= volD && itemD > 0) {
+                    result.addDiscount(prodId, itemD, itemResult.getItemPromoNames().get(prodId));
+                } else if (volD > itemD) {
+                    result.addDiscount(prodId, volD, volumeResult.getItemPromoNames().get(prodId));
+                }
+            }
+
+            // 4. Aplicar promociones GLOBALES
             applyGlobalPromos(items, activePromos, result);
 
         } catch (SQLException e) {

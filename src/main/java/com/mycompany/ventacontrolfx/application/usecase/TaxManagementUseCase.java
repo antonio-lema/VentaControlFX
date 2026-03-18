@@ -2,6 +2,8 @@ package com.mycompany.ventacontrolfx.application.usecase;
 
 import com.mycompany.ventacontrolfx.domain.model.TaxGroup;
 import com.mycompany.ventacontrolfx.domain.model.TaxRate;
+import com.mycompany.ventacontrolfx.domain.model.TaxRevision;
+import com.mycompany.ventacontrolfx.domain.repository.IProductRepository;
 import com.mycompany.ventacontrolfx.domain.repository.ITaxRepository;
 import com.mycompany.ventacontrolfx.util.AuthorizationService;
 
@@ -16,10 +18,13 @@ import java.util.Optional;
 public class TaxManagementUseCase {
 
     private final ITaxRepository taxRepository;
+    private final IProductRepository productRepository;
     private final AuthorizationService authService;
 
-    public TaxManagementUseCase(ITaxRepository taxRepository, AuthorizationService authService) {
+    public TaxManagementUseCase(ITaxRepository taxRepository, IProductRepository productRepository,
+            AuthorizationService authService) {
         this.taxRepository = taxRepository;
+        this.productRepository = productRepository;
         this.authService = authService;
     }
 
@@ -86,5 +91,59 @@ public class TaxManagementUseCase {
     public void setDefaultTaxGroup(int taxGroupId) throws SQLException {
         authService.checkPermission("admin.iva");
         taxRepository.setDefaultTaxGroup(taxGroupId);
+
+        // Log global revision
+        taxRepository.getTaxGroupById(taxGroupId).ifPresent(group -> {
+            try {
+                double totalRate = group.getRates().stream().mapToDouble(r -> r.getRate()).sum();
+                TaxRevision revision = new TaxRevision(null, null, TaxRevision.Scope.GLOBAL,
+                        totalRate, group.getName(), java.time.LocalDateTime.now(),
+                        "Cambio de grupo impositivo global");
+                taxRepository.saveTaxRevision(revision);
+            } catch (SQLException ignored) {
+            }
+        });
+    }
+
+    // --- History (V2) ---
+
+    public List<TaxRevision> getTaxHistory(TaxRevision.Scope scope) throws SQLException {
+        return taxRepository.getTaxHistory(scope);
+    }
+
+    public void logCategoryTaxChange(int categoryId, int taxGroupId, String reason) throws SQLException {
+        taxRepository.getTaxGroupById(taxGroupId).ifPresent(group -> {
+            try {
+                double totalRate = group.getRates().stream().mapToDouble(r -> r.getRate()).sum();
+                TaxRevision revision = new TaxRevision(null, categoryId, TaxRevision.Scope.CATEGORY,
+                        totalRate, group.getName(), java.time.LocalDateTime.now(),
+                        reason != null ? reason : "Cambio de IVA por categoría");
+                taxRepository.saveTaxRevision(revision);
+            } catch (SQLException ignored) {
+            }
+        });
+    }
+
+    public void updateTaxGroupForProducts(List<Integer> productIds, int taxGroupId, String reason) throws SQLException {
+        authService.checkPermission("admin.iva");
+
+        // 1. Update the products
+        productRepository.updateTaxGroupForProducts(productIds, taxGroupId);
+
+        // 2. Log revisions for each product
+        taxRepository.getTaxGroupById(taxGroupId).ifPresent(group -> {
+            double totalRate = group.getRates().stream().mapToDouble(r -> r.getRate()).sum();
+            for (Integer productId : productIds) {
+                try {
+                    TaxRevision revision = new TaxRevision(productId, null, TaxRevision.Scope.PRODUCT,
+                            totalRate, group.getName(), java.time.LocalDateTime.now(),
+                            reason != null ? reason : "Cambio de IVA individual");
+                    taxRepository.saveTaxRevision(revision);
+                } catch (SQLException ignored) {
+                }
+            }
+        });
+
+        taxRepository.syncMirroredValues();
     }
 }

@@ -9,8 +9,10 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -35,6 +37,8 @@ public class PromotionFormController implements Injectable {
     @FXML
     private TextField txtValue;
     @FXML
+    private VBox panelValue;
+    @FXML
     private ComboBox<PromotionScope> cmbScope;
     @FXML
     private CheckBox chkActive;
@@ -43,7 +47,7 @@ public class PromotionFormController implements Injectable {
     @FXML
     private DatePicker dpEndDate;
     @FXML
-    private ListView<String> listAffected;
+    private ListView<AffectedItem> listAffected;
     @FXML
     private TextField txtAffectedSearch;
     @FXML
@@ -55,6 +59,7 @@ public class PromotionFormController implements Injectable {
     @FXML
     private TextField txtFreeQty;
 
+    private ContextMenu searchContextMenu;
     private Promotion promotion;
     private boolean saved = false;
     private final Set<Integer> affectedIds = new HashSet<>();
@@ -105,10 +110,61 @@ public class PromotionFormController implements Injectable {
             boolean isVolume = newVal == PromotionType.VOLUME_DISCOUNT;
             panelVolume.setVisible(isVolume);
             panelVolume.setManaged(isVolume);
+            
+            if (panelValue != null) {
+                panelValue.setVisible(!isVolume);
+                panelValue.setManaged(!isVolume);
+            }
         });
 
         dpStartDate.setValue(LocalDate.now());
         dpEndDate.setValue(LocalDate.now().plusMonths(1));
+
+        // Seleccionar por defecto para evitar valores nulos
+        cmbType.getSelectionModel().selectFirst();
+        cmbScope.getSelectionModel().select(PromotionScope.PRODUCT);
+
+        // Sugerencias de búsqueda
+        searchContextMenu = new ContextMenu();
+        txtAffectedSearch.textProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal == null || newVal.trim().isEmpty()) {
+                searchContextMenu.hide();
+                return;
+            }
+            updateSuggestions(newVal.trim());
+        });
+
+        // Cell Factory para poder eliminar de la lista
+        listAffected.setCellFactory(lv -> new ListCell<AffectedItem>() {
+            private final Button btnRemove = new Button();
+            private final Label lbl = new Label();
+            private final HBox container = new HBox(10, lbl, btnRemove);
+            {
+                HBox.setHgrow(lbl, javafx.scene.layout.Priority.ALWAYS);
+                lbl.setMaxWidth(Double.MAX_VALUE);
+                btnRemove.getStyleClass().addAll("btn-icon", "btn-delete-small");
+                btnRemove.setGraphic(new FontAwesomeIconView(de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon.TRASH));
+                btnRemove.setOnAction(e -> {
+                    AffectedItem item = getItem();
+                    if (item != null) {
+                        affectedIds.remove(item.id);
+                        updateAffectedList();
+                    }
+                });
+                container.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+            }
+
+            @Override
+            protected void updateItem(AffectedItem item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setGraphic(null);
+                } else {
+                    lbl.setText(item.label);
+                    setGraphic(container);
+                }
+            }
+        });
     }
 
     public void setPromotion(Promotion p) {
@@ -133,7 +189,7 @@ public class PromotionFormController implements Injectable {
     }
 
     private void updateAffectedList() {
-        ObservableList<String> items = FXCollections.observableArrayList();
+        ObservableList<AffectedItem> items = FXCollections.observableArrayList();
         PromotionScope scope = cmbScope.getValue();
 
         try {
@@ -150,7 +206,7 @@ public class PromotionFormController implements Injectable {
                     if (c != null)
                         label = c.getName();
                 }
-                items.add(label);
+                items.add(new AffectedItem(id, label));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -199,7 +255,11 @@ public class PromotionFormController implements Injectable {
                 promotion = new Promotion();
             promotion.setName(txtName.getText());
             promotion.setType(cmbType.getValue());
-            promotion.setValue(Double.parseDouble(txtValue.getText()));
+            double val = 0.0;
+            if (cmbType.getValue() != PromotionType.VOLUME_DISCOUNT) {
+                try { val = Double.parseDouble(txtValue.getText()); } catch (Exception e) {}
+            }
+            promotion.setValue(val);
             promotion.setScope(cmbScope.getValue());
 
             int buy = 0;
@@ -234,10 +294,12 @@ public class PromotionFormController implements Injectable {
             return false;
         if (cmbScope.getValue() == null)
             return false;
-        try {
-            Double.parseDouble(txtValue.getText());
-        } catch (Exception e) {
-            return false;
+        if (cmbType.getValue() != PromotionType.VOLUME_DISCOUNT) {
+            try {
+                Double.parseDouble(txtValue.getText());
+            } catch (Exception e) {
+                return false;
+            }
         }
         return true;
     }
@@ -252,5 +314,67 @@ public class PromotionFormController implements Injectable {
 
     public Promotion getPromotion() {
         return promotion;
+    }
+
+    private void updateSuggestions(String query) {
+        searchContextMenu.hide(); // Ocultar para actualizar items
+        searchContextMenu.getItems().clear();
+        PromotionScope scope = cmbScope.getValue();
+        if (scope == PromotionScope.GLOBAL) return;
+
+        try {
+            java.nio.file.Files.writeString(
+                java.nio.file.Path.of(System.getProperty("java.io.tmpdir"), "search_log.txt"),
+                "Query: " + query + " | Scope: " + scope + "\n",
+                java.nio.file.StandardOpenOption.CREATE, java.nio.file.StandardOpenOption.APPEND
+            );
+
+            if (scope == PromotionScope.PRODUCT) {
+                List<Product> matches = productUseCase.getVisibleProducts(-1).stream()
+                        .filter(p -> p.getName().toLowerCase().contains(query.toLowerCase()))
+                        .limit(8)
+                        .collect(java.util.stream.Collectors.toList());
+
+                for (Product p : matches) {
+                    MenuItem item = new MenuItem(p.getName());
+                    item.setOnAction(e -> {
+                        affectedIds.add(p.getId());
+                        updateAffectedList();
+                        txtAffectedSearch.clear();
+                        searchContextMenu.hide();
+                    });
+                    searchContextMenu.getItems().add(item);
+                }
+            } else if (scope == PromotionScope.CATEGORY) {
+                List<Category> matches = categoryUseCase.getAll().stream()
+                        .filter(c -> c.getName().toLowerCase().contains(query.toLowerCase()))
+                        .limit(8)
+                        .collect(java.util.stream.Collectors.toList());
+
+                for (Category c : matches) {
+                    MenuItem item = new MenuItem(c.getName());
+                    item.setOnAction(e -> {
+                        affectedIds.add(c.getId());
+                        updateAffectedList();
+                        txtAffectedSearch.clear();
+                        searchContextMenu.hide();
+                    });
+                    searchContextMenu.getItems().add(item);
+                }
+            }
+
+            if (!searchContextMenu.getItems().isEmpty()) {
+                searchContextMenu.show(txtAffectedSearch, javafx.geometry.Side.BOTTOM, 0, 0);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static class AffectedItem {
+        int id;
+        String label;
+        AffectedItem(int id, String l) { this.id = id; this.label = l; }
+        @Override public String toString() { return label; }
     }
 }

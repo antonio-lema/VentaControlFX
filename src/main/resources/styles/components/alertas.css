@@ -31,7 +31,7 @@
 }
 
 .modern-table .column-header {
-    -fx-background-color: #f1f5f9;
+    -fx-background-color: -fx-color-border-light;
     -fx-font-weight: bold;
 }
 

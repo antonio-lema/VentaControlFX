@@ -68,7 +68,13 @@ public class SellViewController implements Injectable, CategoryMenuRenderer.Cate
                 null,
                 config.getTaxRate(),
                 config.isPricesIncludeTax(),
-                container.getCartUseCase()::addItem);
+                p -> {
+                    try {
+                        container.getCartUseCase().addItem(p);
+                    } catch (IllegalArgumentException ex) {
+                        com.mycompany.ventacontrolfx.util.AlertUtil.showWarning("Stock Insuficiente", ex.getMessage());
+                    }
+                });
 
         setupPriceListSelector();
         setupCategorySelector();

@@ -10,17 +10,17 @@
    TARJETAS DE ESTADÍSTICAS (stat-card)
    ========================================= */
 .stat-card {
-    -fx-background-color: white;
+    -fx-background-color: -fx-bg-surface;
     -fx-background-radius: -fx-radius-lg;
     -fx-padding: 18 22;
-    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.06), 8, 0, 0, 2);
-    -fx-border-color: #f1f5f9;
+    -fx-effect: dropshadow(three-pass-box, -fx-shadow-color-subtle, 8, 0, 0, 2);
+    -fx-border-color: -fx-color-border-light;
     -fx-border-width: 1;
     -fx-border-radius: -fx-radius-lg;
 }
 
 .stat-card:hover {
-    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.12), 12, 0, 0, 4);
+    -fx-effect: dropshadow(three-pass-box, -fx-shadow-color-medium, 12, 0, 0, 4);
     -fx-translate-y: -3;
 }
 
@@ -55,9 +55,9 @@
 
 .stat-icon-bg {
     -fx-background-radius: -fx-radius-md;
-    -fx-padding: 10;
-    -fx-min-width: 48;
-    -fx-min-height: 48;
+    -fx-padding: 10px;
+    -fx-min-width: 48px;
+    -fx-min-height: 48px;
     -fx-alignment: CENTER;
 }
 
@@ -92,7 +92,7 @@
 }
 
 .stat-value {
-    -fx-text-fill: #1e293b;
+    -fx-text-fill: -fx-text-custom-main;
     -fx-font-size: 28px;
     -fx-font-weight: bold;
     -fx-padding: 5 0 0 0;
@@ -120,11 +120,11 @@
    FILTROS / FILTER CARD
    ========================================= */
 .filter-card {
-    -fx-background-color: white;
+    -fx-background-color: -fx-bg-surface;
     -fx-background-radius: -fx-radius-lg;
     -fx-padding: 12 20;
-    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.06), 8, 0, 0, 2);
-    -fx-border-color: #f1f5f9;
+    -fx-effect: dropshadow(three-pass-box, -fx-shadow-color-subtle, 8, 0, 0, 2);
+    -fx-border-color: -fx-color-border-light;
     -fx-border-width: 1;
     -fx-border-radius: -fx-radius-lg;
     -fx-spacing: 12;
@@ -133,7 +133,7 @@
 .filter-label-cap {
     -fx-font-size: 9px;
     -fx-font-weight: bold;
-    -fx-text-fill: #64748b;
+    -fx-text-fill: -fx-text-custom-light;
     -fx-text-transform: uppercase;
 }
 
@@ -145,16 +145,16 @@
 .filter-search-field {
     -fx-background-color: transparent;
     -fx-border-color: transparent;
-    -fx-text-fill: #1e293b;
+    -fx-text-fill: -fx-text-custom-main;
 }
 
 /* =========================================
    QUICK FILTER BUTTONS
    ========================================= */
 .quick-filter-btn {
-    -fx-background-color: white;
-    -fx-text-fill: #334155;
-    -fx-border-color: #f1f5f9;
+    -fx-background-color: -fx-bg-surface;
+    -fx-text-fill: -fx-text-custom-main;
+    -fx-border-color: -fx-color-border-light;
     -fx-border-width: 1;
     -fx-border-radius: -fx-radius-xl;
     -fx-background-radius: -fx-radius-xl;
@@ -181,10 +181,10 @@
    PANEL DETALLE DE VENTA
    ========================================= */
 .detail-panel {
-    -fx-background-color: white;
+    -fx-background-color: -fx-bg-surface;
     -fx-background-radius: -fx-radius-lg;
-    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.12), 12, 0, 0, 4);
-    -fx-border-color: #f1f5f9;
+    -fx-effect: dropshadow(three-pass-box, -fx-shadow-color-medium, 12, 0, 0, 4);
+    -fx-border-color: -fx-color-border-light;
     -fx-border-width: 1;
     -fx-border-radius: -fx-radius-lg;
 }
@@ -201,19 +201,19 @@
 .detail-sale-id {
     -fx-font-size: 22px;
     -fx-font-weight: bold;
-    -fx-text-fill: #1e293b;
+    -fx-text-fill: -fx-text-custom-main;
 }
 
 .detail-info-value {
     -fx-font-weight: bold;
     -fx-font-size: 13px;
-    -fx-text-fill: #1e293b;
+    -fx-text-fill: -fx-text-custom-main;
 }
 
 .detail-total-label {
     -fx-font-weight: bold;
     -fx-font-size: 16px;
-    -fx-text-fill: #1e293b;
+    -fx-text-fill: -fx-text-custom-main;
 }
 
 .detail-total-value {
@@ -288,8 +288,8 @@
 }
 
 .btn-warning:disabled {
-    -fx-background-color: #f8fafc;
-    -fx-text-fill: #64748b;
+    -fx-background-color: -fx-bg-main;
+    -fx-text-fill: -fx-text-custom-light;
     -fx-opacity: 0.6;
     -fx-effect: none;
 }
@@ -298,38 +298,38 @@
    LABELS REUTILIZABLES
    ========================================= */
 .label-muted {
-    -fx-text-fill: #64748b;
+    -fx-text-fill: -fx-text-custom-light;
 }
 
 .section-title {
     -fx-font-size: 26px;
     -fx-font-weight: bold;
-    -fx-text-fill: #1e293b;
+    -fx-text-fill: -fx-text-custom-main;
 }
 
 .section-subtitle {
     -fx-font-size: 13px;
-    -fx-text-fill: #64748b;
+    -fx-text-fill: -fx-text-custom-light;
 }
 
 /* =========================================
    SEARCH BAR (reutilizada en tablas)
    ========================================= */
 .search-bar {
-    -fx-background-color: white;
+    -fx-background-color: -fx-bg-surface;
     -fx-background-radius: -fx-radius-md;
-    -fx-padding: 8 14;
-    -fx-border-color: rgba(0, 0, 0, 0.04);
-    -fx-border-width: 1;
+    -fx-padding: 8px 14px;
+    -fx-border-color: -fx-color-border-subtle;
+    -fx-border-width: 1px;
     -fx-border-radius: -fx-radius-md;
-    -fx-spacing: 8;
+    -fx-spacing: 8px;
 }
 
 .search-field {
     -fx-background-color: transparent;
     -fx-border-color: transparent;
-    -fx-text-fill: #1e293b;
-    -fx-prompt-text-fill: #64748b;
+    -fx-text-fill: -fx-text-custom-main;
+    -fx-prompt-text-fill: -fx-text-custom-light;
     -fx-padding: 0;
 }
 
@@ -337,11 +337,11 @@
    CIERRE DE CAJA
    ========================================= */
 .detail-panel-header {
-    -fx-background-color: white;
+    -fx-background-color: -fx-bg-surface;
     -fx-padding: 20 25;
-    -fx-border-color: rgba(0, 0, 0, 0.04);
+    -fx-border-color: -fx-color-border-subtle;
     -fx-border-width: 0 0 1 0;
-    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.06), 8, 0, 0, 2);
+    -fx-effect: dropshadow(three-pass-box, -fx-shadow-color-subtle, 8, 0, 0, 2);
 }
 
 .closure-user-label {
@@ -351,10 +351,10 @@
 }
 
 .closure-amount-row {
-    -fx-background-color: white;
+    -fx-background-color: -fx-bg-surface;
     -fx-padding: 15;
     -fx-background-radius: -fx-radius-lg;
-    -fx-border-color: rgba(0, 0, 0, 0.04);
+    -fx-border-color: -fx-color-border-subtle;
     -fx-border-width: 1;
     -fx-border-radius: -fx-radius-lg;
 }
@@ -386,7 +386,7 @@
 .closure-stat-value {
     -fx-font-weight: bold;
     -fx-font-size: 14px;
-    -fx-text-fill: #1e293b;
+    -fx-text-fill: -fx-text-custom-main;
 }
 
 .closure-status-pending {
@@ -413,7 +413,7 @@
     -fx-padding: 12 24;
     -fx-background-radius: -fx-radius-md;
     -fx-cursor: hand;
-    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.06), 8, 0, 0, 2);
+    -fx-effect: dropshadow(three-pass-box, -fx-shadow-color-subtle, 8, 0, 0, 2);
     -fx-graphic-text-gap: 10px;
 }
 
@@ -454,9 +454,9 @@
 }
 
 .btn-history-close {
-    -fx-background-color: #f8fafc;
-    -fx-text-fill: #475569;
-    -fx-border-color: #e2e8f0;
+    -fx-background-color: -fx-bg-main;
+    -fx-text-fill: -fx-text-custom-light;
+    -fx-border-color: -fx-color-border-main;
     -fx-border-width: 1px;
     -fx-border-radius: -fx-radius-md;
     -fx-background-radius: -fx-radius-md;
@@ -467,7 +467,7 @@
 }
 
 .btn-history-close:hover {
-    -fx-background-color: rgba(0, 0, 0, 0.04);
-    -fx-text-fill: #1e293b;
+    -fx-background-color: -fx-color-border-subtle;
+    -fx-text-fill: -fx-text-custom-main;
     -fx-border-color: #475569;
 }

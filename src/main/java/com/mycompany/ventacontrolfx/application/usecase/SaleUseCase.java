@@ -150,22 +150,31 @@ public class SaleUseCase {
             details.add(d);
         }
 
-        // Total auto-discount already calculated at the beginning of the method
+        // Calcular el ahorro bruto (con impuestos) para guardarlo en discount_amount
+        double grossSavingsTotal = 0.0;
+        for (CartItem item : cartItems) {
+            double lineDiscount = promoResult.getItemDiscounts().getOrDefault(item.getProduct().getId(), 0.0);
+            double taxRate = item.getProduct().resolveEffectiveIva(config.getTaxRate());
+            double taxMultiplier = isInclusive ? 1.0 : (1.0 + (taxRate / 100.0));
+            grossSavingsTotal += lineDiscount * taxMultiplier;
+        }
+        double globalDiscount = promoResult.getItemDiscounts().getOrDefault(-1, 0.0);
+        grossSavingsTotal += globalDiscount;
 
         double finalTotalTax = calculatedTotalIva;
-        double finalTotalNet = total - finalTotalTax;
+        double finalTotalNet = (total - discountAmount) - finalTotalTax;
 
         Sale sale = new Sale();
         sale.setSaleDateTime(LocalDateTime.now());
         sale.setUserId(userId);
         sale.setClientId(clientId);
-        sale.setTotal(total - autoDiscount - discountAmount); // Descuento total = Auto + Manual
+        sale.setTotal(total - discountAmount); // Descuento total = Auto (ya en total) + Manual
         sale.setPaymentMethod(paymentMethod);
         sale.setIva(calculatedTotalIva);
         sale.setTotalNet(finalTotalNet);
         sale.setTotalTax(finalTotalTax);
         sale.setCustomerNameSnapshot(client != null ? client.getName() : "Consumidor Final");
-        sale.setDiscountAmount(autoDiscount + discountAmount);
+        sale.setDiscountAmount(grossSavingsTotal + discountAmount);
         sale.setDiscountReason(((discountReason != null ? discountReason : "") + " "
                 + String.join(", ", promoResult.getAppliedPromos())).trim());
         sale.setReturn(false);

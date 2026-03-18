@@ -92,33 +92,84 @@
     -fx-shadow-color-medium: rgba(0, 0, 0, 0.08);
     -fx-shadow-color-large: rgba(0, 0, 0, 0.12);
     -fx-shadow-color-primary: rgba(30, 136, 229, 0.25);
+
+    /* --- SHADOW TOKENS (Actual Effects) --- */
+    -fx-shadow-soft: dropshadow(three-pass-box, -fx-shadow-color-subtle, 10, 0, 0, 2);
+    -fx-shadow-medium: dropshadow(three-pass-box, -fx-shadow-color-medium, 12, 0, 0, 4);
+    -fx-shadow-large: dropshadow(three-pass-box, -fx-shadow-color-large, 20, 0, 0, 8);
+    -fx-shadow-primary: dropshadow(three-pass-box, -fx-shadow-color-primary, 15, 0, 0, 5);
+    -fx-shadow-premium-sm: dropshadow(three-pass-box, rgba(0, 0, 0, 0.06), 10, 0, 0, 2);
+    -fx-shadow-premium-lg: dropshadow(three-pass-box, rgba(0, 0, 0, 0.1), 30, 0, 0, 10);
+
+    /* --- COLOR ALIASES (For shorthand usage) --- */
+    -color-primary: -fx-custom-color-primary;
+    -color-success: -fx-custom-color-success;
+    -color-danger: -fx-custom-color-danger;
+    -color-warning: -fx-custom-color-warning;
+
+    /* --- TEXT CUSTOM TOKENS --- */
+    -fx-text-custom-cards: -fx-text-custom-main;
+    -fx-text-custom-cards-muted: -fx-text-custom-muted;
+    -fx-text-custom-price: -fx-custom-color-primary;
 }
 
 .dark-theme {
-    /* Fondos Oscuros */
-    -fx-bg-main: #020617;
-    -fx-bg-surface: #0f172a;
-    -fx-bg-sidebar: #020617;
-    -fx-bg-topbar: #0f172a;
-    -fx-bg-subtle: #1e293b;
-    -fx-bg-input: #020617;
+    /* Fondos Oscuros Premium (Zinc / Black) */
+    -fx-bg-main: #09090b;
+    -fx-bg-surface: #121216;
+    -fx-bg-sidebar: #09090b;
+    -fx-bg-topbar: #121216;
+    -fx-bg-subtle: #18181b;
+    -fx-bg-input: #040406;
 
-    /* Texto Oscuro */
-    -fx-text-custom-main: #f8fafc;
-    -fx-text-custom-medium: #cbd5e1;
-    -fx-text-custom-light: #94a3b8;
-    -fx-text-custom-muted: #64748b;
+    /* Texto Oscuro Seda */
+    -fx-text-custom-main: #fafafa;
+    -fx-text-custom-medium: #e4e4e7;
+    -fx-text-custom-light: #a1a1aa;
+    -fx-text-custom-muted: #71717a;
 
     /* Bordes Oscuros */
-    -fx-color-border-main: #1e293b;
-    -fx-color-border-light: #0f172a;
-    -fx-color-border-subtle: rgba(255, 255, 255, 0.05);
+    -fx-color-border-main: #27272a;
+    -fx-color-border-light: #18181b;
+    -fx-color-border-subtle: rgba(255, 255, 255, 0.04);
 
-    -fx-custom-color-purple: #bb86fc;
-    -fx-custom-color-teal: #03dac6;
+    /* Acentos (Indigo/Purple) */
+    -fx-custom-color-primary: #6366f1;
+    -fx-custom-color-primary-dark: #4746e5;
+    -fx-custom-color-primary-bg: rgba(99, 102, 241, 0.1);
 
-    -fx-shadow-color-subtle: rgba(0, 0, 0, 0.3);
-    -fx-shadow-color-medium: rgba(0, 0, 0, 0.5);
+    -fx-custom-color-purple: #a855f7;
+    -fx-custom-color-teal: #14b8a6;
+
+    /* Sombras más visibles para modo carbón */
+    -fx-shadow-color-subtle: rgba(0, 0, 0, 0.45);
+    -fx-shadow-color-medium: rgba(0, 0, 0, 0.65);
+
+    /* --- TEXT CUSTOM TOKENS (Dark Override) --- */
+    -fx-text-custom-cards: -fx-text-custom-main;
+    -fx-text-custom-cards-muted: -fx-text-custom-light;
+}
+
+/* --- OVERRIDES COMPONENTES ESTÁNDAR (MODENA) EN MODO OSCURO --- */
+.dark-theme .combo-box-popup .list-view,
+.dark-theme .context-menu {
+    -fx-background-color: -fx-bg-surface;
+    -fx-border-color: -fx-color-border-main;
+    -fx-border-width: 1.2;
+    -fx-background-radius: 8px;
+    -fx-border-radius: 8px;
+}
+
+.dark-theme .combo-box-popup .list-cell,
+.dark-theme .menu-item {
+    -fx-background-color: transparent;
+    -fx-text-fill: -fx-text-custom-main;
+}
+
+.dark-theme .combo-box-popup .list-cell:hover,
+.dark-theme .menu-item:hover,
+.dark-theme .menu-item:focused {
+    -fx-background-color: -fx-bg-subtle;
 }
 
 /* --- UTILS GLOBALES --- */

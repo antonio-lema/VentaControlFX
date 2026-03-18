@@ -2,6 +2,7 @@ package com.mycompany.ventacontrolfx.infrastructure.persistence;
 
 import com.mycompany.ventacontrolfx.domain.model.TaxGroup;
 import com.mycompany.ventacontrolfx.domain.model.TaxRate;
+import com.mycompany.ventacontrolfx.domain.model.TaxRevision;
 import com.mycompany.ventacontrolfx.domain.repository.ITaxRepository;
 
 import java.sql.*;
@@ -356,7 +357,7 @@ public class JdbcTaxRepository implements ITaxRepository {
                 "AND tr.valid_from <= CURRENT_TIMESTAMP " +
                 "AND (tr.valid_to IS NULL OR tr.valid_to > CURRENT_TIMESTAMP)), 0.0) " +
                 "WHERE c.tax_group_id IS NOT NULL";
- 
+
         // 2. Actualizar productos que tienen un grupo asignado directamente
         String sqlProductsWithGroup = "UPDATE products p SET " +
                 "p.iva = COALESCE((SELECT SUM(tr.rate) FROM tax_rates tr " +
@@ -373,7 +374,8 @@ public class JdbcTaxRepository implements ITaxRepository {
                 "AND (tr.valid_to IS NULL OR tr.valid_to > CURRENT_TIMESTAMP)), 0.0) " +
                 "WHERE p.tax_group_id IS NOT NULL";
 
-        // 3. Propagar IVA de categoría a productos que NO tienen grupo propio (Herencia)
+        // 3. Propagar IVA de categoría a productos que NO tienen grupo propio
+        // (Herencia)
         String sqlProductsInherited = "UPDATE products p " +
                 "JOIN categories c ON p.category_id = c.category_id " +
                 "SET p.iva = c.default_iva, p.tax_rate = c.tax_rate " +
@@ -394,5 +396,109 @@ public class JdbcTaxRepository implements ITaxRepository {
                 conn.setAutoCommit(true);
             }
         }
+    }
+
+    // =========================================================================
+    // TAX REVISIONS (HISTORY)
+    // =========================================================================
+
+    @Override
+    public List<TaxRevision> getTaxHistory(TaxRevision.Scope scope) throws SQLException {
+        String sql = "SELECT * FROM tax_revisions " +
+                (scope != null ? "WHERE scope = ? " : "") +
+                "ORDER BY start_date DESC";
+
+        List<TaxRevision> revisions = new ArrayList<>();
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+            if (scope != null) {
+                ps.setString(1, scope.name());
+            }
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    revisions.add(mapTaxRevision(rs));
+                }
+            }
+        }
+        return revisions;
+    }
+
+    @Override
+    public void saveTaxRevision(TaxRevision revision) throws SQLException {
+        // 1. Close the previous active revision for this target
+        closePreviousRevision(revision);
+
+        // 2. Insert the new revision
+        String sql = "INSERT INTO tax_revisions (product_id, category_id, scope, rate, label, start_date, reason) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?)";
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            if (revision.getProductId() != null)
+                ps.setInt(1, revision.getProductId());
+            else
+                ps.setNull(1, Types.INTEGER);
+
+            if (revision.getCategoryId() != null)
+                ps.setInt(2, revision.getCategoryId());
+            else
+                ps.setNull(2, Types.INTEGER);
+
+            ps.setString(3, revision.getScope().name());
+            ps.setDouble(4, revision.getRate());
+            ps.setString(5, revision.getLabel());
+            ps.setTimestamp(6, Timestamp.valueOf(revision.getStartDate()));
+            ps.setString(7, revision.getReason());
+
+            ps.executeUpdate();
+            try (ResultSet rs = ps.getGeneratedKeys()) {
+                if (rs.next()) {
+                    revision.setId(rs.getInt(1));
+                }
+            }
+        }
+    }
+
+    private void closePreviousRevision(TaxRevision newRevision) throws SQLException {
+        String sql = "UPDATE tax_revisions SET end_date = ? " +
+                "WHERE scope = ? AND end_date IS NULL ";
+
+        if (newRevision.getScope() == TaxRevision.Scope.PRODUCT) {
+            sql += "AND product_id = ?";
+        } else if (newRevision.getScope() == TaxRevision.Scope.CATEGORY) {
+            sql += "AND category_id = ?";
+        }
+
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setTimestamp(1, Timestamp.valueOf(newRevision.getStartDate()));
+            ps.setString(2, newRevision.getScope().name());
+
+            if (newRevision.getScope() == TaxRevision.Scope.PRODUCT) {
+                ps.setInt(3, newRevision.getProductId());
+            } else if (newRevision.getScope() == TaxRevision.Scope.CATEGORY) {
+                ps.setInt(3, newRevision.getCategoryId());
+            }
+
+            ps.executeUpdate();
+        }
+    }
+
+    private TaxRevision mapTaxRevision(ResultSet rs) throws SQLException {
+        TaxRevision r = new TaxRevision();
+        r.setId(rs.getInt("revision_id"));
+        r.setProductId(rs.getObject("product_id", Integer.class));
+        r.setCategoryId(rs.getObject("category_id", Integer.class));
+        r.setScope(TaxRevision.Scope.valueOf(rs.getString("scope")));
+        r.setRate(rs.getDouble("rate"));
+        r.setLabel(rs.getString("label"));
+        r.setStartDate(rs.getTimestamp("start_date").toLocalDateTime());
+
+        Timestamp et = rs.getTimestamp("end_date");
+        if (et != null) {
+            r.setEndDate(et.toLocalDateTime());
+        }
+
+        r.setReason(rs.getString("reason"));
+        return r;
     }
 }

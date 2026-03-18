@@ -41,6 +41,8 @@ public interface IProductRepository {
 
     void updateTaxGroupToAll(int taxGroupId) throws SQLException;
 
+    void updateTaxGroupForProducts(java.util.List<Integer> productIds, int taxGroupId) throws SQLException;
+
     int updateStock(int productId, int quantityDelta, java.sql.Connection conn) throws SQLException;
 
     java.util.List<Product> getLowStock() throws SQLException;

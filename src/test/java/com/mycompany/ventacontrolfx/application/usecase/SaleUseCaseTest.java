@@ -26,6 +26,7 @@ public class SaleUseCaseTest {
     private com.mycompany.ventacontrolfx.domain.repository.IClientRepository clientRepository;
     private com.mycompany.ventacontrolfx.application.service.PromotionService promotionService;
     private com.mycompany.ventacontrolfx.application.service.PromotionEngine promotionEngine;
+    private com.mycompany.ventacontrolfx.domain.repository.IProductRepository productRepository;
     private SaleUseCase saleUseCase;
 
     @BeforeEach
@@ -37,6 +38,7 @@ public class SaleUseCaseTest {
         clientRepository = mock(com.mycompany.ventacontrolfx.domain.repository.IClientRepository.class);
         promotionService = mock(com.mycompany.ventacontrolfx.application.service.PromotionService.class);
         promotionEngine = mock(com.mycompany.ventacontrolfx.application.service.PromotionEngine.class);
+        productRepository = mock(com.mycompany.ventacontrolfx.domain.repository.IProductRepository.class);
         when(promotionEngine.process(any()))
                 .thenReturn(new com.mycompany.ventacontrolfx.application.service.PromotionResult());
 
@@ -57,7 +59,7 @@ public class SaleUseCaseTest {
             }
         };
         saleUseCase = new SaleUseCase(saleRepository, configRepository, dummyAuth, taxEngineService, clientRepository,
-                promotionService, promotionEngine);
+                promotionService, promotionEngine, productRepository);
     }
 
     @Test

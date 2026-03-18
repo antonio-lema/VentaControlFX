@@ -271,6 +271,17 @@ public class CartUseCase {
     }
 
     public void addItem(Product product, int quantity) {
+        if (product.isManageStock()) {
+            Optional<CartItem> existingItem = cartItems.stream()
+                    .filter(item -> item.getProduct().getId() == product.getId())
+                    .findFirst();
+            int currentQty = existingItem.map(CartItem::getQuantity).orElse(0);
+            if (currentQty + quantity > product.getStockQuantity()) {
+                throw new IllegalArgumentException(
+                        "Stock insuficiente (" + product.getStockQuantity() + " disponibles)");
+            }
+        }
+
         Optional<CartItem> existingItem = cartItems.stream()
                 .filter(item -> item.getProduct().getId() == product.getId())
                 .findFirst();
@@ -317,6 +328,11 @@ public class CartUseCase {
             removeItem(product);
             return;
         }
+
+        if (product.isManageStock() && quantity > product.getStockQuantity()) {
+            throw new IllegalArgumentException("Stock insuficiente (" + product.getStockQuantity() + " disponibles)");
+        }
+
         cartItems.stream()
                 .filter(item -> item.getProduct().getId() == product.getId())
                 .findFirst()

@@ -44,6 +44,18 @@
                     </HBox>
                     <VBox styleClass="estetica-card-body" spacing="14">
                         <HBox spacing="12" alignment="CENTER_LEFT">
+                            <Button onAction="#applyPremiumDark" styleClass="palette-chip">
+                                <tooltip><Tooltip text="Dark Premium (Indigo)"/></tooltip>
+                                <graphic>
+                                    <VBox styleClass="palette-inner" style="-fx-background-color: #111116; -fx-background-radius: 10px;" spacing="6" alignment="CENTER">
+                                        <HBox spacing="5" alignment="CENTER">
+                                            <Region style="-fx-background-color: #6366f1; -fx-background-radius: 50; -fx-min-width: 18; -fx-min-height: 18;" styleClass="palette-preview-dot"/>
+                                            <Region style="-fx-background-color: #09090b; -fx-background-radius: 50; -fx-min-width: 18; -fx-min-height: 18;" styleClass="palette-preview-dot"/>
+                                        </HBox>
+                                        <Label text="Premium" styleClass="palette-name" style="-fx-text-fill: #e4e4e7;"/>
+                                    </VBox>
+                                </graphic>
+                            </Button>
                             <Button onAction="#applyClassicBlue" styleClass="palette-chip">
                                 <tooltip><Tooltip text="Clásico Azul"/></tooltip>
                                 <graphic>
@@ -221,32 +233,7 @@
                             </VBox>
                         </VBox>
 
-                        <!-- MODO TEMA -->
-                        <VBox styleClass="estetica-card">
-                            <HBox styleClass="estetica-card-header" alignment="CENTER_LEFT" spacing="12">
-                                <StackPane styleClass="estetica-card-icon-wrap, estetica-icon-green">
-                                    <FontAwesomeIconView glyphName="MOON_ALT" size="16" fill="#22c55e"/>
-                                </StackPane>
-                                <VBox>
-                                    <Label text="Modo de Color" styleClass="estetica-card-title"/>
-                                    <Label text="Elige entre claro u oscuro" styleClass="estetica-card-desc"/>
-                                </VBox>
-                            </HBox>
-                            <VBox styleClass="estetica-card-body" spacing="12">
-                                <HBox spacing="14" alignment="CENTER_LEFT">
-                                    <VBox fx:id="cardLightMode" styleClass="theme-option-card, selected" alignment="CENTER"
-                                          spacing="8" onMouseClicked="#selectLightMode" minWidth="110">
-                                        <FontAwesomeIconView glyphName="SUN_ALT" size="28" fill="#f59e0b"/>
-                                        <Label text="Modo Claro" styleClass="theme-option-label"/>
-                                    </VBox>
-                                    <VBox fx:id="cardDarkMode" styleClass="theme-option-card" alignment="CENTER"
-                                          spacing="8" onMouseClicked="#selectDarkMode" minWidth="110">
-                                        <FontAwesomeIconView glyphName="MOON_ALT" size="28" fill="#6366f1"/>
-                                        <Label text="Modo Oscuro" styleClass="theme-option-label"/>
-                                    </VBox>
-                                </HBox>
-                            </VBox>
-                        </VBox>
+
 
                     </VBox>
 

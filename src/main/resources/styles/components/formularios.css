@@ -7,22 +7,22 @@
 .combo-box,
 .modern-input-field,
 .modern-combo-box {
-    -fx-background-color: white;
-    -fx-border-color: rgba(0, 0, 0, 0.04);
+    -fx-background-color: -fx-bg-surface;
+    -fx-border-color: -fx-color-border-subtle;
     -fx-border-radius: 8px;
     -fx-background-radius: 8px;
-    -fx-text-fill: #1e293b;
+    -fx-text-fill: -fx-text-custom-main;
     -fx-padding: 12 15;
     -fx-font-size: 14px;
-    -fx-prompt-text-fill: #64748b;
+    -fx-prompt-text-fill: -fx-text-custom-light;
 }
 
 .text-field:focused,
 .modern-input-field:focused,
 .modern-combo-box:focused {
-    -fx-background-color: #ffffff;
+    -fx-background-color: -fx-bg-surface;
     -fx-border-color: #1e88e5;
-    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.06), 8, 0, 0, 2);
+    -fx-effect: dropshadow(three-pass-box, -fx-shadow-color-subtle, 8, 0, 0, 2);
     -fx-border-width: 1.5;
 }
 
@@ -31,19 +31,19 @@
 .modern-register-title {
     -fx-font-size: 26px;
     -fx-font-weight: 800;
-    -fx-text-fill: #1e293b;
+    -fx-text-fill: -fx-text-custom-main;
     -fx-padding: 0 0 5 0;
 }
 
 .section-subtitle,
 .modern-register-subtitle {
     -fx-font-size: 14px;
-    -fx-text-fill: #64748b;
+    -fx-text-fill: -fx-text-custom-light;
     -fx-padding: 0 0 20 0;
 }
 
 .label {
-    -fx-text-fill: #1e293b;
+    -fx-text-fill: -fx-text-custom-main;
     -fx-font-weight: 600;
 }
 
@@ -79,12 +79,12 @@
 
 /* Tarjeta principal del formulario */
 .modern-register-card {
-    -fx-background-color: white;
+    -fx-background-color: -fx-bg-surface;
     -fx-background-radius: 16px;
     -fx-border-radius: 16px;
-    -fx-border-color: rgba(0, 0, 0, 0.04);
+    -fx-border-color: -fx-color-border-subtle;
     -fx-border-width: 1px;
-    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.12), 20, 0, 0, 10);
+    -fx-effect: dropshadow(three-pass-box, -fx-shadow-color-medium, 20, 0, 0, 10);
 }
 
 /* Cabecera del formulario */
@@ -94,8 +94,8 @@
 
 /* Contenedor de cada campo con icono */
 .modern-input-container {
-    -fx-background-color: white;
-    -fx-border-color: #e2e8f0;
+    -fx-background-color: -fx-bg-surface;
+    -fx-border-color: -fx-color-border-main;
     -fx-border-width: 1.2;
     -fx-border-radius: 10px;
     -fx-background-radius: 10px;
@@ -105,8 +105,8 @@
 .modern-input-container:focused,
 .modern-input-container:focused-within {
     -fx-border-color: #1e88e5;
-    -fx-background-color: white;
-    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.06), 8, 0, 0, 2);
+    -fx-background-color: -fx-bg-surface;
+    -fx-effect: dropshadow(three-pass-box, -fx-shadow-color-subtle, 8, 0, 0, 2);
 }
 
 /* Campo dentro del contenedor: sin borde propio */
@@ -119,16 +119,29 @@
     -fx-border-radius: 0;
     -fx-padding: 6 8;
     -fx-font-size: 14px;
-    -fx-text-fill: #1e293b;
-    -fx-prompt-text-fill: #64748b;
+    -fx-text-fill: -fx-text-custom-main;
+    -fx-prompt-text-fill: -fx-text-custom-light;
     -fx-effect: null;
 }
 
+/* Fix para DatePicker dentro de contenedor con icono */
+.modern-input-container .modern-input-field>.button {
+    -fx-background-color: transparent;
+    -fx-border-width: 0;
+    -fx-cursor: hand;
+}
+
+.modern-input-container .modern-input-field>.button>.arrow {
+    -fx-background-color: #64748b;
+    /* Color de icono por defecto en contenedor */
+}
+
+
 /* Spinner Moderno */
 .modern-spinner {
-    -fx-background-color: white;
+    -fx-background-color: -fx-bg-surface;
     -fx-background-radius: 8px;
-    -fx-border-color: #e2e8f0;
+    -fx-border-color: -fx-color-border-main;
     -fx-border-width: 1px;
     -fx-border-radius: 8px;
 }
@@ -147,7 +160,7 @@
 
 .modern-spinner .increment-arrow-button:hover,
 .modern-spinner .decrement-arrow-button:hover {
-    -fx-background-color: #f8fafc;
+    -fx-background-color: -fx-bg-main;
 }
 
 /* ===== SECCIÓN DE PERMISOS ===== */
@@ -155,19 +168,19 @@
 .permission-section-title {
     -fx-font-size: 15px;
     -fx-font-weight: 700;
-    -fx-text-fill: #1e293b;
+    -fx-text-fill: -fx-text-custom-main;
 }
 
 .permission-section-subtitle {
     -fx-font-size: 12px;
-    -fx-text-fill: #64748b;
+    -fx-text-fill: -fx-text-custom-light;
     -fx-padding: 0 0 4 0;
 }
 
 /* Caja que envuelve los checkboxes */
 .permissions-box {
-    -fx-background-color: white;
-    -fx-border-color: #e2e8f0;
+    -fx-background-color: -fx-bg-surface;
+    -fx-border-color: -fx-color-border-main;
     -fx-border-width: 1.2;
     -fx-border-radius: 12px;
     -fx-background-radius: 12px;
@@ -176,7 +189,7 @@
 /* Cada checkbox de permiso */
 .permission-checkbox {
     -fx-font-size: 13px;
-    -fx-text-fill: #1e293b;
+    -fx-text-fill: -fx-text-custom-main;
     -fx-cursor: hand;
     -fx-padding: 4 0;
 }
@@ -187,8 +200,8 @@
 }
 
 .permission-checkbox .box {
-    -fx-background-color: #ffffff;
-    -fx-border-color: #e2e8f0;
+    -fx-background-color: -fx-bg-surface;
+    -fx-border-color: -fx-color-border-main;
     -fx-border-radius: 4px;
     -fx-background-radius: 4px;
     -fx-padding: 3;
@@ -200,11 +213,119 @@
 }
 
 .permission-checkbox:selected .mark {
-    -fx-background-color: white;
+    -fx-background-color: -fx-bg-surface;
     -fx-shape: "M 0,5 L 3,8 L 8,0";
 }
 
 .permission-checkbox:hover .box {
     -fx-border-color: #1e88e5;
     -fx-effect: dropshadow(three-pass-box, rgba(30, 136, 229, 0.15), 4, 0, 0, 1);
+}
+
+/* ===== MODERN DATEPICKER ===== */
+
+.modern-datepicker {
+    -fx-background-color: -fx-bg-surface;
+    -fx-border-color: -fx-color-border-subtle;
+    -fx-border-width: 1px;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+}
+
+.modern-datepicker:focused,
+.modern-datepicker:focused-within {
+    -fx-border-color: #1e88e5;
+    -fx-effect: dropshadow(three-pass-box, -fx-shadow-color-subtle, 8, 0, 0, 2);
+    -fx-border-width: 1.5px;
+}
+
+.modern-datepicker>.text-field {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-border-width: 0;
+    -fx-padding: 12 10 12 15;
+    -fx-background-radius: 0;
+    -fx-border-radius: 0;
+    -fx-text-fill: -fx-text-custom-main;
+    -fx-prompt-text-fill: -fx-text-custom-light;
+    -fx-effect: null;
+}
+
+.modern-datepicker>.button {
+    -fx-background-color: transparent;
+    -fx-padding: 0 15 0 5;
+    -fx-cursor: hand;
+}
+
+.modern-datepicker>.button>.arrow {
+    -fx-background-color: -fx-text-custom-light;
+}
+
+.modern-datepicker:focused-within>.button>.arrow {
+    -fx-background-color: #1e88e5;
+}
+
+/* ===== POPUP CALENDAR GLOBALES ===== */
+
+.date-picker-popup {
+    -fx-background-color: -fx-bg-surface;
+    -fx-border-color: -fx-color-border-subtle;
+    -fx-border-width: 1.2px;
+    -fx-border-radius: 12px;
+    -fx-background-radius: 12px;
+    -fx-effect: dropshadow(three-pass-box, -fx-shadow-color-large, 20, 0, 0, 8);
+    -fx-padding: 12px;
+}
+
+.date-picker-popup>.calendar-header {
+    -fx-background-color: transparent;
+    -fx-padding: 5 0 12 0;
+}
+
+.date-picker-popup>.calendar-header>.left-arrow-button,
+.date-picker-popup>.calendar-header>.right-arrow-button {
+    -fx-background-color: transparent;
+}
+
+.date-picker-popup>.calendar-header>.left-arrow-button:hover,
+.date-picker-popup>.calendar-header>.right-arrow-button:hover {
+    -fx-background-color: -fx-bg-subtle;
+}
+
+.date-picker-popup>.calendar-header>.label {
+    -fx-text-fill: -fx-text-custom-main;
+    -fx-font-weight: 700;
+}
+
+.date-picker-popup>.calendar-grid {
+    -fx-background-color: transparent;
+}
+
+.date-picker-popup>.calendar-grid>.day-cell {
+    -fx-background-color: transparent;
+    -fx-text-fill: -fx-text-custom-main;
+    -fx-padding: 8px;
+    -fx-alignment: center;
+    -fx-background-radius: 6px;
+    -fx-cursor: hand;
+}
+
+.date-picker-popup>.calendar-grid>.day-cell:hover {
+    -fx-background-color: -fx-custom-color-primary-hover;
+}
+
+.date-picker-popup>.calendar-grid>.today {
+    -fx-border-color: -fx-custom-color-primary;
+    -fx-border-width: 1.5px;
+    -fx-border-radius: 6px;
+}
+
+.date-picker-popup>.calendar-grid>.selected {
+    -fx-background-color: -fx-custom-color-primary;
+    -fx-text-fill: white;
+}
+
+.date-picker-popup>.calendar-grid>.previous-month,
+.date-picker-popup>.calendar-grid>.next-month {
+    -fx-text-fill: -fx-text-custom-muted;
 }

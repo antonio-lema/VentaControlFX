@@ -163,7 +163,7 @@ public class ServiceContainer {
         this.getSaleTicketUseCase = new GetSaleTicketUseCase(saleRepository);
         this.restoreSuspendedCartUseCase = new RestoreSuspendedCartUseCase(
                 suspendedCartRepository, productRepository, clientRepository, cartUseCase);
-        this.taxManagementUseCase = new TaxManagementUseCase(taxRepository, authService);
+        this.taxManagementUseCase = new TaxManagementUseCase(taxRepository, productRepository, authService);
         this.promotionUseCase = new PromotionUseCase(promotionRepository);
 
         // 4. Domain Services
@@ -339,5 +339,9 @@ public class ServiceContainer {
 
     public PromotionEngine getPromotionEngine() {
         return promotionEngine;
+    }
+
+    public IProductRepository getProductRepository() {
+        return productRepository;
     }
 }

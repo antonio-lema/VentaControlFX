@@ -3,13 +3,13 @@
  */
 
 .payment-root {
-    -fx-background-color: #f1f5f9;
+    -fx-background-color: -fx-color-border-light;
 }
 
 .payment-header {
     -fx-background-color: -fx-grad-primary;
     -fx-padding: 30;
-    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.12), 12, 0, 0, 4);
+    -fx-effect: dropshadow(three-pass-box, -fx-shadow-color-medium, 12, 0, 0, 4);
 }
 
 .payment-header-title {
@@ -30,12 +30,12 @@
 
 /* Tarjetas de método de pago */
 .payment-method-card {
-    -fx-background-color: #ffffff;
+    -fx-background-color: -fx-bg-surface;
     -fx-background-radius: 8px;
     -fx-border-radius: 8px;
-    -fx-border-color: #e2e8f0;
+    -fx-border-color: -fx-color-border-main;
     -fx-border-width: 1.5;
-    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.06), 8, 0, 0, 2);
+    -fx-effect: dropshadow(three-pass-box, -fx-shadow-color-subtle, 8, 0, 0, 2);
     -fx-transition: all 0.3s;
 }
 
@@ -46,21 +46,21 @@
 
 .payment-method-header {
     -fx-padding: 15 20;
-    -fx-border-color: rgba(0, 0, 0, 0.04);
+    -fx-border-color: -fx-color-border-subtle;
     -fx-border-width: 0 0 1 0;
 }
 
 .payment-method-label {
     -fx-font-size: 18px;
     -fx-font-weight: bold;
-    -fx-text-fill: #1e293b;
+    -fx-text-fill: -fx-text-custom-main;
 }
 
 /* Botones de acción rápida de dinero */
 .payment-body .grid-pane .button {
-    -fx-background-color: #f8fafc;
-    -fx-text-fill: #1e293b;
-    -fx-border-color: #e2e8f0;
+    -fx-background-color: -fx-bg-main;
+    -fx-text-fill: -fx-text-custom-main;
+    -fx-border-color: -fx-color-border-main;
     -fx-border-width: 1;
     -fx-background-radius: 4px;
     -fx-padding: 10;
@@ -111,7 +111,7 @@
     /* Padding reducido para evitar "2..." */
     -fx-font-size: 14px;
     -fx-min-height: 45px;
-    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.06), 8, 0, 0, 2);
+    -fx-effect: dropshadow(three-pass-box, -fx-shadow-color-subtle, 8, 0, 0, 2);
 }
 
 .payment-body .btn-primary:hover {
@@ -124,8 +124,8 @@
 .payment-method-btn {
     -fx-padding: 22;
     -fx-cursor: hand;
-    -fx-background-color: #ffffff;
-    -fx-border-color: #e2e8f0;
+    -fx-background-color: -fx-bg-surface;
+    -fx-border-color: -fx-color-border-main;
     -fx-border-width: 1.5;
     -fx-border-radius: 8px;
     -fx-background-radius: 8px;
@@ -135,7 +135,7 @@
     -fx-border-color: -fx-custom-color-primary;
     -fx-background-color: -fx-custom-color-primary-bg;
     -fx-translate-y: -3;
-    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.12), 12, 0, 0, 4);
+    -fx-effect: dropshadow(three-pass-box, -fx-shadow-color-medium, 12, 0, 0, 4);
 }
 
 /* Campos de entrada */
@@ -152,8 +152,8 @@
 
 .payment-footer {
     -fx-padding: 20 30;
-    -fx-background-color: #ffffff;
-    -fx-border-color: rgba(0, 0, 0, 0.04);
+    -fx-background-color: -fx-bg-surface;
+    -fx-border-color: -fx-color-border-subtle;
     -fx-border-width: 1 0 0 0;
 }
 
@@ -164,4 +164,17 @@
     -fx-padding: 5 12;
     -fx-background-radius: 20;
     -fx-font-weight: bold;
+}
+
+/* Icon Utilities */
+.icon-white {
+    -fx-fill: white !important;
+}
+
+.icon-primary {
+    -fx-fill: -fx-custom-color-primary !important;
+}
+
+.icon-muted {
+    -fx-fill: -fx-text-custom-cards-muted !important;
 }

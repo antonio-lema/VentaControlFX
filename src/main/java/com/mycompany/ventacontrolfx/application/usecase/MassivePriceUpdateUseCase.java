@@ -41,11 +41,12 @@ public class MassivePriceUpdateUseCase {
      * @param reason      Motivo del cambio (para trazabilidad en base de datos).
      * @return Número de productos actualizados.
      */
-    public int applyPercentageIncreaseToAll(int priceListId, double percentage, String reason)
+    public int applyPercentageIncreaseToAll(int priceListId, double percentage, String reason,
+            java.time.LocalDateTime startDate)
             throws SQLException {
         validatePercentage(percentage);
         double multiplier = 1.0 + (percentage / 100.0);
-        int updated = priceRepository.applyBulkMultiplier(priceListId, null, multiplier, reason);
+        int updated = priceRepository.applyBulkMultiplier(priceListId, null, multiplier, reason, startDate);
         saveLog("percentage", "Todos los Artículos", percentage, updated, null, reason);
         return updated;
     }
@@ -61,10 +62,10 @@ public class MassivePriceUpdateUseCase {
      * @return Número de productos actualizados.
      */
     public int applyPercentageIncreaseToCategory(int priceListId, int categoryId,
-            double percentage, String reason) throws SQLException {
+            double percentage, String reason, java.time.LocalDateTime startDate) throws SQLException {
         validatePercentage(percentage);
         double multiplier = 1.0 + (percentage / 100.0);
-        int updated = priceRepository.applyBulkMultiplier(priceListId, categoryId, multiplier, reason);
+        int updated = priceRepository.applyBulkMultiplier(priceListId, categoryId, multiplier, reason, startDate);
         saveLog("percentage", "Por Categoría", percentage, updated, categoryId, reason);
         return updated;
     }
@@ -72,10 +73,11 @@ public class MassivePriceUpdateUseCase {
     /**
      * Aplica una subida (o bajada) por importe fijo a TODOS los productos.
      */
-    public int applyFixedAmountIncreaseToAll(int priceListId, double amount, String reason)
+    public int applyFixedAmountIncreaseToAll(int priceListId, double amount, String reason,
+            java.time.LocalDateTime startDate)
             throws SQLException {
         validateAmount(amount);
-        int updated = priceRepository.applyBulkFixedAmount(priceListId, null, amount, reason);
+        int updated = priceRepository.applyBulkFixedAmount(priceListId, null, amount, reason, startDate);
         saveLog("fixed_amount", "Todos los Artículos", amount, updated, null, reason);
         return updated;
     }
@@ -84,9 +86,9 @@ public class MassivePriceUpdateUseCase {
      * Aplica una subida (o bajada) por importe fijo a una categoría.
      */
     public int applyFixedAmountIncreaseToCategory(int priceListId, int categoryId,
-            double amount, String reason) throws SQLException {
+            double amount, String reason, java.time.LocalDateTime startDate) throws SQLException {
         validateAmount(amount);
-        int updated = priceRepository.applyBulkFixedAmount(priceListId, categoryId, amount, reason);
+        int updated = priceRepository.applyBulkFixedAmount(priceListId, categoryId, amount, reason, startDate);
         saveLog("fixed_amount", "Por Categoría", amount, updated, categoryId, reason);
         return updated;
     }
@@ -94,8 +96,9 @@ public class MassivePriceUpdateUseCase {
     /**
      * Redondea precios masivamente a un decimal objetivo (ej: .99).
      */
-    public int applyRoundingToAll(int priceListId, double targetDecimal, String reason) throws SQLException {
-        int updated = priceRepository.applyBulkRounding(priceListId, null, targetDecimal, reason);
+    public int applyRoundingToAll(int priceListId, double targetDecimal, String reason,
+            java.time.LocalDateTime startDate) throws SQLException {
+        int updated = priceRepository.applyBulkRounding(priceListId, null, targetDecimal, reason, startDate);
         saveLog("rounding", "Todos los Artículos", targetDecimal, updated, null, reason);
         return updated;
     }
@@ -103,9 +106,10 @@ public class MassivePriceUpdateUseCase {
     /**
      * Redondea precios de una categoría a un decimal objetivo (ej: .99).
      */
-    public int applyRoundingToCategory(int priceListId, int categoryId, double targetDecimal, String reason)
+    public int applyRoundingToCategory(int priceListId, int categoryId, double targetDecimal, String reason,
+            java.time.LocalDateTime startDate)
             throws SQLException {
-        int updated = priceRepository.applyBulkRounding(priceListId, categoryId, targetDecimal, reason);
+        int updated = priceRepository.applyBulkRounding(priceListId, categoryId, targetDecimal, reason, startDate);
         return updated;
     }
 
@@ -113,7 +117,7 @@ public class MassivePriceUpdateUseCase {
      * Aplica un ajuste (porcentual o fijo) a los N artículos más vendidos.
      */
     public int applyToTopSellers(int priceListId, int topN, int daysBack, double value, String reason,
-            boolean isPercentage)
+            boolean isPercentage, java.time.LocalDateTime startDate)
             throws SQLException {
         if (isPercentage)
             validatePercentage(value);
@@ -126,7 +130,7 @@ public class MassivePriceUpdateUseCase {
 
         double repoValue = isPercentage ? (1.0 + (value / 100.0)) : value;
         int updated = priceRepository.applyBulkMultiplierToTopSellers(priceListId, topN, daysBack, repoValue, reason,
-                isPercentage);
+                isPercentage, startDate);
         saveLog(isPercentage ? "percentage" : "fixed_amount", "Top " + topN + " Vendidos", value, updated, null,
                 reason);
         return updated;
@@ -136,7 +140,7 @@ public class MassivePriceUpdateUseCase {
      * Aplica un ajuste (porcentual o fijo) a artículos sin ventas (slow-movers).
      */
     public int applyToSlowMovers(int priceListId, int daysWithoutSale, double value, String reason,
-            boolean isPercentage)
+            boolean isPercentage, java.time.LocalDateTime startDate)
             throws SQLException {
         if (isPercentage)
             validatePercentage(value);
@@ -147,7 +151,7 @@ public class MassivePriceUpdateUseCase {
 
         double repoValue = isPercentage ? (1.0 + (value / 100.0)) : value;
         int updated = priceRepository.applyBulkMultiplierToSlowMovers(priceListId, daysWithoutSale, repoValue, reason,
-                isPercentage);
+                isPercentage, startDate);
         saveLog(isPercentage ? "percentage" : "fixed_amount", "Sin Ventas (" + daysWithoutSale + "d)", value, updated,
                 null, reason);
         return updated;
@@ -157,7 +161,7 @@ public class MassivePriceUpdateUseCase {
      * Aplica un ajuste (porcentual o fijo) dentro de un rango de precio.
      */
     public int applyToPriceRange(int priceListId, double minPrice, double maxPrice, double value, String reason,
-            boolean isPercentage)
+            boolean isPercentage, java.time.LocalDateTime startDate)
             throws SQLException {
         if (isPercentage)
             validatePercentage(value);
@@ -170,8 +174,7 @@ public class MassivePriceUpdateUseCase {
 
         double repoValue = isPercentage ? (1.0 + (value / 100.0)) : value;
         int updated = priceRepository.applyBulkMultiplierToPriceRange(priceListId, minPrice, maxPrice, repoValue,
-                reason,
-                isPercentage);
+                reason, isPercentage, startDate);
         saveLog(isPercentage ? "percentage" : "fixed_amount", "Rango [" + minPrice + "-" + maxPrice + "]", value,
                 updated, null, reason);
         return updated;
@@ -180,7 +183,8 @@ public class MassivePriceUpdateUseCase {
     /**
      * Aplica un ajuste (porcentual o fijo) a favoritos.
      */
-    public int applyToFavorites(int priceListId, double value, String reason, boolean isPercentage)
+    public int applyToFavorites(int priceListId, double value, String reason, boolean isPercentage,
+            java.time.LocalDateTime startDate)
             throws SQLException {
         if (isPercentage)
             validatePercentage(value);
@@ -188,7 +192,8 @@ public class MassivePriceUpdateUseCase {
             validateAmount(value);
 
         double repoValue = isPercentage ? (1.0 + (value / 100.0)) : value;
-        int updated = priceRepository.applyBulkMultiplierToFavorites(priceListId, repoValue, reason, isPercentage);
+        int updated = priceRepository.applyBulkMultiplierToFavorites(priceListId, repoValue, reason, isPercentage,
+                startDate);
         saveLog(isPercentage ? "percentage" : "fixed_amount", "Favoritos ★", value, updated, null, reason);
         return updated;
     }
@@ -197,7 +202,7 @@ public class MassivePriceUpdateUseCase {
      * Aplica un ajuste (porcentual o fijo) a los N artículos MENOS vendidos.
      */
     public int applyToBottomSellers(int priceListId, int bottomN, int daysBack, double value, String reason,
-            boolean isPercentage)
+            boolean isPercentage, java.time.LocalDateTime startDate)
             throws SQLException {
         if (isPercentage)
             validatePercentage(value);
@@ -210,8 +215,7 @@ public class MassivePriceUpdateUseCase {
 
         double repoValue = isPercentage ? (1.0 + (value / 100.0)) : value;
         int updated = priceRepository.applyBulkMultiplierToBottomSellers(priceListId, bottomN, daysBack, repoValue,
-                reason,
-                isPercentage);
+                reason, isPercentage, startDate);
         saveLog(isPercentage ? "percentage" : "fixed_amount", "Bottom " + bottomN + " Vendidos", value, updated, null,
                 reason);
         return updated;
@@ -221,10 +225,11 @@ public class MassivePriceUpdateUseCase {
      * Clona una lista de precios en otra aplicando un multiplicador masivo.
      * Útil para crear tarifas de mayoristas a partir de la general.
      */
-    public void cloneAndAdjustPrices(int sourceListId, int targetListId, double percentage, String reason)
+    public void cloneAndAdjustPrices(int sourceListId, int targetListId, double percentage, String reason,
+            java.time.LocalDateTime startDate)
             throws SQLException {
         double multiplier = 1.0 + (percentage / 100.0);
-        priceRepository.cloneAndAdjustPriceList(sourceListId, targetListId, multiplier, reason);
+        priceRepository.cloneAndAdjustPriceList(sourceListId, targetListId, multiplier, reason, startDate);
         saveLog("clonacion", "Desde Tarifa " + sourceListId, percentage, -1, null, reason);
     }
 
@@ -270,9 +275,11 @@ public class MassivePriceUpdateUseCase {
     /**
      * Redondea precios de los artículos Top Sellers.
      */
-    public int applyRoundingToTopSellers(int priceListId, int topN, int daysBack, double targetDecimal, String reason)
+    public int applyRoundingToTopSellers(int priceListId, int topN, int daysBack, double targetDecimal, String reason,
+            java.time.LocalDateTime startDate)
             throws SQLException {
-        int updated = priceRepository.applyBulkRoundingToTopSellers(priceListId, topN, daysBack, targetDecimal, reason);
+        int updated = priceRepository.applyBulkRoundingToTopSellers(priceListId, topN, daysBack, targetDecimal, reason,
+                startDate);
         saveLog("rounding", "Top " + topN + " Vendidos", targetDecimal, updated, null, reason);
         return updated;
     }
@@ -281,10 +288,10 @@ public class MassivePriceUpdateUseCase {
      * Redondea precios de los artículos Bottom Sellers.
      */
     public int applyRoundingToBottomSellers(int priceListId, int bottomN, int daysBack, double targetDecimal,
-            String reason)
+            String reason, java.time.LocalDateTime startDate)
             throws SQLException {
         int updated = priceRepository.applyBulkRoundingToBottomSellers(priceListId, bottomN, daysBack, targetDecimal,
-                reason);
+                reason, startDate);
         saveLog("rounding", "Bottom " + bottomN + " Vendidos", targetDecimal, updated, null, reason);
         return updated;
     }
@@ -292,10 +299,11 @@ public class MassivePriceUpdateUseCase {
     /**
      * Redondea precios de los artículos Sin Movimiento (Slow-movers).
      */
-    public int applyRoundingToSlowMovers(int priceListId, int daysWithoutSale, double targetDecimal, String reason)
+    public int applyRoundingToSlowMovers(int priceListId, int daysWithoutSale, double targetDecimal, String reason,
+            java.time.LocalDateTime startDate)
             throws SQLException {
         int updated = priceRepository.applyBulkRoundingToSlowMovers(priceListId, daysWithoutSale, targetDecimal,
-                reason);
+                reason, startDate);
         saveLog("rounding", "Sin Ventas (" + daysWithoutSale + "d)", targetDecimal, updated, null, reason);
         return updated;
     }
@@ -304,9 +312,9 @@ public class MassivePriceUpdateUseCase {
      * Redondea precios de artículos en un rango de precio.
      */
     public int applyRoundingToPriceRange(int priceListId, double minPrice, double maxPrice, double targetDecimal,
-            String reason) throws SQLException {
+            String reason, java.time.LocalDateTime startDate) throws SQLException {
         int updated = priceRepository.applyBulkRoundingToPriceRange(priceListId, minPrice, maxPrice, targetDecimal,
-                reason);
+                reason, startDate);
         saveLog("rounding", "Rango [" + minPrice + "-" + maxPrice + "]", targetDecimal, updated, null, reason);
         return updated;
     }
@@ -314,8 +322,9 @@ public class MassivePriceUpdateUseCase {
     /**
      * Redondea precios de artículos favoritos.
      */
-    public int applyRoundingToFavorites(int priceListId, double targetDecimal, String reason) throws SQLException {
-        return priceRepository.applyBulkRoundingToFavorites(priceListId, targetDecimal, reason);
+    public int applyRoundingToFavorites(int priceListId, double targetDecimal, String reason,
+            java.time.LocalDateTime startDate) throws SQLException {
+        return priceRepository.applyBulkRoundingToFavorites(priceListId, targetDecimal, reason, startDate);
     }
 
     private void validateAmount(double amount) {
@@ -357,5 +366,35 @@ public class MassivePriceUpdateUseCase {
             // Log simple, no interrumpir la operación principal
             System.err.println("Error guardando log de auditoría: " + ex.getMessage());
         }
+    }
+
+    public int applyPercentageIncreaseToProducts(int priceListId, java.util.List<Integer> productIds, double percentage,
+            String reason, java.time.LocalDateTime startDate) throws SQLException {
+        validatePercentage(percentage);
+        double multiplier = 1.0 + (percentage / 100.0);
+        int updated = priceRepository.applyBulkMultiplierToProducts(priceListId, productIds, multiplier, reason,
+                startDate);
+        saveLog("percentage", "Lista de Productos (" + (productIds != null ? productIds.size() : 0) + ")", percentage,
+                updated, null, reason);
+        return updated;
+    }
+
+    public int applyFixedAmountIncreaseToProducts(int priceListId, java.util.List<Integer> productIds, double amount,
+            String reason, java.time.LocalDateTime startDate) throws SQLException {
+        validateAmount(amount);
+        int updated = priceRepository.applyBulkFixedAmountToProducts(priceListId, productIds, amount, reason,
+                startDate);
+        saveLog("fixed_amount", "Lista de Productos (" + (productIds != null ? productIds.size() : 0) + ")", amount,
+                updated, null, reason);
+        return updated;
+    }
+
+    public int applyRoundingToProducts(int priceListId, java.util.List<Integer> productIds, double targetDecimal,
+            String reason, java.time.LocalDateTime startDate) throws SQLException {
+        int updated = priceRepository.applyBulkRoundingToProducts(priceListId, productIds, targetDecimal, reason,
+                startDate);
+        saveLog("rounding", "Lista de Productos (" + (productIds != null ? productIds.size() : 0) + ")", targetDecimal,
+                updated, null, reason);
+        return updated;
     }
 }

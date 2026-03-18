@@ -207,9 +207,10 @@ public class JdbcPriceRepository implements IPriceRepository {
     }
 
     @Override
-    public int applyBulkMultiplier(int priceListId, Integer categoryId, double multiplier, String reason)
+    public int applyBulkMultiplier(int priceListId, Integer categoryId, double multiplier, String reason,
+            java.time.LocalDateTime startDate)
             throws SQLException {
-        LocalDateTime now = LocalDateTime.now();
+
         StringBuilder selectSql = new StringBuilder(
                 "SELECT pp.product_id, pp.price FROM product_prices pp " +
                         "JOIN products p ON p.product_id = pp.product_id " +
@@ -228,7 +229,7 @@ public class JdbcPriceRepository implements IPriceRepository {
                     if (categoryId != null && categoryId > 0)
                         ps.setInt(2, categoryId);
 
-                    int count = executeBulkUpdate(conn, ps, priceListId, multiplier, reason, now, true);
+                    int count = executeBulkUpdate(conn, ps, priceListId, multiplier, reason, startDate, true);
                     conn.commit();
                     return count;
                 }
@@ -242,9 +243,10 @@ public class JdbcPriceRepository implements IPriceRepository {
     }
 
     @Override
-    public int applyBulkFixedAmount(int priceListId, Integer categoryId, double amount, String reason)
+    public int applyBulkFixedAmount(int priceListId, Integer categoryId, double amount, String reason,
+            java.time.LocalDateTime startDate)
             throws SQLException {
-        LocalDateTime now = LocalDateTime.now();
+
         StringBuilder selectSql = new StringBuilder(
                 "SELECT pp.product_id, pp.price FROM product_prices pp " +
                         "JOIN products p ON p.product_id = pp.product_id " +
@@ -263,7 +265,7 @@ public class JdbcPriceRepository implements IPriceRepository {
                     if (categoryId != null && categoryId > 0)
                         ps.setInt(2, categoryId);
 
-                    int count = executeBulkUpdate(conn, ps, priceListId, amount, reason, now, false);
+                    int count = executeBulkUpdate(conn, ps, priceListId, amount, reason, startDate, false);
                     conn.commit();
                     return count;
                 }
@@ -277,7 +279,8 @@ public class JdbcPriceRepository implements IPriceRepository {
     }
 
     private int executeBulkRounding(Connection conn, PreparedStatement selectStmt, int priceListId,
-            double roundingTarget, String reason, LocalDateTime now, double globalTax) throws SQLException {
+            double roundingTarget, String reason, java.time.LocalDateTime startDate, double globalTax)
+            throws SQLException {
         boolean pricesIncludeTax = getPricesIncludeTax(conn);
         int updatedCount = 0;
         String closeSql = "UPDATE product_prices SET end_date = ? " +
@@ -300,18 +303,11 @@ public class JdbcPriceRepository implements IPriceRepository {
                 boolean cIvaIsNull = rs.wasNull();
 
                 double effectiveTaxRate = pIvaIsNull ? (cIvaIsNull ? globalTax : cIva) : pIva;
-                // Si la base de datos ya almacena el PVP, el multiplicador para cálculos de
-                // redondeo es 1.0
                 double taxMultiplier = pricesIncludeTax ? 1.0 : (1.0 + (effectiveTaxRate / 100.0));
 
                 double currentPvp = oldBasePrice * taxMultiplier;
-                // Redondeo psicológico: mantenemos la parte entera y aplicamos los decimales
-                // objetivo
-                // Ejemplo: 10.10 -> 10.99. 10.55 -> 10.99.
                 double roundedPvp = Math.floor(currentPvp) + roundingTarget;
 
-                // Si almacenamos base, dividimos el PVP redondeado por la tasa real, si no, lo
-                // guardamos tal cual
                 double realTaxMultiplier = 1.0 + (effectiveTaxRate / 100.0);
                 double newBasePrice = pricesIncludeTax ? roundedPvp
                         : (Math.round((roundedPvp / realTaxMultiplier) * 10000.0) / 10000.0);
@@ -320,7 +316,7 @@ public class JdbcPriceRepository implements IPriceRepository {
                     newBasePrice = 0.0;
 
                 if (Math.abs(newBasePrice - oldBasePrice) > 0.0001) {
-                    closeStmt.setTimestamp(1, Timestamp.valueOf(now));
+                    closeStmt.setTimestamp(1, Timestamp.valueOf(startDate));
                     closeStmt.setInt(2, productId);
                     closeStmt.setInt(3, priceListId);
                     closeStmt.addBatch();
@@ -328,7 +324,7 @@ public class JdbcPriceRepository implements IPriceRepository {
                     insertStmt.setInt(1, productId);
                     insertStmt.setInt(2, priceListId);
                     insertStmt.setDouble(3, newBasePrice);
-                    insertStmt.setTimestamp(4, Timestamp.valueOf(now));
+                    insertStmt.setTimestamp(4, Timestamp.valueOf(startDate));
                     insertStmt.setString(5, reason);
                     insertStmt.addBatch();
                     updatedCount++;
@@ -344,9 +340,10 @@ public class JdbcPriceRepository implements IPriceRepository {
     }
 
     @Override
-    public int applyBulkRounding(int priceListId, Integer categoryId, double roundingTarget, String reason)
+    public int applyBulkRounding(int priceListId, Integer categoryId, double roundingTarget, String reason,
+            java.time.LocalDateTime startDate)
             throws SQLException {
-        LocalDateTime now = LocalDateTime.now();
+
         try (Connection conn = DBConnection.getConnection()) {
             double globalTax = getGlobalTax(conn);
             StringBuilder selectSql = new StringBuilder(
@@ -368,7 +365,7 @@ public class JdbcPriceRepository implements IPriceRepository {
                     ps.setInt(1, priceListId);
                     if (categoryId != null && categoryId > 0)
                         ps.setInt(2, categoryId);
-                    count = executeBulkRounding(conn, ps, priceListId, roundingTarget, reason, now, globalTax);
+                    count = executeBulkRounding(conn, ps, priceListId, roundingTarget, reason, startDate, globalTax);
                 }
                 conn.commit();
                 return count;
@@ -458,7 +455,7 @@ public class JdbcPriceRepository implements IPriceRepository {
      */
     private int executeBulkUpdate(Connection conn, PreparedStatement selectStmt,
             int priceListId, double value, String reason,
-            LocalDateTime now, boolean isPercentage) throws SQLException {
+            java.time.LocalDateTime startDate, boolean isPercentage) throws SQLException {
         int count = 0;
         String closeSql = "UPDATE product_prices SET end_date = ? WHERE product_id = ? AND price_list_id = ? AND end_date IS NULL";
         String insertSql = "INSERT INTO product_prices (product_id, price_list_id, price, start_date, end_date, reason) VALUES (?, ?, ?, ?, NULL, ?)";
@@ -483,7 +480,7 @@ public class JdbcPriceRepository implements IPriceRepository {
 
                 // Solo si el precio cambia realmente
                 if (Math.abs(newPrice - currentPrice) > 0.0001) {
-                    closeStmt.setTimestamp(1, Timestamp.valueOf(now));
+                    closeStmt.setTimestamp(1, Timestamp.valueOf(startDate));
                     closeStmt.setInt(2, productId);
                     closeStmt.setInt(3, priceListId);
                     closeStmt.addBatch();
@@ -491,7 +488,7 @@ public class JdbcPriceRepository implements IPriceRepository {
                     insertStmt.setInt(1, productId);
                     insertStmt.setInt(2, priceListId);
                     insertStmt.setDouble(3, newPrice);
-                    insertStmt.setTimestamp(4, Timestamp.valueOf(now));
+                    insertStmt.setTimestamp(4, Timestamp.valueOf(startDate));
                     insertStmt.setString(5, reason);
                     insertStmt.addBatch();
                     count++;
@@ -510,8 +507,8 @@ public class JdbcPriceRepository implements IPriceRepository {
 
     @Override
     public int applyBulkMultiplierToTopSellers(int priceListId, int topN, int daysBack,
-            double value, String reason, boolean isPercentage) throws SQLException {
-        LocalDateTime now = LocalDateTime.now();
+            double value, String reason, boolean isPercentage, java.time.LocalDateTime startDate) throws SQLException {
+
         String selectSql = "SELECT pp.product_id, pp.price " +
                 "FROM product_prices pp " +
                 "JOIN products p ON p.product_id = pp.product_id " +
@@ -526,7 +523,7 @@ public class JdbcPriceRepository implements IPriceRepository {
                 "    LIMIT ? " +
                 "  ) AS top_inner " +
                 ") AS top_ranked ON top_ranked.product_id = pp.product_id " +
-                "WHERE pp.price_list_id = ? AND pp.end_date IS NULL AND p.visible = 1";
+                "WHERE pp.price_list_id = ? AND pp.start_date <= CURRENT_TIMESTAMP AND (pp.end_date IS NULL OR pp.end_date > CURRENT_TIMESTAMP) AND p.visible = 1";
 
         try (Connection conn = DBConnection.getConnection()) {
             conn.setAutoCommit(false);
@@ -537,7 +534,7 @@ public class JdbcPriceRepository implements IPriceRepository {
                     ps.setInt(1, daysBack);
                     ps.setInt(2, topN);
                     ps.setInt(3, priceListId);
-                    count = executeBulkUpdate(conn, ps, priceListId, value, reason, now, isPercentage);
+                    count = executeBulkUpdate(conn, ps, priceListId, value, reason, startDate, isPercentage);
                     conn.commit();
                     return count;
                 }
@@ -554,8 +551,8 @@ public class JdbcPriceRepository implements IPriceRepository {
 
     @Override
     public int applyBulkMultiplierToBottomSellers(int priceListId, int bottomN, int daysBack,
-            double value, String reason, boolean isPercentage) throws SQLException {
-        LocalDateTime now = LocalDateTime.now();
+            double value, String reason, boolean isPercentage, java.time.LocalDateTime startDate) throws SQLException {
+
         String selectSql = "SELECT pp.product_id, pp.price " +
                 "FROM product_prices pp " +
                 "JOIN products p ON p.product_id = pp.product_id " +
@@ -573,7 +570,7 @@ public class JdbcPriceRepository implements IPriceRepository {
                 "    LIMIT ? " +
                 "  ) AS bottom_inner " +
                 ") AS bottom_ranked ON bottom_ranked.product_id = pp.product_id " +
-                "WHERE pp.price_list_id = ? AND pp.end_date IS NULL AND p.visible = 1";
+                "WHERE pp.price_list_id = ? AND pp.start_date <= CURRENT_TIMESTAMP AND (pp.end_date IS NULL OR pp.end_date > CURRENT_TIMESTAMP) AND p.visible = 1";
 
         try (Connection conn = DBConnection.getConnection()) {
             conn.setAutoCommit(false);
@@ -584,7 +581,7 @@ public class JdbcPriceRepository implements IPriceRepository {
                     ps.setInt(1, daysBack);
                     ps.setInt(2, bottomN);
                     ps.setInt(3, priceListId);
-                    count = executeBulkUpdate(conn, ps, priceListId, value, reason, now, isPercentage);
+                    count = executeBulkUpdate(conn, ps, priceListId, value, reason, startDate, isPercentage);
                     conn.commit();
                     return count;
                 }
@@ -601,12 +598,13 @@ public class JdbcPriceRepository implements IPriceRepository {
 
     @Override
     public int applyBulkMultiplierToSlowMovers(int priceListId, int daysWithoutSale,
-            double value, String reason, boolean isPercentage) throws SQLException {
-        LocalDateTime now = LocalDateTime.now();
+            double value, String reason, boolean isPercentage, java.time.LocalDateTime startDate) throws SQLException {
+
         String selectSql = "SELECT pp.product_id, pp.price " +
                 "FROM product_prices pp " +
                 "JOIN products p ON p.product_id = pp.product_id " +
-                "WHERE pp.price_list_id = ? AND pp.end_date IS NULL AND p.visible = 1 " +
+                "WHERE pp.price_list_id = ? AND pp.start_date <= CURRENT_TIMESTAMP AND (pp.end_date IS NULL OR pp.end_date > CURRENT_TIMESTAMP) AND p.visible = 1 "
+                +
                 "AND NOT EXISTS ( " +
                 "  SELECT 1 FROM sale_details sd " +
                 "  JOIN sales s ON s.sale_id = sd.sale_id " +
@@ -623,7 +621,7 @@ public class JdbcPriceRepository implements IPriceRepository {
                 try (PreparedStatement ps = conn.prepareStatement(selectSql)) {
                     ps.setInt(1, priceListId);
                     ps.setInt(2, daysWithoutSale);
-                    count = executeBulkUpdate(conn, ps, priceListId, value, reason, now, isPercentage);
+                    count = executeBulkUpdate(conn, ps, priceListId, value, reason, startDate, isPercentage);
                     conn.commit();
                     return count;
                 }
@@ -640,12 +638,13 @@ public class JdbcPriceRepository implements IPriceRepository {
 
     @Override
     public int applyBulkMultiplierToPriceRange(int priceListId, double minPrice, double maxPrice,
-            double value, String reason, boolean isPercentage) throws SQLException {
-        LocalDateTime now = LocalDateTime.now();
+            double value, String reason, boolean isPercentage, java.time.LocalDateTime startDate) throws SQLException {
+
         String selectSql = "SELECT pp.product_id, pp.price " +
                 "FROM product_prices pp " +
                 "JOIN products p ON p.product_id = pp.product_id " +
-                "WHERE pp.price_list_id = ? AND pp.end_date IS NULL AND p.visible = 1 " +
+                "WHERE pp.price_list_id = ? AND pp.start_date <= CURRENT_TIMESTAMP AND (pp.end_date IS NULL OR pp.end_date > CURRENT_TIMESTAMP) AND p.visible = 1 "
+                +
                 "AND pp.price BETWEEN ? AND ?";
 
         try (Connection conn = DBConnection.getConnection()) {
@@ -657,7 +656,7 @@ public class JdbcPriceRepository implements IPriceRepository {
                     ps.setInt(1, priceListId);
                     ps.setDouble(2, minPrice);
                     ps.setDouble(3, maxPrice);
-                    count = executeBulkUpdate(conn, ps, priceListId, value, reason, now, isPercentage);
+                    count = executeBulkUpdate(conn, ps, priceListId, value, reason, startDate, isPercentage);
                     conn.commit();
                     return count;
                 }
@@ -673,13 +672,15 @@ public class JdbcPriceRepository implements IPriceRepository {
     // ─── FAVORITOS ───────────────────────────────────────────────────────────────
 
     @Override
-    public int applyBulkMultiplierToFavorites(int priceListId, double value, String reason, boolean isPercentage)
+    public int applyBulkMultiplierToFavorites(int priceListId, double value, String reason, boolean isPercentage,
+            java.time.LocalDateTime startDate)
             throws SQLException {
-        LocalDateTime now = LocalDateTime.now();
+
         String selectSql = "SELECT pp.product_id, pp.price " +
                 "FROM product_prices pp " +
                 "JOIN products p ON p.product_id = pp.product_id " +
-                "WHERE pp.price_list_id = ? AND pp.end_date IS NULL AND p.visible = 1 " +
+                "WHERE pp.price_list_id = ? AND pp.start_date <= CURRENT_TIMESTAMP AND (pp.end_date IS NULL OR pp.end_date > CURRENT_TIMESTAMP) AND p.visible = 1 "
+                +
                 "AND p.is_favorite = 1";
 
         try (Connection conn = DBConnection.getConnection()) {
@@ -689,7 +690,7 @@ public class JdbcPriceRepository implements IPriceRepository {
                 int count;
                 try (PreparedStatement ps = conn.prepareStatement(selectSql)) {
                     ps.setInt(1, priceListId);
-                    count = executeBulkUpdate(conn, ps, priceListId, value, reason, now, isPercentage);
+                    count = executeBulkUpdate(conn, ps, priceListId, value, reason, startDate, isPercentage);
                     conn.commit();
                     return count;
                 }
@@ -704,11 +705,13 @@ public class JdbcPriceRepository implements IPriceRepository {
 
     @Override
     public void clonePriceList(int sourceId, int targetId) throws SQLException {
-        cloneAndAdjustPriceList(sourceId, targetId, 1.0, "Clonación desde tarifa ID " + sourceId);
+        cloneAndAdjustPriceList(sourceId, targetId, 1.0, "Clonación desde tarifa ID " + sourceId,
+                LocalDateTime.now());
     }
 
     @Override
-    public void cloneAndAdjustPriceList(int sourceId, int targetId, double multiplier, String reason)
+    public void cloneAndAdjustPriceList(int sourceId, int targetId, double multiplier, String reason,
+            LocalDateTime startDate)
             throws SQLException {
         // Primero cerramos los precios que pudieran existir ya en la tarifa destino
         // para
@@ -718,9 +721,9 @@ public class JdbcPriceRepository implements IPriceRepository {
 
         String insertSql = "INSERT INTO product_prices (product_id, price_list_id, price, start_date, end_date, reason) "
                 +
-                "SELECT product_id, ?, price * ?, CURRENT_TIMESTAMP, NULL, ? " +
+                "SELECT product_id, ?, price * ?, ?, NULL, ? " +
                 "FROM product_prices " +
-                "WHERE price_list_id = ? AND end_date IS NULL";
+                "WHERE price_list_id = ? AND start_date <= CURRENT_TIMESTAMP AND (end_date IS NULL OR end_date > CURRENT_TIMESTAMP)";
 
         try (Connection conn = DBConnection.getConnection()) {
             conn.setAutoCommit(false);
@@ -732,8 +735,9 @@ public class JdbcPriceRepository implements IPriceRepository {
 
                 psInsert.setInt(1, targetId);
                 psInsert.setDouble(2, multiplier);
-                psInsert.setString(3, reason);
-                psInsert.setInt(4, sourceId);
+                psInsert.setTimestamp(3, Timestamp.valueOf(startDate));
+                psInsert.setString(4, reason);
+                psInsert.setInt(5, sourceId);
                 psInsert.executeUpdate();
 
                 conn.commit();
@@ -751,14 +755,15 @@ public class JdbcPriceRepository implements IPriceRepository {
             throws SQLException {
         List<com.mycompany.ventacontrolfx.domain.dto.ProductPriceDTO> results = new ArrayList<>();
         String sql = "SELECT p.product_id, p.name as product_name, c.name as category_name, "
-                + "COALESCE(pp.price, 0.0) as price, COALESCE(pp_def.price, 0.0) as default_price, "
-                + "COALESCE(p.iva, c.default_iva, (SELECT value FROM system_config WHERE `key` = 'global_tax' LIMIT 1), 0.0) as effective_tax "
+                + "COALESCE(pp.price, pp_def.price, 0.0) as price, COALESCE(pp_def.price, 0.0) as default_price, "
+                + "COALESCE(p.iva, c.default_iva, (SELECT config_value FROM system_config WHERE config_key = 'global_tax' LIMIT 1), 0.0) as effective_tax "
                 + "FROM products p "
                 + "LEFT JOIN categories c ON p.category_id = c.category_id "
-                + "LEFT JOIN product_prices pp ON p.product_id = pp.product_id AND pp.price_list_id = ? AND pp.end_date IS NULL "
+                + "LEFT JOIN product_prices pp ON p.product_id = pp.product_id AND pp.price_list_id = ? "
+                + "  AND pp.start_date <= CURRENT_TIMESTAMP AND (pp.end_date IS NULL OR pp.end_date > CURRENT_TIMESTAMP) "
                 + "LEFT JOIN product_prices pp_def ON p.product_id = pp_def.product_id "
                 + "  AND pp_def.price_list_id = (SELECT price_list_id FROM price_lists WHERE is_default = 1 LIMIT 1) "
-                + "  AND pp_def.end_date IS NULL "
+                + "  AND pp_def.start_date <= CURRENT_TIMESTAMP AND (pp_def.end_date IS NULL OR pp_def.end_date > CURRENT_TIMESTAMP) "
                 + "WHERE p.visible = 1 "
                 + "ORDER BY c.name, p.name";
 
@@ -786,8 +791,10 @@ public class JdbcPriceRepository implements IPriceRepository {
                 "FROM product_prices pp " +
                 "JOIN product_prices pp_def ON pp.product_id = pp_def.product_id " +
                 "  AND pp_def.price_list_id = (SELECT price_list_id FROM price_lists WHERE is_default = 1 LIMIT 1) " +
-                "  AND pp_def.end_date IS NULL " +
-                "WHERE pp.price_list_id = ? AND pp.end_date IS NULL";
+                "  AND pp_def.start_date <= CURRENT_TIMESTAMP AND (pp_def.end_date IS NULL OR pp_def.end_date > CURRENT_TIMESTAMP) "
+                +
+                "WHERE pp.price_list_id = ? " +
+                "  AND pp.start_date <= CURRENT_TIMESTAMP AND (pp.end_date IS NULL OR pp.end_date > CURRENT_TIMESTAMP)";
 
         try (Connection conn = DBConnection.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -812,8 +819,8 @@ public class JdbcPriceRepository implements IPriceRepository {
 
     @Override
     public int applyBulkRoundingToTopSellers(int priceListId, int topN, int daysBack, double roundingTarget,
-            String reason) throws SQLException {
-        LocalDateTime now = LocalDateTime.now();
+            String reason, java.time.LocalDateTime startDate) throws SQLException {
+
         String selectSql = "SELECT pp.product_id, pp.price, p.iva as p_iva, c.default_iva as c_iva " +
                 "FROM product_prices pp " +
                 "JOIN products p ON p.product_id = pp.product_id " +
@@ -829,7 +836,7 @@ public class JdbcPriceRepository implements IPriceRepository {
                 "    LIMIT ? " +
                 "  ) AS top_inner " +
                 ") AS top_ranked ON top_ranked.product_id = pp.product_id " +
-                "WHERE pp.price_list_id = ? AND pp.end_date IS NULL AND p.visible = 1";
+                "WHERE pp.price_list_id = ? AND pp.start_date <= CURRENT_TIMESTAMP AND (pp.end_date IS NULL OR pp.end_date > CURRENT_TIMESTAMP) AND p.visible = 1";
 
         try (Connection conn = DBConnection.getConnection()) {
             conn.setAutoCommit(false);
@@ -840,7 +847,8 @@ public class JdbcPriceRepository implements IPriceRepository {
                     ps.setInt(1, daysBack);
                     ps.setInt(2, topN);
                     ps.setInt(3, priceListId);
-                    int count = executeBulkRounding(conn, ps, priceListId, roundingTarget, reason, now, globalTax);
+                    int count = executeBulkRounding(conn, ps, priceListId, roundingTarget, reason, startDate,
+                            globalTax);
                     conn.commit();
                     return count;
                 }
@@ -855,8 +863,8 @@ public class JdbcPriceRepository implements IPriceRepository {
 
     @Override
     public int applyBulkRoundingToBottomSellers(int priceListId, int bottomN, int daysBack, double roundingTarget,
-            String reason) throws SQLException {
-        LocalDateTime now = LocalDateTime.now();
+            String reason, java.time.LocalDateTime startDate) throws SQLException {
+
         String selectSql = "SELECT pp.product_id, pp.price, p.iva as p_iva, c.default_iva as c_iva " +
                 "FROM product_prices pp " +
                 "JOIN products p ON p.product_id = pp.product_id " +
@@ -875,7 +883,7 @@ public class JdbcPriceRepository implements IPriceRepository {
                 "    LIMIT ? " +
                 "  ) AS bottom_inner " +
                 ") AS bottom_ranked ON bottom_ranked.product_id = pp.product_id " +
-                "WHERE pp.price_list_id = ? AND pp.end_date IS NULL AND p.visible = 1";
+                "WHERE pp.price_list_id = ? AND pp.start_date <= CURRENT_TIMESTAMP AND (pp.end_date IS NULL OR pp.end_date > CURRENT_TIMESTAMP) AND p.visible = 1";
 
         try (Connection conn = DBConnection.getConnection()) {
             conn.setAutoCommit(false);
@@ -886,7 +894,8 @@ public class JdbcPriceRepository implements IPriceRepository {
                     ps.setInt(1, daysBack);
                     ps.setInt(2, bottomN);
                     ps.setInt(3, priceListId);
-                    int count = executeBulkRounding(conn, ps, priceListId, roundingTarget, reason, now, globalTax);
+                    int count = executeBulkRounding(conn, ps, priceListId, roundingTarget, reason, startDate,
+                            globalTax);
                     conn.commit();
                     return count;
                 }
@@ -900,14 +909,16 @@ public class JdbcPriceRepository implements IPriceRepository {
     }
 
     @Override
-    public int applyBulkRoundingToSlowMovers(int priceListId, int daysWithoutSale, double roundingTarget, String reason)
+    public int applyBulkRoundingToSlowMovers(int priceListId, int daysWithoutSale, double roundingTarget, String reason,
+            java.time.LocalDateTime startDate)
             throws SQLException {
-        LocalDateTime now = LocalDateTime.now();
+
         String selectSql = "SELECT pp.product_id, pp.price, p.iva as p_iva, c.default_iva as c_iva " +
                 "FROM product_prices pp " +
                 "JOIN products p ON p.product_id = pp.product_id " +
                 "LEFT JOIN categories c ON p.category_id = c.category_id " +
-                "WHERE pp.price_list_id = ? AND pp.end_date IS NULL AND p.visible = 1 " +
+                "WHERE pp.price_list_id = ? AND pp.start_date <= CURRENT_TIMESTAMP AND (pp.end_date IS NULL OR pp.end_date > CURRENT_TIMESTAMP) AND p.visible = 1 "
+                +
                 "AND NOT EXISTS ( " +
                 "  SELECT 1 FROM sale_details sd " +
                 "  JOIN sales s ON s.sale_id = sd.sale_id " +
@@ -924,7 +935,8 @@ public class JdbcPriceRepository implements IPriceRepository {
                 try (PreparedStatement ps = conn.prepareStatement(selectSql)) {
                     ps.setInt(1, priceListId);
                     ps.setInt(2, daysWithoutSale);
-                    int count = executeBulkRounding(conn, ps, priceListId, roundingTarget, reason, now, globalTax);
+                    int count = executeBulkRounding(conn, ps, priceListId, roundingTarget, reason, startDate,
+                            globalTax);
                     conn.commit();
                     return count;
                 }
@@ -939,13 +951,14 @@ public class JdbcPriceRepository implements IPriceRepository {
 
     @Override
     public int applyBulkRoundingToPriceRange(int priceListId, double minPrice, double maxPrice, double roundingTarget,
-            String reason) throws SQLException {
-        LocalDateTime now = LocalDateTime.now();
+            String reason, java.time.LocalDateTime startDate) throws SQLException {
+
         String selectSql = "SELECT pp.product_id, pp.price, p.iva as p_iva, c.default_iva as c_iva " +
                 "FROM product_prices pp " +
                 "JOIN products p ON p.product_id = pp.product_id " +
                 "LEFT JOIN categories c ON p.category_id = c.category_id " +
-                "WHERE pp.price_list_id = ? AND pp.end_date IS NULL AND p.visible = 1 " +
+                "WHERE pp.price_list_id = ? AND pp.start_date <= CURRENT_TIMESTAMP AND (pp.end_date IS NULL OR pp.end_date > CURRENT_TIMESTAMP) AND p.visible = 1 "
+                +
                 "AND pp.price BETWEEN ? AND ?";
 
         try (Connection conn = DBConnection.getConnection()) {
@@ -957,7 +970,8 @@ public class JdbcPriceRepository implements IPriceRepository {
                     ps.setInt(1, priceListId);
                     ps.setDouble(2, minPrice);
                     ps.setDouble(3, maxPrice);
-                    int count = executeBulkRounding(conn, ps, priceListId, roundingTarget, reason, now, globalTax);
+                    int count = executeBulkRounding(conn, ps, priceListId, roundingTarget, reason, startDate,
+                            globalTax);
                     conn.commit();
                     return count;
                 }
@@ -971,13 +985,15 @@ public class JdbcPriceRepository implements IPriceRepository {
     }
 
     @Override
-    public int applyBulkRoundingToFavorites(int priceListId, double roundingTarget, String reason) throws SQLException {
-        LocalDateTime now = LocalDateTime.now();
+    public int applyBulkRoundingToFavorites(int priceListId, double roundingTarget, String reason,
+            java.time.LocalDateTime startDate) throws SQLException {
+
         String selectSql = "SELECT pp.product_id, pp.price, p.iva as p_iva, c.default_iva as c_iva " +
                 "FROM product_prices pp " +
                 "JOIN products p ON p.product_id = pp.product_id " +
                 "LEFT JOIN categories c ON p.category_id = c.category_id " +
-                "WHERE pp.price_list_id = ? AND pp.end_date IS NULL AND p.visible = 1 " +
+                "WHERE pp.price_list_id = ? AND pp.start_date <= CURRENT_TIMESTAMP AND (pp.end_date IS NULL OR pp.end_date > CURRENT_TIMESTAMP) AND p.visible = 1 "
+                +
                 "AND p.is_favorite = 1";
 
         try (Connection conn = DBConnection.getConnection()) {
@@ -987,7 +1003,8 @@ public class JdbcPriceRepository implements IPriceRepository {
                 double globalTax = getGlobalTax(conn);
                 try (PreparedStatement ps = conn.prepareStatement(selectSql)) {
                     ps.setInt(1, priceListId);
-                    int count = executeBulkRounding(conn, ps, priceListId, roundingTarget, reason, now, globalTax);
+                    int count = executeBulkRounding(conn, ps, priceListId, roundingTarget, reason, startDate,
+                            globalTax);
                     conn.commit();
                     return count;
                 }
@@ -997,6 +1014,119 @@ public class JdbcPriceRepository implements IPriceRepository {
             } finally {
                 conn.setAutoCommit(true);
             }
+        }
+    }
+
+    @Override
+    public int applyBulkMultiplierToProducts(int priceListId, java.util.List<Integer> productIds, double multiplier,
+            String reason, java.time.LocalDateTime startDate) throws SQLException {
+        if (productIds == null || productIds.isEmpty())
+            return 0;
+        String ids = productIds.stream().map(String::valueOf).collect(java.util.stream.Collectors.joining(","));
+        String selectSql = "SELECT pp.product_id, pp.price FROM product_prices pp " +
+                "JOIN products p ON p.product_id = pp.product_id " +
+                "WHERE pp.price_list_id = ? AND pp.start_date <= CURRENT_TIMESTAMP AND (pp.end_date IS NULL OR pp.end_date > CURRENT_TIMESTAMP) AND p.visible = 1 "
+                +
+                "AND p.product_id IN (" + ids + ")";
+
+        try (Connection conn = DBConnection.getConnection()) {
+            conn.setAutoCommit(false);
+            try {
+                ensurePricesExistForProducts(priceListId, productIds, conn);
+                try (PreparedStatement ps = conn.prepareStatement(selectSql)) {
+                    ps.setInt(1, priceListId);
+                    int count = executeBulkUpdate(conn, ps, priceListId, multiplier, reason, startDate, true);
+                    conn.commit();
+                    return count;
+                }
+            } catch (SQLException e) {
+                conn.rollback();
+                throw e;
+            } finally {
+                conn.setAutoCommit(true);
+            }
+        }
+    }
+
+    @Override
+    public int applyBulkFixedAmountToProducts(int priceListId, java.util.List<Integer> productIds, double amount,
+            String reason, java.time.LocalDateTime startDate) throws SQLException {
+        if (productIds == null || productIds.isEmpty())
+            return 0;
+        String ids = productIds.stream().map(String::valueOf).collect(java.util.stream.Collectors.joining(","));
+        String selectSql = "SELECT pp.product_id, pp.price FROM product_prices pp " +
+                "JOIN products p ON p.product_id = pp.product_id " +
+                "WHERE pp.price_list_id = ? AND pp.start_date <= CURRENT_TIMESTAMP AND (pp.end_date IS NULL OR pp.end_date > CURRENT_TIMESTAMP) AND p.visible = 1 "
+                +
+                "AND p.product_id IN (" + ids + ")";
+
+        try (Connection conn = DBConnection.getConnection()) {
+            conn.setAutoCommit(false);
+            try {
+                ensurePricesExistForProducts(priceListId, productIds, conn);
+                try (PreparedStatement ps = conn.prepareStatement(selectSql)) {
+                    ps.setInt(1, priceListId);
+                    int count = executeBulkUpdate(conn, ps, priceListId, amount, reason, startDate, false);
+                    conn.commit();
+                    return count;
+                }
+            } catch (SQLException e) {
+                conn.rollback();
+                throw e;
+            } finally {
+                conn.setAutoCommit(true);
+            }
+        }
+    }
+
+    @Override
+    public int applyBulkRoundingToProducts(int priceListId, java.util.List<Integer> productIds, double targetDecimal,
+            String reason, java.time.LocalDateTime startDate) throws SQLException {
+        if (productIds == null || productIds.isEmpty())
+            return 0;
+        String ids = productIds.stream().map(String::valueOf).collect(java.util.stream.Collectors.joining(","));
+        String selectSql = "SELECT pp.product_id, pp.price, p.iva as p_iva, c.default_iva as c_iva " +
+                "FROM product_prices pp " +
+                "JOIN products p ON p.product_id = pp.product_id " +
+                "LEFT JOIN categories c ON p.category_id = c.category_id " +
+                "WHERE pp.price_list_id = ? AND pp.start_date <= CURRENT_TIMESTAMP AND (pp.end_date IS NULL OR pp.end_date > CURRENT_TIMESTAMP) AND p.visible = 1 "
+                +
+                "AND p.product_id IN (" + ids + ")";
+
+        try (Connection conn = DBConnection.getConnection()) {
+            double globalTax = getGlobalTax(conn);
+            conn.setAutoCommit(false);
+            try {
+                ensurePricesExistForProducts(priceListId, productIds, conn);
+                try (PreparedStatement ps = conn.prepareStatement(selectSql)) {
+                    ps.setInt(1, priceListId);
+                    int count = executeBulkRounding(conn, ps, priceListId, targetDecimal, reason, startDate, globalTax);
+                    conn.commit();
+                    return count;
+                }
+            } catch (SQLException e) {
+                conn.rollback();
+                throw e;
+            } finally {
+                conn.setAutoCommit(true);
+            }
+        }
+    }
+
+    private void ensurePricesExistForProducts(int priceListId, java.util.List<Integer> productIds, Connection conn)
+            throws SQLException {
+        // Enforce that prices rows exist just like ensurePricesExist for general ones
+        String sql = "INSERT OR IGNORE INTO product_prices (product_id, price_list_id, price, start_date, reason) " +
+                "SELECT p.product_id, ?, p.base_price, CURRENT_TIMESTAMP, 'Inicial masivo' " +
+                "FROM products p WHERE p.product_id IN (" +
+                productIds.stream().map(String::valueOf).collect(java.util.stream.Collectors.joining(",")) + ") " +
+                "AND NOT EXISTS (SELECT 1 FROM product_prices pp WHERE pp.product_id = p.product_id AND pp.price_list_id = ? "
+                +
+                "AND pp.start_date <= CURRENT_TIMESTAMP AND (pp.end_date IS NULL OR pp.end_date > CURRENT_TIMESTAMP))";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, priceListId);
+            ps.setInt(2, priceListId);
+            ps.executeUpdate();
         }
     }
 }
