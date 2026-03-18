@@ -58,7 +58,7 @@ public class JdbcFiscalDocumentRepository implements IFiscalDocumentRepository {
             SELECT s.sale_id, s.doc_type, s.doc_series, s.doc_number,
                    s.doc_status, s.control_hash, s.sale_datetime,
                    s.total, s.iva,
-                   i.company_name, i.tax_id, i.address, i.issued_at,
+                   i.company_name, i.tax_id, i.address, i.phone, i.issued_at,
                    i.receiver_name, i.receiver_tax_id, i.receiver_address,
                    i.base_amount, i.vat_amount, i.total_amount
             FROM sales s
@@ -70,7 +70,7 @@ public class JdbcFiscalDocumentRepository implements IFiscalDocumentRepository {
             SELECT s.sale_id, s.doc_type, s.doc_series, s.doc_number,
                    s.doc_status, s.control_hash, s.sale_datetime,
                    s.total, s.iva,
-                   i.company_name, i.tax_id, i.address, i.issued_at,
+                   i.company_name, i.tax_id, i.address, i.phone, i.issued_at,
                    i.receiver_name, i.receiver_tax_id, i.receiver_address,
                    i.base_amount, i.vat_amount, i.total_amount
             FROM sales s

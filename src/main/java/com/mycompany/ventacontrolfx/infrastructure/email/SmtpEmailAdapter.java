@@ -5,7 +5,10 @@ import com.mycompany.ventacontrolfx.domain.repository.IEmailSender;
 import com.mycompany.ventacontrolfx.infrastructure.persistence.JdbcCompanyConfigRepository;
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
+import javax.mail.util.ByteArrayDataSource;
 import java.util.Properties;
 
 public class SmtpEmailAdapter implements IEmailSender {
@@ -14,6 +17,12 @@ public class SmtpEmailAdapter implements IEmailSender {
 
     @Override
     public void send(String to, String subject, String body) throws Exception {
+        sendWithAttachment(to, subject, body, null, null);
+    }
+
+    @Override
+    public void sendWithAttachment(String to, String subject, String body, byte[] attachment, String fileName)
+            throws Exception {
         String smtpHost = configRepository.getValue("smtp_host");
         String smtpPort = configRepository.getValue("smtp_port");
         String emailFrom = configRepository.getValue("email_from");
@@ -40,7 +49,28 @@ public class SmtpEmailAdapter implements IEmailSender {
         message.setFrom(new InternetAddress(emailFrom));
         message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to));
         message.setSubject(subject);
-        message.setText(body);
+
+        if (attachment != null && fileName != null) {
+            // Multipart message
+            Multipart multipart = new MimeMultipart();
+
+            // Text part
+            MimeBodyPart textPart = new MimeBodyPart();
+            textPart.setText(body);
+            multipart.addBodyPart(textPart);
+
+            // Attachment part
+            MimeBodyPart attachmentPart = new MimeBodyPart();
+            ByteArrayDataSource bds = new ByteArrayDataSource(attachment, "application/pdf");
+            attachmentPart.setDataHandler(new javax.activation.DataHandler(bds));
+            attachmentPart.setFileName(fileName);
+            multipart.addBodyPart(attachmentPart);
+
+            message.setContent(multipart);
+        } else {
+            // Simple text message
+            message.setText(body);
+        }
 
         Transport.send(message);
     }

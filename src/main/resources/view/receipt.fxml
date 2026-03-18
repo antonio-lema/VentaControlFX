@@ -169,7 +169,12 @@
                           <Label style="-fx-text-fill: white; -fx-font-size: 16;" text="⎙" />
                       </graphic>
                   </Button>
-                  <Button fx:id="btnGiftTicket" onAction="#handleGiftTicket" style="-fx-background-color: -fx-bg-surface; -fx-text-fill: #1a73e8; -fx-border-color: #1a73e8; -fx-border-radius: -fx-radius-xl; -fx-border-width: 1; -fx-font-weight: bold; -fx-padding: 8 20; -fx-background-radius: -fx-radius-xl; -fx-cursor: hand;" text="Ticket regalo">
+                   <Button fx:id="btnSendEmail" onAction="#handleSendEmail" managed="false" visible="false" style="-fx-background-color: #34a853; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 8 20; -fx-background-radius: -fx-radius-xl; -fx-cursor: hand;" text="Enviar por Email">
+                       <graphic>
+                           <Label style="-fx-font-size: 16; -fx-text-fill: white;" text="✉" />
+                       </graphic>
+                   </Button>
+                   <Button fx:id="btnGiftTicket" onAction="#handleGiftTicket" style="-fx-background-color: -fx-bg-surface; -fx-text-fill: #1a73e8; -fx-border-color: #1a73e8; -fx-border-radius: -fx-radius-xl; -fx-border-width: 1; -fx-font-weight: bold; -fx-padding: 8 20; -fx-background-radius: -fx-radius-xl; -fx-cursor: hand;" text="Ticket regalo">
                       <graphic>
                           <Label fx:id="lblGiftIcon" style="-fx-font-size: 16; -fx-text-fill: #1a73e8;" text="🎁" />
                       </graphic>

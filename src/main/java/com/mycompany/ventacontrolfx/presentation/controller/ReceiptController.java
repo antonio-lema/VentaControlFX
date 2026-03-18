@@ -3,10 +3,14 @@ package com.mycompany.ventacontrolfx.presentation.controller;
 import com.mycompany.ventacontrolfx.domain.model.CartItem;
 import com.mycompany.ventacontrolfx.domain.model.Client;
 import com.mycompany.ventacontrolfx.domain.model.SaleConfig;
+import com.mycompany.ventacontrolfx.domain.repository.IEmailSender;
+import com.mycompany.ventacontrolfx.application.ports.IFiscalPdfService;
 import com.mycompany.ventacontrolfx.application.usecase.ConfigUseCase;
+import com.mycompany.ventacontrolfx.application.usecase.QueryFiscalDocumentUseCase;
 import com.mycompany.ventacontrolfx.infrastructure.config.Injectable;
 import com.mycompany.ventacontrolfx.infrastructure.config.ServiceContainer;
 import com.mycompany.ventacontrolfx.util.ModalService;
+import com.mycompany.ventacontrolfx.util.AlertUtil;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
@@ -40,7 +44,7 @@ public class ReceiptController implements Injectable {
     @FXML
     private ImageView imgCompanyLogo, imgAppLogoRight;
     @FXML
-    private Button btnGiftTicket;
+    private Button btnGiftTicket, btnSendEmail;
 
     private ServiceContainer container;
     private ConfigUseCase configUseCase;
@@ -233,8 +237,61 @@ public class ReceiptController implements Injectable {
                 lblClientTaxId.setText("CIF: " + client.getTaxId());
             if (lblClientAddress != null)
                 lblClientAddress.setText(client.getAddress());
+
+            if (client.getEmail() != null && !client.getEmail().trim().isEmpty()) {
+                if (btnSendEmail != null) {
+                    btnSendEmail.setVisible(true);
+                    btnSendEmail.setManaged(true);
+                }
+            }
             applyPaperFormat();
         }
+    }
+
+    @FXML
+    private void handleSendEmail() {
+        if (currentClient == null || currentClient.getEmail() == null || currentClient.getEmail().trim().isEmpty()) {
+            AlertUtil.showWarning("Sin Email", "El cliente no tiene un correo electrónico configurado.");
+            return;
+        }
+
+        container.getAsyncManager().runAsyncTask(() -> {
+            // 1. Obtener datos fiscales para el PDF
+            QueryFiscalDocumentUseCase queryUseCase = container.getQueryFiscalDocumentUseCase();
+            QueryFiscalDocumentUseCase.PrintData data = queryUseCase.getDataForReprint(currentSaleId);
+
+            // 2. Adjuntar logo si está disponible
+            if (cfg != null && cfg.getLogoPath() != null && !cfg.getLogoPath().trim().isEmpty()) {
+                data.logoPath = cfg.getLogoPath();
+            }
+
+            // 3. Generar PDF en memoria
+            IFiscalPdfService pdfService = container.getPdfService();
+            byte[] pdfBytes = pdfService.generateInvoicePdfBytes(data);
+
+            // 4. Preparar y enviar Email
+            IEmailSender emailSender = container.getEmailSender();
+            String subject = "Su factura de " + (cfg != null ? cfg.getCompanyName() : "GestionTPV");
+            String body = "Estimado/a " + currentClient.getName() + ",\n\n"
+                    + "Adjuntamos la factura correspondiente a su compra con ID #" + currentSaleId + ".\n\n"
+                    + "Gracias por su confianza.\n\n"
+                    + "Atentamente,\n" + (cfg != null ? cfg.getCompanyName() : "El equipo de Ventas");
+            String fileName = "Factura_" + currentSaleId + ".pdf";
+
+            emailSender.sendWithAttachment(
+                    currentClient.getEmail(),
+                    subject,
+                    body,
+                    pdfBytes,
+                    fileName);
+            return true;
+        }, result -> {
+            AlertUtil.showToast("Factura enviada correctamente a: " + currentClient.getEmail());
+        }, error -> {
+            error.printStackTrace();
+            AlertUtil.showError("Error al enviar email",
+                    "No se pudo enviar el correo: " + error.getMessage());
+        });
     }
 
     @FXML

@@ -134,12 +134,12 @@ public class ServiceContainer {
 
         // 5. Wiring Use Cases (Application Layer)
         this.productUseCase = new com.mycompany.ventacontrolfx.application.usecase.ProductUseCase(productRepository,
-                authService);
+                authService, eventBus);
         this.categoryUseCase = new CategoryUseCase(categoryRepository, productRepository, authService);
         this.clientUseCase = new ClientUseCase(clientRepository, authService);
         this.saleUseCase = new com.mycompany.ventacontrolfx.application.usecase.SaleUseCase(saleRepository,
                 configRepository, authService, taxEngineService, clientRepository, promotionService, promotionEngine,
-                productRepository);
+                productRepository, eventBus);
         this.userUseCase = new com.mycompany.ventacontrolfx.application.usecase.UserUseCase(userRepository, emailSender,
                 authService);
         this.closureUseCase = new CashClosureUseCase(closureRepository, authService);
@@ -343,5 +343,13 @@ public class ServiceContainer {
 
     public IProductRepository getProductRepository() {
         return productRepository;
+    }
+
+    public IEmailSender getEmailSender() {
+        return emailSender;
+    }
+
+    public IFiscalPdfService getPdfService() {
+        return pdfService;
     }
 }
