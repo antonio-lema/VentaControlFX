@@ -1295,6 +1295,22 @@ public class DatabaseInitializer {
                     "item_id INT NOT NULL, " +
                     "PRIMARY KEY (promotion_id, item_id), " +
                     "FOREIGN KEY (promotion_id) REFERENCES promotions(promotion_id) ON DELETE CASCADE)");
+
+            // ── 10. Optimizaciones de Rendimiento Adicionales (V3) ──────────
+            // Optimización búsqueda masiva de precios
+            tryIndex(stmt,
+                    "CREATE INDEX IF NOT EXISTS idx_prices_list_product ON product_prices (price_list_id, product_id)");
+
+            // Filtros rápidos de productos (Existencias y Estado)
+            tryIndex(stmt, "CREATE INDEX IF NOT EXISTS idx_prod_stock          ON products(stock_quantity)");
+            tryIndex(stmt, "CREATE INDEX IF NOT EXISTS idx_prod_active_visible  ON products(is_active, visible)");
+
+            // Segmentación de clientes (B2B vs B2C)
+            tryIndex(stmt, "CREATE INDEX IF NOT EXISTS idx_cli_company         ON clients(is_company)");
+
+            // Consultas de ventas (Valor total y búsqueda reversa)
+            tryIndex(stmt, "CREATE INDEX IF NOT EXISTS idx_sales_amount        ON sales(total)");
+            tryIndex(stmt, "CREATE INDEX IF NOT EXISTS idx_sd_product_sale     ON sale_details(product_id, sale_id)");
         }
     }
 
