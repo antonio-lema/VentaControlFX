@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
+
+<VBox spacing="20" styleClass="modal-container" prefWidth="440" stylesheets="@../../styles/variables.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mycompany.ventacontrolfx.presentation.controller.dialog.ImportResultDialogController">
+    <padding>
+        <Insets top="30" right="35" bottom="30" left="35"/>
+    </padding>
+
+    <VBox alignment="CENTER" spacing="15">
+        <StackPane fx:id="iconContainer" style="-fx-background-color: -fx-custom-color-success-bg; -fx-padding: 20; -fx-background-radius: 50%;">
+            <FontAwesomeIconView fx:id="iconView" glyphName="CHECK_CIRCLE" size="40" fill="-fx-custom-color-success"/>
+        </StackPane>
+        
+        <VBox alignment="CENTER" spacing="5">
+            <Label fx:id="lblTitle" text="Importación Exitosa" style="-fx-font-size: 20px; -fx-font-weight: 800; -fx-text-fill: -fx-text-custom-main;"/>
+            <Label fx:id="lblSubtitle" text="Los productos se han procesado correctamente" style="-fx-text-fill: -fx-text-custom-muted; -fx-font-size: 14px;"/>
+        </VBox>
+    </VBox>
+
+    <VBox spacing="10" style="-fx-background-color: -fx-bg-subtle; -fx-padding: 15; -fx-background-radius: 12; -fx-border-color: -fx-color-border-light; -fx-border-width: 1;">
+        <HBox spacing="10" alignment="CENTER_LEFT">
+            <FontAwesomeIconView glyphName="BOX" size="14" fill="-fx-text-custom-light"/>
+            <Label text="Productos importados:" style="-fx-text-fill: -fx-text-custom-medium;"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Label fx:id="lblCount" text="0" style="-fx-font-weight: bold; -fx-text-fill: -fx-custom-color-success; -fx-font-size: 16px;"/>
+        </HBox>
+        <Separator opacity="0.5"/>
+        <Label fx:id="lblMessage" text="La base de datos se ha actualizado con los nuevos registros y precios correspondientes." wrapText="true" style="-fx-text-fill: -fx-text-custom-muted; -fx-font-size: 12px;"/>
+    </VBox>
+
+    <Button text="Entendido" onAction="#handleClose" maxWidth="Infinity" styleClass="btn-primary" style="-fx-padding: 12;"/>
+</VBox>

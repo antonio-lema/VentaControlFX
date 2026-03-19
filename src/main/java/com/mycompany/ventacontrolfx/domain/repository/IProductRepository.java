@@ -21,6 +21,8 @@ public interface IProductRepository {
 
     void save(Product product) throws SQLException;
 
+    void saveAll(List<Product> products) throws SQLException;
+
     void update(Product product) throws SQLException;
 
     void delete(int id) throws SQLException;

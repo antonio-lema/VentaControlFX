@@ -1,0 +1,11 @@
+Nombre,Precio,Stock,Categoría,SKU,IVA
+Teclado Mecánico RGB,45.90,80,Periféricos,KBD-RGB,21.0
+Ratón Gaming Pro,29.95,120,Periféricos,MOUSE-G,21.0
+Monitor 24" 144Hz,189.00,30,Monitores,MON-24,21.0
+Disco SSD 1TB,75.00,200,Componentes,SSD-1TB,21.0
+Memoria RAM 16GB,64.50,50,Componentes,RAM-16G,21.0
+Cable HDMI 2m,9.90,300,Accesorios,HDMI-02,21.0
+Auriculares Bluetooth,55.00,60,Audio,AUDI-BT,21.0
+Pendrive 64GB USB 3.0,12.50,400,Almacenamiento,PEN-64,21.0
+Tarjeta Gráfica RTX 3060,320.00,15,Componentes,GPU-3060,21.0
+Fuente Alimentación 750W,89.00,25,Componentes,PSU-750,21.0

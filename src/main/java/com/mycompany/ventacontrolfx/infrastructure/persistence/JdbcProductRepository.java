@@ -118,6 +118,7 @@ public class JdbcProductRepository implements IProductRepository {
 
     @Override
     public void save(Product product) throws SQLException {
+        // ... (existing save code remains unchanged)
         Connection conn = null;
         try {
             conn = DBConnection.getConnection();
@@ -198,6 +199,97 @@ public class JdbcProductRepository implements IProductRepository {
                 } catch (SQLException ex) {
                     ex.printStackTrace();
                 }
+            }
+        }
+    }
+
+    @Override
+    public void saveAll(List<Product> products) throws SQLException {
+        if (products == null || products.isEmpty())
+            return;
+
+        Connection conn = null;
+        try {
+            conn = DBConnection.getConnection();
+            conn.setAutoCommit(false);
+
+            // 1. Insertar productos en lote
+            String sql = "INSERT INTO products (category_id, name, is_favorite, image_path, visible, iva, tax_rate, tax_group_id, sku, cost_price, is_active, stock_quantity, min_stock, manage_stock) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            try (PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+                for (Product product : products) {
+                    pstmt.setInt(1, product.getCategoryId());
+                    pstmt.setString(2, product.getName());
+                    pstmt.setBoolean(3, product.isFavorite());
+                    pstmt.setString(4, product.getImagePath());
+                    pstmt.setBoolean(5, product.isVisible());
+
+                    Double iva = product.getIva();
+                    if (iva != null) {
+                        pstmt.setDouble(6, iva);
+                        pstmt.setDouble(7, iva);
+                    } else {
+                        pstmt.setNull(6, Types.DOUBLE);
+                        pstmt.setNull(7, Types.DOUBLE);
+                    }
+                    if (product.getTaxGroupId() != null && product.getTaxGroupId() > 0) {
+                        pstmt.setInt(8, product.getTaxGroupId());
+                    } else {
+                        pstmt.setNull(8, Types.INTEGER);
+                    }
+                    pstmt.setString(9, product.getSku());
+                    pstmt.setDouble(10, product.getCostPrice());
+                    pstmt.setBoolean(11, product.isActive());
+                    pstmt.setInt(12, product.getStockQuantity());
+                    pstmt.setInt(13, product.getMinStock());
+                    pstmt.setBoolean(14, product.isManageStock());
+                    pstmt.addBatch();
+                }
+                pstmt.executeBatch();
+
+                // Obtener IDs generados
+                try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
+                    int i = 0;
+                    while (generatedKeys.next() && i < products.size()) {
+                        products.get(i).setId(generatedKeys.getInt(1));
+                        i++;
+                    }
+                }
+            }
+
+            // 2. Obtener ID de lista de precios por defecto una sola vez
+            int defaultPriceListId = 1;
+            try (Statement stmtList = conn.createStatement();
+                    ResultSet rsList = stmtList.executeQuery(
+                            "SELECT price_list_id FROM price_lists WHERE is_default = 1 LIMIT 1")) {
+                if (rsList.next()) {
+                    defaultPriceListId = rsList.getInt(1);
+                }
+            } catch (Exception ignored) {
+            }
+
+            // 3. Insertar precios en lote
+            String priceSql = "INSERT INTO product_prices (product_id, price_list_id, price, start_date, reason) VALUES (?, ?, ?, NOW(), 'Importación masiva')";
+            try (PreparedStatement pstmtPrice = conn.prepareStatement(priceSql)) {
+                for (Product product : products) {
+                    if (product.getId() > 0) {
+                        pstmtPrice.setInt(1, product.getId());
+                        pstmtPrice.setInt(2, defaultPriceListId);
+                        pstmtPrice.setDouble(3, product.getPrice());
+                        pstmtPrice.addBatch();
+                    }
+                }
+                pstmtPrice.executeBatch();
+            }
+
+            conn.commit();
+        } catch (SQLException e) {
+            if (conn != null)
+                conn.rollback();
+            throw e;
+        } finally {
+            if (conn != null) {
+                conn.setAutoCommit(true);
+                conn.close();
             }
         }
     }

@@ -50,6 +50,8 @@ public class ProductController implements Injectable, com.mycompany.ventacontrol
     private Button btnAdd;
     @FXML
     private Label lblCount;
+    @FXML
+    private javafx.scene.layout.VBox mainContainer;
 
     private ProductUseCase productUseCase;
     private ServiceContainer container;
@@ -256,6 +258,41 @@ public class ProductController implements Injectable, com.mycompany.ventacontrol
         view.setSize("16");
         view.setFill(Color.web(color));
         return view;
+    }
+
+    @FXML
+    private void handleImportExcel() {
+        if (!container.getUserSession().hasPermission("producto.importar") &&
+                !container.getUserSession().hasPermission("PRODUCTOS")) {
+            AlertUtil.showError("Acceso Denegado", "No tiene permiso para importar productos.");
+            return;
+        }
+
+        javafx.stage.FileChooser fileChooser = new javafx.stage.FileChooser();
+        fileChooser.setTitle("Seleccionar archivo CSV de productos");
+        fileChooser.getExtensionFilters().add(new javafx.stage.FileChooser.ExtensionFilter("Archivos CSV", "*.csv"));
+
+        File selectedFile = fileChooser.showOpenDialog(btnAdd.getScene().getWindow());
+        if (selectedFile != null) {
+            asyncManager.runAsyncTask(() -> {
+                return container.getProductImportUseCase().importFromCsv(selectedFile);
+            }, (Integer count) -> {
+                ModalService.showTransparentModal("/view/dialog/import_result_dialog.fxml",
+                        "Resultado de Importación",
+                        container,
+                        (com.mycompany.ventacontrolfx.presentation.controller.dialog.ImportResultDialogController c) -> {
+                            c.initData(count, true, "");
+                        });
+                loadProducts();
+            }, (Throwable ex) -> {
+                ModalService.showTransparentModal("/view/dialog/import_result_dialog.fxml",
+                        "Error de Importación",
+                        container,
+                        (com.mycompany.ventacontrolfx.presentation.controller.dialog.ImportResultDialogController c) -> {
+                            c.initData(0, false, ex.getMessage());
+                        });
+            });
+        }
     }
 
     private void loadProducts() {

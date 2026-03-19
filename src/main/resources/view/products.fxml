@@ -37,6 +37,9 @@
                             <Button fx:id="btnAdd" onAction="#handleAddProduct" styleClass="btn-primary" text=" Nuevo Producto">
                                 <graphic><FontAwesomeIconView glyphName="PLUS" size="14" fill="WHITE"/></graphic>
                             </Button>
+                            <Button text="Importar" onAction="#handleImportExcel" styleClass="btn-secondary">
+                                <graphic><FontAwesomeIconView glyphName="UPLOAD" size="14" fill="white"/></graphic>
+                            </Button>
                         </children>
                     </HBox>
                 </children>

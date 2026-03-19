@@ -73,6 +73,7 @@ public class ServiceContainer {
     private final TaxManagementUseCase taxManagementUseCase;
     private final PromotionUseCase promotionUseCase;
     private final com.mycompany.ventacontrolfx.application.service.PromotionService promotionService;
+    private final ProductImportUseCase productImportUseCase;
 
     // Shared Components
     private final GlobalEventBus eventBus;
@@ -165,6 +166,7 @@ public class ServiceContainer {
                 suspendedCartRepository, productRepository, clientRepository, cartUseCase);
         this.taxManagementUseCase = new TaxManagementUseCase(taxRepository, productRepository, authService);
         this.promotionUseCase = new PromotionUseCase(promotionRepository);
+        this.productImportUseCase = new ProductImportUseCase(productRepository, categoryRepository, authService);
 
         // 4. Domain Services
         // taxEngineService is now initialized above
@@ -351,5 +353,9 @@ public class ServiceContainer {
 
     public IFiscalPdfService getPdfService() {
         return pdfService;
+    }
+
+    public ProductImportUseCase getProductImportUseCase() {
+        return productImportUseCase;
     }
 }
