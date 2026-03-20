@@ -1116,7 +1116,7 @@ public class JdbcPriceRepository implements IPriceRepository {
     private void ensurePricesExistForProducts(int priceListId, java.util.List<Integer> productIds, Connection conn)
             throws SQLException {
         // Enforce that prices rows exist just like ensurePricesExist for general ones
-        String sql = "INSERT OR IGNORE INTO product_prices (product_id, price_list_id, price, start_date, reason) " +
+        String sql = "INSERT IGNORE INTO product_prices (product_id, price_list_id, price, start_date, reason) " +
                 "SELECT p.product_id, ?, p.base_price, CURRENT_TIMESTAMP, 'Inicial masivo' " +
                 "FROM products p WHERE p.product_id IN (" +
                 productIds.stream().map(String::valueOf).collect(java.util.stream.Collectors.joining(",")) + ") " +
@@ -1128,5 +1128,92 @@ public class JdbcPriceRepository implements IPriceRepository {
             ps.setInt(2, priceListId);
             ps.executeUpdate();
         }
+    }
+
+    @Override
+    public java.util.List<com.mycompany.ventacontrolfx.domain.dto.ProductPriceDTO> findPricesByListPaginated(
+            int priceListId,
+            String search, int limit, int offset) throws SQLException {
+        java.util.List<com.mycompany.ventacontrolfx.domain.dto.ProductPriceDTO> results = new java.util.ArrayList<>();
+        String searchPattern = (search == null || search.trim().isEmpty()) ? null
+                : "%" + search.trim().toLowerCase() + "%";
+
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT p.product_id, p.name as product_name, c.name as category_name, ");
+        sql.append("COALESCE(pp.price, pp_def.price, 0.0) as price, COALESCE(pp_def.price, 0.0) as default_price, ");
+        sql.append(
+                "COALESCE(p.iva, c.default_iva, (SELECT config_value FROM system_config WHERE config_key = 'global_tax' LIMIT 1), 0.0) as effective_tax ");
+        sql.append("FROM products p ");
+        sql.append("LEFT JOIN categories c ON p.category_id = c.category_id ");
+        sql.append("LEFT JOIN product_prices pp ON p.product_id = pp.product_id AND pp.price_list_id = ? ");
+        sql.append(
+                "  AND pp.start_date <= CURRENT_TIMESTAMP AND (pp.end_date IS NULL OR pp.end_date > CURRENT_TIMESTAMP) ");
+        sql.append("LEFT JOIN product_prices pp_def ON p.product_id = pp_def.product_id ");
+        sql.append(
+                "  AND pp_def.price_list_id = (SELECT price_list_id FROM price_lists WHERE is_default = 1 LIMIT 1) ");
+        sql.append(
+                "  AND pp_def.start_date <= CURRENT_TIMESTAMP AND (pp_def.end_date IS NULL OR pp_def.end_date > CURRENT_TIMESTAMP) ");
+        sql.append("WHERE p.visible = 1 ");
+
+        if (searchPattern != null) {
+            sql.append("AND (LOWER(p.name) LIKE ? OR LOWER(c.name) LIKE ? OR CAST(p.product_id AS CHAR) LIKE ?) ");
+        }
+
+        sql.append("ORDER BY c.name, p.name LIMIT ? OFFSET ?");
+
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+            int paramIdx = 1;
+            ps.setInt(paramIdx++, priceListId);
+            if (searchPattern != null) {
+                ps.setString(paramIdx++, searchPattern);
+                ps.setString(paramIdx++, searchPattern);
+                ps.setString(paramIdx++, searchPattern);
+            }
+            ps.setInt(paramIdx++, limit);
+            ps.setInt(paramIdx++, offset);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    results.add(new com.mycompany.ventacontrolfx.domain.dto.ProductPriceDTO(
+                            rs.getInt("product_id"),
+                            rs.getString("product_name"),
+                            rs.getString("category_name"),
+                            rs.getDouble("price"),
+                            rs.getDouble("default_price"),
+                            rs.getDouble("effective_tax")));
+                }
+            }
+        }
+        return results;
+    }
+
+    @Override
+    public int countPricesByList(int priceListId, String search) throws SQLException {
+        String searchPattern = (search == null || search.trim().isEmpty()) ? null
+                : "%" + search.trim().toLowerCase() + "%";
+
+        StringBuilder sql = new StringBuilder();
+        sql.append(
+                "SELECT COUNT(*) FROM products p LEFT JOIN categories c ON p.category_id = c.category_id WHERE p.visible = 1 ");
+
+        if (searchPattern != null) {
+            sql.append("AND (LOWER(p.name) LIKE ? OR LOWER(c.name) LIKE ? OR CAST(p.product_id AS CHAR) LIKE ?) ");
+        }
+
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+            if (searchPattern != null) {
+                ps.setString(1, searchPattern);
+                ps.setString(2, searchPattern);
+                ps.setString(3, searchPattern);
+            }
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        }
+        return 0;
     }
 }

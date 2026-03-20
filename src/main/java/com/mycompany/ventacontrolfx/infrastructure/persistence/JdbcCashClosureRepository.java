@@ -101,7 +101,6 @@ public class JdbcCashClosureRepository implements ICashClosureRepository {
         totals.put("returns_card", returnsCard);
         totals.put("returns_total", returnsCash + returnsCard);
         totals.put("manual_in", manualIn);
-        totals.put("manual_in", manualIn);
         totals.put("manual_out", manualOut);
 
         // Discounts tracking
