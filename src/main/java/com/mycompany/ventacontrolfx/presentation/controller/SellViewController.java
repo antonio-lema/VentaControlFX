@@ -11,7 +11,6 @@ import com.mycompany.ventacontrolfx.presentation.renderer.CategoryMenuRenderer;
 import com.mycompany.ventacontrolfx.presentation.renderer.ProductGridRenderer;
 import com.mycompany.ventacontrolfx.application.usecase.PriceListUseCase;
 import com.mycompany.ventacontrolfx.domain.model.PriceList;
-import com.mycompany.ventacontrolfx.shared.async.AsyncManager;
 import com.mycompany.ventacontrolfx.application.usecase.ProductFilterUseCase.FilterType;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -20,11 +19,8 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
+import javafx.scene.control.ScrollPane;
 import javafx.util.StringConverter;
-import java.util.ArrayList;
-import java.util.stream.Collectors;
-
-import java.sql.SQLException;
 import java.util.List;
 
 public class SellViewController implements Injectable, CategoryMenuRenderer.CategorySelectionHandler,
@@ -33,6 +29,8 @@ public class SellViewController implements Injectable, CategoryMenuRenderer.Cate
 
     @FXML
     private TilePane productsPane;
+    @FXML
+    private ScrollPane productsScrollPane;
     @FXML
     private ComboBox<PriceList> comboPriceList;
     @FXML
@@ -54,6 +52,9 @@ public class SellViewController implements Injectable, CategoryMenuRenderer.Cate
     private ProductGridRenderer productRenderer;
 
     private int selectedPriceListId = -1;
+    private int currentOffset = 0;
+    private static final int PAGE_SIZE = 500;
+    private int totalProductCount = 0;
     private java.util.List<com.mycompany.ventacontrolfx.domain.model.Promotion> activePromotions = new java.util.ArrayList<>();
 
     @Override
@@ -138,27 +139,37 @@ public class SellViewController implements Injectable, CategoryMenuRenderer.Cate
             }
         }, promos -> {
             this.activePromotions = promos;
-            container.getAsyncManager().runAsyncTask(() -> productUseCase.getVisibleProducts(selectedPriceListId),
-                    products -> {
-                        filterUseCase.updateSourceData(products);
-                        applyCategoryFilterById(container.getCartUseCase().getSelectedCategoryId());
-                        loadingOverlay.setVisible(false);
-                    }, null);
+            int initialCatId = container.getCartUseCase().getSelectedCategoryId();
+            updateCategoryLabelFromId(initialCatId);
+            applyCategoryFilterById(initialCatId);
+            loadingOverlay.setVisible(false);
         }, null);
     }
 
     private void applyCategoryFilterById(int catId) {
-        if (catId == -1)
-            renderProducts(filterUseCase.applyAll());
-        else if (catId == -2)
-            renderProducts(filterUseCase.applyFavorites());
-        else if (catId == -3)
-            renderProducts(filterUseCase.applyPromotions(activePromotions));
-        else {
-            // Buscamos la categoría para aplicar el filtro específico
+        if (catId == -1) {
+            filterUseCase.applyAll();
+            refreshProductsWithNewPriceList();
+        } else if (catId == -2) {
+            loadingOverlay.setVisible(true);
+            container.getAsyncManager().runAsyncTask(() -> productUseCase.getFavorites(selectedPriceListId),
+                    products -> {
+                        filterUseCase.updateSourceData(products);
+                        renderProducts(products);
+                        loadingOverlay.setVisible(false);
+                    }, null);
+        } else if (catId == -3) {
+            // Fallback para promociones: Mostramos todos y el renderer destacará los que
+            // tengan promo
+            filterUseCase.applyAll();
+            refreshProductsWithNewPriceList();
+        } else {
+            // Categoría específica
             container.getAsyncManager().runAsyncTask(() -> categoryUseCase.getAll(), cats -> {
-                cats.stream().filter(c -> c.getId() == catId).findFirst()
-                        .ifPresent(c -> renderProducts(filterUseCase.applyCategory(c)));
+                cats.stream().filter(c -> c.getId() == catId).findFirst().ifPresent(c -> {
+                    filterUseCase.applyCategory(c);
+                    refreshProductsWithNewPriceList();
+                });
             }, null);
         }
     }
@@ -303,52 +314,54 @@ public class SellViewController implements Injectable, CategoryMenuRenderer.Cate
     }
 
     private void refreshProductsWithNewPriceList() {
+        this.currentOffset = 0;
+        productsScrollPane.setVvalue(0);
         loadingOverlay.setVisible(true);
-        container.getAsyncManager().runAsyncTask(() -> productUseCase.getVisibleProducts(selectedPriceListId),
-                products -> {
-                    filterUseCase.updateSourceData(products);
-                    // Aplicar el filtro actual de nuevo
-                    renderProducts(filterUseCase.applyCurrentFilter());
-                    loadingOverlay.setVisible(false);
-                }, null);
-    }
 
-    @Override
-    public void onCategorySelected(Category category) {
-        renderProducts(filterUseCase.applyCategory(category));
-    }
+        container.getAsyncManager().runAsyncTask(() -> {
+            FilterType type = filterUseCase.getCurrentType();
+            Object criteria = filterUseCase.getCurrentCriteria();
+            int count = 0;
+            List<Product> products;
 
-    @Override
-    public void onSpecialFilterSelected(FilterType type) {
-        if (type == FilterType.FAVORITES)
-            renderProducts(filterUseCase.applyFavorites());
-        else if (type == FilterType.PROMOTIONS)
-            renderProducts(filterUseCase.applyPromotions(activePromotions));
-        else
-            renderProducts(filterUseCase.applyAll());
+            if (type == FilterType.CATEGORY && criteria != null) {
+                Category cat = (Category) criteria;
+                count = container.getProductRepository().countByCategory(cat.getId(), true);
+                products = container.getProductRepository().getByCategoryPaginated(cat.getId(), PAGE_SIZE,
+                        currentOffset, selectedPriceListId);
+            } else if (type == FilterType.FAVORITES) {
+                // Para favoritos, la paginación es en memoria o podríamos implementarla en repo
+                List<Product> allFavs = productUseCase.getFavorites(selectedPriceListId);
+                count = allFavs.size();
+                int end = Math.min(currentOffset + PAGE_SIZE, allFavs.size());
+                products = (currentOffset < allFavs.size()) ? allFavs.subList(currentOffset, end)
+                        : new java.util.ArrayList<>();
+            } else if (type == FilterType.SEARCH && criteria != null) {
+                String query = (String) criteria;
+                count = container.getProductRepository().countSearch(query, true);
+                products = container.getProductRepository().searchPaginated(query, PAGE_SIZE, currentOffset,
+                        selectedPriceListId, true);
+            } else {
+                count = container.getProductRepository().countSearch("", true);
+                products = container.getProductRepository().searchPaginated("", PAGE_SIZE, currentOffset,
+                        selectedPriceListId, true);
+            }
+
+            return new Object[] { products, count };
+        }, result -> {
+            Object[] data = (Object[]) result;
+            List<Product> products = (List<Product>) data[0];
+            this.totalProductCount = (Integer) data[1];
+
+            filterUseCase.updateSourceData(products);
+            renderProducts(products);
+            loadingOverlay.setVisible(false);
+        }, null);
     }
 
     private void renderProducts(List<Product> products) {
         productRenderer.render(products);
         updateFilterUI(products);
-    }
-
-    @Override
-    public void handleSearch(String text) {
-        if (text == null || text.trim().isEmpty()) {
-            renderProducts(filterUseCase.applyAll());
-            return;
-        }
-        String query = text.toLowerCase().trim();
-        container.getAsyncManager().runAsyncTask(() -> productUseCase.getVisibleProducts(selectedPriceListId),
-                allProducts -> {
-                    List<Product> filtered = allProducts.stream()
-                            .filter(p -> p.getName().toLowerCase().contains(query) ||
-                                    (p.getCategoryName() != null && p.getCategoryName().toLowerCase().contains(query)))
-                            .toList();
-                    renderProducts(filtered);
-                    filterLabel.setText("Búsqueda: " + text + " (" + filtered.size() + ")");
-                }, null);
     }
 
     private void updateFilterUI(List<Product> products) {
@@ -362,7 +375,38 @@ public class SellViewController implements Injectable, CategoryMenuRenderer.Cate
         else if (type == FilterType.CATEGORY)
             lbl = ((Category) criteria).getName();
 
-        filterLabel.setText(lbl + " (" + products.size() + ")");
+        filterLabel.setText(lbl + " (" + totalProductCount + ")");
+    }
+
+    @Override
+    public void onCategorySelected(Category category) {
+        filterUseCase.applyCategory(category);
+        refreshProductsWithNewPriceList();
+    }
+
+    @Override
+    public void onSpecialFilterSelected(FilterType type) {
+        if (type == FilterType.FAVORITES)
+            filterUseCase.applyFavorites();
+        else if (type == FilterType.PROMOTIONS)
+            filterUseCase.applyPromotions(activePromotions);
+        else
+            filterUseCase.applyAll();
+
+        refreshProductsWithNewPriceList();
+    }
+
+    @Override
+    public void handleSearch(String text) {
+        if (text == null || text.trim().isEmpty()) {
+            filterUseCase.applyAll();
+            refreshProductsWithNewPriceList();
+            return;
+        }
+
+        String query = text.trim();
+        filterUseCase.applySearch(query);
+        refreshProductsWithNewPriceList();
     }
 
     private String getDiscountDescription(Product p) {

@@ -61,36 +61,41 @@
                 </children>
             </VBox>
             
-            <StackPane VBox.vgrow="ALWAYS">
-                <ScrollPane fitToHeight="true" fitToWidth="true" styleClass="products-scroll-pane">
-                    <TilePane fx:id="productsPane" hgap="20" vgap="20" styleClass="products-grid">
-                        <padding>
-                            <Insets top="25" right="25" bottom="25" left="25"/>
-                        </padding>
-                    </TilePane>
-                </ScrollPane>
-                
-                <!-- NEW: Category Mega Menu Overlay -->
-                <VBox fx:id="categoryMenuContainer" visible="false" managed="false" styleClass="category-mega-menu">
-                    <children>
-                        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="mega-menu-scroll">
-                            <content>
-                                <FlowPane fx:id="categoriesMegaFlowPane" hgap="15" vgap="15" styleClass="mega-menu-flow">
-                                    <padding>
-                                        <Insets top="25" right="25" bottom="25" left="25"/>
-                                    </padding>
-                                </FlowPane>
-                            </content>
+            <VBox VBox.vgrow="ALWAYS" spacing="10">
+                <children>
+                    <StackPane VBox.vgrow="ALWAYS">
+                        <ScrollPane fx:id="productsScrollPane" fitToHeight="true" fitToWidth="true" styleClass="products-scroll-pane">
+                            <TilePane fx:id="productsPane" hgap="20" vgap="20" styleClass="products-grid">
+                                <padding>
+                                    <Insets top="25" right="25" bottom="25" left="25"/>
+                                </padding>
+                            </TilePane>
                         </ScrollPane>
-                        <Region VBox.vgrow="ALWAYS" onMouseClicked="#handleToggleCategoryMenu" style="-fx-background-color: rgba(0,0,0,0.1);"/>
-                    </children>
-                </VBox>
+                        
+                        <!-- NEW: Category Mega Menu Overlay -->
+                        <VBox fx:id="categoryMenuContainer" visible="false" managed="false" styleClass="category-mega-menu">
+                            <children>
+                                <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="mega-menu-scroll">
+                                    <content>
+                                        <FlowPane fx:id="categoriesMegaFlowPane" hgap="15" vgap="15" styleClass="mega-menu-flow">
+                                            <padding>
+                                                <Insets top="25" right="25" bottom="25" left="25"/>
+                                            </padding>
+                                        </FlowPane>
+                                    </content>
+                                </ScrollPane>
+                                <Region VBox.vgrow="ALWAYS" onMouseClicked="#handleToggleCategoryMenu" style="-fx-background-color: rgba(0,0,0,0.1);"/>
+                            </children>
+                        </VBox>
 
-                <VBox fx:id="loadingOverlay" visible="false" alignment="CENTER" styleClass="loading-overlay">
-                    <ProgressIndicator />
-                    <Label text="Cargando productos..." styleClass="label-muted"/>
-                </VBox>
-            </StackPane>
+                        <VBox fx:id="loadingOverlay" visible="false" alignment="CENTER" styleClass="loading-overlay">
+                            <ProgressIndicator />
+                            <Label text="Cargando productos..." styleClass="label-muted"/>
+                        </VBox>
+                    </StackPane>
+
+                </children>
+            </VBox>
         </VBox>
     </center>
 </BorderPane>
