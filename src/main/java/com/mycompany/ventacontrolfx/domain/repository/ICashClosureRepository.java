@@ -76,6 +76,13 @@ public interface ICashClosureRepository {
     /** Marca un cierre como revisado por un administrador. */
     void markAsReviewed(int closureId, int reviewerId) throws SQLException;
 
+    /** Marca un cierre como excluido de las estadísticas global. */
+    void markAsExcluded(int closureId, int reviewerId) throws SQLException;
+
+    /** Modifica el importe real de un cierre y añade una nota de auditoría. */
+    void updateClosure(int closureId, double actualCash, String reason, int reviewerId, double previousCash)
+            throws SQLException;
+
     /** Representa un movimiento de efectivo con detalles para auditoría. */
     class CashMovement {
         public int movementId;

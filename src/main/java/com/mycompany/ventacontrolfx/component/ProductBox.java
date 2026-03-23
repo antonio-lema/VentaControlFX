@@ -7,15 +7,12 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
-import javafx.scene.paint.Color;
+import javafx.application.Platform;
 import javafx.scene.shape.Rectangle;
 
 public class ProductBox extends VBox {
@@ -24,6 +21,8 @@ public class ProductBox extends VBox {
             Consumer<Product> onAddToCart) {
         this.getStyleClass().add("product-box");
         this.setPrefWidth(200);
+        this.setCache(true);
+        this.setCacheHint(javafx.scene.CacheHint.SPEED);
 
         // ── IMAGE SECTION (StackPane allows overlay of price badge) ──
         StackPane imageContainer = new StackPane();
@@ -42,34 +41,32 @@ public class ProductBox extends VBox {
         clip.setArcHeight(28);
         imageContainer.setClip(clip);
 
+        StackPane imageDisplayContainer = new StackPane();
+        imageDisplayContainer.getStyleClass().add("product-image-display");
+        double margin = 8.0;
+        StackPane.setMargin(imageDisplayContainer, new Insets(margin));
+        imageDisplayContainer.getChildren().add(createPlaceholder());
+        imageContainer.getChildren().add(imageDisplayContainer);
+
         if (product.getImagePath() != null && !product.getImagePath().isEmpty()) {
-            File file = resolveFile(product.getImagePath());
-            if (file != null && file.exists()) {
-                StackPane imageDisplay = new StackPane();
-                imageDisplay.getStyleClass().add("product-image-display");
-
-                // Margen interno elegante para que la imagen no toque los bordes si se desea
-                double margin = 8.0;
-                StackPane.setMargin(imageDisplay, new Insets(margin));
-
-                // CSS para "cover" effect con redondeo interno coordinado
-                String imageUrl = file.toURI().toString();
-                imageDisplay.setStyle(
-                        "-fx-background-image: url(\"" + imageUrl + "\"); " +
-                                "-fx-background-size: contain; " +
-                                "-fx-background-position: center center; " +
-                                "-fx-background-repeat: no-repeat; " +
-                                "-fx-border-color: rgba(0,0,0,0.05); " +
-                                "-fx-border-width: 1px; " +
-                                "-fx-background-color: rgba(255,255,255,0.4);"); // Fondo sutil para imágenes
-                                                                                 // transparentes
-
-                imageContainer.getChildren().add(imageDisplay);
-            } else {
-                imageContainer.getChildren().add(createPlaceholder());
-            }
-        } else {
-            imageContainer.getChildren().add(createPlaceholder());
+            // Load image asynchronously to avoid blocking UI thread with file.exists()
+            java.util.concurrent.CompletableFuture.supplyAsync(() -> resolveFile(product.getImagePath()))
+                    .thenAcceptAsync(file -> {
+                        if (file != null) {
+                            String imageUrl = file.toURI().toString();
+                            Platform.runLater(() -> {
+                                imageDisplayContainer.getChildren().clear();
+                                imageDisplayContainer.setStyle(
+                                        "-fx-background-image: url(\"" + imageUrl + "\"); " +
+                                                "-fx-background-size: contain; " +
+                                                "-fx-background-position: center center; " +
+                                                "-fx-background-repeat: no-repeat; " +
+                                                "-fx-border-color: rgba(0,0,0,0.05); " +
+                                                "-fx-border-width: 1px; " +
+                                                "-fx-background-color: rgba(255,255,255,0.4);");
+                            });
+                        }
+                    }, Platform::runLater);
         }
 
         // Price Badge (overlaid top-right on image)
@@ -115,6 +112,21 @@ public class ProductBox extends VBox {
         descLabel.setMaxWidth(Double.MAX_VALUE);
 
         infoBox.getChildren().addAll(nameLabel, descLabel);
+
+        // Stock and SKU fields
+        Label stockLabel = new Label("Stock: " + product.getStockQuantity());
+        if (product.getStockQuantity() <= 0) {
+            stockLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: #ef4444; -fx-font-weight: bold;"); // Red
+        } else {
+            stockLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: #10b981; -fx-font-weight: bold;"); // Green
+        }
+        infoBox.getChildren().add(stockLabel);
+
+        if (product.getSku() != null && !product.getSku().isEmpty()) {
+            Label skuLabel = new Label("SKU: " + product.getSku());
+            skuLabel.setStyle("-fx-font-size: 10px; -fx-text-fill: #64748b;");
+            infoBox.getChildren().add(skuLabel);
+        }
 
         // ── ADD BUTTON ──
         FontAwesomeIconView addIcon = new FontAwesomeIconView();

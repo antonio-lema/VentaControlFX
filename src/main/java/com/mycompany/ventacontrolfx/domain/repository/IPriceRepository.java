@@ -181,6 +181,11 @@ public interface IPriceRepository {
         List<com.mycompany.ventacontrolfx.domain.dto.ProductPriceDTO> findPricesByList(int priceListId)
                         throws SQLException;
 
+        List<com.mycompany.ventacontrolfx.domain.dto.ProductPriceDTO> findPricesByListPaginated(int priceListId,
+                        String search, int limit, int offset) throws SQLException;
+
+        int countPricesByList(int priceListId, String search) throws SQLException;
+
         String getAveragePercentageDifference(int priceListId) throws SQLException;
 
         int applyBulkMultiplierToProducts(int priceListId, java.util.List<Integer> productIds, double multiplier,

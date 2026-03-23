@@ -9,6 +9,9 @@ import com.mycompany.ventacontrolfx.application.usecase.GetSaleTicketUseCase;
 import com.mycompany.ventacontrolfx.infrastructure.config.Injectable;
 import com.mycompany.ventacontrolfx.infrastructure.config.ServiceContainer;
 import com.mycompany.ventacontrolfx.util.AlertUtil;
+import com.mycompany.ventacontrolfx.util.ModalService;
+import com.mycompany.ventacontrolfx.domain.model.Product;
+import com.mycompany.ventacontrolfx.domain.model.CartItem;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
@@ -40,6 +43,7 @@ public class TicketDetailController implements Injectable {
     private ClientUseCase clientUseCase;
     private GetSaleTicketUseCase getSaleTicketUseCase;
     private ServiceContainer container;
+    private Sale currentSale;
 
     private static final DateTimeFormatter FMT = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
@@ -62,6 +66,7 @@ public class TicketDetailController implements Injectable {
             if (sale.getDetails() == null || sale.getDetails().isEmpty()) {
                 sale = getSaleTicketUseCase.execute(sale.getSaleId());
             }
+            this.currentSale = sale;
 
             // Datos de cabecera
             lblTicketId.setText("Ticket #" + sale.getSaleId());
@@ -197,8 +202,38 @@ public class TicketDetailController implements Injectable {
 
     @FXML
     private void handlePrint() {
-        // Implementación futura de impresión física o PDF
-        AlertUtil.showInfo("Impresión", "Enviando ticket a la impresora térmica...");
+        if (currentSale == null)
+            return;
+
+        ModalService.showStandardModal("/view/print_preview.fxml",
+                currentSale.getClientId() != null && currentSale.getClientId() > 0 ? "Factura" : "Factura Simplificada",
+                container,
+                (PrintPreviewController ppc) -> {
+                    try {
+                        List<CartItem> cartItems = new ArrayList<>();
+                        for (SaleDetail detail : currentSale.getDetails()) {
+                            Product p = new Product();
+                            p.setName(detail.getProductName());
+                            p.setPrice(detail.getUnitPrice());
+                            p.setIva(detail.getIvaRate()); // Usar IVA histórico
+                            cartItems.add(new CartItem(p, detail.getQuantity()));
+                        }
+
+                        if (currentSale.getClientId() != null && currentSale.getClientId() > 0) {
+                            Client client = clientUseCase.getById(currentSale.getClientId());
+                            if (client != null) {
+                                ppc.setClientInfo(client);
+                            }
+                        }
+
+                        ppc.setReceiptData(cartItems, currentSale.getTotal(), currentSale.getTotal(), 0.0,
+                                currentSale.getPaymentMethod(), currentSale.getSaleId());
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        AlertUtil.showError("Error", "Error al preparar la vista previa de impresión.");
+                    }
+                });
     }
 
     @FXML

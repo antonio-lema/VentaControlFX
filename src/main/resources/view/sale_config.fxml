@@ -19,20 +19,17 @@
 <?import javafx.collections.FXCollections?>
 <?import java.lang.String?>
 
-<BorderPane xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="com.mycompany.ventacontrolfx.presentation.controller.SaleConfigController"
-            styleClass="main-content-area">
-
-    <!-- ===== CABECERA ===== -->
-    <top>
-        <VBox styleClass="config-page-header">
-            <HBox alignment="CENTER_LEFT" spacing="15">
-                <StackPane styleClass="config-header-icon-wrap">
-                    <FontAwesomeIconView glyphName="COG" size="28" fill="white"/>
+<VBox xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.mycompany.ventacontrolfx.presentation.controller.SaleConfigController"
+      styleClass="main-content-area" spacing="0">
+        <VBox styleClass="view-header">
+            <HBox alignment="CENTER_LEFT" spacing="16">
+                <StackPane styleClass="view-header-icon-wrap">
+                    <FontAwesomeIconView glyphName="COG" size="24" fill="white"/>
                 </StackPane>
                 <VBox spacing="2">
-                    <Label text="Configuración de Venta" styleClass="config-page-title"/>
-                    <Label text="Ajusta los parámetros generales del punto de venta" styleClass="config-page-subtitle"/>
+                    <Label text="Configuración de Venta" styleClass="view-title"/>
+                    <Label text="Ajusta los parámetros generales del punto de venta" styleClass="view-subtitle"/>
                 </VBox>
                 <Region HBox.hgrow="ALWAYS"/>
                 <!-- Botón Guardar (cabecera) -->
@@ -45,15 +42,8 @@
                 </Button>
             </HBox>
         </VBox>
-    </top>
-
-    <!-- ===== CONTENIDO PRINCIPAL ===== -->
-    <center>
-        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="detail-scroll">
-            <VBox spacing="20">
-                <padding>
-                    <Insets top="20" right="25" bottom="30" left="25"/>
-                </padding>
+        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="detail-scroll, edge-to-edge" VBox.vgrow="ALWAYS">
+            <VBox spacing="20" style="-fx-padding: 30;">
 
                 <!-- ─── FILA 1: Empresa + Fiscal ─── -->
                 <HBox spacing="20">
@@ -354,5 +344,4 @@
 
             </VBox>
         </ScrollPane>
-    </center>
-</BorderPane>
+</VBox>

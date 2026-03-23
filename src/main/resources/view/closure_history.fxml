@@ -133,7 +133,6 @@
                                                     <TableColumn fx:id="colExpected" prefWidth="110.0" text="ESPERADO" />
                                                     <TableColumn fx:id="colActual" prefWidth="110.0" text="CONTADO" />
                                                     <TableColumn fx:id="colDifference" prefWidth="100.0" text="DIFERENCIA" />
-                                                    <TableColumn fx:id="colActions" prefWidth="60.0" text="" />
                                                 </columns>
                                                 <columnResizePolicy>
                                                     <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
@@ -231,7 +230,8 @@
                                                     <Separator />
                                                     <HBox spacing="12" alignment="CENTER">
                                                         <children>
-                                                            <Button fx:id="btnMarkReviewed" onAction="#handleMarkReviewed" text="MARCAR COMO REVISADO" styleClass="btn-primary-saas" maxWidth="Infinity" HBox.hgrow="ALWAYS" prefHeight="45"/>
+                                                            <Button fx:id="btnMarkReviewed" onAction="#handleMarkReviewed" text="MARCAR REVISADO" styleClass="btn-primary-saas" maxWidth="Infinity" HBox.hgrow="ALWAYS" prefHeight="45"/>
+                                                            <Button fx:id="btnEditClosure" onAction="#handleEditClosure" text="MODIFICAR" styleClass="btn-secondary-saas" maxWidth="Infinity" HBox.hgrow="ALWAYS" prefHeight="45"/>
                                                             <Button onAction="#handlePrintAudit" styleClass="btn-secondary-saas" prefHeight="45" prefWidth="50">
                                                                 <graphic><FontAwesomeIconView glyphName="PRINT" size="18" /></graphic>
                                                             </Button>

@@ -5,9 +5,11 @@ import com.mycompany.ventacontrolfx.infrastructure.config.ServiceContainer;
 import com.mycompany.ventacontrolfx.domain.repository.IAppSettingsRepository;
 import com.mycompany.ventacontrolfx.presentation.theme.ThemeManager;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
-import javafx.scene.layout.VBox;
-import javafx.scene.layout.HBox;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ColorPicker;
+import javafx.scene.control.Label;
+import javafx.scene.control.Slider;
 import javafx.scene.paint.Color;
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -312,7 +314,9 @@ public class CustomizationController implements Injectable {
     @FXML
     private void applyPremiumDark() {
         // Indigo, Muted, Bg, Text, TextCards, TextPrice, Sidebar
-        applyPalette("#6366f1", "#71717a", "#09090b", "#fafafa", "#fafafa", "#6366f1", "#09090b");
+        // Cambiado a Slate-900 (#0f172a) para mejor contraste visual que el negro
+        // absoluto
+        applyPalette("#6366f1", "#94a3b8", "#0f172a", "#f8fafc", "#f8fafc", "#818cf8", "#0f172a");
     }
 
     @FXML

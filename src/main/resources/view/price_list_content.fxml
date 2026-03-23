@@ -54,6 +54,12 @@
         </columns>
     </TableView>
 
+    <!-- Pagination -->
+    <HBox alignment="CENTER_RIGHT" spacing="15">
+        <javafx.scene.control.Pagination fx:id="pagination" maxPageIndicatorCount="5" styleClass="server-pagination" />
+        <Label fx:id="lblCount" text="0 productos" style="-fx-text-fill: #6b7280; -fx-font-weight: bold;"/>
+    </HBox>
+
     <!-- Actions -->
     <HBox alignment="CENTER_RIGHT">
         <Button text="Cerrar" onAction="#handleClose" styleClass="btn-secondary"/>

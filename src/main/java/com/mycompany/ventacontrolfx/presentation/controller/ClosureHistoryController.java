@@ -7,6 +7,7 @@ import com.mycompany.ventacontrolfx.infrastructure.config.Injectable;
 import com.mycompany.ventacontrolfx.infrastructure.config.ServiceContainer;
 import com.mycompany.ventacontrolfx.util.AlertUtil;
 import com.mycompany.ventacontrolfx.util.PaginationHelper;
+import com.mycompany.ventacontrolfx.util.ModalService;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import javafx.beans.property.SimpleStringProperty;
@@ -16,6 +17,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.VBox;
+import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 
 import java.sql.SQLException;
@@ -40,8 +42,6 @@ public class ClosureHistoryController implements Injectable {
     private TableColumn<CashClosure, String> colStatus, colCreated, colUser;
     @FXML
     private TableColumn<CashClosure, Double> colInitialFund, colExpected, colActual, colDifference;
-    @FXML
-    private TableColumn<CashClosure, Void> colActions;
 
     @FXML
     private VBox detailsPanel;
@@ -50,7 +50,7 @@ public class ClosureHistoryController implements Injectable {
     @FXML
     private Label lblDetInitial, lblDetSales, lblDetIn, lblDetOut, lblDetExpected, lblDetActual, lblDetNotes;
     @FXML
-    private Button btnMarkReviewed;
+    private Button btnMarkReviewed, btnEditClosure;
 
     @FXML
     private TableView<CashMovement> tableMovements;
@@ -63,12 +63,14 @@ public class ClosureHistoryController implements Injectable {
 
     private CashClosureUseCase closureUseCase;
     private com.mycompany.ventacontrolfx.util.UserSession userSession;
+    private com.mycompany.ventacontrolfx.infrastructure.config.ServiceContainer container;
     private PaginationHelper<CashClosure> paginationHelper;
     private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
     private ObservableList<CashClosure> allClosures = FXCollections.observableArrayList();
 
     @Override
     public void inject(ServiceContainer container) {
+        this.container = container;
         this.closureUseCase = container.getClosureUseCase();
         this.userSession = container.getUserSession();
 
@@ -88,7 +90,8 @@ public class ClosureHistoryController implements Injectable {
     }
 
     private void setupFilters() {
-        cmbStatusFilter.setItems(FXCollections.observableArrayList("Todos", "CUADRADO", "DESCUADRE", "REVISADO"));
+        cmbStatusFilter
+                .setItems(FXCollections.observableArrayList("Todos", "CUADRADO", "DESCUADRE", "REVISADO", "EXCLUIDO"));
         cmbStatusFilter.setValue("Todos");
         cmbStatusFilter.setOnAction(e -> applyFilters());
     }
@@ -103,21 +106,6 @@ public class ClosureHistoryController implements Injectable {
         setupCurrencyColumn(colExpected, "expectedCash");
         setupCurrencyColumn(colActual, "actualCash");
         setupDifferenceColumn();
-
-        colActions.setCellFactory(column -> new TableCell<>() {
-            private final Button btnPrint = new Button();
-            {
-                btnPrint.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.PRINT));
-                btnPrint.setStyle("-fx-background-color: transparent; -fx-cursor: hand;");
-                btnPrint.setOnAction(e -> handlePrintClosure(getTableRow().getItem()));
-            }
-
-            @Override
-            protected void updateItem(Void item, boolean empty) {
-                super.updateItem(item, empty);
-                setGraphic(empty ? null : btnPrint);
-            }
-        });
     }
 
     private void setupStatusColumn() {
@@ -141,6 +129,9 @@ public class ClosureHistoryController implements Injectable {
                     else if ("REVISADO".equals(item))
                         label.setStyle(
                                 "-fx-background-color: -fx-custom-color-primary-bg; -fx-text-fill: -fx-custom-color-primary-dark;");
+                    else if ("EXCLUIDO".equals(item))
+                        label.setStyle(
+                                "-fx-background-color: #f1f5f9; -fx-text-fill: #64748b;");
                     setGraphic(label);
                 }
             }
@@ -297,6 +288,7 @@ public class ClosureHistoryController implements Injectable {
 
     private void updateKPIs() {
         double totalDiff = allClosures.stream()
+                .filter(c -> !"EXCLUIDO".equals(c.getStatus()))
                 .mapToDouble(CashClosure::getDifference)
                 .sum();
         long pending = allClosures.stream()
@@ -335,7 +327,12 @@ public class ClosureHistoryController implements Injectable {
             List<CashMovement> movements = closureUseCase.getMovementsByClosure(closure.getClosureId());
             tableMovements.setItems(FXCollections.observableArrayList(movements));
 
-            btnMarkReviewed.setDisable("REVISADO".equals(closure.getStatus()));
+            btnMarkReviewed
+                    .setDisable("REVISADO".equals(closure.getStatus()) || "EXCLUIDO".equals(closure.getStatus()));
+            boolean isAdmin = userSession != null && userSession.getCurrentUser() != null
+                    && ("ADMIN".equalsIgnoreCase(userSession.getCurrentUser().getRole())
+                            || "Administrador".equalsIgnoreCase(userSession.getCurrentUser().getRole()));
+            btnEditClosure.setDisable(!isAdmin);
 
             detailsPanel.setVisible(true);
             detailsPanel.setManaged(true);
@@ -359,6 +356,28 @@ public class ClosureHistoryController implements Injectable {
             loadClosures(); // Recargar para ver cambios
         } catch (SQLException e) {
             AlertUtil.showError("Error", "No se pudo actualizar el estado.");
+        }
+    }
+
+    @FXML
+    private void handleEditClosure() {
+        CashClosure closure = tableClosures.getSelectionModel().getSelectedItem();
+        if (closure == null)
+            return;
+
+        com.mycompany.ventacontrolfx.presentation.controller.dialog.EditClosureDialogController controller = ModalService
+                .showStandardModal(
+                        "/view/dialog/edit_closure_dialog.fxml",
+                        "Modificar Arqueo",
+                        container,
+                        c -> {
+                            ((com.mycompany.ventacontrolfx.presentation.controller.dialog.EditClosureDialogController) c)
+                                    .init(closureUseCase, userSession, closure.getClosureId(), closure.getActualCash());
+                        });
+
+        if (controller != null && controller.isConfirmed()) {
+            AlertUtil.showToast("Cierre modificado correctamente.");
+            loadClosures();
         }
     }
 
@@ -402,10 +421,24 @@ public class ClosureHistoryController implements Injectable {
 
     @FXML
     private void handlePrintAudit() {
-        AlertUtil.showInfo("Imprimir", "Generando informe de auditoría PDF...");
+        CashClosure closure = tableClosures.getSelectionModel().getSelectedItem();
+        if (closure != null) {
+            handlePrintClosure(closure);
+        } else {
+            AlertUtil.showWarning("Imprimir", "Seleccione un cierre para imprimir.");
+        }
     }
 
     private void handlePrintClosure(CashClosure closure) {
-        AlertUtil.showInfo("Imprimir", "Reimprimiendo ticket de cierre #" + closure.getClosureId());
+        if (closure == null)
+            return;
+
+        ModalService.showStandardModal(
+                "/view/print_preview.fxml",
+                "Vista Previa de Impresión - Cierre #" + closure.getClosureId(),
+                container,
+                (PrintPreviewController controller) -> {
+                    controller.setClosureData(closure);
+                });
     }
 }

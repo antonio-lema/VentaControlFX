@@ -12,11 +12,15 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
+import com.mycompany.ventacontrolfx.shared.async.AsyncManager;
+import com.mycompany.ventacontrolfx.util.ServerPaginationHelper;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
+import javafx.scene.control.Pagination;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 
 import java.sql.SQLException;
@@ -44,36 +48,67 @@ public class PriceListContentController implements Injectable {
     private TableColumn<ProductPriceDTO, String> colListPvp;
     @FXML
     private TableColumn<ProductPriceDTO, String> colDiff;
+    @FXML
+    private Pagination pagination;
+    @FXML
+    private Label lblCount;
 
     private IPriceRepository priceRepository;
+    private AsyncManager asyncManager;
     private PriceList currentList;
-    private ObservableList<ProductPriceDTO> allPrices;
+    private ServerPaginationHelper<ProductPriceDTO> paginationHelper;
+    private String currentSearch = "";
 
     @Override
     public void inject(ServiceContainer container) {
         this.priceRepository = container.getPriceRepository();
+        this.asyncManager = container.getAsyncManager();
     }
 
     public void initData(PriceList pl) {
         this.currentList = pl;
         lblTitle.setText("Precios: " + pl.getName());
         setupTable();
-        loadData();
+        paginationHelper = new ServerPaginationHelper<>(tablePrices, null, lblCount, pagination, "productos",
+                this::fetchPricesPage);
     }
 
     private void setupTable() {
-        colId.setCellValueFactory(cellData -> new SimpleIntegerProperty(cellData.getValue().getProductId()).asObject());
-        colCategory.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getProductCategory()));
-        colProduct.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getProductName()));
+        colId.setCellValueFactory(new PropertyValueFactory<>("productId"));
+        colCategory.setCellValueFactory(new PropertyValueFactory<>("productCategory"));
+        colProduct.setCellValueFactory(new PropertyValueFactory<>("productName"));
 
-        colBasePrice.setCellValueFactory(
-                cellData -> new SimpleStringProperty(String.format("%.2f €", cellData.getValue().getDefaultPrice())));
-        colListPrice.setCellValueFactory(
-                cellData -> new SimpleStringProperty(String.format("%.2f €", cellData.getValue().getPrice())));
-        colListPvp.setCellValueFactory(
-                cellData -> new SimpleStringProperty(String.format("%.2f €", cellData.getValue().getListPvp())));
-        colDiff.setCellValueFactory(
-                cellData -> new SimpleStringProperty(cellData.getValue().getDiffPercentFormatted()));
+        colBasePrice.setCellFactory(column -> new javafx.scene.control.TableCell<>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || getTableRow() == null || getTableRow().getItem() == null)
+                    setText(null);
+                else
+                    setText(String.format("%.2f €", getTableRow().getItem().getDefaultPrice()));
+            }
+        });
+        colListPrice.setCellFactory(column -> new javafx.scene.control.TableCell<>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || getTableRow() == null || getTableRow().getItem() == null)
+                    setText(null);
+                else
+                    setText(String.format("%.2f €", getTableRow().getItem().getPrice()));
+            }
+        });
+        colListPvp.setCellFactory(column -> new javafx.scene.control.TableCell<>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || getTableRow() == null || getTableRow().getItem() == null)
+                    setText(null);
+                else
+                    setText(String.format("%.2f €", getTableRow().getItem().getListPvp()));
+            }
+        });
+        colDiff.setCellValueFactory(new PropertyValueFactory<>("diffPercentFormatted"));
 
         // Estilos para la columna de diferencia
         colDiff.setCellFactory(column -> {
@@ -98,38 +133,25 @@ public class PriceListContentController implements Injectable {
             };
         });
 
-        txtSearch.textProperty().addListener((observable, oldValue, newValue) -> filterTable(newValue));
-    }
-
-    private void loadData() {
-        try {
-            List<ProductPriceDTO> prices = priceRepository.findPricesByList(currentList.getId());
-            allPrices = FXCollections.observableArrayList(prices);
-            tablePrices.setItems(allPrices);
-        } catch (SQLException e) {
-            AlertUtil.showError("Error", "No se pudieron cargar los precios de la tarifa: " + e.getMessage());
-        }
-    }
-
-    private void filterTable(String filterText) {
-        if (allPrices == null)
-            return;
-        if (filterText == null || filterText.isEmpty()) {
-            tablePrices.setItems(allPrices);
-            return;
-        }
-
-        String lowerCaseFilter = filterText.toLowerCase();
-        FilteredList<ProductPriceDTO> filteredData = new FilteredList<>(allPrices, p -> {
-            if (p.getProductName().toLowerCase().contains(lowerCaseFilter))
-                return true;
-            if (p.getProductCategory() != null && p.getProductCategory().toLowerCase().contains(lowerCaseFilter))
-                return true;
-            if (String.valueOf(p.getProductId()).contains(lowerCaseFilter))
-                return true;
-            return false;
+        txtSearch.textProperty().addListener((observable, oldValue, newValue) -> {
+            this.currentSearch = newValue;
+            paginationHelper.refresh();
         });
-        tablePrices.setItems(filteredData);
+    }
+
+    private void fetchPricesPage(int offset, int limit) {
+        asyncManager.runAsyncTask(() -> {
+            int total = priceRepository.countPricesByList(currentList.getId(), currentSearch);
+            List<ProductPriceDTO> items = priceRepository.findPricesByListPaginated(currentList.getId(), currentSearch,
+                    limit, offset);
+            return new Object[] { total, items };
+        }, (res) -> {
+            Object[] data = (Object[]) res;
+            int total = (int) data[0];
+            @SuppressWarnings("unchecked")
+            List<ProductPriceDTO> items = (List<ProductPriceDTO>) data[1];
+            paginationHelper.applyDataTarget(items, total);
+        }, null);
     }
 
     @FXML

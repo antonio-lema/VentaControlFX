@@ -16,6 +16,8 @@ public class CashWithdrawController {
     @FXML
     private Label lblAvailable;
     @FXML
+    private javafx.scene.layout.HBox bannerAvailable;
+    @FXML
     private TextField txtAmount;
     @FXML
     private Label lblWarning;
@@ -32,6 +34,12 @@ public class CashWithdrawController {
     public void init(CashClosureUseCase useCase, UserSession session) {
         this.closureUseCase = useCase;
         this.userSession = session;
+
+        boolean canSeeTotals = userSession.hasPermission("caja.ver_totales") || userSession.hasPermission("USUARIOS");
+        if (bannerAvailable != null) {
+            bannerAvailable.setVisible(canSeeTotals);
+            bannerAvailable.setManaged(canSeeTotals);
+        }
 
         try {
             this.availableAmount = closureUseCase.getCurrentCashInDrawer();
@@ -50,8 +58,14 @@ public class CashWithdrawController {
         try {
             double amount = Double.parseDouble(text.replace(",", ".").trim());
             if (amount > availableAmount) {
-                lblWarning.setText(String.format(
-                        "⚠️ Saldo insuficiente. Disponible: %.2f €", availableAmount));
+                boolean canSeeTotals = userSession.hasPermission("caja.ver_totales")
+                        || userSession.hasPermission("USUARIOS");
+                if (canSeeTotals) {
+                    lblWarning.setText(String.format(
+                            "⚠️ Saldo insuficiente. Disponible: %.2f €", availableAmount));
+                } else {
+                    lblWarning.setText("⚠️ Saldo insuficiente.");
+                }
                 lblWarning.setVisible(true);
                 lblWarning.setManaged(true);
                 btnConfirm.setDisable(true);

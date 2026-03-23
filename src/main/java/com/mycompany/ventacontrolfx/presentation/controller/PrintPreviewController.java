@@ -3,6 +3,7 @@ package com.mycompany.ventacontrolfx.presentation.controller;
 import com.mycompany.ventacontrolfx.application.usecase.ConfigUseCase;
 import com.mycompany.ventacontrolfx.infrastructure.config.Injectable;
 import com.mycompany.ventacontrolfx.infrastructure.config.ServiceContainer;
+import com.mycompany.ventacontrolfx.domain.model.CashClosure;
 import com.mycompany.ventacontrolfx.domain.model.CartItem;
 import com.mycompany.ventacontrolfx.domain.model.SaleConfig;
 import java.time.LocalDateTime;
@@ -66,6 +67,8 @@ public class PrintPreviewController implements Injectable {
     private Label lblGiftIcon;
     @FXML
     private Label lblGiftIndicator;
+    @FXML
+    private Button btnNewSale;
     @FXML
     private Label lblPVPHeader;
     @FXML
@@ -268,6 +271,108 @@ public class PrintPreviewController implements Injectable {
 
         // Aplicar formato de papel
         applyPaperFormat();
+    }
+
+    public void setClosureData(CashClosure closure) {
+        if (configUseCase != null) {
+            this.cfg = configUseCase.getConfig();
+        }
+
+        // Cargar impresoras disponibles
+        if (cmbPrinters != null) {
+            cmbPrinters.setItems(FXCollections.observableArrayList(javafx.print.Printer.getAllPrinters()));
+            javafx.print.Printer defaultPrinter = javafx.print.Printer.getDefaultPrinter();
+            if (defaultPrinter != null) {
+                cmbPrinters.getSelectionModel().select(defaultPrinter);
+            }
+        }
+
+        // Ocultar botón de ticket regalo que no aplica a arqueos
+        if (btnGiftTicket != null) {
+            btnGiftTicket.setVisible(false);
+            btnGiftTicket.setManaged(false);
+        }
+
+        // Ocultar botón de Nueva Venta que no aplica a arqueos
+        if (btnNewSale != null) {
+            btnNewSale.setVisible(false);
+            btnNewSale.setManaged(false);
+        }
+
+        applyCompanyHeader();
+        lblTicketTitle.setText("TICKET DE CIERRE #" + closure.getClosureId());
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+        lblDate.setText(
+                "Fecha: " + (closure.getCreatedAt() != null ? closure.getCreatedAt().format(formatter) : "N/D"));
+
+        // Hide sales specific sections
+        if (itemsHeaderHBox != null) {
+            itemsHeaderHBox.setVisible(false);
+            itemsHeaderHBox.setManaged(false);
+        }
+        itemsContainer.setVisible(false);
+        itemsContainer.setManaged(false);
+        totalsContainer.setVisible(false);
+        totalsContainer.setManaged(false);
+        paymentInfoContainer.setVisible(false);
+        paymentInfoContainer.setManaged(false);
+        if (barcodeSection != null) {
+            barcodeSection.setVisible(false);
+            barcodeSection.setManaged(false);
+        }
+        if (lblVatLabel != null) {
+            lblVatLabel.setVisible(false);
+            lblVatLabel.setManaged(false);
+        }
+
+        // Create Closure Details Section
+        VBox closureDetails = new VBox(10);
+        closureDetails.setStyle("-fx-padding: 15 0;");
+
+        Label title = new Label("RESUMEN DE CAJA");
+        title.setStyle("-fx-font-weight: bold; -fx-font-size: 12px; -fx-text-fill: black;");
+        closureDetails.getChildren().add(title);
+
+        javafx.scene.layout.GridPane grid = new javafx.scene.layout.GridPane();
+        grid.setVgap(5);
+        grid.setHgap(10);
+
+        int row = 0;
+        addGridRow(grid, row++, "Cajero:", closure.getUsername() != null ? closure.getUsername() : "N/D");
+        addGridRow(grid, row++, "Fondo Inicial:", String.format("%.2f €", closure.getInitialFund()));
+        addGridRow(grid, row++, "(+) Ventas:", String.format("%.2f €",
+                closure.getTotalCash() - closure.getInitialFund() - closure.getCashIn() + closure.getCashOut()));
+        addGridRow(grid, row++, "(+) Entradas:", String.format("%.2f €", closure.getCashIn()));
+        addGridRow(grid, row++, "(-) Retiradas:", String.format("%.2f €", closure.getCashOut()));
+        addGridRow(grid, row++, "Total Esperado:", String.format("%.2f €", closure.getExpectedCash()));
+        addGridRow(grid, row++, "Total Contado:", String.format("%.2f €", closure.getActualCash()));
+        addGridRow(grid, row++, "Diferencia:", String.format("%+.2f €", closure.getDifference()));
+
+        closureDetails.getChildren().add(grid);
+
+        if (closure.getNotes() != null && !closure.getNotes().isEmpty()) {
+            Label notesTitle = new Label("Observaciones:");
+            notesTitle.setStyle(
+                    "-fx-font-weight: bold; -fx-font-size: 11px; -fx-padding: 10 0 2 0; -fx-text-fill: black;");
+            Label notes = new Label(closure.getNotes());
+            notes.setWrapText(true);
+            notes.setStyle("-fx-font-size: 10px; -fx-text-fill: black;");
+            closureDetails.getChildren().addAll(notesTitle, notes);
+        }
+
+        paperSheet.getChildren().add(closureDetails);
+
+        // Aplicar formato de papel
+        applyPaperFormat();
+    }
+
+    private void addGridRow(javafx.scene.layout.GridPane grid, int row, String labelText, String valueText) {
+        Label label = new Label(labelText);
+        label.setStyle("-fx-font-size: 10px; -fx-text-fill: black;");
+        Label value = new Label(valueText);
+        value.setStyle("-fx-font-size: 10px; -fx-font-weight: bold; -fx-text-fill: black;");
+        grid.add(label, 0, row);
+        grid.add(value, 1, row);
     }
 
     private void applyPaperFormat() {

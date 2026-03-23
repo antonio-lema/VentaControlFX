@@ -36,7 +36,7 @@ public class CashClosureController implements Injectable {
     private Label lblDate, lblTotalCash, lblTotalCard, lblTotalAll, lblSalesCount,
             lblCurrentUser, lblStatus, lblCashInDrawer, lblActiveFund, lblTotalReturns, lblTotalDiscounts;
     @FXML
-    private VBox containerReturns, containerDiscounts, cardCash, cardAccounting;
+    private VBox containerReturns, containerDiscounts, cardCash, cardAccounting, cardProductSummary;
     @FXML
     private Button btnPerformClosure, btnWithdrawCash, btnRegisterCashEntry, btnOpenFund, btnRefreshCash;
     @FXML
@@ -74,12 +74,28 @@ public class CashClosureController implements Injectable {
             boolean canSeeTotals = userSession.hasPermission("caja.ver_totales")
                     || userSession.hasPermission("USUARIOS");
             if (cardCash != null) {
-                cardCash.setVisible(canSeeTotals);
-                cardCash.setManaged(canSeeTotals);
+                boolean canOperateCash = userSession.hasPermission("caja.abrir")
+                        || userSession.hasPermission("caja.cerrar");
+                cardCash.setVisible(canSeeTotals || canOperateCash);
+                cardCash.setManaged(canSeeTotals || canOperateCash);
+
+                // Ocultar saldo exacto si no tiene permiso de ver totales (Cierre a ciegas)
+                if (lblCashInDrawer != null) {
+                    lblCashInDrawer.setVisible(canSeeTotals);
+                    lblCashInDrawer.setManaged(canSeeTotals);
+                }
             }
             if (cardAccounting != null) {
                 cardAccounting.setVisible(canSeeTotals);
                 cardAccounting.setManaged(canSeeTotals);
+            }
+            if (cardProductSummary != null) {
+                cardProductSummary.setVisible(canSeeTotals);
+                cardProductSummary.setManaged(canSeeTotals);
+            }
+            if (lblActiveFund != null) {
+                lblActiveFund.setVisible(canSeeTotals);
+                lblActiveFund.setManaged(canSeeTotals);
             }
         }
 

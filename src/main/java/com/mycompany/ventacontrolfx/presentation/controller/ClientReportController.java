@@ -12,25 +12,18 @@ import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.XYChart;
+import javafx.scene.chart.CategoryAxis;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
-import javafx.event.EventHandler;
-import javafx.scene.input.MouseEvent;
 import com.mycompany.ventacontrolfx.util.ModalService;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.stage.Modality;
 
 import java.sql.SQLException;
 import java.time.LocalDate;
@@ -390,29 +383,88 @@ public class ClientReportController implements Injectable {
 
     private void populateEvolutionChart(List<Sale> sales) {
         chartEvolution.getData().clear();
+        CategoryAxis xAxis = (CategoryAxis) chartEvolution.getXAxis();
+        if (xAxis != null) {
+            xAxis.getCategories().clear();
+        }
+
+        if (sales.isEmpty())
+            return;
+
         XYChart.Series<String, Number> series = new XYChart.Series<>();
 
-        // Group by Month
-        Map<YearMonth, Double> byMonth = new TreeMap<>();
-        for (Sale s : sales) {
-            if (s.getSaleDateTime() != null) {
-                YearMonth ym = YearMonth.from(s.getSaleDateTime());
-                byMonth.put(ym, byMonth.getOrDefault(ym, 0.0) + s.getTotal());
+        // 1. Determine granularity based on ComboBox
+        String filter = cmbDateRange != null ? cmbDateRange.getValue() : "Este año";
+        boolean groupByDay = filter.contains("día") || filter.contains("Hoy") || filter.contains("mes");
+
+        if (groupByDay) {
+            // Group by Day
+            Map<LocalDate, Double> byDay = new TreeMap<>();
+            for (Sale s : sales) {
+                if (s.getSaleDateTime() != null) {
+                    LocalDate date = s.getSaleDateTime().toLocalDate();
+                    byDay.put(date, byDay.getOrDefault(date, 0.0) + s.getTotal());
+                }
+            }
+
+            // Fill filler for last N days based on filter type
+            LocalDate end = LocalDate.now();
+            LocalDate start = filter.equals("7 días") ? end.minusDays(7) : end.minusDays(30);
+
+            // Adjust start to first sale index if oldest sale is before start
+            Optional<LocalDate> firstSale = byDay.keySet().stream().findFirst();
+            if (firstSale.isPresent() && firstSale.get().isBefore(start)) {
+                start = firstSale.get();
+            }
+
+            for (LocalDate d = start; !d.isAfter(end); d = d.plusDays(1)) {
+                if (!byDay.containsKey(d))
+                    byDay.put(d, 0.0);
+            }
+
+            DateTimeFormatter dayFmt = DateTimeFormatter.ofPattern("dd MMM");
+            List<String> categories = new ArrayList<>();
+            for (Map.Entry<LocalDate, Double> entry : byDay.entrySet()) {
+                String label = entry.getKey().format(dayFmt);
+                categories.add(label);
+                series.getData().add(new XYChart.Data<>(label, entry.getValue()));
+            }
+
+            if (xAxis != null) {
+                xAxis.setCategories(FXCollections.observableArrayList(categories));
+            }
+
+        } else {
+            // Group by Month
+            Map<YearMonth, Double> byMonth = new TreeMap<>();
+            for (Sale s : sales) {
+                if (s.getSaleDateTime() != null) {
+                    YearMonth ym = YearMonth.from(s.getSaleDateTime());
+                    byMonth.put(ym, byMonth.getOrDefault(ym, 0.0) + s.getTotal());
+                }
+            }
+
+            // Adaptive Month filler
+            YearMonth current = YearMonth.now().minusMonths(5);
+            for (int i = 0; i < 6; i++) {
+                if (!byMonth.containsKey(current))
+                    byMonth.put(current, 0.0);
+                current = current.plusMonths(1);
+            }
+
+            DateTimeFormatter monthFmt = DateTimeFormatter.ofPattern("MMM yy");
+            List<String> categories = new ArrayList<>();
+            for (Map.Entry<YearMonth, Double> entry : byMonth.entrySet()) {
+                String label = entry.getKey().format(monthFmt);
+                categories.add(label);
+                series.getData().add(new XYChart.Data<>(label, entry.getValue()));
+            }
+
+            if (xAxis != null) {
+                xAxis.setCategories(FXCollections.observableArrayList(categories));
             }
         }
 
-        // Ensure at least 6 months back filler
-        YearMonth current = YearMonth.now().minusMonths(5);
-        for (int i = 0; i < 6; i++) {
-            if (!byMonth.containsKey(current))
-                byMonth.put(current, 0.0);
-            current = current.plusMonths(1);
-        }
-
-        DateTimeFormatter monthFmt = DateTimeFormatter.ofPattern("MMM");
-        for (Map.Entry<YearMonth, Double> entry : byMonth.entrySet()) {
-            series.getData().add(new XYChart.Data<>(entry.getKey().format(monthFmt), entry.getValue()));
-        }
         chartEvolution.getData().add(series);
     }
 
@@ -433,10 +485,15 @@ public class ClientReportController implements Injectable {
 
         lblPrefPayment.setText(best);
         if (best.equalsIgnoreCase("Efectivo")) {
-            iconPrefPayment.setGlyphName("MONEY");
+            iconPrefPayment.setIcon(FontAwesomeIcon.MONEY);
+            // Asegurar que la fuente es FontAwesome y la clase es correcta
+            iconPrefPayment.setStyle("-fx-font-family: 'FontAwesome';");
+            iconPrefPayment.getStyleClass().add("glyph-icon");
             iconPrefPayment.setFill(javafx.scene.paint.Color.web("#16a34a"));
         } else {
-            iconPrefPayment.setGlyphName("CREDIT_CARD");
+            iconPrefPayment.setIcon(FontAwesomeIcon.CREDIT_CARD);
+            iconPrefPayment.setStyle("-fx-font-family: 'FontAwesome';");
+            iconPrefPayment.getStyleClass().add("glyph-icon");
             iconPrefPayment.setFill(javafx.scene.paint.Color.web("#3b82f6"));
         }
     }

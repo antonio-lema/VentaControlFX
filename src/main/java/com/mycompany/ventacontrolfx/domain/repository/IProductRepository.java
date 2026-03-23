@@ -5,48 +5,60 @@ import java.sql.SQLException;
 import java.util.List;
 
 public interface IProductRepository {
-    List<Product> getAll() throws SQLException;
+        List<Product> getAll() throws SQLException;
 
-    List<Product> getAll(int priceListId) throws SQLException;
+        List<Product> getAll(int priceListId) throws SQLException;
 
-    List<Product> getAllVisible() throws SQLException;
+        List<Product> getAllVisible() throws SQLException;
 
-    List<Product> getAllVisible(int priceListId) throws SQLException;
+        List<Product> getAllVisible(int priceListId) throws SQLException;
 
-    List<Product> getFavorites() throws SQLException;
+        List<Product> searchPaginated(String query, int limit, int offset, int priceListId, boolean onlyVisible)
+                        throws SQLException;
 
-    List<Product> getFavorites(int priceListId) throws SQLException;
+        int countSearch(String query, boolean onlyVisible) throws SQLException;
 
-    Product getById(int id) throws SQLException;
+        List<Product> getFavorites() throws SQLException;
 
-    void save(Product product) throws SQLException;
+        List<Product> getFavorites(int priceListId) throws SQLException;
 
-    void saveAll(List<Product> products) throws SQLException;
+        Product getById(int id) throws SQLException;
 
-    void update(Product product) throws SQLException;
+        void save(Product product) throws SQLException;
 
-    void delete(int id) throws SQLException;
+        void saveAll(List<Product> products) throws SQLException;
 
-    int count() throws SQLException;
+        void update(Product product) throws SQLException;
 
-    void updateFavorite(int productId, boolean favorite) throws SQLException;
+        void delete(int id) throws SQLException;
 
-    void updateVisibility(int productId, boolean visible) throws SQLException;
+        int count() throws SQLException;
 
-    void updateVisibilityByCategory(int categoryId, boolean visible) throws SQLException;
+        void updateFavorite(int productId, boolean favorite) throws SQLException;
 
-    void updateTaxRateByCategory(int categoryId, double taxRate) throws SQLException;
+        void updateVisibility(int productId, boolean visible) throws SQLException;
 
-    void updateTaxRateToAll(double taxRate) throws SQLException;
+        void updateVisibilityByCategory(int categoryId, boolean visible) throws SQLException;
 
-    void updateTaxGroupByCategory(int categoryId, int taxGroupId) throws SQLException;
+        void updateTaxRateByCategory(int categoryId, double taxRate) throws SQLException;
 
-    void updateTaxGroupToAll(int taxGroupId) throws SQLException;
+        void updateTaxRateToAll(double taxRate) throws SQLException;
 
-    void updateTaxGroupForProducts(java.util.List<Integer> productIds, int taxGroupId) throws SQLException;
+        void updateTaxGroupByCategory(int categoryId, int taxGroupId) throws SQLException;
 
-    int updateStock(int productId, int quantityDelta, java.sql.Connection conn) throws SQLException;
+        void updateTaxGroupToAll(int taxGroupId) throws SQLException;
 
-    java.util.List<Product> getLowStock() throws SQLException;
+        void updateTaxGroupForProducts(java.util.List<Integer> productIds, int taxGroupId) throws SQLException;
+
+        int updateStock(int productId, int quantityDelta, java.sql.Connection conn) throws SQLException;
+
+        java.util.List<Product> getLowStock() throws SQLException;
+
+        java.util.List<Product> getByCategory(int categoryId, int priceListId) throws SQLException;
+
+        java.util.List<Product> getByCategoryPaginated(int categoryId, int limit, int offset, int priceListId)
+                        throws SQLException;
+
+        int countByCategory(int categoryId, boolean onlyVisible) throws SQLException;
 
 }

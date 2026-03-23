@@ -6,12 +6,14 @@ import com.mycompany.ventacontrolfx.infrastructure.config.Injectable;
 import com.mycompany.ventacontrolfx.infrastructure.config.ServiceContainer;
 import com.mycompany.ventacontrolfx.util.AlertUtil;
 import com.mycompany.ventacontrolfx.util.ModalService;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
+import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
@@ -64,13 +66,13 @@ public class PriceListController implements Injectable {
         card.setPadding(new Insets(20));
         card.setPrefWidth(350);
         card.setStyle(
-                "-fx-background-color: white; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 10, 0, 0, 4);");
+                "-fx-background-color: -fx-bg-surface; -fx-background-radius: 12; -fx-effect: -fx-card-shadow;");
 
         HBox header = new HBox(10);
         header.setAlignment(Pos.CENTER_LEFT);
 
         Label lblName = new Label(pl.getName());
-        lblName.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #1f2937;");
+        lblName.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: -fx-text-custom-main;");
 
         header.getChildren().add(lblName);
 
@@ -94,13 +96,13 @@ public class PriceListController implements Injectable {
 
         VBox content = new VBox(8);
         Label lblInfo = new Label("ID Tarifa: " + pl.getId());
-        lblInfo.setStyle("-fx-text-fill: #6b7280; -fx-font-size: 13px;");
+        lblInfo.setStyle("-fx-text-fill: -fx-text-custom-muted; -fx-font-size: 13px;");
         content.getChildren().add(lblInfo);
 
         if (pl.getDescription() != null && !pl.getDescription().isBlank()) {
             Label lblDesc = new Label(pl.getDescription());
             lblDesc.setWrapText(true);
-            lblDesc.setStyle("-fx-text-fill: #4b5563; -fx-font-size: 14px; -fx-font-style: italic;");
+            lblDesc.setStyle("-fx-text-fill: -fx-text-custom-medium; -fx-font-size: 14px; -fx-font-style: italic;");
             content.getChildren().add(lblDesc);
         }
 
@@ -123,21 +125,21 @@ public class PriceListController implements Injectable {
         FlowPane actionBox = new FlowPane(8, 8);
         actionBox.setAlignment(Pos.CENTER_RIGHT);
 
-        Button btnEdit = createIconButton("Editar", "PENCIL", "#eff6ff", "#1e40af");
+        Button btnEdit = createIconButton("Editar", FontAwesomeIcon.PENCIL, "#eff6ff", "#1e40af");
         btnEdit.setOnAction(e -> openPriceListForm(pl));
 
-        Button btnDelete = createIconButton("Eliminar", "TRASH", "#fef2f2", "#b91c1c");
+        Button btnDelete = createIconButton("Eliminar", FontAwesomeIcon.TRASH, "#fef2f2", "#b91c1c");
         btnDelete.setDisable(pl.isDefault() || pl.getId() == 1);
         btnDelete.setOnAction(e -> deletePriceList(pl));
 
-        Button btnMakeDefault = createIconButton("Fijar por defecto", "STAR", "#f3f4f6", "#374151");
+        Button btnMakeDefault = createIconButton("Fijar por defecto", FontAwesomeIcon.STAR, "#f3f4f6", "#374151");
         btnMakeDefault.setDisable(pl.isDefault());
         btnMakeDefault.setOnAction(e -> makeDefault(pl));
 
-        Button btnClone = createIconButton("Clonar", "COPY", "#fdf2f8", "#9d174d");
+        Button btnClone = createIconButton("Clonar", FontAwesomeIcon.COPY, "#fdf2f8", "#9d174d");
         btnClone.setOnAction(e -> handleClone(pl));
 
-        Button btnViewTable = createIconButton("Ver Precios", "EYE", "#ecfdf5", "#065f46");
+        Button btnViewTable = createIconButton("Ver Precios", FontAwesomeIcon.EYE, "#ecfdf5", "#065f46");
         btnViewTable.setOnAction(e -> openPriceTableView(pl));
 
         actionBox.getChildren().addAll(btnViewTable, btnClone, btnMakeDefault, btnEdit, btnDelete);
@@ -215,16 +217,19 @@ public class PriceListController implements Injectable {
         }
     }
 
-    private Button createIconButton(String text, String glyphName, String bgColor, String textColor) {
+    private Button createIconButton(String text, FontAwesomeIcon iconEnum, String bgColor, String textColor) {
         Button btn = new Button(text);
         btn.setStyle("-fx-background-color: " + bgColor + "; -fx-text-fill: " + textColor
                 + "; -fx-background-radius: 6; -fx-padding: 6 12; -fx-cursor: hand; -fx-font-weight: bold; -fx-font-size: 12px;");
 
-        FontAwesomeIconView icon = new FontAwesomeIconView();
-        icon.setGlyphName(glyphName);
-        icon.setSize("14");
-        icon.setStyle("-fx-fill: " + textColor + ";");
+        FontAwesomeIconView icon = new FontAwesomeIconView(iconEnum);
+        icon.setGlyphSize(14);
+        icon.setFill(javafx.scene.paint.Color.valueOf(textColor));
+
         btn.setGraphic(icon);
+        btn.setContentDisplay(ContentDisplay.LEFT);
+        btn.setGraphicTextGap(8);
+
         return btn;
     }
 }

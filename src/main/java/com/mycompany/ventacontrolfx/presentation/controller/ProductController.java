@@ -2,17 +2,15 @@ package com.mycompany.ventacontrolfx.presentation.controller;
 
 import com.mycompany.ventacontrolfx.domain.model.Product;
 import com.mycompany.ventacontrolfx.application.usecase.ProductUseCase;
-import com.mycompany.ventacontrolfx.application.usecase.ScheduleVatChangeUseCase;
 import com.mycompany.ventacontrolfx.infrastructure.config.Injectable;
 import com.mycompany.ventacontrolfx.infrastructure.config.ServiceContainer;
 import com.mycompany.ventacontrolfx.shared.async.AsyncManager;
 import com.mycompany.ventacontrolfx.util.AlertUtil;
 import com.mycompany.ventacontrolfx.util.ModalService;
-import com.mycompany.ventacontrolfx.util.PaginationHelper;
+import com.mycompany.ventacontrolfx.util.ServerPaginationHelper;
 import com.mycompany.ventacontrolfx.component.ToggleSwitch;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
-import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
@@ -22,8 +20,6 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
-import javafx.stage.Modality;
-
 import java.io.File;
 import java.sql.SQLException;
 import java.util.List;
@@ -35,11 +31,15 @@ public class ProductController implements Injectable, com.mycompany.ventacontrol
     @FXML
     private TableView<Product> productsTable;
     @FXML
-    private TableColumn<Product, String> colCategoryName, colName, colImage;
+    private TableColumn<Product, String> colCategoryName, colName, colImage, colSku;
+    @FXML
+    private TableColumn<Product, Integer> colStock;
     @FXML
     private TableColumn<Product, Double> colPrice;
     @FXML
     private TableColumn<Product, Boolean> colFavorite, colVisible;
+    @FXML
+    private TableColumn<Product, Double> colIva;
     @FXML
     private TableColumn<Product, Void> colActions;
     @FXML
@@ -56,9 +56,12 @@ public class ProductController implements Injectable, com.mycompany.ventacontrol
     private ProductUseCase productUseCase;
     private ServiceContainer container;
     private AsyncManager asyncManager;
-    private PaginationHelper<Product> paginationHelper;
+    @FXML
+    private Pagination pagination;
+
+    private ServerPaginationHelper<Product> paginationHelper;
+    private String currentSearchQuery = "";
     private final WeakHashMap<String, Image> imageCache = new WeakHashMap<>();
-    private ScheduleVatChangeUseCase vatUseCase;
     private double globalIva = 21.0;
 
     @Override
@@ -66,20 +69,16 @@ public class ProductController implements Injectable, com.mycompany.ventacontrol
         this.container = container;
         this.productUseCase = container.getProductUseCase();
         this.asyncManager = container.getAsyncManager();
-        this.vatUseCase = container.getVatUseCase();
 
         try {
-            // globalIva = vatUseCase.getCurrentGlobalRate()
-            // .map(com.mycompany.ventacontrolfx.domain.model.TaxRevision::getRate)
-            // .orElse(21.0);
             globalIva = 21.0;
         } catch (Exception e) {
             globalIva = 21.0;
         }
 
         setupTable();
-        paginationHelper = new PaginationHelper<>(productsTable, cmbRowLimit, lblCount, "productos");
-        loadProducts();
+        paginationHelper = new ServerPaginationHelper<>(productsTable, cmbRowLimit, lblCount, pagination, "productos",
+                this::fetchProductsPage);
         setupSearch();
 
         container.getEventBus().subscribe(this);
@@ -87,19 +86,60 @@ public class ProductController implements Injectable, com.mycompany.ventacontrol
 
     @Override
     public void onDataChanged() {
-        javafx.application.Platform.runLater(this::loadProducts);
+        javafx.application.Platform.runLater(() -> paginationHelper.refresh());
     }
 
     private void setupTable() {
         colCategoryName.setCellValueFactory(new PropertyValueFactory<>("categoryName"));
         colName.setCellValueFactory(new PropertyValueFactory<>("name"));
-        colPrice.setCellValueFactory(new PropertyValueFactory<>("price"));
+        colSku.setCellValueFactory(new PropertyValueFactory<>("sku"));
+        colStock.setCellValueFactory(new PropertyValueFactory<>("stockQuantity"));
+        setupPriceColumn();
         colImage.setCellValueFactory(new PropertyValueFactory<>("imagePath"));
 
         setupImageColumn();
         setupToggleColumn(colFavorite, true);
         setupToggleColumn(colVisible, false);
+        setupIvaColumn();
         setupActionColumn();
+    }
+
+    private void setupPriceColumn() {
+        colPrice.setCellValueFactory(new PropertyValueFactory<>("price"));
+        colPrice.setCellFactory(column -> new TableCell<>() {
+            @Override
+            protected void updateItem(Double price, boolean empty) {
+                super.updateItem(price, empty);
+                if (empty || price == null) {
+                    setText(null);
+                    setGraphic(null);
+                    setStyle("");
+                } else {
+                    setText(String.format("%.2f €", price));
+                    setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #10b981;");
+                    setAlignment(Pos.CENTER_RIGHT);
+                }
+            }
+        });
+    }
+
+    private void setupIvaColumn() {
+        colIva.setCellFactory(column -> new TableCell<>() {
+            @Override
+            protected void updateItem(Double item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || getTableRow() == null || getTableRow().getItem() == null) {
+                    setText(null);
+                    setGraphic(null);
+                } else {
+                    Product p = getTableRow().getItem();
+                    double effectiveIva = p.resolveEffectiveIva(globalIva);
+                    setText(String.format("%.1f%%", effectiveIva));
+                    setStyle("-fx-font-weight: bold; -fx-text-fill: #1e88e5;");
+                    setAlignment(Pos.CENTER);
+                }
+            }
+        });
     }
 
     private void setupImageColumn() {
@@ -117,28 +157,42 @@ public class ProductController implements Injectable, com.mycompany.ventacontrol
             @Override
             protected void updateItem(String imagePath, boolean empty) {
                 super.updateItem(imagePath, empty);
+
+                imageView.setImage(null);
                 if (empty) {
                     setGraphic(null);
-                } else if (imagePath == null || imagePath.isEmpty()) {
-                    imageView.setImage(null);
+                } else if (imagePath == null || imagePath.trim().isEmpty()) {
                     FontAwesomeIconView icon = new FontAwesomeIconView(FontAwesomeIcon.IMAGE);
                     icon.setSize("24");
                     icon.setFill(Color.web("#bdc3c7"));
                     setGraphic(new StackPane(icon));
                 } else {
-                    File file = resolveFile(imagePath);
-                    if (file != null && file.exists()) {
-                        String uri = file.toURI().toString();
-                        Image img = imageCache.computeIfAbsent(uri, k -> new Image(k, 80, 80, true, true));
-                        imageView.setImage(img);
-                        setGraphic(container);
-                    } else {
-                        imageView.setImage(null);
-                        FontAwesomeIconView icon = new FontAwesomeIconView(FontAwesomeIcon.IMAGE);
-                        icon.setSize("24");
-                        icon.setFill(Color.web("#bdc3c7"));
-                        setGraphic(new StackPane(icon));
-                    }
+                    // Placeholder mientras carga asincrónicamente
+                    FontAwesomeIconView iconLoading = new FontAwesomeIconView(FontAwesomeIcon.IMAGE);
+                    iconLoading.setSize("24");
+                    iconLoading.setFill(Color.web("#bdc3c7"));
+                    setGraphic(new StackPane(iconLoading));
+
+                    // Offload file.exists() I/O from the blocking JavaFX thread
+                    asyncManager.runAsyncTask(() -> {
+                        return resolveFile(imagePath);
+                    }, (File file) -> {
+                        // Confirmar que la celda aún muestra el mismo path (protección de reciclaje de
+                        // celdas TableView)
+                        if (imagePath.equals(getItem())) {
+                            if (file != null) {
+                                String uri = file.toURI().toString();
+                                Image img = imageCache.computeIfAbsent(uri, k -> new Image(k, 80, 80, true, true));
+                                imageView.setImage(img);
+                                setGraphic(container);
+                            } else {
+                                FontAwesomeIconView icon = new FontAwesomeIconView(FontAwesomeIcon.IMAGE);
+                                icon.setSize("24");
+                                icon.setFill(Color.web("#bdc3c7"));
+                                setGraphic(new StackPane(icon));
+                            }
+                        }
+                    }, null);
                 }
             }
         });
@@ -242,11 +296,8 @@ public class ProductController implements Injectable, com.mycompany.ventacontrol
                 if (empty || getTableRow() == null || getTableRow().getItem() == null) {
                     setGraphic(null);
                 } else {
-                    Product p = getTableRow().getItem();
-                    double effectiveIva = p.resolveEffectiveIva(globalIva);
-                    btnEdit.setText(String.format("%.1f%%", effectiveIva));
+                    btnEdit.setText(null);
                     btnEdit.setGraphic(createIcon(FontAwesomeIcon.PENCIL, "#1e88e5"));
-                    btnEdit.setContentDisplay(ContentDisplay.LEFT);
                     setGraphic(pane);
                 }
             }
@@ -280,50 +331,49 @@ public class ProductController implements Injectable, com.mycompany.ventacontrol
                 ModalService.showTransparentModal("/view/dialog/import_result_dialog.fxml",
                         "Resultado de Importación",
                         container,
-                        (com.mycompany.ventacontrolfx.presentation.controller.dialog.ImportResultDialogController c) -> {
-                            c.initData(count, true, "");
+                        (c) -> {
+                            if (c instanceof com.mycompany.ventacontrolfx.presentation.controller.dialog.ImportResultDialogController)
+                                ((com.mycompany.ventacontrolfx.presentation.controller.dialog.ImportResultDialogController) c)
+                                        .initData(count, true, "");
                         });
-                loadProducts();
+                paginationHelper.refresh();
             }, (Throwable ex) -> {
                 ModalService.showTransparentModal("/view/dialog/import_result_dialog.fxml",
                         "Error de Importación",
                         container,
-                        (com.mycompany.ventacontrolfx.presentation.controller.dialog.ImportResultDialogController c) -> {
-                            c.initData(0, false, ex.getMessage());
+                        (c) -> {
+                            if (c instanceof com.mycompany.ventacontrolfx.presentation.controller.dialog.ImportResultDialogController)
+                                ((com.mycompany.ventacontrolfx.presentation.controller.dialog.ImportResultDialogController) c)
+                                        .initData(0, false, ex.getMessage());
                         });
             });
         }
     }
 
-    private void loadProducts() {
-        asyncManager.runAsyncTask(() -> productUseCase.getAllProducts(), products -> {
-            paginationHelper.setData(products);
+    private void fetchProductsPage(int offset, int limit) {
+        asyncManager.runAsyncTask(() -> {
+            int total = productUseCase.getTotalProductCount(currentSearchQuery);
+            List<Product> items = productUseCase.getPaginatedProducts(currentSearchQuery, limit, offset);
+            return new Object[] { total, items };
+        }, (Object res) -> {
+            Object[] data = (Object[]) res;
+            int total = (int) data[0];
+            @SuppressWarnings("unchecked")
+            List<Product> items = (List<Product>) data[1];
+            paginationHelper.applyDataTarget(items, total);
         }, null);
     }
 
-    private void updateCount(int count) {
-        if (lblCount != null)
-            lblCount.setText(count + " productos encontrados");
-    }
-
     private void setupSearch() {
-        searchField.textProperty().addListener((obs, old, nv) -> handleSearch(nv));
+        searchField.textProperty().addListener((obs, old, nv) -> {
+            handleSearch(nv);
+        });
     }
 
     @Override
     public void handleSearch(String text) {
-        if (text == null || text.trim().isEmpty()) {
-            loadProducts();
-            return;
-        }
-        String query = text.toLowerCase().trim();
-        asyncManager.runAsyncTask(() -> productUseCase.getAllProducts(), allProducts -> {
-            List<Product> filtered = allProducts.stream()
-                    .filter(p -> p.getName().toLowerCase().contains(query) ||
-                            (p.getCategoryName() != null && p.getCategoryName().toLowerCase().contains(query)))
-                    .toList();
-            paginationHelper.setData(filtered);
-        }, null);
+        this.currentSearchQuery = (text == null) ? "" : text.trim();
+        paginationHelper.refresh();
     }
 
     @FXML
@@ -341,7 +391,7 @@ public class ProductController implements Injectable, com.mycompany.ventacontrol
                     if (p != null)
                         controller.setProduct(p);
                 });
-        loadProducts();
+        paginationHelper.refresh();
     }
 
     private void handleDeleteProduct(Product p) {
@@ -352,10 +402,24 @@ public class ProductController implements Injectable, com.mycompany.ventacontrol
         if (AlertUtil.showConfirmation("Eliminar", "¿Seguro que desea eliminar " + p.getName() + "?", "")) {
             try {
                 productUseCase.deleteProduct(p.getId());
-                loadProducts();
+                paginationHelper.refresh();
             } catch (SQLException e) {
                 AlertUtil.showError("Error", "No se pudo eliminar el producto.");
             }
+        }
+    }
+
+    @FXML
+    private void handleJumpBack10() {
+        if (paginationHelper != null) {
+            paginationHelper.jumpPages(-10);
+        }
+    }
+
+    @FXML
+    private void handleJumpForward10() {
+        if (paginationHelper != null) {
+            paginationHelper.jumpPages(10);
         }
     }
 }

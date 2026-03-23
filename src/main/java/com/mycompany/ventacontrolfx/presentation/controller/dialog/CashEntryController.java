@@ -17,6 +17,8 @@ public class CashEntryController {
     @FXML
     private Label lblCurrentCash;
     @FXML
+    private javafx.scene.layout.HBox bannerCurrentCash;
+    @FXML
     private TextField txtAmount;
     @FXML
     private ComboBox<String> comboType;
@@ -30,6 +32,12 @@ public class CashEntryController {
     public void init(CashClosureUseCase useCase, UserSession session) {
         this.closureUseCase = useCase;
         this.userSession = session;
+
+        boolean canSeeTotals = userSession.hasPermission("caja.ver_totales") || userSession.hasPermission("USUARIOS");
+        if (bannerCurrentCash != null) {
+            bannerCurrentCash.setVisible(canSeeTotals);
+            bannerCurrentCash.setManaged(canSeeTotals);
+        }
 
         comboType.setItems(FXCollections.observableArrayList(
                 "Cambio banco", "Fondo de reserva", "Ajuste manual",

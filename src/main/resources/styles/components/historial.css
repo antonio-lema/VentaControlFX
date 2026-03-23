@@ -317,11 +317,11 @@
    ========================================= */
 .search-bar {
     -fx-background-color: -fx-bg-surface;
-    -fx-background-radius: -fx-radius-md;
+    -fx-background-radius: 8px;
     -fx-padding: 8px 14px;
     -fx-border-color: -fx-color-border-subtle;
     -fx-border-width: 1px;
-    -fx-border-radius: -fx-radius-md;
+    -fx-border-radius: 8px;
     -fx-spacing: 8px;
 }
 
@@ -470,4 +470,25 @@
     -fx-background-color: -fx-color-border-subtle;
     -fx-text-fill: -fx-text-custom-main;
     -fx-border-color: #475569;
+}
+
+/* Modern Clear Button */
+.btn-modern-clear {
+    -fx-background-color: transparent;
+    -fx-text-fill: -fx-text-custom-light;
+    -fx-border-color: -fx-color-border-subtle;
+    -fx-border-width: 1px;
+    -fx-border-radius: -fx-radius-md;
+    -fx-background-radius: -fx-radius-md;
+    -fx-font-weight: bold;
+    -fx-font-size: 11px;
+    -fx-padding: 8 16;
+    -fx-cursor: hand;
+    -fx-transition-duration: 200ms;
+}
+
+.btn-modern-clear:hover {
+    -fx-background-color: rgba(239, 68, 68, 0.05);
+    -fx-text-fill: #ef4444;
+    -fx-border-color: #ef4444;
 }

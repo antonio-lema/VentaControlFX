@@ -5,7 +5,6 @@ import javafx.scene.Scene;
 import javafx.scene.Parent;
 import java.sql.SQLException;
 import java.util.Map;
-import java.util.List;
 import java.util.Base64;
 import java.nio.charset.StandardCharsets;
 import java.net.URL;
@@ -311,10 +310,15 @@ public class ThemeManager {
                 sb.append("  -fx-bg-main: ").append(bg).append(";\n");
                 sb.append("  -fx-bg-sidebar: ").append(bg).append(";\n");
                 sb.append("  -fx-grad-sidebar: ").append(bg).append(";\n");
-                // Asegurar que las tarjetas (surface) no se queden blancas si el fondo es
-                // oscuro
-                String surface = isDark ? brighten(bg, 0.08) : "#ffffff";
-                sb.append("  -fx-bg-surface: ").append(surface).append(";\n");
+
+                if (isDark) {
+                    String surface = brightenAbsolute(bg, 0.15); // Aumento del 15% para contraste visible
+                    String subtle = brightenAbsolute(bg, 0.08);
+                    sb.append("  -fx-bg-surface: ").append(surface).append(";\n");
+                    sb.append("  -fx-bg-subtle: ").append(subtle).append(";\n");
+                } else {
+                    sb.append("  -fx-bg-surface: #ffffff;\n");
+                }
                 sb.append("}\n\n");
             }
         }
@@ -341,6 +345,28 @@ public class ThemeManager {
                         ".cart-panel, .product-box, .client-card, .user-card, .stat-card, .filter-card, .detail-panel, .view-header-icon-wrap {\n");
                 sb.append("  -fx-background-radius: ").append(bRadius * 2).append("px !important;\n");
                 sb.append("  -fx-border-radius: ").append(bRadius * 2).append("px !important;\n");
+                sb.append("}\n\n");
+
+                // Headers del carrito (solo el de arriba del todo lleva redondeo superior)
+                sb.append(".cart-customer-header {\n");
+                sb.append("  -fx-background-radius: ").append(bRadius * 2).append("px ").append(bRadius * 2)
+                        .append("px 0 0 !important;\n");
+                sb.append("  -fx-border-radius: ").append(bRadius * 2).append("px ").append(bRadius * 2)
+                        .append("px 0 0 !important;\n");
+                sb.append("}\n\n");
+
+                // Headers intermedios (cuadrados para que no se separen)
+                sb.append(".cart-pricelist-header, .cart-items-header {\n");
+                sb.append("  -fx-background-radius: 0 !important;\n");
+                sb.append("  -fx-border-radius: 0 !important;\n");
+                sb.append("}\n\n");
+
+                // Resumen del carrito (parte inferior lleva redondeo inferior)
+                sb.append(".checkout-summary {\n");
+                sb.append("  -fx-background-radius: 0 0 ").append(bRadius * 2).append("px ").append(bRadius * 2)
+                        .append("px !important;\n");
+                sb.append("  -fx-border-radius: 0 0 ").append(bRadius * 2).append("px ").append(bRadius * 2)
+                        .append("px !important;\n");
                 sb.append("}\n\n");
 
                 sb.append(".product-image-container {\n");
@@ -423,6 +449,24 @@ public class ThemeManager {
     }
 
     // --- Helpers de Manipulación de Color ---
+
+    private String brightenAbsolute(String hex, double amount) {
+        try {
+            Color c = Color.valueOf(hex);
+            double h = c.getHue();
+            double s = c.getSaturation();
+            double b = c.getBrightness();
+
+            double bNew = Math.min(1.0, b + amount);
+            // Desaturamos un poco al elevar para crear superficies más neutras en SaaS
+            // style
+            double sNew = Math.max(0.0, s - (amount * 0.4));
+
+            return toHex(Color.hsb(h, sNew, bNew));
+        } catch (Exception e) {
+            return hex;
+        }
+    }
 
     private String brighten(String hex, double factor) {
         try {

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
+<?import java.net.URL?>
+
+<VBox xmlns:fx="http://javafx.com/fxml/1" fx:id="root" spacing="20" styleClass="modern-register-card"
+      prefWidth="450" alignment="TOP_CENTER"
+      fx:controller="com.mycompany.ventacontrolfx.presentation.controller.dialog.EditClosureDialogController">
+
+    <stylesheets>
+        <URL value="@/styles/variables.css" />
+        <URL value="@/styles/components/botones.css" />
+        <URL value="@/styles/components/formularios.css" />
+    </stylesheets>
+
+    <VBox spacing="5" alignment="CENTER" style="-fx-padding: 30 0 10 0;">
+        <StackPane styleClass="estetica-card-icon-wrap, estetica-icon-blue" maxWidth="50" maxHeight="50"
+                   style="-fx-background-color: #eff6ff; -fx-background-radius: 50; -fx-border-radius: 50;">
+            <FontAwesomeIconView glyphName="PENCIL_SQUARE" size="24" fill="#3b82f6"/>
+        </StackPane>
+        <Label text="Modificar Arqueo" styleClass="modern-register-title" />
+        <Label text="Ajusta el total contado y registra el motivo del cambio" styleClass="modern-register-subtitle" />
+    </VBox>
+
+    <VBox spacing="15" style="-fx-padding: 0 40 30 40;">
+
+        <!-- Info Anterior -->
+        <HBox spacing="10" alignment="CENTER_LEFT"
+              style="-fx-background-color: #f0f9ff; -fx-padding: 12; -fx-background-radius: 8; -fx-border-color: #bae6fd; -fx-border-radius: 8;">
+            <FontAwesomeIconView glyphName="INFO_CIRCLE" size="14" fill="#0284c7" />
+            <VBox>
+                <Label text="Efectivo contado anterior:" styleClass="label-muted" />
+                <Label fx:id="lblPreviousCash" text="0,00 €" style="-fx-font-weight: bold; -fx-text-fill: #0284c7;" />
+            </VBox>
+        </HBox>
+
+        <!-- Importe Nuevo -->
+        <VBox spacing="8">
+            <Label text="Nuevo Total Contado (€):" styleClass="label" />
+            <HBox spacing="10" alignment="CENTER_LEFT" styleClass="modern-input-container">
+                <FontAwesomeIconView glyphName="MONEY" size="20" fill="#3b82f6" />
+                <TextField fx:id="txtAmount" promptText="0,00" HBox.hgrow="ALWAYS" styleClass="modern-input-field"
+                           style="-fx-font-size: 22px; -fx-font-weight: 900;" />
+            </HBox>
+        </VBox>
+
+        <!-- Motivo -->
+        <VBox spacing="8">
+            <Label text="Motivo de la Modificación:" styleClass="label" />
+            <HBox spacing="10" alignment="CENTER_LEFT" styleClass="modern-input-container">
+                <FontAwesomeIconView glyphName="PENCIL" size="14" fill="#94a3b8" />
+                <TextField fx:id="txtReason" promptText="Ej: Error de digitación, billete traspapelado..." HBox.hgrow="ALWAYS" styleClass="modern-input-field" />
+            </HBox>
+        </VBox>
+
+        <!-- Botones de Acción -->
+        <HBox spacing="15" alignment="CENTER_RIGHT" style="-fx-padding: 10 0 0 0;">
+            <Button text="CANCELAR" onAction="#handleCancel" styleClass="btn-secondary" prefHeight="45" prefWidth="120" />
+            <Button fx:id="btnConfirm" text="MODIFICAR ARQUEO" onAction="#handleConfirm" styleClass="btn-primary" prefHeight="45" HBox.hgrow="ALWAYS" maxWidth="Infinity">
+                <graphic>
+                    <FontAwesomeIconView glyphName="CHECK_CIRCLE" size="16" fill="white" />
+                </graphic>
+            </Button>
+        </HBox>
+    </VBox>
+</VBox>

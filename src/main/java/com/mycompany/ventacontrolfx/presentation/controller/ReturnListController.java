@@ -495,15 +495,4 @@ public class ReturnListController implements Injectable {
         handleViewTicket(currentSelectedReturn.getSaleId());
     }
 
-    @FXML
-    private void handleExport() {
-        if (masterData.isEmpty()) {
-            AlertUtil.showWarning("Aviso", "No hay datos para exportar.");
-            return;
-        }
-
-        // Simulación de exportación
-        AlertUtil.showInfo("Exportación",
-                "La funcionalidad de exportación a Excel se implementará en una futura actualización.");
-    }
 }

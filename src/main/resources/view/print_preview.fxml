@@ -204,7 +204,7 @@
             
             <HBox spacing="10" alignment="CENTER">
                 <Button text="Volver" onAction="#cancel" style="-fx-background-color: #ea4335; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 8 25; -fx-background-radius: -fx-radius-xl; -fx-cursor: hand;" />
-                <Button text="Nueva Venta" onAction="#cancel" style="-fx-background-color: #1a73e8; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 8 25; -fx-background-radius: -fx-radius-xl; -fx-cursor: hand;" />
+                <Button fx:id="btnNewSale" text="Nueva Venta" onAction="#cancel" style="-fx-background-color: #1a73e8; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 8 25; -fx-background-radius: -fx-radius-xl; -fx-cursor: hand;" />
             </HBox>
          </children>
       </VBox>

@@ -14,10 +14,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
-import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
-import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 
 import java.sql.SQLException;
 import java.time.LocalDate;
@@ -49,7 +46,7 @@ public class FiscalDocumentsController implements Injectable {
     @FXML
     private TableView<FiscalDocument> fiscalTable;
     @FXML
-    private TableColumn<FiscalDocument, String> colDate, colRef, colType, colClient, colTotal, colStatus, colActions;
+    private TableColumn<FiscalDocument, String> colDate, colRef, colType, colClient, colTotal, colStatus;
 
     private ServiceContainer container;
     private QueryFiscalDocumentUseCase queryUseCase;
@@ -118,38 +115,6 @@ public class FiscalDocumentsController implements Injectable {
                     else if ("ANULADO".equals(item))
                         badge.getStyleClass().add("badge-danger");
                     setGraphic(badge);
-                }
-            }
-        });
-
-        colActions.setCellFactory(column -> new TableCell<FiscalDocument, String>() {
-            private final Button btnPrint = new Button();
-            private final Button btnCancel = new Button();
-            private final HBox container = new HBox(8, btnPrint, btnCancel);
-
-            {
-                btnPrint.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.PRINT));
-                btnPrint.getStyleClass().addAll("btn-icon", "btn-history-print");
-                btnPrint.setTooltip(new Tooltip("Reimprimir Documento"));
-                btnPrint.setOnAction(e -> handlePrint(getTableView().getItems().get(getIndex())));
-
-                btnCancel.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.BAN));
-                btnCancel.getStyleClass().addAll("btn-icon", "btn-danger-light");
-                btnCancel.setTooltip(new Tooltip("Anular Documento"));
-                btnCancel.setOnAction(e -> handleCancel(getTableView().getItems().get(getIndex())));
-
-                container.setStyle("-fx-alignment: CENTER;");
-            }
-
-            @Override
-            protected void updateItem(String item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty) {
-                    setGraphic(null);
-                } else {
-                    FiscalDocument doc = getTableView().getItems().get(getIndex());
-                    btnCancel.setDisable(doc.getDocStatus() != Status.EMITIDO);
-                    setGraphic(container);
                 }
             }
         });
@@ -343,30 +308,4 @@ public class FiscalDocumentsController implements Injectable {
         }
     }
 
-    private void handlePrint(FiscalDocument doc) {
-        try {
-            QueryFiscalDocumentUseCase.PrintData data = queryUseCase.getDataForReprint(doc.getSaleId());
-            // Aquí llamaríamos al servicio de impresión o generador de PDF
-            AlertUtil.showInfo("Reimpresión", "Generando duplicado de " + doc.getFullReference() + "...");
-        } catch (SQLException e) {
-            AlertUtil.showError("Error", "No se pudo recuperar los datos para reimprimir.");
-        }
-    }
-
-    private void handleCancel(FiscalDocument doc) {
-        if (!AlertUtil.showConfirmation("Confirmar Anulación", "Anular Documento",
-                "¿Está seguro de que desea anular la " + doc.getDocType()
-                        + " " + doc.getFullReference()
-                        + "? \n\nEsto no revertirá el stock ni el dinero en caja, solo invalidará el documento fiscal.")) {
-            return;
-        }
-
-        try {
-            emitUseCase.cancelDocument(doc.getSaleId());
-            AlertUtil.showToast("Documento " + doc.getFullReference() + " anulado correctamente.");
-            loadData();
-        } catch (SQLException e) {
-            AlertUtil.showError("Error al anular", e.getMessage());
-        }
-    }
 }

@@ -209,6 +209,11 @@
 }
 
 /* ─── Iconos ───────────────────────────────────────────── */
+.glyph-icon,
+.font-awesome {
+    -fx-font-family: "FontAwesome";
+}
+
 .sidebar-icon {
     -fx-fill: -fx-text-custom-muted;
     -fx-opacity: 0.8;

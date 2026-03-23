@@ -152,7 +152,6 @@
                 <TableColumn fx:id="colClient" text="Cliente / Receptor" prefWidth="250"/>
                 <TableColumn fx:id="colTotal" text="Importe Total" prefWidth="130" styleClass="column-right"/>
                 <TableColumn fx:id="colStatus" text="Estado" prefWidth="120" styleClass="column-center"/>
-                <TableColumn fx:id="colActions" text="Acciones" prefWidth="150" styleClass="column-center"/>
             </columns>
             <columnResizePolicy>
                 <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>

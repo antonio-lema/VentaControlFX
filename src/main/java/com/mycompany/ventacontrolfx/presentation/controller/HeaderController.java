@@ -11,6 +11,11 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
+import javafx.animation.PauseTransition;
+import javafx.util.Duration;
+import javafx.stage.Window;
+import javafx.stage.PopupWindow;
+import javafx.scene.input.MouseEvent;
 
 public class HeaderController implements Injectable {
 
@@ -28,6 +33,7 @@ public class HeaderController implements Injectable {
     private ServiceContainer container;
     private NavigationService navigationService;
     private com.mycompany.ventacontrolfx.shared.bus.GlobalEventBus.DataChangeListener stockRefreshListener;
+    private PauseTransition menuClosePause;
 
     @Override
     public void inject(ServiceContainer container) {
@@ -78,10 +84,53 @@ public class HeaderController implements Injectable {
                 lblHeaderUsername.setText(name != null ? name : "Usuario");
             }
         }
+
         if (userMenuButton != null) {
-            userMenuButton.setOnMouseEntered(e -> {
-                if (!userMenuButton.isShowing())
-                    userMenuButton.show();
+            menuClosePause = new PauseTransition(Duration.millis(300));
+            menuClosePause.setOnFinished(e -> userMenuButton.hide());
+
+            userMenuButton.sceneProperty().addListener((obs, oldScene, newScene) -> {
+                if (newScene != null) {
+                    newScene.addEventFilter(MouseEvent.MOUSE_MOVED, e -> {
+                        if (userMenuButton.getScene() == null)
+                            return;
+
+                        double mouseX = e.getScreenX();
+                        double mouseY = e.getScreenY();
+
+                        boolean overButton = false;
+                        javafx.geometry.Bounds btnBounds = userMenuButton
+                                .localToScreen(userMenuButton.getBoundsInLocal());
+                        if (btnBounds != null && btnBounds.contains(mouseX, mouseY)) {
+                            overButton = true;
+                        }
+
+                        boolean overPopup = false;
+                        if (userMenuButton.isShowing()) {
+                            for (Window w : Window.getWindows()) {
+                                if (w instanceof PopupWindow && w.isShowing()) {
+                                    if (w.getX() <= mouseX && mouseX <= w.getX() + w.getWidth() &&
+                                            w.getY() <= mouseY && mouseY <= w.getY() + w.getHeight()) {
+                                        overPopup = true;
+                                    }
+                                }
+                            }
+                        }
+
+                        if (overButton || overPopup) {
+                            menuClosePause.stop();
+                            if (!userMenuButton.isShowing() && overButton) {
+                                userMenuButton.show();
+                            }
+                        } else {
+                            if (userMenuButton.isShowing()) {
+                                if (menuClosePause.getStatus() != javafx.animation.Animation.Status.RUNNING) {
+                                    menuClosePause.playFromStart();
+                                }
+                            }
+                        }
+                    });
+                }
             });
         }
 

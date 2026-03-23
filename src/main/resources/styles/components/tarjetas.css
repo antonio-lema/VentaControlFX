@@ -48,8 +48,9 @@
     -fx-background-color: -fx-bg-sidebar;
     -fx-text-fill: -fx-text-custom-price !important;
     -fx-font-weight: 800;
-    -fx-font-size: 13px;
-    -fx-padding: 4px 10px;
+    -fx-font-size: 18px;
+    /* Grande */
+    -fx-padding: 6px 14px;
     -fx-background-radius: -fx-radius-xl;
     -fx-effect: dropshadow(three-pass-box, -fx-shadow-color-primary, 8, 0, 0, 2);
 }

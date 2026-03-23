@@ -6,13 +6,13 @@
 <?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
 
 <VBox xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mycompany.ventacontrolfx.presentation.controller.ReturnListController" 
-      spacing="0" styleClass="main-container">
+      spacing="0" styleClass="main-content-area">
     <stylesheets>
         <java.net.URL value="@/styles/components/historial.css" />
     </stylesheets>
 
     <!-- Header Section -->
-    <VBox styleClass="view-header" spacing="0" AnchorPane.leftAnchor="-30.0" AnchorPane.rightAnchor="-30.0" AnchorPane.topAnchor="-30.0" style="-fx-margin: -30 -30 0 -30; -fx-padding: 30 35 25 35;">
+    <VBox styleClass="view-header" spacing="0">
         <children>
             <HBox spacing="16" alignment="CENTER_LEFT">
                 <children>
@@ -30,17 +30,16 @@
                         <Button fx:id="btnRefresh" onAction="#loadReturns" styleClass="btn-secondary" text="Actualizar">
                             <graphic><FontAwesomeIconView glyphName="REFRESH" size="14"/></graphic>
                         </Button>
-                        <Button fx:id="btnExport" onAction="#handleExport" styleClass="btn-info" text="Exportar">
-                            <graphic><FontAwesomeIconView glyphName="FILE_EXCEL_ALT" size="14" fill="white"/></graphic>
-                        </Button>
                     </HBox>
                 </children>
             </HBox>
         </children>
     </VBox>
 
-    <!-- Filters Section -->
-    <HBox spacing="15" alignment="CENTER_LEFT" styleClass="filter-card">
+    <!-- Body Content Section with Standard Padding -->
+    <VBox spacing="20" VBox.vgrow="ALWAYS" style="-fx-padding: 30;">
+        <!-- Filters Section -->
+        <HBox spacing="15" alignment="CENTER_LEFT" styleClass="filter-card">
         <padding><Insets top="15" right="20" bottom="15" left="20"/></padding>
         
         <VBox spacing="5">
@@ -64,7 +63,9 @@
         </VBox>
 
         <VBox spacing="5" alignment="BOTTOM_LEFT">
-             <Button text="LIMPIAR" onAction="#handleClearFilters" styleClass="btn-outline-secondary"/>
+             <Button text="LIMPIAR" onAction="#handleClearFilters" styleClass="btn-modern-clear">
+                 <graphic><FontAwesomeIconView glyphName="ERASER" size="12"/></graphic>
+             </Button>
         </VBox>
     </HBox>
 
@@ -151,4 +152,5 @@
             </VBox>
         </VBox>
     </HBox>
+    </VBox>
 </VBox>

@@ -159,9 +159,7 @@ public class SellViewController implements Injectable, CategoryMenuRenderer.Cate
                         loadingOverlay.setVisible(false);
                     }, null);
         } else if (catId == -3) {
-            // Fallback para promociones: Mostramos todos y el renderer destacará los que
-            // tengan promo
-            filterUseCase.applyAll();
+            filterUseCase.applyPromotions(activePromotions);
             refreshProductsWithNewPriceList();
         } else {
             // Categoría específica
@@ -336,6 +334,30 @@ public class SellViewController implements Injectable, CategoryMenuRenderer.Cate
                 int end = Math.min(currentOffset + PAGE_SIZE, allFavs.size());
                 products = (currentOffset < allFavs.size()) ? allFavs.subList(currentOffset, end)
                         : new java.util.ArrayList<>();
+            } else if (type == FilterType.PROMOTIONS) {
+                // Fetch reasonably large page representing 'all' to filter in memory
+                List<Product> allProducts = container.getProductRepository().searchPaginated("", 5000, 0,
+                        selectedPriceListId, true);
+
+                List<Product> filtered = allProducts.stream()
+                        .filter(p -> {
+                            boolean hasProductPromo = activePromotions.stream().anyMatch(promo -> promo
+                                    .getScope() == com.mycompany.ventacontrolfx.domain.model.PromotionScope.PRODUCT &&
+                                    promo.getAffectedIds().contains(p.getId()));
+
+                            boolean hasCategoryPromo = activePromotions.stream().anyMatch(promo -> promo
+                                    .getScope() == com.mycompany.ventacontrolfx.domain.model.PromotionScope.CATEGORY &&
+                                    promo.getAffectedIds().contains(p.getCategoryId()));
+
+                            boolean hasGlobal = activePromotions.stream().anyMatch(promo -> promo
+                                    .getScope() == com.mycompany.ventacontrolfx.domain.model.PromotionScope.GLOBAL);
+
+                            return hasGlobal || hasProductPromo || hasCategoryPromo;
+                        }).collect(java.util.stream.Collectors.toList());
+
+                count = filtered.size();
+                int end = Math.min(currentOffset + PAGE_SIZE, count);
+                products = (currentOffset < count) ? filtered.subList(currentOffset, end) : new java.util.ArrayList<>();
             } else if (type == FilterType.SEARCH && criteria != null) {
                 String query = (String) criteria;
                 count = container.getProductRepository().countSearch(query, true);

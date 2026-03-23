@@ -149,6 +149,16 @@ public class DatabaseInitializer {
             } catch (SQLException e) {
             }
 
+            // --- Rendimiento (Índices para búsquedas de 100K productos) ---
+            try {
+                stmt.execute("CREATE INDEX idx_products_name ON products(name)");
+            } catch (SQLException e) {
+            }
+            try {
+                stmt.execute("CREATE INDEX idx_products_sku ON products(sku)");
+            } catch (SQLException e) {
+            }
+
             // 1. Sales Table
             stmt.execute("CREATE TABLE IF NOT EXISTS sales (" +
                     "sale_id INT AUTO_INCREMENT PRIMARY KEY, " +

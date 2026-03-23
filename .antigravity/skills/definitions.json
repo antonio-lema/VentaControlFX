@@ -1,0 +1,171 @@
+{
+    "skills": [
+        {
+            "name": "search_product",
+            "description": "Busca un producto por nombre o SKU",
+            "input": {
+                "query": "string",
+                "limit": "int"
+            },
+            "output": {
+                "results": [
+                    {
+                        "id": "int",
+                        "name": "string",
+                        "price": "float"
+                    }
+                ]
+            },
+            "example": {
+                "input": {
+                    "query": "manzana",
+                    "limit": 2
+                },
+                "output": {
+                    "results": [
+                        {
+                            "id": 101,
+                            "name": "Manzana Roja",
+                            "price": 1.2
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "name": "calculate_discount",
+            "description": "Calcula el descuento aplicable a un monto",
+            "input": {
+                "total": "float",
+                "code": "string"
+            },
+            "output": {
+                "disc": "float",
+                "final": "float"
+            },
+            "example": {
+                "input": {
+                    "total": 100.0,
+                    "code": "PROMO10"
+                },
+                "output": {
+                    "disc": 10.0,
+                    "final": 90.0
+                }
+            }
+        },
+        {
+            "name": "get_cart_summary",
+            "description": "Resumen de totales del carrito actual",
+            "input": {},
+            "output": {
+                "count": "int",
+                "sub": "float",
+                "tax": "float",
+                "total": "float"
+            },
+            "example": {
+                "input": {},
+                "output": {
+                    "count": 3,
+                    "sub": 45.0,
+                    "tax": 7.2,
+                    "total": 52.2
+                }
+            }
+        },
+        {
+            "name": "add_cart_item",
+            "description": "Añade producto al carrito de sesión",
+            "input": {
+                "id": "int",
+                "qty": "int"
+            },
+            "output": {
+                "ok": "bool",
+                "items": "int"
+            },
+            "example": {
+                "input": {
+                    "id": 50,
+                    "qty": 1
+                },
+                "output": {
+                    "ok": true,
+                    "items": 4
+                }
+            }
+        },
+        {
+            "name": "set_client",
+            "description": "Asigna un cliente a la transacción activa",
+            "input": {
+                "id": "int"
+            },
+            "output": {
+                "ok": "bool",
+                "name": "string"
+            },
+            "example": {
+                "input": {
+                    "id": 12
+                },
+                "output": {
+                    "ok": true,
+                    "name": "Carlos Ruíz"
+                }
+            }
+        }
+    ],
+    "mcp_resources": [
+        {
+            "name": "current_cart",
+            "description": "Estado persistente del carrito",
+            "type": "array",
+            "structure": [
+                {
+                    "id": "int",
+                    "qty": "int",
+                    "p": "float"
+                }
+            ],
+            "example": [
+                {
+                    "id": 1,
+                    "qty": 2,
+                    "p": 15.5
+                }
+            ]
+        },
+        {
+            "name": "current_client",
+            "description": "Cliente vinculado a la sesión",
+            "type": "object",
+            "structure": {
+                "id": "int",
+                "name": "string",
+                "tier": "string"
+            },
+            "example": {
+                "id": 12,
+                "name": "Carlos Ruíz",
+                "tier": "VIP"
+            }
+        },
+        {
+            "name": "session_config",
+            "description": "Configuración de venta activa",
+            "type": "object",
+            "structure": {
+                "store_id": "int",
+                "currency": "string",
+                "tax_rate": "float"
+            },
+            "example": {
+                "store_id": 1,
+                "currency": "EUR",
+                "tax_rate": 0.16
+            }
+        }
+    ]
+}

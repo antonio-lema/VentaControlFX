@@ -27,7 +27,7 @@
     <VBox spacing="15" style="-fx-padding: 0 40 30 40;">
 
         <!-- Saldo disponible -->
-        <HBox spacing="10" alignment="CENTER_LEFT"
+        <HBox fx:id="bannerAvailable" spacing="10" alignment="CENTER_LEFT"
               style="-fx-background-color: #fef2f2; -fx-padding: 12; -fx-background-radius: 8; -fx-border-color: #fecaca; -fx-border-radius: 8;">
             <FontAwesomeIconView glyphName="WARNING" size="14" fill="#dc2626" />
             <VBox>

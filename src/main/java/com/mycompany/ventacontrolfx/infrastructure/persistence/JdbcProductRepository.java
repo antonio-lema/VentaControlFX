@@ -80,6 +80,44 @@ public class JdbcProductRepository implements IProductRepository {
     }
 
     @Override
+    public List<Product> getByCategory(int categoryId, int priceListId) throws SQLException {
+        List<Product> products = new ArrayList<>();
+        String priceSubquery;
+        if (priceListId > 0) {
+            priceSubquery = "COALESCE(" +
+                    "(SELECT pp.price FROM product_prices pp WHERE pp.product_id = p.product_id AND pp.price_list_id = ? AND pp.start_date <= CURRENT_TIMESTAMP AND (pp.end_date IS NULL OR pp.end_date > CURRENT_TIMESTAMP) ORDER BY pp.start_date DESC LIMIT 1), "
+                    +
+                    "(SELECT pp.price FROM product_prices pp JOIN price_lists pl ON pp.price_list_id = pl.price_list_id WHERE pp.product_id = p.product_id AND pl.is_default = 1 AND pp.start_date <= CURRENT_TIMESTAMP AND (pp.end_date IS NULL OR pp.end_date > CURRENT_TIMESTAMP) ORDER BY pp.start_date DESC LIMIT 1), "
+                    +
+                    "0.0)";
+        } else {
+            priceSubquery = "COALESCE((SELECT pp.price FROM product_prices pp JOIN price_lists pl ON pp.price_list_id = pl.price_list_id WHERE pp.product_id = p.product_id AND pl.is_default = 1 AND pp.start_date <= CURRENT_TIMESTAMP AND (pp.end_date IS NULL OR pp.end_date > CURRENT_TIMESTAMP) ORDER BY pp.start_date DESC LIMIT 1), 0.0)";
+        }
+
+        String sql = "SELECT p.*, c.name AS category_name, c.default_iva AS category_iva, " +
+                priceSubquery + " AS current_price " +
+                "FROM products p LEFT JOIN categories c ON p.category_id = c.category_id " +
+                "WHERE p.visible = TRUE AND p.category_id = ? " +
+                "LIMIT 100";
+
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            int paramIdx = 1;
+            if (priceListId > 0) {
+                pstmt.setInt(paramIdx++, priceListId);
+            }
+            pstmt.setInt(paramIdx, categoryId);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    products.add(mapResultSetToProduct(rs));
+                }
+            }
+        }
+        return products;
+    }
+
+    @Override
     public List<Product> getFavorites() throws SQLException {
         return getFavorites(-1);
     }
@@ -421,6 +459,35 @@ public class JdbcProductRepository implements IProductRepository {
     }
 
     @Override
+    public List<Product> getByCategoryPaginated(int categoryId, int limit, int offset, int priceListId)
+            throws SQLException {
+        List<Product> products = new ArrayList<>();
+        String priceSubquery = "(SELECT price FROM product_prices WHERE product_id = p.product_id AND price_list_id = "
+                + (priceListId == -1 ? "(SELECT price_list_id FROM price_lists ORDER BY is_default DESC LIMIT 1)"
+                        : priceListId)
+                + " ORDER BY start_date DESC LIMIT 1)";
+
+        String sql = "SELECT p.*, c.name AS category_name, c.default_iva AS category_iva, " +
+                priceSubquery + " AS current_price " +
+                "FROM products p LEFT JOIN categories c ON p.category_id = c.category_id " +
+                "WHERE p.visible = TRUE AND p.category_id = ? " +
+                "LIMIT ? OFFSET ?";
+
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, categoryId);
+            pstmt.setInt(2, limit);
+            pstmt.setInt(3, offset);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    products.add(mapResultSetToProduct(rs));
+                }
+            }
+        }
+        return products;
+    }
+
+    @Override
     public void delete(int id) throws SQLException {
         String sql = "DELETE FROM products WHERE product_id = ?";
         try (Connection conn = DBConnection.getConnection();
@@ -659,4 +726,118 @@ public class JdbcProductRepository implements IProductRepository {
         return p;
     }
 
+    @Override
+    public List<Product> searchPaginated(String query, int limit, int offset, int priceListId, boolean onlyVisible)
+            throws SQLException {
+        List<Product> products = new ArrayList<>();
+        String priceSubquery;
+        if (priceListId > 0) {
+            priceSubquery = "COALESCE((SELECT pp.price FROM product_prices pp WHERE pp.product_id = p.product_id AND pp.price_list_id = ? AND pp.start_date <= CURRENT_TIMESTAMP AND (pp.end_date IS NULL OR pp.end_date > CURRENT_TIMESTAMP) ORDER BY pp.start_date DESC LIMIT 1), 0.0)";
+        } else {
+            priceSubquery = "COALESCE((SELECT pp.price FROM product_prices pp JOIN price_lists pl ON pp.price_list_id = pl.price_list_id WHERE pp.product_id = p.product_id AND pl.is_default = 1 AND pp.start_date <= CURRENT_TIMESTAMP AND (pp.end_date IS NULL OR pp.end_date > CURRENT_TIMESTAMP) ORDER BY pp.start_date DESC LIMIT 1), 0.0)";
+        }
+
+        StringBuilder whereClause = new StringBuilder();
+        if (onlyVisible) {
+            whereClause.append(" WHERE p.visible = TRUE ");
+        }
+
+        boolean hasQuery = query != null && !query.trim().isEmpty();
+        String safeQuery = "";
+        if (hasQuery) {
+            if (whereClause.length() == 0)
+                whereClause.append(" WHERE ");
+            else
+                whereClause.append(" AND ");
+
+            whereClause.append(" (p.name LIKE ? OR c.name LIKE ? OR p.sku LIKE ?) ");
+            safeQuery = "%" + query.trim() + "%";
+        }
+
+        String sql = "SELECT p.*, c.name AS category_name, c.default_iva AS category_iva, " +
+                priceSubquery + " AS current_price " +
+                "FROM products p LEFT JOIN categories c ON p.category_id = c.category_id " +
+                whereClause.toString() +
+                " ORDER BY p.name ASC LIMIT ? OFFSET ?";
+
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            int paramIndex = 1;
+            if (priceListId > 0) {
+                pstmt.setInt(paramIndex++, priceListId);
+            }
+            if (hasQuery) {
+                pstmt.setString(paramIndex++, safeQuery);
+                pstmt.setString(paramIndex++, safeQuery);
+                pstmt.setString(paramIndex++, safeQuery);
+            }
+            pstmt.setInt(paramIndex++, limit);
+            pstmt.setInt(paramIndex++, offset);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    products.add(mapResultSetToProduct(rs));
+                }
+            }
+        }
+        return products;
+    }
+
+    @Override
+    public int countSearch(String query, boolean onlyVisible) throws SQLException {
+        StringBuilder whereClause = new StringBuilder();
+        if (onlyVisible) {
+            whereClause.append(" WHERE p.visible = TRUE ");
+        }
+
+        boolean hasQuery = query != null && !query.trim().isEmpty();
+        String safeQuery = "";
+        if (hasQuery) {
+            if (whereClause.length() == 0)
+                whereClause.append(" WHERE ");
+            else
+                whereClause.append(" AND ");
+
+            whereClause.append(" (p.name LIKE ? OR c.name LIKE ? OR p.sku LIKE ?) ");
+            safeQuery = "%" + query.trim() + "%";
+        } else if (!onlyVisible) {
+            return count(); // Rápido si no hay filtros
+        }
+
+        String sql = "SELECT COUNT(*) FROM products p LEFT JOIN categories c ON p.category_id = c.category_id "
+                + whereClause.toString();
+
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            if (hasQuery) {
+                pstmt.setString(1, safeQuery);
+                pstmt.setString(2, safeQuery);
+                pstmt.setString(3, safeQuery);
+            }
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        }
+        return 0;
+    }
+
+    @Override
+    public int countByCategory(int categoryId, boolean onlyVisible) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM products WHERE category_id = ?";
+        if (onlyVisible) {
+            sql += " AND visible = TRUE";
+        }
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, categoryId);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        }
+        return 0;
+    }
 }

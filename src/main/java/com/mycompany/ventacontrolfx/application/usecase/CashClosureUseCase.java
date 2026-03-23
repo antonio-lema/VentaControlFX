@@ -201,4 +201,15 @@ public class CashClosureUseCase {
         authService.checkPermission("CIERRES");
         repository.markAsReviewed(closureId, reviewerId);
     }
+
+    public void markAsExcluded(int closureId, int reviewerId) throws SQLException {
+        authService.checkPermission("CIERRES");
+        repository.markAsExcluded(closureId, reviewerId);
+    }
+
+    public void updateClosure(int closureId, double actualCash, String reason, int reviewerId, double previousCash)
+            throws SQLException {
+        authService.checkPermission("CIERRES");
+        repository.updateClosure(closureId, actualCash, reason, reviewerId, previousCash);
+    }
 }

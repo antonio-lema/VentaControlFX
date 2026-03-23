@@ -74,4 +74,12 @@ public class ProductUseCase {
         if (eventBus != null)
             eventBus.publishDataChange();
     }
+
+    public List<Product> getPaginatedProducts(String query, int limit, int offset) throws SQLException {
+        return repository.searchPaginated(query, limit, offset, -1, false);
+    }
+
+    public int getTotalProductCount(String query) throws SQLException {
+        return repository.countSearch(query, false);
+    }
 }

@@ -457,4 +457,40 @@ public class JdbcCashClosureRepository implements ICashClosureRepository {
             pstmt.executeUpdate();
         }
     }
+
+    @Override
+    public void markAsExcluded(int closureId, int reviewerId) throws SQLException {
+        String sql = "UPDATE cash_closures SET status = 'EXCLUIDO', reviewed_by = ?, reviewed_at = CURRENT_TIMESTAMP WHERE closure_id = ?";
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, reviewerId);
+            pstmt.setInt(2, closureId);
+            pstmt.executeUpdate();
+        }
+    }
+
+    @Override
+    public void updateClosure(int closureId, double actualCash, String reason, int reviewerId, double previousCash)
+            throws SQLException {
+        String sql = "UPDATE cash_closures SET " +
+                "actual_cash = ?, " +
+                "difference = ? - expected_cash, " +
+                "notes = CONCAT(IFNULL(notes, ''), '\n[Editado: ', ?, ' | Antiguo: ', ?, ' €]'), " +
+                "reviewed_by = ?, " +
+                "reviewed_at = CURRENT_TIMESTAMP, " +
+                "status = CASE WHEN ABS(? - expected_cash) < 0.01 THEN 'CUADRADO' ELSE 'DESCUADRE' END " +
+                "WHERE closure_id = ?";
+
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setDouble(1, actualCash);
+            pstmt.setDouble(2, actualCash);
+            pstmt.setString(3, reason);
+            pstmt.setDouble(4, previousCash);
+            pstmt.setInt(5, reviewerId);
+            pstmt.setDouble(6, actualCash);
+            pstmt.setInt(7, closureId);
+            pstmt.executeUpdate();
+        }
+    }
 }

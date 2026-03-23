@@ -33,9 +33,27 @@ public class ProductGridRenderer {
             labelCountProducts.setText(String.valueOf(products.size()));
 
         for (Product p : products) {
-            String discountDesc = promotionResolver != null ? promotionResolver.apply(p) : null;
-            ProductBox box = new ProductBox(p, globalTaxRate, pricesIncludeTax, discountDesc, onAddToCart);
-            productsPane.getChildren().add(box);
+            addProductToGrid(p);
         }
+    }
+
+    public void append(List<Product> products) {
+        if (products == null || products.isEmpty())
+            return;
+
+        for (Product p : products) {
+            addProductToGrid(p);
+        }
+
+        if (labelCountProducts != null) {
+            int currentCount = productsPane.getChildren().size();
+            labelCountProducts.setText(String.valueOf(currentCount));
+        }
+    }
+
+    private void addProductToGrid(Product p) {
+        String discountDesc = promotionResolver != null ? promotionResolver.apply(p) : null;
+        ProductBox box = new ProductBox(p, globalTaxRate, pricesIncludeTax, discountDesc, onAddToCart);
+        productsPane.getChildren().add(box);
     }
 }

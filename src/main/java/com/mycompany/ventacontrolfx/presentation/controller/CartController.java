@@ -31,7 +31,6 @@ import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 
 import java.util.List;
-import java.sql.SQLException;
 
 public class CartController implements Injectable {
 
@@ -201,18 +200,133 @@ public class CartController implements Injectable {
                     .findFirst()
                     .orElse(lists.get(0));
 
-            javafx.scene.control.ChoiceDialog<com.mycompany.ventacontrolfx.domain.model.PriceList> dialog = new javafx.scene.control.ChoiceDialog<>(
-                    current, lists);
-            dialog.setTitle("Cambiar Tarifa");
-            dialog.setHeaderText("Seleccione la tarifa para esta venta");
-            dialog.setContentText("Tarifa activa:");
+            // Contenedor principal
+            VBox root = new VBox(20);
+            root.getStyleClass().add("modal-container");
+            root.setPrefWidth(420);
+            root.setAlignment(Pos.CENTER);
+            root.setPadding(new Insets(30));
 
-            // Estilizar un poco el diálogo si es posible o usar ModalService si tuviera
-            // soporte para esto
-            dialog.showAndWait().ifPresent(selected -> {
-                cartUseCase.setPriceListId(selected.getId());
-                AlertUtil.showToast("Cambiado a: " + selected.getName());
+            // Cabecera
+            VBox header = new VBox(10);
+            header.setAlignment(Pos.CENTER);
+
+            de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView icon = new de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView(
+                    de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon.TAGS);
+            icon.setSize("45px");
+            icon.setFill(javafx.scene.paint.Color.valueOf("#2196f3")); // Azul primario
+
+            Label title = new Label("Cambiar Tarifa");
+            title.getStyleClass().add("custom-modal-title");
+            Label subtitle = new Label("Seleccione la tarifa para esta venta");
+            subtitle.setStyle("-fx-text-fill: #999999; -fx-font-size: 14px;");
+            header.getChildren().addAll(icon, title, subtitle);
+
+            // Campo de ComboBox
+            VBox content = new VBox(8);
+            content.setAlignment(Pos.CENTER_LEFT);
+            Label lblHint = new Label("Tarifa:");
+            lblHint.setStyle("-fx-font-weight: bold; -fx-text-fill: #555555;");
+
+            javafx.scene.control.ComboBox<com.mycompany.ventacontrolfx.domain.model.PriceList> cmbPriceList = new javafx.scene.control.ComboBox<>(
+                    javafx.collections.FXCollections.observableArrayList(lists));
+            cmbPriceList.getSelectionModel().select(current);
+            cmbPriceList.getStyleClass().add("input-field-modern");
+            cmbPriceList.setMaxWidth(Double.MAX_VALUE);
+            cmbPriceList.setPrefHeight(45);
+
+            // Cell Factory para el nombre de la tarifa
+            cmbPriceList.setCellFactory(
+                    lv -> new javafx.scene.control.ListCell<com.mycompany.ventacontrolfx.domain.model.PriceList>() {
+                        @Override
+                        protected void updateItem(com.mycompany.ventacontrolfx.domain.model.PriceList item,
+                                boolean empty) {
+                            super.updateItem(item, empty);
+                            if (empty || item == null) {
+                                setText(null);
+                            } else {
+                                setText(item.getName());
+                            }
+                        }
+                    });
+            cmbPriceList.setButtonCell(
+                    new javafx.scene.control.ListCell<com.mycompany.ventacontrolfx.domain.model.PriceList>() {
+                        @Override
+                        protected void updateItem(com.mycompany.ventacontrolfx.domain.model.PriceList item,
+                                boolean empty) {
+                            super.updateItem(item, empty);
+                            if (empty || item == null) {
+                                setText(null);
+                            } else {
+                                setText(item.getName());
+                            }
+                        }
+                    });
+
+            content.getChildren().addAll(lblHint, cmbPriceList);
+
+            // Botones
+            HBox footer = new HBox(15);
+            footer.setAlignment(Pos.CENTER);
+            Button btnCancel = new Button("CANCELAR");
+            btnCancel.getStyleClass().add("btn-secondary");
+            btnCancel.setPrefHeight(40);
+            btnCancel.setPrefWidth(120);
+
+            Button btnConfirm = new Button("APLICAR CAMBIO");
+            btnConfirm.getStyleClass().add("btn-primary");
+            btnConfirm.setPrefHeight(40);
+            btnConfirm.setPrefWidth(160);
+
+            footer.getChildren().addAll(btnCancel, btnConfirm);
+            root.getChildren().addAll(header, content, footer);
+
+            // Stage Config
+            Stage stage = new Stage();
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.initStyle(StageStyle.TRANSPARENT);
+
+            if (cartItemsContainer.getScene() != null) {
+                stage.initOwner(cartItemsContainer.getScene().getWindow());
+            }
+
+            javafx.scene.Scene scene = new javafx.scene.Scene(root);
+            scene.setFill(javafx.scene.paint.Color.TRANSPARENT);
+            if (container != null) {
+                container.getThemeManager().applyFullTheme(scene);
+            }
+            stage.setScene(scene);
+
+            // Animación sutil
+            root.setOpacity(0);
+            root.setScaleX(0.9);
+            root.setScaleY(0.9);
+
+            stage.setOnShowing(evt -> {
+                FadeTransition ft = new FadeTransition(Duration.millis(250), root);
+                ft.setToValue(1.0);
+                ScaleTransition st = new ScaleTransition(Duration.millis(250), root);
+                st.setFromX(0.9);
+                st.setFromY(0.9);
+                st.setToX(1.0);
+                st.setToY(1.0);
+                ft.play();
+                st.play();
             });
+
+            btnCancel.setOnAction(e -> stage.close());
+
+            btnConfirm.setOnAction(e -> {
+                com.mycompany.ventacontrolfx.domain.model.PriceList selected = cmbPriceList.getSelectionModel()
+                        .getSelectedItem();
+                if (selected != null) {
+                    cartUseCase.setPriceListId(selected.getId());
+                    stage.close();
+                    AlertUtil.showToast("Cambiado a: " + selected.getName());
+                }
+            });
+
+            stage.showAndWait();
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -309,60 +423,49 @@ public class CartController implements Injectable {
         root.setOpacity(0);
         root.setScaleX(0.9);
         root.setScaleY(0.9);
-        stage.setOnShowing(new EventHandler<WindowEvent>() {
-            @Override
-            public void handle(WindowEvent evt) {
-                javafx.animation.FadeTransition ft = new javafx.animation.FadeTransition(
-                        javafx.util.Duration.millis(250),
-                        root);
-                ft.setToValue(1.0);
-                javafx.animation.ScaleTransition st = new javafx.animation.ScaleTransition(
-                        javafx.util.Duration.millis(250),
-                        root);
-                st.setFromX(0.9);
-                st.setFromY(0.9);
-                st.setToX(1.0);
-                st.setToY(1.0);
-                ft.play();
-                st.play();
-            }
+        stage.setOnShowing(evt -> {
+            javafx.animation.FadeTransition ft = new javafx.animation.FadeTransition(
+                    javafx.util.Duration.millis(250),
+                    root);
+            ft.setToValue(1.0);
+            javafx.animation.ScaleTransition st = new javafx.animation.ScaleTransition(
+                    javafx.util.Duration.millis(250),
+                    root);
+            st.setFromX(0.9);
+            st.setFromY(0.9);
+            st.setToX(1.0);
+            st.setToY(1.0);
+            ft.play();
+            st.play();
         });
 
-        btnCancel.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent e) {
+        btnCancel.setOnAction(e -> stage.close());
+
+        btnConfirm.setOnAction(e -> {
+            String alias = txtAlias.getText().trim();
+            if (alias.isEmpty()) {
+                txtAlias.setStyle("-fx-border-color: #ef4444; -fx-border-width: 2;");
+                javafx.animation.TranslateTransition tt = new javafx.animation.TranslateTransition(
+                        javafx.util.Duration.millis(50), txtAlias);
+                tt.setByX(5);
+                tt.setCycleCount(6);
+                tt.setAutoReverse(true);
+                tt.play();
+                return;
+            }
+            try {
+                container.getSuspendedCartUseCase().suspendCart(
+                        alias,
+                        new java.util.ArrayList<>(cartUseCase.getCartItems()),
+                        cartUseCase.getSelectedClient(),
+                        currentUser.getUserId(),
+                        cartUseCase.getGrandTotal());
+                cartUseCase.clear();
                 stage.close();
-            }
-        });
-
-        btnConfirm.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent e) {
-                String alias = txtAlias.getText().trim();
-                if (alias.isEmpty()) {
-                    txtAlias.setStyle("-fx-border-color: #ef4444; -fx-border-width: 2;");
-                    javafx.animation.TranslateTransition tt = new javafx.animation.TranslateTransition(
-                            javafx.util.Duration.millis(50), txtAlias);
-                    tt.setByX(5);
-                    tt.setCycleCount(6);
-                    tt.setAutoReverse(true);
-                    tt.play();
-                    return;
-                }
-                try {
-                    container.getSuspendedCartUseCase().suspendCart(
-                            alias,
-                            new java.util.ArrayList<>(cartUseCase.getCartItems()),
-                            cartUseCase.getSelectedClient(),
-                            currentUser.getUserId(),
-                            cartUseCase.getGrandTotal());
-                    cartUseCase.clear();
-                    stage.close();
-                    AlertUtil.showToast("Venta '" + alias + "' guardada correctamente.");
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                    AlertUtil.showError("Error", "No se pudo guardar la venta: " + ex.getMessage());
-                }
+                AlertUtil.showToast("Venta '" + alias + "' guardada correctamente.");
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                AlertUtil.showError("Error", "No se pudo guardar la venta: " + ex.getMessage());
             }
         });
 
@@ -373,28 +476,20 @@ public class CartController implements Injectable {
     private void handleShowSuspendedCarts() {
         try {
             ModalService.showTransparentModal("/view/suspended_carts_dialog.fxml", "Carritos Aplazados", container,
-                    new java.util.function.Consumer<SuspendedCartsDialogController>() {
-                        @Override
-                        public void accept(SuspendedCartsDialogController controller) {
-                            if (controller == null)
-                                return;
-                            controller.setOnCartSelected(
-                                    new java.util.function.Consumer<com.mycompany.ventacontrolfx.domain.model.SuspendedCart>() {
-                                        @Override
-                                        public void accept(
-                                                com.mycompany.ventacontrolfx.domain.model.SuspendedCart suspendedCart) {
-                                            try {
-                                                restoreSuspendedCartUseCase.execute(suspendedCart.getId());
-                                                AlertUtil.showToast(
-                                                        "Venta '" + suspendedCart.getAlias() + "' recuperada.");
-                                            } catch (Exception e) {
-                                                e.printStackTrace();
-                                                AlertUtil.showError("Error al recuperar",
-                                                        "No se pudo recuperar la venta: " + e.getMessage());
-                                            }
-                                        }
-                                    });
-                        }
+                    (SuspendedCartsDialogController controller) -> {
+                        if (controller == null)
+                            return;
+                        controller.setOnCartSelected(
+                                (com.mycompany.ventacontrolfx.domain.model.SuspendedCart suspendedCart) -> {
+                                    try {
+                                        restoreSuspendedCartUseCase.execute(suspendedCart.getId());
+                                        AlertUtil.showToast("Venta '" + suspendedCart.getAlias() + "' recuperada.");
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                        AlertUtil.showError("Error al recuperar",
+                                                "No se pudo recuperar la venta: " + e.getMessage());
+                                    }
+                                });
                     });
         } catch (Exception e) {
             e.printStackTrace();
@@ -408,22 +503,22 @@ public class CartController implements Injectable {
             return;
 
         ModalService.showModal("/view/payment.fxml", "Pago", Modality.APPLICATION_MODAL, StageStyle.UNDECORATED,
-                container, new java.util.function.Consumer<PaymentController>() {
-                    @Override
-                    public void accept(PaymentController pc) {
-                        pc.setTotalAmount(cartUseCase.getGrandTotal(), (paid, change, method) -> {
-                            try {
-                                List<com.mycompany.ventacontrolfx.domain.model.CartItem> items = new java.util.ArrayList<>(
-                                        cartUseCase.getCartItems());
-                                double total = cartUseCase.getGrandTotal();
-                                Client client = cartUseCase.getSelectedClient();
-                                Integer clientId = client != null ? client.getId() : null;
-                                int userId = container.getUserSession().getCurrentUser().getUserId();
+                container, (PaymentController pc) -> {
+                    pc.setTotalAmount(cartUseCase.getGrandTotal(), (paid, change, method) -> {
+                        try {
+                            List<com.mycompany.ventacontrolfx.domain.model.CartItem> items = new java.util.ArrayList<>(
+                                    cartUseCase.getCartItems());
+                            double total = cartUseCase.getGrandTotal();
+                            Client client = cartUseCase.getSelectedClient();
+                            Integer clientId = client != null ? client.getId() : null;
+                            int userId = container.getUserSession().getCurrentUser().getUserId();
 
+                            container.getAsyncManager().runAsyncTask(() -> {
+                                // ── 1. PROCESAR VENTA EN HILO DE FONDO ──
                                 int saleId = container.getSaleUseCase().processSale(items, total, method, clientId,
                                         userId);
 
-                                // ── EMISIÓN FISCAL AUTOMÁTICA ──
+                                // ── 2. EMISIÓN FISCAL AUTOMÁTICA EN HILO DE FONDO ──
                                 try {
                                     if (client != null && client.getTaxId() != null
                                             && !client.getTaxId().trim().isEmpty()) {
@@ -451,33 +546,32 @@ public class CartController implements Injectable {
                                 } catch (Exception fiscalEx) {
                                     System.err.println("Error en emisión fiscal: " + fiscalEx.getMessage());
                                 }
+                                return saleId;
 
+                            }, (Integer saleId) -> {
+                                // ── 3. ACTUALIZAR UI EN HILO PRINCIPAL ──
                                 cartUseCase.clear();
                                 container.getEventBus().publishDataChange();
 
-                                javafx.application.Platform.runLater(() -> {
-                                    ModalService.showStandardModal("/view/receipt.fxml",
-                                            client != null ? "Factura" : "Factura simplificada", container,
-                                            new java.util.function.Consumer<ReceiptController>() {
-                                                @Override
-                                                public void accept(ReceiptController rc) {
-                                                    if (client != null)
-                                                        rc.setClientInfo(client);
-                                                    rc.setReceiptData(items, total, paid, change, method, saleId, null,
-                                                            null);
-                                                }
-                                            });
-                                });
-                            } catch (SQLException e) {
-                                e.printStackTrace();
+                                ModalService.showStandardModal("/view/receipt.fxml",
+                                        client != null ? "Factura" : "Factura simplificada", container,
+                                        (ReceiptController rc) -> {
+                                            if (client != null)
+                                                rc.setClientInfo(client);
+                                            rc.setReceiptData(items, total, paid, change, method, saleId, null, null);
+                                        });
+
+                            }, (Throwable e) -> {
                                 if (e.getMessage() != null && e.getMessage().contains("OPERACION_BLOQUEADA")) {
                                     showCashNotOpenAlert(e.getMessage().replace("OPERACION_BLOQUEADA: ", ""));
                                 } else {
                                     AlertUtil.showError("Error al procesar venta", e.getMessage());
                                 }
-                            }
-                        });
-                    }
+                            });
+                        } catch (Exception e) {
+                            AlertUtil.showError("Error inesperado", e.getMessage());
+                        }
+                    });
                 });
     }
 
@@ -493,7 +587,6 @@ public class CartController implements Injectable {
         root.getStyleClass().add("modal-container");
 
         // Icono de advertencia premium
-        javafx.scene.image.ImageView iconImg = null; // Reemplazar con FontAwesome si está disponible en este contexto
         FontAwesomeIconView iconView = new FontAwesomeIconView(FontAwesomeIcon.EXCLAMATION_CIRCLE);
         iconView.setSize("60px");
         iconView.setFill(javafx.scene.paint.Color.valueOf("#fb8c00")); // Brand warning orange
