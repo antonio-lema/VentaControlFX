@@ -1,5 +1,7 @@
 package com.mycompany.ventacontrolfx.infrastructure.persistence;
 
+import com.mycompany.ventacontrolfx.domain.dto.PriceUpdateLogDTO;
+import com.mycompany.ventacontrolfx.domain.dto.ProductPriceDTO;
 import com.mycompany.ventacontrolfx.domain.model.Price;
 import com.mycompany.ventacontrolfx.domain.model.PriceList;
 import com.mycompany.ventacontrolfx.domain.repository.IPriceRepository;
@@ -1133,27 +1135,41 @@ public class JdbcPriceRepository implements IPriceRepository {
     @Override
     public java.util.List<com.mycompany.ventacontrolfx.domain.dto.ProductPriceDTO> findPricesByListPaginated(
             int priceListId,
-            String search, int limit, int offset) throws SQLException {
+            String search, java.time.LocalDateTime startDate, int limit, int offset) throws SQLException {
         java.util.List<com.mycompany.ventacontrolfx.domain.dto.ProductPriceDTO> results = new java.util.ArrayList<>();
         String searchPattern = (search == null || search.trim().isEmpty()) ? null
                 : "%" + search.trim().toLowerCase() + "%";
 
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT p.product_id, p.name as product_name, c.name as category_name, ");
-        sql.append("COALESCE(pp.price, pp_def.price, 0.0) as price, COALESCE(pp_def.price, 0.0) as default_price, ");
+        sql.append("COALESCE(pp.price, pp_def.price, 0.0) as price, ");
+        sql.append("COALESCE(pp_now.price, pp.price, pp_def.price, 0.0) as current_price, ");
+        sql.append("COALESCE(pp_def.price, 0.0) as default_price, ");
         sql.append(
                 "COALESCE(p.iva, c.default_iva, (SELECT config_value FROM system_config WHERE config_key = 'global_tax' LIMIT 1), 0.0) as effective_tax ");
         sql.append("FROM products p ");
         sql.append("LEFT JOIN categories c ON p.category_id = c.category_id ");
         sql.append("LEFT JOIN product_prices pp ON p.product_id = pp.product_id AND pp.price_list_id = ? ");
+        if (startDate == null) {
+            sql.append(
+                    "  AND pp.start_date <= CURRENT_TIMESTAMP AND (pp.end_date IS NULL OR pp.end_date > CURRENT_TIMESTAMP) ");
+        } else {
+            // Use a 1-second window to handle precision mismatches
+            sql.append("  AND pp.start_date >= DATE_SUB(?, INTERVAL 1 SECOND) ");
+            sql.append("  AND pp.start_date <= DATE_ADD(?, INTERVAL 1 SECOND) ");
+        }
+        sql.append("LEFT JOIN product_prices pp_now ON p.product_id = pp_now.product_id AND pp_now.price_list_id = ? ");
         sql.append(
-                "  AND pp.start_date <= CURRENT_TIMESTAMP AND (pp.end_date IS NULL OR pp.end_date > CURRENT_TIMESTAMP) ");
+                "  AND pp_now.start_date <= CURRENT_TIMESTAMP AND (pp_now.end_date IS NULL OR pp_now.end_date > CURRENT_TIMESTAMP) ");
         sql.append("LEFT JOIN product_prices pp_def ON p.product_id = pp_def.product_id ");
         sql.append(
                 "  AND pp_def.price_list_id = (SELECT price_list_id FROM price_lists WHERE is_default = 1 LIMIT 1) ");
         sql.append(
                 "  AND pp_def.start_date <= CURRENT_TIMESTAMP AND (pp_def.end_date IS NULL OR pp_def.end_date > CURRENT_TIMESTAMP) ");
         sql.append("WHERE p.visible = 1 ");
+        if (startDate != null) {
+            sql.append("AND pp.price_id IS NOT NULL ");
+        }
 
         if (searchPattern != null) {
             sql.append("AND (LOWER(p.name) LIKE ? OR LOWER(c.name) LIKE ? OR CAST(p.product_id AS CHAR) LIKE ?) ");
@@ -1165,6 +1181,12 @@ public class JdbcPriceRepository implements IPriceRepository {
                 PreparedStatement ps = conn.prepareStatement(sql.toString())) {
             int paramIdx = 1;
             ps.setInt(paramIdx++, priceListId);
+            if (startDate != null) {
+                java.sql.Timestamp ts = java.sql.Timestamp.valueOf(startDate);
+                ps.setTimestamp(paramIdx++, ts);
+                ps.setTimestamp(paramIdx++, ts);
+            }
+            ps.setInt(paramIdx++, priceListId);
             if (searchPattern != null) {
                 ps.setString(paramIdx++, searchPattern);
                 ps.setString(paramIdx++, searchPattern);
@@ -1175,13 +1197,15 @@ public class JdbcPriceRepository implements IPriceRepository {
 
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    results.add(new com.mycompany.ventacontrolfx.domain.dto.ProductPriceDTO(
+                    com.mycompany.ventacontrolfx.domain.dto.ProductPriceDTO dto = new com.mycompany.ventacontrolfx.domain.dto.ProductPriceDTO(
                             rs.getInt("product_id"),
                             rs.getString("product_name"),
                             rs.getString("category_name"),
                             rs.getDouble("price"),
                             rs.getDouble("default_price"),
-                            rs.getDouble("effective_tax")));
+                            rs.getDouble("effective_tax"));
+                    dto.setCurrentPrice(rs.getDouble("current_price"));
+                    results.add(dto);
                 }
             }
         }
@@ -1189,13 +1213,23 @@ public class JdbcPriceRepository implements IPriceRepository {
     }
 
     @Override
-    public int countPricesByList(int priceListId, String search) throws SQLException {
+    public int countPricesByList(int priceListId, String search, java.time.LocalDateTime startDate)
+            throws SQLException {
         String searchPattern = (search == null || search.trim().isEmpty()) ? null
                 : "%" + search.trim().toLowerCase() + "%";
 
         StringBuilder sql = new StringBuilder();
-        sql.append(
-                "SELECT COUNT(*) FROM products p LEFT JOIN categories c ON p.category_id = c.category_id WHERE p.visible = 1 ");
+        sql.append("SELECT COUNT(*) FROM products p ");
+        sql.append("LEFT JOIN categories c ON p.category_id = c.category_id ");
+        if (startDate != null) {
+            sql.append("JOIN product_prices pp ON p.product_id = pp.product_id AND pp.price_list_id = ? ");
+            sql.append("AND pp.start_date >= DATE_SUB(?, INTERVAL 1 SECOND) ");
+            sql.append("AND pp.start_date <= DATE_ADD(?, INTERVAL 1 SECOND) ");
+        }
+        sql.append("WHERE p.visible = 1 ");
+        if (startDate != null) {
+            // Already filtered by join
+        }
 
         if (searchPattern != null) {
             sql.append("AND (LOWER(p.name) LIKE ? OR LOWER(c.name) LIKE ? OR CAST(p.product_id AS CHAR) LIKE ?) ");
@@ -1203,10 +1237,17 @@ public class JdbcPriceRepository implements IPriceRepository {
 
         try (Connection conn = DBConnection.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+            int paramIdx = 1;
+            if (startDate != null) {
+                ps.setInt(paramIdx++, priceListId);
+                java.sql.Timestamp ts = java.sql.Timestamp.valueOf(startDate);
+                ps.setTimestamp(paramIdx++, ts);
+                ps.setTimestamp(paramIdx++, ts);
+            }
             if (searchPattern != null) {
-                ps.setString(1, searchPattern);
-                ps.setString(2, searchPattern);
-                ps.setString(3, searchPattern);
+                ps.setString(paramIdx++, searchPattern);
+                ps.setString(paramIdx++, searchPattern);
+                ps.setString(paramIdx++, searchPattern);
             }
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
@@ -1215,5 +1256,61 @@ public class JdbcPriceRepository implements IPriceRepository {
             }
         }
         return 0;
+    }
+
+    @Override
+    public List<PriceUpdateLogDTO> findBulkUpdateLog(int priceListId) throws SQLException {
+        List<PriceUpdateLogDTO> logs = new ArrayList<>();
+        String sql = "SELECT * FROM price_update_log ORDER BY applied_at DESC LIMIT 100";
+        try (Connection conn = DBConnection.getConnection();
+                Statement stmt = conn.createStatement();
+                ResultSet rs = stmt.executeQuery(sql)) {
+            while (rs.next()) {
+                logs.add(new PriceUpdateLogDTO(
+                        rs.getInt("log_id"),
+                        rs.getString("update_type"),
+                        rs.getString("scope"),
+                        rs.getDouble("value"),
+                        rs.getInt("products_updated"),
+                        rs.getString("reason"),
+                        rs.getTimestamp("applied_at").toLocalDateTime()));
+            }
+        }
+        return logs;
+    }
+
+    @Override
+    public List<ProductPriceDTO> findAllPriceHistory(int priceListId) throws SQLException {
+        List<ProductPriceDTO> results = new ArrayList<>();
+        String sql = "SELECT p.product_id, p.name as product_name, c.name as category_name, "
+                + "pp.price, pp.start_date, pp.end_date, pp.reason "
+                + "FROM product_prices pp "
+                + "JOIN products p ON pp.product_id = p.product_id "
+                + "LEFT JOIN categories c ON p.category_id = c.category_id "
+                + "WHERE pp.price_list_id = ? AND pp.end_date IS NOT NULL "
+                + "ORDER BY pp.end_date DESC LIMIT 200";
+
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, priceListId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    ProductPriceDTO dto = new ProductPriceDTO(
+                            rs.getInt("product_id"),
+                            rs.getString("product_name"),
+                            rs.getString("category_name"),
+                            rs.getDouble("price"),
+                            0.0,
+                            0.0);
+                    Timestamp endTs = rs.getTimestamp("end_date");
+                    if (endTs != null) {
+                        dto.setEndDate(endTs.toLocalDateTime());
+                    }
+                    dto.setReason(rs.getString("reason"));
+                    results.add(dto);
+                }
+            }
+        }
+        return results;
     }
 }

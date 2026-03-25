@@ -182,9 +182,9 @@ public interface IPriceRepository {
                         throws SQLException;
 
         List<com.mycompany.ventacontrolfx.domain.dto.ProductPriceDTO> findPricesByListPaginated(int priceListId,
-                        String search, int limit, int offset) throws SQLException;
+                        String search, java.time.LocalDateTime startDate, int limit, int offset) throws SQLException;
 
-        int countPricesByList(int priceListId, String search) throws SQLException;
+        int countPricesByList(int priceListId, String search, java.time.LocalDateTime startDate) throws SQLException;
 
         String getAveragePercentageDifference(int priceListId) throws SQLException;
 
@@ -196,4 +196,16 @@ public interface IPriceRepository {
 
         int applyBulkRoundingToProducts(int priceListId, java.util.List<Integer> productIds, double targetDecimal,
                         String reason, java.time.LocalDateTime startDate) throws SQLException;
+
+        /**
+         * Obtiene el log de actualizaciones masivas para una lista específica.
+         */
+        List<com.mycompany.ventacontrolfx.domain.dto.PriceUpdateLogDTO> findBulkUpdateLog(int priceListId)
+                        throws SQLException;
+
+        /**
+         * Obtiene todos los precios históricos (no vigentes) de una lista.
+         */
+        List<com.mycompany.ventacontrolfx.domain.dto.ProductPriceDTO> findAllPriceHistory(int priceListId)
+                        throws SQLException;
 }
