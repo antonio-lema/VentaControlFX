@@ -40,6 +40,7 @@ public class SaleDetail {
     // Auxiliary field for UI display
     private String productName;
     private int returnedQuantity;
+    private String observations;
 
     public SaleDetail() {
     }
@@ -163,5 +164,13 @@ public class SaleDetail {
 
     public void setReturnedQuantity(int returnedQuantity) {
         this.returnedQuantity = returnedQuantity;
+    }
+
+    public String getObservations() {
+        return observations;
+    }
+
+    public void setObservations(String observations) {
+        this.observations = observations;
     }
 }

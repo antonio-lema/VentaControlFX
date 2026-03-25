@@ -13,7 +13,9 @@ public class Sale {
     private String paymentMethod;
     private double iva;
     private boolean isReturn;
-    private double returnedAmount; // NEW
+    private double returnedAmount;
+    private double cashAmount; // Split amount for Mixed payment
+    private double cardAmount; // Split amount for Mixed payment
 
     // Campos Fiscales (Documento)
     private String docType;
@@ -28,6 +30,7 @@ public class Sale {
     private double totalTax;
     private double discountAmount;
     private String discountReason;
+    private String observations; // General sale-level observation
 
     public double getDiscountAmount() {
         return discountAmount;
@@ -75,6 +78,22 @@ public class Sale {
 
     public void setReturnedAmount(double returnedAmount) {
         this.returnedAmount = returnedAmount;
+    }
+
+    public double getCashAmount() {
+        return cashAmount;
+    }
+
+    public void setCashAmount(double cashAmount) {
+        this.cashAmount = cashAmount;
+    }
+
+    public double getCardAmount() {
+        return cardAmount;
+    }
+
+    public void setCardAmount(double cardAmount) {
+        this.cardAmount = cardAmount;
     }
 
     private Integer closureId; // Connection to cash closure
@@ -228,5 +247,13 @@ public class Sale {
 
     public void setControlHash(String controlHash) {
         this.controlHash = controlHash;
+    }
+
+    public String getObservations() {
+        return observations;
+    }
+
+    public void setObservations(String observations) {
+        this.observations = observations;
     }
 }

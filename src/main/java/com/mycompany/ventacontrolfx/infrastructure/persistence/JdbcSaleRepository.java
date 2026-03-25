@@ -21,7 +21,7 @@ public class JdbcSaleRepository implements ISaleRepository {
 
     @Override
     public int saveSale(Sale sale, Connection conn) throws SQLException {
-        String sql = "INSERT INTO sales (user_id, client_id, total, payment_method, iva, sale_datetime, is_return, doc_type, doc_series, doc_number, doc_status, control_hash, total_net, total_tax, customer_name_snapshot, discount_amount, discount_reason) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO sales (user_id, client_id, total, payment_method, iva, sale_datetime, is_return, doc_type, doc_series, doc_number, doc_status, control_hash, total_net, total_tax, customer_name_snapshot, discount_amount, discount_reason, cash_amount, card_amount, observations) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             pstmt.setInt(1, sale.getUserId());
             if (sale.getClientId() != null && sale.getClientId() > 0) {
@@ -48,6 +48,9 @@ public class JdbcSaleRepository implements ISaleRepository {
             pstmt.setString(15, sale.getCustomerNameSnapshot());
             pstmt.setDouble(16, sale.getDiscountAmount());
             pstmt.setString(17, sale.getDiscountReason());
+            pstmt.setDouble(18, sale.getCashAmount());
+            pstmt.setDouble(19, sale.getCardAmount());
+            pstmt.setString(20, sale.getObservations());
             pstmt.executeUpdate();
 
             try (ResultSet rs = pstmt.getGeneratedKeys()) {
@@ -71,7 +74,7 @@ public class JdbcSaleRepository implements ISaleRepository {
 
     @Override
     public void saveSaleDetails(List<SaleDetail> details, int saleId, Connection conn) throws SQLException {
-        String sql = "INSERT INTO sale_details (sale_id, product_id, quantity, unit_price, line_total, iva_rate, iva_amount, product_name_snapshot, net_unit_price, tax_basis, tax_amount, gross_total, applied_tax_group, sku_snapshot, category_name_snapshot) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO sale_details (sale_id, product_id, quantity, unit_price, line_total, iva_rate, iva_amount, product_name_snapshot, net_unit_price, tax_basis, tax_amount, gross_total, applied_tax_group, sku_snapshot, category_name_snapshot, observations) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             for (SaleDetail detail : details) {
                 pstmt.setInt(1, saleId);
@@ -89,6 +92,7 @@ public class JdbcSaleRepository implements ISaleRepository {
                 pstmt.setString(13, detail.getAppliedTaxGroup());
                 pstmt.setString(14, detail.getSkuSnapshot());
                 pstmt.setString(15, detail.getCategoryNameSnapshot());
+                pstmt.setString(16, detail.getObservations());
                 pstmt.addBatch();
             }
             pstmt.executeBatch();
@@ -151,6 +155,7 @@ public class JdbcSaleRepository implements ISaleRepository {
                     detail.setAppliedTaxGroup(rs.getString("applied_tax_group"));
                     detail.setSkuSnapshot(rs.getString("sku_snapshot"));
                     detail.setCategoryNameSnapshot(rs.getString("category_name_snapshot"));
+                    detail.setObservations(rs.getString("observations"));
                     details.add(detail);
                 }
             }
@@ -410,6 +415,8 @@ public class JdbcSaleRepository implements ISaleRepository {
         sale.setReturnReason(rs.getString("return_reason"));
         sale.setReturnedAmount(rs.getDouble("returned_amount"));
         sale.setClosureId((Integer) rs.getObject("closure_id"));
+        sale.setCashAmount(rs.getDouble("cash_amount"));
+        sale.setCardAmount(rs.getDouble("card_amount"));
 
         // Atributos fiscales
         sale.setDocType(rs.getString("doc_type"));
@@ -422,6 +429,7 @@ public class JdbcSaleRepository implements ISaleRepository {
         sale.setTotalNet(rs.getDouble("total_net"));
         sale.setTotalTax(rs.getDouble("total_tax"));
         sale.setCustomerNameSnapshot(rs.getString("customer_name_snapshot"));
+        sale.setObservations(rs.getString("observations"));
 
         return sale;
     }

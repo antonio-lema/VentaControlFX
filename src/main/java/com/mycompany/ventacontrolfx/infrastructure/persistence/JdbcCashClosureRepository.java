@@ -42,20 +42,19 @@ public class JdbcCashClosureRepository implements ICashClosureRepository {
     @Override
     public Map<String, Double> getPendingTotals() throws SQLException {
         Map<String, Double> totals = new HashMap<>();
-        String sqlSales = "SELECT COALESCE(payment_method, 'Efectivo') as method, SUM(total) as amount FROM sales WHERE closure_id IS NULL GROUP BY method";
+        String sqlSales = "SELECT SUM(COALESCE(cash_amount, IF(payment_method = 'Efectivo', total, 0))) as cash_total, "
+                +
+                "SUM(COALESCE(card_amount, IF(payment_method = 'Tarjeta', total, 0))) as card_total, " +
+                "SUM(IF(payment_method NOT IN ('Efectivo', 'Tarjeta'), total, 0)) as others_total " +
+                "FROM sales WHERE closure_id IS NULL";
         double cash = 0, card = 0, others = 0;
         try (Connection connection = DBConnection.getConnection();
                 Statement stmt = connection.createStatement();
                 ResultSet rs = stmt.executeQuery(sqlSales)) {
-            while (rs.next()) {
-                String method = rs.getString("method");
-                double amount = rs.getDouble("amount");
-                if ("Efectivo".equalsIgnoreCase(method))
-                    cash += amount;
-                else if ("Tarjeta".equalsIgnoreCase(method))
-                    card += amount;
-                else
-                    others += amount;
+            if (rs.next()) {
+                cash = rs.getDouble("cash_total");
+                card = rs.getDouble("card_total");
+                others = rs.getDouble("others_total");
             }
         }
         String sqlReturns = "SELECT COALESCE(r.payment_method, 'Efectivo') as method, SUM(r.total_refunded) as amount FROM returns r JOIN sales s ON r.sale_id = s.sale_id WHERE r.closure_id IS NULL GROUP BY method";

@@ -10,6 +10,9 @@ public class CartItem {
     private IntegerProperty quantity;
     private final DoubleProperty unitPrice = new SimpleDoubleProperty(0.0);
     private final DoubleProperty discountAmount = new SimpleDoubleProperty(0.0);
+    private final DoubleProperty manualDiscountAmount = new SimpleDoubleProperty(0.0);
+    private final javafx.beans.property.StringProperty observations = new javafx.beans.property.SimpleStringProperty(
+            "");
 
     public CartItem(Product product, int quantity) {
         this.product = product;
@@ -43,7 +46,6 @@ public class CartItem {
      * Al llamar a este método, la UI se refresca automáticamente.
      */
     public void updateUnitPrice(double newPrice) {
-        this.product.setPrice(newPrice);
         // Forzamos una notificación aunque el valor sea el mismo
         // (evita el bug de JavaFX donde set() no dispara si el valor no cambia)
         double prev = this.unitPrice.get();
@@ -72,6 +74,30 @@ public class CartItem {
 
     public DoubleProperty discountAmountProperty() {
         return discountAmount;
+    }
+
+    public double getManualDiscountAmount() {
+        return manualDiscountAmount.get();
+    }
+
+    public void setManualDiscountAmount(double amount) {
+        this.manualDiscountAmount.set(amount);
+    }
+
+    public DoubleProperty manualDiscountAmountProperty() {
+        return manualDiscountAmount;
+    }
+
+    public String getObservations() {
+        return observations.get();
+    }
+
+    public void setObservations(String observations) {
+        this.observations.set(observations);
+    }
+
+    public javafx.beans.property.StringProperty observationsProperty() {
+        return observations;
     }
 
     public double getTotal() {

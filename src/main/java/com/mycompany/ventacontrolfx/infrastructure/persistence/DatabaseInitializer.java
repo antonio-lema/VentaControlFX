@@ -318,6 +318,10 @@ public class DatabaseInitializer {
                 stmt.execute("ALTER TABLE sale_details ADD COLUMN returned_quantity INT DEFAULT 0");
             } catch (SQLException e) {
             }
+            try {
+                stmt.execute("ALTER TABLE sale_details ADD COLUMN observations TEXT DEFAULT NULL");
+            } catch (SQLException e) {
+            }
 
             // Add returned_amount to sales table for easier tracking
             try {
@@ -1321,6 +1325,39 @@ public class DatabaseInitializer {
             // Consultas de ventas (Valor total y búsqueda reversa)
             tryIndex(stmt, "CREATE INDEX IF NOT EXISTS idx_sales_amount        ON sales(total)");
             tryIndex(stmt, "CREATE INDEX IF NOT EXISTS idx_sd_product_sale     ON sale_details(product_id, sale_id)");
+
+            // V4: Add general observations to sales
+            try {
+                stmt.execute("ALTER TABLE sales ADD COLUMN observations TEXT");
+            } catch (SQLException e) {
+                // Column probably already exists
+            }
+
+            // V5: Seed system category and generic product for manual entries
+            try {
+                stmt.execute("INSERT IGNORE INTO categories (name, visible) VALUES ('SISTEMA', 0)");
+                int systemCatId = -1;
+                try (ResultSet rs = stmt.executeQuery("SELECT category_id FROM categories WHERE name = 'SISTEMA' LIMIT 1")) {
+                    if (rs.next()) systemCatId = rs.getInt(1);
+                }
+                if (systemCatId != -1) {
+                    stmt.execute("INSERT IGNORE INTO products (category_id, name, visible, is_active, manage_stock, sku) " +
+                                 "VALUES (" + systemCatId + ", 'PRODUCTO GENÉRICO', 0, 1, 0, 'SYS-GEN-001')");
+                    
+                    int genProductId = -1;
+                    try (ResultSet rs = stmt.executeQuery("SELECT product_id FROM products WHERE sku = 'SYS-GEN-001' LIMIT 1")) {
+                        if (rs.next()) genProductId = rs.getInt(1);
+                    }
+                    
+                    if (genProductId != -1) {
+                        stmt.execute("INSERT IGNORE INTO product_prices (product_id, price_list_id, price, start_date, reason) " +
+                                     "SELECT " + genProductId + ", 1, 0.0, CURRENT_TIMESTAMP, 'Sistema' FROM DUAL " +
+                                     "WHERE NOT EXISTS (SELECT 1 FROM product_prices WHERE product_id = " + genProductId + ")");
+                    }
+                }
+            } catch (SQLException e) {
+                System.err.println("[WARN] Could not seed generic product: " + e.getMessage());
+            }
         }
     }
 
