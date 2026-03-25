@@ -57,6 +57,14 @@
         </HBox>
         <Region HBox.hgrow="ALWAYS"/>
         <HBox spacing="5" alignment="CENTER_RIGHT">
+            <Button onAction="#handleAddManualItem" styleClass="btn-add-manual-item">
+                <tooltip><Tooltip text="Añadir producto manual/fantasma"/></tooltip>
+                <graphic><FontAwesomeIconView glyphName="PLUS_SQUARE" size="14" styleClass="icon-primary"/></graphic>
+            </Button>
+            <Button onAction="#handleAddObservation" styleClass="btn-add-observation">
+                <tooltip><Tooltip text="Añadir observación libre"/></tooltip>
+                <graphic><FontAwesomeIconView glyphName="COMMENTING" size="14" styleClass="icon-primary"/></graphic>
+            </Button>
             <Button onAction="#handleSuspendCart" styleClass="btn-suspend-cart">
                 <tooltip><Tooltip text="Aplazar esta venta"/></tooltip>
                 <graphic><FontAwesomeIconView glyphName="PAUSE" size="14" styleClass="icon-warning"/></graphic>
@@ -82,6 +90,19 @@
             <VBox fx:id="cartItemsContainer" spacing="0" styleClass="cart-list-container"/>
         </ScrollPane>
     </StackPane>
+
+    <!-- General Observation Display -->
+    <VBox fx:id="observationContainer" spacing="5" styleClass="cart-observation-box" visible="false" managed="false">
+        <HBox spacing="10" alignment="CENTER_LEFT">
+            <FontAwesomeIconView glyphName="COMMENTING" size="12" styleClass="icon-primary"/>
+            <Label text="Observación de la venta" style="-fx-font-size: 11px; -fx-font-weight: bold; -fx-text-fill: -fx-custom-color-primary;"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button onAction="#handleClearObservation" styleClass="btn-icon-only-tiny">
+                <graphic><FontAwesomeIconView glyphName="TIMES" size="10" fill="#ef4444"/></graphic>
+            </Button>
+        </HBox>
+        <Label fx:id="lblGeneralObservation" wrapText="true" style="-fx-font-size: 12px; -fx-font-style: italic; -fx-text-fill: -fx-text-custom-muted;"/>
+    </VBox>
     
     <VBox styleClass="checkout-summary">
         <HBox alignment="CENTER_LEFT">

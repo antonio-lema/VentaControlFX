@@ -1,0 +1,26 @@
+
+.btn-add-observation, .btn-add-manual-item {
+    -fx-background-color: transparent;
+    -fx-background-radius: 8;
+    -fx-padding: 6;
+    -fx-cursor: hand;
+    -fx-border-color: #e0e0e0;
+    -fx-border-width: 1;
+    -fx-border-radius: 8;
+}
+
+.btn-add-observation:hover, .btn-add-manual-item:hover {
+    -fx-background-color: #f5f5f5;
+    -fx-border-color: -fx-custom-color-primary;
+}
+
+.btn-icon-only-tiny {
+    -fx-background-color: transparent;
+    -fx-background-radius: 4;
+    -fx-padding: 2;
+    -fx-cursor: hand;
+}
+
+.btn-icon-only-tiny:hover {
+    -fx-background-color: rgba(239, 68, 68, 0.1);
+}

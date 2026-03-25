@@ -15,7 +15,10 @@ import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.Scene;
+import javafx.scene.paint.Color;
 import javafx.scene.layout.VBox;
 import javafx.scene.layout.HBox;
 import javafx.event.ActionEvent;
@@ -43,6 +46,10 @@ public class CartController implements Injectable {
     private HBox hboxSavings;
     @FXML
     private Button btnClearCart, payButton, btnRemoveClient, showAddClientDialog;
+    @FXML
+    private VBox observationContainer;
+    @FXML
+    private Label lblGeneralObservation;
 
     private ServiceContainer container;
     private NavigationService navigationService;
@@ -62,7 +69,8 @@ public class CartController implements Injectable {
                 cartItemsContainer,
                 cartUseCase,
                 config.getTaxRate(),
-                config.isPricesIncludeTax());
+                config.isPricesIncludeTax(),
+                this.container);
 
         initBindings();
         initListeners();
@@ -104,6 +112,11 @@ public class CartController implements Injectable {
                 () -> String.format("📦 Subtotal (%d item%s)", cartUseCase.getItemCount(),
                         cartUseCase.getItemCount() != 1 ? "s" : ""),
                 cartUseCase.itemCountProperty()));
+
+        // Observation Display Bindings
+        observationContainer.visibleProperty().bind(cartUseCase.generalObservationProperty().isNotEmpty());
+        observationContainer.managedProperty().bind(observationContainer.visibleProperty());
+        lblGeneralObservation.textProperty().bind(cartUseCase.generalObservationProperty());
     }
 
     private void initListeners() {
@@ -502,21 +515,34 @@ public class CartController implements Injectable {
         if (cartUseCase.getItemCount() == 0)
             return;
 
+        double grandTotal = cartUseCase.getGrandTotal();
+        Client selectedClient = cartUseCase.getSelectedClient();
+
+        if (grandTotal > 1000) {
+            if (selectedClient == null || selectedClient.getTaxId() == null
+                    || selectedClient.getTaxId().trim().isEmpty()) {
+                AlertUtil.showError("Identificación Obligatoria",
+                        "Para ventas superiores a 1000€ es obligatorio identificar al cliente con NIF/CIF para emitir la factura legal correspondiente.");
+                return;
+            }
+        }
+
         ModalService.showModal("/view/payment.fxml", "Pago", Modality.APPLICATION_MODAL, StageStyle.UNDECORATED,
                 container, (PaymentController pc) -> {
-                    pc.setTotalAmount(cartUseCase.getGrandTotal(), (paid, change, method) -> {
+                    pc.setTotalAmount(cartUseCase.getGrandTotal(), (paid, change, method, cashAmount, cardAmount) -> {
                         try {
                             List<com.mycompany.ventacontrolfx.domain.model.CartItem> items = new java.util.ArrayList<>(
                                     cartUseCase.getCartItems());
                             double total = cartUseCase.getGrandTotal();
                             Client client = cartUseCase.getSelectedClient();
                             Integer clientId = client != null ? client.getId() : null;
+                            String observations = cartUseCase.getGeneralObservation();
                             int userId = container.getUserSession().getCurrentUser().getUserId();
 
                             container.getAsyncManager().runAsyncTask(() -> {
                                 // ── 1. PROCESAR VENTA EN HILO DE FONDO ──
                                 int saleId = container.getSaleUseCase().processSale(items, total, method, clientId,
-                                        userId);
+                                        userId, 0.0, null, cashAmount, cardAmount, observations);
 
                                 // ── 2. EMISIÓN FISCAL AUTOMÁTICA EN HILO DE FONDO ──
                                 try {
@@ -558,7 +584,7 @@ public class CartController implements Injectable {
                                         (ReceiptController rc) -> {
                                             if (client != null)
                                                 rc.setClientInfo(client);
-                                            rc.setReceiptData(items, total, paid, change, method, saleId, null, null);
+                                            rc.setReceiptData(items, total, paid, change, method, saleId, null, null, observations);
                                         });
 
                             }, (Throwable e) -> {
@@ -648,5 +674,146 @@ public class CartController implements Injectable {
         });
 
         stage.showAndWait();
+    }
+
+    @FXML
+    private void handleAddManualItem() {
+        VBox root = new VBox(20);
+        root.getStyleClass().add("modal-container");
+        root.setPrefWidth(400);
+        root.setAlignment(Pos.CENTER);
+        root.setPadding(new Insets(25));
+
+        VBox header = new VBox(10);
+        header.setAlignment(Pos.CENTER);
+        FontAwesomeIconView icon = new FontAwesomeIconView(FontAwesomeIcon.PLUS_SQUARE);
+        icon.setSize("40");
+        icon.setFill(Color.valueOf("#4caf50")); // Green for "add"
+        Label title = new Label("Producto Manual / Fantasma");
+        title.getStyleClass().add("custom-modal-title");
+        header.getChildren().addAll(icon, title);
+
+        VBox content = new VBox(15);
+        content.setAlignment(Pos.CENTER_LEFT);
+
+        Label lblName = new Label("Concepto / Nombre");
+        lblName.getStyleClass().add("input-label-modern");
+        TextField txtName = new TextField();
+        txtName.setPromptText("Ej: Reparación rápida, Artículo sin SKU...");
+        txtName.getStyleClass().add("input-field-modern");
+
+        Label lblPrice = new Label("Precio (€)");
+        lblPrice.getStyleClass().add("input-label-modern");
+        TextField txtPrice = new TextField();
+        txtPrice.setPromptText("0.00");
+        txtPrice.getStyleClass().add("input-field-modern");
+
+        // Solo permitir números y punto en el precio
+        txtPrice.textProperty().addListener((obs, oldVal, newVal) -> {
+            if (!newVal.matches("\\d*(\\.\\d*)?")) {
+                txtPrice.setText(oldVal);
+            }
+        });
+
+        content.getChildren().addAll(lblName, txtName, lblPrice, txtPrice);
+
+        HBox footer = new HBox(15);
+        footer.setAlignment(Pos.CENTER);
+        Button btnCancel = new Button("CANCELAR");
+        btnCancel.getStyleClass().add("btn-secondary");
+        Button btnAdd = new Button("AÑADIR AL CARRITO");
+        btnAdd.getStyleClass().add("btn-primary");
+        footer.getChildren().addAll(btnCancel, btnAdd);
+
+        root.getChildren().addAll(header, content, footer);
+
+        Stage stage = new Stage();
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.initStyle(StageStyle.TRANSPARENT);
+        stage.initOwner(cartItemsContainer.getScene().getWindow());
+
+        Scene scene = new Scene(root);
+        scene.setFill(Color.TRANSPARENT);
+        container.getThemeManager().applyFullTheme(scene);
+        stage.setScene(scene);
+
+        btnCancel.setOnAction(e -> stage.close());
+        btnAdd.setOnAction(e -> {
+            String name = txtName.getText().trim();
+            String priceStr = txtPrice.getText().trim();
+
+            if (name.isEmpty()) {
+                AlertUtil.showWarning("Datos incompletos", "Por favor introduzca un nombre o concepto.");
+                return;
+            }
+
+            try {
+                double price = priceStr.isEmpty() ? 0.0 : Double.parseDouble(priceStr);
+                cartUseCase.addCustomItem(name, price);
+                stage.close();
+            } catch (NumberFormatException ex) {
+                AlertUtil.showError("Precio inválido", "Por favor introduzca un precio numérico válido.");
+            }
+        });
+
+        stage.show();
+    }
+
+    @FXML
+    private void handleAddObservation() {
+        // Modal sencillo para captura de texto
+        VBox root = new VBox(20);
+        root.getStyleClass().add("modal-container");
+        root.setPrefWidth(400);
+        root.setAlignment(Pos.CENTER);
+        root.setPadding(new Insets(25));
+
+        VBox header = new VBox(10);
+        header.setAlignment(Pos.CENTER);
+        FontAwesomeIconView icon = new FontAwesomeIconView(FontAwesomeIcon.COMMENTING);
+        icon.setSize("40");
+        icon.setFill(Color.valueOf("#2196f3"));
+        Label title = new Label("Observación General");
+        title.getStyleClass().add("custom-modal-title");
+        header.getChildren().addAll(icon, title);
+
+        TextArea txtObs = new TextArea(cartUseCase.getGeneralObservation());
+        txtObs.setPromptText("Escriba la observación aquí...");
+        txtObs.getStyleClass().add("text-area-modern");
+        txtObs.setPrefHeight(100);
+        txtObs.setWrapText(true);
+
+        HBox footer = new HBox(15);
+        footer.setAlignment(Pos.CENTER);
+        Button btnCancel = new Button("CANCELAR");
+        btnCancel.getStyleClass().add("btn-secondary");
+        Button btnApply = new Button("APLICAR NOTA");
+        btnApply.getStyleClass().add("btn-primary");
+        footer.getChildren().addAll(btnCancel, btnApply);
+
+        root.getChildren().addAll(header, txtObs, footer);
+
+        Stage stage = new Stage();
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.initStyle(StageStyle.TRANSPARENT);
+        stage.initOwner(cartItemsContainer.getScene().getWindow());
+
+        Scene scene = new Scene(root);
+        scene.setFill(Color.TRANSPARENT);
+        container.getThemeManager().applyFullTheme(scene);
+        stage.setScene(scene);
+
+        btnCancel.setOnAction(e -> stage.close());
+        btnApply.setOnAction(e -> {
+            cartUseCase.setGeneralObservation(txtObs.getText().trim());
+            stage.close();
+        });
+
+        stage.show();
+    }
+
+    @FXML
+    private void handleClearObservation() {
+        cartUseCase.setGeneralObservation("");
     }
 }
