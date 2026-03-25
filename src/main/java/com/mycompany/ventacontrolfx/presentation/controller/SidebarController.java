@@ -22,7 +22,7 @@ public class SidebarController implements Injectable {
     @FXML
     private Button btnSell, btnProducts, btnCategories, btnHistory, btnReturns, btnClosures, btnBilling,
             btnClients, btnConfig, btnLock, btnThemeSettings, btnReports, btnClientReport, btnPriceLists, btnVat,
-            btnUsers, btnRoles, btnPromotions;
+            btnUsers, btnRoles, btnPromotions, btnWorkSessions;
 
     @FXML
     private VBox contentVentas, contentCatalogo, contentClientes, contentGestion, contentSistema;
@@ -160,7 +160,7 @@ public class SidebarController implements Injectable {
                 btnSell, btnHistory, btnReturns, btnProducts,
                 btnClients, btnReports, btnClosures, btnBilling,
                 btnConfig, btnThemeSettings, btnLock, btnPriceLists, btnVat,
-                btnUsers, btnRoles, btnPromotions
+                btnUsers, btnRoles, btnPromotions, btnWorkSessions
         };
         for (Button b : btns) {
             if (b != null)
@@ -198,6 +198,7 @@ public class SidebarController implements Injectable {
         setVisible(btnUsers, authService.hasPermission("usuario.crear"));
         setVisible(btnRoles, authService.hasPermission("rol.editar"));
         setVisible(btnPromotions, authService.hasPermission("admin.precios") || authService.hasPermission("PRODUCTOS"));
+        setVisible(btnWorkSessions, true); // Accessible to all logged in users for now
         setVisible(btnLock, true);
 
         // Ocultar secciones enteras si no hay hijos permitidos
@@ -236,7 +237,7 @@ public class SidebarController implements Injectable {
                 btnSell, btnHistory, btnReturns, btnProducts, btnCategories,
                 btnClients, btnReports, btnClientReport, btnClosures, btnBilling,
                 btnConfig, btnThemeSettings, btnLock, btnPriceLists, btnVat,
-                btnUsers, btnRoles, btnPromotions
+                btnUsers, btnRoles, btnPromotions, btnWorkSessions
         };
         for (Button b : btns) {
             if (b != null)
@@ -349,6 +350,12 @@ public class SidebarController implements Injectable {
     private void handleShowRoles() {
         setActiveButton(btnRoles);
         navigationService.navigateTo("/view/manage_roles.fxml");
+    }
+
+    @FXML
+    private void handleShowWorkSessions() {
+        setActiveButton(btnWorkSessions);
+        navigationService.navigateTo("/view/shift_management.fxml");
     }
 
     // ─── ADMINISTRACIÓN ──────────────────────────────────────

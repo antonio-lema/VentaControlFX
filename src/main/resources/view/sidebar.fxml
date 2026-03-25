@@ -131,6 +131,11 @@
                         <FontAwesomeIconView glyphName="SHIELD" size="22" styleClass="sidebar-icon"/>
                     </graphic>
                 </Button>
+                <Button fx:id="btnWorkSessions" styleClass="sidebar-button" onAction="#handleShowWorkSessions" contentDisplay="TOP" maxWidth="Infinity" text="Turnos / Descansos">
+                    <graphic>
+                        <FontAwesomeIconView glyphName="CLOCK_ALT" size="22" styleClass="sidebar-icon"/>
+                    </graphic>
+                </Button>
             </VBox>
 
             <Separator styleClass="sidebar-divider" />

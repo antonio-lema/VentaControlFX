@@ -1333,26 +1333,46 @@ public class DatabaseInitializer {
                 // Column probably already exists
             }
 
+            // V6: Work Sessions (Shifts and Breaks)
+            stmt.execute("CREATE TABLE IF NOT EXISTS work_sessions (" +
+                    "session_id INT AUTO_INCREMENT PRIMARY KEY, " +
+                    "user_id INT NOT NULL, " +
+                    "type VARCHAR(20) NOT NULL, " +
+                    "start_time DATETIME NOT NULL, " +
+                    "end_time DATETIME, " +
+                    "status VARCHAR(20) NOT NULL, " +
+                    "notes TEXT, " +
+                    "FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE)");
+            tryIndex(stmt, "CREATE INDEX IF NOT EXISTS idx_ws_user_status ON work_sessions(user_id, status)");
+
             // V5: Seed system category and generic product for manual entries
             try {
                 stmt.execute("INSERT IGNORE INTO categories (name, visible) VALUES ('SISTEMA', 0)");
                 int systemCatId = -1;
-                try (ResultSet rs = stmt.executeQuery("SELECT category_id FROM categories WHERE name = 'SISTEMA' LIMIT 1")) {
-                    if (rs.next()) systemCatId = rs.getInt(1);
+                try (ResultSet rs = stmt
+                        .executeQuery("SELECT category_id FROM categories WHERE name = 'SISTEMA' LIMIT 1")) {
+                    if (rs.next())
+                        systemCatId = rs.getInt(1);
                 }
                 if (systemCatId != -1) {
-                    stmt.execute("INSERT IGNORE INTO products (category_id, name, visible, is_active, manage_stock, sku) " +
-                                 "VALUES (" + systemCatId + ", 'PRODUCTO GENÉRICO', 0, 1, 0, 'SYS-GEN-001')");
-                    
+                    stmt.execute(
+                            "INSERT IGNORE INTO products (category_id, name, visible, is_active, manage_stock, sku) " +
+                                    "VALUES (" + systemCatId + ", 'PRODUCTO GENÉRICO', 0, 1, 0, 'SYS-GEN-001')");
+
                     int genProductId = -1;
-                    try (ResultSet rs = stmt.executeQuery("SELECT product_id FROM products WHERE sku = 'SYS-GEN-001' LIMIT 1")) {
-                        if (rs.next()) genProductId = rs.getInt(1);
+                    try (ResultSet rs = stmt
+                            .executeQuery("SELECT product_id FROM products WHERE sku = 'SYS-GEN-001' LIMIT 1")) {
+                        if (rs.next())
+                            genProductId = rs.getInt(1);
                     }
-                    
+
                     if (genProductId != -1) {
-                        stmt.execute("INSERT IGNORE INTO product_prices (product_id, price_list_id, price, start_date, reason) " +
-                                     "SELECT " + genProductId + ", 1, 0.0, CURRENT_TIMESTAMP, 'Sistema' FROM DUAL " +
-                                     "WHERE NOT EXISTS (SELECT 1 FROM product_prices WHERE product_id = " + genProductId + ")");
+                        stmt.execute(
+                                "INSERT IGNORE INTO product_prices (product_id, price_list_id, price, start_date, reason) "
+                                        +
+                                        "SELECT " + genProductId + ", 1, 0.0, CURRENT_TIMESTAMP, 'Sistema' FROM DUAL " +
+                                        "WHERE NOT EXISTS (SELECT 1 FROM product_prices WHERE product_id = "
+                                        + genProductId + ")");
                     }
                 }
             } catch (SQLException e) {

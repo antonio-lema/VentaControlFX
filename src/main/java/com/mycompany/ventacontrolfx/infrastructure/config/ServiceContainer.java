@@ -47,6 +47,7 @@ public class ServiceContainer {
     private final IPromotionRepository promotionRepository;
     private final PromotionEngine promotionEngine;
     private final IAiIntentRepository aiIntentRepository;
+    private final IWorkSessionRepository workSessionRepository;
 
     // Use Cases (Application Layer)
     private final ProductUseCase productUseCase;
@@ -74,6 +75,7 @@ public class ServiceContainer {
     private final PromotionUseCase promotionUseCase;
     private final com.mycompany.ventacontrolfx.application.service.PromotionService promotionService;
     private final ProductImportUseCase productImportUseCase;
+    private final WorkSessionUseCase workSessionUseCase;
 
     // Shared Components
     private final GlobalEventBus eventBus;
@@ -120,6 +122,7 @@ public class ServiceContainer {
         this.priceLogRepository = new JdbcPriceUpdateLogRepository();
         this.promotionRepository = new JdbcPromotionRepository();
         this.aiIntentRepository = new JdbcAiIntentRepository();
+        this.workSessionRepository = new JdbcWorkSessionRepository();
 
         // 3. Domain Services
         this.taxEngineService = new com.mycompany.ventacontrolfx.domain.service.TaxEngineService(taxRepository,
@@ -167,6 +170,7 @@ public class ServiceContainer {
         this.taxManagementUseCase = new TaxManagementUseCase(taxRepository, productRepository, authService);
         this.promotionUseCase = new PromotionUseCase(promotionRepository);
         this.productImportUseCase = new ProductImportUseCase(productRepository, categoryRepository, authService);
+        this.workSessionUseCase = new WorkSessionUseCase(workSessionRepository);
 
         // 4. Domain Services
         // taxEngineService is now initialized above
@@ -357,5 +361,9 @@ public class ServiceContainer {
 
     public ProductImportUseCase getProductImportUseCase() {
         return productImportUseCase;
+    }
+
+    public WorkSessionUseCase getWorkSessionUseCase() {
+        return workSessionUseCase;
     }
 }
