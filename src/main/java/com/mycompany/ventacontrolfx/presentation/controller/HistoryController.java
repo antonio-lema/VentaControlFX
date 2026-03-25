@@ -9,8 +9,11 @@ import com.mycompany.ventacontrolfx.infrastructure.config.Injectable;
 import com.mycompany.ventacontrolfx.infrastructure.config.ServiceContainer;
 import com.mycompany.ventacontrolfx.util.AlertUtil;
 import com.mycompany.ventacontrolfx.util.ModalService;
+import com.mycompany.ventacontrolfx.util.PaginationHelper;
+import com.mycompany.ventacontrolfx.util.Searchable;
+import com.mycompany.ventacontrolfx.presentation.util.RealTimeSearchBinder;
+import com.mycompany.ventacontrolfx.util.DateFilterUtils;
 import javafx.beans.property.SimpleStringProperty;
-import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
@@ -21,18 +24,11 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.StageStyle;
-import javafx.util.Pair;
 
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Map;
-
-import com.mycompany.ventacontrolfx.util.PaginationHelper;
-import com.mycompany.ventacontrolfx.util.Searchable;
-import com.mycompany.ventacontrolfx.util.PaginationHelper;
-import com.mycompany.ventacontrolfx.presentation.util.RealTimeSearchBinder;
 
 public class HistoryController implements Injectable, Searchable {
 
@@ -57,14 +53,14 @@ public class HistoryController implements Injectable, Searchable {
     @FXML
     private Label lblSaleId, lblSaleFullDate, lblPaymentMethod, lblTotalAmountDetail, lblReturnBadge;
     @FXML
-    private Button btnReturn, btnPrint, btnQuickToday, btnQuickWeek, btnQuickMonth;
+    private Button btnReturn, btnPrint;
+    @FXML
+    private HBox quickFilterContainer;
 
     private SaleUseCase saleUseCase;
     private ServiceContainer container;
     private PaginationHelper<Sale> paginationHelper;
     private final DateTimeFormatter fullFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
-
-    private static final String ACTIVE_CLASS = "active-filter";
 
     @Override
     public void inject(ServiceContainer container) {
@@ -75,7 +71,10 @@ public class HistoryController implements Injectable, Searchable {
         datePickerEnd.setValue(LocalDate.now());
         setupTable();
         paginationHelper = new PaginationHelper<>(salesTable, cmbRowLimit, lblCount, "tickets");
-        setActiveFilter(btnQuickToday);
+
+        DateFilterUtils.addQuickFilters(quickFilterContainer, datePickerStart,
+                datePickerEnd, this::loadSalesDirect);
+
         loadSalesDirect();
 
         salesTable.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
@@ -131,7 +130,8 @@ public class HistoryController implements Injectable, Searchable {
                 if (empty || item == null) {
                     setText(null);
                 } else {
-                    String emoji = "Tarjeta".equalsIgnoreCase(item) ? "💳 " : "💵 ";
+                    String emoji = item.contains("Mixed") || item.contains("Mixto") ? "🔄 "
+                            : ("Tarjeta".equalsIgnoreCase(item) ? "💳 " : "💵 ");
                     setText(emoji + item);
                 }
             }
@@ -154,7 +154,6 @@ public class HistoryController implements Injectable, Searchable {
 
     @FXML
     private void loadSales() {
-        setActiveFilter(null);
         if (txtSearchId != null && !txtSearchId.getText().trim().isEmpty()) {
             handleSearch();
             return;
@@ -166,55 +165,25 @@ public class HistoryController implements Injectable, Searchable {
         try {
             LocalDate start = datePickerStart.getValue();
             LocalDate end = datePickerEnd.getValue();
-            if (start == null || end == null)
-                return;
-            if (start.isAfter(end)) {
-                AlertUtil.showError("Error", "La fecha de inicio no puede ser posterior a la de fin.");
-                return;
+
+            List<Sale> sales;
+            if (start == null || end == null) {
+                // All time (wide range)
+                sales = saleUseCase.getHistory(LocalDate.of(2000, 1, 1), LocalDate.of(2100, 1, 1));
+            } else {
+                if (start.isAfter(end)) {
+                    AlertUtil.showError("Error", "La fecha de inicio no puede ser posterior a la de fin.");
+                    return;
+                }
+                sales = saleUseCase.getHistory(start, end);
             }
-            List<Sale> sales = saleUseCase.getHistory(start, end);
             paginationHelper.setData(sales);
-            updateSummaries(sales); // Mantener sumatorios sobre el total cargado, no solo lo visible
+            updateSummaries(sales);
             handleCloseDetails();
         } catch (SQLException e) {
             e.printStackTrace();
             AlertUtil.showError("Error", "No se pudieron cargar las ventas: " + e.getMessage());
         }
-    }
-
-    @FXML
-    private void filterToday() {
-        datePickerStart.setValue(LocalDate.now());
-        datePickerEnd.setValue(LocalDate.now());
-        setActiveFilter(btnQuickToday);
-        loadSalesDirect();
-    }
-
-    @FXML
-    private void filterLast7Days() {
-        datePickerStart.setValue(LocalDate.now().minusDays(7));
-        datePickerEnd.setValue(LocalDate.now());
-        setActiveFilter(btnQuickWeek);
-        loadSalesDirect();
-    }
-
-    @FXML
-    private void filterThisMonth() {
-        datePickerStart.setValue(LocalDate.now().withDayOfMonth(1));
-        datePickerEnd.setValue(LocalDate.now());
-        setActiveFilter(btnQuickMonth);
-        loadSalesDirect();
-    }
-
-    private void setActiveFilter(Button btn) {
-        if (btnQuickToday != null)
-            btnQuickToday.getStyleClass().remove(ACTIVE_CLASS);
-        if (btnQuickWeek != null)
-            btnQuickWeek.getStyleClass().remove(ACTIVE_CLASS);
-        if (btnQuickMonth != null)
-            btnQuickMonth.getStyleClass().remove(ACTIVE_CLASS);
-        if (btn != null && !btn.getStyleClass().contains(ACTIVE_CLASS))
-            btn.getStyleClass().add(ACTIVE_CLASS);
     }
 
     @Override
@@ -253,19 +222,31 @@ public class HistoryController implements Injectable, Searchable {
     @FXML
     private void handleClearFilters() {
         txtSearchId.clear();
-        filterToday();
+        datePickerStart.setValue(LocalDate.now());
+        datePickerEnd.setValue(LocalDate.now());
+        loadSalesDirect();
     }
 
     private void updateSummaries(List<Sale> sales) {
         int count = sales.size();
         double total = 0, cash = 0, card = 0;
         for (Sale s : sales) {
-            double net = s.getTotal() - s.getReturnedAmount();
-            total += net;
-            if ("Tarjeta".equalsIgnoreCase(s.getPaymentMethod()))
-                card += net;
-            else
-                cash += net;
+            double netRatio = (s.getTotal() - s.getReturnedAmount()) / (s.getTotal() == 0 ? 1 : s.getTotal());
+            total += (s.getTotal() - s.getReturnedAmount());
+
+            double saleCash = s.getCashAmount();
+            double saleCard = s.getCardAmount();
+
+            // Fallback para registros antiguos sin desglosar
+            if (saleCash == 0 && saleCard == 0) {
+                if ("Tarjeta".equalsIgnoreCase(s.getPaymentMethod()))
+                    saleCard = s.getTotal();
+                else
+                    saleCash = s.getTotal();
+            }
+
+            cash += saleCash * netRatio;
+            card += saleCard * netRatio;
         }
 
         // Emojis y colores integrados en el valor
@@ -293,8 +274,6 @@ public class HistoryController implements Injectable, Searchable {
         detailsPanel.setManaged(true);
         lblSaleId.setText("Ticket #" + String.format("%04d", sale.getSaleId()));
 
-        boolean hasReturnable = sale.getDetails().stream()
-                .anyMatch(d -> (d.getQuantity() - d.getReturnedQuantity()) > 0);
         boolean hasAnyReturned = sale.getDetails().stream().anyMatch(d -> d.getReturnedQuantity() > 0);
 
         if (sale.isReturn()) {

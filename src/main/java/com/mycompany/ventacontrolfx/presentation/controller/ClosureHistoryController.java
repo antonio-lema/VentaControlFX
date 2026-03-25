@@ -6,10 +6,9 @@ import com.mycompany.ventacontrolfx.application.usecase.CashClosureUseCase;
 import com.mycompany.ventacontrolfx.infrastructure.config.Injectable;
 import com.mycompany.ventacontrolfx.infrastructure.config.ServiceContainer;
 import com.mycompany.ventacontrolfx.util.AlertUtil;
-import com.mycompany.ventacontrolfx.util.PaginationHelper;
+import com.mycompany.ventacontrolfx.util.DateFilterUtils;
 import com.mycompany.ventacontrolfx.util.ModalService;
-import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
-import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
+import com.mycompany.ventacontrolfx.util.PaginationHelper;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -17,8 +16,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.VBox;
-import javafx.scene.layout.GridPane;
-import javafx.scene.paint.Color;
+import javafx.scene.layout.HBox;
 
 import java.sql.SQLException;
 import java.time.LocalDate;
@@ -31,6 +29,8 @@ public class ClosureHistoryController implements Injectable {
 
     @FXML
     private DatePicker datePickerStart, datePickerEnd;
+    @FXML
+    private HBox quickFilterContainer;
     @FXML
     private ComboBox<String> cmbStatusFilter;
     @FXML
@@ -80,6 +80,8 @@ public class ClosureHistoryController implements Injectable {
         setupTable();
         setupMovementsTable();
         setupFilters();
+        DateFilterUtils.addQuickFilters(quickFilterContainer, datePickerStart,
+                datePickerEnd, this::loadClosures);
         paginationHelper = new PaginationHelper<>(tableClosures, cmbRowLimit, lblCount, "arqueos");
         loadClosures();
 
@@ -265,10 +267,16 @@ public class ClosureHistoryController implements Injectable {
         try {
             LocalDate start = datePickerStart.getValue();
             LocalDate end = datePickerEnd.getValue();
-            if (start == null || end == null)
-                return;
 
-            List<CashClosure> closures = closureUseCase.getHistory(start, end);
+            List<CashClosure> closures;
+            if (start == null || end == null) {
+                // If Todo is selected, we fetch a wide range or all.
+                // Using 2000-01-01 to 2100-01-01 as a safe "All" range if the repository
+                // requires dates.
+                closures = closureUseCase.getHistory(LocalDate.of(2000, 1, 1), LocalDate.of(2100, 1, 1));
+            } else {
+                closures = closureUseCase.getHistory(start, end);
+            }
             allClosures.setAll(closures);
             applyFilters();
             updateKPIs();
