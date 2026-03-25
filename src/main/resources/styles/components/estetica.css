@@ -450,3 +450,65 @@
     -fx-padding: 6 0 0 0;
     -fx-alignment: center;
 }
+
+/* ============================================================
+   MENU & NAVIGATION ENHANCEMENTS (VAT Explorer)
+   ============================================================ */
+
+.menu-item-bold {
+    -fx-font-weight: bold;
+}
+
+/* Ensure explorer checkboxes have enough contrast and spacing */
+.vat-explorer-checkbox {
+    -fx-text-fill: -fx-text-custom-main;
+    -fx-font-size: 13px;
+    -fx-padding: 6 12;
+    -fx-cursor: hand;
+}
+
+.vat-custom-menu-item {
+    -fx-padding: 0;
+}
+
+.vat-custom-menu-item:hover,
+.vat-custom-menu-item:focused {
+    -fx-background-color: -fx-custom-color-primary;
+}
+
+/* Force white text on hover for both the menu item and the checkbox inside it */
+.vat-custom-menu-item:hover .vat-explorer-checkbox,
+.vat-custom-menu-item:focused .vat-explorer-checkbox,
+.vat-custom-menu-item:hover .vat-explorer-checkbox .text,
+.vat-custom-menu-item:focused .vat-explorer-checkbox .text {
+    -fx-text-fill: white !important;
+}
+
+/* Fix for standard menus in light theme */
+.light-theme .context-menu {
+    -fx-background-color: -fx-bg-surface;
+    -fx-padding: 6px;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.12), 15, 0, 0, 5);
+    -fx-border-color: -fx-color-border-main;
+    -fx-border-width: 1;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+}
+
+.light-theme .menu-item {
+    -fx-padding: 8 12;
+    -fx-text-fill: -fx-text-custom-main;
+}
+
+.light-theme .menu-item:hover,
+.light-theme .menu-item:focused {
+    -fx-background-color: -fx-custom-color-primary;
+    -fx-text-fill: white !important;
+}
+
+/* Ensure the explorer checkboxes have enough contrast when NOT hovered */
+.vat-explorer-checkbox {
+    -fx-text-fill: -fx-text-custom-main;
+    -fx-font-size: 13px;
+    -fx-padding: 2 0;
+}

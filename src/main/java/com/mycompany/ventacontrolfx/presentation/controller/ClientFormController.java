@@ -21,6 +21,8 @@ public class ClientFormController implements Injectable {
     @FXML
     private javafx.scene.control.ComboBox<String> cmbType;
     @FXML
+    private javafx.scene.control.ComboBox<String> cmbIdType;
+    @FXML
     private javafx.scene.control.ComboBox<PriceList> cmbPriceList;
     @FXML
     private TextField txtName, txtTaxId, txtAddress, txtPostalCode, txtCity, txtProvince, txtCountry, txtEmail,
@@ -41,15 +43,36 @@ public class ClientFormController implements Injectable {
         this.currentClient = client;
 
         cmbType.setItems(javafx.collections.FXCollections.observableArrayList("Particular", "Empresa"));
+        cmbIdType.setItems(javafx.collections.FXCollections.observableArrayList("DNI", "NIE", "CIF", "Pasaporte"));
+
         cmbType.valueProperty().addListener((obs, oldVal, newVal) -> {
             if ("Empresa".equals(newVal)) {
                 lblTitle.setText(currentClient == null ? "Nueva Empresa" : "Editar Empresa");
                 txtName.setPromptText("Nombre de la empresa");
-                txtTaxId.setPromptText("CIF");
+                cmbIdType.setValue("CIF");
             } else {
                 lblTitle.setText(currentClient == null ? "Nuevo Cliente" : "Editar Cliente");
                 txtName.setPromptText("Nombre completo");
-                txtTaxId.setPromptText("DNI / NIE");
+                cmbIdType.setValue("DNI");
+            }
+        });
+
+        cmbIdType.valueProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal == null)
+                return;
+            switch (newVal) {
+                case "DNI":
+                    txtTaxId.setPromptText("12345678A");
+                    break;
+                case "NIE":
+                    txtTaxId.setPromptText("X1234567L");
+                    break;
+                case "CIF":
+                    txtTaxId.setPromptText("A12345678");
+                    break;
+                case "Pasaporte":
+                    txtTaxId.setPromptText("Número de pasaporte");
+                    break;
             }
         });
 
@@ -113,11 +136,18 @@ public class ClientFormController implements Injectable {
             return;
         }
 
-        if ("Empresa".equals(cmbType.getValue()) && txtTaxId.getText().trim().isEmpty()) {
-            AlertUtil.showWarning("Validación", "El CIF es obligatorio para configurar una Empresa.");
+        String idType = cmbIdType.getValue();
+        String taxId = txtTaxId.getText().trim();
+
+        if (taxId.isEmpty()) {
+            AlertUtil.showWarning("Validación", "El número de identificación es obligatorio.");
             return;
         }
 
+        if (!validateIdentification(idType, taxId)) {
+            AlertUtil.showWarning("Validación", "El formato del " + idType + " es inválido.");
+            return;
+        }
         String email = txtEmail.getText().trim();
         if (!email.isEmpty() && !email.matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
             AlertUtil.showWarning("Validación", "El formato del correo electrónico es inválido.");
@@ -164,5 +194,77 @@ public class ClientFormController implements Injectable {
 
     private void close() {
         ((Stage) txtName.getScene().getWindow()).close();
+    }
+
+    private boolean validateIdentification(String type, String id) {
+        if (id == null || id.isEmpty())
+            return false;
+        id = id.toUpperCase().trim();
+
+        switch (type) {
+            case "DNI":
+                return validateDNI(id);
+            case "NIE":
+                return validateNIE(id);
+            case "CIF":
+                return validateCIF(id);
+            case "Pasaporte":
+                return id.length() >= 5; // Validación básica
+            default:
+                return true;
+        }
+    }
+
+    private boolean validateDNI(String dni) {
+        if (!dni.matches("^[0-9]{8}[TRWAGMYFPDXBNJZSQVHLCKE]$"))
+            return false;
+        String numberPart = dni.substring(0, 8);
+        char letter = dni.charAt(8);
+        return calculateDNILetter(Integer.parseInt(numberPart)) == letter;
+    }
+
+    private boolean validateNIE(String nie) {
+        if (!nie.matches("^[XYZ][0-9]{7}[TRWAGMYFPDXBNJZSQVHLCKE]$"))
+            return false;
+        String nieFormatted = nie.replace('X', '0').replace('Y', '1').replace('Z', '2');
+        String numberPart = nieFormatted.substring(0, 8);
+        char letter = nie.charAt(8);
+        return calculateDNILetter(Integer.parseInt(numberPart)) == letter;
+    }
+
+    private char calculateDNILetter(int number) {
+        String letters = "TRWAGMYFPDXBNJZSQVHLCKE";
+        return letters.charAt(number % 23);
+    }
+
+    private boolean validateCIF(String cif) {
+        if (!cif.matches("^[ABCDEFGHJNPQRSUVW][0-9]{7}[A-J0-9]$"))
+            return false;
+
+        String control = cif.substring(8);
+        String digits = cif.substring(1, 8);
+        int sumEven = 0;
+        int sumOdd = 0;
+
+        for (int i = 0; i < digits.length(); i++) {
+            int digit = Character.getNumericValue(digits.charAt(i));
+            if (i % 2 == 0) { // Posiciones impares de la cadena (1, 3, 5, 7) -> índices pares 0, 2, 4, 6
+                int doubleDigit = digit * 2;
+                sumOdd += (doubleDigit / 10) + (doubleDigit % 10);
+            } else {
+                sumEven += digit;
+            }
+        }
+
+        int totalSum = sumEven + sumOdd;
+        int lastDigit = totalSum % 10;
+        int controlDigit = (lastDigit == 0) ? 0 : (10 - lastDigit);
+        char controlLetter = "JABCDEFGHI".charAt(controlDigit);
+
+        if (Character.isDigit(control.charAt(0))) {
+            return Integer.parseInt(control) == controlDigit;
+        } else {
+            return control.charAt(0) == controlLetter;
+        }
     }
 }

@@ -17,6 +17,7 @@ import com.mycompany.ventacontrolfx.domain.model.PriceList;
 import com.mycompany.ventacontrolfx.domain.repository.IPriceRepository;
 import com.mycompany.ventacontrolfx.domain.service.TaxEngineService;
 import com.mycompany.ventacontrolfx.domain.service.PriceResolutionService;
+import com.mycompany.ventacontrolfx.domain.repository.IProductRepository;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,22 +39,27 @@ public class CartUseCase {
     private final ObjectProperty<Client> selectedClient = new SimpleObjectProperty<>(null);
     private final IntegerProperty priceListId = new SimpleIntegerProperty(-1);
     private final IntegerProperty selectedCategoryId = new SimpleIntegerProperty(-2);
+    private final StringProperty generalObservation = new SimpleStringProperty("");
 
     private final ICompanyConfigRepository configRepository;
     private final com.mycompany.ventacontrolfx.domain.service.PriceResolutionService priceResolutionService;
     private final TaxEngineService taxEngineService;
     private final com.mycompany.ventacontrolfx.application.service.PromotionEngine promotionEngine;
+    private final IProductRepository productRepository;
+    private int systemObservationProductId = -1;
 
     public CartUseCase(ICompanyConfigRepository configRepository,
             PriceResolutionService priceResolutionService,
             TaxEngineService taxEngineService,
-            PromotionService promotionService, // Kept in constructor for compatibility but not used as field
+            PromotionService promotionService,
             com.mycompany.ventacontrolfx.application.service.PromotionEngine promotionEngine,
-            IPriceRepository priceRepository) { // priceRepository still needed for legacy listener fallback
+            IPriceRepository priceRepository,
+            IProductRepository productRepository) {
         this.configRepository = configRepository;
         this.taxEngineService = taxEngineService;
         this.promotionEngine = promotionEngine;
         this.priceResolutionService = priceResolutionService;
+        this.productRepository = productRepository;
         this.cartItems = FXCollections
                 .observableArrayList((CartItem item) -> new Observable[] { item.quantityProperty() });
         this.cartItems.addListener((ListChangeListener.Change<? extends CartItem> c) -> updateTotals());
@@ -130,7 +136,7 @@ public class CartUseCase {
         bgThread.start();
     }
 
-    private void updateTotals() {
+    public void updateTotals() {
         SaleConfig config = configRepository.load();
         double totalInclusive = 0.0;
         double totalBase = 0.0;
@@ -147,20 +153,21 @@ public class CartUseCase {
             Product product = item.getProduct();
             try {
                 // Obtener descuento específico para este producto desde el motor
-                double lineDiscount = promoResult.getItemDiscounts().getOrDefault(product.getId(), 0.0);
-                item.setDiscountAmount(lineDiscount);
+                double autoDiscount = promoResult.getItemDiscounts().getOrDefault(product.getId(), 0.0);
+                double totalLineDiscount = autoDiscount + item.getManualDiscountAmount();
+                item.setDiscountAmount(totalLineDiscount);
 
                 // Acumular ahorros para la etiqueta (gross-up si es necesario)
                 double taxRate = product.resolveEffectiveIva(config.getTaxRate());
                 double taxMultiplier = isInclusive ? 1.0 : (1.0 + (taxRate / 100.0));
-                grossSavingsTotal += lineDiscount * taxMultiplier;
+                grossSavingsTotal += totalLineDiscount * taxMultiplier;
 
                 // Precio unitario original (con tarifa de cliente ya aplicada)
                 double unitPrice = item.getUnitPrice();
 
                 // Calculamos el total de la línea YA con descuento para que el TaxEngine
                 // recalcule la base e IVA
-                double grossLineTotal = (unitPrice * item.getQuantity()) - lineDiscount;
+                double grossLineTotal = (unitPrice * item.getQuantity()) - totalLineDiscount;
 
                 // Simulamos un precio unitario efectivo para el motor de impuestos
                 // (grossLineTotal / quantity) nos da el precio unitario real pagado
@@ -173,11 +180,12 @@ public class CartUseCase {
                 totalInclusive += result.getGrossTotal();
             } catch (SQLException e) {
                 // Fallback en caso de error en el motor de impuestos
-                double lineDiscount = promoResult.getItemDiscounts().getOrDefault(product.getId(), 0.0);
+                double autoDiscount = promoResult.getItemDiscounts().getOrDefault(product.getId(), 0.0);
+                double totalLineDiscount = autoDiscount + item.getManualDiscountAmount();
 
                 double taxRate = product.resolveEffectiveIva(config.getTaxRate());
                 double taxMultiplier = isInclusive ? 1.0 : (1.0 + (taxRate / 100.0));
-                grossSavingsTotal += lineDiscount * taxMultiplier;
+                grossSavingsTotal += totalLineDiscount * taxMultiplier;
 
                 double lineTotal = (Math.round(item.getTotal() * 100.0) / 100.0); // CartItem.getTotal() ya descuenta
                 double effectiveRate = product.resolveEffectiveIva(config.getTaxRate());
@@ -250,6 +258,18 @@ public class CartUseCase {
         this.priceListId.set(id);
     }
 
+    public StringProperty generalObservationProperty() {
+        return generalObservation;
+    }
+
+    public String getGeneralObservation() {
+        return generalObservation.get();
+    }
+
+    public void setGeneralObservation(String observation) {
+        this.generalObservation.set(observation);
+    }
+
     public int getPriceListId() {
         return priceListId.get();
     }
@@ -283,7 +303,7 @@ public class CartUseCase {
         }
 
         Optional<CartItem> existingItem = cartItems.stream()
-                .filter(item -> item.getProduct().getId() == product.getId())
+                .filter(item -> item.getProduct().getId() == product.getId() && product.getId() > 0)
                 .findFirst();
 
         if (existingItem.isPresent()) {
@@ -291,6 +311,51 @@ public class CartUseCase {
             item.setQuantity(item.getQuantity() + quantity);
         } else {
             cartItems.add(new CartItem(product, quantity));
+        }
+    }
+
+    public void addCustomItem(String name, double price) {
+        try {
+            Product genericProduct = productRepository.findBySku("SYS-GEN-001");
+            if (genericProduct != null) {
+                // Creamos un producto virtual basado en el genérico
+                Product customProduct = new Product(
+                        genericProduct.getId(),
+                        genericProduct.getCategoryId(),
+                        name,
+                        price,
+                        false,
+                        true,
+                        genericProduct.getImagePath(),
+                        genericProduct.getCategoryName(),
+                        genericProduct.getIva(),
+                        genericProduct.getCategoryIva(),
+                        genericProduct.getSku(),
+                        0,
+                        true,
+                        0,
+                        0,
+                        false);
+                customProduct.setCurrentPrice(price);
+
+                // Agrupamos solo si el nombre y el precio coinciden exactamente
+                Optional<CartItem> existingItem = cartItems.stream()
+                        .filter(item -> {
+                            Product p = item.getProduct();
+                            return "SYS-GEN-001".equals(p.getSku()) &&
+                                    name.equals(p.getName()) &&
+                                    item.getUnitPrice() == price;
+                        })
+                        .findFirst();
+
+                if (existingItem.isPresent()) {
+                    existingItem.get().setQuantity(existingItem.get().getQuantity() + 1);
+                } else {
+                    cartItems.add(new CartItem(customProduct, 1));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 
@@ -339,9 +404,14 @@ public class CartUseCase {
                 .ifPresent(item -> item.setQuantity(quantity));
     }
 
+    public void addObservation(String text) {
+        setGeneralObservation(text);
+    }
+
     public void clear() {
         cartItems.clear();
         selectedClient.set(null);
+        generalObservation.set("");
     }
 
     public Client getSelectedClient() {

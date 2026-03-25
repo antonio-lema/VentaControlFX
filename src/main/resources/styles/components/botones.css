@@ -211,3 +211,40 @@
 .btn-trash-small .glyph-icon {
     -fx-fill: inherit;
 }
+
+/* ───────────────────────────────────────────────────
+   FILTROS DE FECHA RÁPIDA (CHIPS/PILLS)
+   ─────────────────────────────────────────────────── */
+.date-filter-chip {
+    -fx-background-color: -fx-bg-subtle;
+    -fx-text-fill: -fx-text-custom-light;
+    -fx-padding: 5 12;
+    -fx-background-radius: 20px;
+    -fx-border-color: -fx-color-border-main;
+    -fx-border-width: 1px;
+    -fx-border-radius: 20px;
+    -fx-font-size: 11px;
+    -fx-font-weight: 800;
+    -fx-cursor: hand;
+}
+
+.date-filter-chip:hover {
+    -fx-background-color: -fx-neutral-200;
+    -fx-text-fill: -fx-text-custom-main;
+}
+
+.date-filter-chip:selected {
+    -fx-background-color: -color-primary;
+    -fx-text-fill: white !important;
+    -fx-border-color: transparent;
+    -fx-effect: dropshadow(three-pass-box, -fx-shadow-color-primary, 8, 0, 0, 2);
+}
+
+.dark-theme .date-filter-chip {
+    -fx-background-color: -fx-bg-surface;
+    -fx-border-color: -fx-color-border-main;
+}
+
+.date-filter-container {
+    -fx-padding: 5 0;
+}

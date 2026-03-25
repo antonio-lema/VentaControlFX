@@ -6,29 +6,23 @@ import com.mycompany.ventacontrolfx.domain.model.ReturnDetail;
 import com.mycompany.ventacontrolfx.infrastructure.config.Injectable;
 import com.mycompany.ventacontrolfx.infrastructure.config.ServiceContainer;
 import com.mycompany.ventacontrolfx.util.AlertUtil;
+import com.mycompany.ventacontrolfx.util.DateFilterUtils;
 import com.mycompany.ventacontrolfx.util.ModalService;
-import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
-import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
-import com.mycompany.ventacontrolfx.presentation.controller.TicketDetailController;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
-import javafx.scene.layout.*;
-import javafx.scene.input.MouseEvent;
-import javafx.event.EventHandler;
 import com.mycompany.ventacontrolfx.presentation.util.RealTimeSearchBinder;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.VBox;
 
-import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -38,6 +32,8 @@ public class ReturnListController implements Injectable {
 
     @FXML
     private DatePicker datePickerStart, datePickerEnd;
+    @FXML
+    private HBox quickFilterContainer;
     @FXML
     private TextField txtSearch;
     @FXML
@@ -98,6 +94,10 @@ public class ReturnListController implements Injectable {
         }
 
         setupTable();
+
+        DateFilterUtils.addQuickFilters(quickFilterContainer, datePickerStart,
+                datePickerEnd, this::loadReturns);
+
         loadReturns();
 
         // Listeners para búsqueda en tiempo real
@@ -320,10 +320,15 @@ public class ReturnListController implements Injectable {
     @FXML
     public void loadReturns() {
         try {
-            LocalDate start = (datePickerStart != null) ? datePickerStart.getValue() : LocalDate.now();
-            LocalDate end = (datePickerEnd != null) ? datePickerEnd.getValue() : LocalDate.now();
+            LocalDate start = (datePickerStart != null) ? datePickerStart.getValue() : null;
+            LocalDate end = (datePickerEnd != null) ? datePickerEnd.getValue() : null;
 
-            List<Return> returns = saleUseCase.getReturnsHistory(start, end);
+            List<Return> returns;
+            if (start == null || end == null) {
+                returns = saleUseCase.getReturnsHistory(LocalDate.of(2000, 1, 1), LocalDate.of(2100, 1, 1));
+            } else {
+                returns = saleUseCase.getReturnsHistory(start, end);
+            }
             masterData.setAll(returns);
             applyFilters();
         } catch (SQLException e) {

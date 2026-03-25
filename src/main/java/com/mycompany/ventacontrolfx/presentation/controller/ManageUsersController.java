@@ -123,6 +123,12 @@ public class ManageUsersController implements Injectable {
         btnDelete.setGraphic(deleteIcon);
         btnDelete.setOnAction(e -> handleDeleteSingleUser(user));
 
+        // El usuario administrador principal (normalmente ID 1) no puede ser eliminado
+        if (user.getUserId() == 1 || "admin".equalsIgnoreCase(user.getUsername())) {
+            btnDelete.setDisable(true);
+            btnDelete.setTooltip(new Tooltip("El usuario administrador principal no puede ser eliminado."));
+        }
+
         actions.getChildren().addAll(btnEdit, btnDelete);
         card.getChildren().addAll(avatar, info, badge, actions);
         return card;

@@ -123,26 +123,46 @@
 }
 
 .modern-combo-box {
-    -fx-background-color: transparent;
+    -fx-background-color: -fx-bg-input;
+    -fx-background-radius: 8px;
+    -fx-border-color: -fx-color-border-main;
+    -fx-border-radius: 8px;
+    -fx-border-width: 1px;
+    -fx-padding: 6 12;
     -fx-font-size: 14px;
-    -fx-padding: 4px;
+    -fx-cursor: hand;
+    -fx-transition: all 0.2s ease;
+}
+
+.modern-combo-box:hover {
+    -fx-border-color: -fx-custom-color-primary;
+    -fx-background-color: -fx-bg-surface;
+}
+
+.modern-combo-box:focused {
+    -fx-border-color: -fx-custom-color-primary;
+    -fx-border-width: 1.5px;
+    -fx-effect: dropshadow(three-pass-box, -fx-shadow-color-subtle, 8, 0, 0, 2);
 }
 
 .modern-combo-box>.list-cell {
     -fx-text-fill: -fx-text-custom-main;
     -fx-background-color: transparent;
+    -fx-padding: 0;
 }
 
 .modern-combo-box>.arrow-button {
     -fx-background-color: transparent;
+    -fx-padding: 0 0 0 10;
 }
 
 .modern-combo-box>.arrow-button>.arrow {
     -fx-background-color: -fx-text-custom-light;
+    -fx-shape: "M 0 0 L 4 4 L 8 0 Z";
 }
 
-.config-input-container:focused-within .modern-combo-box>.arrow-button>.arrow {
-    -fx-background-color: #1e88e5;
+.modern-combo-box:hover>.arrow-button>.arrow {
+    -fx-background-color: -fx-custom-color-primary;
 }
 
 /* Input Icons */

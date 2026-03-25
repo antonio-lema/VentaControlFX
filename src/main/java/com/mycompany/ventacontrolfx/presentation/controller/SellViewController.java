@@ -1,6 +1,7 @@
 package com.mycompany.ventacontrolfx.presentation.controller;
 
 import com.mycompany.ventacontrolfx.application.usecase.ProductFilterUseCase;
+import com.mycompany.ventacontrolfx.domain.model.VisibilityFilter;
 import com.mycompany.ventacontrolfx.application.usecase.ProductUseCase;
 import com.mycompany.ventacontrolfx.application.usecase.CategoryUseCase;
 import com.mycompany.ventacontrolfx.domain.model.Category;
@@ -324,7 +325,7 @@ public class SellViewController implements Injectable, CategoryMenuRenderer.Cate
 
             if (type == FilterType.CATEGORY && criteria != null) {
                 Category cat = (Category) criteria;
-                count = container.getProductRepository().countByCategory(cat.getId(), true);
+                count = container.getProductRepository().countByCategory(cat.getId(), VisibilityFilter.VISIBLE);
                 products = container.getProductRepository().getByCategoryPaginated(cat.getId(), PAGE_SIZE,
                         currentOffset, selectedPriceListId);
             } else if (type == FilterType.FAVORITES) {
@@ -337,20 +338,25 @@ public class SellViewController implements Injectable, CategoryMenuRenderer.Cate
             } else if (type == FilterType.PROMOTIONS) {
                 // Fetch reasonably large page representing 'all' to filter in memory
                 List<Product> allProducts = container.getProductRepository().searchPaginated("", 5000, 0,
-                        selectedPriceListId, true);
+                        selectedPriceListId, VisibilityFilter.VISIBLE);
 
                 List<Product> filtered = allProducts.stream()
                         .filter(p -> {
-                            boolean hasProductPromo = activePromotions.stream().anyMatch(promo -> promo
-                                    .getScope() == com.mycompany.ventacontrolfx.domain.model.PromotionScope.PRODUCT &&
-                                    promo.getAffectedIds().contains(p.getId()));
+                            boolean hasProductPromo = activePromotions.stream().anyMatch(
+                                    promo -> promo
+                                            .getScope() == com.mycompany.ventacontrolfx.domain.model.PromotionScope.PRODUCT
+                                            &&
+                                            promo.getAffectedIds().contains(p.getId()));
 
-                            boolean hasCategoryPromo = activePromotions.stream().anyMatch(promo -> promo
-                                    .getScope() == com.mycompany.ventacontrolfx.domain.model.PromotionScope.CATEGORY &&
-                                    promo.getAffectedIds().contains(p.getCategoryId()));
+                            boolean hasCategoryPromo = activePromotions.stream().anyMatch(
+                                    promo -> promo
+                                            .getScope() == com.mycompany.ventacontrolfx.domain.model.PromotionScope.CATEGORY
+                                            &&
+                                            promo.getAffectedIds().contains(p.getCategoryId()));
 
-                            boolean hasGlobal = activePromotions.stream().anyMatch(promo -> promo
-                                    .getScope() == com.mycompany.ventacontrolfx.domain.model.PromotionScope.GLOBAL);
+                            boolean hasGlobal = activePromotions.stream().anyMatch(
+                                    promo -> promo
+                                            .getScope() == com.mycompany.ventacontrolfx.domain.model.PromotionScope.GLOBAL);
 
                             return hasGlobal || hasProductPromo || hasCategoryPromo;
                         }).collect(java.util.stream.Collectors.toList());
@@ -360,13 +366,13 @@ public class SellViewController implements Injectable, CategoryMenuRenderer.Cate
                 products = (currentOffset < count) ? filtered.subList(currentOffset, end) : new java.util.ArrayList<>();
             } else if (type == FilterType.SEARCH && criteria != null) {
                 String query = (String) criteria;
-                count = container.getProductRepository().countSearch(query, true);
+                count = container.getProductRepository().countSearch(query, VisibilityFilter.VISIBLE);
                 products = container.getProductRepository().searchPaginated(query, PAGE_SIZE, currentOffset,
-                        selectedPriceListId, true);
+                        selectedPriceListId, VisibilityFilter.VISIBLE);
             } else {
-                count = container.getProductRepository().countSearch("", true);
+                count = container.getProductRepository().countSearch("", VisibilityFilter.VISIBLE);
                 products = container.getProductRepository().searchPaginated("", PAGE_SIZE, currentOffset,
-                        selectedPriceListId, true);
+                        selectedPriceListId, VisibilityFilter.VISIBLE);
             }
 
             return new Object[] { products, count };

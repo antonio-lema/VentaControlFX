@@ -131,7 +131,7 @@ public class ServiceContainer {
 
         // 4. Cart Initialized after TaxEngineService and PromotionService
         this.cartUseCase = new CartUseCase(configRepository, priceResolutionService, taxEngineService, promotionService,
-                promotionEngine, priceRepository);
+                promotionEngine, priceRepository, productRepository);
 
         // 5. Wiring Use Cases (Application Layer)
         this.productUseCase = new com.mycompany.ventacontrolfx.application.usecase.ProductUseCase(productRepository,

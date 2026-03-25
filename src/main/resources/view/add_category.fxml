@@ -18,43 +18,46 @@
         <!-- Header -->
         <VBox styleClass="modern-register-header" alignment="CENTER_LEFT">
             <Label fx:id="lblTitle" text="Nueva Categoría" styleClass="modern-register-title"/>
-            <Label fx:id="lblSubtitle" text="Introduce el nombre de la categoría" styleClass="modern-register-subtitle"/>
+            <Label fx:id="lblSubtitle" text="Introduce el nombre de la categoría" styleClass="modern-register-subtitle" style="-fx-text-fill: #64748b;"/>
         </VBox>
         
         <VBox spacing="15">
             <!-- Name -->
             <VBox styleClass="modern-input-group">
+                <Label text="Nombre de la Categoría" styleClass="modern-label" style="-fx-text-fill: #64748b; -fx-font-size: 11px; -fx-font-weight: bold; -fx-padding: 0 0 5 0;"/>
                 <HBox styleClass="modern-input-container" alignment="CENTER_LEFT">
-                    <FontAwesomeIconView glyphName="FOLDER" size="18" styleClass="sidebar-icon">
+                    <FontAwesomeIconView glyphName="FOLDER" size="18" fill="#64748b">
                         <HBox.margin>
                             <Insets right="10"/>
                         </HBox.margin>
                     </FontAwesomeIconView> 
-                    <TextField fx:id="txtName" promptText="Nombre de la categoría" styleClass="modern-input-field" HBox.hgrow="ALWAYS"/>
+                    <TextField fx:id="txtName" promptText="Ej: Bebidas, Snacks..." styleClass="modern-input-field" HBox.hgrow="ALWAYS" style="-fx-text-fill: #1e293b;"/>
                 </HBox>
             </VBox>
 
             <!-- Default Tax Group (V2) -->
             <VBox styleClass="modern-input-group">
+                <Label text="Grupo de Impuestos por Defecto" styleClass="modern-label" style="-fx-text-fill: #64748b; -fx-font-size: 11px; -fx-font-weight: bold; -fx-padding: 0 0 5 0;"/>
                 <HBox styleClass="modern-input-container" alignment="CENTER_LEFT">
-                    <FontAwesomeIconView glyphName="BALANCE_SCALE" size="18" styleClass="sidebar-icon">
+                    <FontAwesomeIconView glyphName="BALANCE_SCALE" size="18" fill="#64748b">
                         <HBox.margin>
                             <Insets right="10"/>
                         </HBox.margin>
                     </FontAwesomeIconView> 
-                    <ComboBox fx:id="cmbTaxGroup" promptText="Grupo de Impuestos (V2)" styleClass="modern-combo-box" HBox.hgrow="ALWAYS" maxWidth="1.7976931348623157E308"/>
+                    <ComboBox fx:id="cmbTaxGroup" promptText="Seleccionar grupo fiscal..." styleClass="modern-input-field" HBox.hgrow="ALWAYS" maxWidth="1.7976931348623157E308" style="-fx-background-color: transparent; -fx-text-fill: #1e293b;"/>
                 </HBox>
             </VBox>
 
             <!-- Default IVA -->
             <VBox styleClass="modern-input-group">
+                <Label text="IVA por Defecto (%)" styleClass="modern-label" style="-fx-text-fill: #64748b; -fx-font-size: 11px; -fx-font-weight: bold; -fx-padding: 0 0 5 0;"/>
                 <HBox styleClass="modern-input-container" alignment="CENTER_LEFT">
-                    <FontAwesomeIconView glyphName="PERCENT" size="18" styleClass="sidebar-icon">
+                    <FontAwesomeIconView glyphName="PERCENT" size="18" fill="#64748b">
                         <HBox.margin>
                             <Insets right="10"/>
                         </HBox.margin>
                     </FontAwesomeIconView> 
-                    <TextField fx:id="txtIva" promptText="IVA por defecto (%)" styleClass="modern-input-field" HBox.hgrow="ALWAYS" text="21.0"/>
+                    <TextField fx:id="txtIva" promptText="21.0" styleClass="modern-input-field" HBox.hgrow="ALWAYS" style="-fx-text-fill: #1e293b;"/>
                 </HBox>
             </VBox>
         </VBox>
@@ -62,7 +65,7 @@
         <!-- Actions -->
         <HBox spacing="15" alignment="CENTER_RIGHT" style="-fx-padding: 30 0 0 0;">
             <Button text="Cancelar" onAction="#handleCancel" styleClass="modern-btn-secondary" cancelButton="true"/>
-            <Button text="Guardar" onAction="#handleSave" styleClass="modern-btn-primary" defaultButton="true"/>
+            <Button text="Guardar Categoría" onAction="#handleSave" styleClass="modern-btn-primary" defaultButton="true"/>
         </HBox>
     </VBox>
 </StackPane>

@@ -32,15 +32,16 @@ public class ReceiptController implements Injectable {
 
     @FXML
     private VBox receiptContent, companyHeaderSection, ticketInfoSection, itemsContainer, totalsContainer,
-            barcodeSection, paymentInfoContainer, clientInfoSection, vatBreakdownContainer, hboxSavings;
+            barcodeSection, paymentInfoContainer, clientInfoSection, vatBreakdownContainer, hboxSavings,
+            observationSection;
     @FXML
     private HBox itemsHeaderHBox, hboxVatTotal;
     @FXML
     private Label lblTicketTitle, lblSuccessMessage, lblDate, lblSubtotal, lblVat, lblTotal, lblPaid, lblChange,
             lblPaymentMethod, lblTotalRight, lblChangeRight, lblGiftIndicator, lblPVPHeader, lblTotalHeader,
             lblClientName, lblClientTaxId, lblClientAddress, lblCompanyBrand, lblCompanyName, lblCompanyAddress,
-            lblCompanyPhone, lblCompanyCif, lblFooterMessage, lblSuccessIcon, lblGiftIcon, lblCompanyIcon,
-            lblAttendedBy, lblWebsiteUrl, lblSavings;
+            lblCompanyPhone,            lblCompanyCif, lblFooterMessage, lblSuccessIcon, lblGiftIcon, lblCompanyIcon,
+            lblAttendedBy, lblWebsiteUrl, lblSavings, lblObservations;
     @FXML
     private ImageView imgCompanyLogo, imgAppLogoRight;
     @FXML
@@ -67,6 +68,11 @@ public class ReceiptController implements Injectable {
 
     public void setReceiptData(List<CartItem> items, double total, double paid, double change, String paymentMethod,
             int saleId, Runnable onNewSale, Runnable onBack) {
+        setReceiptData(items, total, paid, change, paymentMethod, saleId, onNewSale, onBack, null);
+    }
+
+    public void setReceiptData(List<CartItem> items, double total, double paid, double change, String paymentMethod,
+            int saleId, Runnable onNewSale, Runnable onBack, String observations) {
         this.currentItems = items;
         this.currentTotal = total;
         this.currentPaid = paid;
@@ -179,6 +185,16 @@ public class ReceiptController implements Injectable {
             lblTotalRight.setText(String.format(fmt, total));
         if (lblChangeRight != null)
             lblChangeRight.setText(String.format(fmt, change));
+
+        // Display general observation
+        if (observationSection != null && lblObservations != null) {
+            boolean hasObs = observations != null && !observations.trim().isEmpty();
+            observationSection.setVisible(hasObs);
+            observationSection.setManaged(hasObs);
+            if (hasObs) {
+                lblObservations.setText(observations);
+            }
+        }
 
         applyPaperFormat();
     }

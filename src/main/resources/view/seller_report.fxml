@@ -13,6 +13,7 @@
       styleClass="main-content-area" spacing="0" style="-fx-background-color: -fx-bg-main;">
     <stylesheets>
         <java.net.URL value="@/styles/components/informes.css" />
+        <java.net.URL value="@/styles/components/filters.css" />
     </stylesheets>
 
     <!-- Header & Action Bar -->
@@ -32,6 +33,8 @@
                 <DatePicker fx:id="dpFrom" prefWidth="120" promptText="Desde" styleClass="input-saas"/>
                 <Label text="-" styleClass="view-subtitle"/>
                 <DatePicker fx:id="dpTo" prefWidth="120" promptText="Hasta" styleClass="input-saas"/>
+                
+                <HBox fx:id="quickFilterContainer" spacing="8" alignment="CENTER_LEFT" styleClass="date-filter-container" />
                 
                 <Separator orientation="VERTICAL" prefHeight="24" style="-fx-padding: 0 10; -fx-opacity: 0.3;"/>
                 

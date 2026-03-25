@@ -109,6 +109,12 @@ public class ManageRolesController implements Injectable {
         btnEdit.setGraphic(editIcon);
         btnEdit.setOnAction(e -> handleEditSingleRole(role));
 
+        // Disable editing for "admin" role to ensure immutability
+        if ("admin".equalsIgnoreCase(role.getName())) {
+            btnEdit.setDisable(true);
+            btnEdit.setTooltip(new Tooltip("El rol de administrador principal no puede ser modificado."));
+        }
+
         Button btnDelete = new Button();
         btnDelete.getStyleClass().addAll("user-action-btn", "btn-trash-small");
         FontAwesomeIconView deleteIcon = new FontAwesomeIconView(FontAwesomeIcon.TRASH);

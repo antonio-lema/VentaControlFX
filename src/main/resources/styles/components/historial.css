@@ -191,7 +191,7 @@
 
 .detail-panel-accent {
     -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #1e88e5 0%, #1565c0 100%);
-    -fx-background-radius: -fx-radius-lg -fx-radius-lg 0 0;
+    -fx-background-radius: -fx-radius-lg;
 }
 
 .detail-panel-body {
@@ -250,7 +250,7 @@
     -fx-font-size: 10px;
     -fx-font-weight: bold;
     -fx-padding: 3 8;
-    -fx-background-radius: 5px;
+    -fx-background-radius: -fx-radius-sm;
 }
 
 .badge-warning {
@@ -259,7 +259,7 @@
     -fx-font-size: 10px;
     -fx-font-weight: bold;
     -fx-padding: 3 8;
-    -fx-background-radius: 5px;
+    -fx-background-radius: -fx-radius-sm;
 }
 
 /* =========================================

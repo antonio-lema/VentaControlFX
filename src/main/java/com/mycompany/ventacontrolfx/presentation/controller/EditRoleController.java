@@ -17,6 +17,8 @@ import javafx.stage.Stage;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 public class EditRoleController implements Injectable {
 
@@ -61,15 +63,71 @@ public class EditRoleController implements Injectable {
 
         try {
             List<Permission> allPerms = permissionUseCase.getAllPermissions();
+
+            // Agrupar por prefijo (e.g. "caja", "venta")
+            Map<String, List<Permission>> grouped = new TreeMap<>();
             for (Permission perm : allPerms) {
-                CheckBox cb = new CheckBox(perm.getDescription());
-                cb.setId("perm_" + perm.getCode());
-                cb.getStyleClass().add("permission-checkbox");
-                cb.setUserData(perm.getCode());
-                // Agregar un tooltip con el código
-                cb.setTooltip(new Tooltip(perm.getCode()));
-                permissionCheckboxes.add(cb);
-                permissionsContainer.getChildren().add(cb);
+                String category = "General";
+                if (perm.getCode().contains(".")) {
+                    category = perm.getCode().split("\\.")[0].toUpperCase();
+                } else {
+                    // Fallback para códigos sin punto
+                    category = perm.getCode().toUpperCase();
+                }
+                grouped.computeIfAbsent(category, k -> new ArrayList<>()).add(perm);
+            }
+
+            for (Map.Entry<String, List<Permission>> entry : grouped.entrySet()) {
+                String categoryName = entry.getKey();
+                List<Permission> perms = entry.getValue();
+
+                VBox groupContainer = new VBox(8);
+                groupContainer.setPadding(new Insets(10, 0, 15, 0));
+
+                // Header de categoría con CheckBox "Seleccionar Todo"
+                CheckBox chkSelectAll = new CheckBox(categoryName);
+                chkSelectAll.setStyle("-fx-font-weight: bold; -fx-text-fill: -color-primary; -fx-font-size: 14px;");
+
+                VBox permsBox = new VBox(5);
+                permsBox.setPadding(new Insets(0, 0, 0, 20));
+
+                List<CheckBox> groupCheckboxes = new ArrayList<>();
+
+                for (Permission perm : perms) {
+                    CheckBox cb = new CheckBox(perm.getDescription());
+                    cb.setId("perm_" + perm.getCode());
+                    cb.getStyleClass().add("permission-checkbox");
+                    cb.setUserData(perm.getCode());
+                    cb.setTooltip(new Tooltip(perm.getCode()));
+
+                    permissionCheckboxes.add(cb);
+                    groupCheckboxes.add(cb);
+                    permsBox.getChildren().add(cb);
+
+                    // Lógica para actualizar el "Seleccionar Todo" si se cambia uno individual
+                    cb.selectedProperty().addListener((obs, old, val) -> {
+                        if (!val) {
+                            chkSelectAll.setSelected(false);
+                        } else {
+                            boolean allSelected = groupCheckboxes.stream().allMatch(CheckBox::isSelected);
+                            if (allSelected)
+                                chkSelectAll.setSelected(true);
+                        }
+                    });
+                }
+
+                chkSelectAll.setOnAction(e -> {
+                    boolean allCurrentlySelected = groupCheckboxes.stream().allMatch(CheckBox::isSelected);
+                    boolean target = !allCurrentlySelected;
+
+                    // Asegurar que el checkbox maestro refleje el nuevo estado deseado antes de
+                    // disparar hijos
+                    chkSelectAll.setSelected(target);
+                    groupCheckboxes.forEach(cb -> cb.setSelected(target));
+                });
+
+                groupContainer.getChildren().addAll(chkSelectAll, new Separator(), permsBox);
+                permissionsContainer.getChildren().add(groupContainer);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -99,6 +157,34 @@ public class EditRoleController implements Injectable {
                 if (roleCodes.contains((String) cb.getUserData())) {
                     cb.setSelected(true);
                 }
+
+                // Si es admin, desactivar todos los checkboxes para evitar cambios parciales
+                if ("admin".equalsIgnoreCase(role.getName())) {
+                    cb.setDisable(true);
+                }
+            }
+
+            // Actualizar estado inicial de los checkboxes "Seleccionar Todo"
+            for (javafx.scene.Node node : permissionsContainer.getChildren()) {
+                if (node instanceof VBox group) {
+                    javafx.scene.Node headerNode = group.getChildren().get(0);
+                    if (headerNode instanceof CheckBox chkAll) {
+                        javafx.scene.Node permsBoxNode = group.getChildren().get(2);
+                        if (permsBoxNode instanceof VBox permsBox) {
+                            boolean allSelected = permsBox.getChildren().stream()
+                                    .filter(n -> n instanceof CheckBox)
+                                    .map(n -> (CheckBox) n)
+                                    .allMatch(CheckBox::isSelected);
+                            if (allSelected && !permsBox.getChildren().isEmpty()) {
+                                chkAll.setSelected(true);
+                            }
+                        }
+                    }
+                }
+            }
+
+            if ("admin".equalsIgnoreCase(role.getName())) {
+                btnSave.setDisable(true);
             }
         }
     }

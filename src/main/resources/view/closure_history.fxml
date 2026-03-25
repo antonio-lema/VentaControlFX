@@ -43,6 +43,8 @@
                                 </children>
                             </HBox>
                             
+                             <HBox fx:id="quickFilterContainer" alignment="CENTER_LEFT" spacing="8" styleClass="date-filter-container" />
+                            
                             <Button onAction="#loadClosures" styleClass="btn-primary" text="Refrescar">
                                 <graphic><FontAwesomeIconView glyphName="REFRESH" fill="WHITE" /></graphic>
                             </Button>
@@ -253,5 +255,6 @@
     <!-- CSS Linking -->
     <stylesheets>
         <URL value="@../styles/components/informes.css" />
+        <URL value="@../styles/components/filters.css" />
     </stylesheets>
 </AnchorPane>

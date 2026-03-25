@@ -10,14 +10,16 @@ import javafx.application.Platform;
 public class PaymentController {
 
     @FXML
-    private Label lblTotalAmount, lblCashAmount;
+    private Label lblTotalAmount, lblCashAmount, lblCashWarning;
     @FXML
     private TextField txtGivenAmount;
     @FXML
     private Button btnQuick1, btnQuick2, btnQuick3, btnQuick4;
+    @FXML
+    private javafx.scene.layout.VBox cashSection, vboxCashWarning;
 
     public interface PaymentCallback {
-        void onSuccess(double paid, double change, String method);
+        void onSuccess(double paid, double change, String method, double cashAmount, double cardAmount);
     }
 
     private double totalAmount;
@@ -35,6 +37,16 @@ public class PaymentController {
         lblTotalAmount.setText(formatted);
         lblCashAmount.setText(formatted);
         txtGivenAmount.setText(String.format("%.2f", amount).replace(',', '.'));
+
+        if (amount > 1000) {
+            cashSection.setDisable(true);
+            vboxCashWarning.setVisible(true);
+            vboxCashWarning.setManaged(true);
+        } else {
+            cashSection.setDisable(false);
+            vboxCashWarning.setVisible(false);
+            vboxCashWarning.setManaged(false);
+        }
 
         setupQuickButtons(amount);
     }
@@ -67,17 +79,25 @@ public class PaymentController {
     private void handleCardPayment() {
         handleClose();
         if (callback != null) {
-            Platform.runLater(() -> callback.onSuccess(totalAmount, 0.0, "Tarjeta"));
+            Platform.runLater(() -> callback.onSuccess(totalAmount, 0.0, "Tarjeta", 0.0, totalAmount));
         }
     }
 
     @FXML
     private void handleCashPayment() {
+        processCashPayment(false);
+    }
+
+    @FXML
+    private void handleMixedPayment() {
+        processCashPayment(true);
+    }
+
+    private void processCashPayment(boolean isMixed) {
         try {
             String text = txtGivenAmount.getText().trim().replace(",", ".");
             double given = text.isEmpty() ? totalAmount : Double.parseDouble(text);
 
-            // Redondeo preventivo a 2 decimales para evitar errores por milésimas
             double roundedTotal = Math.round(totalAmount * 100.0) / 100.0;
             double roundedGiven = Math.round(given * 100.0) / 100.0;
 
@@ -85,13 +105,21 @@ public class PaymentController {
                 double change = roundedGiven - roundedTotal;
                 handleClose();
                 if (callback != null) {
-                    Platform.runLater(() -> callback.onSuccess(given, change, "Efectivo"));
+                    Platform.runLater(() -> callback.onSuccess(given, change, "Efectivo", totalAmount, 0.0));
+                }
+            } else if (isMixed && roundedGiven > 0) {
+                // Pago Mixto: Registrar parte en efectivo y el resto por tarjeta
+                double remaining = roundedTotal - roundedGiven;
+                handleClose();
+                if (callback != null) {
+                    String method = String.format("Mixto (Efect: %.2f€, Tarj: %.2f€)", roundedGiven, remaining);
+                    Platform.runLater(() -> callback.onSuccess(roundedTotal, 0.0, method, roundedGiven, remaining));
                 }
             } else {
-                txtGivenAmount.setStyle("-fx-border-color: -color-danger; -fx-border-width: 2;");
+                txtGivenAmount.setStyle("-fx-border-color: #ef4444; -fx-border-width: 2;");
             }
         } catch (NumberFormatException e) {
-            txtGivenAmount.setStyle("-fx-border-color: -color-danger; -fx-border-width: 2;");
+            txtGivenAmount.setStyle("-fx-border-color: #ef4444; -fx-border-width: 2;");
         }
     }
 

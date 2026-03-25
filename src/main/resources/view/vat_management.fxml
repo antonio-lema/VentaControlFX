@@ -11,6 +11,7 @@
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleButton?>
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.CheckBox?>
@@ -148,7 +149,14 @@
                                                              <children>
                                                                 <Label text="Seleccionar productos:" styleClass="label-bold"/>
                                                                 <TextField fx:id="txtVatProductSearch" promptText="Nombre o SKU + ENTER" styleClass="modern-text-field" />
-                                                                <MenuButton fx:id="btnVatProductExplorer" maxWidth="1.7976931348623157E308" text="Explorar Categorías..." styleClass="modern-combo-box" />
+                                                                 <HBox spacing="8.0" alignment="CENTER_LEFT">
+                                                                    <children>
+                                                                       <MenuButton fx:id="btnVatProductExplorer" maxWidth="1.7976931348623157E308" text="Explorar Categorías..." styleClass="modern-combo-box" HBox.hgrow="ALWAYS" />
+                                                                       <Button fx:id="btnClearVatSelection" onAction="#handleClearVatSelection" styleClass="btn-icon, btn-danger" prefHeight="40" prefWidth="40">
+                                                                          <graphic><FontAwesomeIconView glyphName="TRASH" size="16" fill="#ef4444"/></graphic>
+                                                                       </Button>
+                                                                    </children>
+                                                                 </HBox>
                                                              </children>
                                                           </VBox>
                                                           <ListView fx:id="listVatSelectedProducts" prefHeight="80.0" styleClass="modern-list-view" VBox.vgrow="ALWAYS" />
@@ -222,9 +230,14 @@
                                                  <children>
                                                      <HBox alignment="CENTER_LEFT" spacing="20.0" styleClass="estetica-card-body">
                                                          <children>
-                                                             <VBox spacing="8.0" HBox.hgrow="ALWAYS">
+                                                             <VBox spacing="6.0" HBox.hgrow="ALWAYS">
                                                                 <children>
-                                                                   <Label styleClass="label-bold" text="📋 Tarifa a actualizar:" />
+                                                                   <HBox alignment="CENTER_LEFT" spacing="6">
+                                                                       <children>
+                                                                           <FontAwesomeIconView glyphName="TAG" size="12" styleClass="icon-primary"/>
+                                                                           <Label styleClass="label-bold" text="Tarifa a actualizar:" />
+                                                                       </children>
+                                                                   </HBox>
                                                                    <ComboBox fx:id="cmbPriceListUpdate"
                                                                              maxWidth="1.7976931348623157E308"
                                                                              promptText="Selecciona tarifa..."
@@ -274,16 +287,16 @@
                                                                  visible="true" managed="true"
                                                                  styleClass="panel-accent-blue">
                                                               <children>
-                                                                 <FontAwesomeIconView glyphName="FOLDER_OPEN" size="20" styleClass="text-info" />
-                                                                 <VBox spacing="4.0" HBox.hgrow="ALWAYS">
-                                                                    <children>
-                                                                       <Label styleClass="label-muted" text="Categoría (deja vacío para aplicar a TODAS):" />
-                                                                       <ComboBox fx:id="cmbPriceCategory"
-                                                                                 maxWidth="1.7976931348623157E308"
-                                                                                 promptText="Todas las categorías"
-                                                                                 styleClass="modern-combo-box" />
-                                                                    </children>
-                                                                 </VBox>
+                                                                  <HBox alignment="CENTER_LEFT" spacing="8">
+                                                                      <children>
+                                                                          <FontAwesomeIconView glyphName="FOLDER_OPEN" size="14" styleClass="icon-success"/>
+                                                                          <Label styleClass="label-bold" text="Categoría de productos:" />
+                                                                      </children>
+                                                                  </HBox>
+                                                                  <ComboBox fx:id="cmbPriceCategory"
+                                                                            maxWidth="1.7976931348623157E308"
+                                                                            promptText="Todas las categorías"
+                                                                            styleClass="modern-combo-box" />
                                                               </children>
                                                            </HBox>
 
@@ -640,8 +653,15 @@
                                     <!-- Filtro de historial IVA -->
                                     <HBox alignment="CENTER_LEFT" spacing="15.0" styleClass="modern-filter-bar">
                                        <children>
-                                          <Label styleClass="label-muted" text="Historial de IVA:" />
-                                          <ComboBox fx:id="cmbHistoryScope" prefWidth="200.0" promptText="Seleccionar scope" styleClass="modern-combo-box" />
+                                          <Label styleClass="label-muted" text="Fecha:" />
+                                          <HBox spacing="8" styleClass="date-filter-container">
+                                              <children>
+                                                  <ToggleButton fx:id="tglHistHoy" text="Hoy" styleClass="date-filter-chip" onAction="#handleQuickDateFilter" />
+                                                  <ToggleButton fx:id="tglHist7d" text="7 días" styleClass="date-filter-chip" onAction="#handleQuickDateFilter" />
+                                                  <ToggleButton fx:id="tglHist1m" text="1 mes" styleClass="date-filter-chip" onAction="#handleQuickDateFilter" />
+                                                  <ToggleButton fx:id="tglHistTodo" text="Todo" styleClass="date-filter-chip" onAction="#handleQuickDateFilter" selected="true" />
+                                              </children>
+                                          </HBox>
                                           <Region HBox.hgrow="ALWAYS" />
                                           <Button mnemonicParsing="false" onAction="#handleRefreshHistory" styleClass="btn-history-close" text="Refrescar">
                                              <graphic>

@@ -1,6 +1,7 @@
 package com.mycompany.ventacontrolfx.presentation.controller;
 
 import com.mycompany.ventacontrolfx.domain.model.Product;
+import com.mycompany.ventacontrolfx.domain.model.VisibilityFilter;
 import com.mycompany.ventacontrolfx.application.usecase.ProductUseCase;
 import com.mycompany.ventacontrolfx.infrastructure.config.Injectable;
 import com.mycompany.ventacontrolfx.infrastructure.config.ServiceContainer;
@@ -51,6 +52,8 @@ public class ProductController implements Injectable, com.mycompany.ventacontrol
     @FXML
     private Label lblCount;
     @FXML
+    private ToggleButton btnFilterAll, btnFilterVisible, btnFilterDisabled;
+    @FXML
     private javafx.scene.layout.VBox mainContainer;
 
     private ProductUseCase productUseCase;
@@ -61,6 +64,7 @@ public class ProductController implements Injectable, com.mycompany.ventacontrol
 
     private ServerPaginationHelper<Product> paginationHelper;
     private String currentSearchQuery = "";
+    private ToggleGroup filterGroup;
     private final WeakHashMap<String, Image> imageCache = new WeakHashMap<>();
     private double globalIva = 21.0;
 
@@ -77,11 +81,28 @@ public class ProductController implements Injectable, com.mycompany.ventacontrol
         }
 
         setupTable();
+        setupFilterGroup();
         paginationHelper = new ServerPaginationHelper<>(productsTable, cmbRowLimit, lblCount, pagination, "productos",
                 this::fetchProductsPage);
         setupSearch();
 
         container.getEventBus().subscribe(this);
+    }
+
+    private void setupFilterGroup() {
+        filterGroup = new ToggleGroup();
+        btnFilterAll.setToggleGroup(filterGroup);
+        btnFilterVisible.setToggleGroup(filterGroup);
+        btnFilterDisabled.setToggleGroup(filterGroup);
+
+        filterGroup.selectedToggleProperty().addListener((obs, old, nv) -> {
+            if (nv == null) {
+                // Prevenir que se des-eleccione todo
+                old.setSelected(true);
+                return;
+            }
+            paginationHelper.refresh();
+        });
     }
 
     @Override
@@ -269,11 +290,13 @@ public class ProductController implements Injectable, com.mycompany.ventacontrol
             {
                 pane.setAlignment(Pos.CENTER);
                 btnEdit.setGraphic(createIcon(FontAwesomeIcon.PENCIL, "#1e88e5"));
+                btnEdit.getStyleClass().add("btn-icon");
+
                 FontAwesomeIconView trashIcon = new FontAwesomeIconView(FontAwesomeIcon.TRASH);
                 trashIcon.setSize("16");
                 btnDelete.setGraphic(trashIcon);
                 btnDelete.getStyleClass().add("btn-trash-small");
-                btnEdit.setStyle("-fx-background-color: transparent; -fx-cursor: hand;");
+
                 btnEdit.setOnAction(e -> {
                     if (container.getUserSession().hasPermission("producto.editar")) {
                         openProductDialog(getTableRow().getItem());
@@ -351,9 +374,10 @@ public class ProductController implements Injectable, com.mycompany.ventacontrol
     }
 
     private void fetchProductsPage(int offset, int limit) {
+        VisibilityFilter filter = getSelectedFilter();
         asyncManager.runAsyncTask(() -> {
-            int total = productUseCase.getTotalProductCount(currentSearchQuery);
-            List<Product> items = productUseCase.getPaginatedProducts(currentSearchQuery, limit, offset);
+            int total = productUseCase.getTotalProductCount(currentSearchQuery, filter);
+            List<Product> items = productUseCase.getPaginatedProducts(currentSearchQuery, limit, offset, filter);
             return new Object[] { total, items };
         }, (Object res) -> {
             Object[] data = (Object[]) res;
@@ -362,6 +386,18 @@ public class ProductController implements Injectable, com.mycompany.ventacontrol
             List<Product> items = (List<Product>) data[1];
             paginationHelper.applyDataTarget(items, total);
         }, null);
+    }
+
+    private VisibilityFilter getSelectedFilter() {
+        if (filterGroup == null || filterGroup.getSelectedToggle() == null) {
+            return VisibilityFilter.VISIBLE;
+        }
+        if (filterGroup.getSelectedToggle() == btnFilterAll) {
+            return VisibilityFilter.ALL;
+        } else if (filterGroup.getSelectedToggle() == btnFilterDisabled) {
+            return VisibilityFilter.DISABLED;
+        }
+        return VisibilityFilter.VISIBLE;
     }
 
     private void setupSearch() {

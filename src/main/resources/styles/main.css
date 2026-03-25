@@ -49,3 +49,22 @@
     -fx-text-fill: -fx-text-custom-muted !important;
     -fx-padding: 2 0 0 0;
 }
+
+/* Context Menu & MenuItem Hover Fix */
+.context-menu {
+    -fx-background-color: -fx-bg-surface;
+    -fx-border-color: -fx-color-border-subtle;
+    -fx-border-radius: -fx-radius-md;
+    -fx-background-radius: -fx-radius-md;
+    -fx-padding: 5;
+}
+
+.menu-item:hover,
+.menu-item:focused {
+    -fx-background-color: -fx-custom-color-primary;
+}
+
+.menu-item:hover .label,
+.menu-item:focused .label {
+    -fx-text-fill: white !important;
+}

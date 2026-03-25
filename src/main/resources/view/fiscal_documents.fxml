@@ -13,6 +13,7 @@
            styleClass="main-content-area">
     <stylesheets>
         <java.net.URL value="@../styles/components/informes.css"/>
+        <java.net.URL value="@../styles/components/filters.css" />
     </stylesheets>
 
     <VBox spacing="0">
@@ -116,7 +117,8 @@
                 <HBox spacing="10" alignment="CENTER_LEFT">
                     <DatePicker fx:id="dpFrom" prefWidth="150" promptText="Desde" onAction="#applyFilters" styleClass="modern-datepicker"/>
                     <Label text="a" style="-fx-text-fill: #94a3b8;"/>
-                    <DatePicker fx:id="dpTo" prefWidth="150" promptText="Hasta" onAction="#applyFilters" styleClass="modern-datepicker"/>
+                    <DatePicker fx:id="dpTo" prefWidth="145" promptText="Hasta" onAction="#applyFilters" styleClass="modern-datepicker"/>
+                    <HBox fx:id="quickFilterContainer" spacing="8" alignment="CENTER_LEFT" styleClass="date-filter-container" />
                 </HBox>
             </VBox>
 

@@ -55,6 +55,14 @@
                                     <Label fx:id="lblTicketTitle" style="-fx-font-weight: bold; -fx-font-size: 11; -fx-text-fill: -fx-text-custom-main;" text="Factura simplificada Nº: 01/4246" />
                                     <Label fx:id="lblDate" style="-fx-font-size: 10; -fx-text-fill: -fx-text-custom-main;" text="Fecha: 18 Feb, 2026 Hora: 12:20:38 Caja: 01" />
                                 </VBox>
+
+                                <!-- Observations -->
+                                <VBox fx:id="observationSection" managed="false" visible="false" spacing="2.0" style="-fx-padding: 5 10; -fx-background-color: #f8f9fa; -fx-border-color: #eee; -fx-border-width: 1; -fx-border-radius: 4;">
+                                    <HBox spacing="5" alignment="CENTER_LEFT">
+                                        <Label text="Nota:" style="-fx-font-weight: bold; -fx-font-size: 9; -fx-text-fill: #666;" />
+                                    </HBox>
+                                    <Label fx:id="lblObservations" style="-fx-font-size: 10; -fx-text-fill: #333; -fx-font-style: italic;" wrapText="true" text="" />
+                                </VBox>
                                 
                                 <Separator style="-fx-background-color: black; -fx-opacity: 0.1;" />
                                 

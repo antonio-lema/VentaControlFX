@@ -14,6 +14,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 
 import java.sql.SQLException;
@@ -34,6 +35,8 @@ public class FiscalDocumentsController implements Injectable {
     private Label lblTotalTickets, lblTotalInvoices, lblTotalCancelled, lblTotalAmount;
     @FXML
     private DatePicker dpFrom, dpTo;
+    @FXML
+    private HBox quickFilterContainer;
     @FXML
     private ComboBox<String> cbType, cbStatus;
     @FXML
@@ -63,6 +66,10 @@ public class FiscalDocumentsController implements Injectable {
 
         setupTable();
         setupFilters();
+
+        com.mycompany.ventacontrolfx.util.DateFilterUtils.addQuickFilters(quickFilterContainer, dpFrom, dpTo,
+                this::applyFilters);
+
         paginationHelper = new PaginationHelper<>(fiscalTable, cmbRowLimit, lblCount, "documentos");
         loadData();
     }
@@ -183,13 +190,10 @@ public class FiscalDocumentsController implements Injectable {
     @FXML
     public void loadData() {
         try {
-            List<FiscalDocument> docs = queryUseCase.search(null, null, null, null);
-            masterList.setAll(docs);
-            paginationHelper.setData(docs);
-            updateKPIs(docs);
-        } catch (SQLException e) {
+            // Cargar por defecto sin filtro (o con el filtro inicial de setupFilters)
+            applyFilters();
+        } catch (Exception e) {
             e.printStackTrace();
-            AlertUtil.showError("Error al cargar datos", e.getMessage());
         }
     }
 
@@ -220,12 +224,19 @@ public class FiscalDocumentsController implements Injectable {
             Status statusEnum = "Todos los estados".equals(status) ? null : Status.valueOf(status);
             String typeStr = "Todos los tipos".equals(type) ? null : type;
 
-            List<FiscalDocument> filtered = queryUseCase.search(from, to, statusEnum, typeStr).stream()
+            LocalDate finalFrom = (from == null) ? LocalDate.of(2000, 1, 1) : from;
+            LocalDate finalTo = (to == null) ? LocalDate.of(2100, 1, 1) : to;
+
+            List<FiscalDocument> docs = queryUseCase.search(finalFrom, finalTo, statusEnum, typeStr);
+            masterList.setAll(docs); // Necesario para la exportación que usa masterList
+
+            List<FiscalDocument> filtered = docs.stream()
                     .filter(d -> search.isEmpty() || d.getFullReference().toLowerCase().contains(search)
                             || (d.getReceiverName() != null && d.getReceiverName().toLowerCase().contains(search)))
                     .collect(Collectors.toList());
 
             paginationHelper.setData(filtered);
+            updateKPIs(docs);
         } catch (SQLException e) {
             e.printStackTrace();
         }

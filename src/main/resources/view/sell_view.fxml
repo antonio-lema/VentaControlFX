@@ -35,20 +35,26 @@
                                 <children>
                                     <VBox spacing="2">
                                         <children>
-                                            <Label text="TARIFA ACTIVA" styleClass="filter-label-cap" />
-                                            <ComboBox fx:id="comboPriceList" prefWidth="180" styleClass="price-list-selector" />
+                                            <Label text="TARIFA ACTIVA" styleClass="view-subtitle" style="-fx-font-size: 10px; -fx-font-weight: 800; -fx-text-fill: -fx-custom-color-primary;"/>
+                                            <HBox styleClass="modern-input-container, selector-glass" alignment="CENTER_LEFT" spacing="8">
+                                                <children>
+                                                    <FontAwesomeIconView glyphName="TAG" size="14" styleClass="icon-primary"/>
+                                                    <ComboBox fx:id="comboPriceList" prefWidth="160" styleClass="combo-invisible" />
+                                                </children>
+                                            </HBox>
                                         </children>
                                     </VBox>
                                     <Separator orientation="VERTICAL" style="-fx-padding: 5 0;"/>
                                     <VBox spacing="2">
                                         <children>
-                                            <Label text="CATEGORÍA" styleClass="filter-label-cap" />
-                                            <Button fx:id="btnCategorySelector" onAction="#handleToggleCategoryMenu" styleClass="btn-category-trigger" prefWidth="180">
+                                            <Label text="CATEGORÍA" styleClass="view-subtitle" style="-fx-font-size: 10px; -fx-font-weight: 800; -fx-text-fill: -fx-custom-color-success;"/>
+                                            <Button fx:id="btnCategorySelector" onAction="#handleToggleCategoryMenu" styleClass="selector-glass, btn-category-trigger" prefWidth="180">
                                                 <graphic>
-                                                    <HBox spacing="10" alignment="CENTER_LEFT">
+                                                    <HBox spacing="8" alignment="CENTER_LEFT">
+                                                        <FontAwesomeIconView glyphName="FOLDER_OPEN" size="14" styleClass="icon-success"/>
                                                         <Label fx:id="lblSelectedCategory" text="Todas las categorías" styleClass="label-selector-text" />
                                                         <Region HBox.hgrow="ALWAYS" />
-                                                        <FontAwesomeIconView glyphName="CHEVRON_DOWN" size="12" styleClass="icon-muted"/>
+                                                        <FontAwesomeIconView glyphName="CHEVRON_DOWN" size="10" styleClass="icon-muted"/>
                                                     </HBox>
                                                 </graphic>
                                             </Button>

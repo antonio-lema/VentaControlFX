@@ -9,6 +9,7 @@
       spacing="0" styleClass="main-content-area">
     <stylesheets>
         <java.net.URL value="@/styles/components/historial.css" />
+        <java.net.URL value="@/styles/components/filters.css" />
     </stylesheets>
 
     <!-- Header Section -->
@@ -67,6 +68,8 @@
                  <graphic><FontAwesomeIconView glyphName="ERASER" size="12"/></graphic>
              </Button>
         </VBox>
+        
+        <HBox fx:id="quickFilterContainer" spacing="8" alignment="BOTTOM_LEFT" styleClass="date-filter-container" />
     </HBox>
 
     <!-- Table Section with Side Panel -->

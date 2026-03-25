@@ -1,6 +1,7 @@
 package com.mycompany.ventacontrolfx.infrastructure.persistence;
 
 import com.mycompany.ventacontrolfx.domain.model.Product;
+import com.mycompany.ventacontrolfx.domain.model.VisibilityFilter;
 import com.mycompany.ventacontrolfx.domain.repository.IProductRepository;
 import java.sql.*;
 import java.util.ArrayList;
@@ -727,7 +728,8 @@ public class JdbcProductRepository implements IProductRepository {
     }
 
     @Override
-    public List<Product> searchPaginated(String query, int limit, int offset, int priceListId, boolean onlyVisible)
+    public List<Product> searchPaginated(String query, int limit, int offset, int priceListId,
+            VisibilityFilter visibility)
             throws SQLException {
         List<Product> products = new ArrayList<>();
         String priceSubquery;
@@ -738,8 +740,10 @@ public class JdbcProductRepository implements IProductRepository {
         }
 
         StringBuilder whereClause = new StringBuilder();
-        if (onlyVisible) {
+        if (visibility == VisibilityFilter.VISIBLE) {
             whereClause.append(" WHERE p.visible = TRUE ");
+        } else if (visibility == VisibilityFilter.DISABLED) {
+            whereClause.append(" WHERE p.visible = FALSE ");
         }
 
         boolean hasQuery = query != null && !query.trim().isEmpty();
@@ -784,10 +788,12 @@ public class JdbcProductRepository implements IProductRepository {
     }
 
     @Override
-    public int countSearch(String query, boolean onlyVisible) throws SQLException {
+    public int countSearch(String query, VisibilityFilter visibility) throws SQLException {
         StringBuilder whereClause = new StringBuilder();
-        if (onlyVisible) {
+        if (visibility == VisibilityFilter.VISIBLE) {
             whereClause.append(" WHERE p.visible = TRUE ");
+        } else if (visibility == VisibilityFilter.DISABLED) {
+            whereClause.append(" WHERE p.visible = FALSE ");
         }
 
         boolean hasQuery = query != null && !query.trim().isEmpty();
@@ -800,8 +806,8 @@ public class JdbcProductRepository implements IProductRepository {
 
             whereClause.append(" (p.name LIKE ? OR c.name LIKE ? OR p.sku LIKE ?) ");
             safeQuery = "%" + query.trim() + "%";
-        } else if (!onlyVisible) {
-            return count(); // Rápido si no hay filtros
+        } else if (visibility == VisibilityFilter.ALL) {
+            return count(); // Rápido si no hay filtros y queremos todos
         }
 
         String sql = "SELECT COUNT(*) FROM products p LEFT JOIN categories c ON p.category_id = c.category_id "
@@ -824,10 +830,12 @@ public class JdbcProductRepository implements IProductRepository {
     }
 
     @Override
-    public int countByCategory(int categoryId, boolean onlyVisible) throws SQLException {
+    public int countByCategory(int categoryId, VisibilityFilter visibility) throws SQLException {
         String sql = "SELECT COUNT(*) FROM products WHERE category_id = ?";
-        if (onlyVisible) {
+        if (visibility == VisibilityFilter.VISIBLE) {
             sql += " AND visible = TRUE";
+        } else if (visibility == VisibilityFilter.DISABLED) {
+            sql += " AND visible = FALSE";
         }
         try (Connection conn = DBConnection.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -839,5 +847,23 @@ public class JdbcProductRepository implements IProductRepository {
             }
         }
         return 0;
+    }
+
+    @Override
+    public Product findBySku(String sku) throws SQLException {
+        String sql = "SELECT p.*, c.name AS category_name, c.default_iva AS category_iva, " +
+                "COALESCE((SELECT pp.price FROM product_prices pp JOIN price_lists pl ON pp.price_list_id = pl.price_list_id WHERE pp.product_id = p.product_id AND pl.is_default = 1 AND pp.start_date <= CURRENT_TIMESTAMP AND (pp.end_date IS NULL OR pp.end_date > CURRENT_TIMESTAMP) ORDER BY pp.start_date DESC LIMIT 1), 0.0) AS current_price "
+                +
+                "FROM products p LEFT JOIN categories c ON p.category_id = c.category_id WHERE p.sku = ?";
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, sku);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return mapResultSetToProduct(rs);
+                }
+            }
+        }
+        return null;
     }
 }

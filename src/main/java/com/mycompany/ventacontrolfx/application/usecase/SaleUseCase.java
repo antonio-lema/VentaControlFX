@@ -64,11 +64,17 @@ public class SaleUseCase {
 
     public int processSale(List<CartItem> cartItems, double total, String paymentMethod, Integer clientId, int userId)
             throws SQLException {
-        return processSale(cartItems, total, paymentMethod, clientId, userId, 0.0, null);
+        return processSale(cartItems, total, paymentMethod, clientId, userId, 0.0, null, total, 0.0, null);
     }
 
     public int processSale(List<CartItem> cartItems, double total, String paymentMethod, Integer clientId, int userId,
             double discountAmount, String discountReason) throws SQLException {
+        return processSale(cartItems, total, paymentMethod, clientId, userId, discountAmount, discountReason,
+                total - discountAmount, 0.0, null);
+    }
+
+    public int processSale(List<CartItem> cartItems, double total, String paymentMethod, Integer clientId, int userId,
+            double discountAmount, String discountReason, double cashAmount, double cardAmount, String observations) throws SQLException {
         authService.checkPermission("VENTAS");
 
         // ── REGLA DE NEGOCIO: Validar caja abierta ──
@@ -93,20 +99,20 @@ public class SaleUseCase {
         // APLICAR MOTOR DE PROMOCIONES (PIPELINE) - Consistent with CartUseCase
         com.mycompany.ventacontrolfx.application.service.PromotionResult promoResult = promotionEngine
                 .process(cartItems);
-        double autoDiscount = promoResult.getTotalDiscount();
+        double totalPromoDiscount = promoResult.getTotalDiscount();
 
         for (CartItem item : cartItems) {
             Product product = item.getProduct();
 
-            // Obtener descuento específico para este producto desde el motor
-            double lineDiscount = promoResult.getItemDiscounts().getOrDefault(product.getId(), 0.0);
+            double autoLineDiscount = promoResult.getItemDiscounts().getOrDefault(product.getId(), 0.0);
+            double totalLineDiscount = autoLineDiscount + item.getManualDiscountAmount();
 
             // Precio unitario original (con tarifa de cliente ya aplicada)
             double unitPrice = item.getUnitPrice();
 
             // Calculamos el total de la línea YA con descuento para que el TaxEngine
             // recalcule la base e IVA
-            double grossLineTotal = (unitPrice * item.getQuantity()) - lineDiscount;
+            double grossLineTotal = (unitPrice * item.getQuantity()) - totalLineDiscount;
 
             // Simulamos un precio unitario efectivo para el motor de impuestos
             double effectiveUnitPrice = item.getQuantity() > 0 ? (grossLineTotal / item.getQuantity()) : 0.0;
@@ -120,7 +126,8 @@ public class SaleUseCase {
             SaleDetail d = new SaleDetail();
             d.setProductId(product.getId());
             d.setQuantity(item.getQuantity());
-            d.setUnitPrice(product.getPrice());
+            d.setUnitPrice(item.getUnitPrice());
+            d.setObservations(item.getObservations());
 
             // Tax Engine V2 fields
             d.setNetUnitPrice(result.getNetTotal() / item.getQuantity());
@@ -157,10 +164,12 @@ public class SaleUseCase {
         // Calcular el ahorro bruto (con impuestos) para guardarlo en discount_amount
         double grossSavingsTotal = 0.0;
         for (CartItem item : cartItems) {
-            double lineDiscount = promoResult.getItemDiscounts().getOrDefault(item.getProduct().getId(), 0.0);
+            double autoLineDiscount = promoResult.getItemDiscounts().getOrDefault(item.getProduct().getId(), 0.0);
+            double totalLineDiscount = autoLineDiscount + item.getManualDiscountAmount();
+
             double taxRate = item.getProduct().resolveEffectiveIva(config.getTaxRate());
             double taxMultiplier = isInclusive ? 1.0 : (1.0 + (taxRate / 100.0));
-            grossSavingsTotal += lineDiscount * taxMultiplier;
+            grossSavingsTotal += totalLineDiscount * taxMultiplier;
         }
         double globalDiscount = promoResult.getItemDiscounts().getOrDefault(-1, 0.0);
         grossSavingsTotal += globalDiscount;
@@ -183,6 +192,9 @@ public class SaleUseCase {
                 + String.join(", ", promoResult.getAppliedPromos())).trim());
         sale.setReturn(false);
         sale.setDetails(details);
+        sale.setCashAmount(cashAmount);
+        sale.setCardAmount(cardAmount);
+        sale.setObservations(observations);
 
         // 2. Generar el sumario fiscal (Tax Summary) de toda la venta
         List<SaleTaxSummary> taxSummaries = taxEngineService.summarizeTaxes(lineResults);

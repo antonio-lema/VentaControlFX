@@ -1,6 +1,7 @@
 package com.mycompany.ventacontrolfx.application.usecase;
 
 import com.mycompany.ventacontrolfx.domain.model.Product;
+import com.mycompany.ventacontrolfx.domain.model.VisibilityFilter;
 import com.mycompany.ventacontrolfx.domain.repository.IProductRepository;
 import com.mycompany.ventacontrolfx.shared.bus.GlobalEventBus;
 import java.sql.SQLException;
@@ -75,11 +76,20 @@ public class ProductUseCase {
             eventBus.publishDataChange();
     }
 
+    public List<Product> getPaginatedProducts(String query, int limit, int offset, VisibilityFilter visibility)
+            throws SQLException {
+        return repository.searchPaginated(query, limit, offset, -1, visibility);
+    }
+
     public List<Product> getPaginatedProducts(String query, int limit, int offset) throws SQLException {
-        return repository.searchPaginated(query, limit, offset, -1, false);
+        return getPaginatedProducts(query, limit, offset, VisibilityFilter.ALL);
+    }
+
+    public int getTotalProductCount(String query, VisibilityFilter visibility) throws SQLException {
+        return repository.countSearch(query, visibility);
     }
 
     public int getTotalProductCount(String query) throws SQLException {
-        return repository.countSearch(query, false);
+        return getTotalProductCount(query, VisibilityFilter.ALL);
     }
 }

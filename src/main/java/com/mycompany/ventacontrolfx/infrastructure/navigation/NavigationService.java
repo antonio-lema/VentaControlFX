@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 /**
  * Enterprise Navigation and Event Delegation Service.
@@ -72,7 +73,6 @@ public class NavigationService {
 
     /** Vista que debe mostrar el carrito */
     private static final String SELL_VIEW = "/view/sell_view.fxml";
-    private static final String HISTORY_VIEW = "/view/sales.fxml";
 
     public NavigationService(ScrollPane mainContent, VBox loadingOverlay, ServiceContainer container) {
         this.mainContent = mainContent;
@@ -93,6 +93,10 @@ public class NavigationService {
     }
 
     public void navigateTo(String fxmlPath) {
+        navigateTo(fxmlPath, null);
+    }
+
+    public <T> void navigateTo(String fxmlPath, Consumer<T> initializer) {
         // 1. Verificar Permisos (Control de Acceso)
         String requiredPermission = ACCESS_RULES.get(fxmlPath);
         AuthorizationService auth = container.getAuthService();
@@ -125,7 +129,6 @@ public class NavigationService {
 
         // Notificar visibilidad del carrito y búsqueda ANTES de cargar la vista
         boolean isSellView = SELL_VIEW.equals(fxmlPath);
-        boolean isHistoryView = HISTORY_VIEW.equals(fxmlPath);
 
         if (cartVisibilityListener != null) {
             cartVisibilityListener.onCartVisibilityChanged(isSellView);
@@ -139,6 +142,13 @@ public class NavigationService {
             // Automatic Injection
             if (activeView instanceof Injectable) {
                 ((Injectable) activeView).inject(container);
+            }
+
+            // Initialization if provided
+            if (initializer != null) {
+                @SuppressWarnings("unchecked")
+                T controller = (T) activeView;
+                initializer.accept(controller);
             }
 
             // Automatic Search Registration and Visibility

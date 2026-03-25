@@ -111,34 +111,84 @@
     -fx-effect: dropshadow(three-pass-box, rgba(245, 158, 11, 0.4), 15, 0, 0, 5);
 }
 
-/* Price List Selector (PVP General) - Consistent with categories */
-.price-list-selector {
-    -fx-background-color: -fx-bg-surface;
-    -fx-background-radius: -fx-radius-md;
-    -fx-border-color: -fx-color-border-subtle;
-    -fx-border-radius: -fx-radius-md;
+/* ─── Modern Glass Selectors ──────────────────────────────── */
+.selector-glass {
+    -fx-background-color: rgba(255, 255, 255, 0.7);
+    -fx-background-radius: -fx-radius-lg;
+    -fx-border-color: rgba(0, 0, 0, 0.05);
+    -fx-border-radius: -fx-radius-lg;
     -fx-border-width: 1px;
-    -fx-padding: 2;
+    -fx-padding: 8 16;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.03), 10, 0, 0, 2);
     -fx-cursor: hand;
+    -fx-transition: all 0.3s ease;
 }
 
-.price-list-selector .label {
+.dark-theme .selector-glass {
+    -fx-background-color: rgba(30, 30, 35, 0.6);
+    -fx-border-color: rgba(255, 255, 255, 0.08);
+}
+
+.selector-glass:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.9);
+    -fx-border-color: -fx-custom-color-primary;
+    -fx-effect: dropshadow(three-pass-box, rgba(30, 136, 229, 0.15), 15, 0, 0, 5);
+}
+
+.dark-theme .selector-glass:hover {
+    -fx-background-color: rgba(40, 40, 45, 0.8);
+}
+
+/* Invisible ComboBox inside the glass container */
+.combo-invisible {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+}
+
+.combo-invisible>.list-cell {
+    -fx-background-color: transparent;
     -fx-text-fill: -fx-text-custom-main;
     -fx-font-weight: bold;
-    -fx-font-size: 12px;
+    -fx-font-size: 13px;
+    -fx-padding: 0;
 }
 
-.price-list-selector:hover {
-    -fx-border-color: -fx-custom-color-primary;
-    -fx-background-color: -fx-bg-main;
+.combo-invisible .arrow-button {
+    -fx-background-color: transparent;
+    -fx-padding: 0 0 0 10;
 }
 
-.price-list-selector .arrow-button {
+.combo-invisible .arrow {
+    -fx-background-color: -fx-text-custom-muted;
+    -fx-shape: "M 0 0 L 4 4 L 8 0 Z";
+    /* Modern small arrow */
+}
+
+/* Legacy overrides for category trigger if still used */
+.btn-category-trigger {
+    -fx-background-color: transparent;
+    /* Now handled by selector-glass */
+    -fx-border-color: transparent;
+    -fx-padding: 0;
+    -fx-effect: none;
+}
+
+.btn-category-trigger:hover {
     -fx-background-color: transparent;
 }
 
-.price-list-selector .arrow {
-    -fx-background-color: -fx-text-custom-muted;
+/* Icons */
+.icon-primary {
+    -fx-fill: -fx-custom-color-primary;
+}
+
+.icon-success {
+    -fx-fill: -fx-custom-color-success;
+}
+
+.icon-muted {
+    -fx-fill: -fx-text-custom-muted;
 }
 
 /* Price List Selector (PVP General) */

@@ -3,20 +3,24 @@ package com.mycompany.ventacontrolfx.presentation.renderer;
 import com.mycompany.ventacontrolfx.component.CartItemRow;
 import com.mycompany.ventacontrolfx.domain.model.CartItem;
 import com.mycompany.ventacontrolfx.application.usecase.CartUseCase;
+import com.mycompany.ventacontrolfx.presentation.controller.EditCartItemController;
 import javafx.collections.ListChangeListener;
 import javafx.scene.layout.VBox;
 
 public class CartListRenderer {
-    private final VBox container;
+    private final com.mycompany.ventacontrolfx.infrastructure.config.ServiceContainer container;
+    private final VBox containerBox;
     private final CartUseCase cartUseCase;
     private final double globalTaxRate;
     private final boolean pricesIncludeTax;
 
-    public CartListRenderer(VBox container, CartUseCase cartUseCase, double globalTaxRate, boolean pricesIncludeTax) {
-        this.container = container;
+    public CartListRenderer(VBox containerBox, CartUseCase cartUseCase, double globalTaxRate, boolean pricesIncludeTax,
+            com.mycompany.ventacontrolfx.infrastructure.config.ServiceContainer container) {
+        this.containerBox = containerBox;
         this.cartUseCase = cartUseCase;
         this.globalTaxRate = globalTaxRate;
         this.pricesIncludeTax = pricesIncludeTax;
+        this.container = container;
         renderCurrentItems();
         initListener();
     }
@@ -26,7 +30,7 @@ public class CartListRenderer {
     }
 
     private void renderCurrentItems() {
-        container.getChildren().clear();
+        containerBox.getChildren().clear();
         for (CartItem item : cartUseCase.getCartItems()) {
             addRow(item);
         }
@@ -52,8 +56,19 @@ public class CartListRenderer {
                     } catch (IllegalArgumentException ex) {
                         com.mycompany.ventacontrolfx.util.AlertUtil.showWarning("Stock Insuficiente", ex.getMessage());
                     }
+                },
+                () -> {
+                    com.mycompany.ventacontrolfx.util.ModalService.showTransparentModal(
+                            "/view/edit_cart_item.fxml",
+                            "Modificar Producto",
+                            container,
+                            (EditCartItemController controller) -> {
+                                controller.setData(item, () -> {
+                                    cartUseCase.updateTotals();
+                                });
+                            });
                 });
-        container.getChildren().add(row);
+        containerBox.getChildren().add(row);
     }
 
     private void initListener() {
@@ -61,34 +76,12 @@ public class CartListRenderer {
             while (c.next()) {
                 if (c.wasAdded()) {
                     for (CartItem item : c.getAddedSubList()) {
-                        CartItemRow row = new CartItemRow(
-                                item,
-                                globalTaxRate,
-                                pricesIncludeTax,
-                                () -> {
-                                    try {
-                                        cartUseCase.incrementQuantity(item.getProduct());
-                                    } catch (IllegalArgumentException ex) {
-                                        com.mycompany.ventacontrolfx.util.AlertUtil.showWarning("Stock Insuficiente",
-                                                ex.getMessage());
-                                    }
-                                },
-                                () -> cartUseCase.decrementQuantity(item.getProduct()),
-                                () -> cartUseCase.removeItem(item.getProduct()),
-                                (newQty) -> {
-                                    try {
-                                        cartUseCase.updateQuantity(item.getProduct(), newQty);
-                                    } catch (IllegalArgumentException ex) {
-                                        com.mycompany.ventacontrolfx.util.AlertUtil.showWarning("Stock Insuficiente",
-                                                ex.getMessage());
-                                    }
-                                });
-                        container.getChildren().add(row);
+                        addRow(item);
                     }
                 }
                 if (c.wasRemoved()) {
                     for (CartItem item : c.getRemoved()) {
-                        container.getChildren().removeIf(node -> node instanceof CartItemRow
+                        containerBox.getChildren().removeIf(node -> node instanceof CartItemRow
                                 && ((CartItemRow) node).getCartItem().getProduct().getId() == item.getProduct()
                                         .getId());
                     }

@@ -31,7 +31,7 @@ public class CartItemRow extends HBox {
 
     public CartItemRow(CartItem cartItem, double globalTaxRate, boolean pricesIncludeTax, Runnable onIncrement,
             Runnable onDecrement, Runnable onDelete,
-            Consumer<Integer> onSetQuantity) {
+            Consumer<Integer> onSetQuantity, Runnable onEdit) {
         this.cartItem = cartItem;
         this.globalTaxRate = globalTaxRate;
         this.pricesIncludeTax = pricesIncludeTax;
@@ -51,6 +51,13 @@ public class CartItemRow extends HBox {
 
         Label nameLabel = new Label(product.getName());
         nameLabel.getStyleClass().add("cart-item-name");
+
+        Label observationLabel = new Label();
+        observationLabel.getStyleClass().add("cart-item-observation");
+        observationLabel.setStyle("-fx-text-fill: #2196f3; -fx-font-size: 11px; -fx-font-style: italic;");
+        observationLabel.textProperty().bind(cartItem.observationsProperty());
+        observationLabel.visibleProperty().bind(cartItem.observationsProperty().isNotEmpty());
+        observationLabel.managedProperty().bind(observationLabel.visibleProperty());
 
         // Quantity Controls
         HBox quantityBox = new HBox(2);
@@ -103,7 +110,7 @@ public class CartItemRow extends HBox {
         increaseBtn.setOnAction(e -> onIncrement.run());
 
         quantityBox.getChildren().addAll(decreaseBtn, quantityField, increaseBtn);
-        infoBox.getChildren().addAll(nameLabel, quantityBox);
+        infoBox.getChildren().addAll(nameLabel, observationLabel, quantityBox);
 
         // 3. Spacer
         Region spacer = new Region();
@@ -122,32 +129,42 @@ public class CartItemRow extends HBox {
         StackPane.setAlignment(priceContainer, Pos.CENTER_RIGHT);
 
         Label priceLabel = new Label();
-        priceLabel.getStyleClass().add("cart-item-price");
+        priceLabel.getStyleClass().add("cart-item-price-original"); // Old price style
 
         Label discountLabel = new Label();
-        discountLabel.setStyle("-fx-font-size: 10; -fx-text-fill: #ff4444; -fx-font-style: italic;");
+        discountLabel.setStyle("-fx-font-size: 11; -fx-text-fill: #ef4444; -fx-font-weight: bold;");
         discountLabel.setVisible(false);
         discountLabel.setManaged(false);
+
+        Label finalPriceLabel = new Label();
+        finalPriceLabel.getStyleClass().add("cart-item-price"); // Modern price style
 
         // Este Runnable actualiza la etiqueta cuando cambie precio, cantidad o
         // descuento
         Runnable refreshPrice = () -> {
             double originalUnitPrice = cartItem.getUnitPrice();
             double originalLineTotal = (originalUnitPrice * cartItem.getQuantity()) * taxMultiplier;
-            double discountAmount = cartItem.getDiscountAmount() * taxMultiplier;
+            double discountValueToSubtract = cartItem.getDiscountAmount() * taxMultiplier;
+            double finalLineTotal = Math.max(0, originalLineTotal - discountValueToSubtract);
 
-            priceLabel.setText(String.format("%.2f €", originalLineTotal));
+            if (discountValueToSubtract > 0) {
+                // Show original price small and crossed out (or just muted)
+                priceLabel.setText(String.format("%.2f €", originalLineTotal));
+                priceLabel.setVisible(true);
+                priceLabel.setManaged(true);
+                priceLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: #999;");
 
-            if (discountAmount > 0) {
-                discountLabel.setText(String.format("-%.2f €", discountAmount));
+                discountLabel.setText(String.format("-%.2f €", discountValueToSubtract));
                 discountLabel.setVisible(true);
                 discountLabel.setManaged(true);
-                // Estilo para cuando hay descuento
-                priceLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #999;");
+
+                finalPriceLabel.setText(String.format("%.2f €", finalLineTotal));
             } else {
+                priceLabel.setVisible(false);
+                priceLabel.setManaged(false);
                 discountLabel.setVisible(false);
                 discountLabel.setManaged(false);
-                priceLabel.setStyle(""); // Reset style
+                finalPriceLabel.setText(String.format("%.2f €", originalLineTotal));
             }
         };
         refreshPrice.run(); // Pintar el valor inicial
@@ -161,7 +178,18 @@ public class CartItemRow extends HBox {
         // Cuando cambia el descuento (por promociones)
         cartItem.discountAmountProperty().addListener((obs, oldVal, newVal) -> refreshPrice.run());
 
-        priceContainer.getChildren().addAll(priceLabel, discountLabel);
+        priceContainer.getChildren().addAll(priceLabel, discountLabel, finalPriceLabel);
+
+        Button editBtn = new Button();
+        editBtn.getStyleClass().add("cart-edit-btn-reveal"); // New CSS class needed or reuse delete styles
+        FontAwesomeIconView editIcon = new FontAwesomeIconView(FontAwesomeIcon.PENCIL);
+        editIcon.setSize("14");
+        editIcon.getStyleClass().add("icon-white");
+        editBtn.setGraphic(editIcon);
+        StackPane.setAlignment(editBtn, Pos.CENTER_RIGHT);
+        editBtn.setOpacity(0);
+        editBtn.setTranslateX(20);
+        editBtn.setOnAction(e -> onEdit.run());
 
         Button deleteBtn = new Button();
         deleteBtn.getStyleClass().add("cart-delete-btn-reveal");
@@ -174,21 +202,29 @@ public class CartItemRow extends HBox {
         deleteBtn.setTranslateX(20);
         deleteBtn.setOnAction(e -> onDelete.run());
 
-        rightSide.getChildren().addAll(deleteBtn, priceContainer);
+        rightSide.getChildren().addAll(editBtn, deleteBtn, priceContainer);
 
         this.getChildren().addAll(imageNode, infoBox, spacer, rightSide);
 
         // Hover effects
         this.setOnMouseEntered(e -> {
-            priceContainer.setTranslateX(-45);
-            priceContainer.setOpacity(0.5);
+            priceContainer.setTranslateX(-85); // Shift more to fit two buttons
+            priceContainer.setOpacity(0.3);
+
+            editBtn.setOpacity(1);
+            editBtn.setTranslateX(-40); // Standard position for edit
+
             deleteBtn.setOpacity(1);
-            deleteBtn.setTranslateX(0);
+            deleteBtn.setTranslateX(0); // Standard position for delete
         });
 
         this.setOnMouseExited(e -> {
             priceContainer.setTranslateX(0);
             priceContainer.setOpacity(1.0);
+
+            editBtn.setOpacity(0);
+            editBtn.setTranslateX(20);
+
             deleteBtn.setOpacity(0);
             deleteBtn.setTranslateX(20);
         });

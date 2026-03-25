@@ -66,7 +66,13 @@ public class PriceListController implements Injectable {
         card.setPadding(new Insets(20));
         card.setPrefWidth(350);
         card.setStyle(
-                "-fx-background-color: -fx-bg-surface; -fx-background-radius: 12; -fx-effect: -fx-card-shadow;");
+                "-fx-background-color: -fx-bg-surface; -fx-background-radius: 12; -fx-effect: -fx-card-shadow; -fx-cursor: hand;");
+
+        card.setOnMouseClicked(e -> {
+            if (e.getClickCount() == 2) {
+                openPriceTableView(pl);
+            }
+        });
 
         HBox header = new HBox(10);
         header.setAlignment(Pos.CENTER_LEFT);
@@ -167,9 +173,7 @@ public class PriceListController implements Injectable {
     }
 
     private void openPriceTableView(PriceList pl) {
-        ModalService.showTransparentModal("/view/price_list_content.fxml",
-                "Precios - " + pl.getName(),
-                container,
+        container.getNavigationService().navigateTo("/view/price_list_content.fxml",
                 (com.mycompany.ventacontrolfx.presentation.controller.dialog.PriceListContentController c) -> c
                         .initData(pl));
     }

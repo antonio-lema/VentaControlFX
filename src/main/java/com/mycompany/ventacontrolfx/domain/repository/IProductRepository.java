@@ -1,6 +1,7 @@
 package com.mycompany.ventacontrolfx.domain.repository;
 
 import com.mycompany.ventacontrolfx.domain.model.Product;
+import com.mycompany.ventacontrolfx.domain.model.VisibilityFilter;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -13,10 +14,10 @@ public interface IProductRepository {
 
         List<Product> getAllVisible(int priceListId) throws SQLException;
 
-        List<Product> searchPaginated(String query, int limit, int offset, int priceListId, boolean onlyVisible)
+        List<Product> searchPaginated(String query, int limit, int offset, int priceListId, VisibilityFilter visibility)
                         throws SQLException;
 
-        int countSearch(String query, boolean onlyVisible) throws SQLException;
+        int countSearch(String query, VisibilityFilter visibility) throws SQLException;
 
         List<Product> getFavorites() throws SQLException;
 
@@ -59,6 +60,8 @@ public interface IProductRepository {
         java.util.List<Product> getByCategoryPaginated(int categoryId, int limit, int offset, int priceListId)
                         throws SQLException;
 
-        int countByCategory(int categoryId, boolean onlyVisible) throws SQLException;
+        int countByCategory(int categoryId, VisibilityFilter visibility) throws SQLException;
+
+        Product findBySku(String sku) throws SQLException;
 
 }

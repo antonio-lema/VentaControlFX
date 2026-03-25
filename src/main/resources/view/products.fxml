@@ -7,6 +7,7 @@
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleButton?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
@@ -34,11 +35,11 @@
                                 </children>
                             </VBox>
                             <Region HBox.hgrow="ALWAYS" />
-                            <Button fx:id="btnAdd" onAction="#handleAddProduct" styleClass="btn-primary" text=" Nuevo Producto">
+                            <Button fx:id="btnAdd" onAction="#handleAddProduct" styleClass="modern-btn-primary" text=" Nuevo Producto">
                                 <graphic><FontAwesomeIconView glyphName="PLUS" size="14" fill="WHITE"/></graphic>
                             </Button>
-                            <Button text="Importar" onAction="#handleImportExcel" styleClass="btn-secondary">
-                                <graphic><FontAwesomeIconView glyphName="UPLOAD" size="14" fill="white"/></graphic>
+                            <Button text="Importar" onAction="#handleImportExcel" styleClass="modern-btn-secondary">
+                                <graphic><FontAwesomeIconView glyphName="UPLOAD" size="14" fill="#334155"/></graphic>
                             </Button>
                         </children>
                     </HBox>
@@ -58,10 +59,15 @@
                         <HBox alignment="CENTER_LEFT" styleClass="search-bar" HBox.hgrow="ALWAYS" maxWidth="400">
                            <children>
                               <FontAwesomeIconView glyphName="SEARCH" size="14" styleClass="sidebar-icon" />
-                              <TextField fx:id="searchField" promptText="Buscar producto..." styleClass="search-field" HBox.hgrow="ALWAYS" />
-                           </children>
-                        </HBox>
-                        <Region HBox.hgrow="ALWAYS" />
+                               <TextField fx:id="searchField" promptText="Buscar producto..." styleClass="search-field" HBox.hgrow="ALWAYS" />
+                            </children>
+                         </HBox>
+                         <HBox spacing="8" alignment="CENTER_LEFT" styleClass="filter-buttons-container" style="-fx-padding: 0 0 0 15;">
+                             <ToggleButton fx:id="btnFilterAll" text="Todos" styleClass="date-filter-chip" />
+                             <ToggleButton fx:id="btnFilterVisible" text="Visibles" styleClass="date-filter-chip" selected="true" />
+                             <ToggleButton fx:id="btnFilterDisabled" text="Deshabilitados" styleClass="date-filter-chip" />
+                         </HBox>
+                         <Region HBox.hgrow="ALWAYS" />
                         <HBox alignment="CENTER_LEFT" spacing="10" styleClass="row-limit-container">
                            <children>
                               <Label text="Mostrar:" styleClass="label-limit" />

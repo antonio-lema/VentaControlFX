@@ -7,6 +7,9 @@ public class ProductPriceDTO {
     private final double taxRate;
     private double price;
     private double defaultPrice;
+    private double currentPrice; // Price active RIGHT NOW in this list
+    private java.time.LocalDateTime endDate;
+    private String reason;
 
     public ProductPriceDTO(int productId, String productName, String productCategory,
             double price, double defaultPrice, double taxRate) {
@@ -16,6 +19,23 @@ public class ProductPriceDTO {
         this.price = price;
         this.defaultPrice = defaultPrice;
         this.taxRate = taxRate;
+        this.currentPrice = price; // Default to same as price
+    }
+
+    public java.time.LocalDateTime getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(java.time.LocalDateTime endDate) {
+        this.endDate = endDate;
+    }
+
+    public String getReason() {
+        return reason;
+    }
+
+    public void setReason(String reason) {
+        this.reason = reason;
     }
 
     public int getProductId() {
@@ -64,6 +84,25 @@ public class ProductPriceDTO {
         double diff = ((price - defaultPrice) / defaultPrice) * 100.0;
         if (Math.abs(diff) < 0.01)
             return "Igual =";
+        if (diff > 0)
+            return String.format("+%.1f%%", diff);
+        return String.format("%.1f%%", diff);
+    }
+
+    public double getCurrentPrice() {
+        return currentPrice;
+    }
+
+    public void setCurrentPrice(double currentPrice) {
+        this.currentPrice = currentPrice;
+    }
+
+    public String getDiffWithCurrentFormatted() {
+        if (currentPrice <= 0)
+            return "";
+        double diff = ((price - currentPrice) / currentPrice) * 100.0;
+        if (Math.abs(diff) < 0.01)
+            return "Sin cambios";
         if (diff > 0)
             return String.format("+%.1f%%", diff);
         return String.format("%.1f%%", diff);

@@ -21,6 +21,8 @@ import javafx.scene.chart.PieChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.HBox;
+import com.mycompany.ventacontrolfx.util.DateFilterUtils;
 
 import java.sql.SQLException;
 import java.time.LocalDate;
@@ -32,6 +34,8 @@ public class SellerReportController implements Injectable {
 
     @FXML
     private DatePicker dpFrom, dpTo;
+    @FXML
+    private HBox quickFilterContainer;
     @FXML
     private ComboBox<String> cbPaymentMethod;
 
@@ -87,6 +91,8 @@ public class SellerReportController implements Injectable {
         // Rango por defecto: mes actual
         dpFrom.setValue(LocalDate.now().withDayOfMonth(1));
         dpTo.setValue(LocalDate.now());
+
+        DateFilterUtils.addQuickFilters(quickFilterContainer, dpFrom, dpTo, this::loadData);
 
         loadData();
     }
@@ -154,24 +160,29 @@ public class SellerReportController implements Injectable {
         String methodFilter = cbPaymentMethod.getValue();
 
         try {
-            // 1. Cargar Ventas del periodo actual (Todas para cálculo neto)
-            List<Sale> currentSales = saleUseCase.getSalesByRange(from, to).stream()
+            LocalDate searchFrom = (from == null) ? LocalDate.of(2000, 1, 1) : from;
+            LocalDate searchTo = (to == null) ? LocalDate.of(2100, 1, 1) : to;
+
+            // 1. Cargar Ventas del periodo actual
+            List<Sale> currentSales = saleUseCase.getSalesByRange(searchFrom, searchTo).stream()
                     .filter(s -> methodFilter.equals("Todos") || s.getPaymentMethod().equalsIgnoreCase(methodFilter))
                     .collect(Collectors.toList());
 
-            // 1b. Cargar Devoluciones del periodo actual (para KPI y desglose)
-            List<Return> currentReturnsList = saleUseCase.getReturnsHistory(from, to).stream()
+            // 1b. Cargar Devoluciones del periodo actual
+            List<Return> currentReturnsList = saleUseCase.getReturnsHistory(searchFrom, searchTo).stream()
                     .filter(r -> methodFilter.equals("Todos") || r.getPaymentMethod().equalsIgnoreCase(methodFilter))
                     .collect(Collectors.toList());
 
-            // 2. Cargar Ventas Netas del periodo anterior para comparativa (Trend)
-            long days = java.time.temporal.ChronoUnit.DAYS.between(from, to) + 1;
-            LocalDate prevFrom = from.minusDays(days);
-            LocalDate prevTo = from.minusDays(1);
-
-            // Calculamos netos reales también para el prev y evitar inconsistencias
-            List<Sale> prevSales = saleUseCase.getSalesByRange(prevFrom, prevTo);
-            List<Return> prevReturns = saleUseCase.getReturnsHistory(prevFrom, prevTo);
+            // 2. Trend (Periodo anterior) - Solo si hay fechas seleccionadas
+            List<Sale> prevSales = new ArrayList<>();
+            List<Return> prevReturns = new ArrayList<>();
+            if (from != null && to != null) {
+                long days = java.time.temporal.ChronoUnit.DAYS.between(from, to) + 1;
+                LocalDate prevFrom = from.minusDays(days);
+                LocalDate prevTo = from.minusDays(1);
+                prevSales = saleUseCase.getSalesByRange(prevFrom, prevTo);
+                prevReturns = saleUseCase.getReturnsHistory(prevFrom, prevTo);
+            }
 
             processAnalytics(currentSales, currentReturnsList, prevSales, prevReturns);
 

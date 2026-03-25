@@ -4,65 +4,113 @@
 <?import javafx.geometry.Insets?>
 <?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
 
-<VBox spacing="20" styleClass="modal-container"
+<VBox spacing="20" styleClass="view-container"
       xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="com.mycompany.ventacontrolfx.presentation.controller.dialog.PriceListContentController"
-      prefWidth="750" prefHeight="550">
+      fx:controller="com.mycompany.ventacontrolfx.presentation.controller.dialog.PriceListContentController">
       
     <padding>
-        <Insets top="25" right="30" bottom="25" left="30"/>
+        <Insets top="30" right="40" bottom="30" left="40"/>
     </padding>
 
     <!-- Header -->
-    <HBox alignment="CENTER_LEFT" spacing="15">
-        <VBox HBox.hgrow="ALWAYS">
-            <Label fx:id="lblTitle" text="Precios de la tarifa..." styleClass="view-header"/>
-            <Label text="Consulta rápida de precios para la tarifa seleccionada" styleClass="view-subtitle"/>
-        </VBox>
-        <Button onAction="#handleClose" style="-fx-background-color: transparent; -fx-cursor: hand;">
+    <HBox alignment="CENTER_LEFT" spacing="20">
+        <Button onAction="#handleBack" styleClass="btn-icon-circular">
             <graphic>
-                <FontAwesomeIconView glyphName="TIMES" size="20" fill="#9ca3af"/>
+                <FontAwesomeIconView glyphName="ARROW_LEFT" size="18"/>
             </graphic>
         </Button>
-    </HBox>
-
-    <!-- Barra de Búsqueda -->
-    <HBox spacing="15" alignment="CENTER_LEFT">
-        <HBox styleClass="modern-input-container" HBox.hgrow="ALWAYS" alignment="CENTER_LEFT">
-            <FontAwesomeIconView glyphName="SEARCH" size="16" styleClass="sidebar-icon"/>
-            <TextField fx:id="txtSearch" promptText="Buscar por producto o categoría..." styleClass="modern-input-field" HBox.hgrow="ALWAYS">
-                <HBox.margin>
-                    <Insets left="10"/>
-                </HBox.margin>
-            </TextField>
+        <VBox HBox.hgrow="ALWAYS">
+            <Label fx:id="lblTitle" text="Precios de la tarifa..." styleClass="view-header"/>
+            <Label text="Gestión detallada e historial de cambios (Backup)" styleClass="view-subtitle"/>
+        </VBox>
+        <HBox spacing="10" alignment="CENTER_RIGHT">
+             <Button fx:id="btnRefresh" onAction="#handleRefresh" styleClass="btn-secondary">
+                <graphic>
+                    <FontAwesomeIconView glyphName="REFRESH" size="14"/>
+                </graphic>
+                <tooltip><Tooltip text="Refrescar datos"/></tooltip>
+            </Button>
         </HBox>
     </HBox>
 
-    <!-- Content -->
-    <TableView fx:id="tablePrices" VBox.vgrow="ALWAYS" styleClass="modern-table">
-        <placeholder>
-            <Label text="No hay precios registrados en esta tarifa" style="-fx-text-fill: #9ca3af; -fx-font-size: 14px;"/>
-        </placeholder>
-        <columns>
-            <TableColumn fx:id="colId" text="ID" prefWidth="50" style="-fx-alignment: CENTER;" />
-            <TableColumn fx:id="colCategory" text="Categoría" prefWidth="120" />
-            <TableColumn fx:id="colProduct" text="Producto" prefWidth="200" />
-            <TableColumn fx:id="colBasePrice" text="P. Base" prefWidth="80" style="-fx-alignment: CENTER-RIGHT;" />
-            <TableColumn fx:id="colListPrice" text="P. Lista" prefWidth="80" style="-fx-alignment: CENTER-RIGHT;" />
-            <TableColumn fx:id="colListPvp" text="PVP Final" prefWidth="100" style="-fx-alignment: CENTER-RIGHT; -fx-font-weight: bold; -fx-text-fill: #1e40af;" />
-            <TableColumn fx:id="colDiff" text="Δ %" prefWidth="70" style="-fx-alignment: CENTER-RIGHT;" />
-        </columns>
-    </TableView>
+    <TabPane fx:id="tabPane" VBox.vgrow="ALWAYS" tabClosingPolicy="UNAVAILABLE" styleClass="modern-tab-pane">
+        <tabs>
+            <!-- Tab: Precios Actuales -->
+            <Tab text="Precios Actuales">
+                <graphic>
+                    <FontAwesomeIconView glyphName="TABLE" size="14"/>
+                </graphic>
+                <VBox spacing="15">
+                    <padding><Insets top="20" right="0" bottom="0" left="0"/></padding>
+                    
+                    <!-- Barra de Búsqueda -->
+                    <HBox spacing="15" alignment="CENTER_LEFT">
+                        <HBox styleClass="modern-input-container" HBox.hgrow="ALWAYS" alignment="CENTER_LEFT">
+                            <FontAwesomeIconView glyphName="SEARCH" size="16" styleClass="sidebar-icon"/>
+                            <TextField fx:id="txtSearch" promptText="Buscar por producto o categoría..." styleClass="modern-input-field" HBox.hgrow="ALWAYS">
+                                <HBox.margin>
+                                    <Insets left="10"/>
+                                </HBox.margin>
+                            </TextField>
+                        </HBox>
+                        
+                        <HBox fx:id="paneFilterInfo" spacing="10" alignment="CENTER_LEFT" visible="false" managed="false" style="-fx-background-color: #fef9c3; -fx-padding: 8 15; -fx-background-radius: 8;">
+                            <FontAwesomeIconView glyphName="INFO_CIRCLE" size="14" fill="#854d0e"/>
+                            <Label fx:id="lblFilterInfo" text="Filtrado por evento de historial" style="-fx-text-fill: #854d0e; -fx-font-weight: bold;"/>
+                            <Button onAction="#handleRefresh" text="Quitar Filtro" styleClass="btn-secondary" style="-fx-font-size: 11px;"/>
+                        </HBox>
+                    </HBox>
 
-    <!-- Pagination -->
-    <HBox alignment="CENTER_RIGHT" spacing="15">
-        <javafx.scene.control.Pagination fx:id="pagination" maxPageIndicatorCount="5" styleClass="server-pagination" />
-        <Label fx:id="lblCount" text="0 productos" style="-fx-text-fill: #6b7280; -fx-font-weight: bold;"/>
-    </HBox>
+                    <!-- Tabla de Precios -->
+                    <TableView fx:id="tablePrices" VBox.vgrow="ALWAYS" styleClass="modern-table">
+                        <placeholder>
+                            <Label text="No hay precios registrados en esta tarifa" style="-fx-text-fill: #9ca3af; -fx-font-size: 14px;"/>
+                        </placeholder>
+                        <columns>
+                            <TableColumn fx:id="colId" text="ID" prefWidth="60" style="-fx-alignment: CENTER;" />
+                            <TableColumn fx:id="colCategory" text="Categoría" prefWidth="150" />
+                            <TableColumn fx:id="colProduct" text="Producto" prefWidth="300" />
+                            <TableColumn fx:id="colBasePrice" text="P. Base" prefWidth="100" style="-fx-alignment: CENTER-RIGHT;" />
+                            <TableColumn fx:id="colListPrice" text="P. Lista" prefWidth="100" style="-fx-alignment: CENTER-RIGHT;" />
+                            <TableColumn fx:id="colListPvp" text="PVP Final" prefWidth="120" style="-fx-alignment: CENTER-RIGHT; -fx-font-weight: bold; -fx-text-fill: -fx-accent-dark;" />
+                            <TableColumn fx:id="colDiff" text="Δ %" prefWidth="100" style="-fx-alignment: CENTER-RIGHT;" />
+                        </columns>
+                    </TableView>
 
-    <!-- Actions -->
-    <HBox alignment="CENTER_RIGHT">
-        <Button text="Cerrar" onAction="#handleClose" styleClass="btn-secondary"/>
-    </HBox>
+                    <!-- Pagination -->
+                    <HBox alignment="CENTER_RIGHT" spacing="15">
+                        <javafx.scene.control.Pagination fx:id="pagination" maxPageIndicatorCount="5" styleClass="server-pagination" />
+                        <Label fx:id="lblCount" text="0 productos" style="-fx-text-fill: #6b7280; -fx-font-weight: bold;"/>
+                    </HBox>
+                </VBox>
+            </Tab>
+
+            <!-- Tab: Historial de Cambios (Backup) -->
+            <Tab text="Historial de Cambios (Backup)">
+                <graphic>
+                    <FontAwesomeIconView glyphName="HISTORY" size="14"/>
+                </graphic>
+                <VBox spacing="12">
+                    <padding><Insets top="20" right="0" bottom="0" left="0"/></padding>
+                    
+                    <HBox spacing="10" alignment="CENTER_LEFT">
+                        <children>
+                            <Label text="Filtrar por fecha:" styleClass="view-subtitle" style="-fx-font-size: 11px;"/>
+                            <HBox spacing="8" styleClass="date-filter-container">
+                                <children>
+                                    <ToggleButton fx:id="tglFilterHoy" text="Hoy" styleClass="date-filter-chip" onAction="#handleDateFilter" />
+                                    <ToggleButton fx:id="tglFilter7d" text="Siete días" styleClass="date-filter-chip" onAction="#handleDateFilter" />
+                                    <ToggleButton fx:id="tglFilter1m" text="Un mes" styleClass="date-filter-chip" onAction="#handleDateFilter" />
+                                    <ToggleButton fx:id="tglFilterTodo" text="Todo el tiempo" styleClass="date-filter-chip" onAction="#handleDateFilter" selected="true" />
+                                </children>
+                            </HBox>
+                        </children>
+                    </HBox>
+                    
+                    <ListView fx:id="listHistoryTimeline" VBox.vgrow="ALWAYS" styleClass="modern-list-view" />
+                </VBox>
+            </Tab>
+        </tabs>
+    </TabPane>
 
 </VBox>

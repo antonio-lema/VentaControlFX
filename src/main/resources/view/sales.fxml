@@ -12,6 +12,7 @@
             fx:controller="com.mycompany.ventacontrolfx.presentation.controller.HistoryController">
    <stylesheets>
        <URL value="@/styles/components/historial.css" />
+       <URL value="@/styles/components/filters.css" />
    </stylesheets>
    <children>
       <VBox spacing="0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
@@ -71,15 +72,13 @@
             <VBox spacing="20.0" VBox.vgrow="ALWAYS" style="-fx-padding: 25;">
                 <children>
 
-            <!-- Quick Filters Toolbar -->
-            <HBox spacing="10.0" alignment="CENTER_LEFT">
-               <children>
-                  <Label text="Accesos rápidos:" styleClass="label-muted" style="-fx-font-weight: bold;" />
-                  <Button fx:id="btnQuickToday" onAction="#filterToday" styleClass="quick-filter-btn" text="Hoy" />
-                  <Button fx:id="btnQuickWeek" onAction="#filterLast7Days" styleClass="quick-filter-btn" text="Últimos 7 días" />
-                  <Button fx:id="btnQuickMonth" onAction="#filterThisMonth" styleClass="quick-filter-btn" text="Este mes" />
-               </children>
-            </HBox>
+             <!-- Quick Filters Toolbar -->
+             <HBox spacing="10.0" alignment="CENTER_LEFT">
+                <children>
+                   <Label text="Accesos rápidos:" styleClass="label-muted" style="-fx-font-weight: bold;" />
+                   <HBox fx:id="quickFilterContainer" spacing="8.0" alignment="CENTER_LEFT" styleClass="date-filter-container" />
+                </children>
+             </HBox>
 
             <!-- Summary Cards -->
             <HBox spacing="20.0">
