@@ -1,40 +1,38 @@
+/*
+ * WORK_SESSIONS.CSS
+ * Estilos integrados con el sistema de temas de VentaControlFX.
+ * No utiliza colores hardcodeados para respetar el modo claro/oscuro dinámico.
+ */
+
 .main-content-area {
-    -fx-background-color: #f8fafc;
+    -fx-background-color: -fx-bg-main;
 }
 
-.view-header {
-    -fx-background-color: #1e293b;
-    -fx-padding: 30 40;
-    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 2);
+/* El .view-header ya está definido en main.css con -fx-grad-primary.
+   Forzamos el texto a blanco si el fondo es oscuro (comportamiento estándar de la app) */
+.view-header .view-title {
+    -fx-text-fill: white !important;
 }
 
-.view-header-icon-wrap {
-    -fx-background-color: #3b82f6;
-    -fx-background-radius: 12;
-    -fx-min-width: 50;
-    -fx-min-height: 50;
-    -fx-max-width: 50;
-    -fx-max-height: 50;
+.view-header .view-subtitle {
+    -fx-text-fill: rgba(255, 255, 255, 0.7) !important;
 }
 
-.view-title {
-    -fx-text-fill: white;
-    -fx-font-size: 26px;
-    -fx-font-weight: bold;
-    -fx-font-family: 'Inter', 'Segoe UI', system-ui;
-}
-
-.view-subtitle {
-    -fx-text-fill: #94a3b8;
-    -fx-font-size: 14px;
-}
-
-/* Cards */
-.status-card, .info-card, .table-card {
-    -fx-background-color: white;
-    -fx-background-radius: 16;
+/* Tarjetas */
+.status-card,
+.info-card,
+.table-card {
+    -fx-background-color: -fx-bg-surface;
+    -fx-background-radius: -fx-radius-lg;
     -fx-padding: 24;
-    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 15, 0, 0, 5);
+    -fx-effect: -fx-shadow-soft;
+    -fx-border-color: -fx-color-border-light;
+    -fx-border-width: 1;
+    -fx-border-radius: -fx-radius-lg;
+}
+
+.status-card {
+    -fx-max-width: 500;
 }
 
 .status-icon-container {
@@ -42,108 +40,128 @@
     -fx-min-height: 80;
     -fx-max-width: 80;
     -fx-max-height: 80;
-    -fx-background-radius: 20;
+    -fx-background-radius: -fx-radius-lg;
 }
 
 .status-active {
-    -fx-background-color: #10b981; /* Green Emerald */
+    -fx-background-color: -fx-custom-color-success;
+    -fx-effect: dropshadow(three-pass-box, rgba(16, 185, 129, 0.3), 15, 0, 0, 5);
 }
 
 .status-break {
-    -fx-background-color: #f59e0b; /* Amber */
+    -fx-background-color: -fx-custom-color-warning;
+    -fx-effect: dropshadow(three-pass-box, rgba(245, 158, 11, 0.3), 15, 0, 0, 5);
 }
 
 .status-inactive {
-    -fx-background-color: #64748b; /* Slate */
+    -fx-background-color: -fx-neutral-400;
 }
 
 .status-title-label {
-    -fx-font-size: 20px;
+    -fx-font-size: 18px;
     -fx-font-weight: bold;
-    -fx-text-fill: #1e293b;
+    -fx-text-fill: -fx-text-custom-main;
 }
 
 .timer-label {
-    -fx-font-family: 'JetBrains Mono', 'Courier New', monospace;
-    -fx-font-size: 36px;
+    -fx-font-family: 'JetBrains Mono', 'Segoe UI Semibold', monospace;
+    -fx-font-size: 38px;
     -fx-font-weight: bold;
-    -fx-text-fill: #3b82f6;
+    -fx-text-fill: -fx-custom-color-primary;
 }
 
 .card-title-small {
-    -fx-font-size: 14px;
-    -fx-font-weight: bold;
-    -fx-text-fill: #64748b;
-    -fx-letter-spacing: 1px;
-}
-
-.label-muted {
-    -fx-text-fill: #94a3b8;
     -fx-font-size: 13px;
+    -fx-font-weight: 800;
+    -fx-text-fill: -fx-text-custom-muted;
 }
 
 .info-value {
-    -fx-text-fill: #334155;
+    -fx-text-fill: -fx-text-custom-main;
     -fx-font-size: 15px;
     -fx-font-weight: bold;
 }
 
-/* Buttons */
+/* Botones con degradados del sistema */
 .btn-action {
-    -fx-background-radius: 10;
+    -fx-background-radius: -fx-radius-md;
     -fx-font-weight: bold;
     -fx-text-fill: white;
     -fx-cursor: hand;
-    -fx-transition: 0.2s;
+    -fx-transition-duration: 0.2s;
 }
 
-.btn-success { -fx-background-color: #10b981; }
-.btn-success:hover { -fx-background-color: #059669; }
+.btn-success {
+    -fx-background-color: -fx-grad-success;
+}
 
-.btn-warning { -fx-background-color: #f59e0b; }
-.btn-warning:hover { -fx-background-color: #d97706; }
+.btn-success:hover {
+    -fx-scale-x: 1.02;
+    -fx-scale-y: 1.02;
+}
 
-.btn-danger { -fx-background-color: #ef4444; }
-.btn-danger:hover { -fx-background-color: #dc2626; }
+.btn-warning {
+    -fx-background-color: -fx-grad-warning;
+}
+
+.btn-warning:hover {
+    -fx-scale-x: 1.02;
+    -fx-scale-y: 1.02;
+}
+
+.btn-danger {
+    -fx-background-color: -fx-grad-danger;
+}
+
+.btn-danger:hover {
+    -fx-scale-x: 1.02;
+    -fx-scale-y: 1.02;
+}
 
 .btn-refresh {
     -fx-background-color: transparent;
-    -fx-border-color: #e2e8f0;
-    -fx-border-radius: 8;
-    -fx-text-fill: #64748b;
+    -fx-border-color: -fx-color-border-main;
+    -fx-border-radius: -fx-radius-md;
+    -fx-text-fill: -fx-text-custom-light;
     -fx-cursor: hand;
 }
+
 .btn-refresh:hover {
-    -fx-background-color: #f8fafc;
+    -fx-background-color: -fx-bg-subtle;
+    -fx-border-color: -fx-custom-color-primary;
+    -fx-text-fill: -fx-custom-color-primary;
 }
 
-/* Table View */
+/* Tablas Modernas */
 .modern-table-view {
     -fx-background-color: transparent;
+    -fx-border-color: transparent;
 }
 
 .modern-table-view .column-header {
-    -fx-background-color: #f1f5f9;
+    -fx-background-color: -fx-bg-subtle;
     -fx-pref-height: 45;
 }
 
 .modern-table-view .column-header .label {
-    -fx-text-fill: #475569;
+    -fx-text-fill: -fx-text-custom-medium;
     -fx-font-weight: bold;
+    -fx-font-size: 13px;
 }
 
 .modern-table-view .table-row-cell {
-    -fx-cell-size: 55;
-    -fx-border-color: transparent transparent #f1f5f9 transparent;
+    -fx-cell-size: 50;
+    -fx-border-color: transparent transparent -fx-color-border-subtle transparent;
 }
 
 .modern-table-view .table-row-cell:odd {
-    -fx-background-color: #ffffff;
+    -fx-background-color: -fx-bg-surface;
 }
+
 .modern-table-view .table-row-cell:even {
-    -fx-background-color: #fcfcfc;
+    -fx-background-color: -fx-bg-subtle;
 }
 
 .modern-table-view .table-row-cell:selected {
-    -fx-background-color: #eff6ff;
+    -fx-background-color: -fx-custom-color-primary-bg;
 }

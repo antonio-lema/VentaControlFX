@@ -17,6 +17,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.StackPane;
 import javafx.util.Duration;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
@@ -106,33 +107,46 @@ public class WorkSessionController implements Injectable {
 
     private void updateActiveStatusUI() {
         boolean isShift = activeSession.getType() == WorkSession.SessionType.SHIFT;
-        lblCurrentStatus.setText(isShift ? "EN TURNO" : "EN DESCANSO");
 
         statusIconContainer.getStyleClass().removeAll("status-active", "status-break", "status-inactive");
-        statusIconContainer.getStyleClass().add(isShift ? "status-active" : "status-break");
-        statusIcon.setGlyphName(isShift ? "USER" : "COFFEE");
+        if (isShift) {
+            lblCurrentStatus.setText("EN TURNO");
+            statusIconContainer.getStyleClass().add("status-active");
+            statusIcon.setGlyphName("USER");
+            btnStartShift.setDisable(true);
+            btnStartBreak.setDisable(false);
+            btnEndSession.setText("FINALIZAR TURNO");
+        } else {
+            lblCurrentStatus.setText("EN DESCANSO");
+            statusIconContainer.getStyleClass().add("status-break");
+            statusIcon.setGlyphName("COFFEE");
+            btnStartShift.setDisable(false); // Permite "Volver al turno"
+            btnStartShift.setText("VOLVER AL TURNO");
+            btnStartBreak.setDisable(true);
+            btnEndSession.setText("FINALIZAR TODO");
+        }
 
-        btnStartShift.setDisable(true);
-        btnStartBreak.setDisable(!isShift);
         btnEndSession.setDisable(false);
     }
 
     private void updateInactiveStatusUI() {
         lblCurrentStatus.setText("FUERA DE TURNO");
         lblSessionTimer.setText("00:00:00");
-
         statusIconContainer.getStyleClass().removeAll("status-active", "status-break", "status-inactive");
         statusIconContainer.getStyleClass().add("status-inactive");
         statusIcon.setGlyphName("USER_TIMES");
 
         btnStartShift.setDisable(false);
+        btnStartShift.setText("INICIAR TURNO");
         btnStartBreak.setDisable(true);
         btnEndSession.setDisable(true);
+        btnEndSession.setText("FINALIZAR");
     }
 
     private void startGlobalTimer() {
         if (timer != null)
             timer.stop();
+
         timer = new Timeline(new KeyFrame(Duration.seconds(1), event -> updateTimerLabel()));
         timer.setCycleCount(Timeline.INDEFINITE);
         timer.play();
@@ -140,18 +154,52 @@ public class WorkSessionController implements Injectable {
 
     private void updateTimerLabel() {
         if (activeSession != null) {
-            long seconds = ChronoUnit.SECONDS.between(activeSession.getStartTime(), LocalDateTime.now());
-            long h = seconds / 3600;
-            long m = (seconds % 3600) / 60;
-            long s = seconds % 60;
-            lblSessionTimer.setText(String.format("%02d:%02d:%02d", h, m, s));
+            // Update main cumulative timer (User expects work time to continue after break)
+            long totalSeconds = calculateCumulativeTimedSessionToday(activeSession.getType());
+            lblSessionTimer.setText(formatLongDuration(totalSeconds));
+
+            // Periodically refresh the whole history/summary to keep it in sync
+            loadHistory();
+        } else {
+            lblSessionTimer.setText("00:00:00");
         }
+    }
+
+    private long calculateCumulativeTimedSessionToday(WorkSession.SessionType type) {
+        if (userSession.getCurrentUser() == null)
+            return 0;
+
+        LocalDate today = LocalDate.now();
+        List<WorkSession> history = useCase.getHistory(userSession.getCurrentUser().getUserId());
+
+        long completedSeconds = history.stream()
+                .filter(s -> s.getStartTime().toLocalDate().isEqual(today))
+                .filter(s -> s.getType() == type)
+                .filter(s -> s.getStatus() == WorkSession.SessionStatus.COMPLETED)
+                .mapToLong(s -> {
+                    if (s.getEndTime() != null) {
+                        return ChronoUnit.SECONDS.between(s.getStartTime(), s.getEndTime());
+                    }
+                    return 0;
+                })
+                .sum();
+
+        long activeSeconds = 0;
+        if (activeSession != null && activeSession.getType() == type) {
+            activeSeconds = ChronoUnit.SECONDS.between(activeSession.getStartTime(), LocalDateTime.now());
+        }
+
+        return completedSeconds + activeSeconds;
     }
 
     @FXML
     private void handleStartShift() {
         try {
-            useCase.startShift(userSession.getCurrentUser().getUserId());
+            Integer userId = userSession.getCurrentUser().getUserId();
+            if (activeSession != null && activeSession.getType() == WorkSession.SessionType.BREAK) {
+                useCase.endSession(userId);
+            }
+            useCase.startShift(userId);
             refreshUI();
         } catch (Exception e) {
             showAlert("Error", e.getMessage());
@@ -192,10 +240,10 @@ public class WorkSessionController implements Injectable {
     }
 
     private void updateDailySummaries(List<WorkSession> history) {
-        LocalDateTime todayStart = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0);
+        LocalDate today = LocalDate.now();
 
         List<WorkSession> todaySessions = history.stream()
-                .filter(s -> s.getStartTime().isAfter(todayStart))
+                .filter(s -> s.getStartTime().toLocalDate().isEqual(today))
                 .collect(Collectors.toList());
 
         Optional<WorkSession> firstShift = todaySessions.stream()
@@ -207,8 +255,8 @@ public class WorkSessionController implements Injectable {
         long totalWorkedSeconds = calculateTotalSeconds(todaySessions, WorkSession.SessionType.SHIFT);
         long totalBreakSeconds = calculateTotalSeconds(todaySessions, WorkSession.SessionType.BREAK);
 
-        lblTotalWorked.setText(formatDuration(totalWorkedSeconds));
-        lblTotalBreak.setText(formatDuration(totalBreakSeconds));
+        lblTotalWorked.setText(formatShortDuration(totalWorkedSeconds));
+        lblTotalBreak.setText(formatShortDuration(totalBreakSeconds));
     }
 
     private long calculateTotalSeconds(List<WorkSession> sessions, WorkSession.SessionType type) {
@@ -220,10 +268,17 @@ public class WorkSessionController implements Injectable {
                 }).sum();
     }
 
-    private String formatDuration(long seconds) {
+    private String formatShortDuration(long seconds) {
         long h = seconds / 3600;
         long m = (seconds % 3600) / 60;
         return String.format("%dh %dm", h, m);
+    }
+
+    private String formatLongDuration(long seconds) {
+        long h = seconds / 3600;
+        long m = (seconds % 3600) / 60;
+        long s = seconds % 60;
+        return String.format("%02d:%02d:%02d", h, m, s);
     }
 
     private void showAlert(String title, String content) {

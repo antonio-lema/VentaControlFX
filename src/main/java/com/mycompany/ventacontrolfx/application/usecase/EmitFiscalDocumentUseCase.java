@@ -195,36 +195,26 @@ public class EmitFiscalDocumentUseCase {
         // Número correlativo (ATÓMICO dentro de la transacción)
         int docNumber = seriesRepository.getAndIncrement(seriesCode, conn);
 
-        FiscalDocument doc = new FiscalDocument();
-
-        // Snapshot del emisor desde la configuración actual
-        doc.setIssuerName(orEmpty(configRepository.getValue("companyName")));
-        doc.setIssuerTaxId(orEmpty(configRepository.getValue("cif")));
-        doc.setIssuerAddress(orEmpty(configRepository.getValue("address")));
-        doc.setIssuerPhone(orEmpty(configRepository.getValue("phone")));
-
         // Desgloses de IVA
         double totalAmount = sale.getTotal();
         double vatAmount = sale.getIva();
         double baseAmount = totalAmount - vatAmount;
 
-        doc.setSaleId(saleId);
-        doc.setDocType(type);
-        doc.setDocSeries(seriesCode);
-        doc.setDocNumber(docNumber);
-        doc.setDocStatus(Status.EMITIDO);
-        doc.setIssuedAt(LocalDateTime.now());
-        doc.setBaseAmount(baseAmount);
-        doc.setVatAmount(vatAmount);
-        doc.setTotalAmount(totalAmount);
-
-        if (receiverName != null) {
-            doc.setReceiverName(receiverName);
-            doc.setReceiverTaxId(receiverTaxId);
-            doc.setReceiverAddress(receiverAddress);
-        }
-
-        return doc;
+        return FiscalDocument.builder()
+                .saleId(saleId)
+                .type(type)
+                .series(seriesCode)
+                .number(docNumber)
+                .status(Status.EMITIDO)
+                .issuedAt(LocalDateTime.now())
+                .issuer(
+                        orEmpty(configRepository.getValue("companyName")),
+                        orEmpty(configRepository.getValue("cif")),
+                        orEmpty(configRepository.getValue("address")),
+                        orEmpty(configRepository.getValue("phone")))
+                .receiver(receiverName, receiverTaxId, receiverAddress)
+                .amounts(baseAmount, vatAmount, totalAmount)
+                .build();
     }
 
     private String orEmpty(String val) {

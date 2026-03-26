@@ -6,6 +6,10 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
+import com.mycompany.ventacontrolfx.domain.model.BusinessDay;
 
 public class JdbcCompanyConfigRepository implements ICompanyConfigRepository {
 
@@ -52,49 +56,140 @@ public class JdbcCompanyConfigRepository implements ICompanyConfigRepository {
 
     @Override
     public SaleConfig load() {
+        java.util.Map<String, String> cache = new java.util.HashMap<>();
+        String sql = "SELECT config_key, config_value FROM system_config";
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(sql);
+                ResultSet rs = pstmt.executeQuery()) {
+            while (rs.next()) {
+                cache.put(rs.getString("config_key"), rs.getString("config_value"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
         SaleConfig d = new SaleConfig();
         SaleConfig cfg = new SaleConfig();
-        cfg.setCompanyName(getString(K_COMPANY_NAME, d.getCompanyName()));
-        cfg.setCif(getString(K_CIF, d.getCif()));
-        cfg.setAddress(getString(K_ADDRESS, d.getAddress()));
-        cfg.setPhone(getString(K_PHONE, d.getPhone()));
-        cfg.setEmail(getString(K_EMAIL, d.getEmail()));
-        cfg.setLogoPath(getString(K_LOGO_PATH, d.getLogoPath()));
-        cfg.setAppIconPath(getString(K_APP_ICON_PATH, d.getAppIconPath()));
-        cfg.setAppName(getString(K_APP_NAME, d.getAppName()));
-        cfg.setTaxRate(getDouble(K_TAX_RATE, d.getTaxRate()));
-        cfg.setTaxType(getString(K_TAX_TYPE, d.getTaxType()));
-        cfg.setPricesIncludeTax(getBoolean(K_PRICES_INC_TAX, d.isPricesIncludeTax()));
-        cfg.setCurrency(getString(K_CURRENCY, d.getCurrency()));
-        cfg.setDecimals(getString(K_DECIMALS, d.getDecimals()));
-        cfg.setShowLogo(getBoolean(K_SHOW_LOGO, d.isShowLogo()));
-        cfg.setShowAddress(getBoolean(K_SHOW_ADDRESS, d.isShowAddress()));
-        cfg.setShowPhone(getBoolean(K_SHOW_PHONE, d.isShowPhone()));
-        cfg.setShowCif(getBoolean(K_SHOW_CIF, d.isShowCif()));
-        cfg.setFooterMessage(getString(K_FOOTER_MSG, d.getFooterMessage()));
-        cfg.setTicketCopies(getString(K_TICKET_COPIES, d.getTicketCopies()));
-        cfg.setTicketFormat(getString(K_TICKET_FORMAT, d.getTicketFormat()));
-        cfg.setAutoPrint(getBoolean(K_AUTO_PRINT, d.isAutoPrint()));
-        cfg.setCash(getBoolean(K_CASH, d.isCash()));
-        cfg.setCard(getBoolean(K_CARD, d.isCard()));
-        cfg.setTransfer(getBoolean(K_TRANSFER, d.isTransfer()));
-        cfg.setCheck(getBoolean(K_CHECK, d.isCheck()));
-        cfg.setCredit(getBoolean(K_CREDIT, d.isCredit()));
-        cfg.setRounding(getString(K_ROUNDING, d.getRounding()));
-        cfg.setRoundingMethod(getString(K_ROUNDING_METHOD, d.getRoundingMethod()));
-        cfg.setAllowDiscount(getBoolean(K_ALLOW_DISCOUNT, d.isAllowDiscount()));
-        cfg.setAllowGlobalDiscount(getBoolean(K_ALLOW_GLOB_DISC, d.isAllowGlobalDiscount()));
-        cfg.setRequireClient(getBoolean(K_REQUIRE_CLIENT, d.isRequireClient()));
-        cfg.setStockAlert(getBoolean(K_STOCK_ALERT, d.isStockAlert()));
-        cfg.setNegativeStock(getBoolean(K_NEGATIVE_STOCK, d.isNegativeStock()));
-        cfg.setShowBarcode(getBoolean(K_SHOW_BARCODE, d.isShowBarcode()));
-        cfg.setSoundOnAdd(getBoolean(K_SOUND_ON_ADD, d.isSoundOnAdd()));
-        cfg.setConfirmDelete(getBoolean(K_CONFIRM_DELETE, d.isConfirmDelete()));
-        cfg.setSmtpHost(getString(K_SMTP_HOST, d.getSmtpHost()));
-        cfg.setSmtpPort(getString(K_SMTP_PORT, d.getSmtpPort()));
-        cfg.setEmailFrom(getString(K_EMAIL_FROM, d.getEmailFrom()));
-        cfg.setEmailPassword(getString(K_EMAIL_PASS, d.getEmailPassword()));
+        cfg.setCompanyName(getFromCache(cache, K_COMPANY_NAME, d.getCompanyName()));
+        cfg.setCif(getFromCache(cache, K_CIF, d.getCif()));
+        cfg.setAddress(getFromCache(cache, K_ADDRESS, d.getAddress()));
+        cfg.setPhone(getFromCache(cache, K_PHONE, d.getPhone()));
+        cfg.setEmail(getFromCache(cache, K_EMAIL, d.getEmail()));
+        cfg.setLogoPath(getFromCache(cache, K_LOGO_PATH, d.getLogoPath()));
+        cfg.setAppIconPath(getFromCache(cache, K_APP_ICON_PATH, d.getAppIconPath()));
+        cfg.setAppName(getFromCache(cache, K_APP_NAME, d.getAppName()));
+        cfg.setTaxRate(getDoubleFromCache(cache, K_TAX_RATE, d.getTaxRate()));
+        cfg.setTaxType(getFromCache(cache, K_TAX_TYPE, d.getTaxType()));
+        cfg.setPricesIncludeTax(getBooleanFromCache(cache, K_PRICES_INC_TAX, d.isPricesIncludeTax()));
+        cfg.setCurrency(getFromCache(cache, K_CURRENCY, d.getCurrency()));
+        cfg.setDecimals(getFromCache(cache, K_DECIMALS, d.getDecimals()));
+        cfg.setShowLogo(getBooleanFromCache(cache, K_SHOW_LOGO, d.isShowLogo()));
+        cfg.setShowAddress(getBooleanFromCache(cache, K_SHOW_ADDRESS, d.isShowAddress()));
+        cfg.setShowPhone(getBooleanFromCache(cache, K_SHOW_PHONE, d.isShowPhone()));
+        cfg.setShowCif(getBooleanFromCache(cache, K_SHOW_CIF, d.isShowCif()));
+        cfg.setFooterMessage(getFromCache(cache, K_FOOTER_MSG, d.getFooterMessage()));
+        cfg.setTicketCopies(getFromCache(cache, K_TICKET_COPIES, d.getTicketCopies()));
+        cfg.setTicketFormat(getFromCache(cache, K_TICKET_FORMAT, d.getTicketFormat()));
+        cfg.setAutoPrint(getBooleanFromCache(cache, K_AUTO_PRINT, d.isAutoPrint()));
+        cfg.setCash(getBooleanFromCache(cache, K_CASH, d.isCash()));
+        cfg.setCard(getBooleanFromCache(cache, K_CARD, d.isCard()));
+        cfg.setTransfer(getBooleanFromCache(cache, K_TRANSFER, d.isTransfer()));
+        cfg.setCheck(getBooleanFromCache(cache, K_CHECK, d.isCheck()));
+        cfg.setCredit(getBooleanFromCache(cache, K_CREDIT, d.isCredit()));
+        cfg.setRounding(getFromCache(cache, K_ROUNDING, d.getRounding()));
+        cfg.setRoundingMethod(getFromCache(cache, K_ROUNDING_METHOD, d.getRoundingMethod()));
+        cfg.setAllowDiscount(getBooleanFromCache(cache, K_ALLOW_DISCOUNT, d.isAllowDiscount()));
+        cfg.setAllowGlobalDiscount(getBooleanFromCache(cache, K_ALLOW_GLOB_DISC, d.isAllowGlobalDiscount()));
+        cfg.setRequireClient(getBooleanFromCache(cache, K_REQUIRE_CLIENT, d.isRequireClient()));
+        cfg.setStockAlert(getBooleanFromCache(cache, K_STOCK_ALERT, d.isStockAlert()));
+        cfg.setNegativeStock(getBooleanFromCache(cache, K_NEGATIVE_STOCK, d.isNegativeStock()));
+        cfg.setShowBarcode(getBooleanFromCache(cache, K_SHOW_BARCODE, d.isShowBarcode()));
+        cfg.setSoundOnAdd(getBooleanFromCache(cache, K_SOUND_ON_ADD, d.isSoundOnAdd()));
+        cfg.setConfirmDelete(getBooleanFromCache(cache, K_CONFIRM_DELETE, d.isConfirmDelete()));
+        cfg.setSmtpHost(getFromCache(cache, K_SMTP_HOST, d.getSmtpHost()));
+        cfg.setSmtpPort(getFromCache(cache, K_SMTP_PORT, d.getSmtpPort()));
+        cfg.setEmailFrom(getFromCache(cache, K_EMAIL_FROM, d.getEmailFrom()));
+        cfg.setEmailPassword(getFromCache(cache, K_EMAIL_PASS, d.getEmailPassword()));
+
+        // Cargar horario semanal dinámico
+        List<BusinessDay> schedule = new ArrayList<>();
+        for (int i = 1; i <= 7; i++) {
+            boolean isClosed = getBooleanFromCache(cache, "schedule." + i + ".closed", false);
+            BusinessDay day = new BusinessDay(i, isClosed);
+
+            String countStr = getFromCache(cache, "schedule." + i + ".count", null);
+            if (countStr != null) {
+                int shiftCount = Integer.parseInt(countStr);
+                for (int s = 0; s < shiftCount; s++) {
+                    String op = getFromCache(cache, "schedule." + i + "." + s + ".open", "09:00");
+                    String cl = getFromCache(cache, "schedule." + i + "." + s + ".close", "20:00");
+                    List<Integer> users = new ArrayList<>();
+                    String userIdsStr = getFromCache(cache, "schedule." + i + "." + s + ".users", "");
+                    if (!userIdsStr.isEmpty()) {
+                        for (String id : userIdsStr.split(","))
+                            users.add(Integer.parseInt(id));
+                    }
+                    day.getShifts().add(new BusinessDay.TimeRange(LocalTime.parse(op), LocalTime.parse(cl), users));
+                }
+            } else {
+                String op1 = getFromCache(cache, "schedule." + i + ".open", "09:00");
+                String cl1 = getFromCache(cache, "schedule." + i + ".close", "14:00");
+                day.getShifts().add(new BusinessDay.TimeRange(LocalTime.parse(op1), LocalTime.parse(cl1)));
+                if (getBooleanFromCache(cache, "schedule." + i + ".split", false)) {
+                    String op2 = getFromCache(cache, "schedule." + i + ".open2", "17:00");
+                    String cl2 = getFromCache(cache, "schedule." + i + ".close2", "21:00");
+                    day.getShifts().add(new BusinessDay.TimeRange(LocalTime.parse(op2), LocalTime.parse(cl2)));
+                }
+            }
+            schedule.add(day);
+        }
+        cfg.setSchedule(schedule);
+
+        // Cargar días especiales
+        List<SaleConfig.SpecialDay> specials = new ArrayList<>();
+        int specCount = Integer.parseInt(getFromCache(cache, "schedule.special.count", "0"));
+        for (int i = 0; i < specCount; i++) {
+            String dateStr = getFromCache(cache, "schedule.special." + i + ".date", null);
+            if (dateStr == null)
+                continue;
+            boolean closed = getBooleanFromCache(cache, "schedule.special." + i + ".closed", true);
+            String reason = getFromCache(cache, "schedule.special." + i + ".reason", "Festivo");
+            SaleConfig.SpecialDay sd = new SaleConfig.SpecialDay(java.time.LocalDate.parse(dateStr), closed, reason);
+
+            int sCount = Integer.parseInt(getFromCache(cache, "schedule.special." + i + ".count", "0"));
+            for (int s = 0; s < sCount; s++) {
+                String op = getFromCache(cache, "schedule.special." + i + "." + s + ".open", "09:00");
+                String cl = getFromCache(cache, "schedule.special." + i + "." + s + ".close", "20:00");
+                sd.getShifts().add(new BusinessDay.TimeRange(LocalTime.parse(op), LocalTime.parse(cl)));
+            }
+            specials.add(sd);
+        }
+        cfg.setSpecialDays(specials);
+        cfg.setScheduleGracePeriodMins(Integer.parseInt(getFromCache(cache, "schedule.grace", "10")));
+
         return cfg;
+    }
+
+    private String getFromCache(java.util.Map<String, String> cache, String key, String def) {
+        String val = cache.get(key);
+        return val != null ? val : def;
+    }
+
+    private boolean getBooleanFromCache(java.util.Map<String, String> cache, String key, boolean def) {
+        String val = cache.get(key);
+        return val != null ? Boolean.parseBoolean(val) : def;
+    }
+
+    private double getDoubleFromCache(java.util.Map<String, String> cache, String key, double def) {
+        String val = cache.get(key);
+        if (val != null) {
+            try {
+                return Double.parseDouble(val);
+            } catch (Exception e) {
+                return def;
+            }
+        }
+        return def;
     }
 
     @Override
@@ -139,6 +234,38 @@ public class JdbcCompanyConfigRepository implements ICompanyConfigRepository {
         setValue(K_SMTP_PORT, orEmpty(cfg.getSmtpPort()));
         setValue(K_EMAIL_FROM, orEmpty(cfg.getEmailFrom()));
         setValue(K_EMAIL_PASS, orEmpty(cfg.getEmailPassword()));
+
+        // Guardar horario semanal dinámico
+        if (cfg.getSchedule() != null) {
+            for (BusinessDay day : cfg.getSchedule()) {
+                setValue("schedule." + day.getDayOfWeek() + ".closed", String.valueOf(day.isClosed()));
+                setValue("schedule." + day.getDayOfWeek() + ".count", String.valueOf(day.getShifts().size()));
+                for (int s = 0; s < day.getShifts().size(); s++) {
+                    BusinessDay.TimeRange range = day.getShifts().get(s);
+                    setValue("schedule." + day.getDayOfWeek() + "." + s + ".open", range.getOpen().toString());
+                    setValue("schedule." + day.getDayOfWeek() + "." + s + ".close", range.getClose().toString());
+                    String usersStr = range.getAssignedUserIds().stream().map(String::valueOf)
+                            .collect(java.util.stream.Collectors.joining(","));
+                    setValue("schedule." + day.getDayOfWeek() + "." + s + ".users", usersStr);
+                }
+            }
+        }
+
+        // Guardar días especiales
+        setValue("schedule.special.count", String.valueOf(cfg.getSpecialDays().size()));
+        for (int i = 0; i < cfg.getSpecialDays().size(); i++) {
+            SaleConfig.SpecialDay sd = cfg.getSpecialDays().get(i);
+            setValue("schedule.special." + i + ".date", sd.getDate().toString());
+            setValue("schedule.special." + i + ".closed", String.valueOf(sd.isClosed()));
+            setValue("schedule.special." + i + ".reason", sd.getReason());
+            setValue("schedule.special." + i + ".count", String.valueOf(sd.getShifts().size()));
+            for (int s = 0; s < sd.getShifts().size(); s++) {
+                BusinessDay.TimeRange r = sd.getShifts().get(s);
+                setValue("schedule.special." + i + "." + s + ".open", r.getOpen().toString());
+                setValue("schedule.special." + i + "." + s + ".close", r.getClose().toString());
+            }
+        }
+        setValue("schedule.grace", String.valueOf(cfg.getScheduleGracePeriodMins()));
     }
 
     @Override

@@ -41,7 +41,9 @@ public class ReturnListController implements Injectable {
     @FXML
     private TableView<Return> returnsTable;
     @FXML
-    private TableColumn<Return, Integer> colId, colSaleId, colClosure;
+    private TableColumn<Return, String> colId;
+    @FXML
+    private TableColumn<Return, Integer> colSaleId, colClosure;
     @FXML
     private TableColumn<Return, String> colUser, colDate, colReason;
     @FXML
@@ -115,7 +117,7 @@ public class ReturnListController implements Injectable {
         if (returnsTable == null)
             return;
 
-        colId.setCellValueFactory(new PropertyValueFactory<>("returnId"));
+        colId.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getFullReference()));
         colSaleId.setCellValueFactory(new PropertyValueFactory<>("saleId"));
         colReason.setCellValueFactory(new PropertyValueFactory<>("reason"));
         colClosure.setCellValueFactory(new PropertyValueFactory<>("closureId"));
@@ -245,7 +247,7 @@ public class ReturnListController implements Injectable {
 
             // Poblar el panel lateral
             if (lblDetailReturnId != null)
-                lblDetailReturnId.setText("Devolución #" + returnRecord.getReturnId());
+                lblDetailReturnId.setText("Devolución: " + returnRecord.getFullReference());
             if (lblDetailSaleId != null)
                 lblDetailSaleId.setText("Ticket #" + returnRecord.getSaleId());
 
@@ -454,37 +456,10 @@ public class ReturnListController implements Injectable {
             com.mycompany.ventacontrolfx.domain.model.Sale originalSale = saleUseCase
                     .getSaleDetails(currentSelectedReturn.getSaleId());
 
-            // 3. Abrir vista previa
-            ModalService.showStandardModal("/view/print_preview.fxml", "Ticket de Devolución", container,
+            // 3. Abrir vista previa especializada en Devoluciones (Factura Rectificativa)
+            ModalService.showStandardModal("/view/print_preview.fxml", "Factura Rectificativa", container,
                     (PrintPreviewController ppc) -> {
-                        try {
-                            List<com.mycompany.ventacontrolfx.domain.model.CartItem> cartItems = new java.util.ArrayList<>();
-                            for (ReturnDetail detail : currentSelectedReturn.getDetails()) {
-                                com.mycompany.ventacontrolfx.domain.model.Product p = new com.mycompany.ventacontrolfx.domain.model.Product();
-                                p.setName("[DEV] " + detail.getProductName());
-                                p.setPrice(-detail.getUnitPrice()); // Precio negativo para devolución
-                                p.setIva(0.0); // Simplificado para el ticket de devolución
-                                cartItems.add(new com.mycompany.ventacontrolfx.domain.model.CartItem(p,
-                                        detail.getQuantity()));
-                            }
-
-                            // Cargar datos del cliente si el ticket original los tenía
-                            if (originalSale != null && originalSale.getClientId() != null) {
-                                com.mycompany.ventacontrolfx.domain.model.Client client = container.getClientUseCase()
-                                        .getById(originalSale.getClientId());
-                                if (client != null)
-                                    ppc.setClientInfo(client);
-                            }
-
-                            // Configurar vista previa (ponemos el ID de la venta original para referencia)
-                            ppc.setReceiptData(cartItems, -currentSelectedReturn.getTotalRefunded(),
-                                    -currentSelectedReturn.getTotalRefunded(), 0.0,
-                                    currentSelectedReturn.getPaymentMethod(), currentSelectedReturn.getSaleId());
-
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            AlertUtil.showError("Error", "Error al preparar la impresión de la devolución.");
-                        }
+                        ppc.setReturnData(currentSelectedReturn, originalSale, currentSelectedReturn.getDetails());
                     });
 
         } catch (SQLException e) {

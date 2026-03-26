@@ -9,7 +9,7 @@ public class User {
 
     private int userId;
     private String username;
-    private String password;
+    private String passwordHash;
     private String fullName;
     private String role;
 
@@ -31,10 +31,10 @@ public class User {
         // Constructor vacío
     }
 
-    public User(int userId, String username, String password, String fullName, String role, String email) {
+    public User(int userId, String username, String passwordHash, String fullName, String role, String email) {
         this.userId = userId;
         this.username = username;
-        this.password = password;
+        this.passwordHash = passwordHash;
         this.fullName = fullName;
         this.role = role;
         this.email = email;
@@ -68,12 +68,12 @@ public class User {
         this.username = username;
     }
 
-    public String getPassword() {
-        return password;
+    public String getPasswordHash() {
+        return passwordHash;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public void setPasswordHash(String passwordHash) {
+        this.passwordHash = passwordHash;
     }
 
     public String getFullName() {

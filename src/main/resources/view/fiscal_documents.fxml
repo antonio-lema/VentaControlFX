@@ -58,7 +58,7 @@
         <VBox spacing="20" VBox.vgrow="ALWAYS" style="-fx-padding: 30;">
 
         <!-- ─── KPI CARDS ─── -->
-        <HBox spacing="20">
+        <HBox spacing="15">
             <VBox styleClass="stat-card" HBox.hgrow="ALWAYS">
                 <HBox alignment="CENTER_LEFT" spacing="15">
                     <StackPane styleClass="icon-bg-blue">
@@ -85,6 +85,18 @@
 
             <VBox styleClass="stat-card" HBox.hgrow="ALWAYS">
                 <HBox alignment="CENTER_LEFT" spacing="15">
+                    <StackPane styleClass="icon-bg-orange" style="-fx-background-color: #ffedd5;">
+                        <FontAwesomeIconView glyphName="REPLY" size="24" fill="#f97316"/>
+                    </StackPane>
+                    <VBox>
+                        <Label text="Devoluciones" styleClass="stat-label"/>
+                        <Label fx:id="lblTotalReturns" text="0" styleClass="stat-value"/>
+                    </VBox>
+                </HBox>
+            </VBox>
+
+            <VBox styleClass="stat-card" HBox.hgrow="ALWAYS">
+                <HBox alignment="CENTER_LEFT" spacing="15">
                     <StackPane styleClass="icon-bg-red">
                         <FontAwesomeIconView glyphName="BAN" size="24" fill="#ef4444"/>
                     </StackPane>
@@ -101,7 +113,7 @@
                         <FontAwesomeIconView glyphName="CALCULATOR" size="24" fill="#3b82f6"/>
                     </StackPane>
                     <VBox>
-                        <Label text="Total Facturado (Base)" styleClass="stat-label"/>
+                        <Label text="Total Facturado (Neto)" styleClass="stat-label"/>
                         <Label fx:id="lblTotalAmount" text="0.00 €" styleClass="stat-value"/>
                     </VBox>
                 </HBox>

@@ -786,4 +786,95 @@ public class PrintPreviewController implements Injectable {
         Stage stage = (Stage) paperSheet.getScene().getWindow();
         stage.close();
     }
+
+    private com.mycompany.ventacontrolfx.domain.model.Return currentReturn;
+
+    public void setReturnData(com.mycompany.ventacontrolfx.domain.model.Return returnRecord,
+            com.mycompany.ventacontrolfx.domain.model.Sale originalSale,
+            List<com.mycompany.ventacontrolfx.domain.model.ReturnDetail> details) {
+        this.currentReturn = returnRecord;
+
+        if (configUseCase != null) {
+            this.cfg = configUseCase.getConfig();
+        }
+        String sym = cfg != null ? cfg.getCurrencySymbol() : "€";
+        String fmt = "%." + (cfg != null ? cfg.getDecimalCount() : 2) + "f " + sym;
+
+        // Impresoras disponibles
+        cmbPrinters.setItems(FXCollections.observableArrayList(Printer.getAllPrinters()));
+        Printer defaultPrinter = Printer.getDefaultPrinter();
+        if (defaultPrinter != null) {
+            cmbPrinters.getSelectionModel().select(defaultPrinter);
+        }
+
+        // Fecha y hora de la devolución
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMM, yyyy 'Hora:' HH:mm:ss");
+        lblDate.setText("Fecha Dev: " + returnRecord.getReturnDatetime().format(formatter));
+
+        // Título: Factura Rectificativa (Si tiene número fiscal) o Ticket de Devolución
+        if (returnRecord.getDocNumber() != null) {
+            lblTicketTitle.setText("Factura Rectificativa Nº: " + returnRecord.getFullReference());
+        } else {
+            lblTicketTitle.setText("Ticket de Devolución Nº: REF-" + returnRecord.getReturnId());
+        }
+
+        // Información de referencia al ticket original
+        Label lblRef = new Label("Ref. Ticket Original: #" + originalSale.getSaleId());
+        lblRef.setStyle("-fx-font-size: 11px; -fx-text-fill: #666; -fx-padding: 5 0;");
+        if (ticketInfoSection != null)
+            ticketInfoSection.getChildren().add(lblRef);
+
+        // Artículos devueltos
+        itemsContainer.getChildren().clear();
+        for (com.mycompany.ventacontrolfx.domain.model.ReturnDetail detail : details) {
+            HBox row = new HBox(10);
+            row.setStyle("-fx-border-color: transparent transparent #eee transparent; -fx-padding: 4 0 4 0;");
+
+            Label lblDesc = new Label(
+                    detail.getProductName() != null ? detail.getProductName() : "Producto #" + detail.getProductId());
+            lblDesc.setMaxWidth(Double.MAX_VALUE);
+            HBox.setHgrow(lblDesc, Priority.ALWAYS);
+            lblDesc.setStyle("-fx-font-size: 10px; -fx-text-fill: black;");
+
+            Label lblQty = new Label(String.valueOf(detail.getQuantity()));
+            lblQty.setMinWidth(30);
+            lblQty.setStyle("-fx-alignment: CENTER-RIGHT; -fx-font-size: 10px; -fx-text-fill: black;");
+
+            Label lblPrice = new Label(String.format(fmt, detail.getUnitPrice()));
+            lblPrice.setMinWidth(55);
+            lblPrice.setStyle("-fx-alignment: CENTER-RIGHT; -fx-font-size: 10px; -fx-text-fill: black;");
+
+            Label lblTotal = new Label(String.format(fmt, detail.getSubtotal()));
+            lblTotal.setMinWidth(55);
+            lblTotal.setStyle("-fx-alignment: CENTER-RIGHT; -fx-font-size: 10px; -fx-text-fill: black;");
+
+            row.getChildren().addAll(lblDesc, lblQty, lblPrice, lblTotal);
+            itemsContainer.getChildren().add(row);
+        }
+
+        // Totales (Negativos representan abono)
+        lblTotal.setText("-" + String.format(fmt, returnRecord.getTotalRefunded()));
+        lblSubtotal.setText("-" + String.format(fmt, returnRecord.getTotalRefunded())); // Simplificado
+        lblVat.setText("0.00 " + sym); // En abonos simples se suele poner el total bruto
+
+        lblPaymentMethod.setText(returnRecord.getPaymentMethod());
+        if (lblPaid != null)
+            lblPaid.setText(String.format(fmt, returnRecord.getTotalRefunded()));
+
+        // Datos de empresa
+        applyCompanyHeader();
+
+        // Si la venta original tenía cliente, configurarlo para A4
+        if (originalSale.getClientId() != null) {
+            try {
+                com.mycompany.ventacontrolfx.domain.model.Client client = container.getClientUseCase()
+                        .getById(originalSale.getClientId());
+                if (client != null)
+                    setClientInfo(client);
+            } catch (Exception ignored) {
+            }
+        }
+
+        applyPaperFormat();
+    }
 }

@@ -75,7 +75,15 @@ public class OpenPdfFiscalService implements IFiscalPdfService {
         // ─── CABECERA DE DOCUMENTO ───
         PdfPTable typeTable = new PdfPTable(1);
         typeTable.setWidthPercentage(100);
-        String label = isInvoice ? "FACTURA ORDINARIA" : "FACTURA SIMPLIFICADA (TICKET)";
+
+        String label;
+        if (data.document.getDocType() == FiscalDocument.Type.FACTURA) {
+            label = "FACTURA ORDINARIA";
+        } else if (data.document.getDocType() == FiscalDocument.Type.RECTIFICATIVA) {
+            label = "FACTURA RECTIFICATIVA (ABONO)";
+        } else {
+            label = "FACTURA SIMPLIFICADA (TICKET)";
+        }
 
         PdfPCell typeCell = new PdfPCell(new Phrase(label, FONT_TITLE));
         typeCell.setBorder(com.lowagie.text.Rectangle.BOTTOM);

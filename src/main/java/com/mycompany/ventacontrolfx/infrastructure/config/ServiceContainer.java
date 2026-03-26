@@ -68,7 +68,6 @@ public class ServiceContainer {
     private final QueryFiscalDocumentUseCase queryFiscalDocumentUseCase;
     private final LoginUseCase loginUseCase;
     private final PriceListUseCase priceListUseCase;
-    private final ScheduleVatChangeUseCase vatUseCase;
     private final MassivePriceUpdateUseCase massivePriceUpdateUseCase;
     private final TaxManagementUseCase taxManagementUseCase;
     private final PromotionUseCase promotionUseCase;
@@ -161,7 +160,6 @@ public class ServiceContainer {
         this.queryFiscalDocumentUseCase = new QueryFiscalDocumentUseCase(fiscalRepository, saleRepository);
         this.loginUseCase = new LoginUseCase(userRepository, auditRepository, roleUseCase, permissionUseCase);
         this.priceListUseCase = new PriceListUseCase(priceListRepository, priceRepository);
-        this.vatUseCase = new ScheduleVatChangeUseCase(taxRepository);
         this.massivePriceUpdateUseCase = new MassivePriceUpdateUseCase(priceRepository, productRepository,
                 priceLogRepository);
         this.getSaleTicketUseCase = new GetSaleTicketUseCase(saleRepository);
@@ -209,10 +207,6 @@ public class ServiceContainer {
 
     public CategoryUseCase getCategoryUseCase() {
         return categoryUseCase;
-    }
-
-    public ScheduleVatChangeUseCase getVatUseCase() {
-        return vatUseCase;
     }
 
     public ClientUseCase getClientUseCase() {

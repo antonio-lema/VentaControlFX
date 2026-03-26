@@ -174,11 +174,35 @@ public class HeaderController implements Injectable {
 
     @FXML
     private void handleLogout() {
-        if (AlertUtil.showConfirmation("Cerrar Sesión", "¿Estás seguro?", "Se cerrará la sesión actual.")) {
-            container.getUserSession().logout();
-            Stage stage = (Stage) userMenuButton.getScene().getWindow();
-            SceneNavigator.loadScene(stage, "/view/login.fxml", "Login", 900, 600, false, container);
+        try {
+            var user = container.getUserSession().getCurrentUser();
+            if (user == null) {
+                performLogout();
+                return;
+            }
+
+            // 1. Confirmación de Cierre de Sesión
+            if (AlertUtil.showConfirmation("Cerrar Sesión", "¿Estás seguro?",
+                    "Se finalizará tu turno de forma automática al cerrar la sesión.")) {
+
+                // Finalizar turno automáticamente si hay uno activo
+                try {
+                    container.getWorkSessionUseCase().endSession(user.getUserId());
+                } catch (Exception e) {
+                    System.err.println("Error finalizando turno al cerrar sesión: " + e.getMessage());
+                }
+
+                performLogout();
+            }
+        } catch (Exception e) {
+            AlertUtil.showError("Error al cerrar sesión", "Ocurrió un error inesperado: " + e.getMessage());
         }
+    }
+
+    private void performLogout() {
+        container.getUserSession().logout();
+        Stage stage = (Stage) userMenuButton.getScene().getWindow();
+        SceneNavigator.loadScene(stage, "/view/login.fxml", "Login", 900, 600, false, container);
     }
 
     @FXML

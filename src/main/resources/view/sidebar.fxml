@@ -8,161 +8,120 @@
 
 <VBox xmlns:fx="http://javafx.com/fxml/1" 
       fx:controller="com.mycompany.ventacontrolfx.presentation.controller.SidebarController"
-      spacing="2" styleClass="sidebar">
+      spacing="0" styleClass="sidebar">
     <padding>
-        <Insets top="24" right="10" bottom="20" left="10"/>
+        <Insets top="0" right="0" bottom="20" left="0"/>
     </padding>
 
-    <!-- ─── BRANDING SECCIÓN — Dinámico desde configuración ─── -->
-    <VBox alignment="CENTER" spacing="8" styleClass="sidebar-branding">
-        <padding>
-            <Insets bottom="24" />
-        </padding>
-        <!-- Logo de empresa (se muestra si hay imagen configurada) -->
+    <!-- ─── BRANDING SECCIÓN ─── -->
+    <VBox alignment="CENTER" styleClass="sidebar-branding">
         <StackPane fx:id="brandIconWrap" styleClass="brand-icon-wrap" alignment="CENTER">
-            <!-- Icono de fallback, visible cuando no hay logo configurado -->
             <FontAwesomeIconView fx:id="brandFallbackIcon" glyphName="SHOPPING_CART" size="26" styleClass="brand-fallback-icon"/>
-            <!-- Logo real, visible cuando hay imagen -->
-            <ImageView fx:id="brandLogoImage" fitWidth="40" fitHeight="40" preserveRatio="true" visible="false" managed="false"/>
+            <ImageView fx:id="brandLogoImage" fitWidth="35" fitHeight="35" preserveRatio="true" visible="false" managed="false"/>
         </StackPane>
-        <!-- Nombre de la aplicación de la configuración -->
-        <Label fx:id="lblAppName" styleClass="brand-name" alignment="CENTER" maxWidth="Infinity"/>
+        <Label fx:id="lblAppName" styleClass="brand-name" text="GestionTPV" alignment="CENTER" maxWidth="Infinity"/>
     </VBox>
 
     <ScrollPane VBox.vgrow="ALWAYS" fitToWidth="true" styleClass="sidebar-scroll-pane">
-        <VBox spacing="4" style="-fx-background-color: transparent;" alignment="TOP_CENTER">
+        <VBox spacing="0" style="-fx-background-color: transparent;" alignment="TOP_CENTER">
             
             <!-- SECCIÓN: VENTAS -->
             <Button fx:id="sectionVentas" styleClass="sidebar-section-header" onAction="#toggleVentas" text="VENTAS" maxWidth="Infinity" />
-            <VBox fx:id="contentVentas" styleClass="sidebar-section-content" spacing="2" visible="false" managed="false">
+            <VBox fx:id="contentVentas" styleClass="sidebar-section-content" spacing="0" visible="false" managed="false">
                 <Button fx:id="btnSell" styleClass="sidebar-button" onAction="#showSellView" contentDisplay="TOP" maxWidth="Infinity" text="Vender">
-                    <graphic>
-                        <FontAwesomeIconView glyphName="SHOPPING_CART" size="22" styleClass="sidebar-icon"/>
-                    </graphic>
+                    <graphic><FontAwesomeIconView glyphName="SHOPPING_CART" size="22" styleClass="sidebar-icon"/></graphic>
                 </Button>
                 <Button fx:id="btnHistory" styleClass="sidebar-button" onAction="#showHistoryView" contentDisplay="TOP" maxWidth="Infinity" text="Historial">
-                    <graphic>
-                        <FontAwesomeIconView glyphName="HISTORY" size="22" styleClass="sidebar-icon"/>
-                    </graphic>
+                    <graphic><FontAwesomeIconView glyphName="HISTORY" size="22" styleClass="sidebar-icon"/></graphic>
                 </Button>
                 <Button fx:id="btnReturns" styleClass="sidebar-button" onAction="#handleShowReturns" contentDisplay="TOP" maxWidth="Infinity" text="Devoluciones">
-                    <graphic>
-                        <FontAwesomeIconView glyphName="REPLY" size="22" styleClass="sidebar-icon"/>
-                    </graphic>
+                    <graphic><FontAwesomeIconView glyphName="REPLY" size="22" styleClass="sidebar-icon"/></graphic>
                 </Button>
-                <Button fx:id="btnClosures" styleClass="sidebar-button" onAction="#handleShowClosures" contentDisplay="TOP" maxWidth="Infinity" text="Arqueos">
-                    <graphic>
-                        <FontAwesomeIconView glyphName="CALCULATOR" size="22" styleClass="sidebar-icon"/>
-                    </graphic>
+                <Button fx:id="btnClosures" styleClass="sidebar-button" onAction="#handleShowClosures" contentDisplay="TOP" maxWidth="Infinity" text="Arqueos / Cierres">
+                    <graphic><FontAwesomeIconView glyphName="CALCULATOR" size="22" styleClass="sidebar-icon"/></graphic>
                 </Button>
             </VBox>
-
-            <Separator styleClass="sidebar-divider" />
 
             <!-- SECCIÓN: CATÁLOGO -->
             <Button fx:id="sectionCatalogo" styleClass="sidebar-section-header" onAction="#toggleCatalogo" text="CATÁLOGO" maxWidth="Infinity" />
-            <VBox fx:id="contentCatalogo" styleClass="sidebar-section-content" spacing="2" visible="false" managed="false">
+            <VBox fx:id="contentCatalogo" styleClass="sidebar-section-content" spacing="0" visible="false" managed="false">
                 <Button fx:id="btnProducts" styleClass="sidebar-button" onAction="#showProductsView" contentDisplay="TOP" maxWidth="Infinity" text="Productos">
-                    <graphic>
-                        <FontAwesomeIconView glyphName="TAGS" size="22" styleClass="sidebar-icon"/>
-                    </graphic>
+                    <graphic><FontAwesomeIconView glyphName="TAGS" size="22" styleClass="sidebar-icon"/></graphic>
                 </Button>
                 <Button fx:id="btnCategories" styleClass="sidebar-button" onAction="#handleShowCategories" contentDisplay="TOP" maxWidth="Infinity" text="Categorías">
-                    <graphic>
-                        <FontAwesomeIconView glyphName="FOLDER_OPEN" size="22" styleClass="sidebar-icon"/>
-                    </graphic>
+                    <graphic><FontAwesomeIconView glyphName="FOLDER_OPEN" size="22" styleClass="sidebar-icon"/></graphic>
                 </Button>
                 <Button fx:id="btnPriceLists" styleClass="sidebar-button" onAction="#handleShowPriceLists" contentDisplay="TOP" maxWidth="Infinity" text="Tarifas">
-                    <graphic>
-                        <FontAwesomeIconView glyphName="MONEY" size="22" styleClass="sidebar-icon"/>
-                    </graphic>
+                    <graphic><FontAwesomeIconView glyphName="MONEY" size="22" styleClass="sidebar-icon"/></graphic>
                 </Button>
                 <Button fx:id="btnPromotions" styleClass="sidebar-button" onAction="#handleShowPromotions" contentDisplay="TOP" maxWidth="Infinity" text="Promociones">
-                    <graphic>
-                        <FontAwesomeIconView glyphName="PERCENT" size="22" styleClass="sidebar-icon"/>
-                    </graphic>
+                    <graphic><FontAwesomeIconView glyphName="PERCENT" size="22" styleClass="sidebar-icon"/></graphic>
                 </Button>
             </VBox>
 
-            <Separator styleClass="sidebar-divider" />
+            <!-- SECCIÓN: PERSONAL -->
+            <Button fx:id="sectionPersonal" styleClass="sidebar-section-header" onAction="#togglePersonal" text="PERSONAL" maxWidth="Infinity" />
+            <VBox fx:id="contentPersonal" styleClass="sidebar-section-content" spacing="0" visible="false" managed="false">
+                <Button fx:id="btnWorkSessions" styleClass="sidebar-button" onAction="#handleShowWorkSessions" contentDisplay="TOP" maxWidth="Infinity" text="Turnos / Descansos">
+                    <graphic><FontAwesomeIconView glyphName="CLOCK_ALT" size="22" styleClass="sidebar-icon"/></graphic>
+                </Button>
+                <Button fx:id="btnOperativeControl" styleClass="sidebar-button" onAction="#handleShowOperativeDashboard" contentDisplay="TOP" maxWidth="Infinity" text="Monitor">
+                    <graphic><FontAwesomeIconView glyphName="DASHBOARD" size="22" styleClass="sidebar-icon"/></graphic>
+                </Button>
+                <Button fx:id="btnStaffCalendar" styleClass="sidebar-button" onAction="#handleShowStaffCalendar" contentDisplay="TOP" maxWidth="Infinity" text="Planificador">
+                    <graphic><FontAwesomeIconView glyphName="CALENDAR" size="22" styleClass="sidebar-icon"/></graphic>
+                </Button>
+                <Button fx:id="btnPunctualityAudit" styleClass="sidebar-button" onAction="#handleShowPunctualityAudit" contentDisplay="TOP" maxWidth="Infinity" text="Auditoría">
+                    <graphic><FontAwesomeIconView glyphName="CHECK_SQUARE" size="22" styleClass="sidebar-icon"/></graphic>
+                </Button>
+            </VBox>
 
             <!-- SECCIÓN: CLIENTES -->
             <Button fx:id="sectionClientes" styleClass="sidebar-section-header" onAction="#toggleClientes" text="CLIENTES" maxWidth="Infinity" />
-            <VBox fx:id="contentClientes" styleClass="sidebar-section-content" spacing="2" visible="false" managed="false">
+            <VBox fx:id="contentClientes" styleClass="sidebar-section-content" spacing="0" visible="false" managed="false">
                 <Button fx:id="btnClients" styleClass="sidebar-button" onAction="#handleShowClients" contentDisplay="TOP" maxWidth="Infinity" text="Directorio">
-                    <graphic>
-                        <FontAwesomeIconView glyphName="ADDRESS_BOOK" size="22" styleClass="sidebar-icon"/>
-                    </graphic>
+                    <graphic><FontAwesomeIconView glyphName="ADDRESS_BOOK" size="22" styleClass="sidebar-icon"/></graphic>
                 </Button>
                 <Button fx:id="btnClientReport" styleClass="sidebar-button" onAction="#handleShowClientReport" contentDisplay="TOP" maxWidth="Infinity" text="Ventas Clientes">
-                    <graphic>
-                        <FontAwesomeIconView glyphName="USER" size="22" styleClass="sidebar-icon"/>
-                    </graphic>
+                    <graphic><FontAwesomeIconView glyphName="USER" size="22" styleClass="sidebar-icon"/></graphic>
                 </Button>
             </VBox>
-
-            <Separator styleClass="sidebar-divider" />
 
             <!-- SECCIÓN: GESTIÓN -->
             <Button fx:id="sectionGestion" styleClass="sidebar-section-header" onAction="#toggleGestion" text="GESTIÓN" maxWidth="Infinity" />
-            <VBox fx:id="contentGestion" styleClass="sidebar-section-content" spacing="2" visible="false" managed="false">
+            <VBox fx:id="contentGestion" styleClass="sidebar-section-content" spacing="0" visible="false" managed="false">
                 <Button fx:id="btnReports" styleClass="sidebar-button" onAction="#handleShowReports" contentDisplay="TOP" maxWidth="Infinity" text="Informes">
-                    <graphic>
-                        <FontAwesomeIconView glyphName="BAR_CHART" size="22" styleClass="sidebar-icon"/>
-                    </graphic>
+                    <graphic><FontAwesomeIconView glyphName="BAR_CHART" size="22" styleClass="sidebar-icon"/></graphic>
                 </Button>
                 <Button fx:id="btnBilling" styleClass="sidebar-button" onAction="#handleShowBilling" contentDisplay="TOP" maxWidth="Infinity" text="Facturación">
-                    <graphic>
-                        <FontAwesomeIconView glyphName="FILE_TEXT_ALT" size="22" styleClass="sidebar-icon"/>
-                    </graphic>
+                    <graphic><FontAwesomeIconView glyphName="FILE_TEXT_ALT" size="22" styleClass="sidebar-icon"/></graphic>
                 </Button>
                 <Button fx:id="btnVat" styleClass="sidebar-button" onAction="#handleShowVat" contentDisplay="TOP" maxWidth="Infinity" text="IVA">
-                    <graphic>
-                        <FontAwesomeIconView glyphName="PERCENT" size="22" styleClass="sidebar-icon"/>
-                    </graphic>
+                    <graphic><FontAwesomeIconView glyphName="PERCENT" size="22" styleClass="sidebar-icon"/></graphic>
                 </Button>
                 <Button fx:id="btnUsers" styleClass="sidebar-button" onAction="#handleShowUsers" contentDisplay="TOP" maxWidth="Infinity" text="Usuarios">
-                    <graphic>
-                        <FontAwesomeIconView glyphName="USER_PLUS" size="22" styleClass="sidebar-icon"/>
-                    </graphic>
+                    <graphic><FontAwesomeIconView glyphName="USER_PLUS" size="22" styleClass="sidebar-icon"/></graphic>
                 </Button>
-                <Button fx:id="btnRoles" styleClass="sidebar-button" onAction="#handleShowRoles" contentDisplay="TOP" maxWidth="Infinity" text="Roles">
-                    <graphic>
-                        <FontAwesomeIconView glyphName="SHIELD" size="22" styleClass="sidebar-icon"/>
-                    </graphic>
-                </Button>
-                <Button fx:id="btnWorkSessions" styleClass="sidebar-button" onAction="#handleShowWorkSessions" contentDisplay="TOP" maxWidth="Infinity" text="Turnos / Descansos">
-                    <graphic>
-                        <FontAwesomeIconView glyphName="CLOCK_ALT" size="22" styleClass="sidebar-icon"/>
-                    </graphic>
+                <Button fx:id="btnRoles" styleClass="sidebar-button" onAction="#handleShowRoles" contentDisplay="TOP" maxWidth="Infinity" text="Roles / Permisos">
+                    <graphic><FontAwesomeIconView glyphName="SHIELD" size="22" styleClass="sidebar-icon"/></graphic>
                 </Button>
             </VBox>
 
-            <Separator styleClass="sidebar-divider" />
-
             <!-- SECCIÓN: SISTEMA -->
             <Button fx:id="sectionSistema" styleClass="sidebar-section-header" onAction="#toggleSistema" text="SISTEMA" maxWidth="Infinity" />
-            <VBox fx:id="contentSistema" styleClass="sidebar-section-content" spacing="2" visible="false" managed="false">
+            <VBox fx:id="contentSistema" styleClass="sidebar-section-content" spacing="0" visible="false" managed="false">
                 <Button fx:id="btnConfig" styleClass="sidebar-button" onAction="#handleShowConfig" contentDisplay="TOP" maxWidth="Infinity" text="Configuración">
-                    <graphic>
-                        <FontAwesomeIconView glyphName="COG" size="22" styleClass="sidebar-icon"/>
-                    </graphic>
+                    <graphic><FontAwesomeIconView glyphName="COG" size="22" styleClass="sidebar-icon"/></graphic>
                 </Button>
-                <Button fx:id="btnThemeSettings" styleClass="sidebar-button" contentDisplay="TOP" maxWidth="Infinity" onAction="#handleShowCustomization" text="Estética">
-                    <graphic>
-                        <FontAwesomeIconView glyphName="PAINT_BRUSH" size="22" styleClass="sidebar-icon"/>
-                    </graphic>
+                <Button fx:id="btnThemeSettings" styleClass="sidebar-button" onAction="#handleShowCustomization" contentDisplay="TOP" maxWidth="Infinity" text="Estética">
+                    <graphic><FontAwesomeIconView glyphName="PAINT_BRUSH" size="22" styleClass="sidebar-icon"/></graphic>
                 </Button>
             </VBox>
         </VBox>
     </ScrollPane>
 
-    <!-- FOOTER FIJO: BLOQUEAR -->
-    <Separator styleClass="sidebar-divider" />
+    <!-- FOOTER FIJO -->
     <Button fx:id="btnLock" styleClass="sidebar-button" onAction="#handleLock" contentDisplay="TOP" maxWidth="Infinity" text="Bloquear">
-        <graphic>
-            <FontAwesomeIconView glyphName="LOCK" size="22" styleClass="sidebar-icon"/>
-        </graphic>
+        <graphic><FontAwesomeIconView glyphName="LOCK" size="22" styleClass="sidebar-icon"/></graphic>
     </Button>
-
 </VBox>

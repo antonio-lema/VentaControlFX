@@ -85,4 +85,12 @@ public class WorkSessionUseCase {
     public List<WorkSession> getHistory(Integer userId) {
         return repository.getHistory(userId);
     }
+
+    public List<WorkSession> getAllActiveSessions() {
+        return repository.getAllActiveSessions();
+    }
+
+    public List<WorkSession> getHistoryByDate(java.time.LocalDate date) {
+        return repository.getHistoryByDate(date);
+    }
 }

@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 public class FiscalDocument {
 
     public enum Type {
-        TICKET, FACTURA
+        TICKET, FACTURA, RECTIFICATIVA
     }
 
     public enum Status {
@@ -40,10 +40,85 @@ public class FiscalDocument {
     private double totalAmount; // base + iva
     private String controlHash; // SHA-256 para integridad
 
-    public FiscalDocument() {
+    private FiscalDocument() {
     }
 
-    // ── Getters & Setters ──────────────────────────────────────────────
+    public static class Builder {
+        private final FiscalDocument document = new FiscalDocument();
+
+        public Builder saleId(int saleId) {
+            document.saleId = saleId;
+            return this;
+        }
+
+        public Builder type(Type type) {
+            document.docType = type;
+            return this;
+        }
+
+        public Builder series(String series) {
+            document.docSeries = series;
+            return this;
+        }
+
+        public Builder number(int number) {
+            document.docNumber = number;
+            return this;
+        }
+
+        public Builder status(Status status) {
+            document.docStatus = status;
+            return this;
+        }
+
+        public Builder issuer(String name, String taxId, String address, String phone) {
+            document.issuerName = name;
+            document.issuerTaxId = taxId;
+            document.issuerAddress = address;
+            document.issuerPhone = phone;
+            return this;
+        }
+
+        public Builder receiver(String name, String taxId, String address) {
+            document.receiverName = name;
+            document.receiverTaxId = taxId;
+            document.receiverAddress = address;
+            return this;
+        }
+
+        public Builder issuedAt(LocalDateTime dateTime) {
+            document.issuedAt = dateTime;
+            return this;
+        }
+
+        public Builder amounts(double base, double vat, double total) {
+            document.baseAmount = base;
+            document.vatAmount = vat;
+            document.totalAmount = total;
+            return this;
+        }
+
+        public Builder controlHash(String hash) {
+            document.controlHash = hash;
+            return this;
+        }
+
+        public FiscalDocument build() {
+            if (document.docType == null)
+                throw new IllegalStateException("DocType must be set");
+            if (document.docStatus == null)
+                document.docStatus = Status.EMITIDO;
+            if (document.issuedAt == null)
+                document.issuedAt = LocalDateTime.now();
+            return document;
+        }
+    }
+
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    // --- Getters & Protective Setters ---
 
     public int getSaleId() {
         return saleId;
@@ -58,6 +133,7 @@ public class FiscalDocument {
     }
 
     public void setDocType(Type docType) {
+        checkImmutable();
         this.docType = docType;
     }
 
@@ -66,6 +142,7 @@ public class FiscalDocument {
     }
 
     public void setDocSeries(String docSeries) {
+        checkImmutable();
         this.docSeries = docSeries;
     }
 
@@ -74,6 +151,7 @@ public class FiscalDocument {
     }
 
     public void setDocNumber(int docNumber) {
+        checkImmutable();
         this.docNumber = docNumber;
     }
 
@@ -81,8 +159,11 @@ public class FiscalDocument {
         return docStatus;
     }
 
-    public void setDocStatus(Status docStatus) {
-        this.docStatus = docStatus;
+    public void setDocStatus(Status status) {
+        if (!canTransitionTo(status)) {
+            throw new IllegalStateException("Invalid status transition from " + this.docStatus + " to " + status);
+        }
+        this.docStatus = status;
     }
 
     public String getIssuerName() {
@@ -90,6 +171,7 @@ public class FiscalDocument {
     }
 
     public void setIssuerName(String issuerName) {
+        checkImmutable();
         this.issuerName = issuerName;
     }
 
@@ -98,6 +180,7 @@ public class FiscalDocument {
     }
 
     public void setIssuerTaxId(String issuerTaxId) {
+        checkImmutable();
         this.issuerTaxId = issuerTaxId;
     }
 
@@ -106,6 +189,7 @@ public class FiscalDocument {
     }
 
     public void setIssuerAddress(String issuerAddress) {
+        checkImmutable();
         this.issuerAddress = issuerAddress;
     }
 
@@ -114,6 +198,7 @@ public class FiscalDocument {
     }
 
     public void setIssuerPhone(String issuerPhone) {
+        checkImmutable();
         this.issuerPhone = issuerPhone;
     }
 
@@ -122,6 +207,7 @@ public class FiscalDocument {
     }
 
     public void setReceiverName(String receiverName) {
+        checkImmutable();
         this.receiverName = receiverName;
     }
 
@@ -130,6 +216,7 @@ public class FiscalDocument {
     }
 
     public void setReceiverTaxId(String receiverTaxId) {
+        checkImmutable();
         this.receiverTaxId = receiverTaxId;
     }
 
@@ -138,6 +225,7 @@ public class FiscalDocument {
     }
 
     public void setReceiverAddress(String receiverAddress) {
+        checkImmutable();
         this.receiverAddress = receiverAddress;
     }
 
@@ -146,6 +234,7 @@ public class FiscalDocument {
     }
 
     public void setIssuedAt(LocalDateTime issuedAt) {
+        checkImmutable();
         this.issuedAt = issuedAt;
     }
 
@@ -154,6 +243,7 @@ public class FiscalDocument {
     }
 
     public void setBaseAmount(double baseAmount) {
+        checkImmutable();
         this.baseAmount = baseAmount;
     }
 
@@ -162,6 +252,7 @@ public class FiscalDocument {
     }
 
     public void setVatAmount(double vatAmount) {
+        checkImmutable();
         this.vatAmount = vatAmount;
     }
 
@@ -170,6 +261,7 @@ public class FiscalDocument {
     }
 
     public void setTotalAmount(double totalAmount) {
+        checkImmutable();
         this.totalAmount = totalAmount;
     }
 
@@ -178,21 +270,26 @@ public class FiscalDocument {
     }
 
     public void setControlHash(String controlHash) {
+        checkImmutable();
         this.controlHash = controlHash;
     }
 
-    /** Genera la referencia legible del documento. Ej: "2026-T-00042" */
+    private void checkImmutable() {
+        if (this.docStatus == Status.EMITIDO) {
+            throw new IllegalStateException("Cannot modify an EMITIDO fiscal document. Field is immutable.");
+        }
+    }
+
     public String getFullReference() {
         return String.format("%d-%s-%05d", issuedAt != null ? issuedAt.getYear() : 0, docSeries, docNumber);
     }
 
-    /**
-     * Invariante de dominio: un EMITIDO sólo puede pasar a ANULADO.
-     */
     public boolean canTransitionTo(Status newStatus) {
+        if (this.docStatus == null)
+            return true; // Initial creation
         if (this.docStatus == Status.EMITIDO) {
             return newStatus == Status.ANULADO;
         }
-        return false; // estados terminales no admiten transición
+        return false;
     }
 }

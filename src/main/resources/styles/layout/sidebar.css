@@ -1,203 +1,41 @@
 /*
- * SIDEBAR.CSS — Diseño Premium (Mockup Gradient)
- * Nota: Los gradientes lineales en JavaFX no soportan variables CSS
- * directamente, por lo que los colores del fondo del sidebar se hard-codean
- * intencionalmente para mantener el look premium fijo (azul oscuro profundo).
- * Todos los demás colores usan el sistema de variables del proyecto.
+ * SIDEBAR.CSS — Diseño Premium (Inspirado en Mockup)
  */
 
-/* ─── Contenedor principal con degradado ─────────────────────────── */
+/* ─── Contenedor principal ────────────────────────────────────────── */
 .sidebar {
-    /* FALLBACK: degradado por defecto (azul marino oscuro).
-       ThemeManager sobreescribe esto con el color elegido por el usuario en Estética.
-       NOTA: los gradientes en JavaFX NO se pueden referenciar via variables CSS,
-       por eso ThemeManager genera un bloque .sidebar directo en el CSS dinámico. */
-    -fx-background-color: linear-gradient(to bottom right, -fx-custom-color-primary, -fx-custom-color-primary-dark);
-    -fx-pref-width: -fx-sidebar-width;
-    -fx-max-width: -fx-sidebar-width;
+    /* El fondo es gestionado dinámicamente por ThemeManager para permitir degradados */
+    -fx-pref-width: 200px;
+    -fx-min-width: 200px;
+    -fx-max-width: 200px;
     -fx-padding: 0;
-    -fx-border-color: rgba(255, 255, 255, 0.05);
-    -fx-border-width: 0 1 0 0;
 }
 
 /* ─── Branding Sección ───────────────────────────────────────────── */
 .sidebar-branding {
-    -fx-padding: 30 0;
+    -fx-padding: 25 0;
+    -fx-alignment: CENTER;
 }
 
 .brand-icon-wrap {
-    /* Gradiente del icono de marca: usa los colores primario y teal del sistema */
-    -fx-background-color: linear-gradient(to bottom right, -fx-custom-color-primary, -fx-custom-color-teal);
-    -fx-background-radius: -fx-radius-lg;
-    -fx-padding: 10px;
+    -fx-background-color: #121212;
+    -fx-background-radius: 4px;
+    -fx-padding: 8px;
     -fx-min-width: 50;
     -fx-min-height: 50;
     -fx-max-width: 50;
     -fx-max-height: 50;
-    -fx-effect: dropshadow(three-pass-box, -fx-shadow-color-primary, 10, 0, 0, 0);
+}
+
+.brand-logo-image {
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.5), 4, 0, 0, 0);
 }
 
 .brand-name {
-    /* Siempre texto personalizado sobre el fondo oscuro/color del sidebar */
-    -fx-text-fill: -fx-custom-color-sidebar-text !important;
-    -fx-font-size: 15px;
-    -fx-font-weight: 800;
-    -fx-alignment: CENTER;
-    -fx-text-alignment: CENTER;
-    -fx-max-width: Infinity;
-}
-
-.brand-tagline {
-    /* Mismo texto semitransparente */
-    -fx-text-fill: -fx-custom-color-sidebar-text-a70 !important;
-    -fx-font-size: 10px;
+    -fx-text-fill: white !important;
+    -fx-font-size: 13px;
     -fx-font-weight: bold;
-}
-
-/* ─── Botón de navegación (Vertical) ─────────────────────────────── */
-.sidebar-button {
-    -fx-background-color: transparent;
-    -fx-alignment: CENTER;
-    -fx-padding: 20 10;
-    /* Texto semitransparente sobre fondo oscuro */
-    -fx-text-fill: -fx-custom-color-sidebar-text-a60 !important;
-    -fx-font-size: 12px;
-    -fx-font-weight: 600;
-    -fx-cursor: hand;
-    -fx-background-radius: -fx-radius-lg;
-    -fx-spacing: 10;
-    -fx-min-width: -fx-sidebar-btn-width;
-    -fx-max-width: -fx-sidebar-btn-width;
-}
-
-.sidebar-button:hover {
-    -fx-background-color: rgba(255, 255, 255, 0.05);
-    /* Al hacer hover, se vuelve color sólido */
-    -fx-text-fill: -fx-custom-color-sidebar-text !important;
-}
-
-/* ─── Ítem activo con Degradado Suave y Glow Premium ───────────── */
-.active-sidebar-button {
-    /* Usa gradiente mejorado en ThemeManager */
-    -fx-background-color: -fx-grad-sidebar-active;
-    -fx-text-fill: -fx-custom-color-sidebar-text !important;
-    -fx-effect: -fx-shadow-primary;
-    -fx-background-radius: 40px;
-    -fx-border-radius: 40px;
-    -fx-padding: 10 20;
-    -fx-margin: 8 0;
-    /* Ajustamos el tamaño para que sea una cápsula elegante */
-    -fx-min-width: 170px;
-    -fx-max-width: 170px;
-    -fx-alignment: CENTER;
-}
-
-.active-sidebar-button:hover {
-    -fx-background-color: -fx-grad-primary;
-    -fx-effect: -fx-shadow-primary-intense;
-}
-
-/* ─── Icono fallback de branding ─────────────────────────────────── */
-.brand-fallback-icon {
-    -fx-fill: -fx-custom-color-sidebar-text !important;
-}
-
-/* ─── Imagen de logo de empresa ──────────────────────────────────── */
-.brand-logo-image {
-    -fx-effect: dropshadow(three-pass-box, -fx-shadow-color-primary, 6, 0, 0, 0);
-}
-
-/* ─── Iconos ─────────────────────────────────────────────────────── */
-.sidebar-icon {
-    /* Por defecto, los iconos son color de texto al 60% de opacidad para que sean constantes sobre fondos de color oscuro */
-    -fx-fill: -fx-custom-color-sidebar-text !important;
-    -fx-opacity: 0.6;
-}
-
-.sidebar-button:hover .sidebar-icon {
-    -fx-opacity: 1.0;
-}
-
-/* Al estar activo, el ícono se pone blanco/color y opaco */
-.active-sidebar-button .sidebar-icon {
-    -fx-fill: -fx-custom-color-sidebar-text !important;
-    -fx-opacity: 1.0;
-}
-
-/* El label del botón activo también debe ser del color custom */
-.active-sidebar-button .label {
-    -fx-text-fill: -fx-custom-color-sidebar-text !important;
-}
-
-/* ─── NAVEGACIÓN AGRUPADA (ESTÉTICA PRESERVADA) ─── */
-
-.sidebar-section-header {
-    -fx-background-color: rgba(255, 255, 255, 0.04);
-    -fx-padding: 10 15;
-    -fx-alignment: CENTER;
-    -fx-cursor: hand;
-    -fx-max-width: Infinity;
-    -fx-text-fill: white;
-    -fx-font-size: 11px;
-    -fx-font-weight: bold;
-    -fx-background-radius: 0;
-    -fx-border-width: 0 0 1 0;
-    -fx-border-color: rgba(255, 255, 255, 0.06);
-}
-
-.sidebar-section-header:hover {
-    -fx-background-color: rgba(255, 255, 255, 0.08);
-    -fx-text-fill: white;
-}
-
-.sidebar-section-content {
-    -fx-background-color: transparent;
-    -fx-padding: 0;
-}
-
-/* Botones del Sidebar (Mantener idénticos) */
-.sidebar-button {
-    -fx-background-color: transparent;
-    -fx-padding: 12 15;
-    -fx-alignment: CENTER;
-    -fx-cursor: hand;
-    -fx-content-display: TOP;
-    -fx-max-width: Infinity;
-    -fx-text-fill: white;
-    -fx-font-size: 11px;
-    -fx-font-weight: bold;
-    -fx-background-radius: 0;
-    -fx-border-width: 0 0 1 0;
-    -fx-border-color: rgba(255, 255, 255, 0.05);
-}
-
-.sidebar-button:hover {
-    -fx-background-color: rgba(255, 255, 255, 0.1);
-}
-
-.active-sidebar-button {
-    -fx-background-color: linear-gradient(to right, #6366f1, #a855f7);
-    -fx-text-fill: white;
-    -fx-effect: dropshadow(three-pass-box, rgba(99, 102, 241, 0.4), 10, 0, 0, 0);
-}
-
-.sidebar-icon {
-    -fx-fill: white;
-    -fx-opacity: 0.9;
-}
-
-.active-sidebar-button .sidebar-icon {
-    -fx-opacity: 1.0;
-}
-
-.sidebar-divider {
-    -fx-background-color: rgba(255, 255, 255, 0.1);
-    -fx-max-height: 1;
-    -fx-pref-height: 1;
-}
-
-.sidebar-section-arrow {
-    -fx-fill: -fx-custom-color-sidebar-text-a40 !important;
+    -fx-padding: 10 0 0 0;
 }
 
 /* ─── ScrollPane Styling (Transparent) ──────────────────────────── */
@@ -205,39 +43,93 @@
     -fx-background-color: transparent;
     -fx-background: transparent;
     -fx-border-color: transparent;
-    -fx-padding: 0 10;
 }
 
 .sidebar-scroll-pane .viewport {
     -fx-background-color: transparent;
 }
 
-/* ─── Divisor y Footer ───────────────────────────────────────────── */
+/* ─── Cabeceras de Sección ───────────────────────────────────────── */
+.sidebar-section-header {
+    -fx-background-color: transparent;
+    -fx-padding: 12 15;
+    -fx-alignment: CENTER;
+    -fx-cursor: hand;
+    -fx-max-width: Infinity;
+    -fx-text-fill: white !important;
+    -fx-font-size: 11px;
+    -fx-font-weight: 800;
+    -fx-background-radius: 0;
+    -fx-border-width: 1 0 1 0;
+    -fx-border-color: rgba(255, 255, 255, 0.05);
+}
+
+.sidebar-section-header:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.05);
+    -fx-text-fill: white;
+}
+
+/* Estilo para la cabecera cuando la sección está activa/expandida */
+/* Nota: En el SidebarController se podría añadir una clase técnica si se quiere ser perfecto */
+.sidebar-section-header-active {
+    -fx-background-color: #1c629f;
+    /* Blue highlight from image */
+    -fx-text-fill: white !important;
+}
+
+/* ─── Botones de navegación ──────────────────────────────────────── */
+.sidebar-button {
+    -fx-background-color: transparent;
+    -fx-alignment: CENTER;
+    -fx-padding: 15 10;
+    -fx-text-fill: rgba(255, 255, 255, 0.5) !important;
+    -fx-font-size: 11px;
+    -fx-font-weight: 600;
+    -fx-cursor: hand;
+    -fx-spacing: 5;
+    -fx-max-width: Infinity;
+    -fx-graphic-text-gap: 8px;
+}
+
+.sidebar-button:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.03);
+    -fx-text-fill: white !important;
+}
+
+/* Iconos de los botones */
+.sidebar-icon {
+    -fx-fill: rgba(255, 255, 255, 0.85);
+    /* Mucho más visible que antes */
+}
+
+.sidebar-button:hover .sidebar-icon {
+    -fx-fill: white;
+}
+
+/* ─── Ítem activo (Capsule Glow) ─────────────────────────────────── */
+.active-sidebar-button {
+    -fx-background-color: linear-gradient(to right, #7b61ff, #9c27b0);
+    /* Púrpura gradiente como la imagen */
+    -fx-text-fill: white !important;
+    -fx-effect: dropshadow(three-pass-box, rgba(156, 39, 176, 0.4), 15, 0, 0, 0);
+    -fx-background-radius: 12px;
+    -fx-margin: 5 10;
+    -fx-padding: 12 10;
+}
+
+.active-sidebar-button .sidebar-icon {
+    -fx-fill: white !important;
+    -fx-opacity: 1.0;
+}
+
+/* Separadores */
 .sidebar-divider {
-    -fx-background-color: rgba(255, 255, 255, 0.1);
-    -fx-background-radius: 1px;
-    -fx-max-height: 1px;
+    -fx-background-color: rgba(255, 255, 255, 0.08);
+    -fx-max-height: 1;
+    -fx-pref-height: 1;
 }
 
-.sidebar-footer {
-    -fx-padding: 10 15 30 15;
-}
-
-.footer-label-main {
-    /* Siempre texto personalizado constante */
-    -fx-text-fill: -fx-custom-color-sidebar-text !important;
-    -fx-font-size: 13px;
-    -fx-font-weight: bold;
-}
-
-.footer-label-sub {
-    /* semitransparente constante */
-    -fx-text-fill: -fx-custom-color-sidebar-text-a60 !important;
-    -fx-font-size: 10px;
-    -fx-line-spacing: -2;
-}
-
-/* ─── ScrollBar Styling Minimal ──────────────────────────────────── */
+/* ScrollBar Styling Minimal */
 .sidebar .scroll-bar:vertical {
     -fx-background-color: transparent;
     -fx-width: 4px;
@@ -246,8 +138,4 @@
 .sidebar .scroll-bar:vertical .thumb {
     -fx-background-color: rgba(255, 255, 255, 0.1);
     -fx-background-radius: 10;
-}
-
-.sidebar .scroll-bar:vertical .track {
-    -fx-background-color: transparent;
 }

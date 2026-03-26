@@ -43,10 +43,10 @@
    =================================================== */
 .search-bar {
     -fx-background-color: -fx-neutral-50;
-    -fx-background-radius: -fx-radius-xl;
+    -fx-background-radius: 20px;
     -fx-border-color: -fx-neutral-300;
     -fx-border-width: 1.5;
-    -fx-border-radius: -fx-radius-xl;
+    -fx-border-radius: 20px;
     -fx-padding: 0 16;
     -fx-min-width: 400px;
     -fx-max-width: 440px;
@@ -86,7 +86,7 @@
 /* Atajo de teclado Ctrl+K */
 .search-shortcut {
     -fx-background-color: -fx-neutral-100;
-    -fx-background-radius: -fx-radius-sm;
+    -fx-background-radius: 4px;
     -fx-padding: 2 7;
     -fx-text-fill: -fx-neutral-500;
     -fx-font-size: 11px;
@@ -100,8 +100,8 @@
 /* Botón circular de acción (campana, etc.) */
 .top-bar-action-btn {
     -fx-background-color: -fx-neutral-100;
-    -fx-background-radius: 50%;
-    -fx-border-radius: 50%;
+    -fx-background-radius: 40px;
+    -fx-border-radius: 40px;
     -fx-min-width: 40;
     -fx-min-height: 40;
     -fx-max-width: 40;
@@ -121,8 +121,8 @@
    =================================================== */
 .user-menu-button {
     -fx-background-color: -fx-bg-surface;
-    -fx-background-radius: -fx-radius-xl;
-    -fx-border-radius: -fx-radius-xl;
+    -fx-background-radius: 20px;
+    -fx-border-radius: 20px;
     -fx-border-color: -fx-color-border-main;
     -fx-border-width: 1.5;
     -fx-padding: 5 12 5 8;
@@ -174,10 +174,10 @@
    =================================================== */
 .context-menu {
     -fx-background-color: -fx-bg-surface;
-    -fx-background-radius: -fx-radius-lg;
+    -fx-background-radius: 12px;
     -fx-border-color: -fx-color-border-main;
     -fx-border-width: 1;
-    -fx-border-radius: -fx-radius-lg;
+    -fx-border-radius: 12px;
     -fx-padding: 10 5;
     -fx-effect: dropshadow(three-pass-box, -fx-shadow-color-medium, 12, 0, 0, 6);
 }
@@ -192,7 +192,7 @@
 .menu-item {
     -fx-padding: 12 18;
     -fx-background-color: transparent;
-    -fx-background-radius: -fx-radius-md;
+    -fx-background-radius: 8px;
 }
 
 .menu-item:focused,
@@ -237,7 +237,7 @@
 /* Badge de notificación */
 .notification-badge {
     -fx-background-color: -fx-fixed-red;
-    -fx-background-radius: 50%;
+    -fx-background-radius: 40px;
     -fx-min-width: 8;
     -fx-min-height: 8;
     -fx-max-width: 8;

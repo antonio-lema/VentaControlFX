@@ -12,6 +12,26 @@ import java.util.List;
 
 public class JdbcSaleRepository implements ISaleRepository {
 
+    public JdbcSaleRepository() {
+        ensureSchema();
+    }
+
+    private void ensureSchema() {
+        try (Connection conn = DBConnection.getConnection();
+                Statement stmt = conn.createStatement()) {
+            try {
+                stmt.execute("ALTER TABLE returns ADD COLUMN cash_amount DOUBLE DEFAULT 0");
+            } catch (Exception e) {
+            }
+            try {
+                stmt.execute("ALTER TABLE returns ADD COLUMN card_amount DOUBLE DEFAULT 0");
+            } catch (Exception e) {
+            }
+        } catch (SQLException e) {
+            System.err.println("Error verifying schemas: " + e.getMessage());
+        }
+    }
+
     @Override
     public int saveSale(Sale sale) throws SQLException {
         try (Connection conn = DBConnection.getConnection()) {
@@ -235,7 +255,7 @@ public class JdbcSaleRepository implements ISaleRepository {
 
     @Override
     public int saveReturn(Return returnRecord, Connection conn) throws SQLException {
-        String sql = "INSERT INTO returns (sale_id, user_id, return_datetime, total_refunded, reason, payment_method) VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO returns (sale_id, user_id, return_datetime, total_refunded, reason, payment_method, cash_amount, card_amount, doc_type, doc_series, doc_number, doc_status, control_hash, customer_name_snapshot, issuer_name, issuer_tax_id, issuer_address) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             pstmt.setInt(1, returnRecord.getSaleId());
             if (returnRecord.getUserId() > 0) {
@@ -247,6 +267,21 @@ public class JdbcSaleRepository implements ISaleRepository {
             pstmt.setDouble(4, returnRecord.getTotalRefunded());
             pstmt.setString(5, returnRecord.getReason());
             pstmt.setString(6, returnRecord.getPaymentMethod());
+            pstmt.setDouble(7, returnRecord.getCashAmount());
+            pstmt.setDouble(8, returnRecord.getCardAmount());
+            pstmt.setString(9, returnRecord.getDocType() != null ? returnRecord.getDocType() : "RECTIFICATIVA");
+            pstmt.setString(10, returnRecord.getDocSeries() != null ? returnRecord.getDocSeries() : "R");
+            if (returnRecord.getDocNumber() != null) {
+                pstmt.setInt(11, returnRecord.getDocNumber());
+            } else {
+                pstmt.setNull(11, Types.INTEGER);
+            }
+            pstmt.setString(12, returnRecord.getDocStatus() != null ? returnRecord.getDocStatus() : "EMITIDO");
+            pstmt.setString(13, returnRecord.getControlHash());
+            pstmt.setString(14, returnRecord.getCustomerNameSnapshot());
+            pstmt.setString(15, returnRecord.getIssuerName());
+            pstmt.setString(16, returnRecord.getIssuerTaxId());
+            pstmt.setString(17, returnRecord.getIssuerAddress());
 
             pstmt.executeUpdate();
             try (ResultSet rs = pstmt.getGeneratedKeys()) {
@@ -349,8 +384,62 @@ public class JdbcSaleRepository implements ISaleRepository {
                     ret.setClosureId((Integer) rs.getObject("closure_id"));
                     try {
                         ret.setPaymentMethod(rs.getString("payment_method"));
+                        ret.setCashAmount(rs.getDouble("cash_amount"));
+                        ret.setCardAmount(rs.getDouble("card_amount"));
+                        ret.setDocType(rs.getString("doc_type"));
+                        ret.setDocSeries(rs.getString("doc_series"));
+                        ret.setDocNumber((Integer) rs.getObject("doc_number"));
+                        ret.setDocStatus(rs.getString("doc_status"));
+                        ret.setControlHash(rs.getString("control_hash"));
+                        ret.setCustomerNameSnapshot(rs.getString("customer_name_snapshot"));
+                        ret.setIssuerName(rs.getString("issuer_name"));
+                        ret.setIssuerTaxId(rs.getString("issuer_tax_id"));
+                        ret.setIssuerAddress(rs.getString("issuer_address"));
                     } catch (SQLException ignored) {
                     }
+                    returns.add(ret);
+                }
+            }
+        }
+        return returns;
+    }
+
+    @Override
+    public List<Return> getReturnsBySaleId(int saleId) throws SQLException {
+        List<Return> returns = new ArrayList<>();
+        String sql = "SELECT r.*, u.username FROM returns r " +
+                "LEFT JOIN users u ON r.user_id = u.user_id " +
+                "WHERE r.sale_id = ? " +
+                "ORDER BY r.return_datetime DESC";
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, saleId);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    Return ret = new Return();
+                    ret.setReturnId(rs.getInt("return_id"));
+                    ret.setSaleId(rs.getInt("sale_id"));
+                    ret.setUserId(rs.getInt("user_id"));
+                    ret.setUserName(rs.getString("username"));
+                    Timestamp ts = rs.getTimestamp("return_datetime");
+                    if (ts != null) {
+                        ret.setReturnDatetime(ts.toLocalDateTime());
+                    }
+                    ret.setTotalRefunded(rs.getDouble("total_refunded"));
+                    ret.setReason(rs.getString("reason"));
+                    ret.setClosureId((Integer) rs.getObject("closure_id"));
+                    ret.setPaymentMethod(rs.getString("payment_method"));
+                    ret.setCashAmount(rs.getDouble("cash_amount"));
+                    ret.setCardAmount(rs.getDouble("card_amount"));
+                    ret.setDocType(rs.getString("doc_type"));
+                    ret.setDocSeries(rs.getString("doc_series"));
+                    ret.setDocNumber((Integer) rs.getObject("doc_number"));
+                    ret.setDocStatus(rs.getString("doc_status"));
+                    ret.setControlHash(rs.getString("control_hash"));
+                    ret.setCustomerNameSnapshot(rs.getString("customer_name_snapshot"));
+                    ret.setIssuerName(rs.getString("issuer_name"));
+                    ret.setIssuerTaxId(rs.getString("issuer_tax_id"));
+                    ret.setIssuerAddress(rs.getString("issuer_address"));
                     returns.add(ret);
                 }
             }

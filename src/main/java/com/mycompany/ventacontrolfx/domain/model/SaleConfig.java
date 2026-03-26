@@ -1,5 +1,8 @@
 package com.mycompany.ventacontrolfx.domain.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Modelo que representa la configuración general de venta del TPV.
  */
@@ -54,6 +57,11 @@ public class SaleConfig {
     private boolean showBarcode = false;
     private boolean soundOnAdd = true;
     private boolean confirmDelete = true;
+
+    // ── Horarios ──────────────────────────────────────────────────────
+    private List<BusinessDay> schedule = new ArrayList<>();
+    private List<SpecialDay> specialDays = new ArrayList<>();
+    private int scheduleGracePeriodMins = 10;
 
     // ── Getters & Setters ─────────────────────────────────────────────
 
@@ -375,6 +383,78 @@ public class SaleConfig {
 
     public void setConfirmDelete(boolean v) {
         this.confirmDelete = v;
+    }
+
+    public List<BusinessDay> getSchedule() {
+        return schedule;
+    }
+
+    public void setSchedule(List<BusinessDay> schedule) {
+        this.schedule = schedule;
+    }
+
+    public List<SpecialDay> getSpecialDays() {
+        return specialDays;
+    }
+
+    public void setSpecialDays(List<SpecialDay> specialDays) {
+        this.specialDays = specialDays;
+    }
+
+    public int getScheduleGracePeriodMins() {
+        return scheduleGracePeriodMins;
+    }
+
+    public void setScheduleGracePeriodMins(int mins) {
+        this.scheduleGracePeriodMins = mins;
+    }
+
+    public static class SpecialDay {
+        private java.time.LocalDate date;
+        private List<BusinessDay.TimeRange> shifts = new ArrayList<>();
+        private boolean closed;
+        private String reason;
+
+        public SpecialDay() {
+        }
+
+        public SpecialDay(java.time.LocalDate date, boolean closed, String reason) {
+            this.date = date;
+            this.closed = closed;
+            this.reason = reason;
+        }
+
+        public java.time.LocalDate getDate() {
+            return date;
+        }
+
+        public void setDate(java.time.LocalDate date) {
+            this.date = date;
+        }
+
+        public List<BusinessDay.TimeRange> getShifts() {
+            return shifts;
+        }
+
+        public void setShifts(List<BusinessDay.TimeRange> shifts) {
+            this.shifts = shifts;
+        }
+
+        public boolean isClosed() {
+            return closed;
+        }
+
+        public void setClosed(boolean closed) {
+            this.closed = closed;
+        }
+
+        public String getReason() {
+            return reason;
+        }
+
+        public void setReason(String reason) {
+            this.reason = reason;
+        }
     }
 
     // ── Helpers ───────────────────────────────────────────────────────

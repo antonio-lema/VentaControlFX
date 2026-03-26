@@ -27,4 +27,6 @@ Thumbs.db
 *.tmp
 *.bak
 *.swp
-*~.nib
+# Generated files
+archivos_fiscales/
+data/

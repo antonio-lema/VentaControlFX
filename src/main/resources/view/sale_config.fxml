@@ -171,6 +171,29 @@
                     </VBox>
                 </HBox>
 
+                <!-- ─── FILA 3: Horarios ─── -->
+                <HBox spacing="20">
+                    <VBox styleClass="config-card" HBox.hgrow="ALWAYS" maxWidth="450">
+                        <HBox styleClass="config-card-header" alignment="CENTER_LEFT" spacing="10">
+                            <StackPane styleClass="config-card-icon-wrap config-icon-purple">
+                                <FontAwesomeIconView glyphName="CLOCK_ALT" size="16" fill="#7b1fa2"/>
+                            </StackPane>
+                            <Label text="Horarios del Establecimiento" styleClass="config-card-title"/>
+                        </HBox>
+                        <Separator styleClass="config-card-separator"/>
+                        <VBox spacing="14" styleClass="config-card-body">
+                            <Label text="Configura las horas de apertura y cierre semanales para comparativas en el monitor operativo." 
+                                   styleClass="config-field-hint" wrapText="true"/>
+                            <Button text="Gestionar Horarios Comerciales" onAction="#handleShowBusinessHours" 
+                                    styleClass="btn-secondary-saas" maxWidth="Infinity">
+                                <graphic>
+                                    <FontAwesomeIconView glyphName="CALENDAR" size="14" />
+                                </graphic>
+                            </Button>
+                        </VBox>
+                    </VBox>
+                </HBox>
+
                 <!-- ─── FILA 2: Ticket ─── -->
                 <HBox spacing="20">
 

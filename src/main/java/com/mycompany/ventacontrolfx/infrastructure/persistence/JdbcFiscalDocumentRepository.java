@@ -161,36 +161,56 @@ public class JdbcFiscalDocumentRepository implements IFiscalDocumentRepository {
     @Override
     public List<FiscalDocument> findByFilters(LocalDate from, LocalDate to,
             Status status, String docType) throws SQLException {
-        StringBuilder sb = new StringBuilder("""
-                SELECT s.sale_id, s.doc_type, s.doc_series, s.doc_number,
-                       s.doc_status, s.control_hash, s.sale_datetime,
-                       s.total, s.iva,
-                       i.company_name, i.tax_id, i.address, i.phone, i.issued_at,
-                       i.receiver_name, i.receiver_tax_id, i.receiver_address,
-                       i.base_amount, i.vat_amount, i.total_amount
-                FROM sales s
-                LEFT JOIN doc_issuer_snapshots i ON s.sale_id = i.sale_id
-                WHERE s.doc_number IS NOT NULL
-                """);
 
+        // El CTE o subconsulta unificada permite aplicar filtros de forma consistente a
+        // ambos orígenes
+        String baseSql = """
+                SELECT * FROM (
+                    SELECT s.sale_id, s.doc_type, s.doc_series, s.doc_number,
+                           s.doc_status, s.control_hash, s.sale_datetime,
+                           s.total, s.iva,
+                           i.company_name, i.tax_id, i.address, i.phone, i.issued_at,
+                           i.receiver_name, i.receiver_tax_id, i.receiver_address,
+                           i.base_amount, i.vat_amount, i.total_amount
+                    FROM sales s
+                    LEFT JOIN doc_issuer_snapshots i ON s.sale_id = i.sale_id
+                    WHERE s.doc_number IS NOT NULL
+
+                    UNION ALL
+
+                    SELECT r.sale_id, r.doc_type, r.doc_series, r.doc_number,
+                           r.doc_status, r.control_hash, r.return_datetime as sale_datetime,
+                           r.total_refunded as total, 0 as iva,
+                           r.issuer_name as company_name, r.issuer_tax_id as tax_id, r.issuer_address as address,
+                           '' as phone, r.return_datetime as issued_at,
+                           r.customer_name_snapshot as receiver_name, '' as receiver_tax_id, '' as receiver_address,
+                           r.total_refunded as base_amount, 0 as vat_amount, r.total_refunded as total_amount
+                    FROM returns r
+                    WHERE r.doc_number IS NOT NULL
+                ) AS unified_docs
+                WHERE 1=1
+                """;
+
+        StringBuilder sb = new StringBuilder(baseSql);
         List<Object> params = new ArrayList<>();
+
         if (from != null) {
-            sb.append(" AND DATE(s.sale_datetime) >= ?");
+            sb.append(" AND DATE(sale_datetime) >= ?");
             params.add(Date.valueOf(from));
         }
         if (to != null) {
-            sb.append(" AND DATE(s.sale_datetime) <= ?");
+            sb.append(" AND DATE(sale_datetime) <= ?");
             params.add(Date.valueOf(to));
         }
         if (status != null) {
-            sb.append(" AND s.doc_status = ?");
+            sb.append(" AND doc_status = ?");
             params.add(status.name());
         }
         if (docType != null) {
-            sb.append(" AND s.doc_type = ?");
+            sb.append(" AND doc_type = ?");
             params.add(docType);
         }
-        sb.append(" ORDER BY s.sale_datetime DESC");
+        sb.append(" ORDER BY sale_datetime DESC");
 
         List<FiscalDocument> result = new ArrayList<>();
         try (Connection conn = DBConnection.getConnection();
@@ -221,45 +241,23 @@ public class JdbcFiscalDocumentRepository implements IFiscalDocumentRepository {
     // ── mapRow ────────────────────────────────────────────────────────
 
     private FiscalDocument mapRow(ResultSet rs) throws SQLException {
-        FiscalDocument doc = new FiscalDocument();
-        doc.setSaleId(rs.getInt("sale_id"));
-
         String typeStr = rs.getString("doc_type");
+        FiscalDocument.Type type = FiscalDocument.Type.TICKET;
         if (typeStr != null) {
             try {
-                doc.setDocType(Type.valueOf(typeStr));
-            } catch (IllegalArgumentException ignored) {
+                type = FiscalDocument.Type.valueOf(typeStr);
+            } catch (Exception ignored) {
             }
         }
-
-        doc.setDocSeries(rs.getString("doc_series"));
-        doc.setDocNumber(rs.getInt("doc_number"));
 
         String statusStr = rs.getString("doc_status");
+        FiscalDocument.Status status = FiscalDocument.Status.EMITIDO;
         if (statusStr != null) {
             try {
-                doc.setDocStatus(Status.valueOf(statusStr));
-            } catch (IllegalArgumentException ignored) {
+                status = FiscalDocument.Status.valueOf(statusStr);
+            } catch (Exception ignored) {
             }
         }
-
-        doc.setControlHash(rs.getString("control_hash"));
-
-        // Snapshot de emisor (de doc_issuer_snapshots, columnas nullable)
-        doc.setIssuerName(rs.getString("company_name"));
-        doc.setIssuerTaxId(rs.getString("tax_id"));
-        doc.setIssuerAddress(rs.getString("address"));
-        doc.setIssuerPhone(rs.getString("phone"));
-        doc.setReceiverName(rs.getString("receiver_name"));
-        doc.setReceiverTaxId(rs.getString("receiver_tax_id"));
-        doc.setReceiverAddress(rs.getString("receiver_address"));
-
-        // issued_at del snapshot, con fallback a sale_datetime
-        Timestamp issuedAt = rs.getTimestamp("issued_at");
-        if (issuedAt == null)
-            issuedAt = rs.getTimestamp("sale_datetime");
-        if (issuedAt != null)
-            doc.setIssuedAt(issuedAt.toLocalDateTime());
 
         // Importes — preferimos los del snapshot (más precisos)
         double baseAmt = rs.getDouble("base_amount");
@@ -272,10 +270,29 @@ public class JdbcFiscalDocumentRepository implements IFiscalDocumentRepository {
             vatAmt = rs.getDouble("iva");
             baseAmt = totAmt - vatAmt;
         }
-        doc.setBaseAmount(baseAmt);
-        doc.setVatAmount(vatAmt);
-        doc.setTotalAmount(totAmt);
 
-        return doc;
+        Timestamp issuedAtTs = rs.getTimestamp("issued_at");
+        if (issuedAtTs == null)
+            issuedAtTs = rs.getTimestamp("sale_datetime");
+
+        return FiscalDocument.builder()
+                .saleId(rs.getInt("sale_id"))
+                .type(type)
+                .series(rs.getString("doc_series"))
+                .number(rs.getInt("doc_number"))
+                .status(status)
+                .issuer(
+                        rs.getString("company_name"),
+                        rs.getString("tax_id"),
+                        rs.getString("address"),
+                        rs.getString("phone"))
+                .receiver(
+                        rs.getString("receiver_name"),
+                        rs.getString("receiver_tax_id"),
+                        rs.getString("receiver_address"))
+                .amounts(baseAmt, vatAmt, totAmt)
+                .issuedAt(issuedAtTs != null ? issuedAtTs.toLocalDateTime() : LocalDateTime.now())
+                .controlHash(rs.getString("control_hash"))
+                .build();
     }
 }

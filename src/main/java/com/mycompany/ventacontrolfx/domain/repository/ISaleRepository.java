@@ -53,6 +53,8 @@ public interface ISaleRepository {
 
         List<Return> getReturnsByRange(LocalDate start, LocalDate end) throws SQLException;
 
+        List<Return> getReturnsBySaleId(int saleId) throws SQLException;
+
         List<ReturnDetail> getReturnDetailsByReturnId(int returnId) throws SQLException;
 
         int count() throws SQLException;

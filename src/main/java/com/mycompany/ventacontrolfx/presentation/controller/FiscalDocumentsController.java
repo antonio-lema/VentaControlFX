@@ -32,7 +32,7 @@ import com.mycompany.ventacontrolfx.util.PaginationHelper;
 public class FiscalDocumentsController implements Injectable {
 
     @FXML
-    private Label lblTotalTickets, lblTotalInvoices, lblTotalCancelled, lblTotalAmount;
+    private Label lblTotalTickets, lblTotalInvoices, lblTotalReturns, lblTotalCancelled, lblTotalAmount;
     @FXML
     private DatePicker dpFrom, dpTo;
     @FXML
@@ -93,6 +93,8 @@ public class FiscalDocumentsController implements Injectable {
                         getStyleClass().add("text-primary");
                     else if ("FACTURA".equals(item))
                         getStyleClass().add("text-success");
+                    else if ("RECTIFICATIVA".equals(item))
+                        getStyleClass().add("text-danger");
                 }
             }
         });
@@ -150,6 +152,8 @@ public class FiscalDocumentsController implements Injectable {
             String typeFolder;
             if (doc.getDocType() == Type.FACTURA)
                 typeFolder = "Facturas";
+            else if (doc.getDocType() == Type.RECTIFICATIVA)
+                typeFolder = "Devoluciones";
             else
                 typeFolder = "Tickets";
 
@@ -175,7 +179,7 @@ public class FiscalDocumentsController implements Injectable {
     }
 
     private void setupFilters() {
-        cbType.setItems(FXCollections.observableArrayList("Todos los tipos", "TICKET", "FACTURA"));
+        cbType.setItems(FXCollections.observableArrayList("Todos los tipos", "TICKET", "FACTURA", "RECTIFICATIVA"));
         cbType.getSelectionModel().selectFirst();
 
         cbStatus.setItems(FXCollections.observableArrayList("Todos los estados", "EMITIDO", "ANULADO"));
@@ -200,14 +204,21 @@ public class FiscalDocumentsController implements Injectable {
     private void updateKPIs(List<FiscalDocument> docs) {
         long tickets = docs.stream().filter(d -> d.getDocType() == Type.TICKET).count();
         long invoices = docs.stream().filter(d -> d.getDocType() == Type.FACTURA).count();
+        long returns = docs.stream().filter(d -> d.getDocType() == Type.RECTIFICATIVA).count();
         long cancelled = docs.stream().filter(d -> d.getDocStatus() == Status.ANULADO).count();
+
+        // El total facturado neto suele ser Ventas - Devoluciones, pero aquí mostramos
+        // el bruto emitido según requisito.
+        // Si el usuario prefiere restar devoluciones, se puede ajustar aquí.
         double total = docs.stream()
                 .filter(d -> d.getDocStatus() == Status.EMITIDO)
-                .mapToDouble(FiscalDocument::getTotalAmount)
+                .mapToDouble(d -> d.getDocType() == Type.RECTIFICATIVA ? -d.getTotalAmount() : d.getTotalAmount())
                 .sum();
 
         lblTotalTickets.setText(String.valueOf(tickets));
         lblTotalInvoices.setText(String.valueOf(invoices));
+        if (lblTotalReturns != null)
+            lblTotalReturns.setText(String.valueOf(returns));
         lblTotalCancelled.setText(String.valueOf(cancelled));
         lblTotalAmount.setText(String.format("%.2f €", total));
     }

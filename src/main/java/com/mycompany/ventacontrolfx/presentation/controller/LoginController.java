@@ -78,6 +78,14 @@ public class LoginController implements Injectable {
             // Si llegamos aquí, el login fue exitoso
             container.getUserSession().setCurrentUser(user);
 
+            // Iniciar turno automáticamente al entrar
+            try {
+                container.getWorkSessionUseCase().startShift(user.getUserId());
+            } catch (Exception e) {
+                // Si ya tenía un turno abierto (ej: cierre inesperado), no hacemos nada
+                System.out.println("El usuario ya tiene un turno activo o hubo un error al iniciar: " + e.getMessage());
+            }
+
             lblMessage.setText("Login correcto 👍");
             SceneNavigator.loadScene(
                     (Stage) btnLogin.getScene().getWindow(),

@@ -22,13 +22,14 @@ public class SidebarController implements Injectable {
     @FXML
     private Button btnSell, btnProducts, btnCategories, btnHistory, btnReturns, btnClosures, btnBilling,
             btnClients, btnConfig, btnLock, btnThemeSettings, btnReports, btnClientReport, btnPriceLists, btnVat,
-            btnUsers, btnRoles, btnPromotions, btnWorkSessions;
+            btnUsers, btnRoles, btnPromotions, btnWorkSessions, btnOperativeControl, btnStaffCalendar,
+            btnPunctualityAudit;
 
     @FXML
-    private VBox contentVentas, contentCatalogo, contentClientes, contentGestion, contentSistema;
+    private VBox contentVentas, contentCatalogo, contentPersonal, contentClientes, contentGestion, contentSistema;
 
     @FXML
-    private Button sectionVentas, sectionCatalogo, sectionClientes, sectionGestion, sectionSistema;
+    private Button sectionVentas, sectionCatalogo, sectionPersonal, sectionClientes, sectionGestion, sectionSistema;
 
     @FXML
     private Label lblAppName;
@@ -39,6 +40,7 @@ public class SidebarController implements Injectable {
     private NavigationService navigationService;
     private AuthorizationService authService;
     private ServiceContainer container;
+    private VBox activeSection;
 
     @Override
     public void inject(ServiceContainer container) {
@@ -79,11 +81,34 @@ public class SidebarController implements Injectable {
     }
 
     private void collapseAll() {
-        setVisible(contentVentas, false);
-        setVisible(contentCatalogo, false);
-        setVisible(contentClientes, false);
-        setVisible(contentGestion, false);
-        setVisible(contentSistema, false);
+        collapseAll(false);
+    }
+
+    private void collapseAll(boolean force) {
+        if (force || activeSection != contentVentas) {
+            setVisible(contentVentas, false);
+            sectionVentas.getStyleClass().remove("sidebar-section-header-active");
+        }
+        if (force || activeSection != contentCatalogo) {
+            setVisible(contentCatalogo, false);
+            sectionCatalogo.getStyleClass().remove("sidebar-section-header-active");
+        }
+        if (force || activeSection != contentPersonal) {
+            setVisible(contentPersonal, false);
+            sectionPersonal.getStyleClass().remove("sidebar-section-header-active");
+        }
+        if (force || activeSection != contentClientes) {
+            setVisible(contentClientes, false);
+            sectionClientes.getStyleClass().remove("sidebar-section-header-active");
+        }
+        if (force || activeSection != contentGestion) {
+            setVisible(contentGestion, false);
+            sectionGestion.getStyleClass().remove("sidebar-section-header-active");
+        }
+        if (force || activeSection != contentSistema) {
+            setVisible(contentSistema, false);
+            sectionSistema.getStyleClass().remove("sidebar-section-header-active");
+        }
     }
 
     private void toggleSection(VBox container) {
@@ -91,12 +116,34 @@ public class SidebarController implements Injectable {
             return;
         boolean wasVisible = container.isVisible();
 
-        collapseAll(); // Colapsar todo primero
+        // Acordeón estricto: forzar cierre de todo lo demás
+        collapseAll(true);
 
         if (!wasVisible) {
             container.setVisible(true);
             container.setManaged(true);
+
+            // Aplicar estilo activo a la cabecera correspondiente
+            Button header = getHeaderForContent(container);
+            if (header != null)
+                header.getStyleClass().add("sidebar-section-header-active");
         }
+    }
+
+    private Button getHeaderForContent(VBox container) {
+        if (container == contentVentas)
+            return sectionVentas;
+        if (container == contentCatalogo)
+            return sectionCatalogo;
+        if (container == contentPersonal)
+            return sectionPersonal;
+        if (container == contentClientes)
+            return sectionClientes;
+        if (container == contentGestion)
+            return sectionGestion;
+        if (container == contentSistema)
+            return sectionSistema;
+        return null;
     }
 
     @FXML
@@ -107,6 +154,11 @@ public class SidebarController implements Injectable {
     @FXML
     private void toggleCatalogo() {
         toggleSection(contentCatalogo);
+    }
+
+    @FXML
+    private void togglePersonal() {
+        toggleSection(contentPersonal);
     }
 
     @FXML
@@ -160,7 +212,8 @@ public class SidebarController implements Injectable {
                 btnSell, btnHistory, btnReturns, btnProducts,
                 btnClients, btnReports, btnClosures, btnBilling,
                 btnConfig, btnThemeSettings, btnLock, btnPriceLists, btnVat,
-                btnUsers, btnRoles, btnPromotions, btnWorkSessions
+                btnUsers, btnRoles, btnPromotions, btnWorkSessions, btnStaffCalendar, btnPunctualityAudit,
+                btnOperativeControl
         };
         for (Button b : btns) {
             if (b != null)
@@ -199,11 +252,17 @@ public class SidebarController implements Injectable {
         setVisible(btnRoles, authService.hasPermission("rol.editar"));
         setVisible(btnPromotions, authService.hasPermission("admin.precios") || authService.hasPermission("PRODUCTOS"));
         setVisible(btnWorkSessions, true); // Accessible to all logged in users for now
+        setVisible(btnStaffCalendar, true);
+        setVisible(btnOperativeControl,
+                authService.hasPermission("CIERRES") || authService.hasPermission("admin.facturacion"));
+        setVisible(btnPunctualityAudit,
+                authService.hasPermission("CIERRES") || authService.hasPermission("rol.editar"));
         setVisible(btnLock, true);
 
         // Ocultar secciones enteras si no hay hijos permitidos
         updateSectionVisibility(sectionVentas, contentVentas);
         updateSectionVisibility(sectionCatalogo, contentCatalogo);
+        updateSectionVisibility(sectionPersonal, contentPersonal);
         updateSectionVisibility(sectionClientes, contentClientes);
         updateSectionVisibility(sectionGestion, contentGestion);
         updateSectionVisibility(sectionSistema, contentSistema);
@@ -237,7 +296,8 @@ public class SidebarController implements Injectable {
                 btnSell, btnHistory, btnReturns, btnProducts, btnCategories,
                 btnClients, btnReports, btnClientReport, btnClosures, btnBilling,
                 btnConfig, btnThemeSettings, btnLock, btnPriceLists, btnVat,
-                btnUsers, btnRoles, btnPromotions, btnWorkSessions
+                btnUsers, btnRoles, btnPromotions, btnWorkSessions, btnStaffCalendar,
+                btnOperativeControl, btnPunctualityAudit
         };
         for (Button b : btns) {
             if (b != null)
@@ -245,19 +305,28 @@ public class SidebarController implements Injectable {
         }
         if (activeBtn != null) {
             activeBtn.getStyleClass().add("active-sidebar-button");
-            expandParentSection(activeBtn);
+            this.activeSection = expandParentSection(activeBtn);
         }
     }
 
-    private void expandParentSection(Button btn) {
+    private VBox expandParentSection(Button btn) {
         if (btn == null || btn.getParent() == null)
-            return;
+            return null;
         if (btn.getParent() instanceof VBox) {
             VBox parent = (VBox) btn.getParent();
             if (parent.getStyleClass().contains("sidebar-section-content")) {
                 setVisible(parent, true);
+
+                // Asegurar que la cabecera se vea activa
+                Button header = getHeaderForContent(parent);
+                if (header != null && !header.getStyleClass().contains("sidebar-section-header-active")) {
+                    header.getStyleClass().add("sidebar-section-header-active");
+                }
+
+                return parent;
             }
         }
+        return null;
     }
 
     // ─── PRINCIPAL ──────────────────────────────────────────
@@ -356,6 +425,24 @@ public class SidebarController implements Injectable {
     private void handleShowWorkSessions() {
         setActiveButton(btnWorkSessions);
         navigationService.navigateTo("/view/shift_management.fxml");
+    }
+
+    @FXML
+    private void handleShowOperativeDashboard() {
+        setActiveButton(btnOperativeControl);
+        navigationService.navigateTo("/view/operative_dashboard.fxml");
+    }
+
+    @FXML
+    private void handleShowPunctualityAudit() {
+        setActiveButton(btnPunctualityAudit);
+        navigationService.navigateTo("/view/punctuality_audit.fxml");
+    }
+
+    @FXML
+    private void handleShowStaffCalendar() {
+        setActiveButton(btnStaffCalendar);
+        ModalService.showFullScreenModal("/view/staff_calendar.fxml", "Planificador de Personal", container, null);
     }
 
     // ─── ADMINISTRACIÓN ──────────────────────────────────────

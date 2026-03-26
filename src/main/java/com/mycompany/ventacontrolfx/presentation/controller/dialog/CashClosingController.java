@@ -16,13 +16,9 @@ import java.time.LocalDate;
 public class CashClosingController {
 
     @FXML
-    private Label lblExpected;
+    private Label lblInitFund, lblSales, lblCashIn, lblReturns, lblCashOut, lblExpected, lblDifference, lblDiffReason;
     @FXML
     private TextField txtActualAmount;
-    @FXML
-    private Label lblDifference;
-    @FXML
-    private Label lblDiffReason;
     @FXML
     private TextArea txtNotes;
 
@@ -37,9 +33,27 @@ public class CashClosingController {
 
         try {
             this.expectedAmount = closureUseCase.getCurrentCashInDrawer();
-            if (userSession.hasPermission("caja.ver_totales") || userSession.hasPermission("USUARIOS")) {
+            double initialFund = closureUseCase.getActiveFundAmount();
+            java.util.Map<String, Double> totals = closureUseCase.getTodayTotals();
+
+            boolean canSeeTotals = userSession.hasPermission("caja.ver_totales")
+                    || userSession.hasPermission("USUARIOS");
+
+            if (canSeeTotals) {
+                lblInitFund.setText(String.format("%.2f €", initialFund));
+                // Ventas brutas (sin restar devoluciones aún en la etiqueta de ventas)
+                double returnsCash = totals.getOrDefault("returns_cash", 0.0);
+                lblSales.setText(String.format("%.2f €", totals.getOrDefault("cash", 0.0) + returnsCash));
+                lblCashIn.setText(String.format("%.2f €", totals.getOrDefault("manual_in", 0.0)));
+                lblReturns.setText(String.format("%.2f €", returnsCash));
+                lblCashOut.setText(String.format("%.2f €", totals.getOrDefault("manual_out", 0.0)));
                 lblExpected.setText(String.format("%.2f €", expectedAmount));
             } else {
+                lblInitFund.setText("**** €");
+                lblSales.setText("**** €");
+                lblCashIn.setText("**** €");
+                lblReturns.setText("**** €");
+                lblCashOut.setText("**** €");
                 lblExpected.setText("**** €");
             }
             updateDifference();

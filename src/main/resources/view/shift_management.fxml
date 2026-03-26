@@ -85,14 +85,14 @@
                                                 <ColumnConstraints hgrow="ALWAYS"/>
                                             </columnConstraints>
                                             <children>
-                                                <Label text="Inicio Jornada:" styleClass="label-muted" GridPane.rowIndex="0" GridPane.columnIndex(0)/>
-                                                <Label fx:id="lblShiftStart" text="--" styleClass="info-value" GridPane.rowIndex="0" GridPane.columnIndex(1)/>
+                                                <Label text="Inicio Jornada:" styleClass="label-muted" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                                                <Label fx:id="lblShiftStart" text="--" styleClass="info-value" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
                                                 
-                                                <Label text="Total Trabajado:" styleClass="label-muted" GridPane.rowIndex="1" GridPane.columnIndex(0)/>
-                                                <Label fx:id="lblTotalWorked" text="0h 0m" styleClass="info-value" GridPane.rowIndex="1" GridPane.columnIndex(1)/>
+                                                <Label text="Total Trabajado:" styleClass="label-muted" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                                                <Label fx:id="lblTotalWorked" text="0h 0m" styleClass="info-value" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
                                                 
-                                                <Label text="Total Descansos:" styleClass="label-muted" GridPane.rowIndex="2" GridPane.columnIndex(0)/>
-                                                <Label fx:id="lblTotalBreak" text="0h 0m" styleClass="info-value" GridPane.rowIndex="2" GridPane.columnIndex(1)/>
+                                                <Label text="Total Descansos:" styleClass="label-muted" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                                                <Label fx:id="lblTotalBreak" text="0h 0m" styleClass="info-value" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
                                             </children>
                                         </GridPane>
                                     </children>

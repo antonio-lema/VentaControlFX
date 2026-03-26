@@ -18,6 +18,7 @@ public class WorkSession {
     private LocalDateTime endTime;
     private SessionStatus status;
     private String notes;
+    private String userName; // Convenient field for UI
 
     public WorkSession() {
     }
@@ -84,5 +85,13 @@ public class WorkSession {
 
     public void setNotes(String notes) {
         this.notes = notes;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 }

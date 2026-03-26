@@ -80,6 +80,47 @@ public class JdbcWorkSessionRepository implements IWorkSessionRepository {
         return history;
     }
 
+    @Override
+    public List<WorkSession> getAllActiveSessions() {
+        List<WorkSession> sessions = new ArrayList<>();
+        // Unimos con usuarios para tener el nombre en el panel de control
+        String sql = "SELECT s.*, u.full_name as user_name FROM work_sessions s " +
+                "JOIN users u ON s.user_id = u.user_id " +
+                "WHERE s.status = 'ACTIVE'";
+        try (Connection connection = DBConnection.getConnection();
+                PreparedStatement pstmt = connection.prepareStatement(sql);
+                ResultSet rs = pstmt.executeQuery()) {
+            while (rs.next()) {
+                WorkSession session = mapResultSetToWorkSession(rs);
+                // Podemos usar el campo notes temporalmente o añadir un campo transient en el
+                // modelo
+                // Pero por ahora lo dejamos así y lo manejaremos en el ViewModel
+                sessions.add(session);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Error getting active sessions", e);
+        }
+        return sessions;
+    }
+
+    @Override
+    public List<WorkSession> getHistoryByDate(java.time.LocalDate date) {
+        List<WorkSession> history = new ArrayList<>();
+        String sql = "SELECT * FROM work_sessions WHERE DATE(start_time) = ? ORDER BY start_time DESC";
+        try (Connection connection = DBConnection.getConnection();
+                PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setDate(1, java.sql.Date.valueOf(date));
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    history.add(mapResultSetToWorkSession(rs));
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Error getting work session history by date", e);
+        }
+        return history;
+    }
+
     private WorkSession mapResultSetToWorkSession(ResultSet rs) throws SQLException {
         WorkSession session = new WorkSession();
         session.setSessionId(rs.getInt("session_id"));
@@ -91,6 +132,16 @@ public class JdbcWorkSessionRepository implements IWorkSessionRepository {
         }
         session.setStatus(WorkSession.SessionStatus.valueOf(rs.getString("status")));
         session.setNotes(rs.getString("notes"));
+
+        // Cargar nombre de usuario si se incluyó en el JOIN (usado en panel operativo)
+        try {
+            String uname = rs.getString("user_name");
+            if (uname != null)
+                session.setUserName(uname);
+        } catch (SQLException e) {
+            // Ignorar si la columna no existe en este ResultSet específico
+        }
+
         return session;
     }
 }

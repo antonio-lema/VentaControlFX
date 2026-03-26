@@ -38,7 +38,7 @@ public class UserUseCase {
 
     public boolean validateLogin(String username, String password) throws SQLException {
         User user = userRepository.findByUsername(username);
-        return user != null && BCrypt.checkpw(password, user.getPassword());
+        return user != null && BCrypt.checkpw(password, user.getPasswordHash());
     }
 
     public int getUserCount() throws SQLException {
@@ -47,7 +47,7 @@ public class UserUseCase {
 
     public User login(String username, String password) throws SQLException {
         User user = userRepository.findByUsername(username);
-        if (user != null && BCrypt.checkpw(password, user.getPassword())) {
+        if (user != null && BCrypt.checkpw(password, user.getPasswordHash())) {
             return user;
         }
         return null;
@@ -74,7 +74,7 @@ public class UserUseCase {
     public void registerUser(User user) throws SQLException {
         authService.checkPermission("USUARIOS");
         // Encriptar password antes de guardar
-        user.setPassword(BCrypt.hashpw(user.getPassword(), BCrypt.gensalt()));
+        user.setPasswordHash(BCrypt.hashpw(user.getPasswordHash(), BCrypt.gensalt()));
         userRepository.create(user);
     }
 

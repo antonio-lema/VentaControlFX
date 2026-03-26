@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
+<?import javafx.geometry.Insets?>
+<?import java.net.URL?>
+
+<VBox spacing="25" alignment="CENTER" prefWidth="480" 
+      style="-fx-background-color: white; -fx-background-radius: 20; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 30, 0, 0, 10); -fx-border-color: #eeeeee; -fx-border-width: 1; -fx-border-radius: 20;"
+      xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.mycompany.ventacontrolfx.presentation.controller.ClosureReminderController">
+    <padding>
+        <Insets top="40" right="40" bottom="40" left="40"/>
+    </padding>
+    
+    <children>
+        <StackPane 
+            style="-fx-background-color: rgba(245, 158, 11, 0.1); -fx-background-radius: 50%; -fx-min-width: 90; -fx-min-height: 90; -fx-max-width: 90; -fx-max-height: 90;">
+            <children>
+                <FontAwesomeIconView glyphName="CALCULATOR" size="45" fill="#f59e0b"/>
+            </children>
+        </StackPane>
+        
+        <VBox spacing="10" alignment="CENTER">
+            <children>
+                <Label text="¡TURNO FINALIZADO!" 
+                       style="-fx-font-size: 22; -fx-font-weight: 900; -fx-text-fill: #1e293b;"/>
+                <Label text="Tu horario de trabajo ha concluido. ¿Deseas realizar el cierre de caja para finalizar oficialmente tu jornada?" 
+                       wrapText="true" textAlignment="CENTER" 
+                       style="-fx-font-size: 15; -fx-text-fill: #64748b; -fx-line-spacing: 5;"/>
+            </children>
+        </VBox>
+        
+        <VBox spacing="15" alignment="CENTER" maxWidth="Infinity">
+            <children>
+                <Button onAction="#handleCloseNow" maxWidth="Infinity" prefHeight="55"
+                        style="-fx-background-color: #3b82f6; -fx-background-radius: 12; -fx-text-fill: white; -fx-font-size: 16; -fx-font-weight: bold; -fx-cursor: hand; -fx-effect: dropshadow(three-pass-box, rgba(59, 130, 246, 0.3), 10, 0, 0, 5);">
+                    <graphic>
+                        <FontAwesomeIconView glyphName="CHECK_CIRCLE" fill="white" size="20">
+                            <VBox.margin><Insets right="10"/></VBox.margin>
+                        </FontAwesomeIconView>
+                    </graphic>
+                    <text>CERRAR CAJA AHORA</text>
+                </Button>
+                
+                <HBox spacing="12">
+                    <children>
+                        <SplitMenuButton text="POSPONER AVISO" onAction="#handleSnooze15" maxWidth="Infinity" HBox.hgrow="ALWAYS" prefHeight="50"
+                                    style="-fx-background-color: #f8fafc; -fx-background-radius: 12; -fx-border-color: #e2e8f0; -fx-border-radius: 12; -fx-text-fill: #475569; -fx-font-weight: bold; -fx-cursor: hand;">
+                            <items>
+                                <MenuItem text="Posponer 5 minutos" onAction="#handleSnooze5"/>
+                                <MenuItem text="Posponer 15 minutos" onAction="#handleSnooze15"/>
+                                <MenuItem text="Posponer 1 hora" onAction="#handleSnooze60"/>
+                            </items>
+                            <graphic><FontAwesomeIconView glyphName="CLOCK_ALT" size="18" fill="#64748b"/></graphic>
+                        </SplitMenuButton>
+                        
+                        <Button onAction="#handleCancel" prefHeight="50" minWidth="60"
+                                style="-fx-background-color: #f1f5f9; -fx-background-radius: 12; -fx-cursor: hand;">
+                             <graphic><FontAwesomeIconView glyphName="TIMES" size="18" fill="#ef4444"/></graphic>
+                        </Button>
+                    </children>
+                </HBox>
+            </children>
+        </VBox>
+    </children>
+</VBox>

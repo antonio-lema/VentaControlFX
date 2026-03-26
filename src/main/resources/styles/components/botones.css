@@ -18,7 +18,7 @@
     -fx-font-weight: bold;
     -fx-font-size: 14px;
     -fx-padding: 12 32;
-    -fx-background-radius: -fx-radius-lg;
+    -fx-background-radius: 12px;
     -fx-effect: dropshadow(three-pass-box, -fx-shadow-color-primary, 15, 0, 0, 5);
 }
 
@@ -40,7 +40,7 @@
     -fx-border-color: -fx-neutral-200;
     -fx-border-width: 1;
     -fx-border-radius: -fx-radius-lg;
-    -fx-background-radius: -fx-radius-lg;
+    -fx-background-radius: 12px;
 }
 
 .btn-secondary:hover {
@@ -59,7 +59,7 @@
     -fx-text-fill: #ffffff !important;
     -fx-font-weight: bold;
     -fx-padding: 14 30;
-    -fx-background-radius: -fx-radius-lg;
+    -fx-background-radius: 12px;
     -fx-effect: dropshadow(three-pass-box, -fx-custom-color-success-bg, 15, 0, 0, 5);
 }
 
@@ -90,7 +90,7 @@
 .btn-trash-small {
     -fx-background-color: -fx-custom-color-danger-bg;
     -fx-text-fill: -fx-custom-color-danger;
-    -fx-background-radius: -fx-radius-sm;
+    -fx-background-radius: 4px;
     -fx-padding: 6;
     -fx-cursor: hand;
 }
@@ -142,7 +142,7 @@
     -fx-font-weight: bold;
     -fx-font-size: 14px;
     -fx-padding: 12 24;
-    -fx-background-radius: -fx-radius-md;
+    -fx-background-radius: 8px;
     -fx-effect: dropshadow(three-pass-box, -fx-custom-color-warning-bg, 15, 0, 0, 5);
     -fx-cursor: hand;
 }
@@ -162,7 +162,7 @@
     -fx-font-size: 15px;
     -fx-font-weight: bold;
     -fx-padding: 16 28;
-    -fx-background-radius: -fx-radius-lg;
+    -fx-background-radius: 12px;
     -fx-effect: dropshadow(three-pass-box, -fx-shadow-color-primary, 20, 0, 0, 6);
     -fx-cursor: hand;
 }
@@ -181,7 +181,7 @@
     -fx-font-size: 13px;
     -fx-font-weight: bold;
     -fx-padding: 10 20;
-    -fx-background-radius: -fx-radius-md;
+    -fx-background-radius: 8px;
     -fx-effect: dropshadow(three-pass-box, -fx-custom-color-success-bg, 10, 0, 0, 3);
 }
 
@@ -191,7 +191,7 @@
     -fx-font-size: 13px;
     -fx-font-weight: bold;
     -fx-padding: 10 20;
-    -fx-background-radius: -fx-radius-md;
+    -fx-background-radius: 8px;
     -fx-effect: dropshadow(three-pass-box, -fx-custom-color-warning-bg, 10, 0, 0, 3);
 }
 

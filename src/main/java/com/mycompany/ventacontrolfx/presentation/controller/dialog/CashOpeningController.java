@@ -48,6 +48,17 @@ public class CashOpeningController {
     @FXML
     private void handleOpen() {
         try {
+            // New check: Are there ANY pending transactions from before opening this fund?
+            // If they didn't close yesterday, we should not allow starting a 'new' session
+            // without clearing the old one.
+            if (closureUseCase.getTodayTransactionCount() > 0) {
+                AlertUtil.showWarning("Cierre Pendiente",
+                        "Existen ventas o movimientos sin cerrar de una sesión anterior.\n" +
+                                "Debe realizar el Arqueo y Cierre antes de abrir un nuevo turno.");
+                // Optionally redirect or just inform
+                return;
+            }
+
             String amountText = txtInitialAmount.getText().replace(",", ".").trim();
             if (amountText.isEmpty()) {
                 AlertUtil.showWarning("Campo Obligatorio", "Debe introducir un importe inicial.");

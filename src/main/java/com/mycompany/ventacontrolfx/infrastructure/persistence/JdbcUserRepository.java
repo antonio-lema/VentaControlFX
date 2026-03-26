@@ -65,7 +65,7 @@ public class JdbcUserRepository implements IUserRepository {
                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setString(1, user.getUsername());
-            pstmt.setString(2, user.getPassword());
+            pstmt.setString(2, user.getPasswordHash());
             pstmt.setString(3, user.getFullName());
             pstmt.setString(4, user.getRole());
             pstmt.setString(5, user.getEmail());
@@ -148,7 +148,7 @@ public class JdbcUserRepository implements IUserRepository {
         User user = new User();
         user.setUserId(rs.getInt("user_id"));
         user.setUsername(rs.getString("username"));
-        user.setPassword(rs.getString("password_hash"));
+        user.setPasswordHash(rs.getString("password_hash"));
         user.setFullName(rs.getString("full_name"));
         user.setRole(rs.getString("role"));
         user.setEmail(rs.getString("email"));

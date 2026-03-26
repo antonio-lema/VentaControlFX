@@ -161,16 +161,20 @@ public class ThemeManager {
                     .append(primary).append("26);\n");
             sb.append("  -fx-grad-sidebar-active: linear-gradient(to bottom right, ").append(primaryLight)
                     .append("E6, ").append(primaryDark).append(");\n");
-
-            // Variantes de sombras fijas
-            sb.append("  -fx-shadow-success: dropshadow(three-pass-box, rgba(16, 185, 129, 0.4), 15, 0, 0, 5);\n");
-            sb.append("  -fx-shadow-danger: dropshadow(three-pass-box, rgba(239, 68, 68, 0.4), 15, 0, 0, 5);\n");
-            sb.append("  -fx-shadow-warning: dropshadow(three-pass-box, rgba(245, 158, 11, 0.4), 15, 0, 0, 5);\n");
-
-            sb.append("  -fx-grad-success: linear-gradient(to bottom, #10b981, #059669);\n");
-            sb.append("  -fx-grad-danger: linear-gradient(to bottom, #ef4444, #dc2626);\n");
-            sb.append("  -fx-grad-warning: linear-gradient(to bottom, #f59e0b, #d97706);\n");
+        } else {
+            // Fallback for active sidebar when primary is null
+            sb.append(
+                    "  -fx-grad-sidebar-active: linear-gradient(to bottom right, -fx-custom-color-primary-light, -fx-custom-color-primary-dark);\n");
         }
+
+        // Variantes de sombras fijas
+        sb.append("  -fx-shadow-success: dropshadow(three-pass-box, rgba(16, 185, 129, 0.4), 15, 0, 0, 5);\n");
+        sb.append("  -fx-shadow-danger: dropshadow(three-pass-box, rgba(239, 68, 68, 0.4), 15, 0, 0, 5);\n");
+        sb.append("  -fx-shadow-warning: dropshadow(three-pass-box, rgba(245, 158, 11, 0.4), 15, 0, 0, 5);\n");
+
+        sb.append("  -fx-grad-success: linear-gradient(to bottom, #10b981, #059669);\n");
+        sb.append("  -fx-grad-danger: linear-gradient(to bottom, #ef4444, #dc2626);\n");
+        sb.append("  -fx-grad-warning: linear-gradient(to bottom, #f59e0b, #d97706);\n");
 
         String secondary = settings.get("ui.secondary_color");
         if (secondary != null && !secondary.isEmpty()) {

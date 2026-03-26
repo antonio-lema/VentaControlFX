@@ -166,18 +166,17 @@ public class ReturnUseCase {
             return;
         try {
             // Conversión para compatibilidad con IFiscalPdfService.PrintData
-            FiscalDocument doc = new FiscalDocument();
-            doc.setDocType(FiscalDocument.Type.RECTIFICATIVA);
-            doc.setDocSeries(r.getDocSeries());
-            doc.setDocNumber(r.getDocNumber());
-            doc.setIssuedAt(r.getReturnDatetime());
-            doc.setIssuerName(r.getIssuerName());
-            doc.setIssuerTaxId(r.getIssuerTaxId());
-            doc.setIssuerAddress(r.getIssuerAddress());
-            doc.setReceiverName(r.getCustomerNameSnapshot());
-            doc.setTotalAmount(r.getTotalRefunded());
-            doc.setBaseAmount(r.getTotalRefunded());
-            doc.setVatAmount(0);
+            FiscalDocument doc = FiscalDocument.builder()
+                    .saleId(r.getSaleId())
+                    .type(FiscalDocument.Type.RECTIFICATIVA)
+                    .series(r.getDocSeries())
+                    .number(r.getDocNumber())
+                    .issuedAt(r.getReturnDatetime())
+                    .issuer(r.getIssuerName(), r.getIssuerTaxId(), r.getIssuerAddress(), null)
+                    .receiver(r.getCustomerNameSnapshot(), null, null)
+                    .amounts(r.getTotalRefunded(), 0, r.getTotalRefunded())
+                    .status(FiscalDocument.Status.EMITIDO)
+                    .build();
 
             List<SaleDetail> lines = new ArrayList<>();
             for (ReturnDetail rd : details) {

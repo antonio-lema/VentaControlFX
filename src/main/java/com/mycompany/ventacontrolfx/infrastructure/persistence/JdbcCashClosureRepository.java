@@ -45,7 +45,7 @@ public class JdbcCashClosureRepository implements ICashClosureRepository {
         String sqlSales = "SELECT SUM(COALESCE(cash_amount, IF(payment_method = 'Efectivo', total, 0))) as cash_total, "
                 +
                 "SUM(COALESCE(card_amount, IF(payment_method = 'Tarjeta', total, 0))) as card_total, " +
-                "SUM(IF(payment_method NOT IN ('Efectivo', 'Tarjeta'), total, 0)) as others_total " +
+                "SUM(IF(payment_method NOT IN ('Efectivo', 'Tarjeta', 'Mixed'), total, 0)) as others_total " +
                 "FROM sales WHERE closure_id IS NULL";
         double cash = 0, card = 0, others = 0;
         try (Connection connection = DBConnection.getConnection();
@@ -57,23 +57,16 @@ public class JdbcCashClosureRepository implements ICashClosureRepository {
                 others = rs.getDouble("others_total");
             }
         }
-        String sqlReturns = "SELECT COALESCE(r.payment_method, 'Efectivo') as method, SUM(r.total_refunded) as amount FROM returns r JOIN sales s ON r.sale_id = s.sale_id WHERE r.closure_id IS NULL GROUP BY method";
+        String sqlReturns = "SELECT SUM(cash_amount) as returns_cash, SUM(card_amount) as returns_card FROM returns WHERE closure_id IS NULL";
         double returnsCash = 0, returnsCard = 0;
         try (Connection connection = DBConnection.getConnection();
                 Statement stmt = connection.createStatement();
                 ResultSet rs = stmt.executeQuery(sqlReturns)) {
-            while (rs.next()) {
-                String method = rs.getString("method");
-                double amount = rs.getDouble("amount");
-                if ("Efectivo".equalsIgnoreCase(method)) {
-                    returnsCash += amount;
-                    cash -= amount;
-                } else if ("Tarjeta".equalsIgnoreCase(method)) {
-                    returnsCard += amount;
-                    card -= amount;
-                } else {
-                    others -= amount;
-                }
+            if (rs.next()) {
+                returnsCash = rs.getDouble("returns_cash");
+                returnsCard = rs.getDouble("returns_card");
+                cash -= returnsCash;
+                card -= returnsCard;
             }
         }
 
@@ -93,9 +86,14 @@ public class JdbcCashClosureRepository implements ICashClosureRepository {
             }
         }
 
-        totals.put("cash", cash);
-        totals.put("card", card);
-        totals.put("total", cash + card + others);
+        double netCash = cash;
+        double netCard = card;
+        double netOthers = others;
+
+        totals.put("cash", netCash);
+        totals.put("card", netCard);
+        totals.put("others", netOthers);
+        totals.put("total", netCash + netCard + netOthers);
         totals.put("returns_cash", returnsCash);
         totals.put("returns_card", returnsCard);
         totals.put("returns_total", returnsCash + returnsCard);
@@ -382,7 +380,8 @@ public class JdbcCashClosureRepository implements ICashClosureRepository {
 
     @Override
     public boolean hasActiveFund() throws SQLException {
-        String sql = "SELECT COUNT(*) FROM cash_fund_sessions WHERE session_date = CURDATE() AND is_closed = FALSE";
+        // Unclosed session can be from any day (carrying forward)
+        String sql = "SELECT COUNT(*) FROM cash_fund_sessions WHERE is_closed = FALSE";
         try (Connection connection = DBConnection.getConnection();
                 Statement stmt = connection.createStatement();
                 ResultSet rs = stmt.executeQuery(sql)) {
@@ -394,7 +393,12 @@ public class JdbcCashClosureRepository implements ICashClosureRepository {
 
     @Override
     public double getActiveFundAmount() throws SQLException {
-        String sql = "SELECT COALESCE(SUM(initial_amount), 0) FROM cash_fund_sessions WHERE session_date = CURDATE() AND is_closed = FALSE";
+        // Sum all unclosed initial funds to maintain traceability
+        // Sum only the most recent unclosed session's fund? No, sum all active ones but
+        // focus on the latest one if it's on the same day. Actually, just sum is
+        // consistent with carries.
+        // BUT if user says it's wrong, maybe they have double sessions by mistake.
+        String sql = "SELECT COALESCE(SUM(initial_amount), 0) FROM cash_fund_sessions WHERE is_closed = FALSE";
         try (Connection connection = DBConnection.getConnection();
                 Statement stmt = connection.createStatement();
                 ResultSet rs = stmt.executeQuery(sql)) {

@@ -50,6 +50,22 @@ public class CashClosureUseCase {
         repository.save(closure);
     }
 
+    /**
+     * Realiza un cierre parcial (Informe X).
+     * Muestra/Imprime los totales actuales sin cerrar la sesión de caja.
+     */
+    public void performPartialClosure(int userId) throws java.sql.SQLException {
+        authService.checkPermission("CIERRES");
+        java.util.Map<String, Double> totals = repository.getPendingTotals();
+        double currentCash = repository.getCurrentCashInDrawer();
+
+        System.out.println("--- CIERRE PARCIAL (INFORME X) ---");
+        System.out.println("Usuario: " + userId);
+        System.out.println("Efectivo en Cajón: " + currentCash);
+        System.out.println("Ventas Totales: " + totals.getOrDefault("sales_total", 0.0));
+        // Aquí se llamaría al servicio de impresión de tickets
+    }
+
     public List<CashClosure> getHistory(LocalDate start, LocalDate end) throws SQLException {
         return repository.getByRange(start, end);
     }

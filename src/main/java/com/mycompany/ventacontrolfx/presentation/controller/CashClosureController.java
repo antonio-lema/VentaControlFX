@@ -128,17 +128,9 @@ public class CashClosureController implements Injectable {
             currentCard = totals.getOrDefault("card", 0.0);
             double totalAll = totals.getOrDefault("total", currentCash + currentCard);
             double returnsTotal = totals.getOrDefault("returns_total", 0.0);
-            double returnsCash = totals.getOrDefault("returns_cash", 0.0);
-            double returnsCard = totals.getOrDefault("returns_card", 0.0);
 
-            // Ventas netas (ya descontadas las devoluciones)
-            double grossCash = currentCash + returnsCash;
-            double grossCard = currentCard + returnsCard;
-
-            lblTotalCash.setText("💵 " + String.format("%.2f €", grossCash)
-                    + (returnsCash > 0 ? " (−" + String.format("%.2f €", returnsCash) + " dev.)" : ""));
-            lblTotalCard.setText("💳 " + String.format("%.2f €", grossCard)
-                    + (returnsCard > 0 ? " (−" + String.format("%.2f €", returnsCard) + " dev.)" : ""));
+            lblTotalCash.setText("💵 " + String.format("%.2f €", currentCash));
+            lblTotalCard.setText("💳 " + String.format("%.2f €", currentCard));
             lblTotalAll.setText("💰 Neto: " + String.format("%.2f €", totalAll));
 
             // Mostrar devoluciones totales

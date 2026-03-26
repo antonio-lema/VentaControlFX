@@ -11,5 +11,9 @@ public interface IWorkSessionRepository {
 
     Optional<WorkSession> getActiveSession(Integer userId);
 
+    List<WorkSession> getAllActiveSessions();
+
     List<WorkSession> getHistory(Integer userId);
+
+    List<WorkSession> getHistoryByDate(java.time.LocalDate date);
 }

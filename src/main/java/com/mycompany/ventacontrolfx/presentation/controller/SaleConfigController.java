@@ -76,9 +76,11 @@ public class SaleConfigController implements Injectable {
     private HBox bannerSaved;
 
     private ConfigUseCase configUseCase;
+    private ServiceContainer container;
 
     @Override
     public void inject(ServiceContainer container) {
+        this.container = container;
         this.configUseCase = container.getConfigUseCase();
         loadConfig();
     }
@@ -251,6 +253,17 @@ public class SaleConfigController implements Injectable {
         // Si no coincide exactamente, seleccionar el primero si existe
         if (!combo.getItems().isEmpty()) {
             combo.setValue(combo.getItems().get(0));
+        }
+    }
+
+    @FXML
+    private void handleShowBusinessHours() {
+        if (container != null) {
+            com.mycompany.ventacontrolfx.util.ModalService.showFullScreenModal(
+                    "/view/business_hours.fxml",
+                    "Horarios Comerciales",
+                    container,
+                    null);
         }
     }
 }
