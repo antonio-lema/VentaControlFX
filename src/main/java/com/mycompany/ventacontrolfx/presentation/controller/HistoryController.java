@@ -280,12 +280,12 @@ public class HistoryController implements Injectable, Searchable {
             lblReturnBadge.setText("DEVUELTO");
             lblReturnBadge.setVisible(true);
             lblReturnBadge.setStyle(
-                    "-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-size: 10px; -fx-font-weight: bold; -fx-padding: 2 6; -fx-background-radius: 4;");
+                    "-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-size: 10px; -fx-font-weight: bold; -fx-padding: 2px 6px; -fx-background-radius: 4px;");
         } else if (hasAnyReturned) {
             lblReturnBadge.setText("PARCIAL");
             lblReturnBadge.setVisible(true);
             lblReturnBadge.setStyle(
-                    "-fx-background-color: #f39c12; -fx-text-fill: white; -fx-font-size: 10px; -fx-font-weight: bold; -fx-padding: 2 6; -fx-background-radius: 4;");
+                    "-fx-background-color: #f39c12; -fx-text-fill: white; -fx-font-size: 10px; -fx-font-weight: bold; -fx-padding: 2px 6px; -fx-background-radius: 4px;");
         } else {
             lblReturnBadge.setVisible(false);
         }
@@ -427,7 +427,6 @@ public class HistoryController implements Injectable, Searchable {
             return;
         }
 
-        // ── Validar efectivo disponible (Todas las devoluciones salen de caja) ──
         // Calcular el máximo devolvible (productos aún no devueltos) usando el precio
         // real pagado
         double maxRefundable = selected.getDetails().stream()
@@ -438,40 +437,33 @@ public class HistoryController implements Injectable, Searchable {
             try {
                 com.mycompany.ventacontrolfx.application.usecase.CashClosureUseCase closureUseCase = container
                         .getClosureUseCase();
-                double cashAvailable = closureUseCase.getCurrentCashInDrawer();
+                double cashInDrawer = closureUseCase.getCurrentCashInDrawer();
 
-                if (cashAvailable <= 0) {
-                    AlertUtil.showError("❌ Sin efectivo en caja",
-                            String.format(
-                                    "No hay efectivo disponible en la caja para procesar esta devolución.\n\n" +
-                                            "💵 Efectivo en caja: %.2f €\n" +
-                                            "💰 Importe máximo a devolver: %.2f €\n\n" +
-                                            "Abre la caja con un fondo o verifica el saldo disponible.",
-                                    cashAvailable, maxRefundable));
-                    return;
-                }
+                // Calcular cuánto del reembolso total es OBLIGATORIAMENTE en efectivo (basado
+                // en el pago original)
+                double currentGrossTotal = selected.getTotal() + selected.getDiscountAmount();
+                double cashRatio = (currentGrossTotal > 0) ? selected.getCashAmount() / currentGrossTotal : 1.0;
+                double maxCashRefundNeeded = maxRefundable * cashRatio;
 
-                if (maxRefundable > cashAvailable) {
+                if (maxCashRefundNeeded > cashInDrawer) {
                     String oldTicketHint = selected.getClosureId() != null
-                            ? "\n\n💡 *Recuerda*: Este ticket es de una sesión antigua. " +
-                                    "Asegúrate de tener suficiente 'Fondo de Caja' ingresado hoy para cubrirlo."
+                            ? "\n\n💡 *Recuerda*: Este ticket es de una sesión antigua."
                             : "";
 
-                    // Advertir, pero dejar que el usuario elija cuánto devolver (puede ser parcial)
                     boolean continuar = AlertUtil.showConfirmation("⚠️ Efectivo limitado",
-                            "Efectivo insuficiente para devolver el total",
+                            "Efectivo insuficiente para la parte de metálico",
                             String.format(
-                                    "El efectivo en caja (%.2f €) es menor que el importe total del ticket (%.2f €).\n\n"
+                                    "El efectivo en caja (%.2f €) es menor que la parte pagada en efectivo del ticket (%.2f €).\n\n"
                                             +
-                                            "Solo podrás devolver hasta %.2f € en efectivo (las devoluciones siempre son en efectivo).%s\n\n"
-                                            +
-                                            "¿Deseas continuar con una devolución parcial?",
-                                    cashAvailable, maxRefundable, cashAvailable, oldTicketHint));
+                                            "El sistema devolverá %.2f € a la tarjeta automaticamente, pero solo dispone de %.2f € "
+                                            + "físicos para la parte de efectivo.%s\n\n"
+                                            + "¿Deseas continuar con una devolución parcial o total sabiendo que el cajón quedará bajo?",
+                                    cashInDrawer, maxCashRefundNeeded, maxRefundable * (1 - cashRatio), cashInDrawer,
+                                    oldTicketHint));
                     if (!continuar)
                         return;
                 }
             } catch (SQLException e) {
-                // Si no podemos leer el efectivo, dejar pasar (mejor UX que bloquear)
                 e.printStackTrace();
             }
         }

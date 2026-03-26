@@ -40,6 +40,7 @@ public class CartUseCase {
     private final IntegerProperty priceListId = new SimpleIntegerProperty(-1);
     private final IntegerProperty selectedCategoryId = new SimpleIntegerProperty(-2);
     private final StringProperty generalObservation = new SimpleStringProperty("");
+    private final BooleanProperty locked = new SimpleBooleanProperty(false);
 
     private final ICompanyConfigRepository configRepository;
     private final com.mycompany.ventacontrolfx.domain.service.PriceResolutionService priceResolutionService;
@@ -154,7 +155,8 @@ public class CartUseCase {
             try {
                 // Obtener descuento específico para este producto desde el motor
                 double autoDiscount = promoResult.getItemDiscounts().getOrDefault(product.getId(), 0.0);
-                double totalLineDiscount = autoDiscount + item.getManualDiscountAmount();
+                double totalLineDiscount = Math.min(autoDiscount + item.getManualDiscountAmount(),
+                        item.getUnitPrice() * item.getQuantity());
                 item.setDiscountAmount(totalLineDiscount);
 
                 // Acumular ahorros para la etiqueta (gross-up si es necesario)
@@ -181,7 +183,8 @@ public class CartUseCase {
             } catch (SQLException e) {
                 // Fallback en caso de error en el motor de impuestos
                 double autoDiscount = promoResult.getItemDiscounts().getOrDefault(product.getId(), 0.0);
-                double totalLineDiscount = autoDiscount + item.getManualDiscountAmount();
+                double totalLineDiscount = Math.min(autoDiscount + item.getManualDiscountAmount(),
+                        item.getUnitPrice() * item.getQuantity());
 
                 double taxRate = product.resolveEffectiveIva(config.getTaxRate());
                 double taxMultiplier = isInclusive ? 1.0 : (1.0 + (taxRate / 100.0));
@@ -202,10 +205,12 @@ public class CartUseCase {
             }
         }
 
-        // Manejar descuentos globales (ID -1 en el mapa de ahorros)
         double globalDiscount = promoResult.getItemDiscounts().getOrDefault(-1, 0.0);
         if (globalDiscount > 0) {
-            // Si hay descuento global, lo aplicamos al final.
+            // El descuento global no puede superar el total acumulado
+            if (globalDiscount > totalInclusive) {
+                globalDiscount = totalInclusive;
+            }
             totalInclusive -= globalDiscount;
             grossSavingsTotal += globalDiscount;
         }
@@ -287,6 +292,10 @@ public class CartUseCase {
     }
 
     public void addItem(Product product) {
+        if (locked.get()) {
+            throw new IllegalStateException(
+                    "El carrito está BLOQUEADO temporalmente. Debe realizar el cierre de caja o fichar inicio de turno.");
+        }
         addItem(product, 1);
     }
 
@@ -428,5 +437,17 @@ public class CartUseCase {
 
     public int getItemCount() {
         return itemCount.get();
+    }
+
+    public BooleanProperty lockedProperty() {
+        return locked;
+    }
+
+    public void setLocked(boolean locked) {
+        this.locked.set(locked);
+    }
+
+    public boolean isLocked() {
+        return locked.get();
     }
 }

@@ -7,10 +7,18 @@ import com.mycompany.ventacontrolfx.domain.repository.ICompanyConfigRepository;
 import com.mycompany.ventacontrolfx.domain.repository.IClientRepository;
 import com.mycompany.ventacontrolfx.infrastructure.persistence.DBConnection;
 import com.mycompany.ventacontrolfx.util.AuthorizationService;
+import com.mycompany.ventacontrolfx.domain.repository.IDocumentSeriesRepository;
+import com.mycompany.ventacontrolfx.domain.repository.IFiscalDocumentRepository;
+import com.mycompany.ventacontrolfx.domain.service.FiscalIntegrityService;
 import com.mycompany.ventacontrolfx.domain.service.TaxEngineService;
 import com.mycompany.ventacontrolfx.application.service.PromotionService;
 import com.mycompany.ventacontrolfx.shared.bus.GlobalEventBus;
 
+import com.mycompany.ventacontrolfx.application.ports.IFiscalPdfService;
+import com.mycompany.ventacontrolfx.application.usecase.QueryFiscalDocumentUseCase.PrintData;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.LocalDate;
@@ -34,8 +42,16 @@ public class SaleUseCase {
     private final PromotionService promotionService;
     private final com.mycompany.ventacontrolfx.application.service.PromotionEngine promotionEngine;
     private final IProductRepository productRepository;
+    private final IDocumentSeriesRepository seriesRepository;
+    private final IFiscalDocumentRepository fiscalRepository;
     private final GlobalEventBus eventBus;
+    private final FiscalIntegrityService integrityService;
     private CashClosureUseCase cashClosureUseCase;
+    private IFiscalPdfService pdfService;
+
+    public void setPdfService(IFiscalPdfService pdfService) {
+        this.pdfService = pdfService;
+    }
 
     public SaleUseCase(ISaleRepository saleRepository,
             ICompanyConfigRepository configRepository,
@@ -45,6 +61,8 @@ public class SaleUseCase {
             PromotionService promotionService,
             com.mycompany.ventacontrolfx.application.service.PromotionEngine promotionEngine,
             IProductRepository productRepository,
+            IDocumentSeriesRepository seriesRepository,
+            IFiscalDocumentRepository fiscalRepository,
             GlobalEventBus eventBus) {
         this.saleRepository = saleRepository;
         this.configRepository = configRepository;
@@ -54,7 +72,10 @@ public class SaleUseCase {
         this.promotionService = promotionService;
         this.promotionEngine = promotionEngine;
         this.productRepository = productRepository;
+        this.seriesRepository = seriesRepository;
+        this.fiscalRepository = fiscalRepository;
         this.eventBus = eventBus;
+        this.integrityService = new FiscalIntegrityService();
     }
 
     /** Inyecta el use case de caja para registrar movimientos de devolución. */
@@ -74,7 +95,8 @@ public class SaleUseCase {
     }
 
     public int processSale(List<CartItem> cartItems, double total, String paymentMethod, Integer clientId, int userId,
-            double discountAmount, String discountReason, double cashAmount, double cardAmount, String observations) throws SQLException {
+            double discountAmount, String discountReason, double cashAmount, double cardAmount, String observations)
+            throws SQLException {
         authService.checkPermission("VENTAS");
 
         // ── REGLA DE NEGOCIO: Validar caja abierta ──
@@ -293,6 +315,7 @@ public class SaleUseCase {
                             rd.setQuantity(qtyToReturnNow);
                             rd.setUnitPrice(unitRefundPrice);
                             rd.setSubtotal(lineRefund);
+                            rd.setProductName(d.getProductName()); // Snapshot del nombre original
                             newReturnDetails.add(rd);
 
                             // INCREMENTAR STOCK AL DEVOLVER
@@ -305,9 +328,40 @@ public class SaleUseCase {
                 }
 
                 if (refundAmountForThisTransaction > 0) {
-                    // Validación de efectivo disponible para la devolución
-                    if (cashClosureUseCase != null) {
-                        cashClosureUseCase.validateCashAvailableForReturn(refundAmountForThisTransaction);
+                    // Logic for Mixed Payment Returns: Refund Proportionally to what was paid
+                    double currentGrossTotal = sale.getTotal() + sale.getDiscountAmount();
+                    double cashRatio = (currentGrossTotal > 0) ? sale.getCashAmount() / currentGrossTotal : 1.0;
+
+                    double cashToRefund = Math.round((refundAmountForThisTransaction * cashRatio) * 100.0) / 100.0;
+                    double cardToRefund = Math.round((refundAmountForThisTransaction - cashToRefund) * 100.0) / 100.0;
+
+                    // Ensure we don't refund more than what was actually paid in each method
+                    List<Return> prevReturns = saleRepository.getReturnsBySaleId(saleId);
+                    double totalCashReturnedSoFar = prevReturns.stream().mapToDouble(Return::getCashAmount).sum();
+                    double totalCardReturnedSoFar = prevReturns.stream().mapToDouble(Return::getCardAmount).sum();
+
+                    double availableCash = Math.max(0, sale.getCashAmount() - totalCashReturnedSoFar);
+                    double availableCard = Math.max(0, sale.getCardAmount() - totalCardReturnedSoFar);
+
+                    if (cashToRefund > availableCash) {
+                        double excess = cashToRefund - availableCash;
+                        cashToRefund = availableCash;
+                        cardToRefund += excess;
+                    }
+                    if (cardToRefund > availableCard) {
+                        double excess = cardToRefund - availableCard;
+                        cardToRefund = availableCard;
+                        cashToRefund += excess;
+                    }
+
+                    // Cap final refund
+                    cashToRefund = Math.min(cashToRefund, availableCash);
+                    cardToRefund = Math.min(cardToRefund, availableCard);
+
+                    // Validación de efectivo disponible para la devolución (solo la parte que
+                    // devolvemos en cash)
+                    if (cashToRefund > 0 && cashClosureUseCase != null) {
+                        cashClosureUseCase.validateCashAvailableForReturn(cashToRefund);
                     }
 
                     Return newReturn = new Return();
@@ -317,6 +371,27 @@ public class SaleUseCase {
                     newReturn.setReason(reason);
                     newReturn.setReturnDatetime(LocalDateTime.now());
                     newReturn.setPaymentMethod(sale.getPaymentMethod());
+                    newReturn.setCashAmount(cashToRefund);
+                    newReturn.setCardAmount(cardToRefund);
+
+                    // ── GENERACIÓN DE CÓDIGO FISCAL ÚNICO PARA LA DEVOLUCIÓN ──
+                    String seriesCode = "R";
+                    int nextDocNumber = seriesRepository.getAndIncrement(seriesCode, conn);
+
+                    newReturn.setDocType("RECTIFICATIVA");
+                    newReturn.setDocSeries(seriesCode);
+                    newReturn.setDocNumber(nextDocNumber);
+                    newReturn.setDocStatus("EMITIDO");
+
+                    // Snapshots del emisor para el documento de abono
+                    SaleConfig companyData = configRepository.load();
+                    newReturn.setIssuerName(companyData.getCompanyName());
+                    newReturn.setIssuerTaxId(companyData.getCif());
+                    newReturn.setIssuerAddress(companyData.getAddress());
+                    newReturn.setCustomerNameSnapshot(sale.getCustomerNameSnapshot());
+
+                    // Firmar integridad (Opcional pero recomendado para cumplimiento legal)
+                    // newReturn.setControlHash(integrityService.stampHash(newReturn));
 
                     int returnId = saleRepository.saveReturn(newReturn, conn);
                     saleRepository.saveReturnDetails(newReturnDetails, returnId, conn);
@@ -325,12 +400,17 @@ public class SaleUseCase {
                     saleRepository.updateSaleReturnStatus(saleId, allReturned,
                             allReturned ? reason : reason + " (Parcial)", newTotalReturned, conn);
 
-                    // Las devoluciones se hacen SIEMPRE en efectivo
-                    if (cashClosureUseCase != null) {
+                    // Registrar en caja SOLO la parte devuelta en efectivo
+                    if (cashToRefund > 0 && cashClosureUseCase != null) {
                         String cashReason = String.format("[Devolución Ticket #%d - Origen: %s] %s", saleId,
                                 sale.getPaymentMethod(), reason);
-                        cashClosureUseCase.registerCashReturn(refundAmountForThisTransaction, cashReason, userId, conn);
+                        cashClosureUseCase.registerCashReturn(cashToRefund, cashReason, userId, conn);
                     }
+
+                    // Archivamos el PDF fiscal de la devolución antes del commit (para asegurar
+                    // integridad)
+                    archiveReturnInPdf(newReturn, newReturnDetails);
+
                 }
 
                 conn.commit();
@@ -370,5 +450,60 @@ public class SaleUseCase {
     public List<Return> getReturnsHistory(LocalDate start, LocalDate end) throws SQLException {
         authService.checkPermission("HISTORIAL");
         return saleRepository.getReturnsByRange(start, end);
+    }
+
+    /**
+     * Genera y archiva el PDF de la devolución (Factura Rectificativa).
+     * Sincronizado con el motor de ReturnUseCase para mantener coherencia.
+     */
+    private void archiveReturnInPdf(Return r, List<ReturnDetail> details) {
+        if (this.pdfService == null)
+            return;
+        try {
+            // Cargar la venta original para contexto
+            Sale sale = saleRepository.getById(r.getSaleId());
+
+            // Conversión para compatibilidad con IFiscalPdfService.PrintData
+            FiscalDocument doc = new FiscalDocument();
+            doc.setDocType(FiscalDocument.Type.RECTIFICATIVA);
+            doc.setDocSeries(r.getDocSeries());
+            doc.setDocNumber(r.getDocNumber());
+            doc.setIssuedAt(r.getReturnDatetime());
+            doc.setIssuerName(r.getIssuerName());
+            doc.setIssuerTaxId(r.getIssuerTaxId());
+            doc.setIssuerAddress(r.getIssuerAddress());
+            doc.setReceiverName(r.getCustomerNameSnapshot());
+            doc.setTotalAmount(r.getTotalRefunded());
+            doc.setBaseAmount(r.getTotalRefunded());
+            doc.setVatAmount(0);
+
+            List<SaleDetail> lines = new ArrayList<>();
+            for (ReturnDetail rd : details) {
+                SaleDetail sd = new SaleDetail();
+                sd.setProductName(rd.getProductName());
+                sd.setQuantity(rd.getQuantity());
+                sd.setUnitPrice(rd.getUnitPrice());
+                sd.setLineTotal(rd.getSubtotal());
+                lines.add(sd);
+            }
+
+            String logoPath = configRepository.getValue("logoPath");
+            PrintData data = new PrintData(doc, sale, lines, logoPath);
+
+            String year = String.valueOf(doc.getIssuedAt().getYear());
+            String month = String.format("%02d", doc.getIssuedAt().getMonthValue());
+            String dirPath = "archivos_fiscales/" + year + "/" + month + "/Devoluciones";
+
+            Path path = Paths.get(dirPath);
+            if (!Files.exists(path))
+                Files.createDirectories(path);
+
+            String fileName = doc.getFullReference().replace("/", "_") + ".pdf";
+            String fullPath = dirPath + "/" + fileName;
+
+            pdfService.generateInvoicePdf(data, fullPath);
+        } catch (Exception ex) {
+            System.err.println("[SaleUseCase] Error archivando PDF de devolución: " + ex.getMessage());
+        }
     }
 }

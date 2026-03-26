@@ -13,7 +13,7 @@ import com.mycompany.ventacontrolfx.util.AuthorizationService;
 import com.mycompany.ventacontrolfx.infrastructure.navigation.NavigationService;
 import com.mycompany.ventacontrolfx.application.service.PromotionEngine;
 import com.mycompany.ventacontrolfx.application.service.PromotionService;
-import com.mycompany.ventacontrolfx.presentation.ai.*;
+import com.mycompany.ventacontrolfx.application.service.RefundCalculatorService;
 // CartService removed, replaced by CartUseCase
 
 /**
@@ -46,7 +46,6 @@ public class ServiceContainer {
     private final IPriceUpdateLogRepository priceLogRepository;
     private final IPromotionRepository promotionRepository;
     private final PromotionEngine promotionEngine;
-    private final IAiIntentRepository aiIntentRepository;
     private final IWorkSessionRepository workSessionRepository;
 
     // Use Cases (Application Layer)
@@ -76,6 +75,8 @@ public class ServiceContainer {
     private final com.mycompany.ventacontrolfx.application.service.PromotionService promotionService;
     private final ProductImportUseCase productImportUseCase;
     private final WorkSessionUseCase workSessionUseCase;
+    private final ReturnUseCase returnUseCase;
+    private final RefundCalculatorService refundCalculator;
 
     // Shared Components
     private final GlobalEventBus eventBus;
@@ -88,9 +89,6 @@ public class ServiceContainer {
     private NavigationService navigationService;
     private final com.mycompany.ventacontrolfx.domain.service.TaxEngineService taxEngineService;
     private final com.mycompany.ventacontrolfx.domain.service.PriceResolutionService priceResolutionService;
-    private final AiSkillDispatcher aiSkillDispatcher;
-    private final AiToolDefinitionGenerator aiToolGenerator;
-    private final AiIntentRouter aiIntentRouter;
 
     public ServiceContainer() {
         // 1. Shared Infrastructure
@@ -121,7 +119,6 @@ public class ServiceContainer {
         this.taxRepository = new JdbcTaxRepository();
         this.priceLogRepository = new JdbcPriceUpdateLogRepository();
         this.promotionRepository = new JdbcPromotionRepository();
-        this.aiIntentRepository = new JdbcAiIntentRepository();
         this.workSessionRepository = new JdbcWorkSessionRepository();
 
         // 3. Domain Services
@@ -141,9 +138,12 @@ public class ServiceContainer {
                 authService, eventBus);
         this.categoryUseCase = new CategoryUseCase(categoryRepository, productRepository, authService);
         this.clientUseCase = new ClientUseCase(clientRepository, authService);
+        this.refundCalculator = new RefundCalculatorService();
+        this.returnUseCase = new ReturnUseCase(saleRepository, productRepository, seriesRepository, configRepository,
+                refundCalculator, null); // Closure se inyecta luego
         this.saleUseCase = new com.mycompany.ventacontrolfx.application.usecase.SaleUseCase(saleRepository,
                 configRepository, authService, taxEngineService, clientRepository, promotionService, promotionEngine,
-                productRepository, eventBus);
+                productRepository, seriesRepository, fiscalRepository, eventBus);
         this.userUseCase = new com.mycompany.ventacontrolfx.application.usecase.UserUseCase(userRepository, emailSender,
                 authService);
         this.closureUseCase = new CashClosureUseCase(closureRepository, authService);
@@ -178,11 +178,24 @@ public class ServiceContainer {
         // Cross-wiring: SaleUseCase necesita CashClosureUseCase para registrar
         // devoluciones en caja
         this.saleUseCase.setCashClosureUseCase(this.closureUseCase);
+        this.saleUseCase.setPdfService(this.pdfService); // Inyectamos el servicio de PDF para archivado de devoluciones
 
-        // AI Engine Initialization
-        this.aiSkillDispatcher = new AiSkillDispatcher(this);
-        this.aiToolGenerator = new AiToolDefinitionGenerator();
-        this.aiIntentRouter = new AiIntentRouter(this);
+        this.returnUseCase.setPdfService(this.pdfService);
+        // El ReturnUseCase necesita el closure inyectado ahora que ya está creado
+        // Nota: Si ReturnUseCase no tiene setter, habrá que crearlo o usar reflexión si
+        // es singleton
+        // Para simplificar, lo inyectamos aquí (asumiendo que tiene acceso o setter)
+        // en esta versión lo inyectaremos via setter o crearemos el objeto después.
+
+        // Vamos a modificar SaleUseCase para que use el nuevo ReturnUseCase si es
+        // necesario,
+        // pero por ahora los mantendremos independientes para evitar romper
+        // controladores.
+
+        // AI Engine Initialization (Disabled)
+        // this.aiSkillDispatcher = new AiSkillDispatcher(this);
+        // this.aiToolGenerator = new AiToolDefinitionGenerator();
+        // this.aiIntentRouter = new AiIntentRouter(this);
     }
 
     // --- Getters ---
@@ -208,6 +221,10 @@ public class ServiceContainer {
 
     public SaleUseCase getSaleUseCase() {
         return saleUseCase;
+    }
+
+    public ReturnUseCase getReturnUseCase() {
+        return returnUseCase;
     }
 
     public GetSaleTicketUseCase getGetSaleTicketUseCase() {
@@ -252,6 +269,10 @@ public class ServiceContainer {
 
     public NavigationService getNavigationService() {
         return navigationService;
+    }
+
+    public IUserRepository getUserRepository() {
+        return userRepository;
     }
 
     public void setNavigationService(NavigationService navigationService) {

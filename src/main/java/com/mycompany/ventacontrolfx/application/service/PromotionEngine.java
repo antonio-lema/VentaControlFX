@@ -151,11 +151,12 @@ public class PromotionEngine {
     }
 
     private double calculateDiscount(double basePrice, Promotion p) {
+        double result = 0;
         if (p.getType() == PromotionType.PERCENTAGE) {
-            return basePrice * (p.getValue() / 100.0);
+            result = basePrice * (p.getValue() / 100.0);
         } else if (p.getType() == PromotionType.FIXED_DISCOUNT) {
-            return p.getValue();
+            result = p.getValue();
         }
-        return 0;
+        return Math.max(0, result); // Nunca retornar descuentos negativos
     }
 }

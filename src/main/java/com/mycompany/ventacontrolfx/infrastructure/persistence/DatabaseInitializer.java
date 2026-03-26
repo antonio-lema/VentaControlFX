@@ -4,8 +4,6 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
 
 public class DatabaseInitializer {
 
@@ -22,18 +20,9 @@ public class DatabaseInitializer {
                     "company_id INT DEFAULT NULL, " +
                     "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)");
 
-            String[] userCols = {
-                    "email VARCHAR(255)",
-                    "role VARCHAR(50)",
-                    "company_id INT DEFAULT NULL"
-            };
-            for (String col : userCols) {
-                try {
-                    stmt.execute("ALTER TABLE users ADD COLUMN " + col);
-                } catch (SQLException e) {
-                    // Ignore if exists
-                }
-            }
+            addColumnIfNotExists(conn, "users", "email", "VARCHAR(255)");
+            addColumnIfNotExists(conn, "users", "role", "VARCHAR(50)");
+            addColumnIfNotExists(conn, "users", "company_id", "INT DEFAULT NULL");
 
             // 1. Clients Table
             stmt.execute("CREATE TABLE IF NOT EXISTS clients (" +
@@ -50,48 +39,21 @@ public class DatabaseInitializer {
                     "phone VARCHAR(50), " +
                     "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)");
 
-            // Ensure columns exist if table was already there
-            // Ensure columns exist if table was already there
-            String[] clientCols = {
-                    "is_company BOOLEAN DEFAULT FALSE",
-                    "postal_code VARCHAR(10)",
-                    "city VARCHAR(100)",
-                    "province VARCHAR(100)",
-                    "country VARCHAR(100) DEFAULT 'Spain'",
-                    "phone VARCHAR(50)",
-                    "price_list_id INT DEFAULT NULL",
-                    "tax_exempt BOOLEAN DEFAULT FALSE",
-                    "tax_regime VARCHAR(50) DEFAULT 'NORMAL'"
-            };
-            for (String col : clientCols) {
-                try {
-                    stmt.execute("ALTER TABLE clients ADD COLUMN " + col);
-                } catch (SQLException e) {
-                    // System.err.println("Column likely exists: " + col + " - " + e.getMessage());
-                }
-            }
+            addColumnIfNotExists(conn, "clients", "is_company", "BOOLEAN DEFAULT FALSE");
+            addColumnIfNotExists(conn, "clients", "postal_code", "VARCHAR(10)");
+            addColumnIfNotExists(conn, "clients", "city", "VARCHAR(100)");
+            addColumnIfNotExists(conn, "clients", "province", "VARCHAR(100)");
+            addColumnIfNotExists(conn, "clients", "country", "VARCHAR(100) DEFAULT 'Spain'");
+            addColumnIfNotExists(conn, "clients", "phone", "VARCHAR(50)");
+            addColumnIfNotExists(conn, "clients", "price_list_id", "INT DEFAULT NULL");
+            addColumnIfNotExists(conn, "clients", "tax_exempt", "BOOLEAN DEFAULT FALSE");
+            addColumnIfNotExists(conn, "clients", "tax_regime", "VARCHAR(50) DEFAULT 'NORMAL'");
 
             // --- Productos e IVA Flex (Nueva Estructura) ---
-            try {
-                // default_iva en categorías (para herencia)
-                stmt.execute("ALTER TABLE categories ADD COLUMN default_iva DECIMAL(5,2) DEFAULT 21.0");
-            } catch (SQLException e) {
-            }
-            try {
-                // iva en productos (sobrescribe categoría)
-                stmt.execute("ALTER TABLE products ADD COLUMN iva DECIMAL(5,2) DEFAULT NULL");
-            } catch (SQLException e) {
-            }
-            try {
-                // tax_group_id para el Tax Engine V2
-                stmt.execute("ALTER TABLE products ADD COLUMN tax_group_id INT DEFAULT NULL");
-            } catch (SQLException e) {
-            }
-            try {
-                // tax_group_id en categorías (para herencia)
-                stmt.execute("ALTER TABLE categories ADD COLUMN tax_group_id INT DEFAULT NULL");
-            } catch (SQLException e) {
-            }
+            addColumnIfNotExists(conn, "categories", "default_iva", "DECIMAL(5,2) DEFAULT 21.0");
+            addColumnIfNotExists(conn, "products", "iva", "DECIMAL(5,2) DEFAULT NULL");
+            addColumnIfNotExists(conn, "products", "tax_group_id", "INT DEFAULT NULL");
+            addColumnIfNotExists(conn, "categories", "tax_group_id", "INT DEFAULT NULL");
 
             // Inicialización de datos (Expand): Copiar tax_rate actual si existía o usar
             // 21.0
@@ -103,51 +65,20 @@ public class DatabaseInitializer {
             }
 
             // --- Estructura Legacy (Mantener por compatibilidad temporal) ---
-            try {
-                stmt.execute("ALTER TABLE categories ADD COLUMN tax_rate DECIMAL(10,2) DEFAULT 21.0");
-            } catch (SQLException e) {
-            }
-            try {
-                stmt.execute("ALTER TABLE products ADD COLUMN tax_rate DECIMAL(10,2) DEFAULT NULL");
-            } catch (SQLException e) {
-            }
+            addColumnIfNotExists(conn, "categories", "tax_rate", "DECIMAL(10,2) DEFAULT 21.0");
+            addColumnIfNotExists(conn, "products", "tax_rate", "DECIMAL(10,2) DEFAULT NULL");
 
-            try {
-                stmt.execute("ALTER TABLE products ADD COLUMN sku VARCHAR(50) UNIQUE DEFAULT NULL");
-            } catch (SQLException e) {
-            }
-            try {
-                stmt.execute("ALTER TABLE products ADD COLUMN cost_price DECIMAL(10,4) DEFAULT 0.00");
-            } catch (SQLException e) {
-            }
-            try {
-                stmt.execute("ALTER TABLE products ADD COLUMN is_active BOOLEAN DEFAULT TRUE");
-            } catch (SQLException e) {
-            }
+            addColumnIfNotExists(conn, "products", "sku", "VARCHAR(50) UNIQUE DEFAULT NULL");
+            addColumnIfNotExists(conn, "products", "cost_price", "DECIMAL(10,4) DEFAULT 0.00");
+            addColumnIfNotExists(conn, "products", "is_active", "BOOLEAN DEFAULT TRUE");
 
             // --- Control de Stock ---
-            try {
-                stmt.execute("ALTER TABLE products ADD COLUMN stock_quantity INT DEFAULT 0");
-            } catch (SQLException e) {
-            }
-            try {
-                stmt.execute("ALTER TABLE products ADD COLUMN min_stock INT DEFAULT 0");
-            } catch (SQLException e) {
-            }
-            try {
-                stmt.execute("ALTER TABLE products ADD COLUMN manage_stock BOOLEAN DEFAULT FALSE");
-            } catch (SQLException e) {
-            }
+            addColumnIfNotExists(conn, "products", "stock_quantity", "INT DEFAULT 0");
+            addColumnIfNotExists(conn, "products", "min_stock", "INT DEFAULT 0");
+            addColumnIfNotExists(conn, "products", "manage_stock", "BOOLEAN DEFAULT FALSE");
 
-            try {
-                stmt.execute("ALTER TABLE price_lists ADD COLUMN priority INT DEFAULT 0");
-            } catch (SQLException e) {
-            }
-
-            try {
-                stmt.execute("ALTER TABLE categories ADD COLUMN parent_category_id INT DEFAULT NULL");
-            } catch (SQLException e) {
-            }
+            addColumnIfNotExists(conn, "price_lists", "priority", "INT DEFAULT 0");
+            addColumnIfNotExists(conn, "categories", "parent_category_id", "INT DEFAULT NULL");
 
             // --- Rendimiento (Índices para búsquedas de 100K productos) ---
             try {
@@ -173,118 +104,12 @@ public class DatabaseInitializer {
                     "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, " +
                     "FOREIGN KEY (client_id) REFERENCES clients(client_id))");
 
-            // Ensure columns exist and have the right size if table was already there
-            try {
-                stmt.execute("ALTER TABLE sales ADD COLUMN sale_datetime DATETIME");
-            } catch (SQLException e) {
-            }
-            try {
-                stmt.execute("ALTER TABLE sales MODIFY COLUMN sale_datetime DATETIME");
-            } catch (SQLException e) {
-            }
-
-            try {
-                stmt.execute("ALTER TABLE sales ADD COLUMN user_id INT");
-            } catch (SQLException e) {
-            }
-            try {
-                stmt.execute("ALTER TABLE sales MODIFY COLUMN user_id INT");
-            } catch (SQLException e) {
-            }
-
-            try {
-                stmt.execute("ALTER TABLE sales ADD COLUMN client_id INT DEFAULT NULL");
-            } catch (SQLException e) {
-            }
-            try {
-                stmt.execute("ALTER TABLE sales MODIFY COLUMN client_id INT DEFAULT NULL");
-            } catch (SQLException e) {
-            }
-
-            try {
-                stmt.execute("ALTER TABLE sales ADD COLUMN total DECIMAL(10,2) NOT NULL DEFAULT 0");
-            } catch (SQLException e) {
-            }
-            try {
-                stmt.execute("ALTER TABLE sales MODIFY COLUMN total DECIMAL(10,2) NOT NULL DEFAULT 0");
-            } catch (SQLException e) {
-            }
-
-            try {
-                stmt.execute("ALTER TABLE sales ADD COLUMN payment_method VARCHAR(50)");
-            } catch (SQLException e) {
-            }
-            try {
-                stmt.execute("ALTER TABLE sales MODIFY COLUMN payment_method VARCHAR(50)");
-            } catch (SQLException e) {
-            }
-
-            try {
-                stmt.execute("ALTER TABLE sales ADD COLUMN iva DECIMAL(10,2) DEFAULT 0");
-            } catch (SQLException e) {
-            }
-            try {
-                stmt.execute("ALTER TABLE sales MODIFY COLUMN iva DECIMAL(10,2) DEFAULT 0");
-            } catch (SQLException e) {
-            }
-
-            try {
-                stmt.execute("ALTER TABLE sales ADD COLUMN is_return BOOLEAN DEFAULT FALSE");
-            } catch (SQLException e) {
-            }
-            try {
-                stmt.execute("ALTER TABLE sales MODIFY COLUMN is_return BOOLEAN DEFAULT FALSE");
-            } catch (SQLException e) {
-            }
-
-            try {
-                stmt.execute("ALTER TABLE sales ADD COLUMN return_reason TEXT");
-            } catch (SQLException e) {
-            }
-            try {
-                stmt.execute("ALTER TABLE sales MODIFY COLUMN return_reason TEXT");
-            } catch (SQLException e) {
-            }
-
-            try {
-                stmt.execute("ALTER TABLE sales ADD COLUMN closure_id INT DEFAULT NULL");
-            } catch (SQLException e) {
-            }
-            try {
-                stmt.execute("ALTER TABLE sales MODIFY COLUMN closure_id INT DEFAULT NULL");
-            } catch (SQLException e) {
-            }
-
-            try {
-                stmt.execute("ALTER TABLE sales ADD COLUMN created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP");
-            } catch (SQLException e) {
-            }
-            try {
-                stmt.execute("ALTER TABLE sales MODIFY COLUMN created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP");
-            } catch (SQLException e) {
-            }
-
-            // --- Snapshots Fiscales e Inmutabilidad (Fase 3) ---
-            try {
-                stmt.execute("ALTER TABLE sales ADD COLUMN total_net DECIMAL(10,2) DEFAULT 0.00");
-            } catch (SQLException e) {
-            }
-            try {
-                stmt.execute("ALTER TABLE sales ADD COLUMN total_tax DECIMAL(10,2) DEFAULT 0.00");
-            } catch (SQLException e) {
-            }
-            try {
-                stmt.execute("ALTER TABLE sales ADD COLUMN customer_name_snapshot VARCHAR(255) DEFAULT NULL");
-            } catch (SQLException e) {
-            }
-            try {
-                stmt.execute("ALTER TABLE sales ADD COLUMN discount_amount DECIMAL(10,2) DEFAULT 0.00");
-            } catch (SQLException e) {
-            }
-            try {
-                stmt.execute("ALTER TABLE sales ADD COLUMN discount_reason VARCHAR(255) DEFAULT NULL");
-            } catch (SQLException e) {
-            }
+            addColumnIfNotExists(conn, "sales", "closure_id", "INT DEFAULT NULL");
+            addColumnIfNotExists(conn, "sales", "total_net", "DECIMAL(10,2) DEFAULT 0.00");
+            addColumnIfNotExists(conn, "sales", "total_tax", "DECIMAL(10,2) DEFAULT 0.00");
+            addColumnIfNotExists(conn, "sales", "customer_name_snapshot", "VARCHAR(255) DEFAULT NULL");
+            addColumnIfNotExists(conn, "sales", "discount_amount", "DECIMAL(10,2) DEFAULT 0.00");
+            addColumnIfNotExists(conn, "sales", "discount_reason", "VARCHAR(255) DEFAULT NULL");
 
             // 2. Sale Details Table
             stmt.execute("CREATE TABLE IF NOT EXISTS sale_details (" +
@@ -296,72 +121,20 @@ public class DatabaseInitializer {
                     "line_total DECIMAL(10,2), " +
                     "FOREIGN KEY (sale_id) REFERENCES sales(sale_id))");
 
-            try {
-                stmt.execute("ALTER TABLE sale_details ADD COLUMN unit_price DECIMAL(10,2)");
-            } catch (SQLException e) {
-            }
-            try {
-                stmt.execute("ALTER TABLE sale_details MODIFY COLUMN unit_price DECIMAL(10,2)");
-            } catch (SQLException e) {
-            }
-
-            try {
-                stmt.execute("ALTER TABLE sale_details ADD COLUMN line_total DECIMAL(10,2)");
-            } catch (SQLException e) {
-            }
-            try {
-                stmt.execute("ALTER TABLE sale_details MODIFY COLUMN line_total DECIMAL(10,2)");
-            } catch (SQLException e) {
-            }
-
-            try {
-                stmt.execute("ALTER TABLE sale_details ADD COLUMN returned_quantity INT DEFAULT 0");
-            } catch (SQLException e) {
-            }
-            try {
-                stmt.execute("ALTER TABLE sale_details ADD COLUMN observations TEXT DEFAULT NULL");
-            } catch (SQLException e) {
-            }
-
-            // Add returned_amount to sales table for easier tracking
-            try {
-                stmt.execute("ALTER TABLE sales ADD COLUMN returned_amount DECIMAL(10,2) DEFAULT 0.00");
-            } catch (SQLException e) {
-            }
+            addColumnIfNotExists(conn, "sale_details", "returned_quantity", "INT DEFAULT 0");
+            addColumnIfNotExists(conn, "sale_details", "observations", "TEXT DEFAULT NULL");
+            addColumnIfNotExists(conn, "sales", "returned_amount", "DECIMAL(10,2) DEFAULT 0.00");
 
             // --- Detalles de venta con desglose de IVA ---
-            try {
-                stmt.execute("ALTER TABLE sale_details ADD COLUMN iva_rate DECIMAL(5,2) DEFAULT 21.0");
-            } catch (SQLException e) {
-            }
-            try {
-                stmt.execute("ALTER TABLE sale_details ADD COLUMN iva_amount DECIMAL(10,2) DEFAULT 0.00");
-            } catch (SQLException e) {
-            }
-
-            // --- Campos para Snapshot Fiscal V2 (Tax Engine) ---
-            String[] v2SaleDetailCols = {
-                    "net_unit_price DECIMAL(10,4) DEFAULT 0.00",
-                    "tax_basis DECIMAL(10,2) DEFAULT 0.00",
-                    "tax_amount DECIMAL(10,2) DEFAULT 0.00",
-                    "gross_total DECIMAL(10,2) DEFAULT 0.00",
-                    "applied_tax_group VARCHAR(100) DEFAULT NULL"
-            };
-            for (String col : v2SaleDetailCols) {
-                try {
-                    stmt.execute("ALTER TABLE sale_details ADD COLUMN " + col);
-                } catch (SQLException e) {
-                }
-            }
-
-            try {
-                stmt.execute("ALTER TABLE sale_details ADD COLUMN sku_snapshot VARCHAR(50) DEFAULT NULL");
-            } catch (SQLException e) {
-            }
-            try {
-                stmt.execute("ALTER TABLE sale_details ADD COLUMN category_name_snapshot VARCHAR(100) DEFAULT NULL");
-            } catch (SQLException e) {
-            }
+            addColumnIfNotExists(conn, "sale_details", "iva_rate", "DECIMAL(5,2) DEFAULT 21.0");
+            addColumnIfNotExists(conn, "sale_details", "iva_amount", "DECIMAL(10,2) DEFAULT 0.00");
+            addColumnIfNotExists(conn, "sale_details", "net_unit_price", "DECIMAL(10,4) DEFAULT 0.00");
+            addColumnIfNotExists(conn, "sale_details", "tax_basis", "DECIMAL(10,2) DEFAULT 0.00");
+            addColumnIfNotExists(conn, "sale_details", "tax_amount", "DECIMAL(10,2) DEFAULT 0.00");
+            addColumnIfNotExists(conn, "sale_details", "gross_total", "DECIMAL(10,2) DEFAULT 0.00");
+            addColumnIfNotExists(conn, "sale_details", "applied_tax_group", "VARCHAR(100) DEFAULT NULL");
+            addColumnIfNotExists(conn, "sale_details", "sku_snapshot", "VARCHAR(50) DEFAULT NULL");
+            addColumnIfNotExists(conn, "sale_details", "category_name_snapshot", "VARCHAR(100) DEFAULT NULL");
 
             // 3. Closures Table
             stmt.execute("CREATE TABLE IF NOT EXISTS cash_closures (" +
@@ -435,14 +208,17 @@ public class DatabaseInitializer {
                     "closure_id INT DEFAULT NULL, " +
                     "FOREIGN KEY (sale_id) REFERENCES sales(sale_id))");
 
-            try {
-                stmt.execute("ALTER TABLE returns ADD COLUMN closure_id INT DEFAULT NULL");
-            } catch (SQLException e) {
-            }
-            try {
-                stmt.execute("ALTER TABLE returns ADD COLUMN payment_method VARCHAR(50)");
-            } catch (SQLException e) {
-            }
+            addColumnIfNotExists(conn, "returns", "doc_type", "VARCHAR(20) DEFAULT 'RECTIFICATIVA'");
+            addColumnIfNotExists(conn, "returns", "doc_series", "VARCHAR(10) DEFAULT 'R'");
+            addColumnIfNotExists(conn, "returns", "doc_number", "INT DEFAULT NULL");
+            addColumnIfNotExists(conn, "returns", "doc_status", "VARCHAR(20) DEFAULT 'EMITIDO'");
+            addColumnIfNotExists(conn, "returns", "control_hash", "VARCHAR(64) DEFAULT NULL");
+            addColumnIfNotExists(conn, "returns", "customer_name_snapshot", "VARCHAR(255) DEFAULT NULL");
+            addColumnIfNotExists(conn, "returns", "issuer_name", "VARCHAR(255) DEFAULT NULL");
+            addColumnIfNotExists(conn, "returns", "issuer_tax_id", "VARCHAR(50) DEFAULT NULL");
+            addColumnIfNotExists(conn, "returns", "issuer_address", "TEXT DEFAULT NULL");
+            addColumnIfNotExists(conn, "returns", "closure_id", "INT DEFAULT NULL");
+            addColumnIfNotExists(conn, "returns", "payment_method", "VARCHAR(50)");
 
             // 5. Return Details Table
             stmt.execute("CREATE TABLE IF NOT EXISTS return_details (" +
@@ -468,22 +244,12 @@ public class DatabaseInitializer {
                     "attempts INT DEFAULT 0, " +
                     "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)");
 
-            // Asegurarse de que la columna 'attempts' existe en instalaciones antiguas (Fix
-            // V-01)
-            try {
-                stmt.execute("ALTER TABLE password_recoveries ADD COLUMN attempts INT DEFAULT 0");
-            } catch (SQLException ignored) {
-                /* Ya existe */ }
+            addColumnIfNotExists(conn, "password_recoveries", "attempts", "INT DEFAULT 0");
 
             // 8. Promotions table check
-            try {
-                stmt.execute("ALTER TABLE promotions ADD COLUMN buy_qty INT DEFAULT 0");
-            } catch (SQLException e) {
-            }
-            try {
-                stmt.execute("ALTER TABLE promotions ADD COLUMN free_qty INT DEFAULT 0");
-            } catch (SQLException e) {
-            }
+            addColumnIfNotExists(conn, "promotions", "buy_qty", "INT DEFAULT 0");
+            addColumnIfNotExists(conn, "promotions", "free_qty", "INT DEFAULT 0");
+
             String[][] companyDefaults = {
                     { "companyName", "MI EMPRESA S.L." },
                     { "cif", "B12345678" },
@@ -494,10 +260,13 @@ public class DatabaseInitializer {
                     { "currency", "EUR" },
                     { "roundingMethod", "LINE" } // LINE or GLOBAL
             };
-            for (String[] row : companyDefaults) {
-                stmt.execute(String.format(
-                        "INSERT IGNORE INTO system_config (config_key, config_value) VALUES ('%s', '%s')",
-                        row[0], row[1]));
+            try (java.sql.PreparedStatement pstmt = conn
+                    .prepareStatement("INSERT IGNORE INTO system_config (config_key, config_value) VALUES (?, ?)")) {
+                for (String[] row : companyDefaults) {
+                    pstmt.setString(1, row[0]);
+                    pstmt.setString(2, row[1]);
+                    pstmt.execute();
+                }
             }
 
             // 7. Permissions Catalog Table
@@ -858,18 +627,9 @@ public class DatabaseInitializer {
                     "notes TEXT, " +
                     "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)");
 
-            try {
-                stmt.execute("ALTER TABLE cash_fund_sessions ADD COLUMN notes TEXT");
-            } catch (SQLException e) {
-            }
-            try {
-                stmt.execute("ALTER TABLE cash_fund_sessions ADD COLUMN closure_id INT DEFAULT NULL");
-            } catch (SQLException e) {
-            }
-            try {
-                stmt.execute("ALTER TABLE cash_fund_sessions ADD COLUMN is_closed BOOLEAN DEFAULT FALSE");
-            } catch (SQLException e) {
-            }
+            addColumnIfNotExists(conn, "cash_fund_sessions", "notes", "TEXT");
+            addColumnIfNotExists(conn, "cash_fund_sessions", "closure_id", "INT DEFAULT NULL");
+            addColumnIfNotExists(conn, "cash_fund_sessions", "is_closed", "BOOLEAN DEFAULT FALSE");
 
             // 8. Cash Withdrawals Table (retiradas de efectivo)
             stmt.execute("CREATE TABLE IF NOT EXISTS cash_withdrawals (" +
@@ -889,10 +649,7 @@ public class DatabaseInitializer {
                     "reason VARCHAR(255), " +
                     "closure_id INT DEFAULT NULL, " +
                     "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)");
-            try {
-                stmt.execute("ALTER TABLE cash_withdrawals ADD COLUMN closure_id INT DEFAULT NULL");
-            } catch (SQLException e) {
-            }
+            addColumnIfNotExists(conn, "cash_withdrawals", "closure_id", "INT DEFAULT NULL");
 
             // ============================================================
             // ÍNDICES DE RENDIMIENTO
@@ -1063,32 +820,16 @@ public class DatabaseInitializer {
                     + ")");
 
             // Ensure columns exist for tax_rates and tax_groups (Fix for "name not found")
-            String[] taxRateCols = {
-                    "name VARCHAR(100) NOT NULL",
-                    "rate DECIMAL(5,2) NOT NULL",
-                    "country VARCHAR(50) DEFAULT 'España'",
-                    "region VARCHAR(50) DEFAULT NULL",
-                    "valid_from DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP",
-                    "valid_to DATETIME NULL",
-                    "active BOOLEAN DEFAULT TRUE"
-            };
-            for (String col : taxRateCols) {
-                try {
-                    stmt.execute("ALTER TABLE tax_rates ADD COLUMN " + col);
-                } catch (SQLException e) {
-                }
-            }
+            addColumnIfNotExists(conn, "tax_rates", "name", "VARCHAR(100) NOT NULL");
+            addColumnIfNotExists(conn, "tax_rates", "rate", "DECIMAL(5,2) NOT NULL");
+            addColumnIfNotExists(conn, "tax_rates", "country", "VARCHAR(50) DEFAULT 'España'");
+            addColumnIfNotExists(conn, "tax_rates", "region", "VARCHAR(50) DEFAULT NULL");
+            addColumnIfNotExists(conn, "tax_rates", "valid_from", "DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP");
+            addColumnIfNotExists(conn, "tax_rates", "valid_to", "DATETIME NULL");
+            addColumnIfNotExists(conn, "tax_rates", "active", "BOOLEAN DEFAULT TRUE");
 
-            String[] taxGroupCols = {
-                    "name VARCHAR(100) NOT NULL",
-                    "is_default BOOLEAN DEFAULT FALSE"
-            };
-            for (String col : taxGroupCols) {
-                try {
-                    stmt.execute("ALTER TABLE tax_groups ADD COLUMN " + col);
-                } catch (SQLException e) {
-                }
-            }
+            addColumnIfNotExists(conn, "tax_groups", "name", "VARCHAR(100) NOT NULL");
+            addColumnIfNotExists(conn, "tax_groups", "is_default", "BOOLEAN DEFAULT FALSE");
 
             stmt.execute("CREATE TABLE IF NOT EXISTS sale_tax_summary ("
                     + "summary_id   INT AUTO_INCREMENT PRIMARY KEY, "
@@ -1101,18 +842,9 @@ public class DatabaseInitializer {
                     + "FOREIGN KEY (sale_id) REFERENCES sales(sale_id) ON DELETE CASCADE"
                     + ")");
 
-            // Ensure columns exist for older installations
-            String[] summaryCols = {
-                    "tax_rate_id INT NOT NULL DEFAULT 1",
-                    "tax_name VARCHAR(100) DEFAULT 'IVA'",
-                    "tax_rate DECIMAL(5,2) DEFAULT 21.0"
-            };
-            for (String col : summaryCols) {
-                try {
-                    stmt.execute("ALTER TABLE sale_tax_summary ADD COLUMN " + col);
-                } catch (SQLException e) {
-                }
-            }
+            addColumnIfNotExists(conn, "sale_tax_summary", "tax_rate_id", "INT NOT NULL DEFAULT 1");
+            addColumnIfNotExists(conn, "sale_tax_summary", "tax_name", "VARCHAR(100) DEFAULT 'IVA'");
+            addColumnIfNotExists(conn, "sale_tax_summary", "tax_rate", "DECIMAL(5,2) DEFAULT 21.0");
 
             // ─── TAX REVISIONS TABLE (V2) ───────────────────────────────────
             stmt.execute("CREATE TABLE IF NOT EXISTS tax_revisions (" +
@@ -1208,7 +940,8 @@ public class DatabaseInitializer {
             int currentYear = java.time.LocalDate.now().getYear();
             stmt.execute("INSERT IGNORE INTO doc_series (series_code, prefix, last_number, year, description) VALUES " +
                     "('T', '" + currentYear + "-T-', 0, " + currentYear + ", 'Tickets / Facturas Simplificadas'), " +
-                    "('F', '" + currentYear + "-F-', 0, " + currentYear + ", 'Facturas Completas')");
+                    "('F', '" + currentYear + "-F-', 0, " + currentYear + ", 'Facturas Completas'), " +
+                    "('R', '" + currentYear + "-R-', 0, " + currentYear + ", 'Facturas Rectificativas (Abonos)')");
 
             // ── 2. Snapshot de emisor por documento ─────────────────────────
             stmt.execute("CREATE TABLE IF NOT EXISTS doc_issuer_snapshots (" +
@@ -1233,33 +966,16 @@ public class DatabaseInitializer {
             } catch (SQLException e) {
                 /* columna ya existe */ }
 
-            // ── 3. Columnas fiscales en la tabla sales (aditivo) ────────────
-            String[] fiscalCols = {
-                    "doc_type       VARCHAR(20)  DEFAULT NULL", // TICKET / FACTURA
-                    "doc_series     VARCHAR(10)  DEFAULT NULL", // T / F
-                    "doc_number     INT          DEFAULT NULL", // correlativo
-                    "doc_status     VARCHAR(20)  DEFAULT NULL", // EMITIDO / ANULADO
-                    "control_hash   VARCHAR(64)  DEFAULT NULL" // SHA-256 integridad
-            };
-            for (String col : fiscalCols) {
-                try {
-                    stmt.execute("ALTER TABLE sales ADD COLUMN " + col);
-                } catch (SQLException e) {
-                    /* columna ya existe */ }
-            }
+            addColumnIfNotExists(conn, "sales", "doc_type", "VARCHAR(20) DEFAULT NULL");
+            addColumnIfNotExists(conn, "sales", "doc_series", "VARCHAR(10) DEFAULT NULL");
+            addColumnIfNotExists(conn, "sales", "doc_number", "INT DEFAULT NULL");
+            addColumnIfNotExists(conn, "sales", "doc_status", "VARCHAR(20) DEFAULT NULL");
+            addColumnIfNotExists(conn, "sales", "control_hash", "VARCHAR(64) DEFAULT NULL");
 
             // ── 4. Columna snapshot de nombre de producto en sale_details ───
             // Garantiza que los detalles de línea son inmutables ante cambios de catálogo.
-            String[] detailSnapCols = {
-                    "product_name_snapshot VARCHAR(255) DEFAULT NULL",
-                    "discount_pct          DECIMAL(5,2)  DEFAULT 0.00"
-            };
-            for (String col : detailSnapCols) {
-                try {
-                    stmt.execute("ALTER TABLE sale_details ADD COLUMN " + col);
-                } catch (SQLException e) {
-                    /* columna ya existe */ }
-            }
+            addColumnIfNotExists(conn, "sale_details", "product_name_snapshot", "VARCHAR(255) DEFAULT NULL");
+            addColumnIfNotExists(conn, "sale_details", "discount_pct", "DECIMAL(5,2) DEFAULT 0.00");
 
             // ── 5. Migración inicial: rellenar snapshot con nombre actual ───
             // Sólo rellena filas donde product_name_snapshot todavía es NULL
@@ -1390,6 +1106,26 @@ public class DatabaseInitializer {
             stmt.execute(sql);
         } catch (SQLException e) {
             // El índice ya existe o no es soportado — se ignora
+        }
+    }
+
+    /**
+     * Añade una columna a una tabla solo si no existe ya, evitando excepciones
+     * ruidosas
+     * y mejorando el rendimiento de la inicialización de esquemas.
+     */
+    private static void addColumnIfNotExists(Connection conn, String tableName, String columnName, String columnType) {
+        try {
+            ResultSet rs = conn.getMetaData().getColumns(null, null, tableName.toUpperCase(), columnName.toUpperCase());
+            if (!rs.next()) {
+                try (Statement stmt = conn.createStatement()) {
+                    stmt.execute("ALTER TABLE " + tableName + " ADD COLUMN " + columnName + " " + columnType);
+                }
+            }
+        } catch (SQLException e) {
+            // Error al consultar metadatos o al ejecutar ALTER
+            System.err.println("[DB-INIT] No se pudo añadir la columna " + columnName + " en " + tableName + ": "
+                    + e.getMessage());
         }
     }
 }
