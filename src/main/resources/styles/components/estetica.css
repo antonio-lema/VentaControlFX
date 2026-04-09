@@ -13,7 +13,7 @@
    HEADER
    ============================================================ */
 .estetica-header {
-    -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #1e88e5 0%, #1565c0 100%);
+    -fx-background-color: -fx-grad-primary;
     -fx-padding: 28 32 24 32;
     -fx-effect: dropshadow(three-pass-box, -fx-shadow-color-medium, 12, 0, 0, 4);
 }
@@ -65,14 +65,14 @@
 
 .estetica-tab-btn:hover {
     -fx-text-fill: -fx-text-custom-main;
-    -fx-background-color: rgba(30, 136, 229, 0.1);
-    -fx-border-color: #64b5f6;
+    -fx-background-color: -fx-custom-color-primary-bg;
+    -fx-border-color: -fx-custom-color-primary-light;
 }
 
 .estetica-tab-btn.active-tab {
-    -fx-text-fill: #1e88e5;
-    -fx-border-color: #1e88e5;
-    -fx-background-color: rgba(30, 136, 229, 0.1);
+    -fx-text-fill: -fx-custom-color-primary;
+    -fx-border-color: -fx-custom-color-primary;
+    -fx-background-color: -fx-custom-color-primary-bg;
 }
 
 /* ============================================================
@@ -126,7 +126,7 @@
 }
 
 .estetica-icon-blue {
-    -fx-background-color: rgba(30, 136, 229, 0.1);
+    -fx-background-color: -fx-custom-color-primary-bg;
 }
 
 .estetica-icon-green {
@@ -176,7 +176,7 @@
 }
 
 .palette-chip:hover {
-    -fx-border-color: #1e88e5;
+    -fx-border-color: -fx-custom-color-primary;
     -fx-effect: dropshadow(three-pass-box, -fx-shadow-color-subtle, 8, 0, 0, 2);
 }
 
@@ -243,8 +243,8 @@
 }
 
 .estetica-slider-value {
-    -fx-background-color: #1e88e5;
-    -fx-text-fill: white;
+    -fx-background-color: -fx-custom-color-primary;
+    -fx-text-fill: -fx-text-custom-on-primary;
     -fx-font-size: 12px;
     -fx-font-weight: bold;
     -fx-background-radius: 20px;
@@ -265,11 +265,11 @@
 }
 
 .estetica-slider .thumb {
-    -fx-background-color: #1e88e5;
+    -fx-background-color: -fx-custom-color-primary;
     -fx-background-radius: 50;
     -fx-pref-width: 18;
     -fx-pref-height: 18;
-    -fx-effect: dropshadow(three-pass-box, rgba(30, 136, 229, 0.15), 6, 0, 0, 0);
+    -fx-effect: dropshadow(three-pass-box, -fx-shadow-color-primary, 6, 0, 0, 0);
 }
 
 /* ============================================================
@@ -290,7 +290,7 @@
 }
 
 .dark-mode-track.on {
-    -fx-background-color: #1e88e5;
+    -fx-background-color: -fx-custom-color-primary;
 }
 
 /* ============================================================
@@ -324,7 +324,7 @@
 }
 
 .estetica-mini-dot {
-    -fx-background-color: #1e88e5;
+    -fx-background-color: -fx-custom-color-primary;
     -fx-min-width: 10;
     -fx-min-height: 10;
     -fx-background-radius: 50;
@@ -355,18 +355,18 @@
 }
 
 .estetica-btn-save {
-    -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #1e88e5 0%, #1565c0 100%);
-    -fx-text-fill: white !important;
+    -fx-background-color: -fx-grad-primary;
+    -fx-text-fill: -fx-text-custom-on-primary !important;
     -fx-font-weight: bold;
     -fx-font-size: 14px;
     -fx-padding: 11 28;
     -fx-background-radius: 10px;
     -fx-cursor: hand;
-    -fx-effect: dropshadow(three-pass-box, rgba(30, 136, 229, 0.25), 15, 0, 0, 5);
+    -fx-effect: dropshadow(three-pass-box, -fx-shadow-color-primary, 15, 0, 0, 5);
 }
 
 .estetica-btn-save:hover {
-    -fx-effect: dropshadow(three-pass-box, rgba(30, 136, 229, 0.25), 15, 0, 0, 5);
+    -fx-effect: dropshadow(three-pass-box, -fx-shadow-color-primary, 22, 0, 0, 6);
     -fx-scale-x: 1.03;
     -fx-scale-y: 1.03;
 }
@@ -405,9 +405,9 @@
 }
 
 .estetica-btn-secondary:hover {
-    -fx-text-fill: #1e88e5;
-    -fx-border-color: #1e88e5;
-    -fx-background-color: rgba(30, 136, 229, 0.1);
+    -fx-text-fill: -fx-custom-color-primary;
+    -fx-border-color: -fx-custom-color-primary;
+    -fx-background-color: -fx-custom-color-primary-bg;
 }
 
 .estetica-btn-secondary .glyph-icon {
@@ -433,14 +433,14 @@
 }
 
 .theme-option-card:hover {
-    -fx-border-color: #1e88e5;
-    -fx-background-color: rgba(30, 136, 229, 0.1);
+    -fx-border-color: -fx-custom-color-primary;
+    -fx-background-color: -fx-custom-color-primary-bg;
 }
 
 .theme-option-card.selected {
-    -fx-border-color: #1e88e5;
-    -fx-background-color: rgba(30, 136, 229, 0.1);
-    -fx-effect: dropshadow(three-pass-box, rgba(30, 136, 229, 0.15), 8, 0, 0, 0);
+    -fx-border-color: -fx-custom-color-primary;
+    -fx-background-color: -fx-custom-color-primary-bg;
+    -fx-effect: dropshadow(three-pass-box, -fx-shadow-color-primary, 8, 0, 0, 0);
 }
 
 .theme-option-label {

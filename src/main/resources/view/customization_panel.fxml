@@ -132,7 +132,7 @@
                     </VBox>
                 </VBox>
 
-                <!-- FILA DOS COLUMNAS: Colores | Tipograf&#x00ed;a + Tarjetas -->
+                <!-- FILA DOS COLUMNAS: Colores | Tipograf&#x00eda; + Tarjetas -->
                 <HBox spacing="18" fillHeight="true" maxWidth="Infinity">
 
                     <!-- COLUMNA IZQUIERDA: Colores + Modo Tema -->
@@ -151,8 +151,8 @@
                             </HBox>
                             <VBox styleClass="estetica-card-body" spacing="10">
                                 <HBox styleClass="color-row" alignment="CENTER_LEFT" spacing="12">
-                                    <StackPane style="-fx-background-color: -color-primary-bg; -fx-background-radius: 8; -fx-padding: 7;">
-                                        <FontAwesomeIconView glyphName="CIRCLE" size="14" fill="#1e88e5"/>
+                                    <StackPane style="-fx-background-color: -fx-custom-color-primary-bg; -fx-background-radius: 8; -fx-padding: 7;">
+                                        <FontAwesomeIconView glyphName="CIRCLE" size="14" style="-fx-fill: -fx-custom-color-primary;"/>
                                     </StackPane>
                                     <VBox HBox.hgrow="ALWAYS">
                                         <Label text="%custom.color.primary" styleClass="color-row-label"/>
@@ -237,14 +237,14 @@
 
                     </VBox>
 
-                    <!-- COLUMNA DERECHA: Tipograf&#x00ed;a + Tarjetas -->
+                    <!-- COLUMNA DERECHA: Tipograf&#x00eda; + Tarjetas -->
                     <VBox spacing="18" HBox.hgrow="ALWAYS">
 
-                        <!-- TIPOGRAF&#x00cd;A -->
+                        <!-- TIPOGRAF&#x00cdA; -->
                         <VBox styleClass="estetica-card">
                             <HBox styleClass="estetica-card-header" alignment="CENTER_LEFT" spacing="12">
                                 <StackPane styleClass="estetica-card-icon-wrap, estetica-icon-blue">
-                                    <FontAwesomeIconView glyphName="TEXT_HEIGHT" size="16" fill="#1e88e5"/>
+                                    <FontAwesomeIconView glyphName="TEXT_HEIGHT" size="16" style="-fx-fill: -fx-custom-color-primary;"/>
                                 </StackPane>
                                 <VBox>
                                     <Label text="%custom.section.typography" styleClass="estetica-card-title"/>
@@ -382,7 +382,7 @@
                 </graphic>
             </Button>
             <Region HBox.hgrow="ALWAYS"/>
-            <Button text="  %btn.save_changes" onAction="#handleSave" styleClass="estetica-btn-save">
+            <Button text="%btn.save_changes" onAction="#handleSave" styleClass="estetica-btn-save">
                 <graphic>
                     <FontAwesomeIconView glyphName="CHECK" size="13" fill="white"/>
                 </graphic>

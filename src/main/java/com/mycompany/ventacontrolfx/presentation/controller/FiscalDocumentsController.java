@@ -85,10 +85,12 @@ public class FiscalDocumentsController implements Injectable {
             @Override
             protected void updateItem(String item, boolean empty) {
                 super.updateItem(item, empty);
+                getStyleClass().removeAll("text-primary", "text-success", "text-danger");
                 if (empty || item == null) {
                     setText(null);
                     setGraphic(null);
                 } else {
+                    setText(container.getBundle().getString("fiscal.doc.type." + item.toLowerCase()));
                     if ("TICKET".equals(item))
                         getStyleClass().add("text-primary");
                     else if ("FACTURA".equals(item))
@@ -117,7 +119,10 @@ public class FiscalDocumentsController implements Injectable {
                 if (empty || item == null) {
                     setGraphic(null);
                 } else {
-                    Label badge = new Label(container.getBundle().getString("fiscal.doc.status." + item.toLowerCase()));
+                    String statusKey = "fiscal.doc.status." + item.toLowerCase();
+                    String translated = container.getBundle().containsKey(statusKey) 
+                            ? container.getBundle().getString(statusKey) : item;
+                    Label badge = new Label(translated);
                     badge.getStyleClass().add("badge");
                     if ("EMITIDO".equals(item))
                         badge.getStyleClass().add("badge-success");

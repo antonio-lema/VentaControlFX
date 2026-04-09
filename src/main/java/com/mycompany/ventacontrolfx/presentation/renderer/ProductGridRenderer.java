@@ -35,15 +35,21 @@ public class ProductGridRenderer {
         if (labelCountProducts != null)
             labelCountProducts.setText(String.valueOf(products.size()));
 
-        for (Product p : products) {
-            addProductToGrid(p);
+        if (products.isEmpty()) {
+            Label placeholder = new Label(bundle.getString("product.renderer.no_results"));
+            placeholder.setStyle("-fx-font-size: 16px; -fx-text-fill: -fx-text-custom-muted; -fx-padding: 40 0;");
+            
+            // Animaci\u00f3n simple para el placeholder
+            placeholder.setOpacity(0);
+            productsPane.getChildren().add(placeholder);
+            javafx.animation.FadeTransition ft = new javafx.animation.FadeTransition(javafx.util.Duration.millis(400), placeholder);
+            ft.setToValue(1.0);
+            ft.play();
+        } else {
+            for (Product p : products) {
+                addProductToGrid(p);
+            }
         }
-
-        // Animation de entrada
-        javafx.animation.FadeTransition ft = new javafx.animation.FadeTransition(javafx.util.Duration.millis(300), productsPane);
-        ft.setFromValue(0.0);
-        ft.setToValue(1.0);
-        ft.play();
     }
 
     public void showSkeleton(int count) {
@@ -70,6 +76,29 @@ public class ProductGridRenderer {
     private void addProductToGrid(Product p) {
         String discountDesc = promotionResolver != null ? promotionResolver.apply(p) : null;
         ProductBox box = new ProductBox(p, globalTaxRate, pricesIncludeTax, discountDesc, bundle, onAddToCart);
+        
+        // Estado inicial para la animaci\u00f3n (desplazado hacia abajo y transparente)
+        box.setOpacity(0);
+        box.setTranslateY(30);
+        
         productsPane.getChildren().add(box);
+        
+        // Animaci\u00f3n de entrada (Slide up + Fade in)
+        javafx.animation.FadeTransition ft = new javafx.animation.FadeTransition(javafx.util.Duration.millis(500), box);
+        ft.setToValue(1.0);
+        
+        javafx.animation.TranslateTransition tt = new javafx.animation.TranslateTransition(javafx.util.Duration.millis(500), box);
+        tt.setToY(0);
+        
+        javafx.animation.ParallelTransition pt = new javafx.animation.ParallelTransition(ft, tt);
+        
+        // Retraso escalonado (staggered) para un efecto m\u00e1s org\u00e1nico
+        int index = productsPane.getChildren().size() - 1;
+        // Solo aplicar retraso escalonado a los primeros 24 elementos por rendimiento
+        if (index < 24) {
+            pt.setDelay(javafx.util.Duration.millis(index * 40));
+        }
+        
+        pt.play();
     }
 }

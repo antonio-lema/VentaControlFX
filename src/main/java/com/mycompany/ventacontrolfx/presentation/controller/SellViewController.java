@@ -131,7 +131,10 @@ public class SellViewController implements Injectable, CategoryMenuRenderer.Cate
     }
 
     private void loadInitialData() {
+        productRenderer.showSkeleton(16);
         loadingOverlay.setVisible(true);
+        loadingOverlay.setStyle("-fx-background-color: transparent;");
+
         this.selectedPriceListId = container.getCartUseCase().getPriceListId();
 
         container.getAsyncManager().runAsyncTask(() -> {

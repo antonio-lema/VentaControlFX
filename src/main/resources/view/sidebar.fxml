@@ -13,7 +13,7 @@
         <Insets top="0" right="0" bottom="20" left="0"/>
     </padding>
 
-    <!-- &#x2500;&#x2500;&#x2500; BRANDING SECCI&#x00d3;N &#x2500;&#x2500;&#x2500; -->
+    <!--  BRANDING SECCI&#x00d3;N  -->
     <VBox alignment="CENTER" styleClass="sidebar-branding">
         <StackPane fx:id="brandIconWrap" styleClass="brand-icon-wrap" alignment="CENTER">
             <FontAwesomeIconView fx:id="brandFallbackIcon" glyphName="SHOPPING_CART" size="26" styleClass="brand-fallback-icon"/>
@@ -123,9 +123,9 @@
     <!-- IDIOMA -->
     <HBox spacing="10" alignment="CENTER" style="-fx-padding: 10 0;">
         <children>
-            <Button text="ES" onAction="#setLanguageEs" styleClass="btn-link" style="-fx-font-weight: bold; -fx-text-fill: #3b82f6;"/>
+            <Button text="ES" onAction="#setLanguageEs" styleClass="btn-link" style="-fx-font-weight: bold; -fx-text-fill: -fx-custom-color-primary;"/>
             <Label text="|" styleClass="label-muted"/>
-            <Button text="EN" onAction="#setLanguageEn" styleClass="btn-link" style="-fx-font-weight: bold; -fx-text-fill: #3b82f6;"/>
+            <Button text="EN" onAction="#setLanguageEn" styleClass="btn-link" style="-fx-font-weight: bold; -fx-text-fill: -fx-custom-color-primary;"/>
         </children>
     </HBox>
 

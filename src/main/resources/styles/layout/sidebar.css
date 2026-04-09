@@ -72,9 +72,10 @@
 /* Estilo para la cabecera cuando la sección está activa/expandida */
 /* Nota: En el SidebarController se podría añadir una clase técnica si se quiere ser perfecto */
 .sidebar-section-header-active {
-    -fx-background-color: #1c629f;
-    /* Blue highlight from image */
+    -fx-background-color: -fx-custom-color-primary-alpha40;
     -fx-text-fill: white !important;
+    -fx-border-color: -fx-custom-color-primary-light;
+    -fx-border-width: 0 0 0 4;
 }
 
 /* ─── Botones de navegación ──────────────────────────────────────── */
@@ -108,10 +109,9 @@
 
 /* ─── Ítem activo (Capsule Glow) ─────────────────────────────────── */
 .active-sidebar-button {
-    -fx-background-color: linear-gradient(to right, #7b61ff, #9c27b0);
-    /* Púrpura gradiente como la imagen */
-    -fx-text-fill: white !important;
-    -fx-effect: dropshadow(three-pass-box, rgba(156, 39, 176, 0.4), 15, 0, 0, 0);
+    -fx-background-color: -fx-grad-sidebar-active;
+    -fx-text-fill: -fx-text-custom-on-primary !important;
+    -fx-effect: dropshadow(three-pass-box, -fx-shadow-color-primary, 15, 0, 0, 0);
     -fx-background-radius: 12px;
     -fx-margin: 5 10;
     -fx-padding: 12 10;

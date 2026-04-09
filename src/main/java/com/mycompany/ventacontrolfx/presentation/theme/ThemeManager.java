@@ -39,7 +39,8 @@ public class ThemeManager {
             "/styles/components/devoluciones.css",
             "/styles/components/informes.css",
             "/styles/components/vender.css",
-            "/styles/components/alertas.css"
+            "/styles/components/alertas.css",
+            "/styles/skeleton.css"
     };
 
     public ThemeManager(IAppSettingsRepository settingsRepository) {
@@ -202,8 +203,8 @@ public class ThemeManager {
         }
 
         // El color elegido por el usuario ES el color SUPERIOR del gradiente.
-        // Gradiente: vibrante (top) \u00e2\u2020\u2019 35% m\u00e1s oscuro (mid) \u00e2\u2020\u2019 65% m\u00e1s oscuro (bot)
-        // As\u00ed, con sidebar = #1e88e5 (azul) se ver\u00e1: azul \u00e2\u2020\u2019 azul medio \u00e2\u2020\u2019 azul casi
+        // Gradiente: vibrante (top) \u2192 35% m\u00e1s oscuro (mid) \u2192 65% m\u00e1s oscuro (bot)
+        // As\u00ed, con sidebar = #1e88e5 (azul) se ver\u00e1: azul \u2192 azul medio \u2192 azul casi
         // negro
         final String sidebarTop = settings.getOrDefault("ui.sidebar_bg", "#0f172a");
         final String sidebarMid = darken(sidebarTop, 0.35);
