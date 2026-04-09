@@ -15,7 +15,7 @@
           HBox.hgrow="ALWAYS" maxWidth="480">
         <FontAwesomeIconView glyphName="SEARCH" size="16" fill="#adb5bd"/>
         <TextField fx:id="searchField"
-                   promptText="Buscar productos, clientes o códigos..."
+                   promptText="%header.search.prompt"
                    styleClass="search-field"
                    HBox.hgrow="ALWAYS"/>
     </HBox>
@@ -37,7 +37,7 @@
                     <StackPane.margin><Insets top="-8" right="-8"/></StackPane.margin>
                 </Label>
             </StackPane>
-            <Label text="Avisos Stock" style="-fx-text-fill: #e53935; -fx-font-weight: bold; -fx-font-size: 12px;"/>
+            <Label text="%header.stock_alerts" style="-fx-text-fill: #e53935; -fx-font-weight: bold; -fx-font-size: 12px;"/>
             <HBox.margin><Insets right="10"/></HBox.margin>
         </HBox>
 
@@ -47,7 +47,7 @@
                 <HBox spacing="10" alignment="CENTER_LEFT">
                     <VBox alignment="CENTER_RIGHT" spacing="1">
                         <Label fx:id="lblHeaderUsername" text="Administrador" styleClass="label"/>
-                        <Label text="En línea" styleClass="label-muted user-status-online"/>
+                        <Label text="%header.status.online" styleClass="label-muted user-status-online"/>
                     </VBox>
                     <StackPane>
                         <Circle radius="18" styleClass="user-avatar-circle"/>
@@ -56,11 +56,11 @@
                 </HBox>
             </graphic>
             <items>
-                <MenuItem fx:id="menuItemCashClosure" text="Cerrar caja" onAction="#handleCashClosure">
+                <MenuItem fx:id="menuItemCashClosure" text="%header.user.close_cash" onAction="#handleCashClosure">
                     <graphic><FontAwesomeIconView glyphName="MONEY" size="14"/></graphic>
                 </MenuItem>
                 <SeparatorMenuItem />
-                <MenuItem fx:id="menuItemLogout" text="Cerrar sesión" onAction="#handleLogout">
+                <MenuItem fx:id="menuItemLogout" text="%header.user.logout" onAction="#handleLogout">
                     <graphic><FontAwesomeIconView glyphName="SIGN_OUT" size="14" fill="#e53935"/></graphic>
                 </MenuItem>
             </items>

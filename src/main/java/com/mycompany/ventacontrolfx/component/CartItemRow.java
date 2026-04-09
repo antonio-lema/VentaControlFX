@@ -29,10 +29,14 @@ public class CartItemRow extends HBox {
     private final double globalTaxRate;
     private final boolean pricesIncludeTax;
 
-    public CartItemRow(CartItem cartItem, double globalTaxRate, boolean pricesIncludeTax, Runnable onIncrement,
-            Runnable onDecrement, Runnable onDelete,
+    private final java.util.ResourceBundle bundle;
+
+    public CartItemRow(CartItem cartItem, double globalTaxRate, boolean pricesIncludeTax, 
+            java.util.ResourceBundle bundle,
+            Runnable onIncrement, Runnable onDecrement, Runnable onDelete,
             Consumer<Integer> onSetQuantity, Runnable onEdit) {
         this.cartItem = cartItem;
+        this.bundle = bundle;
         this.globalTaxRate = globalTaxRate;
         this.pricesIncludeTax = pricesIncludeTax;
         Product product = cartItem.getProduct();
@@ -49,7 +53,7 @@ public class CartItemRow extends HBox {
         VBox infoBox = new VBox(4);
         infoBox.setAlignment(Pos.CENTER_LEFT);
 
-        Label nameLabel = new Label(product.getName());
+        Label nameLabel = new Label(translateDynamic(product.getName()));
         nameLabel.getStyleClass().add("cart-item-name");
 
         Label observationLabel = new Label();
@@ -270,5 +274,13 @@ public class CartItemRow extends HBox {
         } catch (NumberFormatException e) {
             field.setText(String.valueOf(cartItem.getQuantity()));
         }
+    }
+
+    private String translateDynamic(String text) {
+        if (text == null || text.isBlank()) return text;
+        if (bundle != null && bundle.containsKey(text)) {
+            return bundle.getString(text);
+        }
+        return text;
     }
 }

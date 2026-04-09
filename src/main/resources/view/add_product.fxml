@@ -21,8 +21,8 @@
         </padding>
         <!-- Header -->
         <VBox styleClass="modern-register-header" alignment="CENTER_LEFT">
-            <Label fx:id="lblTitle" text="Producto" styleClass="modern-register-title"/>
-            <Label fx:id="lblSubtitle" text="Introduce los datos del producto" styleClass="modern-register-subtitle" style="-fx-text-fill: #64748b;"/>
+            <Label fx:id="lblTitle" text="%product.form.title" styleClass="modern-register-title"/>
+            <Label fx:id="lblSubtitle" text="%product.form.subtitle" styleClass="modern-register-subtitle" style="-fx-text-fill: #64748b;"/>
         </VBox>
         
         <ScrollPane hbarPolicy="NEVER" vbarPolicy="AS_NEEDED" fitToWidth="true" style="-fx-background-color: transparent; -fx-background: transparent; -fx-padding: 0 10 0 0;">
@@ -31,12 +31,12 @@
                     
                     <!-- Name -->
                     <VBox styleClass="modern-input-group">
-                        <Label text="Nombre del Producto" styleClass="modern-label" style="-fx-text-fill: #1e293b; -fx-font-size: 11px; -fx-font-weight: bold; -fx-padding: 0 0 5 0;"/>
+                        <Label text="%product.form.name" styleClass="modern-label" style="-fx-text-fill: #1e293b; -fx-font-size: 11px; -fx-font-weight: bold; -fx-padding: 0 0 5 0;"/>
                         <HBox styleClass="modern-input-container" alignment="CENTER_LEFT">
                             <FontAwesomeIconView glyphName="TAG" size="18" fill="#64748b">
                                 <HBox.margin><Insets right="10"/></HBox.margin>
                             </FontAwesomeIconView> 
-                            <TextField fx:id="txtName" promptText="Ej: Coca Cola 33cl" styleClass="modern-input-field" HBox.hgrow="ALWAYS" style="-fx-text-fill: #1e293b;"/>
+                            <TextField fx:id="txtName" promptText="%product.form.name.prompt" styleClass="modern-input-field" HBox.hgrow="ALWAYS" style="-fx-text-fill: #1e293b;"/>
                         </HBox>
                     </VBox>
                     
@@ -47,43 +47,43 @@
                     
                     <!-- Category -->
                      <VBox styleClass="modern-input-group">
-                        <Label text="Categoría" styleClass="modern-label" style="-fx-text-fill: #64748b; -fx-font-size: 11px; -fx-font-weight: bold; -fx-padding: 0 0 5 0;"/>
+                        <Label text="%product.form.category" styleClass="modern-label" style="-fx-text-fill: #64748b; -fx-font-size: 11px; -fx-font-weight: bold; -fx-padding: 0 0 5 0;"/>
                         <HBox styleClass="modern-input-container" alignment="CENTER_LEFT">
                             <FontAwesomeIconView glyphName="FOLDER_OPEN" size="18" fill="#64748b">
                                 <HBox.margin><Insets right="10"/></HBox.margin>
                             </FontAwesomeIconView> 
-                            <ComboBox fx:id="cmbCategory" promptText="Seleccionar..." styleClass="modern-input-field" maxWidth="Infinity" HBox.hgrow="ALWAYS" style="-fx-background-color: transparent; -fx-text-fill: #1e293b;"/>
+                            <ComboBox fx:id="cmbCategory" promptText="%product.form.category.prompt" styleClass="modern-input-field" maxWidth="Infinity" HBox.hgrow="ALWAYS" style="-fx-background-color: transparent; -fx-text-fill: #1e293b;"/>
                         </HBox>
                     </VBox>
 
                     <!-- Tax Group (V2) -->
                     <VBox styleClass="modern-input-group">
-                        <Label text="Grupo de Impuestos" styleClass="modern-label" style="-fx-text-fill: #64748b; -fx-font-size: 11px; -fx-font-weight: bold; -fx-padding: 0 0 5 0;"/>
+                        <Label text="%product.form.tax_group" styleClass="modern-label" style="-fx-text-fill: #64748b; -fx-font-size: 11px; -fx-font-weight: bold; -fx-padding: 0 0 5 0;"/>
                         <HBox styleClass="modern-input-container" alignment="CENTER_LEFT">
                             <FontAwesomeIconView glyphName="SHIELD" size="18" fill="#64748b">
                                 <HBox.margin><Insets right="10"/></HBox.margin>
                             </FontAwesomeIconView> 
-                            <ComboBox fx:id="cmbTaxGroup" promptText="Seleccionar grupo fiscal..." styleClass="modern-input-field" maxWidth="Infinity" HBox.hgrow="ALWAYS" style="-fx-background-color: transparent; -fx-text-fill: #1e293b;"/>
+                            <ComboBox fx:id="cmbTaxGroup" promptText="%product.form.tax_group.prompt" styleClass="modern-input-field" maxWidth="Infinity" HBox.hgrow="ALWAYS" style="-fx-background-color: transparent; -fx-text-fill: #1e293b;"/>
                         </HBox>
                     </VBox>
 
                     <!-- IVA Legacy -->
                     <VBox styleClass="modern-input-group">
-                        <Label text="IVA Específico (Opcional)" styleClass="modern-label" style="-fx-text-fill: #64748b; -fx-font-size: 11px; -fx-font-weight: bold; -fx-padding: 0 0 5 0;"/>
+                        <Label text="%product.form.iva" styleClass="modern-label" style="-fx-text-fill: #64748b; -fx-font-size: 11px; -fx-font-weight: bold; -fx-padding: 0 0 5 0;"/>
                         <HBox styleClass="modern-input-container" alignment="CENTER_LEFT">
                             <FontAwesomeIconView glyphName="PERCENT" size="18" fill="#64748b">
                                 <HBox.margin><Insets right="10"/></HBox.margin>
                             </FontAwesomeIconView> 
-                            <TextField fx:id="txtIva" promptText="Ej: 21 (dejar vacío para usar defecto)" styleClass="modern-input-field" HBox.hgrow="ALWAYS" style="-fx-text-fill: #1e293b;"/>
+                            <TextField fx:id="txtIva" promptText="%product.form.iva.prompt" styleClass="modern-input-field" HBox.hgrow="ALWAYS" style="-fx-text-fill: #1e293b;"/>
                         </HBox>
                     </VBox>
 
                     <!-- Stock Management -->
                     <VBox spacing="10" style="-fx-background-color: #f1f5f9; -fx-padding: 15; -fx-background-radius: 8;">
-                        <CheckBox fx:id="chkManageStock" text="Gestionar Inventario / Stock" styleClass="modern-checkbox" style="-fx-font-weight: bold; -fx-text-fill: #1e293b;"/>
+                        <CheckBox fx:id="chkManageStock" text="%product.form.manage_stock" styleClass="modern-checkbox" style="-fx-font-weight: bold; -fx-text-fill: #1e293b;"/>
                         <HBox spacing="15" fx:id="hboxStockDetails">
                             <VBox HBox.hgrow="ALWAYS" spacing="5">
-                                <Label text="Stock Actual" style="-fx-font-size: 11px; -fx-text-fill: #64748b; -fx-font-weight: bold;"/>
+                                <Label text="%product.form.stock_now" style="-fx-font-size: 11px; -fx-text-fill: #64748b; -fx-font-weight: bold;"/>
                                 <HBox styleClass="modern-input-container" alignment="CENTER_LEFT">
                                     <FontAwesomeIconView glyphName="CUBE" size="16" fill="#64748b">
                                         <HBox.margin><Insets right="5"/></HBox.margin>
@@ -92,7 +92,7 @@
                                 </HBox>
                             </VBox>
                             <VBox HBox.hgrow="ALWAYS" spacing="5">
-                                <Label text="Aviso Stock Bajo" style="-fx-font-size: 11px; -fx-text-fill: #64748b; -fx-font-weight: bold;"/>
+                                <Label text="%product.form.stock_min" style="-fx-font-size: 11px; -fx-text-fill: #64748b; -fx-font-weight: bold;"/>
                                 <HBox styleClass="modern-input-container" alignment="CENTER_LEFT">
                                     <FontAwesomeIconView glyphName="BELL" size="16" fill="#64748b">
                                         <HBox.margin><Insets right="5"/></HBox.margin>
@@ -105,9 +105,9 @@
                     
                     <!-- Image & Favorite Row -->
                     <HBox spacing="15" alignment="CENTER_LEFT">
-                        <CheckBox fx:id="chkFavorite" text="Favorito" styleClass="modern-checkbox" style="-fx-text-fill: #1e293b;"/>
+                        <CheckBox fx:id="chkFavorite" text="%product.form.favorite" styleClass="modern-checkbox" style="-fx-text-fill: #1e293b;"/>
                         <Region HBox.hgrow="ALWAYS"/>
-                         <Button fx:id="btnSelectImage" text="Cambiar Imagen" onAction="#handleSelectImage" styleClass="modern-btn-secondary">
+                         <Button fx:id="btnSelectImage" text="%product.form.change_image" onAction="#handleSelectImage" styleClass="modern-btn-secondary">
                             <graphic>
                                  <FontAwesomeIconView glyphName="IMAGE" size="14" fill="#64748b"/>
                             </graphic>
@@ -123,8 +123,8 @@
         
         <!-- Actions -->
         <HBox spacing="15" alignment="CENTER_RIGHT" style="-fx-padding: 30 0 0 0;">
-            <Button text="Cancelar" onAction="#handleCancel" styleClass="modern-btn-secondary" cancelButton="true"/>
-            <Button text="Guardar Producto" onAction="#handleSave" styleClass="modern-btn-primary" defaultButton="true"/>
+            <Button text="%btn.cancel" onAction="#handleCancel" styleClass="modern-btn-secondary" cancelButton="true"/>
+            <Button text="%product.form.btn_save" onAction="#handleSave" styleClass="modern-btn-primary" defaultButton="true"/>
         </HBox>
     </VBox>
 </StackPane>

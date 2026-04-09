@@ -79,8 +79,11 @@ public class PromotionsController implements Injectable {
                     setGraphic(null);
                 } else {
                     Promotion p = getTableRow().getItem();
-                    Label statusLabel = new Label(p.isActive() ? "ACTIVA" : "INACTIVA");
-                    statusLabel.getStyleClass().add(p.isActive() ? "badge-success" : "badge-danger");
+                    boolean active = p.isActive();
+                    Label statusLabel = new Label(active 
+                            ? container.getBundle().getString("promotion.status.active") 
+                            : container.getBundle().getString("promotion.status.inactive"));
+                    statusLabel.getStyleClass().add(active ? "badge-success" : "badge-danger");
                     setGraphic(statusLabel);
                 }
             }
@@ -123,7 +126,7 @@ public class PromotionsController implements Injectable {
             applyFilter();
         } catch (SQLException e) {
             e.printStackTrace();
-            showError("Error al cargar promociones", e.getMessage());
+            showError(container.getBundle().getString("promotion.error.load"), e.getMessage());
         }
     }
 
@@ -159,8 +162,8 @@ public class PromotionsController implements Injectable {
 
     private void handleDelete(Promotion promotion) {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Confirmar eliminación");
-        alert.setHeaderText("¿Estás seguro de que deseas eliminar la promoción?");
+        alert.setTitle(container.getBundle().getString("promotion.confirm.delete.title"));
+        alert.setHeaderText(container.getBundle().getString("promotion.confirm.delete.header"));
         alert.setContentText(promotion.getName());
 
         alert.showAndWait().ifPresent(response -> {
@@ -169,7 +172,7 @@ public class PromotionsController implements Injectable {
                     promotionUseCase.deletePromotion(promotion.getId());
                     loadData();
                 } catch (SQLException e) {
-                    showError("Error al eliminar", e.getMessage());
+                    showError(container.getBundle().getString("promotion.error.delete"), e.getMessage());
                 }
             }
         });
@@ -179,7 +182,7 @@ public class PromotionsController implements Injectable {
         try {
             PromotionFormController controller = com.mycompany.ventacontrolfx.util.ModalService.showTransparentModal(
                 "/view/promotion_form.fxml", 
-                promotion == null ? "Nueva Promoción" : "Editar Promoción", 
+                promotion == null ? container.getBundle().getString("promotion.btn.new") : container.getBundle().getString("promotion.btn.edit"), 
                 container, 
                 c -> c.setPromotion(promotion)
             );
@@ -191,13 +194,13 @@ public class PromotionsController implements Injectable {
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            showError("Error al abrir el formulario", e.getMessage());
+            showError(container.getBundle().getString("promotion.error.form"), e.getMessage());
         }
     }
 
     private void showError(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle("Error");
+        alert.setTitle(container.getBundle().getString("alert.error"));
         alert.setHeaderText(title);
         alert.setContentText(message);
         alert.showAndWait();

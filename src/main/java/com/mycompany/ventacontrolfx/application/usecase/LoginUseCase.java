@@ -54,7 +54,7 @@ public class LoginUseCase {
         }
 
         // 2. Validar contraseña con BCrypt
-        if (!BCrypt.checkpw(password, user.getPassword())) {
+        if (!BCrypt.checkpw(password, user.getPasswordHash())) {
             logFailedAttempt(username, "Contraseña incorrecta");
             throw new InvalidPasswordException();
         }

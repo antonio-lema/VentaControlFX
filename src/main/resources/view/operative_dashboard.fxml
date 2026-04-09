@@ -23,10 +23,10 @@
             </StackPane>
             <VBox spacing="4" HBox.hgrow="ALWAYS">
                 <children>
-                    <Label text="MONITOR OPERATIVO REAL-TIME" styleClass="header-title" />
+                    <Label text="%dashboard.header.title" styleClass="header-title" />
                     <HBox alignment="CENTER_LEFT" spacing="12">
                         <children>
-                            <Label text="Supervisión en vivo de personal, cajas y cumplimiento horario" styleClass="header-subtitle" />
+                            <Label text="%dashboard.header.subtitle" styleClass="header-subtitle" />
                             <Separator orientation="VERTICAL" prefHeight="12" />
                             <Label fx:id="lblServerTime" text="13:30:00" styleClass="header-clock" />
                         </children>
@@ -38,7 +38,7 @@
                     <Button onAction="#refreshData" styleClass="btn-icon-refresh">
                         <graphic><FontAwesomeIconView glyphName="REFRESH" size="16" /></graphic>
                     </Button>
-                    <Label fx:id="lblBusinessStatus" text="CARGANDO..." styleClass="status-badge" />
+                    <Label fx:id="lblBusinessStatus" text="%dashboard.status.loading" styleClass="status-badge" />
                 </children>
             </HBox>
         </children>
@@ -57,10 +57,10 @@
                                 <children>
                                     <HBox alignment="CENTER_LEFT" spacing="10">
                                         <StackPane styleClass="kpi-icon-wrap"><FontAwesomeIconView glyphName="USERS" size="18" /></StackPane>
-                                        <Label text="PERSONAL ACTIVO" styleClass="kpi-label" />
+                                        <Label text="%dashboard.kpi.active_staff" styleClass="kpi-label" />
                                     </HBox>
                                     <Label fx:id="lblActiveStaffCount" text="0" styleClass="kpi-value" />
-                                    <Label text="Empleados con jornada iniciada" styleClass="kpi-hint" />
+                                    <Label text="%dashboard.kpi.staff_desc" styleClass="kpi-hint" />
                                 </children>
                             </VBox>
                             
@@ -69,12 +69,12 @@
                                 <children>
                                     <HBox alignment="CENTER_LEFT" spacing="10">
                                         <StackPane styleClass="kpi-icon-wrap"><FontAwesomeIconView glyphName="MONEY" size="18" /></StackPane>
-                                        <Label text="ESTADO DE CAJA" styleClass="kpi-label" />
+                                        <Label text="%dashboard.kpi.cash_status" styleClass="kpi-label" />
                                         <Region HBox.hgrow="ALWAYS" />
-                                        <Label fx:id="lblCashStatus" text="ABIERTA" style="-fx-font-weight: bold; -fx-font-size: 10px;" />
+                                        <Label fx:id="lblCashStatus" text="%dashboard.kpi.cash_open" style="-fx-font-weight: bold; -fx-font-size: 10px;" />
                                     </HBox>
                                     <Label fx:id="lblCashAmount" text="0.00 €" styleClass="kpi-value" />
-                                    <Label text="Efectivo total en el cajón" styleClass="kpi-hint" />
+                                    <Label text="%dashboard.kpi.cash_desc" styleClass="kpi-hint" />
                                 </children>
                             </VBox>
 
@@ -83,10 +83,10 @@
                                 <children>
                                     <HBox alignment="CENTER_LEFT" spacing="10">
                                         <StackPane styleClass="kpi-icon-wrap"><FontAwesomeIconView glyphName="CLOCK_ALT" size="18" /></StackPane>
-                                        <Label text="APERTURA HOY" styleClass="kpi-label" />
+                                        <Label text="%dashboard.kpi.today_open" styleClass="kpi-label" />
                                     </HBox>
                                     <Label fx:id="lblDailyOpenTime" text="--:--" styleClass="kpi-value" />
-                                    <Label text="Primer marcaje del día" styleClass="kpi-hint" />
+                                    <Label text="%dashboard.kpi.open_desc" styleClass="kpi-hint" />
                                 </children>
                             </VBox>
 
@@ -95,10 +95,10 @@
                                 <children>
                                     <HBox alignment="CENTER_LEFT" spacing="10">
                                         <StackPane styleClass="kpi-icon-wrap"><FontAwesomeIconView glyphName="CALENDAR_CHECK_O" size="18" /></StackPane>
-                                        <Label text="PLANIFICACIÓN" styleClass="kpi-label" />
+                                        <Label text="%dashboard.kpi.planning" styleClass="kpi-label" />
                                     </HBox>
                                     <Label fx:id="lblScheduleCompliance" text="100%" styleClass="kpi-value" />
-                                    <Label text="Puntualidad operativa" styleClass="kpi-hint" />
+                                    <Label text="%dashboard.kpi.planning_desc" styleClass="kpi-hint" />
                                 </children>
                             </VBox>
                         </children>
@@ -117,21 +117,21 @@
                                 <padding><Insets top="25" right="25" bottom="25" left="25"/></padding>
                                 <children>
                                     <HBox alignment="CENTER_LEFT" spacing="15">
-                                        <Label text="PERSONAL EN TURNO" styleClass="card-title" />
+                                        <Label text="%dashboard.section.staff" styleClass="card-title" />
                                         <Region HBox.hgrow="ALWAYS" />
-                                        <Button text="Ver Historial" styleClass="btn-link" />
+                                        <Button text="%dashboard.btn.history" styleClass="btn-link" />
                                     </HBox>
                                     <TableView fx:id="tableActiveStaff" prefHeight="400" styleClass="modern-table">
                                         <columns>
-                                            <TableColumn fx:id="colStaffStatus" text="ESTADO" prefWidth="100" />
-                                            <TableColumn fx:id="colStaffName" text="COLABORADOR" prefWidth="200" />
-                                            <TableColumn fx:id="colStaffRole" text="ROL" prefWidth="120" />
-                                            <TableColumn fx:id="colStaffShift" text="TURNO ASIG." prefWidth="130" />
-                                            <TableColumn fx:id="colStaffStart" text="INICIO SES." prefWidth="100" />
-                                            <TableColumn fx:id="colStaffDuration" text="TIEMPO" prefWidth="100" />
-                                            <TableColumn fx:id="colStaffProgress" text="PROGRESO" prefWidth="150" />
+                                            <TableColumn fx:id="colStaffStatus" text="%dashboard.table.status" prefWidth="100" />
+                                            <TableColumn fx:id="colStaffName" text="%dashboard.table.staff" prefWidth="200" />
+                                            <TableColumn fx:id="colStaffRole" text="%dashboard.table.role" prefWidth="120" />
+                                            <TableColumn fx:id="colStaffShift" text="%dashboard.table.shift" prefWidth="130" />
+                                            <TableColumn fx:id="colStaffStart" text="%dashboard.table.session_start" prefWidth="100" />
+                                            <TableColumn fx:id="colStaffDuration" text="%dashboard.table.time" prefWidth="100" />
+                                            <TableColumn fx:id="colStaffProgress" text="%dashboard.table.progress" prefWidth="150" />
                                         </columns>
-                                        <placeholder><Label text="No hay personal activo en este momento."/></placeholder>
+                                        <placeholder><Label text="%dashboard.table.empty"/></placeholder>
                                     </TableView>
                                 </children>
                             </VBox>
@@ -145,7 +145,7 @@
                                         <children>
                                             <HBox alignment="CENTER_LEFT" spacing="10">
                                                 <FontAwesomeIconView glyphName="CALENDAR" size="16" fill="#3b82f6" />
-                                                <Label text="HORARIO DE HOY" styleClass="card-subtitle" />
+                                                <Label text="%dashboard.section.today_schedule" styleClass="card-subtitle" />
                                             </HBox>
                                             <VBox fx:id="vboxTodaySchedule" spacing="10" styleClass="today-schedule-list">
                                                 <!-- Dynamic turns added here -->
@@ -159,14 +159,14 @@
                                         <children>
                                             <HBox alignment="CENTER_LEFT" spacing="10">
                                                 <FontAwesomeIconView glyphName="BELL" size="16" fill="#ef4444" />
-                                                <Label text="ALERTAS RECIENTES" styleClass="card-subtitle" />
+                                                <Label text="%dashboard.section.alerts" styleClass="card-subtitle" />
                                             </HBox>
                                             <VBox fx:id="vboxAlerts" spacing="8">
                                                 <children>
                                                     <!-- Alert placeholders -->
                                                     <HBox spacing="8" styleClass="alert-row, alert-info">
                                                         <FontAwesomeIconView glyphName="INFO_CIRCLE" />
-                                                        <Label text="Sistema operando con normalidad." />
+                                                        <Label text="%dashboard.alert.normal" />
                                                     </HBox>
                                                 </children>
                                             </VBox>

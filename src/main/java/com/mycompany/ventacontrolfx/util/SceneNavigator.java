@@ -13,7 +13,7 @@ public class SceneNavigator {
     public static void loadScene(Stage stage, String fxmlPath, String title, double width, double height,
             boolean fullScreen, ServiceContainer container) {
         try {
-            FXMLLoader loader = new FXMLLoader(SceneNavigator.class.getResource(fxmlPath));
+            FXMLLoader loader = new FXMLLoader(SceneNavigator.class.getResource(fxmlPath), container != null ? container.getBundle() : null);
             Parent root = loader.load();
             Scene scene = new Scene(root, width, height);
 

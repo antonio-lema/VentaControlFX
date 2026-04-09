@@ -168,7 +168,8 @@ public class SuspendedCartsDialogController implements Injectable {
             cartList.setAll(carts);
         } catch (SQLException e) {
             e.printStackTrace();
-            AlertUtil.showError("Error", "No se pudieron cargar los carritos: " + e.getMessage());
+            AlertUtil.showError(container.getBundle().getString("alert.error"), 
+                    String.format(container.getBundle().getString("suspended.carts.error.load"), e.getMessage()));
         }
     }
 
@@ -176,7 +177,8 @@ public class SuspendedCartsDialogController implements Injectable {
     private void handleResume() {
         SuspendedCart selected = tblCarts.getSelectionModel().getSelectedItem();
         if (selected == null) {
-            AlertUtil.showWarning("Selección requerida", "Por favor, seleccione un carrito para recuperar.");
+            AlertUtil.showWarning(container.getBundle().getString("suspended.carts.select_required"), 
+                    container.getBundle().getString("suspended.carts.warn.select_resume"));
             return;
         }
 
@@ -189,19 +191,22 @@ public class SuspendedCartsDialogController implements Injectable {
             handleClose();
         } catch (Exception e) {
             e.printStackTrace();
-            AlertUtil.showError("Error", "No se pudo recuperar el carrito: " + e.getMessage());
+            AlertUtil.showError(container.getBundle().getString("alert.error"), 
+                    String.format(container.getBundle().getString("suspended.carts.error.resume"), e.getMessage()));
         }
     }
 
     private void handleDelete(SuspendedCart cart) {
-        if (AlertUtil.showConfirmation("Eliminar Carrito", "¿Seguro que desea eliminar esta venta aplazada?",
+        if (AlertUtil.showConfirmation(container.getBundle().getString("suspended.carts.confirm.delete.title"), 
+                container.getBundle().getString("suspended.carts.confirm.delete.msg"),
                 cart.getAlias())) {
             try {
                 suspendedCartUseCase.deleteCart(cart.getId());
                 loadCarts();
             } catch (Exception e) {
                 e.printStackTrace();
-                AlertUtil.showError("Error", "No se pudo eliminar: " + e.getMessage());
+                AlertUtil.showError(container.getBundle().getString("alert.error"), 
+                        String.format(container.getBundle().getString("suspended.carts.error.delete"), e.getMessage()));
             }
         }
     }

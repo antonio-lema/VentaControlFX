@@ -29,8 +29,8 @@
                         </StackPane>
                         <VBox spacing="2">
                             <children>
-                                <Label text="Gestión de Facturación" styleClass="view-title"/>
-                                <Label text="Consulta, reimpresión y anulación de documentos fiscales" styleClass="view-subtitle"/>
+                                <Label text="%fiscal.title" styleClass="view-title"/>
+                                <Label text="%fiscal.subtitle" styleClass="view-subtitle"/>
                             </children>
                         </VBox>
                         
@@ -39,15 +39,15 @@
                         <HBox spacing="10" alignment="CENTER_RIGHT">
                             <Button styleClass="btn-secondary" onAction="#handleOpenArchiveDir">
                                 <graphic><FontAwesomeIconView glyphName="FOLDER_OPEN" size="14"/></graphic>
-                                <text>Abrir Carpeta PDF</text>
+                                <text>%fiscal.btn.open_folder</text>
                             </Button>
                             <Button styleClass="btn-secondary" onAction="#refresh">
                                 <graphic><FontAwesomeIconView glyphName="REFRESH" size="14"/></graphic>
-                                <text>Actualizar</text>
+                                <text>%fiscal.btn.refresh</text>
                             </Button>
                             <Button styleClass="btn-primary" onAction="#handleExportData">
                                 <graphic><FontAwesomeIconView glyphName="FILE_EXCEL_ALT" size="14" fill="#ffffff"/></graphic>
-                                <text>Exportar Listado (Excel)</text>
+                                <text>%fiscal.btn.export</text>
                             </Button>
                         </HBox>
                     </children>
@@ -65,7 +65,7 @@
                         <FontAwesomeIconView glyphName="TICKET" size="24" fill="#3b82f6"/>
                     </StackPane>
                     <VBox>
-                        <Label text="Tickets Emitidos" styleClass="stat-label"/>
+                        <Label text="%fiscal.kpi.tickets" styleClass="stat-label"/>
                         <Label fx:id="lblTotalTickets" text="0" styleClass="stat-value"/>
                     </VBox>
                 </HBox>
@@ -77,7 +77,7 @@
                         <FontAwesomeIconView glyphName="BUILDING_ALT" size="24" fill="#10b981"/>
                     </StackPane>
                     <VBox>
-                        <Label text="Facturas Emitidas" styleClass="stat-label"/>
+                        <Label text="%fiscal.kpi.invoices" styleClass="stat-label"/>
                         <Label fx:id="lblTotalInvoices" text="0" styleClass="stat-value"/>
                     </VBox>
                 </HBox>
@@ -89,7 +89,7 @@
                         <FontAwesomeIconView glyphName="REPLY" size="24" fill="#f97316"/>
                     </StackPane>
                     <VBox>
-                        <Label text="Devoluciones" styleClass="stat-label"/>
+                        <Label text="%fiscal.kpi.returns" styleClass="stat-label"/>
                         <Label fx:id="lblTotalReturns" text="0" styleClass="stat-value"/>
                     </VBox>
                 </HBox>
@@ -101,7 +101,7 @@
                         <FontAwesomeIconView glyphName="BAN" size="24" fill="#ef4444"/>
                     </StackPane>
                     <VBox>
-                        <Label text="Documentos Anulados" styleClass="stat-label"/>
+                        <Label text="%fiscal.kpi.voided" styleClass="stat-label"/>
                         <Label fx:id="lblTotalCancelled" text="0" styleClass="stat-value"/>
                     </VBox>
                 </HBox>
@@ -113,7 +113,7 @@
                         <FontAwesomeIconView glyphName="CALCULATOR" size="24" fill="#3b82f6"/>
                     </StackPane>
                     <VBox>
-                        <Label text="Total Facturado (Neto)" styleClass="stat-label"/>
+                        <Label text="%fiscal.kpi.total_facturado" styleClass="stat-label"/>
                         <Label fx:id="lblTotalAmount" text="0.00 €" styleClass="stat-value"/>
                     </VBox>
                 </HBox>
@@ -125,11 +125,11 @@
             <padding><Insets top="15" right="20" bottom="15" left="20"/></padding>
             
             <VBox spacing="5">
-                <Label text="Rango de Fechas" styleClass="filter-label"/>
+                <Label text="%fiscal.filter.range" styleClass="filter-label"/>
                 <HBox spacing="10" alignment="CENTER_LEFT">
-                    <DatePicker fx:id="dpFrom" prefWidth="150" promptText="Desde" onAction="#applyFilters" styleClass="modern-datepicker"/>
+                    <DatePicker fx:id="dpFrom" prefWidth="150" promptText="%fiscal.filter.from" onAction="#applyFilters" styleClass="modern-datepicker"/>
                     <Label text="a" style="-fx-text-fill: #94a3b8;"/>
-                    <DatePicker fx:id="dpTo" prefWidth="145" promptText="Hasta" onAction="#applyFilters" styleClass="modern-datepicker"/>
+                    <DatePicker fx:id="dpTo" prefWidth="145" promptText="%fiscal.filter.to" onAction="#applyFilters" styleClass="modern-datepicker"/>
                     <HBox fx:id="quickFilterContainer" spacing="8" alignment="CENTER_LEFT" styleClass="date-filter-container" />
                 </HBox>
             </VBox>
@@ -137,19 +137,19 @@
             <Separator orientation="VERTICAL" prefHeight="40" style="-fx-opacity: 0.1;"/>
 
             <VBox spacing="5">
-                <Label text="Tipo de Documento" styleClass="filter-label"/>
-                <ComboBox fx:id="cbType" prefWidth="180" promptText="Todos los tipos" onAction="#applyFilters"/>
+                <Label text="%fiscal.filter.type" styleClass="filter-label"/>
+                <ComboBox fx:id="cbType" prefWidth="180" promptText="%fiscal.filter.all_types" onAction="#applyFilters"/>
             </VBox>
 
             <VBox spacing="5">
-                <Label text="Estado" styleClass="filter-label"/>
-                <ComboBox fx:id="cbStatus" prefWidth="150" promptText="Todos los estados" onAction="#applyFilters"/>
+                <Label text="%fiscal.filter.status" styleClass="filter-label"/>
+                <ComboBox fx:id="cbStatus" prefWidth="150" promptText="%fiscal.filter.all_status" onAction="#applyFilters"/>
             </VBox>
 
             <Region HBox.hgrow="ALWAYS"/>
 
             <VBox spacing="5" alignment="CENTER_RIGHT">
-                <Label text="Buscar por Número/Ref" styleClass="filter-label"/>
+                <Label text="%fiscal.filter.search_label" styleClass="filter-label"/>
                 <HBox alignment="CENTER_RIGHT" spacing="5" styleClass="search-box">
                     <FontAwesomeIconView glyphName="SEARCH" size="14" fill="#94a3b8"/>
                     <TextField fx:id="txtSearch" promptText="Ej: 2026-T-001" prefWidth="200" styleClass="search-input"/>
@@ -160,12 +160,12 @@
         <!-- ─── TABLA ─── -->
         <TableView fx:id="fiscalTable" VBox.vgrow="ALWAYS" styleClass="modern-table">
             <columns>
-                <TableColumn fx:id="colDate" text="Fecha Emisión" prefWidth="150"/>
-                <TableColumn fx:id="colRef" text="Referencia" prefWidth="180"/>
-                <TableColumn fx:id="colType" text="Tipo" prefWidth="120"/>
-                <TableColumn fx:id="colClient" text="Cliente / Receptor" prefWidth="250"/>
-                <TableColumn fx:id="colTotal" text="Importe Total" prefWidth="130" styleClass="column-right"/>
-                <TableColumn fx:id="colStatus" text="Estado" prefWidth="120" styleClass="column-center"/>
+                <TableColumn fx:id="colDate" text="%fiscal.table.date" prefWidth="150"/>
+                <TableColumn fx:id="colRef" text="%fiscal.table.ref" prefWidth="180"/>
+                <TableColumn fx:id="colType" text="%fiscal.table.type" prefWidth="120"/>
+                <TableColumn fx:id="colClient" text="%fiscal.table.client" prefWidth="250"/>
+                <TableColumn fx:id="colTotal" text="%fiscal.table.total" prefWidth="130" styleClass="column-right"/>
+                <TableColumn fx:id="colStatus" text="%fiscal.table.status" prefWidth="120" styleClass="column-center"/>
             </columns>
             <columnResizePolicy>
                 <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
@@ -175,10 +175,10 @@
         <!-- Conteo y Paginación -->
         <HBox alignment="CENTER_LEFT" spacing="10" styleClass="row-limit-container">
             <children>
-                <Label text="Mostrar:" styleClass="label-limit" />
+                <Label text="%fiscal.footer.showing" styleClass="label-limit" />
                 <ComboBox fx:id="cmbRowLimit" prefWidth="90" styleClass="combo-limit" />
                 <Region HBox.hgrow="ALWAYS" />
-                <Label fx:id="lblCount" text="0 registros encontrados" styleClass="label-muted" style="-fx-font-weight: bold;" />
+                <Label fx:id="lblCount" text="0 %fiscal.footer.found" styleClass="label-muted" style="-fx-font-weight: bold;" />
             </children>
         </HBox>
 

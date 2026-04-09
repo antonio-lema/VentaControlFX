@@ -101,15 +101,20 @@ public class ClientReportController implements Injectable {
         setupClientTable();
         setupPurchaseTable();
 
-        paginationHelper = new PaginationHelper<>(clientTable, cmbRowLimit, lblClientCount, "clientes");
-        loadDataRange("Este año");
+        paginationHelper = new PaginationHelper<>(clientTable, cmbRowLimit, lblClientCount, container.getBundle().getString("sidebar.item.directory").toLowerCase());
+        loadDataRange(container.getBundle().getString("report.client.range.year"));
     }
 
     private void setupFilters() {
         if (cmbDateRange != null) {
             cmbDateRange.setItems(FXCollections.observableArrayList(
-                    "Hoy", "7 días", "30 días", "Este mes", "Este año", "Histórico"));
-            cmbDateRange.setValue("Este año");
+                    container.getBundle().getString("report.client.range.today"),
+                    container.getBundle().getString("report.client.range.7d"),
+                    container.getBundle().getString("report.client.range.30d"),
+                    container.getBundle().getString("report.client.range.month"),
+                    container.getBundle().getString("report.client.range.year"),
+                    container.getBundle().getString("report.client.range.all")));
+            cmbDateRange.setValue(container.getBundle().getString("report.client.range.year"));
             cmbDateRange.valueProperty().addListener((obs, o, n) -> loadDataRange(n));
         }
 
@@ -131,7 +136,7 @@ public class ClientReportController implements Injectable {
                     setGraphic(null);
                 } else {
                     ClientRow row = getTableRow().getItem();
-                    Label status = new Label(row.isActive ? "Activo" : "Inactivo");
+                    Label status = new Label(row.isActive ? container.getBundle().getString("status.active") : container.getBundle().getString("status.inactive"));
                     if (row.isActive) {
                         status.setStyle(
                                 "-fx-background-color: #dcfce7; -fx-text-fill: #15803d; -fx-padding: 2 8; -fx-background-radius: 12; -fx-font-size: 11px; -fx-font-weight: bold;");
@@ -166,7 +171,7 @@ public class ClientReportController implements Injectable {
                 }
             } catch (Exception e) {
             }
-            return new SimpleStringProperty(items + " unds");
+            return new SimpleStringProperty(String.format(container.getBundle().getString("report.client.units"), items));
         });
 
         colMethod.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getPaymentMethod()));
@@ -196,7 +201,7 @@ public class ClientReportController implements Injectable {
                     });
         } catch (Exception e) {
             e.printStackTrace();
-            AlertUtil.showError("Error", "No se pudo cargar el detalle del ticket.");
+            AlertUtil.showError(container.getBundle().getString("alert.error"), container.getBundle().getString("report.client.error.ticket"));
         }
     }
 
@@ -204,28 +209,20 @@ public class ClientReportController implements Injectable {
         LocalDate end = LocalDate.now();
         LocalDate start = end;
 
-        switch (rangeFilter) {
-            case "Hoy":
-                start = end;
-                break;
-            case "7 días":
-                start = end.minusDays(7);
-                break;
-            case "30 días":
-                start = end.minusDays(30);
-                break;
-            case "Este mes":
-                start = end.withDayOfMonth(1);
-                break;
-            case "Este año":
-                start = end.withDayOfYear(1);
-                break;
-            case "Histórico":
-                start = end.minusYears(10);
-                break;
-            default:
-                start = end.withDayOfYear(1);
-                break;
+        if (rangeFilter.equals(container.getBundle().getString("report.client.range.today"))) {
+            start = end;
+        } else if (rangeFilter.equals(container.getBundle().getString("report.client.range.7d"))) {
+            start = end.minusDays(7);
+        } else if (rangeFilter.equals(container.getBundle().getString("report.client.range.30d"))) {
+            start = end.minusDays(30);
+        } else if (rangeFilter.equals(container.getBundle().getString("report.client.range.month"))) {
+            start = end.withDayOfMonth(1);
+        } else if (rangeFilter.equals(container.getBundle().getString("report.client.range.year"))) {
+            start = end.withDayOfYear(1);
+        } else if (rangeFilter.equals(container.getBundle().getString("report.client.range.all"))) {
+            start = end.minusYears(10);
+        } else {
+            start = end.withDayOfYear(1);
         }
 
         try {
@@ -240,9 +237,9 @@ public class ClientReportController implements Injectable {
             allRows.clear();
             for (Map.Entry<Integer, List<Sale>> entry : byClient.entrySet()) {
                 Client c = clientMap.get(entry.getKey());
-                String name = c != null ? c.getName() : "Cliente #" + entry.getKey();
+                String name = c != null ? c.getName() : container.getBundle().getString("sidebar.item.directory") + " #" + entry.getKey();
                 String info = (c != null && c.getTaxId() != null && !c.getTaxId().isEmpty()) ? "CIF: " + c.getTaxId()
-                        : "Particular";
+                        : container.getBundle().getString("report.client.info.particular");
 
                 double total = entry.getValue().stream().mapToDouble(Sale::getTotal).sum();
                 int count = entry.getValue().size();
@@ -252,13 +249,13 @@ public class ClientReportController implements Injectable {
                         && s.getSaleDateTime().toLocalDate().isAfter(LocalDate.now().minusDays(30)));
 
                 // Tier logic
-                String tier = "Bronce";
+                String tier = container.getBundle().getString("report.client.tier.bronze");
                 String color = "#d1d5db";
                 if (total > 1000) {
-                    tier = "Oro";
+                    tier = container.getBundle().getString("report.client.tier.gold");
                     color = "#fef08a";
                 } else if (total > 300) {
-                    tier = "Plata";
+                    tier = container.getBundle().getString("report.client.tier.silver");
                     color = "#e2e8f0";
                 }
 
@@ -353,18 +350,18 @@ public class ClientReportController implements Injectable {
                 + "; -fx-background-radius: 50; -fx-min-width: 64; -fx-min-height: 64; -fx-max-width: 64; -fx-max-height: 64;");
 
         lblDetailTier.setText(row.tier);
-        if (row.tier.equals("Oro"))
+        if (row.tier.equals(container.getBundle().getString("report.client.tier.gold")))
             lblDetailTier.setStyle(
                     "-fx-background-color: #fef08a; -fx-text-fill: #854d0e; -fx-padding: 2 10; -fx-background-radius: 12; -fx-font-size: 11px; -fx-font-weight: bold;");
-        else if (row.tier.equals("Plata"))
+        else if (row.tier.equals(container.getBundle().getString("report.client.tier.silver")))
             lblDetailTier.setStyle(
                     "-fx-background-color: #f1f5f9; -fx-text-fill: #334155; -fx-padding: 2 10; -fx-background-radius: 12; -fx-font-size: 11px; -fx-font-weight: bold;");
         else
             lblDetailTier.setStyle(
                     "-fx-background-color: #fed7aa; -fx-text-fill: #9a3412; -fx-padding: 2 10; -fx-background-radius: 12; -fx-font-size: 11px; -fx-font-weight: bold;");
 
-        String lastDate = row.sales.isEmpty() ? "Nunca" : row.sales.get(0).getSaleDateTime().format(FMT_DATE);
-        lblDetailInfo.setText(row.info + " | Última compra: " + lastDate);
+        String lastDate = row.sales.isEmpty() ? container.getBundle().getString("report.client.never") : row.sales.get(0).getSaleDateTime().format(FMT_DATE);
+        lblDetailInfo.setText(row.info + " | " + String.format(container.getBundle().getString("report.client.last_purchase"), lastDate));
 
         // Populate Sales Table
         List<Sale> sortedSales = new ArrayList<>(row.sales);
@@ -474,7 +471,7 @@ public class ClientReportController implements Injectable {
         Map<String, Long> methodCount = sales.stream().map(Sale::getPaymentMethod).filter(Objects::nonNull)
                 .collect(Collectors.groupingBy(m -> m, Collectors.counting()));
 
-        String best = "Efectivo";
+        String best = container.getBundle().getString("report.client.payment.cash");
         long max = 0;
         for (Map.Entry<String, Long> entry : methodCount.entrySet()) {
             if (entry.getValue() > max) {
@@ -484,7 +481,7 @@ public class ClientReportController implements Injectable {
         }
 
         lblPrefPayment.setText(best);
-        if (best.equalsIgnoreCase("Efectivo")) {
+        if (best.equalsIgnoreCase(container.getBundle().getString("report.client.payment.cash"))) {
             iconPrefPayment.setIcon(FontAwesomeIcon.MONEY);
             // Asegurar que la fuente es FontAwesome y la clase es correcta
             iconPrefPayment.setStyle("-fx-font-family: 'FontAwesome';");
@@ -516,11 +513,10 @@ public class ClientReportController implements Injectable {
         }
 
         List<Map.Entry<String, Integer>> top = productQty.entrySet().stream()
-                .sorted((a, b) -> b.getValue().compareTo(a.getValue()))
                 .limit(3).collect(Collectors.toList());
 
         if (top.isEmpty()) {
-            pnlTopProducts.getChildren().add(new Label("No hay datos suficientes"));
+            pnlTopProducts.getChildren().add(new Label(container.getBundle().getString("report.client.no_data")));
             return;
         }
 
@@ -541,7 +537,7 @@ public class ClientReportController implements Injectable {
     @FXML
     private void handleExport() {
         if (allRows.isEmpty()) {
-            AlertUtil.showWarning("Sin datos", "No hay datos de clientes para exportar.");
+            AlertUtil.showWarning(container.getBundle().getString("alert.warning"), container.getBundle().getString("report.client.no_data"));
             return;
         }
 
@@ -556,7 +552,7 @@ public class ClientReportController implements Injectable {
                     .append("\"").append(row.info.replace("\"", "\"\"")).append("\";")
                     .append("\"").append(totalStr).append("\";")
                     .append(row.count).append(";")
-                    .append(row.isActive ? "Activo" : "Inactivo").append(";")
+                    .append(row.isActive ? container.getBundle().getString("status.active") : container.getBundle().getString("status.inactive")).append(";")
                     .append(row.tier).append("\n");
         }
 
@@ -573,9 +569,10 @@ public class ClientReportController implements Injectable {
             fos.write(content);
             fos.close();
 
-            AlertUtil.showInfo("Exportación Exitosa", "Se ha guardado el archivo " + fileName + " en tu escritorio.");
+            AlertUtil.showInfo(container.getBundle().getString("report.client.export.success"), 
+                    String.format(container.getBundle().getString("report.client.export.success_msg"), fileName));
         } catch (Exception e) {
-            AlertUtil.showError("Error al exportar", "No se pudo crear el archivo: " + e.getMessage());
+            AlertUtil.showError(container.getBundle().getString("alert.error"), String.format(container.getBundle().getString("report.client.error.export"), e.getMessage()));
         }
     }
 

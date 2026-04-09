@@ -155,9 +155,9 @@ public class SaleConfigController implements Injectable {
     @FXML
     private void handleBrowseLogo() {
         FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Seleccionar Logo");
+        fileChooser.setTitle(container.getBundle().getString("config.title.browse_logo"));
         fileChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("Imágenes", "*.png", "*.jpg", "*.jpeg", "*.gif"));
+                new FileChooser.ExtensionFilter(container.getBundle().getString("config.file_filter.images"), "*.png", "*.jpg", "*.jpeg", "*.gif"));
         File file = fileChooser.showOpenDialog(txtLogoPath.getScene().getWindow());
         if (file != null) {
             txtLogoPath.setText(file.getAbsolutePath());
@@ -167,9 +167,9 @@ public class SaleConfigController implements Injectable {
     @FXML
     private void handleBrowseIcon() {
         FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Seleccionar Icono de Aplicación");
+        fileChooser.setTitle(container.getBundle().getString("config.title.browse_icon"));
         fileChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("Iconos", "*.png", "*.jpg", "*.jpeg", "*.ico"));
+                new FileChooser.ExtensionFilter(container.getBundle().getString("config.file_filter.icons"), "*.png", "*.jpg", "*.jpeg", "*.ico"));
         File file = fileChooser.showOpenDialog(txtAppIconPath.getScene().getWindow());
         if (file != null) {
             txtAppIconPath.setText(file.getAbsolutePath());
@@ -261,7 +261,7 @@ public class SaleConfigController implements Injectable {
         if (container != null) {
             com.mycompany.ventacontrolfx.util.ModalService.showFullScreenModal(
                     "/view/business_hours.fxml",
-                    "Horarios Comerciales",
+                    container.getBundle().getString("config.title.business_hours"),
                     container,
                     null);
         }

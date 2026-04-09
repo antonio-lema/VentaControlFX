@@ -18,8 +18,8 @@
         
         <!-- Header -->
         <VBox styleClass="modern-register-header" alignment="CENTER_LEFT">
-             <Label fx:id="lblTitle" text="Nueva Empresa" styleClass="modern-register-title"/>
-             <Label text="Introduce los datos de la empresa o cliente" styleClass="modern-register-subtitle"/>
+             <Label fx:id="lblTitle" text="%client.form.title" styleClass="modern-register-title"/>
+             <Label text="%client.form.subtitle" styleClass="modern-register-subtitle"/>
         </VBox>
 
         <!-- Form Fields -->
@@ -27,46 +27,46 @@
             
             <!-- Tipo de Cliente -->
             <VBox styleClass="modern-input-group">
-                <Label text="Tipo de Cliente" styleClass="modern-label" style="-fx-text-fill: #64748b; -fx-font-size: 11px; -fx-font-weight: bold; -fx-padding: 0 0 5 0;"/>
+                <Label text="%client.form.type" styleClass="modern-label" style="-fx-text-fill: #64748b; -fx-font-size: 11px; -fx-font-weight: bold; -fx-padding: 0 0 5 0;"/>
                 <HBox styleClass="modern-input-container" alignment="CENTER_LEFT">
                     <FontAwesomeIconView glyphName="TAGS" size="18" styleClass="sidebar-icon">
                         <HBox.margin><Insets right="10"/></HBox.margin>
                     </FontAwesomeIconView>
-                    <ComboBox fx:id="cmbType" promptText="Seleccione tipo..." styleClass="modern-input-field" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+                    <ComboBox fx:id="cmbType" promptText="%client.form.type.prompt" styleClass="modern-input-field" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
                 </HBox>
             </VBox>
             
             <!-- Name -->
             <VBox styleClass="modern-input-group">
-                <Label text="Nombre / Razón Social" styleClass="modern-label" style="-fx-text-fill: #64748b; -fx-font-size: 11px; -fx-font-weight: bold; -fx-padding: 0 0 5 0;"/>
+                <Label text="%client.form.name" styleClass="modern-label" style="-fx-text-fill: #64748b; -fx-font-size: 11px; -fx-font-weight: bold; -fx-padding: 0 0 5 0;"/>
                 <HBox styleClass="modern-input-container" alignment="CENTER_LEFT">
                     <FontAwesomeIconView glyphName="BUILDING" size="18" styleClass="sidebar-icon">
                         <HBox.margin>
                             <Insets right="10"/>
                         </HBox.margin>
                     </FontAwesomeIconView>
-                    <TextField fx:id="txtName" promptText="Nombre completo" styleClass="modern-input-field" HBox.hgrow="ALWAYS"/>
+                    <TextField fx:id="txtName" promptText="%client.form.name.prompt" styleClass="modern-input-field" HBox.hgrow="ALWAYS"/>
                 </HBox>
             </VBox>
             
             <HBox spacing="15">
                 <!-- ID Type -->
                 <VBox styleClass="modern-input-group" minWidth="120">
-                    <Label text="Tipo Documento" styleClass="modern-label" style="-fx-text-fill: #64748b; -fx-font-size: 11px; -fx-font-weight: bold; -fx-padding: 0 0 5 0;"/>
+                    <Label text="%client.form.id_type" styleClass="modern-label" style="-fx-text-fill: #64748b; -fx-font-size: 11px; -fx-font-weight: bold; -fx-padding: 0 0 5 0;"/>
                     <HBox styleClass="modern-input-container" alignment="CENTER_LEFT">
                         <ComboBox fx:id="cmbIdType" styleClass="modern-input-field" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
                     </HBox>
                 </VBox>
                 <!-- Tax ID -->
                 <VBox HBox.hgrow="ALWAYS" styleClass="modern-input-group">
-                     <Label text="Nº Identificación" styleClass="modern-label" style="-fx-text-fill: #64748b; -fx-font-size: 11px; -fx-font-weight: bold; -fx-padding: 0 0 5 0;"/>
+                     <Label text="%client.form.tax_id" styleClass="modern-label" style="-fx-text-fill: #64748b; -fx-font-size: 11px; -fx-font-weight: bold; -fx-padding: 0 0 5 0;"/>
                      <HBox styleClass="modern-input-container" alignment="CENTER_LEFT">
                         <FontAwesomeIconView glyphName="ID_CARD" size="18" fill="#b0b0b0">
                             <HBox.margin>
                                 <Insets right="10"/>
                             </HBox.margin>
                         </FontAwesomeIconView>
-                        <TextField fx:id="txtTaxId" promptText="Número" styleClass="modern-input-field" HBox.hgrow="ALWAYS"/>
+                        <TextField fx:id="txtTaxId" promptText="%client.form.tax_id.prompt" styleClass="modern-input-field" HBox.hgrow="ALWAYS"/>
                      </HBox>
                 </VBox>
             </HBox>
@@ -74,80 +74,80 @@
             <!-- Phone, Email -->
             <HBox spacing="15">
                 <VBox HBox.hgrow="ALWAYS" styleClass="modern-input-group">
-                     <Label text="Teléfono" styleClass="modern-label" style="-fx-text-fill: #64748b; -fx-font-size: 11px; -fx-font-weight: bold; -fx-padding: 0 0 5 0;"/>
+                     <Label text="%client.form.phone" styleClass="modern-label" style="-fx-text-fill: #64748b; -fx-font-size: 11px; -fx-font-weight: bold; -fx-padding: 0 0 5 0;"/>
                      <HBox styleClass="modern-input-container" alignment="CENTER_LEFT">
                         <FontAwesomeIconView glyphName="PHONE" size="18" fill="#b0b0b0">
                             <HBox.margin>
                                 <Insets right="10"/>
                             </HBox.margin>
                         </FontAwesomeIconView>
-                        <TextField fx:id="txtPhone" promptText="Ej: 600000000" styleClass="modern-input-field" HBox.hgrow="ALWAYS"/>
+                        <TextField fx:id="txtPhone" promptText="%client.form.phone.prompt" styleClass="modern-input-field" HBox.hgrow="ALWAYS"/>
                      </HBox>
                 </VBox>
                 <VBox HBox.hgrow="ALWAYS" styleClass="modern-input-group">
-                    <Label text="Correo Electrónico" styleClass="modern-label" style="-fx-text-fill: #64748b; -fx-font-size: 11px; -fx-font-weight: bold; -fx-padding: 0 0 5 0;"/>
+                    <Label text="%client.form.email" styleClass="modern-label" style="-fx-text-fill: #64748b; -fx-font-size: 11px; -fx-font-weight: bold; -fx-padding: 0 0 5 0;"/>
                     <HBox styleClass="modern-input-container" alignment="CENTER_LEFT">
                         <FontAwesomeIconView glyphName="ENVELOPE" size="18" styleClass="sidebar-icon">
                             <HBox.margin>
                                 <Insets right="10"/>
                             </HBox.margin>
                         </FontAwesomeIconView>
-                        <TextField fx:id="txtEmail" promptText="correo@ejemplo.com" styleClass="modern-input-field" HBox.hgrow="ALWAYS"/>
+                        <TextField fx:id="txtEmail" promptText="%client.form.email.prompt" styleClass="modern-input-field" HBox.hgrow="ALWAYS"/>
                     </HBox>
                 </VBox>
             </HBox>
 
             <!-- Address -->
             <VBox styleClass="modern-input-group">
-                <Label text="Dirección" styleClass="modern-label" style="-fx-text-fill: #64748b; -fx-font-size: 11px; -fx-font-weight: bold; -fx-padding: 0 0 5 0;"/>
+                <Label text="%client.form.address" styleClass="modern-label" style="-fx-text-fill: #64748b; -fx-font-size: 11px; -fx-font-weight: bold; -fx-padding: 0 0 5 0;"/>
                 <HBox styleClass="modern-input-container" alignment="CENTER_LEFT">
                     <FontAwesomeIconView glyphName="MAP_MARKER" size="18" styleClass="sidebar-icon">
                         <HBox.margin>
                             <Insets right="10"/>
                         </HBox.margin>
                     </FontAwesomeIconView>
-                    <TextField fx:id="txtAddress" promptText="Calle, número, piso..." styleClass="modern-input-field" HBox.hgrow="ALWAYS"/>
+                    <TextField fx:id="txtAddress" promptText="%client.form.address.prompt" styleClass="modern-input-field" HBox.hgrow="ALWAYS"/>
                 </HBox>
             </VBox>
 
             <HBox spacing="15">
                  <VBox HBox.hgrow="ALWAYS" styleClass="modern-input-group" maxWidth="120">
-                     <Label text="Código Postal" styleClass="modern-label" style="-fx-text-fill: #64748b; -fx-font-size: 11px; -fx-font-weight: bold; -fx-padding: 0 0 5 0;"/>
+                     <Label text="%client.form.cp" styleClass="modern-label" style="-fx-text-fill: #64748b; -fx-font-size: 11px; -fx-font-weight: bold; -fx-padding: 0 0 5 0;"/>
                      <HBox styleClass="modern-input-container" alignment="CENTER_LEFT">
-                        <TextField fx:id="txtPostalCode" promptText="C.P." styleClass="modern-input-field" HBox.hgrow="ALWAYS"/>
+                        <TextField fx:id="txtPostalCode" promptText="%client.form.cp.prompt" styleClass="modern-input-field" HBox.hgrow="ALWAYS"/>
                      </HBox>
                 </VBox>
                 <VBox HBox.hgrow="ALWAYS" styleClass="modern-input-group">
-                     <Label text="Ciudad" styleClass="modern-label" style="-fx-text-fill: #64748b; -fx-font-size: 11px; -fx-font-weight: bold; -fx-padding: 0 0 5 0;"/>
+                     <Label text="%client.form.city" styleClass="modern-label" style="-fx-text-fill: #64748b; -fx-font-size: 11px; -fx-font-weight: bold; -fx-padding: 0 0 5 0;"/>
                      <HBox styleClass="modern-input-container" alignment="CENTER_LEFT">
-                        <TextField fx:id="txtCity" promptText="Localidad" styleClass="modern-input-field" HBox.hgrow="ALWAYS"/>
+                        <TextField fx:id="txtCity" promptText="%client.form.city.prompt" styleClass="modern-input-field" HBox.hgrow="ALWAYS"/>
                      </HBox>
                 </VBox>
             </HBox>
             
             <HBox spacing="15">
                  <VBox HBox.hgrow="ALWAYS" styleClass="modern-input-group">
-                     <Label text="Provincia" styleClass="modern-label" style="-fx-text-fill: #64748b; -fx-font-size: 11px; -fx-font-weight: bold; -fx-padding: 0 0 5 0;"/>
+                     <Label text="%client.form.province" styleClass="modern-label" style="-fx-text-fill: #64748b; -fx-font-size: 11px; -fx-font-weight: bold; -fx-padding: 0 0 5 0;"/>
                      <HBox styleClass="modern-input-container" alignment="CENTER_LEFT">
-                        <TextField fx:id="txtProvince" promptText="Provincia" styleClass="modern-input-field" HBox.hgrow="ALWAYS"/>
+                        <TextField fx:id="txtProvince" promptText="%client.form.province.prompt" styleClass="modern-input-field" HBox.hgrow="ALWAYS"/>
                      </HBox>
                 </VBox>
                 <VBox HBox.hgrow="ALWAYS" styleClass="modern-input-group">
-                     <Label text="País" styleClass="modern-label" style="-fx-text-fill: #64748b; -fx-font-size: 11px; -fx-font-weight: bold; -fx-padding: 0 0 5 0;"/>
+                     <Label text="%client.form.country" styleClass="modern-label" style="-fx-text-fill: #64748b; -fx-font-size: 11px; -fx-font-weight: bold; -fx-padding: 0 0 5 0;"/>
                      <HBox styleClass="modern-input-container" alignment="CENTER_LEFT">
-                        <TextField fx:id="txtCountry" promptText="País" styleClass="modern-input-field" HBox.hgrow="ALWAYS"/>
+                        <TextField fx:id="txtCountry" promptText="%client.form.country.prompt" styleClass="modern-input-field" HBox.hgrow="ALWAYS"/>
                      </HBox>
                 </VBox>
             </HBox>
 
             <!-- Price List Selector -->
             <VBox styleClass="modern-input-group">
-                <Label text="Tarifa por Defecto" styleClass="modern-label" style="-fx-text-fill: #64748b; -fx-font-size: 11px; -fx-font-weight: bold; -fx-padding: 0 0 5 0;"/>
+                <Label text="%client.form.pricelist" styleClass="modern-label" style="-fx-text-fill: #64748b; -fx-font-size: 11px; -fx-font-weight: bold; -fx-padding: 0 0 5 0;"/>
                 <HBox styleClass="modern-input-container" alignment="CENTER_LEFT">
                     <FontAwesomeIconView glyphName="MONEY" size="18" styleClass="sidebar-icon">
                         <HBox.margin><Insets right="10"/></HBox.margin>
                     </FontAwesomeIconView>
-                    <ComboBox fx:id="cmbPriceList" promptText="Seleccione tarifa..." styleClass="modern-input-field" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+                    <ComboBox fx:id="cmbPriceList" promptText="%client.form.pricelist.prompt" styleClass="modern-input-field" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
                 </HBox>
             </VBox>
 
@@ -155,8 +155,8 @@
 
         <!-- Actions -->
         <HBox spacing="15" alignment="CENTER_RIGHT" style="-fx-padding: 30 0 0 0;">
-             <Button text="Cancelar" onAction="#handleCancel" styleClass="modern-btn-secondary" cancelButton="true" />
-             <Button text="Guardar" onAction="#handleSave" styleClass="modern-btn-primary" defaultButton="true" />
+             <Button text="%btn.cancel" onAction="#handleCancel" styleClass="modern-btn-secondary" cancelButton="true" />
+             <Button text="%btn.save" onAction="#handleSave" styleClass="modern-btn-primary" defaultButton="true" />
         </HBox>
 
     </VBox>

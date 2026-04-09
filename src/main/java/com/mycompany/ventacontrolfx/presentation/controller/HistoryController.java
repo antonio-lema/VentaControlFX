@@ -70,7 +70,8 @@ public class HistoryController implements Injectable, Searchable {
         datePickerStart.setValue(LocalDate.now());
         datePickerEnd.setValue(LocalDate.now());
         setupTable();
-        paginationHelper = new PaginationHelper<>(salesTable, cmbRowLimit, lblCount, "tickets");
+        paginationHelper = new PaginationHelper<>(salesTable, cmbRowLimit, lblCount,
+                container.getBundle().getString("sales.entity_plural"), container.getBundle());
 
         DateFilterUtils.addQuickFilters(quickFilterContainer, datePickerStart,
                 datePickerEnd, this::loadSalesDirect);
@@ -109,7 +110,8 @@ public class HistoryController implements Injectable, Searchable {
                     setStyle("");
                 } else {
                     Sale s = getTableRow().getItem();
-                    setText(String.format("%.2f €", item));
+                    setText(String.format("%.2f €", item)); // Formato de moneda sigue igual por ahora, pero podríamos
+                                                            // usar cfg
                     if (s != null) {
                         if (s.isReturn()) {
                             setStyle("-fx-font-weight: bold; -fx-text-fill: #ef4444; -fx-strikethrough: true;");
@@ -131,7 +133,8 @@ public class HistoryController implements Injectable, Searchable {
                     setText(null);
                 } else {
                     String emoji = item.contains("Mixed") || item.contains("Mixto") ? "🔄 "
-                            : ("Tarjeta".equalsIgnoreCase(item) ? "💳 " : "💵 ");
+                            : (container.getBundle().getString("payment.method.card").equalsIgnoreCase(item) ? "💳 "
+                                    : "💵 ");
                     setText(emoji + item);
                 }
             }
@@ -172,7 +175,8 @@ public class HistoryController implements Injectable, Searchable {
                 sales = saleUseCase.getHistory(LocalDate.of(2000, 1, 1), LocalDate.of(2100, 1, 1));
             } else {
                 if (start.isAfter(end)) {
-                    AlertUtil.showError("Error", "La fecha de inicio no puede ser posterior a la de fin.");
+                    AlertUtil.showError(container.getBundle().getString("alert.error"),
+                            container.getBundle().getString("history.error.date_range"));
                     return;
                 }
                 sales = saleUseCase.getHistory(start, end);
@@ -182,7 +186,8 @@ public class HistoryController implements Injectable, Searchable {
             handleCloseDetails();
         } catch (SQLException e) {
             e.printStackTrace();
-            AlertUtil.showError("Error", "No se pudieron cargar las ventas: " + e.getMessage());
+            AlertUtil.showError(container.getBundle().getString("alert.error"),
+                    container.getBundle().getString("history.error.load") + ": " + e.getMessage());
         }
     }
 
@@ -209,13 +214,16 @@ public class HistoryController implements Injectable, Searchable {
                 updateSummaries(java.util.Collections.singletonList(s));
                 salesTable.getSelectionModel().select(s);
             } else {
-                AlertUtil.showInfo("No encontrado", "No se encontró el ticket #" + id);
+                AlertUtil.showInfo(container.getBundle().getString("alert.not_found"),
+                        container.getBundle().getString("history.error.not_found") + " #" + id);
             }
         } catch (NumberFormatException e) {
-            AlertUtil.showError("Error", "El número de ticket debe ser numérico.");
+            AlertUtil.showError(container.getBundle().getString("alert.error"),
+                    container.getBundle().getString("history.error.numeric_id"));
         } catch (SQLException e) {
             e.printStackTrace();
-            AlertUtil.showError("Error", "Error en la búsqueda: " + e.getMessage());
+            AlertUtil.showError(container.getBundle().getString("alert.error"),
+                    container.getBundle().getString("history.error.search") + ": " + e.getMessage());
         }
     }
 
@@ -256,7 +264,7 @@ public class HistoryController implements Injectable, Searchable {
         lblTotalCard.setText("💳 " + String.format("%.2f €", card));
 
         if (lblCount != null)
-            lblCount.setText("🔍 " + count + " tickets encontrados");
+            lblCount.setText("🔍 " + count + " " + container.getBundle().getString("history.count_suffix"));
     }
 
     private void showDetails(Sale sale) {
@@ -272,17 +280,18 @@ public class HistoryController implements Injectable, Searchable {
 
         detailsPanel.setVisible(true);
         detailsPanel.setManaged(true);
-        lblSaleId.setText("Ticket #" + String.format("%04d", sale.getSaleId()));
+        lblSaleId.setText(container.getBundle().getString("history.detail.ticket") + " #"
+                + String.format("%04d", sale.getSaleId()));
 
         boolean hasAnyReturned = sale.getDetails().stream().anyMatch(d -> d.getReturnedQuantity() > 0);
 
         if (sale.isReturn()) {
-            lblReturnBadge.setText("DEVUELTO");
+            lblReturnBadge.setText(container.getBundle().getString("history.status.returned"));
             lblReturnBadge.setVisible(true);
             lblReturnBadge.setStyle(
                     "-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-size: 10px; -fx-font-weight: bold; -fx-padding: 2px 6px; -fx-background-radius: 4px;");
         } else if (hasAnyReturned) {
-            lblReturnBadge.setText("PARCIAL");
+            lblReturnBadge.setText(container.getBundle().getString("history.status.partial"));
             lblReturnBadge.setVisible(true);
             lblReturnBadge.setStyle(
                     "-fx-background-color: #f39c12; -fx-text-fill: white; -fx-font-size: 10px; -fx-font-weight: bold; -fx-padding: 2px 6px; -fx-background-radius: 4px;");
@@ -293,11 +302,15 @@ public class HistoryController implements Injectable, Searchable {
         btnReturn.setDisable(sale.isReturn());
         // La opacidad y el color ahora se gestionan vía CSS (.btn-warning:disabled)
 
-        lblSaleFullDate.setText(sale.getSaleDateTime().format(fullFormatter) + "\nAtendido por: " + sale.getUserName());
+        lblSaleFullDate.setText(sale.getSaleDateTime().format(fullFormatter) + "\n"
+                + container.getBundle().getString("receipt.attended_by") + ": " + sale.getUserName());
 
-        String methodEmoji = "Tarjeta".equalsIgnoreCase(sale.getPaymentMethod()) ? "💳 " : "💵 ";
-        lblPaymentMethod.setText(methodEmoji + sale.getPaymentMethod());
-
+        String methodEmoji = container.getBundle().getString("payment.method.card")
+                .equalsIgnoreCase(sale.getPaymentMethod()) ? "💳 " : "💵 ";
+        lblPaymentMethod.setText(
+                methodEmoji + (sale.getPaymentMethod().contains("Mixed") || sale.getPaymentMethod().contains("Mixto")
+                        ? container.getBundle().getString("payment.method.mixed")
+                        : sale.getPaymentMethod()));
         lblTotalAmountDetail.setText(String.format("%.2f €", sale.getTotal()));
         // El color se gestiona mediante clases de utilidad
         lblTotalAmountDetail.getStyleClass().removeAll("text-total", "text-error");
@@ -342,7 +355,8 @@ public class HistoryController implements Injectable, Searchable {
     private void handlePrintTicket() {
         Sale selected = salesTable.getSelectionModel().getSelectedItem();
         if (selected == null) {
-            AlertUtil.showWarning("Aviso", "Por favor, seleccione un ticket primero.");
+            AlertUtil.showWarning(container.getBundle().getString("alert.warning"),
+                    container.getBundle().getString("history.error.no_selection"));
             return;
         }
 
@@ -358,19 +372,23 @@ public class HistoryController implements Injectable, Searchable {
                     }
                 }
             } catch (SQLException e) {
-                AlertUtil.showError("Error", "No se pudieron cargar los detalles del ticket: " + e.getMessage());
+                AlertUtil.showError(container.getBundle().getString("alert.error"),
+                        container.getBundle().getString("history.error.load_details") + ": " + e.getMessage());
                 return;
             }
         }
 
         if (selected.getDetails() == null || selected.getDetails().isEmpty()) {
-            AlertUtil.showWarning("Aviso", "Este ticket no tiene productos para mostrar.");
+            AlertUtil.showWarning(container.getBundle().getString("alert.warning"),
+                    container.getBundle().getString("history.error.no_details"));
             return;
         }
 
         // 2. Abrir vista previa de impresión
         ModalService.showStandardModal("/view/print_preview.fxml",
-                selected.getClientId() != null ? "Factura" : "Factura Simplificada", container,
+                selected.getClientId() != null ? container.getBundle().getString("receipt.title.invoice")
+                        : container.getBundle().getString("receipt.title.simplified"),
+                container,
                 (PrintPreviewController ppc) -> {
                     try {
                         // Convertir SaleDetails a CartItems
@@ -398,7 +416,8 @@ public class HistoryController implements Injectable, Searchable {
 
                     } catch (Exception e) {
                         e.printStackTrace();
-                        AlertUtil.showError("Error", "Error al preparar la vista previa de impresión.");
+                        AlertUtil.showError(container.getBundle().getString("alert.error"),
+                                container.getBundle().getString("history.error.load_preview"));
                     }
                 });
     }
@@ -417,13 +436,15 @@ public class HistoryController implements Injectable, Searchable {
                     selected.setDetails(fullSale.getDetails());
                 }
             } catch (SQLException e) {
-                AlertUtil.showError("Error", "No se pudieron cargar los detalles del ticket: " + e.getMessage());
+                AlertUtil.showError(container.getBundle().getString("alert.error"),
+                        container.getBundle().getString("history.error.load_details") + ": " + e.getMessage());
                 return;
             }
         }
 
         if (selected.getDetails() == null || selected.getDetails().isEmpty()) {
-            AlertUtil.showWarning("Aviso", "Este ticket no tiene productos registrados o ya han sido devueltos todos.");
+            AlertUtil.showWarning(container.getBundle().getString("alert.warning"),
+                    container.getBundle().getString("history.error.already_returned_all"));
             return;
         }
 
@@ -468,7 +489,8 @@ public class HistoryController implements Injectable, Searchable {
             }
         }
 
-        ModalService.showModal("/view/return_dialog.fxml", "Registrar Devolución", Modality.APPLICATION_MODAL,
+        ModalService.showModal("/view/return_dialog.fxml",
+                container.getBundle().getString("history.btn.register_return"), Modality.APPLICATION_MODAL,
                 StageStyle.TRANSPARENT, container, (ReturnDialogController controller) -> {
                     controller.init(selected);
                     controller.setOnSuccess((reason, items) -> {
@@ -488,7 +510,8 @@ public class HistoryController implements Injectable, Searchable {
 
                             int userId = container.getUserSession().getCurrentUser().getUserId();
                             saleUseCase.registerPartialReturn(selected.getSaleId(), items, reason, userId);
-                            AlertUtil.showInfo("Éxito", "Devolución registrada correctamente.");
+                            AlertUtil.showInfo(container.getBundle().getString("alert.success"),
+                                    container.getBundle().getString("history.success.return"));
                             loadSalesDirect();
                         } catch (SQLException e) {
                             e.printStackTrace();

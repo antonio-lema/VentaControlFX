@@ -29,7 +29,7 @@ import javafx.scene.Scene;
 import javafx.application.Platform;
 import javafx.stage.Stage;
 
-public class MainController implements Injectable {
+public class MainController implements Injectable, com.mycompany.ventacontrolfx.shared.bus.GlobalEventBus.LocaleChangeListener {
 
     @FXML
     private StackPane headerContainer, sidebarContainer, cartContainer;
@@ -55,6 +55,7 @@ public class MainController implements Injectable {
         });
 
         loadStaticComponents();
+        container.getEventBus().subscribeLocale(this);
         showInitialView();
         startShiftMonitor();
     }
@@ -203,10 +204,12 @@ public class MainController implements Injectable {
 
         if (!lateUsers.isEmpty()) {
             notifiedLateUserIds.addAll(newlyNotified);
-            final String message = "⚠️ PERSONAL NO PRESENTADO:\n" + String.join(", ", lateUsers);
+            final String message = container.getBundle().getString("main.attendance.late_warning") + "\n"
+                    + String.join(", ", lateUsers);
             Platform.runLater(() -> {
                 // We use AlertUtil for a quick toast/warning to the Admin
-                com.mycompany.ventacontrolfx.util.AlertUtil.showWarning("Control de Asistencia", message);
+                com.mycompany.ventacontrolfx.util.AlertUtil.showWarning(
+                        container.getBundle().getString("main.attendance.title"), message);
             });
         }
     }
@@ -292,7 +295,7 @@ public class MainController implements Injectable {
                 Stage stage = new Stage();
                 stage.initModality(javafx.stage.Modality.APPLICATION_MODAL);
                 stage.initStyle(javafx.stage.StageStyle.TRANSPARENT);
-                stage.setTitle("Fin de Turno - Cierre de Caja");
+                stage.setTitle(container.getBundle().getString("main.shift_end.title"));
 
                 Scene scene = new Scene(root);
                 scene.setFill(null);
@@ -348,7 +351,7 @@ public class MainController implements Injectable {
 
     private void loadComponent(String fxml, StackPane target) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxml));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxml), container.getBundle());
             Node node = loader.load();
             Object controller = loader.getController();
             if (controller instanceof Injectable) {
@@ -363,7 +366,7 @@ public class MainController implements Injectable {
     @SuppressWarnings("unchecked")
     private <T> T loadComponentWithController(String fxml, StackPane target) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxml));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxml), container.getBundle());
             Node node = loader.load();
             Object controller = loader.getController();
             if (controller instanceof Injectable) {
@@ -375,5 +378,13 @@ public class MainController implements Injectable {
             e.printStackTrace();
             return null;
         }
+    }
+
+    @Override
+    public void onLocaleChanged() {
+        Platform.runLater(() -> {
+            loadStaticComponents();
+            showInitialView(); // This will refresh the center view too
+        });
     }
 }

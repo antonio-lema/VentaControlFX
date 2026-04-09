@@ -17,37 +17,60 @@ public class DateFilterUtils {
     /**
      * Standard version that updates two DatePickers.
      */
-    public static void addQuickFilters(HBox container, DatePicker start, DatePicker end, Runnable onFilter) {
+    public static void addQuickFilters(HBox container, DatePicker start, DatePicker end, java.util.ResourceBundle bundle, Runnable onFilter) {
         addQuickFilters(container, (label) -> {
             if (start == null || end == null)
                 return;
-            switch (label) {
-                case "Hoy":
+            if (bundle != null) {
+                if (label.equals(bundle.getString("filter.date.today"))) {
                     start.setValue(LocalDate.now());
                     end.setValue(LocalDate.now());
-                    break;
-                case "7D":
+                } else if (label.equals(bundle.getString("filter.date.7d"))) {
                     start.setValue(LocalDate.now().minusDays(7));
                     end.setValue(LocalDate.now());
-                    break;
-                case "Este Mes":
+                } else if (label.equals(bundle.getString("filter.date.this_month"))) {
                     start.setValue(LocalDate.now().with(TemporalAdjusters.firstDayOfMonth()));
                     end.setValue(LocalDate.now());
-                    break;
-                case "Todo":
-                default:
+                } else {
                     start.setValue(null);
                     end.setValue(null);
-                    break;
+                }
+            } else {
+                switch (label) {
+                    case "Hoy":
+                        start.setValue(LocalDate.now());
+                        end.setValue(LocalDate.now());
+                        break;
+                    case "7D":
+                        start.setValue(LocalDate.now().minusDays(7));
+                        end.setValue(LocalDate.now());
+                        break;
+                    case "Este Mes":
+                        start.setValue(LocalDate.now().with(TemporalAdjusters.firstDayOfMonth()));
+                        end.setValue(LocalDate.now());
+                        break;
+                    case "Todo":
+                    default:
+                        start.setValue(null);
+                        end.setValue(null);
+                        break;
+                }
             }
-        }, onFilter);
+        }, bundle, onFilter);
+    }
+
+    /**
+     * Standard version that updates two DatePickers. (Legacy support)
+     */
+    public static void addQuickFilters(HBox container, DatePicker start, DatePicker end, Runnable onFilter) {
+        addQuickFilters(container, start, end, null, onFilter);
     }
 
     /**
      * Flexible version that just provides the label to a range setter consumer.
      */
     public static void addQuickFilters(HBox container, java.util.function.Consumer<String> rangeSetter,
-            Runnable onFilter) {
+            java.util.ResourceBundle bundle, Runnable onFilter) {
         if (container == null)
             return;
 
@@ -59,15 +82,33 @@ public class DateFilterUtils {
         ToggleGroup group = new ToggleGroup();
         List<ToggleButton> buttons = new ArrayList<>();
 
-        buttons.add(createFilterChip("Hoy", rangeSetter, group, onFilter));
-        buttons.add(createFilterChip("7D", rangeSetter, group, onFilter));
-        buttons.add(createFilterChip("Este Mes", rangeSetter, group, onFilter));
+        if (bundle != null) {
+            buttons.add(createFilterChip(bundle.getString("filter.date.today"), rangeSetter, group, onFilter));
+            buttons.add(createFilterChip(bundle.getString("filter.date.7d"), rangeSetter, group, onFilter));
+            buttons.add(createFilterChip(bundle.getString("filter.date.this_month"), rangeSetter, group, onFilter));
 
-        ToggleButton btnTodo = createFilterChip("Todo", rangeSetter, group, onFilter);
-        buttons.add(btnTodo);
-        btnTodo.setSelected(true);
+            ToggleButton btnTodo = createFilterChip(bundle.getString("filter.date.all"), rangeSetter, group, onFilter);
+            buttons.add(btnTodo);
+            btnTodo.setSelected(true);
+        } else {
+            buttons.add(createFilterChip("Hoy", rangeSetter, group, onFilter));
+            buttons.add(createFilterChip("7D", rangeSetter, group, onFilter));
+            buttons.add(createFilterChip("Este Mes", rangeSetter, group, onFilter));
+
+            ToggleButton btnTodo = createFilterChip("Todo", rangeSetter, group, onFilter);
+            buttons.add(btnTodo);
+            btnTodo.setSelected(true);
+        }
 
         container.getChildren().addAll(buttons);
+    }
+
+    /**
+     * Flexible version that just provides the label to a range setter consumer. (Legacy support)
+     */
+    public static void addQuickFilters(HBox container, java.util.function.Consumer<String> rangeSetter,
+            Runnable onFilter) {
+        addQuickFilters(container, rangeSetter, null, onFilter);
     }
 
     private static ToggleButton createFilterChip(String text, java.util.function.Consumer<String> rangeSetter,

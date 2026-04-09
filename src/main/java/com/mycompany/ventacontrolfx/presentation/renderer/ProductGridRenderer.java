@@ -15,15 +15,18 @@ public class ProductGridRenderer {
     private final double globalTaxRate;
     private final boolean pricesIncludeTax;
     private final java.util.function.Function<Product, String> promotionResolver;
+    private final java.util.ResourceBundle bundle;
 
     public ProductGridRenderer(TilePane productsPane, Label labelCountProducts, double globalTaxRate,
             boolean pricesIncludeTax, java.util.function.Function<Product, String> promotionResolver,
+            java.util.ResourceBundle bundle,
             Consumer<Product> onAddToCart) {
         this.productsPane = productsPane;
         this.labelCountProducts = labelCountProducts;
         this.globalTaxRate = globalTaxRate;
         this.pricesIncludeTax = pricesIncludeTax;
         this.promotionResolver = promotionResolver;
+        this.bundle = bundle;
         this.onAddToCart = onAddToCart;
     }
 
@@ -53,7 +56,7 @@ public class ProductGridRenderer {
 
     private void addProductToGrid(Product p) {
         String discountDesc = promotionResolver != null ? promotionResolver.apply(p) : null;
-        ProductBox box = new ProductBox(p, globalTaxRate, pricesIncludeTax, discountDesc, onAddToCart);
+        ProductBox box = new ProductBox(p, globalTaxRate, pricesIncludeTax, discountDesc, bundle, onAddToCart);
         productsPane.getChildren().add(box);
     }
 }

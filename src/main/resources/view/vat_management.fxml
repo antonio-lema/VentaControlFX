@@ -36,8 +36,8 @@
                             </StackPane>
                             <VBox spacing="2">
                                 <children>
-                                    <Label text="Gestión de Impuestos y Precios" styleClass="view-title"/>
-                                    <Label text="Configura las tasas de IVA globales, por categoría, y realiza actualizaciones masivas de precios con múltiples criterios de agrupación." styleClass="view-subtitle"/>
+                                    <Label text="%vat.title" styleClass="view-title"/>
+                                    <Label text="%vat.subtitle" styleClass="view-subtitle"/>
                                 </children>
                             </VBox>
                         </children>
@@ -50,7 +50,7 @@
 
             <TabPane tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS" styleClass="modern-tab-pane">
               <tabs>
-                <Tab text="Configuración Actual">
+                <Tab text="%vat.tab.current">
                     <graphic>
                         <FontAwesomeIconView glyphName="COG" size="14" />
                     </graphic>
@@ -62,7 +62,7 @@
                                     <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="info-banner">
                                        <children>
                                           <FontAwesomeIconView glyphName="INFO_CIRCLE" size="16" styleClass="text-info" />
-                                          <Label wrapText="true" text="Nota: Los cambios de IVA no afectan a tickets ya emitidos. Los tickets nuevos usarán la tasa vigente en el momento de la venta." styleClass="label-muted" />
+                                          <Label wrapText="true" text="%vat.banner.note" styleClass="label-muted" />
                                        </children>
                                     </HBox>
 
@@ -76,25 +76,25 @@
                                                           <StackPane styleClass="config-card-icon-wrap, config-icon-blue">
                                                               <children><FontAwesomeIconView glyphName="GEAR" size="16" fill="#1e88e5"/></children>
                                                           </StackPane>
-                                                          <Label styleClass="config-card-title" text="Grupo Global" />
+                                                          <Label styleClass="config-card-title" text="%vat.card.global" />
                                                       </children>
                                                   </HBox>
                                                   <VBox spacing="18.0" styleClass="config-card-body" VBox.vgrow="ALWAYS">
                                                       <children>
                                                          <HBox alignment="CENTER_LEFT" spacing="15.0">
                                                             <children>
-                                                               <Label text="Grupo actual:" styleClass="label-muted"/>
-                                                               <Label fx:id="lblCurrentGlobalTaxGroup" styleClass="label-highlight" text="Cargando..." />
+                                                               <Label text="%vat.field.current_group" styleClass="label-muted"/>
+                                                               <Label fx:id="lblCurrentGlobalTaxGroup" styleClass="label-highlight" text="%vat.loading" />
                                                             </children>
                                                          </HBox>
                                                          <VBox spacing="8.0">
                                                             <children>
-                                                               <Label text="Cambiar grupo global:" styleClass="label-bold"/>
-                                                               <ComboBox fx:id="cmbGlobalTaxGroup" maxWidth="1.7976931348623157E308" promptText="Seleccionar grupo..." styleClass="modern-combo-box" />
+                                                               <Label text="%vat.field.change_global" styleClass="label-bold"/>
+                                                               <ComboBox fx:id="cmbGlobalTaxGroup" maxWidth="1.7976931348623157E308" promptText="%vat.field.select_group.prompt" styleClass="modern-combo-box" />
                                                             </children>
                                                          </VBox>
                                                          <Region VBox.vgrow="ALWAYS" />
-                                                         <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleUpdateGlobalTaxGroup" styleClass="btn-primary" text="Establecer como Global" />
+                                                         <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleUpdateGlobalTaxGroup" styleClass="btn-primary" text="%vat.btn.set_global" />
                                                       </children>
                                                   </VBox>
                                               </children>
@@ -108,25 +108,25 @@
                                                           <StackPane styleClass="config-card-icon-wrap, config-icon-green">
                                                               <children><FontAwesomeIconView glyphName="TAGS" size="16" fill="#10b981"/></children>
                                                           </StackPane>
-                                                          <Label styleClass="config-card-title" text="Por Categoría" />
+                                                          <Label styleClass="config-card-title" text="%vat.card.category" />
                                                       </children>
                                                   </HBox>
                                                   <VBox spacing="18.0" styleClass="config-card-body" VBox.vgrow="ALWAYS">
                                                       <children>
                                                          <VBox spacing="8.0">
                                                             <children>
-                                                               <Label text="Seleccionar categoría:" styleClass="label-bold"/>
-                                                               <MenuButton fx:id="cmbCategory" maxWidth="1.7976931348623157E308" text="Elegir..." styleClass="modern-combo-box" />
+                                                               <Label text="%vat.field.select_category" styleClass="label-bold"/>
+                                                               <MenuButton fx:id="cmbCategory" maxWidth="1.7976931348623157E308" text="%vat.field.choose.prompt" styleClass="modern-combo-box" />
                                                             </children>
                                                          </VBox>
                                                          <VBox spacing="8.0">
                                                             <children>
-                                                               <Label text="Grupo para categoría:" styleClass="label-bold"/>
-                                                               <ComboBox fx:id="cmbCategoryTaxGroup" maxWidth="1.7976931348623157E308" promptText="Heredar global" styleClass="modern-combo-box" />
+                                                               <Label text="%vat.field.group_category" styleClass="label-bold"/>
+                                                               <ComboBox fx:id="cmbCategoryTaxGroup" maxWidth="1.7976931348623157E308" promptText="%vat.field.inherit_global.prompt" styleClass="modern-combo-box" />
                                                             </children>
                                                          </VBox>
                                                          <Region VBox.vgrow="ALWAYS" />
-                                                         <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleUpdateCategoryTaxGroup" styleClass="btn-success" text="Asignar a Categoría" />
+                                                         <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleUpdateCategoryTaxGroup" styleClass="btn-success" text="%vat.btn.assign_category" />
                                                       </children>
                                                   </VBox>
                                               </children>
@@ -140,18 +140,18 @@
                                                           <StackPane styleClass="config-card-icon-wrap, config-icon-orange">
                                                               <children><FontAwesomeIconView glyphName="CUBE" size="16" fill="#f59e0b"/></children>
                                                           </StackPane>
-                                                          <Label styleClass="config-card-title" text="Por Producto" />
+                                                          <Label styleClass="config-card-title" text="%vat.card.product" />
                                                       </children>
                                                   </HBox>
                                                   <VBox spacing="15.0" styleClass="config-card-body" VBox.vgrow="ALWAYS">
                                                       <children>
                                                           <VBox spacing="8.0">
                                                              <children>
-                                                                <Label text="Seleccionar productos:" styleClass="label-bold"/>
-                                                                <TextField fx:id="txtVatProductSearch" promptText="Nombre o SKU + ENTER" styleClass="modern-text-field" />
+                                                                <Label text="%vat.field.select_products" styleClass="label-bold"/>
+                                                                <TextField fx:id="txtVatProductSearch" promptText="%vat.field.search.prompt" styleClass="modern-text-field" />
                                                                  <HBox spacing="8.0" alignment="CENTER_LEFT">
                                                                     <children>
-                                                                       <MenuButton fx:id="btnVatProductExplorer" maxWidth="1.7976931348623157E308" text="Explorar Categorías..." styleClass="modern-combo-box" HBox.hgrow="ALWAYS" />
+                                                                       <MenuButton fx:id="btnVatProductExplorer" maxWidth="1.7976931348623157E308" text="%vat.btn.explore" styleClass="modern-combo-box" HBox.hgrow="ALWAYS" />
                                                                        <Button fx:id="btnClearVatSelection" onAction="#handleClearVatSelection" styleClass="btn-icon, btn-danger" prefHeight="40" prefWidth="40">
                                                                           <graphic><FontAwesomeIconView glyphName="TRASH" size="16" fill="#ef4444"/></graphic>
                                                                        </Button>
@@ -162,11 +162,11 @@
                                                           <ListView fx:id="listVatSelectedProducts" prefHeight="80.0" styleClass="modern-list-view" VBox.vgrow="ALWAYS" />
                                                           <VBox spacing="8.0">
                                                              <children>
-                                                                <Label text="Nuevo grupo de IVA:" styleClass="label-bold"/>
-                                                                <ComboBox fx:id="cmbProductTaxGroup" maxWidth="1.7976931348623157E308" promptText="Seleccionar grupo..." styleClass="modern-combo-box" />
+                                                                <Label text="%vat.field.new_group" styleClass="label-bold"/>
+                                                                <ComboBox fx:id="cmbProductTaxGroup" maxWidth="1.7976931348623157E308" promptText="%vat.field.select_group.prompt" styleClass="modern-combo-box" />
                                                              </children>
                                                           </VBox>
-                                                          <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleUpdateProductTaxGroup" styleClass="btn-primary" text="Asignar a Productos" />
+                                                          <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleUpdateProductTaxGroup" styleClass="btn-primary" text="%vat.btn.assign_products" />
                                                       </children>
                                                   </VBox>
                                               </children>
@@ -183,7 +183,7 @@
                 <!-- ═══════════════════════════════════════════════════════════════ -->
                 <!--  PESTAÑA: SUBIDA MASIVA DE PRECIOS — UI DINÁMICA              -->
                 <!-- ═══════════════════════════════════════════════════════════════ -->
-                <Tab text="Subida Masiva de Precios">
+                <Tab text="%vat.tab.mass_update">
                     <graphic>
                         <FontAwesomeIconView glyphName="LINE_CHART" size="14" />
                     </graphic>
@@ -205,9 +205,9 @@
                                              </VBox>
                                              <VBox spacing="4.0" HBox.hgrow="ALWAYS">
                                                  <children>
-                                                     <Label styleClass="estetica-title" text="Optimizador de Precios Inteligente" />
+                                                     <Label styleClass="estetica-title" text="%vat.mass.title" />
                                                      <Label styleClass="estetica-subtitle" wrapText="true"
-                                                            text="Ajusta tus márgenes de beneficio de forma masiva sobre grupos específicos de productos. Todos los cambios quedan auditados." />
+                                                            text="%vat.mass.subtitle" />
                                                  </children>
                                              </VBox>
                                          </children>
@@ -222,7 +222,7 @@
                                              <HBox alignment="CENTER_LEFT" spacing="10">
                                                  <children>
                                                      <Label text="1" styleClass="step-number" />
-                                                     <Label styleClass="estetica-card-title" text="Selecciona el grupo de productos" />
+                                                     <Label styleClass="estetica-card-title" text="%vat.mass.step1" />
                                                  </children>
                                              </HBox>
                                              
@@ -235,27 +235,27 @@
                                                                    <HBox alignment="CENTER_LEFT" spacing="6">
                                                                        <children>
                                                                            <FontAwesomeIconView glyphName="TAG" size="12" styleClass="icon-primary"/>
-                                                                           <Label styleClass="label-bold" text="Tarifa a actualizar:" />
+                                                                           <Label styleClass="label-bold" text="%vat.mass.field.price_list" />
                                                                        </children>
                                                                    </HBox>
                                                                    <ComboBox fx:id="cmbPriceListUpdate"
                                                                              maxWidth="1.7976931348623157E308"
-                                                                             promptText="Selecciona tarifa..."
+                                                                             promptText="%vat.mass.field.price_list.prompt"
                                                                              styleClass="modern-combo-box" />
                                                                 </children>
                                                              </VBox>
                                                             <VBox spacing="8.0" HBox.hgrow="ALWAYS">
                                                                <children>
-                                                                  <Label styleClass="label-bold" text="📦 Criterio de agrupación:" />
+                                                                  <Label styleClass="label-bold" text="%vat.mass.field.grouping" />
                                                                   <ComboBox fx:id="cmbGroupingType"
                                                                             maxWidth="1.7976931348623157E308"
-                                                                            promptText="Selecciona cómo agrupar..."
+                                                                            promptText="%vat.mass.field.grouping.prompt"
                                                                             styleClass="modern-combo-box" />
                                                                </children>
                                                             </VBox>
                                                             <VBox spacing="8.0" HBox.hgrow="ALWAYS">
                                                                <children>
-                                                                  <Label styleClass="label-bold" text="🔧 Tipo de operación:" />
+                                                                  <Label styleClass="label-bold" text="%vat.mass.field.operation" />
                                                                   <ComboBox fx:id="cmbPriceUpdateType"
                                                                             maxWidth="1.7976931348623157E308"
                                                                             styleClass="modern-combo-box" />
@@ -274,7 +274,7 @@
                                              <HBox alignment="CENTER_LEFT" spacing="10">
                                                  <children>
                                                      <Label text="2" styleClass="step-number" />
-                                                     <Label styleClass="estetica-card-title" text="Configura los parámetros del filtro" />
+                                                     <Label styleClass="estetica-card-title" text="%vat.mass.step2" />
                                                  </children>
                                              </HBox>
 
@@ -290,12 +290,12 @@
                                                                   <HBox alignment="CENTER_LEFT" spacing="8">
                                                                       <children>
                                                                           <FontAwesomeIconView glyphName="FOLDER_OPEN" size="14" styleClass="icon-success"/>
-                                                                          <Label styleClass="label-bold" text="Categoría de productos:" />
+                                                                          <Label styleClass="label-bold" text="%vat.mass.field.category" />
                                                                       </children>
                                                                   </HBox>
                                                                   <ComboBox fx:id="cmbPriceCategory"
                                                                             maxWidth="1.7976931348623157E308"
-                                                                            promptText="Todas las categorías"
+                                                                            promptText="%vat.mass.field.category.all"
                                                                             styleClass="modern-combo-box" />
                                                               </children>
                                                            </HBox>
@@ -308,17 +308,17 @@
                                                                   <FontAwesomeIconView glyphName="COPY" size="20" styleClass="text-info" />
                                                                   <VBox spacing="4.0" HBox.hgrow="ALWAYS">
                                                                      <children>
-                                                                        <Label styleClass="label-muted" text="Tarifa de ORIGEN (desde la que copiar):" />
+                                                                        <Label styleClass="label-muted" text="%vat.mass.field.source_list" />
                                                                         <ComboBox fx:id="cmbSourcePriceList"
                                                                                   maxWidth="1.7976931348623157E308"
-                                                                                  promptText="Selecciona origen..."
+                                                                                  promptText="%vat.mass.field.source_list.prompt"
                                                                                   styleClass="modern-combo-box" />
                                                                      </children>
                                                                   </VBox>
                                                                   <VBox spacing="4.0" HBox.hgrow="ALWAYS" alignment="CENTER_LEFT">
                                                                       <children>
                                                                          <Label styleClass="label-muted, font-italic" wrapText="true"
-                                                                                text="Se copiarán todos los precios actuales de la tarifa origen a la destino aplicando el % indicado." />
+                                                                                text="%vat.mass.field.clone.desc" />
                                                                       </children>
                                                                   </VBox>
                                                                </children>
@@ -334,20 +334,20 @@
                                                                  </VBox>
                                                                  <VBox spacing="4.0">
                                                                     <children>
-                                                                       <Label styleClass="label-muted" text="Top N artículos:" />
+                                                                       <Label styleClass="label-muted" text="%vat.mass.field.top_n" />
                                                                        <TextField fx:id="txtTopN" prefWidth="100.0" promptText="Ej: 20" styleClass="modern-text-field" />
                                                                     </children>
                                                                  </VBox>
                                                                  <VBox spacing="4.0">
                                                                     <children>
-                                                                       <Label styleClass="label-muted" text="Análisis últimos días:" />
+                                                                       <Label styleClass="label-muted" text="%vat.mass.field.top_days" />
                                                                        <TextField fx:id="txtTopDays" prefWidth="120.0" promptText="Ej: 90" styleClass="modern-text-field" />
                                                                     </children>
                                                                  </VBox>
                                                                  <VBox spacing="4.0" HBox.hgrow="ALWAYS" alignment="CENTER_LEFT">
                                                                     <children>
                                                                        <Label styleClass="label-muted, font-italic" wrapText="true"
-                                                                              text="Afecta a los productos más exitosos en el periodo." />
+                                                                              text="%vat.mass.field.top.desc" />
                                                                     </children>
                                                                  </VBox>
                                                               </children>
@@ -363,20 +363,20 @@
                                                                  </VBox>
                                                                  <VBox spacing="4.0">
                                                                     <children>
-                                                                       <Label styleClass="label-muted" text="Artículos (Bottom N):" />
+                                                                       <Label styleClass="label-muted" text="%vat.mass.field.bottom_n" />
                                                                        <TextField fx:id="txtBottomN" prefWidth="100.0" promptText="Ej: 5" styleClass="modern-text-field" />
                                                                     </children>
                                                                  </VBox>
                                                                  <VBox spacing="4.0">
                                                                     <children>
-                                                                       <Label styleClass="label-muted" text="Días sin éxito:" />
+                                                                       <Label styleClass="label-muted" text="%vat.mass.field.bottom_days" />
                                                                        <TextField fx:id="txtBottomDays" prefWidth="100.0" promptText="Ej: 90" styleClass="modern-text-field" />
                                                                     </children>
                                                                  </VBox>
                                                                  <VBox spacing="4.0" HBox.hgrow="ALWAYS">
                                                                     <children>
                                                                        <Label styleClass="label-muted" wrapText="true"
-                                                                              text="Ideal para promociones sobre stock con baja rotación." />
+                                                                              text="%vat.mass.field.bottom.desc" />
                                                                     </children>
                                                                  </VBox>
                                                               </children>
@@ -392,14 +392,14 @@
                                                                  </VBox>
                                                                  <VBox spacing="4.0">
                                                                     <children>
-                                                                       <Label styleClass="label-muted" text="Días sin ventas:" />
+                                                                       <Label styleClass="label-muted" text="%vat.mass.field.slow_days" />
                                                                        <TextField fx:id="txtSlowDays" prefWidth="130.0" promptText="Ej: 60" styleClass="modern-text-field" />
                                                                     </children>
                                                                  </VBox>
                                                                  <VBox spacing="4.0" HBox.hgrow="ALWAYS">
                                                                     <children>
                                                                        <Label styleClass="label-muted" wrapText="true"
-                                                                              text="Identifica productos 'parados' para liquidación." />
+                                                                              text="%vat.mass.field.slow.desc" />
                                                                     </children>
                                                                  </VBox>
                                                               </children>
@@ -415,13 +415,13 @@
                                                                  </VBox>
                                                                  <VBox spacing="4.0">
                                                                     <children>
-                                                                       <Label styleClass="label-muted" text="Desde (€):" />
+                                                                       <Label styleClass="label-muted" text="%vat.mass.field.min_price" />
                                                                        <TextField fx:id="txtMinPrice" prefWidth="110.0" promptText="0.00" styleClass="modern-text-field" />
                                                                     </children>
                                                                  </VBox>
                                                                  <VBox spacing="4.0">
                                                                     <children>
-                                                                       <Label styleClass="label-muted" text="Hasta (€):" />
+                                                                       <Label styleClass="label-muted" text="%vat.mass.field.max_price" />
                                                                        <TextField fx:id="txtMaxPrice" prefWidth="110.0" promptText="20.00" styleClass="modern-text-field" />
                                                                     </children>
                                                                  </VBox>
@@ -437,7 +437,7 @@
                                                                      <children><FontAwesomeIconView glyphName="HEART" size="20" fill="#ffffff" /></children>
                                                                  </VBox>
                                                                  <Label styleClass="label-muted" wrapText="true" HBox.hgrow="ALWAYS"
-                                                                        text="Se aplicará el ajuste exclusivamente a los productos marcados como favoritos en el catálogo." />
+                                                                        text="%vat.mass.field.favorites.desc" />
                                                               </children>
                                                            </HBox>
 
@@ -453,8 +453,8 @@
                                                                           </VBox>
                                                                           <VBox spacing="4.0" HBox.hgrow="ALWAYS">
                                                                              <children>
-                                                                                <Label styleClass="label-muted" text="Busca y selecciona los artículos:" />
-                                                                                <TextField fx:id="txtProductSearch" promptText="Escribe nombre o código..." styleClass="modern-text-field" />
+                                                                                <Label styleClass="label-muted" text="%vat.mass.field.search_products" />
+                                                                                <TextField fx:id="txtProductSearch" promptText="%vat.mass.field.search_products.prompt" styleClass="modern-text-field" />
                                                                              </children>
                                                                           </VBox>
                                                                       </children>
@@ -462,7 +462,7 @@
                                                                   <ListView fx:id="listSelectedProducts" prefHeight="150.0" styleClass="modern-list-view" />
                                                                   <HBox alignment="CENTER_RIGHT">
                                                                       <children>
-                                                                          <Label fx:id="lblSelectedCount" text="0 artículos seleccionados" styleClass="label-muted" />
+                                                                          <Label fx:id="lblSelectedCount" text="%vat.mass.selected_count" styleClass="label-muted" />
                                                                       </children>
                                                                   </HBox>
                                                                </children>
@@ -480,7 +480,7 @@
                                              <HBox alignment="CENTER_LEFT" spacing="10">
                                                  <children>
                                                      <Label text="3" styleClass="step-number" />
-                                                     <Label styleClass="estetica-card-title" text="Define el ajuste y ejecuta" />
+                                                     <Label styleClass="estetica-card-title" text="%vat.mass.step3" />
                                                  </children>
                                              </HBox>
 
@@ -492,21 +492,21 @@
                                                               <children>
                                                                  <VBox spacing="6.0" minWidth="150">
                                                                     <children>
-                                                                       <Label fx:id="lblPriceValue" styleClass="label-bold" text="Valor (%):" />
+                                                                       <Label fx:id="lblPriceValue" styleClass="label-bold" text="%vat.mass.field.value" />
                                                                        <TextField fx:id="txtPriceValue" prefWidth="150.0" promptText="Ej: 5 (o -5)" styleClass="modern-text-field, font-large-bold"/>
                                                                     </children>
                                                                  </VBox>
                                                                   <VBox spacing="6.0" minWidth="150">
                                                                      <children>
-                                                                        <Label styleClass="label-bold" text="Fecha de Inicio:" />
-                                                                        <DatePicker fx:id="dpPriceStartDate" prefWidth="150.0" promptText="Hoy (ahora)" styleClass="modern-datepicker" />
+                                                                        <Label styleClass="label-bold" text="%vat.mass.field.start_date" />
+                                                                        <DatePicker fx:id="dpPriceStartDate" prefWidth="150.0" promptText="%vat.mass.field.start_date.prompt" styleClass="modern-datepicker" />
                                                                      </children>
                                                                   </VBox>
                                                                   <VBox spacing="6.0" HBox.hgrow="ALWAYS">
                                                                      <children>
-                                                                        <Label styleClass="label-bold" text="Motivo de la actualización (Auditoría):" />
+                                                                        <Label styleClass="label-bold" text="%vat.mass.field.reason" />
                                                                         <TextField fx:id="txtPriceReason"
-                                                                                   promptText="Describe el porqué del cambio (obligatorio)"
+                                                                                   promptText="%vat.mass.field.reason.prompt"
                                                                                    styleClass="modern-text-field" />
                                                                      </children>
                                                                   </VBox>
@@ -518,7 +518,7 @@
                                                                    mnemonicParsing="false"
                                                                    onAction="#handleMassivePriceUpdate"
                                                                    styleClass="estetica-btn-save"
-                                                                   text="🚀  Ejecutar Actualización Masiva">
+                                                                   text="%vat.mass.btn.execute">
                                                               <graphic>
                                                                   <FontAwesomeIconView glyphName="BOLT" />
                                                               </graphic>
@@ -541,7 +541,7 @@
                 <!-- ═══════════════════════════════════════════════════════════════ -->
                 <!--  PESTAÑA: CATÁLOGO DE IMPUESTOS (MANTENIMIENTO)                -->
                 <!-- ═══════════════════════════════════════════════════════════════ -->
-                <Tab text="Catálogo de Impuestos">
+                <Tab text="%vat.tab.catalog">
                     <graphic>
                         <FontAwesomeIconView glyphName="LIST_ALT" size="14" />
                     </graphic>
@@ -564,11 +564,11 @@
                                                   </VBox>
                                                   <VBox HBox.hgrow="ALWAYS">
                                                      <children>
-                                                        <Label styleClass="config-card-title" text="Tipos Impositivos (Tasas)" />
-                                                        <Label styleClass="label-muted" text="Define los porcentajes individuales de impuestos (ej: IVA 21%, RE 5.2%)." />
+                                                        <Label styleClass="config-card-title" text="%vat.catalog.rates.title" />
+                                                        <Label styleClass="label-muted" text="%vat.catalog.rates.desc" />
                                                      </children>
                                                   </VBox>
-                                                  <Button mnemonicParsing="false" onAction="#handleAddTaxRate" styleClass="btn-primary" text="Nueva Tasa">
+                                                  <Button mnemonicParsing="false" onAction="#handleAddTaxRate" styleClass="btn-primary" text="%vat.catalog.btn.new_rate">
                                                      <graphic>
                                                         <FontAwesomeIconView glyphName="PLUS" size="14" />
                                                      </graphic>
@@ -578,11 +578,11 @@
                                             
                                             <TableView fx:id="taxRatesTable" prefHeight="200.0" styleClass="modern-table-view">
                                                <columns>
-                                                  <TableColumn fx:id="colRateName" prefWidth="150.0" text="NOMBRE" />
-                                                  <TableColumn fx:id="colRateValue" prefWidth="100.0" text="TASA (%)" />
-                                                  <TableColumn fx:id="colRateCountry" prefWidth="120.0" text="PAÍS" />
-                                                  <TableColumn fx:id="colRateStatus" prefWidth="100.0" text="ESTADO" />
-                                                  <TableColumn fx:id="colRateActions" prefWidth="120.0" text="ACCIONES" />
+                                                  <TableColumn fx:id="colRateName" prefWidth="150.0" text="%vat.table.name" />
+                                                  <TableColumn fx:id="colRateValue" prefWidth="100.0" text="%vat.table.rate" />
+                                                  <TableColumn fx:id="colRateCountry" prefWidth="120.0" text="%vat.table.country" />
+                                                  <TableColumn fx:id="colRateStatus" prefWidth="100.0" text="%vat.table.status" />
+                                                  <TableColumn fx:id="colRateActions" prefWidth="120.0" text="%vat.table.actions" />
                                                </columns>
                                                <columnResizePolicy>
                                                   <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
@@ -603,11 +603,11 @@
                                                   </VBox>
                                                   <VBox HBox.hgrow="ALWAYS">
                                                      <children>
-                                                        <Label styleClass="config-card-title" text="Grupos de Impuestos" />
-                                                        <Label styleClass="label-muted" text="Agrupa varias tasas para aplicarlas a productos (ej: IVA General + Recargo)." />
+                                                        <Label styleClass="config-card-title" text="%vat.catalog.groups.title" />
+                                                        <Label styleClass="label-muted" text="%vat.catalog.groups.desc" />
                                                      </children>
                                                   </VBox>
-                                                  <Button mnemonicParsing="false" onAction="#handleAddTaxGroup" styleClass="btn-success" text="Nuevo Grupo">
+                                                  <Button mnemonicParsing="false" onAction="#handleAddTaxGroup" styleClass="btn-success" text="%vat.catalog.btn.new_group">
                                                      <graphic>
                                                         <FontAwesomeIconView glyphName="PLUS" size="14" />
                                                      </graphic>
@@ -617,10 +617,10 @@
                                             
                                             <TableView fx:id="taxGroupsTable" prefHeight="220.0" styleClass="modern-table-view">
                                                <columns>
-                                                  <TableColumn fx:id="colGroupName" prefWidth="200.0" text="NOMBRE DEL GRUPO" />
-                                                  <TableColumn fx:id="colGroupDefault" prefWidth="120.0" text="POR DEFECTO" />
-                                                  <TableColumn fx:id="colGroupRates" prefWidth="300.0" text="TASAS INCLUIDAS" />
-                                                  <TableColumn fx:id="colGroupActions" prefWidth="150.0" text="ACCIONES" />
+                                                  <TableColumn fx:id="colGroupName" prefWidth="200.0" text="%vat.table.group_name" />
+                                                  <TableColumn fx:id="colGroupDefault" prefWidth="120.0" text="%vat.table.default" />
+                                                  <TableColumn fx:id="colGroupRates" prefWidth="300.0" text="%vat.table.included_rates" />
+                                                  <TableColumn fx:id="colGroupActions" prefWidth="150.0" text="%vat.table.actions" />
                                                </columns>
                                                <columnResizePolicy>
                                                   <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
@@ -640,7 +640,7 @@
                 <!-- ═══════════════════════════════════════════════════════════════ -->
                 <!--  PESTAÑA: HISTORIAL DE REVISIONES                             -->
                 <!-- ═══════════════════════════════════════════════════════════════ -->
-                <Tab text="Historial de Revisiones">
+                <Tab text="%vat.tab.history">
                     <graphic>
                         <FontAwesomeIconView glyphName="HISTORY" size="14" />
                     </graphic>
@@ -653,17 +653,17 @@
                                     <!-- Filtro de historial IVA -->
                                     <HBox alignment="CENTER_LEFT" spacing="15.0" styleClass="modern-filter-bar">
                                        <children>
-                                          <Label styleClass="label-muted" text="Fecha:" />
+                                          <Label styleClass="label-muted" text="%vat.field.date" />
                                           <HBox spacing="8" styleClass="date-filter-container">
                                               <children>
-                                                  <ToggleButton fx:id="tglHistHoy" text="Hoy" styleClass="date-filter-chip" onAction="#handleQuickDateFilter" />
-                                                  <ToggleButton fx:id="tglHist7d" text="7 días" styleClass="date-filter-chip" onAction="#handleQuickDateFilter" />
-                                                  <ToggleButton fx:id="tglHist1m" text="1 mes" styleClass="date-filter-chip" onAction="#handleQuickDateFilter" />
-                                                  <ToggleButton fx:id="tglHistTodo" text="Todo" styleClass="date-filter-chip" onAction="#handleQuickDateFilter" selected="true" />
+                                                  <ToggleButton fx:id="tglHistHoy" text="%btn.today" styleClass="date-filter-chip" onAction="#handleQuickDateFilter" />
+                                                  <ToggleButton fx:id="tglHist7d" text="%btn.7days" styleClass="date-filter-chip" onAction="#handleQuickDateFilter" />
+                                                  <ToggleButton fx:id="tglHist1m" text="%btn.1month" styleClass="date-filter-chip" onAction="#handleQuickDateFilter" />
+                                                  <ToggleButton fx:id="tglHistTodo" text="%btn.all" styleClass="date-filter-chip" onAction="#handleQuickDateFilter" selected="true" />
                                               </children>
                                           </HBox>
                                           <Region HBox.hgrow="ALWAYS" />
-                                          <Button mnemonicParsing="false" onAction="#handleRefreshHistory" styleClass="btn-history-close" text="Refrescar">
+                                          <Button mnemonicParsing="false" onAction="#handleRefreshHistory" styleClass="btn-history-close" text="%btn.refresh">
                                              <graphic>
                                                 <FontAwesomeIconView glyphName="REFRESH" />
                                              </graphic>
@@ -674,12 +674,12 @@
                                     <!-- Tabla historial IVA -->
                                     <TableView fx:id="historyTable" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS" styleClass="modern-table-view">
                                       <columns>
-                                        <TableColumn fx:id="colDate" prefWidth="150.0" text="FECHA INICIO" />
-                                          <TableColumn fx:id="colEndDate" prefWidth="150.0" text="FECHA CIERRE" />
-                                        <TableColumn fx:id="colScope" prefWidth="120.0" text="ÁMBITO" />
-                                          <TableColumn fx:id="colTarget" prefWidth="150.0" text="AFECTADO" />
-                                          <TableColumn fx:id="colRate" prefWidth="80.0" text="TASA" />
-                                          <TableColumn fx:id="colReason" prefWidth="250.0" text="MOTIVO" />
+                                        <TableColumn fx:id="colDate" prefWidth="150.0" text="%vat.table.start_date" />
+                                          <TableColumn fx:id="colEndDate" prefWidth="150.0" text="%vat.table.end_date" />
+                                        <TableColumn fx:id="colScope" prefWidth="120.0" text="%vat.table.scope" />
+                                          <TableColumn fx:id="colTarget" prefWidth="150.0" text="%vat.table.target" />
+                                          <TableColumn fx:id="colRate" prefWidth="80.0" text="%vat.table.rate_alias" />
+                                          <TableColumn fx:id="colReason" prefWidth="250.0" text="%vat.table.reason" />
                                       </columns>
                                        <columnResizePolicy>
                                           <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
@@ -687,17 +687,17 @@
                                     </TableView>
 
                                     <!-- Separador -->
-                                    <Label styleClass="history-subtitle" text="▼  Historial de Actualizaciones Masivas de Precios" />
+                                    <Label styleClass="history-subtitle" text="▼  %vat.history.mass.title" />
 
                                     <!-- Tabla historial actualizaciones de precio -->
                                     <TableView fx:id="priceLogTable" prefHeight="180.0" VBox.vgrow="ALWAYS" styleClass="modern-table-view">
                                        <columns>
-                                          <TableColumn fx:id="colLogDate" prefWidth="150.0" text="FECHA" />
-                                          <TableColumn fx:id="colLogType" prefWidth="160.0" text="TIPO" />
-                                          <TableColumn fx:id="colLogScope" prefWidth="130.0" text="AGRUPACIÓN" />
-                                          <TableColumn fx:id="colLogCategory" prefWidth="150.0" text="DETALLE" />
-                                          <TableColumn fx:id="colLogValue" prefWidth="100.0" text="VALOR" />
-                                          <TableColumn fx:id="colLogProducts" prefWidth="100.0" text="PRODUCTOS" />
+                                          <TableColumn fx:id="colLogDate" prefWidth="150.0" text="%vat.table.date_alias" />
+                                          <TableColumn fx:id="colLogType" prefWidth="160.0" text="%vat.table.type" />
+                                          <TableColumn fx:id="colLogScope" prefWidth="130.0" text="%vat.table.grouping_alias" />
+                                          <TableColumn fx:id="colLogCategory" prefWidth="150.0" text="%vat.table.detail" />
+                                          <TableColumn fx:id="colLogValue" prefWidth="100.0" text="%vat.table.value_alias" />
+                                          <TableColumn fx:id="colLogProducts" prefWidth="100.0" text="%vat.table.products_count" />
                                           <TableColumn fx:id="colLogReason" prefWidth="250.0" text="MOTIVO" />
                                        </columns>
                                        <columnResizePolicy>

@@ -132,7 +132,7 @@ public class RegisterUserController implements Injectable {
         permissionCheckboxes.clear();
 
         // Checkbox maestro para habilitar personalización
-        chkAllowExtraPerms = new CheckBox("Habilitar permisos adicionales (fuera del rol)");
+        chkAllowExtraPerms = new CheckBox(container.getBundle().getString("user.register.perms.extra"));
         chkAllowExtraPerms.setStyle("-fx-text-fill: -color-primary; -fx-font-weight: bold; -fx-padding: 0 0 10 0;");
         chkAllowExtraPerms.selectedProperty()
                 .addListener((obs, old, val) -> updatePermissionsByRole(cmbRole.getValue()));
@@ -145,7 +145,7 @@ public class RegisterUserController implements Injectable {
             // Agrupar por prefijo
             Map<String, List<Permission>> grouped = new TreeMap<>();
             for (Permission perm : allPermissions) {
-                String category = "General";
+                String category = container.getBundle().getString("user.register.perms.category.general");
                 if (perm.getCode().contains(".")) {
                     category = perm.getCode().split("\\.")[0].toUpperCase();
                 } else {
@@ -225,7 +225,7 @@ public class RegisterUserController implements Injectable {
             if (userUseCase.getUserCount() == 0) {
                 isInitialSetup = true;
                 if (lblTitle != null)
-                    lblTitle.setText("Configuración: Crear Administrador");
+                    lblTitle.setText(container.getBundle().getString("user.register.setup.title"));
                 if (btnCancel != null) {
                     btnCancel.setVisible(false);
                     btnCancel.setManaged(false);
@@ -254,11 +254,11 @@ public class RegisterUserController implements Injectable {
             // haya uno
             if (user.getUserId() == 1 || "admin".equalsIgnoreCase(user.getUsername())) {
                 cmbRole.setDisable(true);
-                cmbRole.setTooltip(new Tooltip("No se puede cambiar el rol del administrador principal."));
+                cmbRole.setTooltip(new Tooltip(container.getBundle().getString("user.register.edit_principal.tooltip")));
             }
 
             if (lblTitle != null)
-                lblTitle.setText("Editar Usuario");
+                lblTitle.setText(container.getBundle().getString("user.register.edit.title"));
 
             updatePermissionsByRole(user.getRole());
             // Cargar los permisos actuales del usuario y marcar sus checkboxes
@@ -338,22 +338,22 @@ public class RegisterUserController implements Injectable {
         String pass2 = txtConfirmPassword.getText();
 
         if (fullName.isEmpty() || username.isEmpty() || role == null) {
-            showError("Todos los campos obligatorios deben llenarse.");
+            showError(container.getBundle().getString("user.register.error.fields"));
             return;
         }
 
         if (userToEdit == null && (pass1.isEmpty() || pass2.isEmpty())) {
-            showError("La contraseña es obligatoria para nuevos usuarios.");
+            showError(container.getBundle().getString("user.register.error.password_required"));
             return;
         }
 
         if (!pass1.isEmpty() || !pass2.isEmpty()) {
             if (!pass1.equals(pass2)) {
-                showError("Las contraseñas no coinciden.");
+                showError(container.getBundle().getString("user.register.error.password_mismatch"));
                 return;
             }
             if (pass1.length() < 4) {
-                showError("La contraseña es muy corta (mínimo 4 caracteres).");
+                showError(container.getBundle().getString("user.register.error.password_short"));
                 return;
             }
         }
@@ -373,11 +373,11 @@ public class RegisterUserController implements Injectable {
                 newUser.setUsername(username);
                 newUser.setEmail(email);
                 newUser.setRole(role);
-                newUser.setPassword(pass1);
+                newUser.setPasswordHash(pass1);
 
                 User existing = userUseCase.getUserByUsername(username);
                 if (existing != null) {
-                    showError("El nombre de usuario ya está en uso.");
+                    showError(container.getBundle().getString("user.register.error.username_exists"));
                     return;
                 }
 
@@ -389,7 +389,7 @@ public class RegisterUserController implements Injectable {
                     permissionUseCase.savePermissionsForUser(created.getUserId(), selectedPermissions);
                 }
 
-                showSuccess("Usuario creado correctamente.");
+                showSuccess(container.getBundle().getString("user.register.success.created"));
 
                 if (isInitialSetup) {
                     SceneNavigator.loadScene(
@@ -413,7 +413,7 @@ public class RegisterUserController implements Injectable {
                 if (!pass1.isEmpty()) {
                     userUseCase.resetPassword(userToEdit.getEmail(), pass1);
                 }
-                showSuccess("Usuario actualizado correctamente.");
+                showSuccess(container.getBundle().getString("user.register.success.updated"));
                 closeWindow();
             }
         } catch (Exception e) {
@@ -429,7 +429,7 @@ public class RegisterUserController implements Injectable {
     }
 
     private void showSuccess(String message) {
-        AlertUtil.showInfo("Éxito", message);
+        AlertUtil.showInfo(container.getBundle().getString("user.register.success.title"), message);
     }
 
     @FXML

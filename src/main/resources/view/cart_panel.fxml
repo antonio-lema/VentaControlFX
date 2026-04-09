@@ -14,7 +14,7 @@
             <StackPane styleClass="icon-container-small-blue">
                 <FontAwesomeIconView glyphName="USER_PLUS" size="14" styleClass="icon-primary"/>
             </StackPane>
-            <Label fx:id="lblSelectedClient" text="Añadir empresa" styleClass="cart-customer-title"/>
+            <Label fx:id="lblSelectedClient" text="%cart.client.add" styleClass="cart-customer-title"/>
         </HBox>
         <Region HBox.hgrow="ALWAYS"/>
         <HBox spacing="5" alignment="CENTER_RIGHT">
@@ -24,7 +24,7 @@
                 </graphic>
             </Button>
             <Button fx:id="showAddClientDialog" onAction="#showAddClientDialog" styleClass="btn-add-customer">
-                <tooltip><Tooltip text="Añadir nueva empresa"/></tooltip>
+                <tooltip><Tooltip text="%cart.client.tooltip.add"/></tooltip>
                 <graphic><FontAwesomeIconView glyphName="PLUS" size="14" styleClass="add-customer-icon"/></graphic>
             </Button>
         </HBox>
@@ -37,12 +37,12 @@
                 <FontAwesomeIconView glyphName="TAG" size="12" style="-fx-fill: -fx-custom-color-primary;"/>
             </StackPane>
             <VBox spacing="0">
-                <Label text="Tarifa" style="-fx-font-size: 10px; -fx-text-fill: -fx-text-custom-muted;"/>
-                <Label fx:id="lblCurrentPriceList" text="General" styleClass="cart-pricelist-title"/>
+                <Label text="%cart.pricelist.label" style="-fx-font-size: 10px; -fx-text-fill: -fx-text-custom-muted;"/>
+                <Label fx:id="lblCurrentPriceList" text="%cart.pricelist.default" styleClass="cart-pricelist-title"/>
             </VBox>
             <Region HBox.hgrow="ALWAYS"/>
             <Button onAction="#handleChangePriceList" styleClass="btn-change-pricelist">
-                <tooltip><Tooltip text="Cambiar tarifa"/></tooltip>
+                <tooltip><Tooltip text="%cart.pricelist.tooltip.change"/></tooltip>
                 <graphic><FontAwesomeIconView glyphName="EDIT" size="12" styleClass="icon-primary"/></graphic>
             </Button>
         </HBox>
@@ -53,28 +53,28 @@
             <StackPane styleClass="icon-container-small">
                 <FontAwesomeIconView glyphName="LIST_UL" size="14" styleClass="sidebar-icon"/>
             </StackPane>
-            <Label text="Artículos" styleClass="cart-section-title"/>
+            <Label text="%cart.items.title" styleClass="cart-section-title"/>
         </HBox>
         <Region HBox.hgrow="ALWAYS"/>
         <HBox spacing="5" alignment="CENTER_RIGHT">
             <Button onAction="#handleAddManualItem" styleClass="btn-add-manual-item">
-                <tooltip><Tooltip text="Añadir producto manual/fantasma"/></tooltip>
+                <tooltip><Tooltip text="%cart.items.tooltip.manual"/></tooltip>
                 <graphic><FontAwesomeIconView glyphName="PLUS_SQUARE" size="14" styleClass="icon-primary"/></graphic>
             </Button>
             <Button onAction="#handleAddObservation" styleClass="btn-add-observation">
-                <tooltip><Tooltip text="Añadir observación libre"/></tooltip>
+                <tooltip><Tooltip text="%cart.items.tooltip.observation"/></tooltip>
                 <graphic><FontAwesomeIconView glyphName="COMMENTING" size="14" styleClass="icon-primary"/></graphic>
             </Button>
             <Button onAction="#handleSuspendCart" styleClass="btn-suspend-cart">
-                <tooltip><Tooltip text="Aplazar esta venta"/></tooltip>
+                <tooltip><Tooltip text="%cart.items.tooltip.suspend"/></tooltip>
                 <graphic><FontAwesomeIconView glyphName="PAUSE" size="14" styleClass="icon-warning"/></graphic>
             </Button>
             <Button onAction="#handleShowSuspendedCarts" styleClass="btn-resume-cart">
-                <tooltip><Tooltip text="Recuperar carritos aplazados"/></tooltip>
+                <tooltip><Tooltip text="%cart.items.tooltip.resume"/></tooltip>
                 <graphic><FontAwesomeIconView glyphName="FOLDER_OPEN" size="14" styleClass="icon-primary"/></graphic>
             </Button>
             <Button fx:id="btnClearCart" onAction="#clearCart" styleClass="btn-clear-cart">
-                <tooltip><Tooltip text="Vaciar carrito"/></tooltip>
+                <tooltip><Tooltip text="%cart.items.tooltip.clear"/></tooltip>
                 <graphic>
                     <FontAwesomeIconView glyphName="TRASH" size="14" styleClass="icon-danger"/>
                 </graphic>
@@ -95,7 +95,7 @@
     <VBox fx:id="observationContainer" spacing="5" styleClass="cart-observation-box" visible="false" managed="false">
         <HBox spacing="10" alignment="CENTER_LEFT">
             <FontAwesomeIconView glyphName="COMMENTING" size="12" styleClass="icon-primary"/>
-            <Label text="Observación de la venta" style="-fx-font-size: 11px; -fx-font-weight: bold; -fx-text-fill: -fx-custom-color-primary;"/>
+            <Label text="%cart.observation.title" style="-fx-font-size: 11px; -fx-font-weight: bold; -fx-text-fill: -fx-custom-color-primary;"/>
             <Region HBox.hgrow="ALWAYS"/>
             <Button onAction="#handleClearObservation" styleClass="btn-icon-only-tiny">
                 <graphic><FontAwesomeIconView glyphName="TIMES" size="10" fill="#ef4444"/></graphic>
@@ -106,27 +106,27 @@
     
     <VBox styleClass="checkout-summary">
         <HBox alignment="CENTER_LEFT">
-            <Label fx:id="itemsCountLabel" text="Subtotal (0 item)" styleClass="summary-label"/>
+            <Label fx:id="itemsCountLabel" text="%cart.summary.subtotal" styleClass="summary-label"/>
             <Region HBox.hgrow="ALWAYS"/>
             <Label fx:id="subtotalLabel" text="0,00 €" styleClass="summary-value"/>
         </HBox>
         <HBox alignment="CENTER_LEFT">
-            <Label text="Impuestos (21%)" styleClass="summary-label"/>
+            <Label text="%cart.summary.taxes" styleClass="summary-label"/>
             <Region HBox.hgrow="ALWAYS"/>
             <Label fx:id="taxLabel" text="0,00 €" styleClass="summary-value"/>
         </HBox>
         <HBox fx:id="hboxSavings" alignment="CENTER_LEFT" style="-fx-text-fill: -color-success;">
-            <Label text="Ahorros por promociones" styleClass="summary-label" style="-fx-text-fill: -color-success;"/>
+            <Label text="%cart.summary.savings" styleClass="summary-label" style="-fx-text-fill: -color-success;"/>
             <Region HBox.hgrow="ALWAYS"/>
             <Label fx:id="savingsLabel" text="0,00 €" styleClass="summary-value" style="-fx-text-fill: -color-success; -fx-font-weight: bold;"/>
         </HBox>
         <Separator/>
         <HBox alignment="CENTER_LEFT">
-            <Label text="TOTAL COBRAR" styleClass="total-label"/>
+            <Label text="%cart.summary.total" styleClass="total-label"/>
             <Region HBox.hgrow="ALWAYS"/>
             <Label fx:id="totalButtonLabel" text="0,00 €" styleClass="total-value"/>
         </HBox>
-        <Button fx:id="payButton" text="REALIZAR PAGO" onAction="#handlePayButton" styleClass="btn-pay" maxWidth="Infinity" graphicTextGap="12">
+        <Button fx:id="payButton" text="%cart.btn.pay" onAction="#handlePayButton" styleClass="btn-pay" maxWidth="Infinity" graphicTextGap="12">
             <graphic>
                 <FontAwesomeIconView glyphName="CHECK_CIRCLE" size="20" fill="white" />
             </graphic>

@@ -11,7 +11,6 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
-
 import java.sql.SQLException;
 
 public class ClientFormController implements Injectable {
@@ -28,6 +27,7 @@ public class ClientFormController implements Injectable {
     private TextField txtName, txtTaxId, txtAddress, txtPostalCode, txtCity, txtProvince, txtCountry, txtEmail,
             txtPhone;
 
+    private ServiceContainer container;
     private ClientUseCase clientUseCase;
     private PriceListUseCase priceListUseCase;
     private Client currentClient;
@@ -35,6 +35,7 @@ public class ClientFormController implements Injectable {
 
     @Override
     public void inject(ServiceContainer container) {
+        this.container = container;
         this.clientUseCase = container.getClientUseCase();
         this.priceListUseCase = container.getPriceListUseCase();
     }
@@ -42,17 +43,22 @@ public class ClientFormController implements Injectable {
     public void init(Client client) {
         this.currentClient = client;
 
-        cmbType.setItems(javafx.collections.FXCollections.observableArrayList("Particular", "Empresa"));
+        cmbType.setItems(javafx.collections.FXCollections.observableArrayList(
+                container.getBundle().getString("client.type.person"),
+                container.getBundle().getString("client.type.company")));
         cmbIdType.setItems(javafx.collections.FXCollections.observableArrayList("DNI", "NIE", "CIF", "Pasaporte"));
 
         cmbType.valueProperty().addListener((obs, oldVal, newVal) -> {
-            if ("Empresa".equals(newVal)) {
-                lblTitle.setText(currentClient == null ? "Nueva Empresa" : "Editar Empresa");
-                txtName.setPromptText("Nombre de la empresa");
+            boolean isCompany = container.getBundle().getString("client.type.company").equals(newVal);
+            if (isCompany) {
+                lblTitle.setText(currentClient == null ? container.getBundle().getString("client.form.new_company")
+                        : container.getBundle().getString("client.form.edit_company"));
+                txtName.setPromptText(container.getBundle().getString("client.form.name.prompt_company"));
                 cmbIdType.setValue("CIF");
             } else {
-                lblTitle.setText(currentClient == null ? "Nuevo Cliente" : "Editar Cliente");
-                txtName.setPromptText("Nombre completo");
+                lblTitle.setText(currentClient == null ? container.getBundle().getString("client.form.new_client")
+                        : container.getBundle().getString("client.form.edit_client"));
+                txtName.setPromptText(container.getBundle().getString("client.form.name.prompt_client"));
                 cmbIdType.setValue("DNI");
             }
         });
@@ -77,7 +83,8 @@ public class ClientFormController implements Injectable {
         });
 
         if (client != null) {
-            cmbType.setValue(client.isIsCompany() ? "Empresa" : "Particular");
+            cmbType.setValue(client.isIsCompany() ? container.getBundle().getString("client.type.company")
+                    : container.getBundle().getString("client.type.person"));
             txtName.setText(client.getName());
             txtTaxId.setText(client.getTaxId());
             txtAddress.setText(client.getAddress());
@@ -88,7 +95,7 @@ public class ClientFormController implements Injectable {
             txtEmail.setText(client.getEmail());
             txtPhone.setText(client.getPhone());
         } else {
-            cmbType.setValue("Particular");
+            cmbType.setValue(container.getBundle().getString("client.type.person"));
         }
 
         setupPriceLists();
@@ -100,7 +107,8 @@ public class ClientFormController implements Injectable {
             cmbPriceList.setConverter(new javafx.util.StringConverter<PriceList>() {
                 @Override
                 public String toString(PriceList object) {
-                    return object == null ? "Tarifa del sistema" : object.getName();
+                    return object == null ? container.getBundle().getString("client.form.price_list.default")
+                            : object.getName();
                 }
 
                 @Override
@@ -132,7 +140,8 @@ public class ClientFormController implements Injectable {
     @FXML
     private void handleSave() {
         if (txtName.getText().trim().isEmpty()) {
-            AlertUtil.showWarning("Validación", "El nombre es obligatorio.");
+            AlertUtil.showWarning(container.getBundle().getString("alert.validation"),
+                    container.getBundle().getString("client.error.name_required"));
             return;
         }
 
@@ -140,24 +149,27 @@ public class ClientFormController implements Injectable {
         String taxId = txtTaxId.getText().trim();
 
         if (taxId.isEmpty()) {
-            AlertUtil.showWarning("Validación", "El número de identificación es obligatorio.");
+            AlertUtil.showWarning(container.getBundle().getString("alert.validation"),
+                    container.getBundle().getString("client.error.id_required"));
             return;
         }
 
         if (!validateIdentification(idType, taxId)) {
-            AlertUtil.showWarning("Validación", "El formato del " + idType + " es inválido.");
+            AlertUtil.showWarning(container.getBundle().getString("alert.validation"),
+                    container.getBundle().getString("client.error.invalid_format") + " " + idType);
             return;
         }
         String email = txtEmail.getText().trim();
         if (!email.isEmpty() && !email.matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
-            AlertUtil.showWarning("Validación", "El formato del correo electrónico es inválido.");
+            AlertUtil.showWarning(container.getBundle().getString("alert.validation"),
+                    container.getBundle().getString("client.error.invalid_email"));
             return;
         }
 
         if (currentClient == null)
             currentClient = new Client();
 
-        currentClient.setIsCompany("Empresa".equals(cmbType.getValue()));
+        currentClient.setIsCompany(container.getBundle().getString("client.type.company").equals(cmbType.getValue()));
         currentClient.setName(txtName.getText());
         currentClient.setTaxId(txtTaxId.getText());
         currentClient.setAddress(txtAddress.getText());
@@ -183,7 +195,8 @@ public class ClientFormController implements Injectable {
             saveClicked = true;
             close();
         } catch (SQLException e) {
-            AlertUtil.showError("Error", "Error al guardar: " + e.getMessage());
+            AlertUtil.showError(container.getBundle().getString("alert.error"),
+                    container.getBundle().getString("error.save") + ": " + e.getMessage());
         }
     }
 

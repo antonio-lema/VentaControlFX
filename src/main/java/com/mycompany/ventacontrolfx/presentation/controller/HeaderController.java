@@ -81,7 +81,7 @@ public class HeaderController implements Injectable {
                 String name = currentUser.getFullName() != null && !currentUser.getFullName().isBlank()
                         ? currentUser.getFullName()
                         : currentUser.getUsername();
-                lblHeaderUsername.setText(name != null ? name : "Usuario");
+                lblHeaderUsername.setText(name != null ? name : container.getBundle().getString("main.session.user"));
             }
         }
 
@@ -169,7 +169,8 @@ public class HeaderController implements Injectable {
 
     @FXML
     private void handleCashClosure() {
-        ModalService.showFullScreenModal("/view/cash_closure.fxml", "Cierre de Caja", container, null);
+        ModalService.showFullScreenModal("/view/cash_closure.fxml",
+                container.getBundle().getString("main.shift_end.title"), container, null);
     }
 
     @FXML
@@ -182,8 +183,9 @@ public class HeaderController implements Injectable {
             }
 
             // 1. Confirmación de Cierre de Sesión
-            if (AlertUtil.showConfirmation("Cerrar Sesión", "¿Estás seguro?",
-                    "Se finalizará tu turno de forma automática al cerrar la sesión.")) {
+            if (AlertUtil.showConfirmation(container.getBundle().getString("header.logout.title"),
+                    container.getBundle().getString("header.logout.confirm"),
+                    container.getBundle().getString("header.logout.msg"))) {
 
                 // Finalizar turno automáticamente si hay uno activo
                 try {
@@ -195,7 +197,8 @@ public class HeaderController implements Injectable {
                 performLogout();
             }
         } catch (Exception e) {
-            AlertUtil.showError("Error al cerrar sesión", "Ocurrió un error inesperado: " + e.getMessage());
+            AlertUtil.showError(container.getBundle().getString("header.logout.error"),
+                    container.getBundle().getString("cart.payment.error.unexpected") + ": " + e.getMessage());
         }
     }
 
@@ -207,6 +210,7 @@ public class HeaderController implements Injectable {
 
     @FXML
     private void handleShowStockAlerts() {
-        ModalService.showStandardModal("/view/low_stock_dialog.fxml", "Alertas de Stock Bajo", container, null);
+        ModalService.showStandardModal("/view/low_stock_dialog.fxml",
+                container.getBundle().getString("header.stock_alerts.title"), container, null);
     }
 }

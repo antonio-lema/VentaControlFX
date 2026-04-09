@@ -56,14 +56,15 @@ public class ManageUsersController implements Injectable {
             renderUserCards(userList);
         } catch (SQLException e) {
             e.printStackTrace();
-            AlertUtil.showError("Error", "No se pudieron cargar los usuarios: " + e.getMessage());
+            AlertUtil.showError(container.getBundle().getString("alert.error"), 
+                    String.format(container.getBundle().getString("user.manage.error.load"), e.getMessage()));
         }
     }
 
     private void renderUserCards(List<User> users) {
         userCardsPane.getChildren().clear();
         if (lblCount != null)
-            lblCount.setText(users.size() + " usuarios encontrados");
+            lblCount.setText(String.format(container.getBundle().getString("user.manage.found"), users.size()));
         for (User user : users) {
             userCardsPane.getChildren().add(createUserCard(user));
         }
@@ -126,7 +127,7 @@ public class ManageUsersController implements Injectable {
         // El usuario administrador principal (normalmente ID 1) no puede ser eliminado
         if (user.getUserId() == 1 || "admin".equalsIgnoreCase(user.getUsername())) {
             btnDelete.setDisable(true);
-            btnDelete.setTooltip(new Tooltip("El usuario administrador principal no puede ser eliminado."));
+            btnDelete.setTooltip(new Tooltip(container.getBundle().getString("user.manage.no_delete_admin")));
         }
 
         actions.getChildren().addAll(btnEdit, btnDelete);
@@ -150,19 +151,19 @@ public class ManageUsersController implements Injectable {
     @FXML
     private void handleNewUser() {
         if (!container.getUserSession().hasPermission("usuario.crear")) {
-            AlertUtil.showError("Acceso Denegado", "No tiene permiso para gestionar usuarios.");
+            AlertUtil.showError(container.getBundle().getString("access.denied"), container.getBundle().getString("sidebar.permission_denied_msg"));
             return;
         }
-        ModalService.showTransparentModal("/view/register_user.fxml", "Registrar Usuario", container, null);
+        ModalService.showTransparentModal("/view/register_user.fxml", container.getBundle().getString("user.manage.btn.new"), container, null);
         loadUsers();
     }
 
     private void handleEditSingleUser(User user) {
         if (!container.getUserSession().hasPermission("usuario.crear")) {
-            AlertUtil.showError("Acceso Denegado", "No tiene permiso para gestionar usuarios.");
+            AlertUtil.showError(container.getBundle().getString("access.denied"), container.getBundle().getString("sidebar.permission_denied_msg"));
             return;
         }
-        ModalService.showTransparentModal("/view/register_user.fxml", "Editar Usuario", container,
+        ModalService.showTransparentModal("/view/register_user.fxml", container.getBundle().getString("user.manage.btn.edit"), container,
                 (RegisterUserController controller) -> {
                     controller.setUser(user);
                 });
@@ -171,20 +172,22 @@ public class ManageUsersController implements Injectable {
 
     private void handleDeleteSingleUser(User user) {
         if (!container.getUserSession().hasPermission("usuario.crear")) {
-            AlertUtil.showError("Acceso Denegado", "No tiene permiso para gestionar usuarios.");
+            AlertUtil.showError(container.getBundle().getString("access.denied"), container.getBundle().getString("sidebar.permission_denied_msg"));
             return;
         }
-        if (AlertUtil.showConfirmation("Eliminar Usuario", "¿Eliminar a " + user.getUsername() + "?",
-                "Esta acción es irreversible.")) {
+        if (AlertUtil.showConfirmation(container.getBundle().getString("user.manage.confirm.delete.title"), 
+                String.format(container.getBundle().getString("user.manage.confirm.delete.msg"), user.getUsername()),
+                container.getBundle().getString("user.manage.confirm.delete.header"))) {
             try {
                 if (userUseCase.deleteUser(user.getUserId())) {
                     loadUsers();
                 } else {
-                    AlertUtil.showError("Error", "No se pudo eliminar el usuario");
+                    AlertUtil.showError(container.getBundle().getString("alert.error"), container.getBundle().getString("user.manage.error.delete"));
                 }
             } catch (SQLException e) {
                 e.printStackTrace();
-                AlertUtil.showError("Error", "Error al eliminar usuario: " + e.getMessage());
+                AlertUtil.showError(container.getBundle().getString("alert.error"), 
+                        String.format(container.getBundle().getString("user.manage.error.delete_db"), e.getMessage()));
             }
         }
     }

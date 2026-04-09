@@ -18,7 +18,7 @@
         <StackPane styleClass="status-icon-bg-blue">
             <FontAwesomeIconView glyphName="TAGS" size="10" fill="#ffffff"/>
         </StackPane>
-        <Label text="Productos:" styleClass="status-badge-label"/>
+        <Label text="%status.products" styleClass="status-badge-label"/>
         <Label fx:id="labelCountProducts" text="0" styleClass="status-badge-value"/>
     </HBox>
     
@@ -26,7 +26,7 @@
         <StackPane styleClass="status-icon-bg-purple">
             <FontAwesomeIconView glyphName="LIST" size="10" fill="#ffffff"/>
         </StackPane>
-        <Label text="Categorías:" styleClass="status-badge-label"/>
+        <Label text="%status.categories" styleClass="status-badge-label"/>
         <Label fx:id="labelCountCategories" text="0" styleClass="status-badge-value"/>
     </HBox>
     
@@ -34,7 +34,7 @@
         <StackPane styleClass="status-icon-bg-orange">
             <FontAwesomeIconView glyphName="HISTORY" size="10" fill="#ffffff"/>
         </StackPane>
-        <Label text="Ventas hoy:" styleClass="status-badge-label"/>
+        <Label text="%status.sales_today" styleClass="status-badge-label"/>
         <Label fx:id="labelCountHistory" text="0" styleClass="status-badge-value"/>
     </HBox>
     
@@ -42,7 +42,7 @@
         <StackPane styleClass="status-icon-bg-green">
             <FontAwesomeIconView glyphName="USERS" size="10" fill="#ffffff"/>
         </StackPane>
-        <Label text="Empresas:" styleClass="status-badge-label"/>
+        <Label text="%status.companies" styleClass="status-badge-label"/>
         <Label fx:id="labelCountClients" text="0" styleClass="status-badge-value"/>
     </HBox>
     
@@ -50,7 +50,7 @@
         <StackPane styleClass="status-icon-bg-red">
             <FontAwesomeIconView glyphName="USER_CIRCLE" size="10" fill="#ffffff"/>
         </StackPane>
-        <Label text="Usuarios:" styleClass="status-badge-label"/>
+        <Label text="%status.users" styleClass="status-badge-label"/>
         <Label fx:id="labelCountUsers" text="0" styleClass="status-badge-value"/>
     </HBox>
     
@@ -58,7 +58,7 @@
         <StackPane styleClass="status-icon-bg-teal">
             <FontAwesomeIconView glyphName="ARCHIVE" size="10" fill="#ffffff"/>
         </StackPane>
-        <Label text="Cierres:" styleClass="status-badge-label"/>
+        <Label text="%status.closures" styleClass="status-badge-label"/>
         <Label fx:id="labelCountClosures" text="0" styleClass="status-badge-value"/>
     </HBox>
 </HBox>

@@ -27,10 +27,11 @@ public class SpecialDaysController implements Injectable {
 
     private List<SaleConfig.SpecialDay> specialDays;
     private Runnable onSaveCallback;
+    private ServiceContainer container;
 
     @Override
     public void inject(ServiceContainer container) {
-        // This view is usually initialized manually from the parent controller
+        this.container = container;
     }
 
     public void initData(List<SaleConfig.SpecialDay> existing, Runnable onSave) {
@@ -96,14 +97,18 @@ public class SpecialDaysController implements Injectable {
                     javafx.scene.layout.VBox vInfo = new javafx.scene.layout.VBox(3);
                     Label lblReason = new Label(item.getReason());
                     lblReason.setStyle("-fx-font-weight: bold; -fx-text-fill: #334155;");
-                    Label lblSub = new Label("Año " + item.getDate().getYear());
+                    Label lblSub = new Label(container != null 
+                            ? String.format(container.getBundle().getString("special.days.label.year"), item.getDate().getYear())
+                            : "Año " + item.getDate().getYear());
                     lblSub.setStyle("-fx-font-size: 11px; -fx-text-fill: #94a3b8;");
                     vInfo.getChildren().addAll(lblReason, lblSub);
 
                     javafx.scene.layout.Region spacer = new javafx.scene.layout.Region();
                     javafx.scene.layout.HBox.setHgrow(spacer, javafx.scene.layout.Priority.ALWAYS);
 
-                    Label badge = new Label(item.isClosed() ? "CERRADO" : "ABIERTO");
+                    Label badge = new Label(item.isClosed() 
+                            ? (container != null ? container.getBundle().getString("special.status.closed") : "CERRADO")
+                            : (container != null ? container.getBundle().getString("special.status.open") : "ABIERTO"));
                     badge.setPadding(new javafx.geometry.Insets(4, 10, 4, 10));
                     badge.setMinWidth(75);
                     badge.setAlignment(javafx.geometry.Pos.CENTER);

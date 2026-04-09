@@ -18,7 +18,7 @@ public class ModalService {
             com.mycompany.ventacontrolfx.infrastructure.config.ServiceContainer container,
             Consumer<T> controllerConsumer) {
         try {
-            FXMLLoader loader = new FXMLLoader(ModalService.class.getResource(fxmlPath));
+            FXMLLoader loader = new FXMLLoader(ModalService.class.getResource(fxmlPath), container != null ? container.getBundle() : null);
             Parent root = loader.load();
             T controller = loader.getController();
 
@@ -46,9 +46,9 @@ public class ModalService {
 
             stage.showAndWait();
             return controller;
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
-            AlertUtil.showError("Error", "No se pudo abrir la ventana: " + title);
+            AlertUtil.showError("Error", "No se pudo abrir la ventana: " + title + "\n\nError: " + e.toString());
             return null;
         }
     }
@@ -71,7 +71,10 @@ public class ModalService {
             com.mycompany.ventacontrolfx.infrastructure.config.ServiceContainer container,
             Consumer<T> controllerConsumer) {
         try {
-            FXMLLoader loader = new FXMLLoader(ModalService.class.getResource(fxmlPath));
+            FXMLLoader loader = new FXMLLoader(ModalService.class.getResource(fxmlPath), container != null ? container.getBundle() : null);
+            if (container != null) {
+                loader.setResources(container.getBundle());
+            }
             Parent root = loader.load();
             T controller = loader.getController();
 
@@ -107,9 +110,9 @@ public class ModalService {
 
             stage.showAndWait();
             return controller;
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
-            AlertUtil.showError("Error", "No se pudo abrir la ventana: " + title);
+            AlertUtil.showError("Error", "No se pudo abrir la ventana: " + title + "\n\nError: " + e.toString());
             return null;
         }
     }

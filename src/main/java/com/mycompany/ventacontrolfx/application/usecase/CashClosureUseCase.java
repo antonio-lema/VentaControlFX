@@ -36,6 +36,11 @@ public class CashClosureUseCase {
         closure.setInitialFund(initialFund);
         closure.setExpectedCash(currentCash);
 
+        // Enrich totals for history
+        closure.setTotalCash(totals.getOrDefault("cash", 0.0));
+        closure.setTotalCard(totals.getOrDefault("card", 0.0));
+        closure.setTotalAll(totals.getOrDefault("total", 0.0));
+
         // Determinamos el estado según la diferencia
         double diff = closure.getActualCash() - currentCash;
         closure.setDifference(diff);

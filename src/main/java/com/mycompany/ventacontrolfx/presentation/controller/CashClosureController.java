@@ -131,7 +131,8 @@ public class CashClosureController implements Injectable {
 
             lblTotalCash.setText("💵 " + String.format("%.2f €", currentCash));
             lblTotalCard.setText("💳 " + String.format("%.2f €", currentCard));
-            lblTotalAll.setText("💰 Neto: " + String.format("%.2f €", totalAll));
+            lblTotalAll.setText(
+                    "💰 " + container.getBundle().getString("closure.net") + ": " + String.format("%.2f €", totalAll));
 
             // Mostrar devoluciones totales
             if (lblTotalReturns != null) {
@@ -175,14 +176,15 @@ public class CashClosureController implements Injectable {
                     && closureUseCase.getTodayTransactionCount() == 0)
                 markAsClosed();
             else {
-                lblStatus.setText("En curso... ⏳");
+                lblStatus.setText(container.getBundle().getString("closure.status.in_progress") + " ⏳");
                 lblStatus.getStyleClass().removeAll("closure-status-done");
                 lblStatus.getStyleClass().add("closure-status-pending");
                 btnPerformClosure.setDisable(false);
-                btnPerformClosure.setText("REALIZAR CIERRE DE CAJA");
+                btnPerformClosure.setText(container.getBundle().getString("closure.btn.perform"));
             }
         } catch (SQLException e) {
-            AlertUtil.showError("Error", "No se pudieron cargar los datos del día.");
+            AlertUtil.showError(container.getBundle().getString("alert.error"),
+                    container.getBundle().getString("closure.error.load_today"));
         }
     }
 
@@ -193,7 +195,8 @@ public class CashClosureController implements Injectable {
             double fundAmount = closureUseCase.getActiveFundAmount();
 
             if (hasFund) {
-                lblActiveFund.setText("💼 Fondo: " + String.format("%.2f €", fundAmount));
+                lblActiveFund.setText("💼 " + container.getBundle().getString("closure.fund") + ": "
+                        + String.format("%.2f €", fundAmount));
                 lblActiveFund.setStyle("-fx-text-fill: -color-success; -fx-font-weight: bold;");
                 lblCashInDrawer.setText("🏦 " + String.format("%.2f €", cashInDrawer));
 
@@ -210,45 +213,45 @@ public class CashClosureController implements Injectable {
                 }
 
                 btnOpenFund.setDisable(true);
-                btnOpenFund.setText("✅ CAJA ABIERTA");
+                btnOpenFund.setText("✅ " + container.getBundle().getString("closure.status.open"));
                 btnWithdrawCash.setDisable(false);
                 if (btnRegisterCashEntry != null)
                     btnRegisterCashEntry.setDisable(false);
 
                 // Asegurar que el botón de cierre esté habilitado si hay sesión activa
                 btnPerformClosure.setDisable(false);
-                btnPerformClosure.setText("REALIZAR CIERRE DE CAJA");
-                lblStatus.setText("En curso... ⏳");
+                btnPerformClosure.setText(container.getBundle().getString("closure.btn.perform"));
+                lblStatus.setText(container.getBundle().getString("closure.status.in_progress") + " ⏳");
                 lblStatus.getStyleClass().removeAll("closure-status-done");
                 lblStatus.getStyleClass().add("closure-status-pending");
             } else {
-                lblActiveFund.setText("⚠️ Sin fondo de caja");
+                lblActiveFund.setText("⚠️ " + container.getBundle().getString("closure.no_fund"));
                 lblActiveFund.setStyle("-fx-text-fill: -color-warning; -fx-font-weight: bold;");
-                lblCashInDrawer.setText("🏦 Sin sesión");
+                lblCashInDrawer.setText("🏦 " + container.getBundle().getString("closure.no_session"));
                 lblCashInDrawer.setStyle("-fx-text-fill: -text-muted; -fx-font-size: 22px;");
                 btnOpenFund.setDisable(false);
-                btnOpenFund.setText("💼 ABRIR CAJA CON FONDO");
+                btnOpenFund.setText("💼 " + container.getBundle().getString("closure.btn.open_fund"));
                 btnWithdrawCash.setDisable(true);
                 if (btnRegisterCashEntry != null)
                     btnRegisterCashEntry.setDisable(true);
             }
         } catch (SQLException e) {
-            lblCashInDrawer.setText("🏦 Error al cargar");
+            lblCashInDrawer.setText("🏦 " + container.getBundle().getString("error.load"));
         }
     }
 
     private void markAsClosed() {
-        lblStatus.setText("Realizado ✅");
+        lblStatus.setText(container.getBundle().getString("closure.status.completed") + " ✅");
         lblStatus.getStyleClass().removeAll("closure-status-pending");
         lblStatus.getStyleClass().add("closure-status-done");
         btnPerformClosure.setDisable(true);
-        btnPerformClosure.setText("CIERRE COMPLETADO");
+        btnPerformClosure.setText(container.getBundle().getString("closure.btn.completed"));
     }
 
     @FXML
     private void handlePerformClosure() {
         CashClosingController ctrl = ModalService.showTransparentModal("/view/dialog/cash_closing_dialog.fxml",
-                "Arqueo y Cierre de Caja", container,
+                container.getBundle().getString("closure.dialog.closing_title"), container,
                 (CashClosingController controller) -> {
                     controller.init(closureUseCase, userSession);
                 });
@@ -271,7 +274,7 @@ public class CashClosureController implements Injectable {
             controller.init(closureUseCase, userSession);
 
             Stage stage = new Stage();
-            stage.setTitle("Apertura de Caja");
+            stage.setTitle(container.getBundle().getString("closure.dialog.opening_title"));
             stage.initModality(javafx.stage.Modality.APPLICATION_MODAL);
             stage.initOwner(lblDate.getScene().getWindow());
             stage.setScene(new javafx.scene.Scene(pane));
@@ -279,11 +282,12 @@ public class CashClosureController implements Injectable {
 
             if (controller.isConfirmed()) {
                 refreshCashDrawer();
-                AlertUtil.showToast("Caja abierta correctamente.");
+                AlertUtil.showToast(container.getBundle().getString("closure.success.opened"));
             }
         } catch (java.io.IOException e) {
             e.printStackTrace();
-            AlertUtil.showError("Error", "No se pudo cargar el diálogo de apertura.");
+            AlertUtil.showError(container.getBundle().getString("alert.error"),
+                    container.getBundle().getString("closure.error.dialog_opening"));
         }
     }
 
@@ -296,7 +300,7 @@ public class CashClosureController implements Injectable {
             controller.init(closureUseCase, userSession);
 
             javafx.stage.Stage stage = new javafx.stage.Stage();
-            stage.setTitle("Retirar Efectivo");
+            stage.setTitle(container.getBundle().getString("closure.dialog.withdraw_title"));
             stage.initModality(javafx.stage.Modality.APPLICATION_MODAL);
             stage.initOwner(lblDate.getScene().getWindow());
             stage.setScene(new javafx.scene.Scene(pane));
@@ -305,11 +309,12 @@ public class CashClosureController implements Injectable {
             if (controller.isConfirmed()) {
                 refreshCashDrawer();
                 loadTodayData();
-                AlertUtil.showToast("Retirada registrada correctamente.");
+                AlertUtil.showToast(container.getBundle().getString("closure.success.withdraw"));
             }
         } catch (java.io.IOException e) {
             e.printStackTrace();
-            AlertUtil.showError("Error", "No se pudo cargar el diálogo de retirada.");
+            AlertUtil.showError(container.getBundle().getString("alert.error"),
+                    container.getBundle().getString("closure.error.dialog_withdraw"));
         }
     }
 
@@ -322,7 +327,7 @@ public class CashClosureController implements Injectable {
             controller.init(closureUseCase, userSession);
 
             javafx.stage.Stage stage = new javafx.stage.Stage();
-            stage.setTitle("Ingresar Efectivo");
+            stage.setTitle(container.getBundle().getString("closure.dialog.entry_title"));
             stage.initModality(javafx.stage.Modality.APPLICATION_MODAL);
             stage.initOwner(lblDate.getScene().getWindow());
             stage.setScene(new javafx.scene.Scene(pane));
@@ -331,11 +336,12 @@ public class CashClosureController implements Injectable {
             if (controller.isConfirmed()) {
                 refreshCashDrawer();
                 loadTodayData();
-                AlertUtil.showToast("Ingreso registrado correctamente.");
+                AlertUtil.showToast(container.getBundle().getString("closure.success.entry"));
             }
         } catch (java.io.IOException e) {
             e.printStackTrace();
-            AlertUtil.showError("Error", "No se pudo cargar el diálogo de ingreso.");
+            AlertUtil.showError(container.getBundle().getString("alert.error"),
+                    container.getBundle().getString("closure.error.dialog_entry"));
         }
     }
 

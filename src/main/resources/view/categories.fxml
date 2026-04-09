@@ -28,14 +28,14 @@
                             </StackPane>
                             <VBox spacing="2">
                                 <children>
-                                    <Label text="Categorías de Productos" styleClass="view-title"/>
-                                    <Label text="Organiza tus productos por grupos" styleClass="view-subtitle"/>
+                                    <Label text="%categories.title" styleClass="view-title"/>
+                                    <Label text="%categories.subtitle" styleClass="view-subtitle"/>
                                 </children>
                             </VBox>
                             <Region HBox.hgrow="ALWAYS" />
                             <HBox spacing="10.0" alignment="CENTER_RIGHT">
                                 <children>
-                                    <Button fx:id="btnAdd" onAction="#handleAddCategory" styleClass="btn-primary" text=" Nueva Categoría">
+                                    <Button fx:id="btnAdd" onAction="#handleAddCategory" styleClass="btn-primary" text="%categories.btn.new">
                                         <graphic><FontAwesomeIconView glyphName="PLUS" size="14" fill="WHITE"/></graphic>
                                     </Button>
                                 </children>
@@ -54,19 +54,19 @@
                   <!-- Filter Section -->
                   <HBox alignment="CENTER_LEFT" styleClass="modern-filter-bar">
                      <children>
-                        <Label text="Buscar categoría:" styleClass="label-muted" />
+                        <Label text="%categories.filter.label" styleClass="label-muted" />
                         <HBox alignment="CENTER_LEFT" styleClass="search-bar" HBox.hgrow="ALWAYS" maxWidth="400">
                            <children>
                               <FontAwesomeIconView glyphName="SEARCH" size="14" styleClass="sidebar-icon" />
-                              <TextField fx:id="searchField" promptText="Escribe el nombre..." styleClass="search-field" HBox.hgrow="ALWAYS" />
+                              <TextField fx:id="searchField" promptText="%categories.filter.prompt" styleClass="search-field" HBox.hgrow="ALWAYS" />
                            </children>
                         </HBox>
                         <Region HBox.hgrow="ALWAYS" />
                         <HBox alignment="CENTER_LEFT" spacing="10">
                            <children>
-                              <Label text="Ver" textFill="#7f8c8d" />
+                              <Label text="%categories.show_label" textFill="#7f8c8d" />
                               <TextField fx:id="rowsPerPageField" prefWidth="45.0" text="10" styleClass="row-count-field" />
-                              <Label text="filas" textFill="#7f8c8d" />
+                              <Label text="%categories.rows_label" textFill="#7f8c8d" />
                            </children>
                         </HBox>
                      </children>
@@ -75,12 +75,12 @@
                   <!-- Table View -->
                   <TableView fx:id="categoriesTable" styleClass="modern-table-view" VBox.vgrow="ALWAYS">
                     <columns>
-                       <TableColumn fx:id="colName" prefWidth="300.0" text="NOMBRE DE CATEGORÍA" />
-                       <TableColumn fx:id="colTaxGroup" prefWidth="150.0" text="GRUPO IMPUESTOS" />
-                <TableColumn fx:id="colIva" prefWidth="80.0" text="IVA (%)" />
-                       <TableColumn fx:id="colVisible" prefWidth="100.0" text="ESTADO" />
-                       <TableColumn fx:id="colFavorite" prefWidth="100.0" text="FAVORITO" />
-                       <TableColumn fx:id="colActions" prefWidth="180.0" text="ACCIONES" />
+                       <TableColumn fx:id="colName" prefWidth="300.0" text="%categories.table.name" />
+                       <TableColumn fx:id="colTaxGroup" prefWidth="150.0" text="%categories.table.tax_group" />
+                <TableColumn fx:id="colIva" prefWidth="80.0" text="%categories.table.iva" />
+                       <TableColumn fx:id="colVisible" prefWidth="100.0" text="%categories.table.status" />
+                       <TableColumn fx:id="colFavorite" prefWidth="100.0" text="%categories.table.favorite" />
+                       <TableColumn fx:id="colActions" prefWidth="180.0" text="%categories.table.actions" />
                     </columns>
                      <columnResizePolicy>
                         <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
@@ -89,7 +89,7 @@
                   <!-- Count Section -->
                   <HBox alignment="CENTER_RIGHT" style="-fx-padding: 10;">
                       <children>
-                          <Label fx:id="lblCount" text="0 categorías encontradas" style="-fx-text-fill: #7f8c8d; -fx-font-weight: bold;"/>
+                          <Label fx:id="lblCount" text="%categories.found_count" style="-fx-text-fill: #7f8c8d; -fx-font-weight: bold;"/>
                       </children>
                   </HBox>
                </children>

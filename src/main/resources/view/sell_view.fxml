@@ -23,8 +23,8 @@
                             </StackPane>
                             <VBox spacing="2">
                                 <children>
-                                    <Label text="Realizar Venta" styleClass="view-title"/>
-                                    <Label fx:id="filterLabel" text="Catálogo de productos y punto de venta" styleClass="view-subtitle"/>
+                                    <Label text="%sell.title" styleClass="view-title"/>
+                                    <Label fx:id="filterLabel" text="%sell.subtitle" styleClass="view-subtitle"/>
                                 </children>
                             </VBox>
                             
@@ -35,7 +35,7 @@
                                 <children>
                                     <VBox spacing="2">
                                         <children>
-                                            <Label text="TARIFA ACTIVA" styleClass="view-subtitle" style="-fx-font-size: 10px; -fx-font-weight: 800; -fx-text-fill: -fx-custom-color-primary;"/>
+                                            <Label text="%sell.active_rate" styleClass="view-subtitle" style="-fx-font-size: 10px; -fx-font-weight: 800; -fx-text-fill: -fx-custom-color-primary;"/>
                                             <HBox styleClass="modern-input-container, selector-glass" alignment="CENTER_LEFT" spacing="8">
                                                 <children>
                                                     <FontAwesomeIconView glyphName="TAG" size="14" styleClass="icon-primary"/>
@@ -47,12 +47,12 @@
                                     <Separator orientation="VERTICAL" style="-fx-padding: 5 0;"/>
                                     <VBox spacing="2">
                                         <children>
-                                            <Label text="CATEGORÍA" styleClass="view-subtitle" style="-fx-font-size: 10px; -fx-font-weight: 800; -fx-text-fill: -fx-custom-color-success;"/>
+                                            <Label text="%sell.category_label" styleClass="view-subtitle" style="-fx-font-size: 10px; -fx-font-weight: 800; -fx-text-fill: -fx-custom-color-success;"/>
                                             <Button fx:id="btnCategorySelector" onAction="#handleToggleCategoryMenu" styleClass="selector-glass, btn-category-trigger" prefWidth="180">
                                                 <graphic>
                                                     <HBox spacing="8" alignment="CENTER_LEFT">
                                                         <FontAwesomeIconView glyphName="FOLDER_OPEN" size="14" styleClass="icon-success"/>
-                                                        <Label fx:id="lblSelectedCategory" text="Todas las categorías" styleClass="label-selector-text" />
+                                                        <Label fx:id="lblSelectedCategory" text="%sell.all_categories" styleClass="label-selector-text" />
                                                         <Region HBox.hgrow="ALWAYS" />
                                                         <FontAwesomeIconView glyphName="CHEVRON_DOWN" size="10" styleClass="icon-muted"/>
                                                     </HBox>
@@ -96,7 +96,7 @@
 
                         <VBox fx:id="loadingOverlay" visible="false" alignment="CENTER" styleClass="loading-overlay">
                             <ProgressIndicator />
-                            <Label text="Cargando productos..." styleClass="label-muted"/>
+                            <Label text="%sell.loading_products" styleClass="label-muted"/>
                         </VBox>
                     </StackPane>
 

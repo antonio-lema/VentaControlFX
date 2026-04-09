@@ -7,7 +7,17 @@ import javafx.scene.control.Button;
 import javafx.stage.Stage;
 import javafx.application.Platform;
 
-public class PaymentController {
+import com.mycompany.ventacontrolfx.infrastructure.config.Injectable;
+import com.mycompany.ventacontrolfx.infrastructure.config.ServiceContainer;
+
+public class PaymentController implements Injectable {
+
+    private ServiceContainer container;
+
+    @Override
+    public void inject(ServiceContainer container) {
+        this.container = container;
+    }
 
     @FXML
     private Label lblTotalAmount, lblCashAmount, lblCashWarning;
@@ -79,7 +89,8 @@ public class PaymentController {
     private void handleCardPayment() {
         handleClose();
         if (callback != null) {
-            Platform.runLater(() -> callback.onSuccess(totalAmount, 0.0, "Tarjeta", 0.0, totalAmount));
+            String method = container.getBundle().getString("payment.method.card");
+            Platform.runLater(() -> callback.onSuccess(totalAmount, 0.0, method, 0.0, totalAmount));
         }
     }
 
@@ -105,14 +116,16 @@ public class PaymentController {
                 double change = roundedGiven - roundedTotal;
                 handleClose();
                 if (callback != null) {
-                    Platform.runLater(() -> callback.onSuccess(given, change, "Efectivo", totalAmount, 0.0));
+                    String method = container.getBundle().getString("payment.method.cash");
+                    Platform.runLater(() -> callback.onSuccess(given, change, method, totalAmount, 0.0));
                 }
             } else if (isMixed && roundedGiven > 0) {
                 // Pago Mixto: Registrar parte en efectivo y el resto por tarjeta
                 double remaining = roundedTotal - roundedGiven;
                 handleClose();
                 if (callback != null) {
-                    String method = String.format("Mixto (Efect: %.2f€, Tarj: %.2f€)", roundedGiven, remaining);
+                    String method = String.format(container.getBundle().getString("payment.method.mixed_format"),
+                            roundedGiven, remaining);
                     Platform.runLater(() -> callback.onSuccess(roundedTotal, 0.0, method, roundedGiven, remaining));
                 }
             } else {

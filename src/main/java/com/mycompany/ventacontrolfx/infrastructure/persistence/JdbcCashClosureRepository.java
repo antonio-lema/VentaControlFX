@@ -150,7 +150,7 @@ public class JdbcCashClosureRepository implements ICashClosureRepository {
     public int getPendingTransactionCount() throws SQLException {
         String sql = "SELECT (SELECT COUNT(*) FROM sales WHERE closure_id IS NULL) + " +
                 "(SELECT COUNT(*) FROM returns WHERE closure_id IS NULL) + " +
-                "(SELECT COUNT(*) FROM cash_fund_sessions WHERE closure_id IS NULL) + " +
+                "(SELECT COUNT(*) FROM cash_fund_sessions WHERE is_closed = FALSE) + " +
                 "(SELECT COUNT(*) FROM cash_movements WHERE closure_id IS NULL) as total_pending";
         try (Connection conn = DBConnection.getConnection();
                 Statement stmt = conn.createStatement();
@@ -247,7 +247,7 @@ public class JdbcCashClosureRepository implements ICashClosureRepository {
         for (String table : tables) {
             String sql = "UPDATE " + table + " SET closure_id = ? WHERE closure_id IS NULL";
             if ("cash_fund_sessions".equals(table)) {
-                sql = "UPDATE cash_fund_sessions SET closure_id = ?, is_closed = TRUE WHERE closure_id IS NULL";
+                sql = "UPDATE cash_fund_sessions SET closure_id = ?, is_closed = TRUE WHERE is_closed = FALSE";
             }
             try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
                 pstmt.setInt(1, closureId);
@@ -393,12 +393,9 @@ public class JdbcCashClosureRepository implements ICashClosureRepository {
 
     @Override
     public double getActiveFundAmount() throws SQLException {
-        // Sum all unclosed initial funds to maintain traceability
-        // Sum only the most recent unclosed session's fund? No, sum all active ones but
-        // focus on the latest one if it's on the same day. Actually, just sum is
-        // consistent with carries.
-        // BUT if user says it's wrong, maybe they have double sessions by mistake.
-        String sql = "SELECT COALESCE(SUM(initial_amount), 0) FROM cash_fund_sessions WHERE is_closed = FALSE";
+        // Obtenemos solo el fondo de la sesión activa más reciente
+        // Si hay varias abiertas por error, no las sumamos para no inflar el esperado
+        String sql = "SELECT initial_amount FROM cash_fund_sessions WHERE is_closed = FALSE ORDER BY created_at DESC LIMIT 1";
         try (Connection connection = DBConnection.getConnection();
                 Statement stmt = connection.createStatement();
                 ResultSet rs = stmt.executeQuery(sql)) {

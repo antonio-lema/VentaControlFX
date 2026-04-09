@@ -27,8 +27,8 @@
                             </StackPane>
                             <VBox spacing="2">
                                 <children>
-                                    <Label text="Auditoría de Arqueos" styleClass="view-title" />
-                                    <Label text="Control financiero, descuadres y trazabilidad de caja" styleClass="view-subtitle" />
+                                    <Label text="%closure_history.title" styleClass="view-title" />
+                                    <Label text="%closure_history.subtitle" styleClass="view-subtitle" />
                                 </children>
                             </VBox>
                             <Region HBox.hgrow="ALWAYS" />
@@ -37,18 +37,18 @@
                                 <padding><Insets left="15" right="15"/></padding>
                                 <children>
                                     <FontAwesomeIconView glyphName="CALENDAR" fill="#94a3b8" size="14" />
-                                    <DatePicker fx:id="datePickerStart" onAction="#loadClosures" promptText="Desde" prefWidth="145"/>
+                                    <DatePicker fx:id="datePickerStart" onAction="#loadClosures" promptText="%closure_history.filter.from" prefWidth="145"/>
                                     <Label text="—" textFill="#94a3b8"/>
-                                    <DatePicker fx:id="datePickerEnd" onAction="#loadClosures" promptText="Hasta" prefWidth="145"/>
+                                    <DatePicker fx:id="datePickerEnd" onAction="#loadClosures" promptText="%closure_history.filter.to" prefWidth="145"/>
                                 </children>
                             </HBox>
                             
                              <HBox fx:id="quickFilterContainer" alignment="CENTER_LEFT" spacing="8" styleClass="date-filter-container" />
                             
-                            <Button onAction="#loadClosures" styleClass="btn-primary" text="Refrescar">
+                            <Button onAction="#loadClosures" styleClass="btn-primary" text="%closure_history.btn.refresh">
                                 <graphic><FontAwesomeIconView glyphName="REFRESH" fill="WHITE" /></graphic>
                             </Button>
-                            <Button onAction="#handleMarkAllReviewed" styleClass="btn-secondary" text="Revisar Todo">
+                            <Button onAction="#handleMarkAllReviewed" styleClass="btn-secondary" text="%closure_history.btn.review_all">
                                 <graphic><FontAwesomeIconView glyphName="CHECK_SQUARE_ALT" /></graphic>
                             </Button>
                         </children>
@@ -69,10 +69,10 @@
                                         <children>
                                             <HBox alignment="CENTER_LEFT" spacing="10">
                                                 <StackPane styleClass="icon-bg-blue"><FontAwesomeIconView glyphName="LIST_ALT" fill="#2563eb" size="16"/></StackPane>
-                                                <Label text="TOTAL ARQUEOS" styleClass="kpi-label-saas" />
+                                                <Label text="%closure_history.kpi.total_count" styleClass="kpi-label-saas" />
                                             </HBox>
                                             <Label fx:id="lblTotalClosures" text="0" styleClass="kpi-value-saas" />
-                                            <Label text="Cierres en el periodo" styleClass="trend-text" />
+                                            <Label text="%closure_history.kpi.desc.period" styleClass="trend-text" />
                                         </children>
                                     </VBox>
                                     
@@ -80,10 +80,10 @@
                                         <children>
                                             <HBox alignment="CENTER_LEFT" spacing="10">
                                                 <StackPane styleClass="icon-bg-red"><FontAwesomeIconView glyphName="EXCLAMATION_TRIANGLE" fill="#dc2626" size="16"/></StackPane>
-                                                <Label text="DESCUADRE TOTAL" styleClass="kpi-label-saas" />
+                                                <Label text="%closure_history.kpi.total_difference" styleClass="kpi-label-saas" />
                                             </HBox>
                                             <Label fx:id="lblTotalDifference" text="0.00 €" styleClass="kpi-value-saas" style="-fx-text-fill: #dc2626;" />
-                                            <Label text="Suma de diferencias detectadas" styleClass="trend-text" />
+                                            <Label text="%closure_history.kpi.desc.difference" styleClass="trend-text" />
                                         </children>
                                     </VBox>
                                     
@@ -91,10 +91,10 @@
                                         <children>
                                             <HBox alignment="CENTER_LEFT" spacing="10">
                                                 <StackPane styleClass="icon-bg-gold"><FontAwesomeIconView glyphName="EYE" fill="#d97706" size="16"/></StackPane>
-                                                <Label text="PENDIENTES REVISIÓN" styleClass="kpi-label-saas" />
+                                                <Label text="%closure_history.kpi.pending_review" styleClass="kpi-label-saas" />
                                             </HBox>
                                             <Label fx:id="lblPendingReview" text="0" styleClass="kpi-value-saas" />
-                                            <Label text="Cierres sin validar por admin" styleClass="trend-text" />
+                                            <Label text="%closure_history.kpi.desc.pending" styleClass="trend-text" />
                                         </children>
                                     </VBox>
                                     
@@ -102,10 +102,10 @@
                                         <children>
                                             <HBox alignment="CENTER_LEFT" spacing="10">
                                                 <StackPane styleClass="icon-bg-green"><FontAwesomeIconView glyphName="MONEY" fill="#16a34a" size="16"/></StackPane>
-                                                <Label text="EFECTIVO EN CAJA" styleClass="kpi-label-saas" />
+                                                <Label text="%closure_history.kpi.current_cash" styleClass="kpi-label-saas" />
                                             </HBox>
                                             <Label fx:id="lblCurrentCash" text="0.00 €" styleClass="kpi-value-saas" style="-fx-text-fill: #16a34a;" />
-                                            <Label text="Saldo teórico actual" styleClass="trend-text" />
+                                            <Label text="%closure_history.kpi.desc.theoretical" styleClass="trend-text" />
                                         </children>
                                     </VBox>
                                 </children>
@@ -119,22 +119,22 @@
                                         <children>
                                             <HBox alignment="CENTER_LEFT" spacing="15">
                                                 <children>
-                                                    <Label text="Listado de Cierres de Sesión" styleClass="widget-title" />
+                                                    <Label text="%closure_history.list.title" styleClass="widget-title" />
                                                     <Region HBox.hgrow="ALWAYS" />
-                                                    <Button onAction="#handleMarkAllReviewed" text="Marcar todo revisado" styleClass="btn-secondary-saas"/>
-                                                    <ComboBox fx:id="cmbStatusFilter" promptText="Filtrar por estado" styleClass="btn-secondary-saas" />
+                                                    <Button onAction="#handleMarkAllReviewed" text="%closure_history.btn.review_all" styleClass="btn-secondary-saas"/>
+                                                    <ComboBox fx:id="cmbStatusFilter" promptText="%closure_history.table.status" styleClass="btn-secondary-saas" />
                                                 </children>
                                             </HBox>
                                             
                                             <TableView fx:id="tableClosures" VBox.vgrow="ALWAYS" styleClass="table-saas" prefHeight="500">
                                                 <columns>
-                                                    <TableColumn fx:id="colStatus" prefWidth="100.0" text="ESTADO" />
-                                                    <TableColumn fx:id="colCreated" prefWidth="160.0" text="FECHA/HORA" />
-                                                    <TableColumn fx:id="colUser" prefWidth="130.0" text="CAJERO" />
-                                                    <TableColumn fx:id="colInitialFund" prefWidth="100.0" text="FONDO INI." />
-                                                    <TableColumn fx:id="colExpected" prefWidth="110.0" text="ESPERADO" />
-                                                    <TableColumn fx:id="colActual" prefWidth="110.0" text="CONTADO" />
-                                                    <TableColumn fx:id="colDifference" prefWidth="100.0" text="DIFERENCIA" />
+                                                    <TableColumn fx:id="colStatus" prefWidth="100.0" text="%closure_history.table.status" />
+                                                    <TableColumn fx:id="colCreated" prefWidth="160.0" text="%closure_history.table.date" />
+                                                    <TableColumn fx:id="colUser" prefWidth="130.0" text="%closure_history.table.user" />
+                                                    <TableColumn fx:id="colInitialFund" prefWidth="100.0" text="%closure_history.table.initial" />
+                                                    <TableColumn fx:id="colExpected" prefWidth="110.0" text="%closure_history.table.expected" />
+                                                    <TableColumn fx:id="colActual" prefWidth="110.0" text="%closure_history.table.count" />
+                                                    <TableColumn fx:id="colDifference" prefWidth="100.0" text="%closure_history.table.difference" />
                                                 </columns>
                                                 <columnResizePolicy>
                                                     <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
@@ -143,7 +143,7 @@
                                             
                                             <HBox alignment="CENTER_LEFT" spacing="10" styleClass="row-limit-container">
                                                 <children>
-                                                    <Label text="Mostrar:" styleClass="label-limit" />
+                                                    <Label text="%products.show_limit" styleClass="label-limit" />
                                                     <ComboBox fx:id="cmbRowLimit" prefWidth="90" styleClass="combo-limit" />
                                                     <Region HBox.hgrow="ALWAYS" />
                                                     <Label fx:id="lblCount" text="0 registros" styleClass="trend-text" />
@@ -170,31 +170,31 @@
                                             <!-- DESGLOSE -->
                                             <VBox spacing="10" style="-fx-background-color: #f8fafc; -fx-padding: 15; -fx-background-radius: 8; -fx-border-color: #e2e8f0; -fx-border-radius: 8;">
                                                 <children>
-                                                    <Label text="DESGLOSE DE ARQUEO" style="-fx-font-weight: bold; -fx-font-size: 13px; -fx-text-fill: -fx-text-custom-main;" />
+                                                    <Label text="%closure_history.detail.summary" style="-fx-font-weight: bold; -fx-font-size: 13px; -fx-text-fill: -fx-text-custom-main;" />
                                                     <GridPane vgap="10" hgap="15">
                                                         <columnConstraints>
                                                             <ColumnConstraints hgrow="ALWAYS" />
                                                             <ColumnConstraints halignment="RIGHT" minWidth="80"/>
                                                         </columnConstraints>
                                                         <children>
-                                                            <Label text="Fondo inicial declarado:" GridPane.rowIndex="0" styleClass="trend-text"/>
+                                                            <Label text="%closure_history.detail.initial_decl" GridPane.rowIndex="0" styleClass="trend-text"/>
                                                             <Label fx:id="lblDetInitial" text="0.00 €" GridPane.rowIndex="0" GridPane.columnIndex="1" style="-fx-font-weight: bold;"/>
                                                             
-                                                            <Label text="(+) Ventas en efectivo:" GridPane.rowIndex="1" styleClass="trend-text"/>
+                                                            <Label text="%closure_history.detail.cash_sales" GridPane.rowIndex="1" styleClass="trend-text"/>
                                                             <Label fx:id="lblDetSales" text="0.00 €" GridPane.rowIndex="1" GridPane.columnIndex="1" style="-fx-text-fill: #16a34a;"/>
                                                             
-                                                            <Label text="(+) Entradas manuales:" GridPane.rowIndex="2" styleClass="trend-text"/>
+                                                            <Label text="%closure_history.detail.manual_in" GridPane.rowIndex="2" styleClass="trend-text"/>
                                                             <Label fx:id="lblDetIn" text="0.00 €" GridPane.rowIndex="2" GridPane.columnIndex="1" style="-fx-text-fill: #16a34a;"/>
                                                             
-                                                            <Label text="(-) Retiradas de efectivo:" GridPane.rowIndex="3" styleClass="trend-text"/>
+                                                            <Label text="%closure_history.detail.manual_out" GridPane.rowIndex="3" styleClass="trend-text"/>
                                                             <Label fx:id="lblDetOut" text="0.00 €" GridPane.rowIndex="3" GridPane.columnIndex="1" style="-fx-text-fill: #dc2626;"/>
                                                             
-                                                            <Label text="(=) Total esperado:" GridPane.rowIndex="4" style="-fx-font-weight: bold;"/>
+                                                            <Label text="%closure_history.detail.total_expected" GridPane.rowIndex="4" style="-fx-font-weight: bold;"/>
                                                             <Label fx:id="lblDetExpected" text="0.00 €" GridPane.rowIndex="4" GridPane.columnIndex="1" style="-fx-font-weight: bold;"/>
                                                             
                                                             <Separator GridPane.rowIndex="5" GridPane.columnSpan="2" style="-fx-padding: 5 0;"/>
                                                             
-                                                            <Label text="Total contado (Arqueo):" GridPane.rowIndex="6" style="-fx-font-weight: bold;"/>
+                                                            <Label text="%closure_history.detail.total_counted" GridPane.rowIndex="6" style="-fx-font-weight: bold;"/>
                                                             <Label fx:id="lblDetActual" text="0.00 €" GridPane.rowIndex="6" GridPane.columnIndex="1" style="-fx-font-weight: bold; -fx-font-size: 16px; -fx-text-fill: -fx-text-custom-main;"/>
                                                         </children>
                                                     </GridPane>
@@ -204,15 +204,15 @@
                                             <!-- MOVIMIENTOS CON SCROLL HORIZONTAL -->
                                             <VBox spacing="10" VBox.vgrow="ALWAYS">
                                                 <children>
-                                                    <Label text="MOVIMIENTOS MANUALES" style="-fx-font-weight: bold; -fx-font-size: 13px; -fx-text-fill: -fx-text-custom-main;" />
+                                                    <Label text="%closure_history.detail.movements" style="-fx-font-weight: bold; -fx-font-size: 13px; -fx-text-fill: -fx-text-custom-main;" />
                                                     <!-- Quitamos la constrained policy para que aparezca el scroll horizontal -->
                                                     <TableView fx:id="tableMovements" prefHeight="250" styleClass="table-saas">
                                                         <columns>
-                                                            <TableColumn fx:id="colMovCreated" text="Hora" prefWidth="70" minWidth="65"/>
-                                                            <TableColumn fx:id="colMovType" text="Tipo" prefWidth="80" minWidth="75"/>
-                                                            <TableColumn fx:id="colMovAmount" text="Importe" prefWidth="100" minWidth="90"/>
-                                                            <TableColumn fx:id="colMovReason" text="Motivo" prefWidth="300" minWidth="250"/>
-                                                            <TableColumn fx:id="colMovUser" text="Usuario" prefWidth="100" minWidth="80"/>
+                                                            <TableColumn fx:id="colMovCreated" text="%closure_history.detail.mov.time" prefWidth="70" minWidth="65"/>
+                                                            <TableColumn fx:id="colMovType" text="%closure_history.detail.mov.type" prefWidth="80" minWidth="75"/>
+                                                            <TableColumn fx:id="colMovAmount" text="%closure_history.detail.mov.amount" prefWidth="100" minWidth="90"/>
+                                                            <TableColumn fx:id="colMovReason" text="%closure_history.detail.mov.reason" prefWidth="300" minWidth="250"/>
+                                                            <TableColumn fx:id="colMovUser" text="%closure_history.detail.mov.user" prefWidth="100" minWidth="80"/>
                                                         </columns>
                                                     </TableView>
                                                 </children>
@@ -221,7 +221,7 @@
                                             <!-- OBSERVACIONES -->
                                             <VBox spacing="8">
                                                 <children>
-                                                    <Label text="OBSERVACIONES DEL CAJERO" style="-fx-font-weight: bold; -fx-font-size: 13px; -fx-text-fill: -fx-text-custom-main;" />
+                                                    <Label text="%closure_history.detail.obs_label" style="-fx-font-weight: bold; -fx-font-size: 13px; -fx-text-fill: -fx-text-custom-main;" />
                                                     <Label fx:id="lblDetNotes" text="..." wrapText="true" style="-fx-background-color: #fffbeb; -fx-padding: 12; -fx-background-radius: 8; -fx-border-color: #fef3c7; -fx-text-fill: #92400e; -fx-font-size: 13px;" maxWidth="Infinity"/>
                                                 </children>
                                             </VBox>
@@ -232,8 +232,8 @@
                                                     <Separator />
                                                     <HBox spacing="12" alignment="CENTER">
                                                         <children>
-                                                            <Button fx:id="btnMarkReviewed" onAction="#handleMarkReviewed" text="MARCAR REVISADO" styleClass="btn-primary-saas" maxWidth="Infinity" HBox.hgrow="ALWAYS" prefHeight="45"/>
-                                                            <Button fx:id="btnEditClosure" onAction="#handleEditClosure" text="MODIFICAR" styleClass="btn-secondary-saas" maxWidth="Infinity" HBox.hgrow="ALWAYS" prefHeight="45"/>
+                                                            <Button fx:id="btnMarkReviewed" onAction="#handleMarkReviewed" text="%closure_history.btn.mark_reviewed" styleClass="btn-primary-saas" maxWidth="Infinity" HBox.hgrow="ALWAYS" prefHeight="45"/>
+                                                            <Button fx:id="btnEditClosure" onAction="#handleEditClosure" text="%closure_history.btn.modify" styleClass="btn-secondary-saas" maxWidth="Infinity" HBox.hgrow="ALWAYS" prefHeight="45"/>
                                                             <Button onAction="#handlePrintAudit" styleClass="btn-secondary-saas" prefHeight="45" prefWidth="50">
                                                                 <graphic><FontAwesomeIconView glyphName="PRINT" size="18" /></graphic>
                                                             </Button>

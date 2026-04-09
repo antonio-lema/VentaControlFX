@@ -41,11 +41,12 @@ public class CartListRenderer {
                 item,
                 globalTaxRate,
                 pricesIncludeTax,
+                container.getBundle(),
                 () -> {
                     try {
                         cartUseCase.incrementQuantity(item.getProduct());
                     } catch (IllegalArgumentException ex) {
-                        com.mycompany.ventacontrolfx.util.AlertUtil.showWarning("Stock Insuficiente", ex.getMessage());
+                        com.mycompany.ventacontrolfx.util.AlertUtil.showWarning(container.getBundle().getString("cart.error.insufficient_stock"), ex.getMessage());
                     }
                 },
                 () -> cartUseCase.decrementQuantity(item.getProduct()),
@@ -54,13 +55,13 @@ public class CartListRenderer {
                     try {
                         cartUseCase.updateQuantity(item.getProduct(), newQty);
                     } catch (IllegalArgumentException ex) {
-                        com.mycompany.ventacontrolfx.util.AlertUtil.showWarning("Stock Insuficiente", ex.getMessage());
+                        com.mycompany.ventacontrolfx.util.AlertUtil.showWarning(container.getBundle().getString("cart.error.insufficient_stock"), ex.getMessage());
                     }
                 },
                 () -> {
                     com.mycompany.ventacontrolfx.util.ModalService.showTransparentModal(
                             "/view/edit_cart_item.fxml",
-                            "Modificar Producto",
+                            container.getBundle().getString("cart.edit.title"),
                             container,
                             (EditCartItemController controller) -> {
                                 controller.setData(item, () -> {

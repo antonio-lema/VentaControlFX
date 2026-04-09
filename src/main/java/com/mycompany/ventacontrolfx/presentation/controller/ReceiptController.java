@@ -35,13 +35,13 @@ public class ReceiptController implements Injectable {
             barcodeSection, paymentInfoContainer, clientInfoSection, vatBreakdownContainer, hboxSavings,
             observationSection;
     @FXML
-    private HBox itemsHeaderHBox, hboxVatTotal;
+    private HBox itemsHeaderHBox, hboxVatTotal, barcodeContainer;
     @FXML
     private Label lblTicketTitle, lblSuccessMessage, lblDate, lblSubtotal, lblVat, lblTotal, lblPaid, lblChange,
             lblPaymentMethod, lblTotalRight, lblChangeRight, lblGiftIndicator, lblPVPHeader, lblTotalHeader,
             lblClientName, lblClientTaxId, lblClientAddress, lblCompanyBrand, lblCompanyName, lblCompanyAddress,
-            lblCompanyPhone,            lblCompanyCif, lblFooterMessage, lblSuccessIcon, lblGiftIcon, lblCompanyIcon,
-            lblAttendedBy, lblWebsiteUrl, lblSavings, lblObservations;
+            lblCompanyPhone, lblCompanyCif, lblFooterMessage, lblSuccessIcon, lblGiftIcon, lblCompanyIcon,
+            lblAttendedBy, lblWebsiteUrl, lblSavings, lblObservations, lblModalTitle, lblBarcodeValue;
     @FXML
     private ImageView imgCompanyLogo, imgAppLogoRight;
     @FXML
@@ -86,13 +86,17 @@ public class ReceiptController implements Injectable {
         String fmt = "%." + cfg.getDecimalCount() + "f " + sym;
 
         lblDate.setText(
-                "Fecha: " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd MMM, yyyy 'Hora:' HH:mm:ss")));
+                container.getBundle().getString("receipt.info.date") + ": "
+                        + LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd MMM, yyyy '"
+                                + container.getBundle().getString("receipt.info.time") + ":' HH:mm:ss")));
         lblTicketTitle.setText(
-                (isGiftMode ? "Ticket regalo Nº: " : "Factura simplificada Nº: ") + String.format("%03d", saleId));
+                (isGiftMode ? container.getBundle().getString("receipt.title.gift") + " Nº: "
+                        : container.getBundle().getString("receipt.title.invoice") + " Nº: ")
+                        + String.format("%03d", saleId));
 
         if (lblSuccessMessage != null) {
-            lblSuccessMessage.setText(isGiftMode ? "¡Ticket regalo creado!"
-                    : (currentClient != null ? "¡Factura creada!" : "¡Ticket creado!"));
+            lblSuccessMessage.setText(isGiftMode ? container.getBundle().getString("receipt.success.gift_title")
+                    : container.getBundle().getString("receipt.success.title"));
         }
 
         applyCompanyHeader();
@@ -156,7 +160,8 @@ public class ReceiptController implements Injectable {
             vatBreakdownContainer.getChildren().clear();
             for (java.util.Map.Entry<Double, Double[]> entry : vatBreakdown.entrySet()) {
                 HBox row = new HBox();
-                Label lblRate = new Label(String.format("IVA %.0f%%", entry.getKey()));
+                Label lblRate = new Label(container.getBundle().getString("receipt.vat_label")
+                        + String.format(" %.0f%%", entry.getKey()));
                 lblRate.setMaxWidth(Double.MAX_VALUE);
                 HBox.setHgrow(lblRate, Priority.ALWAYS);
                 lblRate.setStyle("-fx-font-size: 10; -fx-text-fill: black;");
@@ -175,7 +180,8 @@ public class ReceiptController implements Injectable {
         }
 
         lblSubtotal.setText(String.format(fmt, totalSubtotal));
-        lblVat.setText("IVA Incl. " + String.format(fmt, totalVatAmount));
+        lblVat.setText(
+                container.getBundle().getString("receipt.vat_label") + " Incl. " + String.format(fmt, totalVatAmount));
         lblTotal.setText(String.format(fmt, currentTotal));
         lblPaid.setText(String.format(fmt, paid));
         lblChange.setText(String.format(fmt, change));
@@ -221,11 +227,13 @@ public class ReceiptController implements Injectable {
         setLabelText(lblCompanyPhone, cfg.isShowPhone() ? "Tel: " + cfg.getPhone() : "");
         setLabelText(lblCompanyCif, cfg.isShowCif() ? "CIF: " + cfg.getCif() : "");
         setLabelText(lblFooterMessage,
-                cfg.getFooterMessage() != null ? cfg.getFooterMessage() : "GRACIAS POR SU VISITA");
+                cfg.getFooterMessage() != null ? cfg.getFooterMessage()
+                        : container.getBundle().getString("receipt.footer.thanks"));
 
         if (lblAttendedBy != null && container != null && container.getUserSession() != null
                 && container.getUserSession().getCurrentUser() != null) {
-            setLabelText(lblAttendedBy, "Le ha atendido: " + container.getUserSession().getCurrentUser().getUsername());
+            setLabelText(lblAttendedBy, container.getBundle().getString("receipt.attended_by") + ": "
+                    + container.getUserSession().getCurrentUser().getUsername());
         } else {
             setLabelText(lblAttendedBy, "");
         }
@@ -267,7 +275,8 @@ public class ReceiptController implements Injectable {
     @FXML
     private void handleSendEmail() {
         if (currentClient == null || currentClient.getEmail() == null || currentClient.getEmail().trim().isEmpty()) {
-            AlertUtil.showWarning("Sin Email", "El cliente no tiene un correo electrónico configurado.");
+            AlertUtil.showWarning(container.getBundle().getString("alert.warning"),
+                    container.getBundle().getString("receipt.error.no_email"));
             return;
         }
 
@@ -302,17 +311,19 @@ public class ReceiptController implements Injectable {
                     fileName);
             return true;
         }, result -> {
-            AlertUtil.showToast("Factura enviada correctamente a: " + currentClient.getEmail());
+            AlertUtil.showToast(
+                    container.getBundle().getString("receipt.success.email_sent") + ": " + currentClient.getEmail());
         }, error -> {
             error.printStackTrace();
-            AlertUtil.showError("Error al enviar email",
-                    "No se pudo enviar el correo: " + error.getMessage());
+            AlertUtil.showError(container.getBundle().getString("alert.error"),
+                    container.getBundle().getString("receipt.error.email_failed") + ": " + error.getMessage());
         });
     }
 
     @FXML
     private void handlePrint() {
-        ModalService.showStandardModal("/view/print_preview.fxml", "Vista Previa", container,
+        ModalService.showStandardModal("/view/print_preview.fxml",
+                container.getBundle().getString("receipt.print_preview"), container,
                 (PrintPreviewController ctrl) -> {
                     if (currentClient != null)
                         ctrl.setClientInfo(currentClient);
@@ -350,7 +361,7 @@ public class ReceiptController implements Injectable {
         row.setAlignment(Pos.CENTER_LEFT);
         row.setStyle("-fx-border-color: transparent transparent #eee transparent; -fx-padding: 5 0;");
 
-        Label desc = new Label(item.getProduct().getName());
+        Label desc = new Label(translateDynamic(item.getProduct().getName()));
         HBox.setHgrow(desc, Priority.ALWAYS);
         desc.setMaxWidth(Double.MAX_VALUE);
 
@@ -381,8 +392,7 @@ public class ReceiptController implements Injectable {
             HBox discountRow = new HBox(10);
             discountRow.setAlignment(Pos.CENTER_LEFT);
             discountRow.setStyle("-fx-padding: 2 0 5 15;"); // Indentación
-
-            Label discDesc = new Label("[DESC] Ahorro Promoción");
+            Label discDesc = new Label("[DESC] " + container.getBundle().getString("receipt.savings_label"));
             discDesc.setStyle("-fx-font-size: 10; -fx-text-fill: #666; -fx-font-style: italic;");
             HBox.setHgrow(discDesc, Priority.ALWAYS);
             discDesc.setMaxWidth(Double.MAX_VALUE);
@@ -409,5 +419,12 @@ public class ReceiptController implements Injectable {
             receiptContent.setPrefWidth(700);
         else
             receiptContent.setPrefWidth(300);
+    }
+    private String translateDynamic(String text) {
+        if (text == null || text.isBlank()) return text;
+        if (container != null && container.getBundle() != null && container.getBundle().containsKey(text)) {
+            return container.getBundle().getString(text);
+        }
+        return text;
     }
 }

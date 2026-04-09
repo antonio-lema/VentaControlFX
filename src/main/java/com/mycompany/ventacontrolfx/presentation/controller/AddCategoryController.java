@@ -30,6 +30,7 @@ public class AddCategoryController implements Injectable {
     @FXML
     private StackPane rootStackPane;
 
+    private ServiceContainer container;
     private CategoryUseCase categoryUseCase;
     private TaxEngineService taxEngineService;
     private Category categoryToEdit;
@@ -38,6 +39,7 @@ public class AddCategoryController implements Injectable {
 
     @Override
     public void inject(ServiceContainer container) {
+        this.container = container;
         this.categoryUseCase = container.getCategoryUseCase();
         this.taxEngineService = container.getTaxEngineService();
         setupTaxGroupComboBox();
@@ -67,8 +69,8 @@ public class AddCategoryController implements Injectable {
     public void setCategory(Category category) {
         this.categoryToEdit = category;
         if (category != null) {
-            lblTitle.setText("Editar Categoría");
-            lblSubtitle.setText("Modifica el nombre de la categoría");
+            lblTitle.setText(container.getBundle().getString("category.form.edit_title"));
+            lblSubtitle.setText(container.getBundle().getString("category.form.edit_subtitle"));
             txtName.setText(category.getName());
             txtIva.setText(String.valueOf(category.getDefaultIva()));
 
@@ -97,8 +99,8 @@ public class AddCategoryController implements Injectable {
                 txtIva.setText(String.valueOf(category.getDefaultIva()));
             }
         } else {
-            lblTitle.setText("Nueva Categoría");
-            lblSubtitle.setText("Introduce el nombre de la categoría");
+            lblTitle.setText(container.getBundle().getString("category.form.new_title"));
+            lblSubtitle.setText(container.getBundle().getString("category.form.new_subtitle"));
             txtIva.setText("21.0");
             cmbTaxGroup.setValue(null);
         }
@@ -110,7 +112,8 @@ public class AddCategoryController implements Injectable {
         String ivaStr = txtIva.getText();
 
         if (name == null || name.trim().isEmpty()) {
-            AlertUtil.showWarning("Validación", "Introduce un nombre.");
+            AlertUtil.showWarning(container.getBundle().getString("alert.validation"),
+                    container.getBundle().getString("category.error.name_required"));
             return;
         }
 
@@ -120,7 +123,8 @@ public class AddCategoryController implements Injectable {
                 iva = Double.parseDouble(ivaStr.replace(",", "."));
             }
         } catch (NumberFormatException e) {
-            AlertUtil.showWarning("Validación", "IVA inválido. Se usará 21.0%.");
+            AlertUtil.showWarning(container.getBundle().getString("alert.validation"),
+                    container.getBundle().getString("category.error.invalid_iva"));
         }
 
         try {
@@ -140,7 +144,8 @@ public class AddCategoryController implements Injectable {
             }
             handleCancel();
         } catch (SQLException e) {
-            AlertUtil.showError("Error", "No se pudo guardar: " + e.getMessage());
+            AlertUtil.showError(container.getBundle().getString("alert.error"),
+                    container.getBundle().getString("error.save") + ": " + e.getMessage());
         }
     }
 
@@ -148,7 +153,7 @@ public class AddCategoryController implements Injectable {
         cmbTaxGroup.setConverter(new StringConverter<>() {
             @Override
             public String toString(TaxGroup t) {
-                return t != null ? t.getName() : "Sin Grupo (V2) - Usar IVA Legacy";
+                return t != null ? t.getName() : container.getBundle().getString("category.form.tax_group.legacy");
             }
 
             @Override

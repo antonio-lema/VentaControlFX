@@ -73,12 +73,14 @@ public class OperativeDashboardController implements Injectable {
     private CashClosureUseCase cashClosureUseCase;
     private ConfigUseCase configUseCase;
     private UserUseCase userUseCase;
+    private ServiceContainer container;
     private List<User> allUsers;
     private Timer refreshTimer;
     private final ObservableList<ActiveStaffViewModel> activeStaffList = FXCollections.observableArrayList();
 
     @Override
     public void inject(ServiceContainer container) {
+        this.container = container;
         this.workSessionUseCase = container.getWorkSessionUseCase();
         this.cashClosureUseCase = container.getClosureUseCase();
         this.configUseCase = container.getConfigUseCase();
@@ -138,7 +140,7 @@ public class OperativeDashboardController implements Injectable {
                                         .filter(r -> r.getAssignedUserIds().contains(s.getUserId()))
                                         .findFirst().orElse(null);
                             }
-                            return new ActiveStaffViewModel(s, u, range, userSessionsToday);
+                            return new ActiveStaffViewModel(s, u, range, userSessionsToday, container.getBundle());
                         })
                         .collect(Collectors.toList()));
             });
@@ -147,7 +149,7 @@ public class OperativeDashboardController implements Injectable {
             boolean isCashOpen = cashClosureUseCase.hasActiveFund();
             double currentCash = cashClosureUseCase.getCurrentCashInDrawer();
             Platform.runLater(() -> {
-                lblCashStatus.setText(isCashOpen ? "ABIERTA" : "CERRADA");
+                lblCashStatus.setText(container.getBundle().getString("dashboard.cash." + (isCashOpen ? "open" : "closed")));
                 lblCashStatus.setStyle(isCashOpen ? "-fx-text-fill: #16a34a;" : "-fx-text-fill: #ef4444;");
                 lblCashAmount.setText(String.format("%.2f €", currentCash));
             });
@@ -173,11 +175,12 @@ public class OperativeDashboardController implements Injectable {
     @FXML
     private void handlePartialClosure() {
         try {
-            cashClosureUseCase.performPartialClosure(1); // UserID 1 for now
-            AlertUtil.showInfo("Cierre Parcial",
-                    "Se ha generado el informe X. Los datos han sido enviados a la impresora.");
+            cashClosureUseCase.performPartialClosure(container.getUserSession().getCurrentUser().getUserId());
+            AlertUtil.showInfo(container.getBundle().getString("dashboard.partial.closure.title"),
+                    container.getBundle().getString("dashboard.partial.closure.msg"));
         } catch (Exception e) {
-            AlertUtil.showError("Error", "No se pudo realizar el cierre parcial: " + e.getMessage());
+            AlertUtil.showError(container.getBundle().getString("alert.error"), 
+                    container.getBundle().getString("closure.error.generic") + ": " + e.getMessage());
         }
     }
 
@@ -187,10 +190,10 @@ public class OperativeDashboardController implements Injectable {
             vboxAlerts.getChildren().clear();
 
             if (schedule == null || schedule.isClosed() || schedule.getShifts().isEmpty()) {
-                lblBusinessStatus.setText(schedule != null && schedule.isClosed() ? "CERRADO" : "SIN HORARIO");
+                lblBusinessStatus.setText(container.getBundle().getString("dashboard.status." + (schedule != null && schedule.isClosed() ? "closed" : "no_schedule")));
                 lblBusinessStatus.setStyle("-fx-background-color: #f1f5f9; -fx-text-fill: #475569;");
                 lblScheduleCompliance.setText("N/A");
-                vboxTodaySchedule.getChildren().add(new Label("No hay turnos hoy."));
+                vboxTodaySchedule.getChildren().add(new Label(container.getBundle().getString("dashboard.shifts.none")));
                 return;
             }
 
@@ -198,7 +201,7 @@ public class OperativeDashboardController implements Injectable {
             boolean isOpen = schedule.getShifts().stream()
                     .anyMatch(s -> now.isAfter(s.getOpen()) && now.isBefore(s.getClose()));
 
-            lblBusinessStatus.setText(isOpen ? "ABIERTO (TURNO)" : "FUERA DE HORARIO");
+            lblBusinessStatus.setText(container.getBundle().getString("dashboard.status." + (isOpen ? "open" : "out_of_hours")));
             lblBusinessStatus.setStyle(isOpen ? "-fx-background-color: #dcfce7; -fx-text-fill: #16a34a;"
                     : "-fx-background-color: #fef3c7; -fx-text-fill: #d97706;");
 
@@ -206,23 +209,23 @@ public class OperativeDashboardController implements Injectable {
             if (actualStart != null && !schedule.getShifts().isEmpty()) {
                 LocalTime expected = schedule.getShifts().get(0).getOpen();
                 if (actualStart.toLocalTime().isAfter(expected.plusMinutes(10))) {
-                    lblScheduleCompliance.setText("RETRASO");
+                    lblScheduleCompliance.setText(container.getBundle().getString("dashboard.compliance.delay"));
                     lblScheduleCompliance.setStyle("-fx-text-fill: #ef4444;");
-                    addAlert("Apertura tardía ("
-                            + actualStart.toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm")) + ")", "warning");
+                    addAlert(String.format(container.getBundle().getString("dashboard.alert.late_opening"),
+                            actualStart.toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm"))), "warning");
                 } else {
-                    lblScheduleCompliance.setText("ÓPTIMO");
+                    lblScheduleCompliance.setText(container.getBundle().getString("dashboard.compliance.optimal"));
                     lblScheduleCompliance.setStyle("-fx-text-fill: #16a34a;");
                 }
             } else {
-                lblScheduleCompliance.setText("PENDIENTE");
+                lblScheduleCompliance.setText(container.getBundle().getString("dashboard.compliance.pending"));
                 lblScheduleCompliance.setStyle("-fx-text-fill: #94a3b8;");
             }
 
             for (BusinessDay.TimeRange r : schedule.getShifts()) {
                 String staffNames = r.getAssignedUserIds().stream()
                         .map(id -> allUsers.stream().filter(u -> u.getUserId() == id).map(User::getFullName).findFirst()
-                                .orElse("User " + id))
+                                .orElse(String.format(container.getBundle().getString("dashboard.staff.user"), id)))
                         .collect(Collectors.joining(", "));
 
                 VBox shiftBox = new VBox(5);
@@ -236,7 +239,7 @@ public class OperativeDashboardController implements Injectable {
                         new Label(r.getOpen() + " - " + r.getClose()));
                 timeRow.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
 
-                Label lblStaff = new Label(staffNames.isEmpty() ? "Sin personal asignado" : staffNames);
+                Label lblStaff = new Label(staffNames.isEmpty() ? container.getBundle().getString("dashboard.alert.no_staff_assigned") : staffNames);
                 lblStaff.setStyle("-fx-font-size: 11px; -fx-text-fill: #64748b; -fx-font-style: italic;");
                 lblStaff.setWrapText(true);
 
@@ -249,8 +252,8 @@ public class OperativeDashboardController implements Injectable {
                     for (Integer id : r.getAssignedUserIds()) {
                         if (active.stream().noneMatch(s -> s.getUserId() == id)) {
                             String name = allUsers.stream().filter(u -> u.getUserId() == id).map(User::getFullName)
-                                    .findFirst().orElse("ID " + id);
-                            addAlert("Ausencia detectada: " + name + " (En turno actual)", "warning");
+                                    .findFirst().orElse(String.format(container.getBundle().getString("dashboard.staff.user"), id));
+                            addAlert(String.format(container.getBundle().getString("dashboard.alert.absence_detected"), name), "warning");
                         }
                     }
                 }
@@ -258,11 +261,11 @@ public class OperativeDashboardController implements Injectable {
 
             // National Holiday Alert
             if (SpanishHolidays.isHoliday(LocalDate.now())) {
-                addAlert("HOY ES FESTIVO: " + SpanishHolidays.getHolidayName(LocalDate.now()), "info");
+                addAlert(String.format(container.getBundle().getString("dashboard.alert.holiday"), container.getBundle().getString(SpanishHolidays.getHolidayName(LocalDate.now()))), "info");
             }
 
             if (vboxAlerts.getChildren().isEmpty()) {
-                addAlert("Operativa estable. Sin incidencias.", "info");
+                addAlert(container.getBundle().getString("dashboard.alert.stable"), "info");
             }
         });
     }
@@ -312,9 +315,9 @@ public class OperativeDashboardController implements Injectable {
         private final javafx.scene.Node statusNode;
 
         public ActiveStaffViewModel(WorkSession session, User user, BusinessDay.TimeRange scheduledRange,
-                List<WorkSession> userSessionsToday) {
+                List<WorkSession> userSessionsToday, java.util.ResourceBundle bundle) {
             String uname = session.getUserName();
-            this.name = (uname != null && !uname.isEmpty()) ? uname : "Usuario #" + session.getUserId();
+            this.name = (uname != null && !uname.isEmpty()) ? uname : String.format(bundle.getString("dashboard.staff.user"), session.getUserId());
             this.role = (user != null) ? user.getRole() : "N/D";
 
             // First start time of the day (SHIFTS only)
@@ -326,7 +329,7 @@ public class OperativeDashboardController implements Injectable {
 
             this.start = firstStart.format(DateTimeFormatter.ofPattern("HH:mm"));
             this.shift = (scheduledRange != null) ? (scheduledRange.getOpen() + " - " + scheduledRange.getClose())
-                    : "No asig.";
+                    : bundle.getString("dashboard.staff.no_assigned");
 
             // Total worked seconds (SHIFTS only)
             long totalSeconds = userSessionsToday.stream()
@@ -352,18 +355,18 @@ public class OperativeDashboardController implements Injectable {
 
             LocalTime now = LocalTime.now();
             if (session.getType() == WorkSession.SessionType.BREAK) {
-                lblStatus.setText("EN DESCANSO");
+                lblStatus.setText(bundle.getString("dashboard.staff.status.break"));
                 lblStatus.setStyle(lblStatus.getStyle() + "-fx-background-color: #f59e0b;"); // Amber
             } else if (scheduledRange != null) {
                 if (now.isAfter(scheduledRange.getOpen()) && now.isBefore(scheduledRange.getClose())) {
-                    lblStatus.setText("EN TURNO");
+                    lblStatus.setText(bundle.getString("dashboard.staff.status.shift"));
                     lblStatus.setStyle(lblStatus.getStyle() + "-fx-background-color: #10b981;"); // Green
                 } else {
-                    lblStatus.setText("EXTRAS");
+                    lblStatus.setText(bundle.getString("dashboard.staff.status.extras"));
                     lblStatus.setStyle(lblStatus.getStyle() + "-fx-background-color: #8b5cf6;"); // Purple
                 }
             } else {
-                lblStatus.setText("FUERA PROG.");
+                lblStatus.setText(bundle.getString("dashboard.staff.status.out_of_prog"));
                 lblStatus.setStyle(lblStatus.getStyle() + "-fx-background-color: #64748b;"); // Gray
             }
             this.statusNode = lblStatus;

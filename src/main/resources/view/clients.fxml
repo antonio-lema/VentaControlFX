@@ -20,12 +20,12 @@
                     </StackPane>
                     <VBox spacing="2">
                         <children>
-                            <Label text="Clientes y Empresas" styleClass="view-title"/>
-                            <Label text="Gestión centralizada de clientes particulares y empresas" styleClass="view-subtitle"/>
+                            <Label text="%clients.title" styleClass="view-title"/>
+                            <Label text="%clients.subtitle" styleClass="view-subtitle"/>
                         </children>
                     </VBox>
                     <Region HBox.hgrow="ALWAYS" />
-                    <Button fx:id="btnToggleForm" text=" Nuevo Registro" onAction="#handleAddClient"
+                    <Button fx:id="btnToggleForm" text="%clients.btn.new" onAction="#handleAddClient"
                             styleClass="btn-primary">
                         <graphic>
                             <FontAwesomeIconView glyphName="PLUS" size="14" fill="WHITE"/>
@@ -45,7 +45,7 @@
             <!-- Search Bar -->
             <HBox spacing="10" alignment="CENTER_LEFT" styleClass="search-bar">
                 <FontAwesomeIconView glyphName="SEARCH" size="16" styleClass="sidebar-icon"/>
-                <TextField fx:id="searchField" promptText="Buscar por nombre, CIF o teléfono..."
+                <TextField fx:id="searchField" promptText="%clients.search.prompt"
                            HBox.hgrow="ALWAYS" styleClass="search-field"/>
                 <Button fx:id="btnClearSearch" visible="false" styleClass="btn-icon">
                     <graphic><FontAwesomeIconView glyphName="CLOSE" size="12" styleClass="sidebar-icon"/></graphic>
@@ -60,7 +60,7 @@
             <!-- Count Section -->
             <HBox alignment="CENTER_RIGHT" style="-fx-padding: 10 15;">
                 <children>
-                    <Label fx:id="lblCount" text="0 registros encontrados" styleClass="label-muted" style="-fx-font-weight: bold; -fx-font-size: 14;"/>
+                    <Label fx:id="lblCount" text="%clients.found_count" styleClass="label-muted" style="-fx-font-weight: bold; -fx-font-size: 14;"/>
                 </children>
             </HBox>
         </VBox>

@@ -91,14 +91,18 @@ public class ReturnListController implements Injectable {
             datePickerEnd.setValue(LocalDate.now());
 
         if (cmbPaymentMethod != null) {
-            cmbPaymentMethod.setItems(FXCollections.observableArrayList("Todos", "Efectivo", "Tarjeta"));
-            cmbPaymentMethod.setValue("Todos");
+            cmbPaymentMethod.setItems(FXCollections.observableArrayList(
+                container.getBundle().getString("returns.filter.all"), 
+                container.getBundle().getString("returns.filter.cash"), 
+                container.getBundle().getString("returns.filter.card")
+            ));
+            cmbPaymentMethod.setValue(container.getBundle().getString("returns.filter.all"));
         }
 
         setupTable();
 
         DateFilterUtils.addQuickFilters(quickFilterContainer, datePickerStart,
-                datePickerEnd, this::loadReturns);
+                datePickerEnd, container.getBundle(), this::loadReturns);
 
         loadReturns();
 
@@ -195,7 +199,7 @@ public class ReturnListController implements Injectable {
                     setGraphic(null);
                     setText(null);
                 } else if (item == null || item == 0) {
-                    Label badge = new Label("PENDIENTE");
+                    Label badge = new Label(container.getBundle().getString("returns.table.pending"));
                     badge.getStyleClass().add("badge-warning");
                     setGraphic(badge);
                     setText(null);
@@ -224,13 +228,14 @@ public class ReturnListController implements Injectable {
             if (sale == null)
                 return;
 
-            ModalService.showStandardModal("/view/view_ticket_modal.fxml", "Detalle de Ticket #" + saleId, container,
+            ModalService.showStandardModal("/view/view_ticket_modal.fxml", 
+                    container.getBundle().getString("returns.modal.ticket_title") + saleId, container,
                     (TicketDetailController controller) -> {
                         controller.setSale(sale);
                     });
         } catch (SQLException e) {
             e.printStackTrace();
-            AlertUtil.showError("Error", "No se pudo cargar el ticket.");
+            AlertUtil.showError(container.getBundle().getString("alert.error"), container.getBundle().getString("returns.error.ticket"));
         }
     }
 
@@ -247,9 +252,9 @@ public class ReturnListController implements Injectable {
 
             // Poblar el panel lateral
             if (lblDetailReturnId != null)
-                lblDetailReturnId.setText("Devolución: " + returnRecord.getFullReference());
+                lblDetailReturnId.setText(container.getBundle().getString("returns.detail.id_prefix") + returnRecord.getFullReference());
             if (lblDetailSaleId != null)
-                lblDetailSaleId.setText("Ticket #" + returnRecord.getSaleId());
+                lblDetailSaleId.setText(container.getBundle().getString("returns.detail.ticket_prefix") + returnRecord.getSaleId());
 
             if (lblDetailDate != null) {
                 if (returnRecord.getReturnDatetime() != null) {
@@ -273,8 +278,8 @@ public class ReturnListController implements Injectable {
                     itemBox.setStyle("-fx-background-color: transparent;");
 
                     HBox topRow = new HBox();
-                    Label nameLabel = new Label(detail.getProductName() != null ? detail.getProductName()
-                            : "Producto ID: " + detail.getProductId());
+                    Label nameLabel = new Label(detail.getProductName() != null ? translateDynamic(detail.getProductName())
+                            : container.getBundle().getString("products.field.id") + ": " + detail.getProductId());
                     nameLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #1e293b; -fx-font-size: 13px;");
 
                     Region spacer = new Region();
@@ -307,7 +312,7 @@ public class ReturnListController implements Injectable {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            AlertUtil.showError("Error de Apertura", "No se pudo cargar los detalles: " + e.getMessage());
+            AlertUtil.showError(container.getBundle().getString("alert.error"), container.getBundle().getString("returns.error.details") + ": " + e.getMessage());
         }
     }
 
@@ -334,7 +339,7 @@ public class ReturnListController implements Injectable {
             masterData.setAll(returns);
             applyFilters();
         } catch (SQLException e) {
-            AlertUtil.showError("Error de Carga", "Error al obtener historial de devoluciones: " + e.getMessage());
+            AlertUtil.showError(container.getBundle().getString("alert.error"), container.getBundle().getString("returns.error.load") + ": " + e.getMessage());
         }
     }
 
@@ -344,7 +349,7 @@ public class ReturnListController implements Injectable {
             return;
 
         String filterText = txtSearch.getText().toLowerCase().trim();
-        String paymentFilter = (cmbPaymentMethod != null) ? cmbPaymentMethod.getValue() : "Todos";
+        String paymentFilter = (cmbPaymentMethod != null) ? cmbPaymentMethod.getValue() : container.getBundle().getString("returns.filter.all");
 
         FilteredList<Return> filteredData = new FilteredList<>(masterData, r -> {
             // Filtro por texto
@@ -358,8 +363,12 @@ public class ReturnListController implements Injectable {
 
             // Filtro por método de pago
             boolean matchesPayment = true;
-            if (paymentFilter != null && !"Todos".equals(paymentFilter)) {
-                matchesPayment = paymentFilter.equalsIgnoreCase(r.getPaymentMethod());
+            if (paymentFilter != null && !container.getBundle().getString("returns.filter.all").equals(paymentFilter)) {
+                if (container.getBundle().getString("returns.filter.cash").equalsIgnoreCase(paymentFilter)) {
+                    matchesPayment = "EFECTIVO".equalsIgnoreCase(r.getPaymentMethod()) || "CASH".equalsIgnoreCase(r.getPaymentMethod());
+                } else if (container.getBundle().getString("returns.filter.card").equalsIgnoreCase(paymentFilter)) {
+                    matchesPayment = "TARJETA".equalsIgnoreCase(r.getPaymentMethod()) || "CARD".equalsIgnoreCase(r.getPaymentMethod());
+                }
             }
 
             return matchesText && matchesPayment;
@@ -386,7 +395,7 @@ public class ReturnListController implements Injectable {
         }
 
         if (lblCount != null)
-            lblCount.setText(count + " registros");
+            lblCount.setText(String.format(container.getBundle().getString("returns.footer.records"), count));
         if (lblTotalRefunded != null)
             lblTotalRefunded.setText(String.format("%.2f €", total));
 
@@ -405,7 +414,7 @@ public class ReturnListController implements Injectable {
         if (txtSearch != null)
             txtSearch.clear();
         if (cmbPaymentMethod != null)
-            cmbPaymentMethod.setValue("Todos");
+            cmbPaymentMethod.setValue(container.getBundle().getString("returns.filter.all"));
         if (datePickerStart != null)
             datePickerStart.setValue(LocalDate.now());
         if (datePickerEnd != null)
@@ -442,7 +451,7 @@ public class ReturnListController implements Injectable {
     @FXML
     private void handleReprint() {
         if (currentSelectedReturn == null) {
-            AlertUtil.showWarning("Aviso", "Por favor, seleccione una devolución primero.");
+            AlertUtil.showWarning(container.getBundle().getString("alert.warning"), container.getBundle().getString("returns.warning.select"));
             return;
         }
 
@@ -457,14 +466,14 @@ public class ReturnListController implements Injectable {
                     .getSaleDetails(currentSelectedReturn.getSaleId());
 
             // 3. Abrir vista previa especializada en Devoluciones (Factura Rectificativa)
-            ModalService.showStandardModal("/view/print_preview.fxml", "Factura Rectificativa", container,
+            ModalService.showStandardModal("/view/print_preview.fxml", container.getBundle().getString("returns.modal.rectificativa_title"), container,
                     (PrintPreviewController ppc) -> {
                         ppc.setReturnData(currentSelectedReturn, originalSale, currentSelectedReturn.getDetails());
                     });
 
         } catch (SQLException e) {
             e.printStackTrace();
-            AlertUtil.showError("Error", "No se pudieron obtener los datos de la devolución: " + e.getMessage());
+            AlertUtil.showError(container.getBundle().getString("alert.error"), container.getBundle().getString("returns.error.details") + ": " + e.getMessage());
         }
     }
 
@@ -475,4 +484,11 @@ public class ReturnListController implements Injectable {
         handleViewTicket(currentSelectedReturn.getSaleId());
     }
 
+    private String translateDynamic(String text) {
+        if (text == null || text.isBlank()) return text;
+        if (container != null && container.getBundle() != null && container.getBundle().containsKey(text)) {
+            return container.getBundle().getString(text);
+        }
+        return text;
+    }
 }

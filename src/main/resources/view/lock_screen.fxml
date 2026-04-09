@@ -30,21 +30,21 @@
         </StackPane>
 
         <VBox alignment="CENTER" spacing="5">
-            <Label text="Sesión Bloqueada" styleClass="lock-title"/>
-            <Label fx:id="lblUsername" text="Usuario" styleClass="lock-username"/>
+            <Label text="%lock.title" styleClass="lock-title"/>
+            <Label fx:id="lblUsername" text="%lock.default_user" styleClass="lock-username"/>
         </VBox>
 
         <VBox spacing="8" maxWidth="300" alignment="CENTER_LEFT" style="-fx-padding: 20 0 10 0;">
-            <Label text="Contraseña" styleClass="lock-input-label"/>
-            <PasswordField fx:id="passwordField" promptText="Introduce tu contraseña"
+            <Label text="%lock.input_label" styleClass="lock-input-label"/>
+            <PasswordField fx:id="passwordField" promptText="%lock.input_prompt"
                            styleClass="lock-field" onAction="#handleUnlock"/>
             <Label fx:id="lblError" styleClass="modern-error-label" visible="false" managed="false"/>
         </VBox>
 
-        <Button text="DESBLOQUEAR" onAction="#handleUnlock"
+        <Button text="%lock.btn_unlock" onAction="#handleUnlock"
                 styleClass="btn-unlock" maxWidth="300" prefHeight="45" defaultButton="true"/>
 
-        <Button text="Cambiar de usuario" onAction="#handleChangeUser"
+        <Button text="%lock.btn_change_user" onAction="#handleChangeUser"
                 styleClass="btn-change-user" maxWidth="200"/>
 
     </VBox>

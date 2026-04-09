@@ -27,8 +27,8 @@
                             </StackPane>
                             <VBox spacing="2">
                                 <children>
-                                    <Label text="Historial de Ventas" styleClass="view-title"/>
-                                    <Label text="Consulta y filtra las ventas por rango de fechas 🔍" styleClass="view-subtitle"/>
+                                    <Label text="%history.title" styleClass="view-title"/>
+                                    <Label text="%history.subtitle" styleClass="view-subtitle"/>
                                 </children>
                             </VBox>
                             <Region HBox.hgrow="ALWAYS" />
@@ -38,28 +38,28 @@
                                 <children>
                                     <VBox spacing="2">
                                     <children>
-                                        <Label text="DESDE" styleClass="filter-label-cap" />
+                                        <Label text="%history.filter.from" styleClass="filter-label-cap" />
                                         <DatePicker fx:id="datePickerStart" onAction="#loadSales" prefWidth="130.0" styleClass="filter-datepicker" />
                                     </children>
                                     </VBox>
                                     <Separator orientation="VERTICAL" prefHeight="30" />
                                     <VBox spacing="2">
                                     <children>
-                                        <Label text="HASTA" styleClass="filter-label-cap" />
+                                        <Label text="%history.filter.to" styleClass="filter-label-cap" />
                                         <DatePicker fx:id="datePickerEnd" onAction="#loadSales" prefWidth="130.0" styleClass="filter-datepicker" />
                                     </children>
                                     </VBox>
                                     <Separator orientation="VERTICAL" prefHeight="30" />
                                     <VBox spacing="2">
                                     <children>
-                                        <Label text="BUSCAR TICKET" styleClass="filter-label-cap" />
-                                        <TextField fx:id="txtSearchId" promptText="Nº Ticket..." onAction="#handleSearch" prefWidth="100.0" styleClass="filter-search-field" />
+                                        <Label text="%history.filter.search_ticket" styleClass="filter-label-cap" />
+                                        <TextField fx:id="txtSearchId" promptText="%history.filter.ticket_prompt" onAction="#handleSearch" prefWidth="100.0" styleClass="filter-search-field" />
                                     </children>
                                     </VBox>
-                                    <Button onAction="#loadSales" styleClass="btn-primary" text="Filtrar">
+                                    <Button onAction="#loadSales" styleClass="btn-primary" text="%history.btn.filter">
                                     <graphic><FontAwesomeIconView glyphName="SEARCH" fill="WHITE" /></graphic>
                                     </Button>
-                                    <Button onAction="#handleClearFilters" styleClass="btn-secondary" text="Limpiar">
+                                    <Button onAction="#handleClearFilters" styleClass="btn-secondary" text="%history.btn.clear">
                                     <graphic><FontAwesomeIconView glyphName="ERASER" styleClass="sidebar-icon" /></graphic>
                                     </Button>
                                 </children>
@@ -75,7 +75,7 @@
              <!-- Quick Filters Toolbar -->
              <HBox spacing="10.0" alignment="CENTER_LEFT">
                 <children>
-                   <Label text="Accesos rápidos:" styleClass="label-muted" style="-fx-font-weight: bold;" />
+                   <Label text="%history.quick_filters" styleClass="label-muted" style="-fx-font-weight: bold;" />
                    <HBox fx:id="quickFilterContainer" spacing="8.0" alignment="CENTER_LEFT" styleClass="date-filter-container" />
                 </children>
              </HBox>
@@ -90,7 +90,7 @@
                               <StackPane styleClass="stat-icon-bg stat-icon-bg-blue">
                                  <children><FontAwesomeIconView glyphName="SHOPPING_CART" size="22" fill="#ffffff" /></children>
                               </StackPane>
-                              <Label text="Tickets" styleClass="stat-label" />
+                              <Label text="%history.stat.tickets" styleClass="stat-label" />
                            </children>
                         </HBox>
                         <Label fx:id="lblTotalSalesCount" text="0" styleClass="stat-value, text-info" />
@@ -103,7 +103,7 @@
                               <StackPane styleClass="stat-icon-bg stat-icon-bg-green">
                                  <children><FontAwesomeIconView glyphName="EURO" size="22" fill="#ffffff" /></children>
                               </StackPane>
-                              <Label text="Total Recaudado" styleClass="stat-label" />
+                              <Label text="%history.stat.total" styleClass="stat-label" />
                            </children>
                         </HBox>
                         <Label fx:id="lblTotalAmount" text="0,00 €" styleClass="stat-value, text-total" />
@@ -116,7 +116,7 @@
                               <StackPane styleClass="stat-icon-bg stat-icon-bg-orange">
                                  <children><FontAwesomeIconView glyphName="MONEY" size="22" fill="#ffffff" /></children>
                               </StackPane>
-                              <Label text="Efectivo" styleClass="stat-label" />
+                              <Label text="%history.stat.cash" styleClass="stat-label" />
                            </children>
                         </HBox>
                         <Label fx:id="lblTotalCash" text="0,00 €" styleClass="stat-value, text-cash" />
@@ -129,7 +129,7 @@
                               <StackPane styleClass="stat-icon-bg stat-icon-bg-purple">
                                  <children><FontAwesomeIconView glyphName="CREDIT_CARD" size="22" fill="#ffffff" /></children>
                               </StackPane>
-                              <Label text="Tarjeta" styleClass="stat-label" />
+                              <Label text="%history.stat.card" styleClass="stat-label" />
                            </children>
                         </HBox>
                         <Label fx:id="lblTotalCard" text="0,00 €" styleClass="stat-value, text-card" />
@@ -145,11 +145,11 @@
                      <children>
                         <TableView fx:id="salesTable" styleClass="modern-table-view" VBox.vgrow="ALWAYS">
                           <columns>
-                            <TableColumn fx:id="colId" prefWidth="100.0" text="Nº TICKET" />
-                            <TableColumn fx:id="colUser" prefWidth="180.0" text="ATENDIDO POR" />
-                            <TableColumn fx:id="colDate" prefWidth="150.0" text="FECHA Y HORA" />
-                            <TableColumn fx:id="colTotal" prefWidth="120.0" text="IMPORTE TOTAL" />
-                            <TableColumn fx:id="colMethod" prefWidth="150.0" text="MÉTODO DE PAGO" />
+                            <TableColumn fx:id="colId" prefWidth="100.0" text="%history.table.ticket" />
+                            <TableColumn fx:id="colUser" prefWidth="180.0" text="%history.table.attended_by" />
+                            <TableColumn fx:id="colDate" prefWidth="150.0" text="%history.table.date" />
+                            <TableColumn fx:id="colTotal" prefWidth="120.0" text="%history.table.total" />
+                            <TableColumn fx:id="colMethod" prefWidth="150.0" text="%history.table.method" />
                           </columns>
                            <columnResizePolicy>
                               <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
@@ -157,10 +157,10 @@
                         </TableView>
                         <HBox alignment="CENTER_LEFT" prefHeight="30.0" spacing="10.0" style="-fx-padding: 0 10;">
                            <children>
-                              <Label text="Mostrar:" styleClass="label-limit" />
+                              <Label text="%history.show_limit" styleClass="label-limit" />
                               <ComboBox fx:id="cmbRowLimit" prefWidth="90" styleClass="combo-limit" />
                               <Region HBox.hgrow="ALWAYS" />
-                              <Label fx:id="lblCount" text="0 tickets encontrados" styleClass="label-muted" style="-fx-font-weight: bold;" />
+                              <Label fx:id="lblCount" text="%history.found_count" styleClass="label-muted" style="-fx-font-weight: bold;" />
                            </children>
                         </HBox>
                      </children>
@@ -174,11 +174,11 @@
                            <children>
                               <VBox alignment="CENTER" spacing="5">
                                  <children>
-                                    <Label text="📦 DETALLE DE TRANSACCIÓN" styleClass="filter-label-cap" />
+                                    <Label text="%history.detail.title" styleClass="filter-label-cap" />
                                     <HBox spacing="10" alignment="CENTER">
                                         <children>
-                                            <Label fx:id="lblSaleId" text="Ticket #0000" styleClass="detail-sale-id" />
-                                            <Label fx:id="lblReturnBadge" text="DEVUELTO" visible="false" styleClass="badge-danger" />
+                                            <Label fx:id="lblSaleId" text="%history.detail.ticket_prefix" styleClass="detail-sale-id" />
+                                            <Label fx:id="lblReturnBadge" text="%history.detail.returned" visible="false" styleClass="badge-danger" />
                                         </children>
                                      </HBox>
                                     <Label fx:id="lblSaleFullDate" text="18/02/2026 15:30" styleClass="label-muted" />
@@ -187,7 +187,7 @@
 
                               <Separator />
 
-                              <Label text="PRODUCTOS" styleClass="filter-label-cap" />
+                              <Label text="%history.detail.products" styleClass="filter-label-cap" />
                               <ScrollPane fitToWidth="true" styleClass="detail-scroll" prefHeight="300.0">
                                  <content>
                                     <VBox fx:id="detailsItemsContainer" spacing="12.0" styleClass="detail-items-container" />
@@ -200,14 +200,14 @@
                                  <children>
                                     <HBox alignment="CENTER_LEFT">
                                        <children>
-                                          <Label text="Método de pago" styleClass="label-muted" />
+                                          <Label text="%history.detail.payment_method" styleClass="label-muted" />
                                           <Region HBox.hgrow="ALWAYS" />
                                           <Label fx:id="lblPaymentMethod" text="Efectivo" styleClass="detail-info-value" />
                                        </children>
                                     </HBox>
                                     <HBox alignment="CENTER_LEFT" style="-fx-padding: 10 0 0 0;">
                                        <children>
-                                          <Label text="TOTAL TICKET" styleClass="detail-total-label" />
+                                          <Label text="%history.detail.total" styleClass="detail-total-label" />
                                           <Region HBox.hgrow="ALWAYS" />
                                           <Label fx:id="lblTotalAmountDetail" text="0,00 €" styleClass="detail-total-value, text-total" />
                                        </children>
@@ -217,12 +217,12 @@
 
                                <HBox spacing="10">
                                   <children>
-                                      <Button fx:id="btnPrint" text="IMPRIMIR" onAction="#handlePrintTicket" HBox.hgrow="ALWAYS" maxWidth="Infinity" styleClass="btn-history-print">
+                                      <Button fx:id="btnPrint" text="%history.detail.btn.print" onAction="#handlePrintTicket" HBox.hgrow="ALWAYS" maxWidth="Infinity" styleClass="btn-history-print">
                                          <graphic>
                                             <FontAwesomeIconView glyphName="PRINT" fill="white" size="16" />
                                          </graphic>
                                       </Button>
-                                      <Button fx:id="btnReturn" text="DEVOLVER" onAction="#handleRegisterReturn" HBox.hgrow="ALWAYS" maxWidth="Infinity" styleClass="btn-history-return">
+                                      <Button fx:id="btnReturn" text="%history.detail.btn.return" onAction="#handleRegisterReturn" HBox.hgrow="ALWAYS" maxWidth="Infinity" styleClass="btn-history-return">
                                          <graphic>
                                             <FontAwesomeIconView glyphName="REPLY" fill="white" size="16" />
                                          </graphic>
@@ -231,7 +231,7 @@
                                </HBox>
 
                                <Region VBox.vgrow="ALWAYS" />
-                               <Button onAction="#handleCloseDetails" text="CERRAR DETALLES" maxWidth="Infinity" styleClass="btn-history-close" />
+                               <Button onAction="#handleCloseDetails" text="%history.detail.btn.close" maxWidth="Infinity" styleClass="btn-history-close" />
                            </children>
                         </VBox>
                      </children>

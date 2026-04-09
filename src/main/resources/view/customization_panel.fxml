@@ -19,8 +19,8 @@
                     <FontAwesomeIconView glyphName="PAINT_BRUSH" size="24" fill="white"/>
                 </StackPane>
                 <VBox spacing="2">
-                    <Label text="Personalización Visual" styleClass="view-title"/>
-                    <Label text="Ajusta colores, tipografía y tarjetas en tiempo real." styleClass="view-subtitle"/>
+                    <Label text="%custom.title" styleClass="view-title"/>
+                    <Label text="%custom.subtitle" styleClass="view-subtitle"/>
                 </VBox>
             </HBox>
         </VBox>
@@ -38,93 +38,93 @@
                             <FontAwesomeIconView glyphName="STAR" size="16" fill="#f59e0b"/>
                         </StackPane>
                         <VBox>
-                            <Label text="Paletas Rápidas" styleClass="estetica-card-title"/>
-                            <Label text="Aplica un estilo predefinido al instante" styleClass="estetica-card-desc"/>
+                            <Label text="%custom.section.palettes" styleClass="estetica-card-title"/>
+                            <Label text="%custom.section.palettes.desc" styleClass="estetica-card-desc"/>
                         </VBox>
                     </HBox>
                     <VBox styleClass="estetica-card-body" spacing="14">
                         <HBox spacing="12" alignment="CENTER_LEFT">
                             <Button onAction="#applyPremiumDark" styleClass="palette-chip">
-                                <tooltip><Tooltip text="Dark Premium (Indigo)"/></tooltip>
+                                <tooltip><Tooltip text="%custom.palette.premium"/></tooltip>
                                 <graphic>
                                     <VBox styleClass="palette-inner" style="-fx-background-color: #111116; -fx-background-radius: 10px;" spacing="6" alignment="CENTER">
                                         <HBox spacing="5" alignment="CENTER">
                                             <Region style="-fx-background-color: #6366f1; -fx-background-radius: 50; -fx-min-width: 18; -fx-min-height: 18;" styleClass="palette-preview-dot"/>
                                             <Region style="-fx-background-color: #09090b; -fx-background-radius: 50; -fx-min-width: 18; -fx-min-height: 18;" styleClass="palette-preview-dot"/>
                                         </HBox>
-                                        <Label text="Premium" styleClass="palette-name" style="-fx-text-fill: #e4e4e7;"/>
+                                        <Label text="%custom.palette.premium" styleClass="palette-name" style="-fx-text-fill: #e4e4e7;"/>
                                     </VBox>
                                 </graphic>
                             </Button>
                             <Button onAction="#applyClassicBlue" styleClass="palette-chip">
-                                <tooltip><Tooltip text="Clásico Azul"/></tooltip>
+                                <tooltip><Tooltip text="%custom.palette.blue"/></tooltip>
                                 <graphic>
                                     <VBox styleClass="palette-inner" style="-fx-background-color: #f0f7ff; -fx-background-radius: -fx-radius-md;" spacing="6" alignment="CENTER">
                                         <HBox spacing="4" alignment="CENTER">
                                             <Region style="-fx-background-color: #1e88e5; -fx-background-radius: -fx-radius-xl; -fx-min-width: 18; -fx-min-height: 18;" styleClass="palette-preview-dot"/>
                                             <Region style="-fx-background-color: #64748b; -fx-background-radius: -fx-radius-xl; -fx-min-width: 18; -fx-min-height: 18;" styleClass="palette-preview-dot"/>
                                         </HBox>
-                                        <Label text="Azul" styleClass="palette-name"/>
+                                        <Label text="%custom.palette.blue" styleClass="palette-name"/>
                                     </VBox>
                                 </graphic>
                             </Button>
                             <Button onAction="#applyEmeraldGreen" styleClass="palette-chip">
-                                <tooltip><Tooltip text="Verde Esmeralda"/></tooltip>
+                                <tooltip><Tooltip text="%custom.palette.green"/></tooltip>
                                 <graphic>
                                     <VBox styleClass="palette-inner" style="-fx-background-color: #f0fdf4; -fx-background-radius: -fx-radius-md;" spacing="6" alignment="CENTER">
                                         <HBox spacing="4" alignment="CENTER">
                                             <Region style="-fx-background-color: #2e7d32; -fx-background-radius: -fx-radius-xl; -fx-min-width: 18; -fx-min-height: 18;" styleClass="palette-preview-dot"/>
                                             <Region style="-fx-background-color: #455a64; -fx-background-radius: -fx-radius-xl; -fx-min-width: 18; -fx-min-height: 18;" styleClass="palette-preview-dot"/>
                                         </HBox>
-                                        <Label text="Verde" styleClass="palette-name"/>
+                                        <Label text="%custom.palette.green" styleClass="palette-name"/>
                                     </VBox>
                                 </graphic>
                             </Button>
                             <Button onAction="#applyMidnightPurple" styleClass="palette-chip">
-                                <tooltip><Tooltip text="Púrpura Profundo"/></tooltip>
+                                <tooltip><Tooltip text="%custom.palette.purple"/></tooltip>
                                 <graphic>
                                     <VBox styleClass="palette-inner" style="-fx-background-color: #faf5ff; -fx-background-radius: -fx-radius-md;" spacing="6" alignment="CENTER">
                                         <HBox spacing="4" alignment="CENTER">
                                             <Region style="-fx-background-color: #6a1b9a; -fx-background-radius: -fx-radius-xl; -fx-min-width: 18; -fx-min-height: 18;" styleClass="palette-preview-dot"/>
                                             <Region style="-fx-background-color: #37474f; -fx-background-radius: -fx-radius-xl; -fx-min-width: 18; -fx-min-height: 18;" styleClass="palette-preview-dot"/>
                                         </HBox>
-                                        <Label text="Púrpura" styleClass="palette-name"/>
+                                        <Label text="%custom.palette.purple" styleClass="palette-name"/>
                                     </VBox>
                                 </graphic>
                             </Button>
                             <Button onAction="#applySunsetAmber" styleClass="palette-chip">
-                                <tooltip><Tooltip text="Ámbar Atardecer"/></tooltip>
+                                <tooltip><Tooltip text="%custom.palette.amber"/></tooltip>
                                 <graphic>
                                     <VBox styleClass="palette-inner" style="-fx-background-color: #fffbeb; -fx-background-radius: 10px;" spacing="6" alignment="CENTER">
                                         <HBox spacing="5" alignment="CENTER">
                                             <Region style="-fx-background-color: #ef6c00; -fx-background-radius: 50; -fx-min-width: 18; -fx-min-height: 18;" styleClass="palette-preview-dot"/>
                                             <Region style="-fx-background-color: #4e342e; -fx-background-radius: 50; -fx-min-width: 18; -fx-min-height: 18;" styleClass="palette-preview-dot"/>
                                         </HBox>
-                                        <Label text="Ámbar" styleClass="palette-name"/>
+                                        <Label text="%custom.palette.amber" styleClass="palette-name"/>
                                     </VBox>
                                 </graphic>
                             </Button>
                             <Button onAction="#applySoftRose" styleClass="palette-chip">
-                                <tooltip><Tooltip text="Rosa Suave"/></tooltip>
+                                <tooltip><Tooltip text="%custom.palette.rose"/></tooltip>
                                 <graphic>
                                     <VBox styleClass="palette-inner" style="-fx-background-color: #fff0f3; -fx-background-radius: 10px;" spacing="6" alignment="CENTER">
                                         <HBox spacing="5" alignment="CENTER">
                                             <Region style="-fx-background-color: #d81b60; -fx-background-radius: 50; -fx-min-width: 18; -fx-min-height: 18;" styleClass="palette-preview-dot"/>
                                             <Region style="-fx-background-color: #4a148c; -fx-background-radius: 50; -fx-min-width: 18; -fx-min-height: 18;" styleClass="palette-preview-dot"/>
                                         </HBox>
-                                        <Label text="Rosa" styleClass="palette-name"/>
+                                        <Label text="%custom.palette.rose" styleClass="palette-name"/>
                                     </VBox>
                                 </graphic>
                             </Button>
                             <Button onAction="#applyOceanTeal" styleClass="palette-chip">
-                                <tooltip><Tooltip text="Océano Turquesa"/></tooltip>
+                                <tooltip><Tooltip text="%custom.palette.ocean"/></tooltip>
                                 <graphic>
                                     <VBox styleClass="palette-inner" style="-fx-background-color: #f0fdfa; -fx-background-radius: 10px;" spacing="6" alignment="CENTER">
                                         <HBox spacing="5" alignment="CENTER">
                                             <Region style="-fx-background-color: #0d9488; -fx-background-radius: 50; -fx-min-width: 18; -fx-min-height: 18;" styleClass="palette-preview-dot"/>
                                             <Region style="-fx-background-color: #1e293b; -fx-background-radius: 50; -fx-min-width: 18; -fx-min-height: 18;" styleClass="palette-preview-dot"/>
                                         </HBox>
-                                        <Label text="Océano" styleClass="palette-name"/>
+                                        <Label text="%custom.palette.ocean" styleClass="palette-name"/>
                                     </VBox>
                                 </graphic>
                             </Button>
@@ -145,8 +145,8 @@
                                     <FontAwesomeIconView glyphName="TINT" size="16" fill="#f43f5e"/>
                                 </StackPane>
                                 <VBox>
-                                    <Label text="Colores de Marca" styleClass="estetica-card-title"/>
-                                    <Label text="Define la identidad visual de la aplicación" styleClass="estetica-card-desc"/>
+                                    <Label text="%custom.section.colors" styleClass="estetica-card-title"/>
+                                    <Label text="%custom.section.colors.desc" styleClass="estetica-card-desc"/>
                                 </VBox>
                             </HBox>
                             <VBox styleClass="estetica-card-body" spacing="10">
@@ -155,8 +155,8 @@
                                         <FontAwesomeIconView glyphName="CIRCLE" size="14" fill="#1e88e5"/>
                                     </StackPane>
                                     <VBox HBox.hgrow="ALWAYS">
-                                        <Label text="Color Primario" styleClass="color-row-label"/>
-                                        <Label text="Botones, acentos y elementos activos" styleClass="color-row-hint"/>
+                                        <Label text="%custom.color.primary" styleClass="color-row-label"/>
+                                        <Label text="%custom.color.primary.desc" styleClass="color-row-hint"/>
                                     </VBox>
                                     <ColorPicker fx:id="cpPrimary" maxWidth="140" prefHeight="36"/>
                                 </HBox>
@@ -165,8 +165,8 @@
                                         <FontAwesomeIconView glyphName="CIRCLE_ALT" size="14" fill="#64748b"/>
                                     </StackPane>
                                     <VBox HBox.hgrow="ALWAYS">
-                                        <Label text="Color Secundario" styleClass="color-row-label"/>
-                                        <Label text="Elementos de soporte y secundarios" styleClass="color-row-hint"/>
+                                        <Label text="%custom.color.secondary" styleClass="color-row-label"/>
+                                        <Label text="%custom.color.secondary.desc" styleClass="color-row-hint"/>
                                     </VBox>
                                     <ColorPicker fx:id="cpSecondary" maxWidth="140" prefHeight="36"/>
                                 </HBox>
@@ -175,8 +175,8 @@
                                         <FontAwesomeIconView glyphName="SQUARE_ALT" size="14" fill="#2c3e50"/>
                                     </StackPane>
                                     <VBox HBox.hgrow="ALWAYS">
-                                        <Label text="Color de Fondo" styleClass="color-row-label"/>
-                                        <Label text="Fondo principal de pantallas" styleClass="color-row-hint"/>
+                                        <Label text="%custom.color.bg" styleClass="color-row-label"/>
+                                        <Label text="%custom.color.bg.desc" styleClass="color-row-hint"/>
                                     </VBox>
                                     <ColorPicker fx:id="cpBackground" maxWidth="140" prefHeight="36"/>
                                 </HBox>
@@ -185,8 +185,8 @@
                                         <FontAwesomeIconView glyphName="FONT" size="14" fill="#2c3e50"/>
                                     </StackPane>
                                     <VBox HBox.hgrow="ALWAYS">
-                                        <Label text="Color de Texto" styleClass="color-row-label"/>
-                                        <Label text="Texto principal en la app" styleClass="color-row-hint"/>
+                                        <Label text="%custom.color.text" styleClass="color-row-label"/>
+                                        <Label text="%custom.color.text.desc" styleClass="color-row-hint"/>
                                     </VBox>
                                     <ColorPicker fx:id="cpText" maxWidth="140" prefHeight="36"/>
                                 </HBox>
@@ -195,8 +195,8 @@
                                         <FontAwesomeIconView glyphName="TH_LARGE" size="14" fill="#8b5cf6"/>
                                     </StackPane>
                                     <VBox HBox.hgrow="ALWAYS">
-                                        <Label text="Texto Tarjetas/Carrito" styleClass="color-row-label"/>
-                                        <Label text="Color del texto interior" styleClass="color-row-hint"/>
+                                        <Label text="%custom.color.cards_text" styleClass="color-row-label"/>
+                                        <Label text="%custom.color.cards_text.desc" styleClass="color-row-hint"/>
                                     </VBox>
                                     <ColorPicker fx:id="cpTextCards" maxWidth="140" prefHeight="36"/>
                                 </HBox>
@@ -205,8 +205,8 @@
                                         <FontAwesomeIconView glyphName="DOLLAR" size="14" fill="#10b981"/>
                                     </StackPane>
                                     <VBox HBox.hgrow="ALWAYS">
-                                        <Label text="Color Texto Precio" styleClass="color-row-label"/>
-                                        <Label text="Color de los precios (tarjetas y carrito)" styleClass="color-row-hint"/>
+                                        <Label text="%custom.color.price_text" styleClass="color-row-label"/>
+                                        <Label text="%custom.color.price_text.desc" styleClass="color-row-hint"/>
                                     </VBox>
                                     <ColorPicker fx:id="cpTextPrice" maxWidth="140" prefHeight="36"/>
                                 </HBox>
@@ -215,8 +215,8 @@
                                         <FontAwesomeIconView glyphName="BARS" size="14" fill="#0f172a"/>
                                     </StackPane>
                                     <VBox HBox.hgrow="ALWAYS">
-                                        <Label text="Color del Sidebar" styleClass="color-row-label"/>
-                                        <Label text="Fondo de la barra lateral de navegación" styleClass="color-row-hint"/>
+                                        <Label text="%custom.color.sidebar" styleClass="color-row-label"/>
+                                        <Label text="%custom.color.sidebar.desc" styleClass="color-row-hint"/>
                                     </VBox>
                                     <ColorPicker fx:id="cpSidebar" maxWidth="140" prefHeight="36"/>
                                 </HBox>
@@ -225,8 +225,8 @@
                                         <FontAwesomeIconView glyphName="FONT" size="14" fill="#0f172a"/>
                                     </StackPane>
                                     <VBox HBox.hgrow="ALWAYS">
-                                        <Label text="Color Letra Sidebar" styleClass="color-row-label"/>
-                                        <Label text="Texto e iconos del menú lateral" styleClass="color-row-hint"/>
+                                        <Label text="%custom.color.sidebar_text" styleClass="color-row-label"/>
+                                        <Label text="%custom.color.sidebar_text.desc" styleClass="color-row-hint"/>
                                     </VBox>
                                     <ColorPicker fx:id="cpSidebarText" maxWidth="140" prefHeight="36"/>
                                 </HBox>
@@ -247,14 +247,14 @@
                                     <FontAwesomeIconView glyphName="TEXT_HEIGHT" size="16" fill="#1e88e5"/>
                                 </StackPane>
                                 <VBox>
-                                    <Label text="Tipografía" styleClass="estetica-card-title"/>
-                                    <Label text="Tamaño de fuentes y redondeado de bordes" styleClass="estetica-card-desc"/>
+                                    <Label text="%custom.section.typography" styleClass="estetica-card-title"/>
+                                    <Label text="%custom.section.typography.desc" styleClass="estetica-card-desc"/>
                                 </VBox>
                             </HBox>
                             <VBox styleClass="estetica-card-body" spacing="16">
                                 <VBox spacing="8">
                                     <HBox alignment="CENTER_LEFT" spacing="8">
-                                        <Label text="Tamaño de Fuente Base" styleClass="estetica-slider-label"/>
+                                        <Label text="%custom.field.font_size" styleClass="estetica-slider-label"/>
                                         <Region HBox.hgrow="ALWAYS"/>
                                         <Label fx:id="lblFontSizeVal" text="14px" styleClass="estetica-slider-value"/>
                                     </HBox>
@@ -263,7 +263,7 @@
                                 </VBox>
                                 <VBox spacing="8">
                                     <HBox alignment="CENTER_LEFT" spacing="8">
-                                        <Label text="Redondeado Global de Bordes" styleClass="estetica-slider-label"/>
+                                        <Label text="%custom.field.border_radius" styleClass="estetica-slider-label"/>
                                         <Region HBox.hgrow="ALWAYS"/>
                                         <Label fx:id="lblBorderRadiusVal" text="8px" styleClass="estetica-slider-value"/>
                                     </HBox>
@@ -280,14 +280,14 @@
                                     <FontAwesomeIconView glyphName="TH_LARGE" size="16" fill="#8b5cf6"/>
                                 </StackPane>
                                 <VBox>
-                                    <Label text="Ajustes de Tarjetas" styleClass="estetica-card-title"/>
-                                    <Label text="Escala, sombra y efectos hover" styleClass="estetica-card-desc"/>
+                                    <Label text="%custom.section.cards" styleClass="estetica-card-title"/>
+                                    <Label text="%custom.section.cards.desc" styleClass="estetica-card-desc"/>
                                 </VBox>
                             </HBox>
                             <VBox styleClass="estetica-card-body" spacing="16">
                                 <VBox spacing="8">
                                     <HBox alignment="CENTER_LEFT" spacing="8">
-                                        <Label text="Tamaño de Tarjeta" styleClass="estetica-slider-label"/>
+                                        <Label text="%custom.field.card_scale" styleClass="estetica-slider-label"/>
                                         <Region HBox.hgrow="ALWAYS"/>
                                         <Label fx:id="lblCardScaleVal" text="1.0×" styleClass="estetica-slider-value"/>
                                     </HBox>
@@ -296,7 +296,7 @@
                                 </VBox>
                                 <VBox spacing="8">
                                     <HBox alignment="CENTER_LEFT" spacing="8">
-                                        <Label text="Intensidad de Sombra" styleClass="estetica-slider-label"/>
+                                        <Label text="%custom.field.shadow" styleClass="estetica-slider-label"/>
                                         <Region HBox.hgrow="ALWAYS"/>
                                         <Label fx:id="lblCardShadowVal" text="15" styleClass="estetica-slider-value"/>
                                     </HBox>
@@ -305,7 +305,7 @@
                                 </VBox>
                                 <VBox spacing="8">
                                     <HBox alignment="CENTER_LEFT" spacing="8">
-                                        <Label text="Elevación al apuntar (Hover)" styleClass="estetica-slider-label"/>
+                                        <Label text="%custom.field.hover_lift" styleClass="estetica-slider-label"/>
                                         <Region HBox.hgrow="ALWAYS"/>
                                         <Label fx:id="lblCardHoverLiftVal" text="8px" styleClass="estetica-slider-value"/>
                                     </HBox>
@@ -314,7 +314,7 @@
                                 </VBox>
                                 <VBox spacing="8">
                                     <HBox alignment="CENTER_LEFT" spacing="8">
-                                        <Label text="Grosor de Borde" styleClass="estetica-slider-label"/>
+                                        <Label text="%custom.field.border_width" styleClass="estetica-slider-label"/>
                                         <Region HBox.hgrow="ALWAYS"/>
                                         <Label fx:id="lblCardBorderWidthVal" text="1.5px" styleClass="estetica-slider-value"/>
                                     </HBox>
@@ -323,7 +323,7 @@
                                 </VBox>
                                 <VBox spacing="8">
                                     <HBox alignment="CENTER_LEFT" spacing="8">
-                                        <Label text="Escala al apuntar" styleClass="estetica-slider-label"/>
+                                        <Label text="%custom.field.hover_scale" styleClass="estetica-slider-label"/>
                                         <Region HBox.hgrow="ALWAYS"/>
                                         <Label fx:id="lblCardHoverScaleVal" text="1.02×" styleClass="estetica-slider-value"/>
                                     </HBox>
@@ -338,31 +338,31 @@
 
                 <!-- LIVE PREVIEW (ancho completo) -->
                 <VBox styleClass="estetica-preview-wrapper" spacing="12">
-                    <Label text="👁  VISTA PREVIA EN TIEMPO REAL" styleClass="estetica-preview-title"/>
+                    <Label text="%custom.preview.title" styleClass="estetica-preview-title"/>
                     <HBox spacing="14" alignment="CENTER_LEFT">
                         <VBox styleClass="estetica-mini-card" spacing="10" HBox.hgrow="ALWAYS">
                             <HBox spacing="8" alignment="CENTER_LEFT">
                                 <Region styleClass="estetica-mini-dot"/>
-                                <Label text="Producto Ejemplo" styleClass="estetica-mini-title"/>
+                                <Label text="%custom.preview.prod_name" styleClass="estetica-mini-title"/>
                             </HBox>
-                            <Label text="Descripción de prueba del estilo actual." styleClass="estetica-mini-sub"/>
-                            <Button text="Ver detalle" styleClass="btn-primary" style="-fx-padding: 7 18;"/>
+                            <Label text="%custom.preview.prod_desc" styleClass="estetica-mini-sub"/>
+                            <Button text="%custom.preview.btn_detail" styleClass="btn-primary" style="-fx-padding: 7 18;"/>
                         </VBox>
                         <VBox styleClass="estetica-mini-card" spacing="10" HBox.hgrow="ALWAYS">
                             <HBox spacing="8" alignment="CENTER_LEFT">
                                 <Region styleClass="estetica-mini-dot"/>
-                                <Label text="Segundo Panel" styleClass="estetica-mini-title"/>
+                                <Label text="%custom.preview.panel2" styleClass="estetica-mini-title"/>
                             </HBox>
-                            <Label text="Texto secundario para contrastar." styleClass="estetica-mini-sub"/>
-                            <Button text="Acción" styleClass="btn-secondary" style="-fx-padding: 7 18;"/>
+                            <Label text="%custom.preview.panel2_desc" styleClass="estetica-mini-sub"/>
+                            <Button text="%custom.preview.btn_action" styleClass="btn-secondary" style="-fx-padding: 7 18;"/>
                         </VBox>
                         <VBox styleClass="estetica-mini-card" spacing="10" HBox.hgrow="ALWAYS">
                             <HBox spacing="8" alignment="CENTER_LEFT">
                                 <Region styleClass="estetica-mini-dot"/>
-                                <Label text="Panel de Venta" styleClass="estetica-mini-title"/>
+                                <Label text="%custom.preview.panel3" styleClass="estetica-mini-title"/>
                             </HBox>
-                            <Label text="Ejemplo de panel de transacción." styleClass="estetica-mini-sub"/>
-                            <Button text="Confirmar" styleClass="btn-primary" style="-fx-padding: 7 18;"/>
+                            <Label text="%custom.preview.panel3_desc" styleClass="estetica-mini-sub"/>
+                            <Button text="%custom.preview.btn_confirm" styleClass="btn-primary" style="-fx-padding: 7 18;"/>
                         </VBox>
                     </HBox>
                 </VBox>
@@ -376,13 +376,13 @@
     <!-- ============================= ACTION BAR ============================= -->
     <bottom>
         <HBox styleClass="estetica-action-bar" spacing="12">
-            <Button text="Restablecer" onAction="#handleReset" styleClass="estetica-btn-reset">
+            <Button text="%btn.reset" onAction="#handleReset" styleClass="estetica-btn-reset">
                 <graphic>
                     <FontAwesomeIconView glyphName="UNDO" size="13" fill="#94a3b8"/>
                 </graphic>
             </Button>
             <Region HBox.hgrow="ALWAYS"/>
-            <Button text="  Guardar Cambios" onAction="#handleSave" styleClass="estetica-btn-save">
+            <Button text="  %btn.save_changes" onAction="#handleSave" styleClass="estetica-btn-save">
                 <graphic>
                     <FontAwesomeIconView glyphName="CHECK" size="13" fill="white"/>
                 </graphic>

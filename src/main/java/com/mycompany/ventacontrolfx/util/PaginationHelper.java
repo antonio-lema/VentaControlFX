@@ -1,7 +1,6 @@
 package com.mycompany.ventacontrolfx.util;
 
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableView;
@@ -19,14 +18,20 @@ public class PaginationHelper<T> {
     private final ComboBox<Integer> comboLimit;
     private final Label lblCount;
     private final String entityNamePlural;
-
     private List<T> allItems = new ArrayList<>();
+    private java.util.ResourceBundle bundle;
 
     public PaginationHelper(TableView<T> table, ComboBox<Integer> comboLimit, Label lblCount, String entityNamePlural) {
+        this(table, comboLimit, lblCount, entityNamePlural, null);
+    }
+
+    public PaginationHelper(TableView<T> table, ComboBox<Integer> comboLimit, Label lblCount, String entityNamePlural,
+            java.util.ResourceBundle bundle) {
         this.table = table;
         this.comboLimit = comboLimit;
         this.lblCount = lblCount;
         this.entityNamePlural = entityNamePlural;
+        this.bundle = bundle;
         setup();
     }
 
@@ -59,8 +64,10 @@ public class PaginationHelper<T> {
 
     private void updateCountLabel(int showing, int total) {
         if (lblCount != null) {
-            String text = String.format("🔍 Mostrando %d de %d %s", showing, total, entityNamePlural);
-            lblCount.setText(text);
+            String format = (bundle != null && bundle.containsKey("pagination.showing_simple"))
+                    ? bundle.getString("pagination.showing_simple")
+                    : "🔍 Mostrando %d de %d %s";
+            lblCount.setText(String.format(format, showing, total, entityNamePlural));
         }
     }
 }

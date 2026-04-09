@@ -67,7 +67,8 @@ public class ClientsController implements Injectable, com.mycompany.ventacontrol
             java.util.List<Client> clients = clientUseCase.getAllClients();
             displayClients(clients);
         } catch (SQLException e) {
-            AlertUtil.showError("Error", "No se pudieron cargar los clientes.");
+            AlertUtil.showError(container.getBundle().getString("alert.error"),
+                    container.getBundle().getString("client.error.load"));
         }
     }
 
@@ -88,7 +89,7 @@ public class ClientsController implements Injectable, com.mycompany.ventacontrol
             clientsListContainer.getChildren().add(createClientCard(client));
         }
         if (lblCount != null)
-            lblCount.setText(clients.size() + " registros encontrados");
+            lblCount.setText(clients.size() + " " + container.getBundle().getString("clients.count_suffix"));
     }
 
     private Node createClientCard(Client client) {
@@ -113,7 +114,8 @@ public class ClientsController implements Injectable, com.mycompany.ventacontrol
         nameLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 16; -fx-text-fill: -fx-text-custom-main;");
         nameLabel.setWrapText(true);
 
-        Label typeLabel = new Label(client.isIsCompany() ? "Empresa" : "Particular");
+        Label typeLabel = new Label(client.isIsCompany() ? container.getBundle().getString("client.type.company")
+                : container.getBundle().getString("client.type.individual"));
         typeLabel.setStyle(
                 "-fx-font-size: 11; -fx-text-fill: #94a3b8; -fx-text-transform: uppercase; -fx-letter-spacing: 1;");
 
@@ -147,7 +149,8 @@ public class ClientsController implements Injectable, com.mycompany.ventacontrol
             if (container.getUserSession().hasPermission("cliente.editar")) {
                 openClientForm(client);
             } else {
-                AlertUtil.showError("Acceso Denegado", "No tiene permiso para editar clientes.");
+                AlertUtil.showError(container.getBundle().getString("alert.access_denied"),
+                        container.getBundle().getString("error.no_permission"));
             }
         });
 
@@ -197,7 +200,7 @@ public class ClientsController implements Injectable, com.mycompany.ventacontrol
 
     private String getPriceListName(int priceListId) {
         if (priceListId <= 0)
-            return "Tarifa Estándar";
+            return container.getBundle().getString("client.price_list.standard");
         try {
             List<com.mycompany.ventacontrolfx.domain.model.PriceList> lists = container.getPriceListUseCase()
                     .getAll();
@@ -205,16 +208,17 @@ public class ClientsController implements Injectable, com.mycompany.ventacontrol
                     .filter(l -> l.getId() == priceListId)
                     .findFirst()
                     .map(com.mycompany.ventacontrolfx.domain.model.PriceList::getName)
-                    .orElse("Tarifa Estándar");
+                    .orElse(container.getBundle().getString("client.price_list.standard"));
         } catch (Exception e) {
-            return "Tarifa Estándar";
+            return container.getBundle().getString("client.price_list.standard");
         }
     }
 
     @FXML
     private void handleAddClient() {
         if (!container.getUserSession().hasPermission("cliente.crear")) {
-            AlertUtil.showError("Acceso Denegado", "No tiene permiso para registrar clientes.");
+            AlertUtil.showError(container.getBundle().getString("alert.access_denied"),
+                    container.getBundle().getString("error.no_permission"));
             return;
         }
         openClientForm(null);
@@ -222,7 +226,8 @@ public class ClientsController implements Injectable, com.mycompany.ventacontrol
 
     private void openClientForm(Client client) {
         ModalService.showTransparentModal("/view/client_form.fxml",
-                client == null ? "Nuevo Registro" : "Editar Registro",
+                client == null ? container.getBundle().getString("client.dialog.new")
+                        : container.getBundle().getString("client.dialog.edit"),
                 container, (ClientFormController ctrl) -> {
                     ctrl.init(client);
                 });
@@ -239,16 +244,19 @@ public class ClientsController implements Injectable, com.mycompany.ventacontrol
         if (client == null)
             return;
         if (!container.getUserSession().hasPermission("cliente.eliminar")) {
-            AlertUtil.showError("Acceso Denegado", "No tiene permiso para eliminar clientes.");
+            AlertUtil.showError(container.getBundle().getString("alert.access_denied"),
+                    container.getBundle().getString("error.no_permission"));
             return;
         }
-        if (AlertUtil.showConfirmation("Eliminar", "¿Seguro que desea eliminar a " + client.getName() + "?",
-                "Esta acción no se puede deshacer.")) {
+        if (AlertUtil.showConfirmation(container.getBundle().getString("alert.delete"),
+                container.getBundle().getString("client.confirm.delete") + " " + client.getName() + "?",
+                container.getBundle().getString("alert.confirm.undone"))) {
             try {
                 clientUseCase.deleteClient(client.getId());
                 loadClients();
             } catch (SQLException e) {
-                AlertUtil.showError("Error", "No se pudo eliminar el cliente.");
+                AlertUtil.showError(container.getBundle().getString("alert.error"),
+                        container.getBundle().getString("client.error.delete"));
             }
         }
     }

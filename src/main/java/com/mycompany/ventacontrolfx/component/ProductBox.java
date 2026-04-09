@@ -14,11 +14,14 @@ import javafx.scene.layout.VBox;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import javafx.application.Platform;
 import javafx.scene.shape.Rectangle;
+import java.util.ResourceBundle;
 
 public class ProductBox extends VBox {
+    private final ResourceBundle bundle;
 
     public ProductBox(Product product, double globalTaxRate, boolean pricesIncludeTax, String discountDesc,
-            Consumer<Product> onAddToCart) {
+            ResourceBundle bundle, Consumer<Product> onAddToCart) {
+        this.bundle = bundle;
         this.getStyleClass().add("product-box");
         this.setPrefWidth(200);
         this.setCache(true);
@@ -96,7 +99,7 @@ public class ProductBox extends VBox {
         infoBox.setAlignment(Pos.TOP_LEFT);
         VBox.setVgrow(infoBox, Priority.ALWAYS);
 
-        Label nameLabel = new Label(product.getName());
+        Label nameLabel = new Label(translateDynamic(product.getName()));
         nameLabel.getStyleClass().add("product-name");
         nameLabel.setWrapText(false);
         nameLabel.setMaxWidth(Double.MAX_VALUE);
@@ -104,8 +107,8 @@ public class ProductBox extends VBox {
         // Description (use category name as subtitle, or product description if
         // available)
         String descText = (product.getCategoryName() != null && !product.getCategoryName().isEmpty())
-                ? product.getCategoryName()
-                : "Producto sin categoría";
+                ? translateDynamic(product.getCategoryName())
+                : bundle.getString("product.no_category");
         Label descLabel = new Label(descText);
         descLabel.getStyleClass().add("product-description");
         descLabel.setWrapText(false);
@@ -114,7 +117,7 @@ public class ProductBox extends VBox {
         infoBox.getChildren().addAll(nameLabel, descLabel);
 
         // Stock and SKU fields
-        Label stockLabel = new Label("Stock: " + product.getStockQuantity());
+        Label stockLabel = new Label(bundle.getString("product.stock") + product.getStockQuantity());
         if (product.getStockQuantity() <= 0) {
             stockLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: #ef4444; -fx-font-weight: bold;"); // Red
         } else {
@@ -123,7 +126,7 @@ public class ProductBox extends VBox {
         infoBox.getChildren().add(stockLabel);
 
         if (product.getSku() != null && !product.getSku().isEmpty()) {
-            Label skuLabel = new Label("SKU: " + product.getSku());
+            Label skuLabel = new Label(bundle.getString("product.sku") + product.getSku());
             skuLabel.setStyle("-fx-font-size: 10px; -fx-text-fill: #64748b;");
             infoBox.getChildren().add(skuLabel);
         }
@@ -134,7 +137,7 @@ public class ProductBox extends VBox {
         addIcon.setSize("11");
         addIcon.getStyleClass().add("product-add-icon");
 
-        Label addLabel = new Label("AÑADIR");
+        Label addLabel = new Label(bundle.getString("product.add"));
         addLabel.getStyleClass().add("product-add-label");
 
         HBox addBtnContent = new HBox(6, addIcon, addLabel);
@@ -158,8 +161,8 @@ public class ProductBox extends VBox {
         });
     }
 
-    public ProductBox(Product product, Consumer<Product> onAddToCart) {
-        this(product, 21.0, true, null, onAddToCart);
+    public ProductBox(Product product, Consumer<Product> onAddToCart, ResourceBundle bundle) {
+        this(product, 21.0, true, null, bundle, onAddToCart);
     }
 
     private File resolveFile(String path) {
@@ -187,5 +190,13 @@ public class ProductBox extends VBox {
         VBox container = new VBox(icon);
         container.setAlignment(Pos.CENTER);
         return container;
+    }
+
+    private String translateDynamic(String text) {
+        if (text == null || text.isBlank()) return text;
+        if (bundle != null && bundle.containsKey(text)) {
+            return bundle.getString(text);
+        }
+        return text;
     }
 }

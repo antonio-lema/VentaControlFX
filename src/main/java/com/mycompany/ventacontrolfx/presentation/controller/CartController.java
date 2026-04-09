@@ -92,14 +92,16 @@ public class CartController implements Injectable {
         btnClearCart.managedProperty().bind(btnClearCart.visibleProperty());
 
         subtotalLabel.textProperty().bind(Bindings.createStringBinding(
-                () -> String.format("💰 %.2f €", cartUseCase.getSubtotal()),
+                () -> String.format(container.getBundle().getString("cart.summary.subtotal_format"),
+                        cartUseCase.getSubtotal()),
                 cartUseCase.subtotalProperty()));
         taxLabel.textProperty().bind(Bindings.createStringBinding(
-                () -> String.format("📑 %.2f €", cartUseCase.getTax()),
+                () -> String.format(container.getBundle().getString("cart.summary.tax_format"), cartUseCase.getTax()),
                 cartUseCase.taxProperty()));
 
         savingsLabel.textProperty().bind(Bindings.createStringBinding(
-                () -> String.format("🎉 -%.2f €", cartUseCase.getTotalSavings()),
+                () -> String.format(container.getBundle().getString("cart.summary.savings_format"),
+                        cartUseCase.getTotalSavings()),
                 cartUseCase.totalSavingsProperty()));
 
         hboxSavings.visibleProperty().bind(cartUseCase.totalSavingsProperty().greaterThan(0));
@@ -109,8 +111,11 @@ public class CartController implements Injectable {
                 () -> String.format("%.2f €", cartUseCase.getGrandTotal()),
                 cartUseCase.grandTotalProperty()));
         itemsCountLabel.textProperty().bind(Bindings.createStringBinding(
-                () -> String.format("📦 Subtotal (%d item%s)", cartUseCase.getItemCount(),
-                        cartUseCase.getItemCount() != 1 ? "s" : ""),
+                () -> String.format(container.getBundle().getString("cart.summary.items_count_format"),
+                        cartUseCase.getItemCount(),
+                        cartUseCase.getItemCount() != 1
+                                ? container.getBundle().getString("cart.summary.items_suffix_plural")
+                                : container.getBundle().getString("cart.summary.items_suffix_singular")),
                 cartUseCase.itemCountProperty()));
 
         // Observation Display Bindings
@@ -159,7 +164,7 @@ public class CartController implements Injectable {
                     .findFirst()
                     .ifPresent(l -> lblCurrentPriceList.setText(l.getName()));
         } catch (Exception e) {
-            lblCurrentPriceList.setText("Tarifa Desconocida");
+            lblCurrentPriceList.setText(container.getBundle().getString("cart.price_list.unknown"));
         }
     }
 
@@ -169,7 +174,7 @@ public class CartController implements Injectable {
             lblSelectedClient.setText(client.getName());
             lblSelectedClient.setStyle("-fx-text-fill: #1e88e5; -fx-font-weight: bold;");
         } else {
-            lblSelectedClient.setText("Añadir empresa");
+            lblSelectedClient.setText(container.getBundle().getString("cart.client.none"));
             lblSelectedClient.setStyle("");
         }
         btnRemoveClient.setVisible(client != null);
@@ -183,7 +188,8 @@ public class CartController implements Injectable {
         if (container.getUserSession().hasPermission("venta.limpiar")) {
             cartUseCase.clear();
         } else {
-            AlertUtil.showError("Acceso Denegado", "No tiene permiso para vaciar el carrito.");
+            AlertUtil.showError(container.getBundle().getString("cart.error.clear_denied.title"),
+                    container.getBundle().getString("cart.error.clear_denied.msg"));
         }
     }
 
@@ -203,7 +209,8 @@ public class CartController implements Injectable {
             List<com.mycompany.ventacontrolfx.domain.model.PriceList> lists = container.getPriceListUseCase()
                     .getAll();
             if (lists.isEmpty()) {
-                AlertUtil.showWarning("Sin Tarifas", "No hay otras tarifas configuradas.");
+                AlertUtil.showWarning(container.getBundle().getString("price_list.error.load"),
+                        container.getBundle().getString("cart.price_list.change.error_load"));
                 return;
             }
 
@@ -229,16 +236,16 @@ public class CartController implements Injectable {
             icon.setSize("45px");
             icon.setFill(javafx.scene.paint.Color.valueOf("#2196f3")); // Azul primario
 
-            Label title = new Label("Cambiar Tarifa");
+            Label title = new Label(container.getBundle().getString("cart.price_list.change.title"));
             title.getStyleClass().add("custom-modal-title");
-            Label subtitle = new Label("Seleccione la tarifa para esta venta");
+            Label subtitle = new Label(container.getBundle().getString("cart.price_list.change.subtitle"));
             subtitle.setStyle("-fx-text-fill: #999999; -fx-font-size: 14px;");
             header.getChildren().addAll(icon, title, subtitle);
 
             // Campo de ComboBox
             VBox content = new VBox(8);
             content.setAlignment(Pos.CENTER_LEFT);
-            Label lblHint = new Label("Tarifa:");
+            Label lblHint = new Label(container.getBundle().getString("cart.price_list.change.label"));
             lblHint.setStyle("-fx-font-weight: bold; -fx-text-fill: #555555;");
 
             javafx.scene.control.ComboBox<com.mycompany.ventacontrolfx.domain.model.PriceList> cmbPriceList = new javafx.scene.control.ComboBox<>(
@@ -281,12 +288,12 @@ public class CartController implements Injectable {
             // Botones
             HBox footer = new HBox(15);
             footer.setAlignment(Pos.CENTER);
-            Button btnCancel = new Button("CANCELAR");
+            Button btnCancel = new Button(container.getBundle().getString("btn.cancel").toUpperCase());
             btnCancel.getStyleClass().add("btn-secondary");
             btnCancel.setPrefHeight(40);
             btnCancel.setPrefWidth(120);
 
-            Button btnConfirm = new Button("APLICAR CAMBIO");
+            Button btnConfirm = new Button(container.getBundle().getString("cart.price_list.change.apply"));
             btnConfirm.getStyleClass().add("btn-primary");
             btnConfirm.setPrefHeight(40);
             btnConfirm.setPrefWidth(160);
@@ -335,7 +342,8 @@ public class CartController implements Injectable {
                 if (selected != null) {
                     cartUseCase.setPriceListId(selected.getId());
                     stage.close();
-                    AlertUtil.showToast("Cambiado a: " + selected.getName());
+                    AlertUtil.showToast(
+                            container.getBundle().getString("cart.price_list.change.toast") + selected.getName());
                 }
             });
 
@@ -343,25 +351,29 @@ public class CartController implements Injectable {
 
         } catch (Exception e) {
             e.printStackTrace();
-            AlertUtil.showError("Error", "No se pudieron cargar las tarifas disponibles.");
+            AlertUtil.showError(container.getBundle().getString("alert.error"),
+                    container.getBundle().getString("cart.price_list.change.error_load"));
         }
     }
 
     @FXML
     private void handleSuspendCart() {
         if (!container.getUserSession().hasPermission("venta.aplazar")) {
-            AlertUtil.showError("Acceso Denegado", "No tiene permiso para aplazar ventas.");
+            AlertUtil.showError(container.getBundle().getString("cart.suspend.denied.title"),
+                    container.getBundle().getString("cart.suspend.denied.msg"));
             return;
         }
         if (cartUseCase.getItemCount() == 0) {
-            AlertUtil.showWarning("Carrito Vacío", "No hay productos para aplazar.");
+            AlertUtil.showWarning(container.getBundle().getString("cart.suspend.empty.title"),
+                    container.getBundle().getString("cart.suspend.empty.msg"));
             return;
         }
 
         // Obtener usuario con seguridad para evitar el "pete"
         com.mycompany.ventacontrolfx.domain.model.User currentUser = container.getUserSession().getCurrentUser();
         if (currentUser == null) {
-            AlertUtil.showError("Error de Sesión", "No hay un usuario activo. Reinicie la aplicación.");
+            AlertUtil.showError(container.getBundle().getString("cart.suspend.session_error.title"),
+                    container.getBundle().getString("cart.suspend.session_error.msg"));
             return;
         }
 
@@ -381,20 +393,20 @@ public class CartController implements Injectable {
         icon.setSize("45px");
         icon.setFill(javafx.scene.paint.Color.valueOf("#fb8c00")); // Naranja cálido (brand warning)
 
-        Label title = new Label("Aplazar Venta");
+        Label title = new Label(container.getBundle().getString("cart.suspend.title"));
         title.getStyleClass().add("custom-modal-title");
-        Label subtitle = new Label("Asigne un nombre para identificar esta venta luego");
+        Label subtitle = new Label(container.getBundle().getString("cart.suspend.subtitle"));
         subtitle.setStyle("-fx-text-fill: #999999; -fx-font-size: 14px;");
         header.getChildren().addAll(icon, title, subtitle);
 
         // Campo de texto
         VBox content = new VBox(8);
         content.setAlignment(Pos.CENTER_LEFT);
-        Label lblHint = new Label("Nombre o Identificador:");
+        Label lblHint = new Label(container.getBundle().getString("cart.suspend.alias_label"));
         lblHint.setStyle("-fx-font-weight: bold; -fx-text-fill: #555555;");
 
-        TextField txtAlias = new TextField(
-                "Venta " + java.time.LocalTime.now().format(java.time.format.DateTimeFormatter.ofPattern("HH:mm")));
+        TextField txtAlias = new TextField(container.getBundle().getString("cart.suspend.alias_default")
+                + java.time.LocalTime.now().format(java.time.format.DateTimeFormatter.ofPattern("HH:mm")));
         txtAlias.getStyleClass().add("input-field-modern");
         txtAlias.setPrefHeight(45);
         content.getChildren().addAll(lblHint, txtAlias);
@@ -402,12 +414,12 @@ public class CartController implements Injectable {
         // Botones
         HBox footer = new HBox(15);
         footer.setAlignment(Pos.CENTER);
-        Button btnCancel = new Button("CANCELAR");
+        Button btnCancel = new Button(container.getBundle().getString("btn.cancel").toUpperCase());
         btnCancel.getStyleClass().add("btn-secondary");
         btnCancel.setPrefHeight(40);
         btnCancel.setPrefWidth(120);
 
-        Button btnConfirm = new Button("APLAZAR AHORA");
+        Button btnConfirm = new Button(container.getBundle().getString("cart.suspend.apply"));
         btnConfirm.getStyleClass().add("btn-primary");
         btnConfirm.setPrefHeight(40);
         btnConfirm.setPrefWidth(160);
@@ -475,10 +487,12 @@ public class CartController implements Injectable {
                         cartUseCase.getGrandTotal());
                 cartUseCase.clear();
                 stage.close();
-                AlertUtil.showToast("Venta '" + alias + "' guardada correctamente.");
+                AlertUtil.showToast(java.text.MessageFormat.format(
+                        container.getBundle().getString("cart.suspend.success_toast"), alias));
             } catch (Exception ex) {
                 ex.printStackTrace();
-                AlertUtil.showError("Error", "No se pudo guardar la venta: " + ex.getMessage());
+                AlertUtil.showError(container.getBundle().getString("alert.error"),
+                        container.getBundle().getString("error.save") + ": " + ex.getMessage());
             }
         });
 
@@ -488,7 +502,7 @@ public class CartController implements Injectable {
     @FXML
     private void handleShowSuspendedCarts() {
         try {
-            ModalService.showTransparentModal("/view/suspended_carts_dialog.fxml", "Carritos Aplazados", container,
+            ModalService.showTransparentModal("/view/suspended_carts_dialog.fxml", container.getBundle().getString("cart.suspended.title"), container,
                     (SuspendedCartsDialogController controller) -> {
                         if (controller == null)
                             return;
@@ -496,17 +510,20 @@ public class CartController implements Injectable {
                                 (com.mycompany.ventacontrolfx.domain.model.SuspendedCart suspendedCart) -> {
                                     try {
                                         restoreSuspendedCartUseCase.execute(suspendedCart.getId());
-                                        AlertUtil.showToast("Venta '" + suspendedCart.getAlias() + "' recuperada.");
+                                        AlertUtil.showToast(container.getBundle().getString("history.success.return")
+                                                .replace("{0}", suspendedCart.getAlias())); // Reusing key for toast
                                     } catch (Exception e) {
                                         e.printStackTrace();
-                                        AlertUtil.showError("Error al recuperar",
-                                                "No se pudo recuperar la venta: " + e.getMessage());
+                                        AlertUtil.showError(container.getBundle().getString("alert.error"),
+                                                container.getBundle().getString("history.error.load_details") + ": "
+                                                        + e.getMessage());
                                     }
                                 });
                     });
         } catch (Exception e) {
             e.printStackTrace();
-            AlertUtil.showError("Error", "No se pudo abrir la lista de ventas aplazadas: " + e.getMessage());
+            AlertUtil.showError(container.getBundle().getString("alert.error"),
+                    container.getBundle().getString("history.error.load") + ": " + e.getMessage());
         }
     }
 
@@ -521,13 +538,14 @@ public class CartController implements Injectable {
         if (grandTotal > 1000) {
             if (selectedClient == null || selectedClient.getTaxId() == null
                     || selectedClient.getTaxId().trim().isEmpty()) {
-                AlertUtil.showError("Identificación Obligatoria",
-                        "Para ventas superiores a 1000€ es obligatorio identificar al cliente con NIF/CIF para emitir la factura legal correspondiente.");
+                AlertUtil.showError(container.getBundle().getString("payment.error.id_required.title"),
+                        container.getBundle().getString("payment.error.id_required.msg"));
                 return;
             }
         }
 
-        ModalService.showModal("/view/payment.fxml", "Pago", Modality.APPLICATION_MODAL, StageStyle.UNDECORATED,
+        ModalService.showModal("/view/payment.fxml", container.getBundle().getString("payment.title"),
+                Modality.APPLICATION_MODAL, StageStyle.UNDECORATED,
                 container, (PaymentController pc) -> {
                     pc.setTotalAmount(cartUseCase.getGrandTotal(), (paid, change, method, cashAmount, cardAmount) -> {
                         try {
@@ -580,22 +598,27 @@ public class CartController implements Injectable {
                                 container.getEventBus().publishDataChange();
 
                                 ModalService.showStandardModal("/view/receipt.fxml",
-                                        client != null ? "Factura" : "Factura simplificada", container,
+                                        client != null ? container.getBundle().getString("receipt.title.invoice")
+                                                : container.getBundle().getString("receipt.title.simplified"),
+                                        container,
                                         (ReceiptController rc) -> {
                                             if (client != null)
                                                 rc.setClientInfo(client);
-                                            rc.setReceiptData(items, total, paid, change, method, saleId, null, null, observations);
+                                            rc.setReceiptData(items, total, paid, change, method, saleId, null, null,
+                                                    observations);
                                         });
 
                             }, (Throwable e) -> {
                                 if (e.getMessage() != null && e.getMessage().contains("OPERACION_BLOQUEADA")) {
                                     showCashNotOpenAlert(e.getMessage().replace("OPERACION_BLOQUEADA: ", ""));
                                 } else {
-                                    AlertUtil.showError("Error al procesar venta", e.getMessage());
+                                    AlertUtil.showError(container.getBundle().getString("cart.payment.error.process"),
+                                            e.getMessage());
                                 }
                             });
                         } catch (Exception e) {
-                            AlertUtil.showError("Error inesperado", e.getMessage());
+                            AlertUtil.showError(container.getBundle().getString("cart.payment.error.unexpected"),
+                                    e.getMessage());
                         }
                     });
                 });
@@ -620,7 +643,7 @@ public class CartController implements Injectable {
         VBox textContent = new VBox(10);
         textContent.setAlignment(Pos.CENTER);
 
-        Label title = new Label("CAJA CERRADA");
+        Label title = new Label(container.getBundle().getString("cart.cash_closed.title"));
         title.getStyleClass().add("modal-title");
 
         Label content = new Label(message);
@@ -634,7 +657,7 @@ public class CartController implements Injectable {
         HBox footer = new HBox(15);
         footer.setAlignment(Pos.CENTER);
 
-        Button btnClose = new Button("ENTENDIDO");
+        Button btnClose = new Button(container.getBundle().getString("btn.close").toUpperCase());
         btnClose.getStyleClass().add("btn-primary");
         btnClose.setPrefWidth(180);
         btnClose.setPrefHeight(45);
@@ -689,20 +712,20 @@ public class CartController implements Injectable {
         FontAwesomeIconView icon = new FontAwesomeIconView(FontAwesomeIcon.PLUS_SQUARE);
         icon.setSize("40");
         icon.setFill(Color.valueOf("#4caf50")); // Green for "add"
-        Label title = new Label("Producto Manual / Fantasma");
+        Label title = new Label(container.getBundle().getString("cart.manual_item.title"));
         title.getStyleClass().add("custom-modal-title");
         header.getChildren().addAll(icon, title);
 
         VBox content = new VBox(15);
         content.setAlignment(Pos.CENTER_LEFT);
 
-        Label lblName = new Label("Concepto / Nombre");
+        Label lblName = new Label(container.getBundle().getString("cart.manual_item.name_label"));
         lblName.getStyleClass().add("input-label-modern");
         TextField txtName = new TextField();
-        txtName.setPromptText("Ej: Reparación rápida, Artículo sin SKU...");
+        txtName.setPromptText(container.getBundle().getString("cart.manual_item.name_prompt"));
         txtName.getStyleClass().add("input-field-modern");
 
-        Label lblPrice = new Label("Precio (€)");
+        Label lblPrice = new Label(container.getBundle().getString("cart.manual_item.price_label"));
         lblPrice.getStyleClass().add("input-label-modern");
         TextField txtPrice = new TextField();
         txtPrice.setPromptText("0.00");
@@ -719,9 +742,9 @@ public class CartController implements Injectable {
 
         HBox footer = new HBox(15);
         footer.setAlignment(Pos.CENTER);
-        Button btnCancel = new Button("CANCELAR");
+        Button btnCancel = new Button(container.getBundle().getString("btn.cancel").toUpperCase());
         btnCancel.getStyleClass().add("btn-secondary");
-        Button btnAdd = new Button("AÑADIR AL CARRITO");
+        Button btnAdd = new Button(container.getBundle().getString("cart.manual_item.apply"));
         btnAdd.getStyleClass().add("btn-primary");
         footer.getChildren().addAll(btnCancel, btnAdd);
 
@@ -743,7 +766,8 @@ public class CartController implements Injectable {
             String priceStr = txtPrice.getText().trim();
 
             if (name.isEmpty()) {
-                AlertUtil.showWarning("Datos incompletos", "Por favor introduzca un nombre o concepto.");
+                AlertUtil.showWarning(container.getBundle().getString("cart.manual_item.error.incomplete.title"),
+                        container.getBundle().getString("cart.manual_item.error.incomplete.msg"));
                 return;
             }
 
@@ -752,7 +776,8 @@ public class CartController implements Injectable {
                 cartUseCase.addCustomItem(name, price);
                 stage.close();
             } catch (NumberFormatException ex) {
-                AlertUtil.showError("Precio inválido", "Por favor introduzca un precio numérico válido.");
+                AlertUtil.showError(container.getBundle().getString("alert.error"),
+                        container.getBundle().getString("cart.manual_item.price_label") + " invalid.");
             }
         });
 
@@ -773,21 +798,21 @@ public class CartController implements Injectable {
         FontAwesomeIconView icon = new FontAwesomeIconView(FontAwesomeIcon.COMMENTING);
         icon.setSize("40");
         icon.setFill(Color.valueOf("#2196f3"));
-        Label title = new Label("Observación General");
+        Label title = new Label(container.getBundle().getString("cart.observation.title"));
         title.getStyleClass().add("custom-modal-title");
         header.getChildren().addAll(icon, title);
 
         TextArea txtObs = new TextArea(cartUseCase.getGeneralObservation());
-        txtObs.setPromptText("Escriba la observación aquí...");
+        txtObs.setPromptText(container.getBundle().getString("cart.observation.prompt"));
         txtObs.getStyleClass().add("text-area-modern");
         txtObs.setPrefHeight(100);
         txtObs.setWrapText(true);
 
         HBox footer = new HBox(15);
         footer.setAlignment(Pos.CENTER);
-        Button btnCancel = new Button("CANCELAR");
+        Button btnCancel = new Button(container.getBundle().getString("btn.cancel").toUpperCase());
         btnCancel.getStyleClass().add("btn-secondary");
-        Button btnApply = new Button("APLICAR NOTA");
+        Button btnApply = new Button(container.getBundle().getString("cart.observation.apply"));
         btnApply.getStyleClass().add("btn-primary");
         footer.getChildren().addAll(btnCancel, btnApply);
 

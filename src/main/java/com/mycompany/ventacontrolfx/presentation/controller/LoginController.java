@@ -47,11 +47,11 @@ public class LoginController implements Injectable {
     private void checkIfUsersExist() {
         try {
             if (userUseCase.getUserCount() == 0) {
-                showErrorMessage("No hay usuarios registrados. Redirigiendo...");
+                showErrorMessage(container.getBundle().getString("login.error.no_users"));
                 Platform.runLater(() -> SceneNavigator.loadScene(
                         (Stage) btnLogin.getScene().getWindow(),
                         "/view/register_user.fxml",
-                        "Registro Primer Administrador",
+                        container.getBundle().getString("login.dialog.first_admin"),
                         900, 600,
                         false,
                         container));
@@ -67,7 +67,7 @@ public class LoginController implements Injectable {
         String password = txtPassword.getText();
 
         if (username.isEmpty() || password.isEmpty()) {
-            showErrorMessage("Por favor, rellene todos los campos ⚠️");
+            showErrorMessage(container.getBundle().getString("login.error.incomplete"));
             return;
         }
 
@@ -86,7 +86,7 @@ public class LoginController implements Injectable {
                 System.out.println("El usuario ya tiene un turno activo o hubo un error al iniciar: " + e.getMessage());
             }
 
-            lblMessage.setText("Login correcto 👍");
+            lblMessage.setText(container.getBundle().getString("login.success"));
             SceneNavigator.loadScene(
                     (Stage) btnLogin.getScene().getWindow(),
                     "/view/main.fxml",
@@ -96,15 +96,15 @@ public class LoginController implements Injectable {
                     container);
 
         } catch (com.mycompany.ventacontrolfx.domain.exception.UserNotFoundException ex) {
-            showErrorMessage("El usuario no existe ❌");
+            showErrorMessage(container.getBundle().getString("login.error.user_not_found"));
         } catch (com.mycompany.ventacontrolfx.domain.exception.InvalidPasswordException ex) {
-            showErrorMessage("Contraseña incorrecta 🔑");
+            showErrorMessage(container.getBundle().getString("login.error.wrong_password"));
         } catch (SQLException ex) {
             ex.printStackTrace();
-            showErrorMessage("Error crítico de base de datos 💥");
+            showErrorMessage(container.getBundle().getString("login.error.database"));
         } catch (Exception ex) {
             ex.printStackTrace();
-            showErrorMessage("Error inesperado: " + ex.getMessage());
+            showErrorMessage(container.getBundle().getString("login.error.unexpected") + ": " + ex.getMessage());
         }
     }
 
@@ -129,7 +129,7 @@ public class LoginController implements Injectable {
         SceneNavigator.loadScene(
                 (Stage) btnLogin.getScene().getWindow(),
                 "/view/password_recovery.fxml",
-                "Recuperar Contraseña",
+                container.getBundle().getString("login.dialog.recovery"),
                 900, 600,
                 false,
                 container);

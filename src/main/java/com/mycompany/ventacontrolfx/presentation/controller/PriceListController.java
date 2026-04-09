@@ -48,13 +48,14 @@ public class PriceListController implements Injectable {
                 updateUI(lists);
             });
         } catch (SQLException e) {
-            Platform.runLater(() -> AlertUtil.showError("Error", "No se pudieron cargar las tarifas."));
+            Platform.runLater(() -> AlertUtil.showError(container.getBundle().getString("alert.error"),
+                    container.getBundle().getString("price_list.error.load")));
         }
     }
 
     private void updateUI(List<PriceList> lists) {
         priceListsContainer.getChildren().clear();
-        lblCount.setText(lists.size() + " tarifas registradas");
+        lblCount.setText(lists.size() + " " + container.getBundle().getString("price_lists.count_suffix"));
 
         for (PriceList pl : lists) {
             priceListsContainer.getChildren().add(createPriceListCard(pl));
@@ -83,14 +84,14 @@ public class PriceListController implements Injectable {
         header.getChildren().add(lblName);
 
         if (pl.isDefault()) {
-            Label lblDefault = new Label("Por Defecto");
+            Label lblDefault = new Label(container.getBundle().getString("price_list.status.default"));
             lblDefault.setStyle(
                     "-fx-background-color: #d1fae5; -fx-text-fill: #065f46; -fx-padding: 4 8; -fx-background-radius: 12; -fx-font-size: 11px; -fx-font-weight: bold;");
             header.getChildren().add(lblDefault);
         }
 
         if (!pl.isActive()) {
-            Label lblInactive = new Label("Inactiva");
+            Label lblInactive = new Label(container.getBundle().getString("price_list.status.inactive"));
             lblInactive.setStyle(
                     "-fx-background-color: #f3f4f6; -fx-text-fill: #4b5563; -fx-padding: 4 8; -fx-background-radius: 12; -fx-font-size: 11px; -fx-font-weight: bold;");
             header.getChildren().add(lblInactive);
@@ -101,7 +102,7 @@ public class PriceListController implements Injectable {
         header.getChildren().add(r);
 
         VBox content = new VBox(8);
-        Label lblInfo = new Label("ID Tarifa: " + pl.getId());
+        Label lblInfo = new Label(container.getBundle().getString("price_list.label.id") + ": " + pl.getId());
         lblInfo.setStyle("-fx-text-fill: -fx-text-custom-muted; -fx-font-size: 13px;");
         content.getChildren().add(lblInfo);
 
@@ -115,7 +116,7 @@ public class PriceListController implements Injectable {
         if (!pl.isDefault()) {
             try {
                 String pct = priceListUseCase.getAveragePercentageDifference(pl.getId());
-                Label lblPct = new Label("Diferencia media vs principal: " + pct);
+                Label lblPct = new Label(container.getBundle().getString("price_list.label.avg_diff") + ": " + pct);
                 if (pct.startsWith("+")) {
                     lblPct.setStyle("-fx-text-fill: #22c55e; -fx-font-weight: bold; -fx-font-size: 13px;");
                 } else if (pct.startsWith("-")) {
@@ -131,21 +132,26 @@ public class PriceListController implements Injectable {
         FlowPane actionBox = new FlowPane(8, 8);
         actionBox.setAlignment(Pos.CENTER_RIGHT);
 
-        Button btnEdit = createIconButton("Editar", FontAwesomeIcon.PENCIL, "#eff6ff", "#1e40af");
+        Button btnEdit = createIconButton(container.getBundle().getString("btn.edit"), FontAwesomeIcon.PENCIL,
+                "#eff6ff", "#1e40af");
         btnEdit.setOnAction(e -> openPriceListForm(pl));
 
-        Button btnDelete = createIconButton("Eliminar", FontAwesomeIcon.TRASH, "#fef2f2", "#b91c1c");
+        Button btnDelete = createIconButton(container.getBundle().getString("btn.delete"), FontAwesomeIcon.TRASH,
+                "#fef2f2", "#b91c1c");
         btnDelete.setDisable(pl.isDefault() || pl.getId() == 1);
         btnDelete.setOnAction(e -> deletePriceList(pl));
 
-        Button btnMakeDefault = createIconButton("Fijar por defecto", FontAwesomeIcon.STAR, "#f3f4f6", "#374151");
+        Button btnMakeDefault = createIconButton(container.getBundle().getString("price_list.btn.set_default"),
+                FontAwesomeIcon.STAR, "#f3f4f6", "#374151");
         btnMakeDefault.setDisable(pl.isDefault());
         btnMakeDefault.setOnAction(e -> makeDefault(pl));
 
-        Button btnClone = createIconButton("Clonar", FontAwesomeIcon.COPY, "#fdf2f8", "#9d174d");
+        Button btnClone = createIconButton(container.getBundle().getString("btn.clone"), FontAwesomeIcon.COPY,
+                "#fdf2f8", "#9d174d");
         btnClone.setOnAction(e -> handleClone(pl));
 
-        Button btnViewTable = createIconButton("Ver Precios", FontAwesomeIcon.EYE, "#ecfdf5", "#065f46");
+        Button btnViewTable = createIconButton(container.getBundle().getString("price_list.btn.view_prices"),
+                FontAwesomeIcon.EYE, "#ecfdf5", "#065f46");
         btnViewTable.setOnAction(e -> openPriceTableView(pl));
 
         actionBox.getChildren().addAll(btnViewTable, btnClone, btnMakeDefault, btnEdit, btnDelete);
@@ -156,18 +162,22 @@ public class PriceListController implements Injectable {
 
     private void handleClone(PriceList source) {
         com.mycompany.ventacontrolfx.presentation.controller.dialog.PriceListCloneController ctrl = ModalService
-                .showTransparentModal("/view/dialog/price_list_clone_dialog.fxml", "Clonar Tarifa", container,
+                .showTransparentModal("/view/dialog/price_list_clone_dialog.fxml",
+                        container.getBundle().getString("price_list.dialog.clone"), container,
                         (com.mycompany.ventacontrolfx.presentation.controller.dialog.PriceListCloneController c) -> {
-                            c.initData("Clon de " + source.getName());
+                            c.initData(container.getBundle().getString("price_list.clone_prefix") + " "
+                                    + source.getName());
                         });
 
         if (ctrl != null && ctrl.isConfirmed()) {
             try {
                 priceListUseCase.clone(source.getId(), ctrl.getName(), ctrl.getPercentage());
-                AlertUtil.showInfo("Éxito", "Tarifa clonada y precios ajustados correctamente.");
+                AlertUtil.showInfo(container.getBundle().getString("alert.success"),
+                        container.getBundle().getString("price_list.success.cloned"));
                 loadPriceLists();
             } catch (SQLException e) {
-                AlertUtil.showError("Error", "No se pudo clonar la tarifa: " + e.getMessage());
+                AlertUtil.showError(container.getBundle().getString("alert.error"),
+                        container.getBundle().getString("price_list.error.clone") + ": " + e.getMessage());
             }
         }
     }
@@ -185,7 +195,8 @@ public class PriceListController implements Injectable {
 
     private void openPriceListForm(PriceList priceList) {
         ModalService.showTransparentModal("/view/price_list_form.fxml",
-                priceList == null ? "Nueva Tarifa" : "Editar Tarifa",
+                priceList == null ? container.getBundle().getString("price_list.dialog.new")
+                        : container.getBundle().getString("price_list.dialog.edit"),
                 container, (com.mycompany.ventacontrolfx.presentation.controller.dialog.PriceListFormController c) -> c
                         .initData(priceList));
 
@@ -195,18 +206,22 @@ public class PriceListController implements Injectable {
 
     private void deletePriceList(PriceList pl) {
         if (pl.getId() == 1) {
-            AlertUtil.showError("Error", "No se puede eliminar la tarifa principal.");
+            AlertUtil.showError(container.getBundle().getString("alert.error"),
+                    container.getBundle().getString("price_list.error.delete_main"));
             return;
         }
 
-        if (AlertUtil.showConfirmation("Confirmar", "Eliminar Tarifa",
-                "¿Estás seguro de que deseas eliminar la tarifa '" + pl.getName() + "'?")) {
+        if (AlertUtil.showConfirmation(container.getBundle().getString("alert.confirm"),
+                container.getBundle().getString("price_list.confirm.delete_title"),
+                container.getBundle().getString("price_list.confirm.delete_msg") + " '" + pl.getName() + "'?")) {
             try {
                 priceListUseCase.delete(pl.getId());
-                AlertUtil.showInfo("Tarifa eliminada", "La tarifa ha sido eliminada correctamente.");
+                AlertUtil.showInfo(container.getBundle().getString("price_list.success.deleted_title"),
+                        container.getBundle().getString("price_list.success.deleted_msg"));
                 loadPriceLists();
             } catch (SQLException ex) {
-                AlertUtil.showError("Error", "No se pudo eliminar la tarifa: " + ex.getMessage());
+                AlertUtil.showError(container.getBundle().getString("alert.error"),
+                        container.getBundle().getString("price_list.error.delete") + ": " + ex.getMessage());
             }
         }
     }
@@ -214,10 +229,12 @@ public class PriceListController implements Injectable {
     private void makeDefault(PriceList pl) {
         try {
             priceListUseCase.setAsDefault(pl.getId());
-            AlertUtil.showInfo("Tarifa actualizada", "'" + pl.getName() + "' es ahora la tarifa por defecto.");
+            AlertUtil.showInfo(container.getBundle().getString("price_list.success.default_title"),
+                    "'" + pl.getName() + "' " + container.getBundle().getString("price_list.success.default_msg"));
             loadPriceLists();
         } catch (SQLException ex) {
-            AlertUtil.showError("Error", "No se pudo actualizar la tarifa: " + ex.getMessage());
+            AlertUtil.showError(container.getBundle().getString("alert.error"),
+                    container.getBundle().getString("price_list.error.update") + ": " + ex.getMessage());
         }
     }
 

@@ -17,20 +17,41 @@ public class GlobalEventBus {
         void onDataChanged();
     }
 
-    private final List<WeakReference<DataChangeListener>> listeners = new ArrayList<>();
+    public interface LocaleChangeListener {
+        void onLocaleChanged();
+    }
+
+    private final List<WeakReference<DataChangeListener>> dataListeners = new ArrayList<>();
+    private final List<WeakReference<LocaleChangeListener>> localeListeners = new ArrayList<>();
 
     public void subscribe(DataChangeListener listener) {
-        listeners.add(new WeakReference<>(listener));
+        dataListeners.add(new WeakReference<>(listener));
+    }
+
+    public void subscribeLocale(LocaleChangeListener listener) {
+        localeListeners.add(new WeakReference<>(listener));
     }
 
     public void publishDataChange() {
-        Iterator<WeakReference<DataChangeListener>> iterator = listeners.iterator();
+        Iterator<WeakReference<DataChangeListener>> iterator = dataListeners.iterator();
         while (iterator.hasNext()) {
             DataChangeListener listener = iterator.next().get();
             if (listener == null) {
-                iterator.remove(); // Auto-cleanup of dead references
+                iterator.remove();
             } else {
                 listener.onDataChanged();
+            }
+        }
+    }
+
+    public void publishLocaleChange() {
+        Iterator<WeakReference<LocaleChangeListener>> iterator = localeListeners.iterator();
+        while (iterator.hasNext()) {
+            LocaleChangeListener listener = iterator.next().get();
+            if (listener == null) {
+                iterator.remove();
+            } else {
+                listener.onLocaleChanged();
             }
         }
     }

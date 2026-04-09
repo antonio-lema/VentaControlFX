@@ -73,11 +73,13 @@ public class SellViewController implements Injectable, CategoryMenuRenderer.Cate
                 config.getTaxRate(),
                 config.isPricesIncludeTax(),
                 this::getDiscountDescription,
+                container.getBundle(),
                 p -> {
                     try {
                         container.getCartUseCase().addItem(p);
                     } catch (IllegalArgumentException ex) {
-                        com.mycompany.ventacontrolfx.util.AlertUtil.showWarning("Stock Insuficiente", ex.getMessage());
+                        com.mycompany.ventacontrolfx.util.AlertUtil
+                                .showWarning(container.getBundle().getString("alert.validation"), ex.getMessage());
                     }
                 });
 
@@ -180,13 +182,13 @@ public class SellViewController implements Injectable, CategoryMenuRenderer.Cate
         container.getAsyncManager().runAsyncTask(() -> {
             List<Category> cats = categoryUseCase.getAll();
             Category all = new Category();
-            all.setName("Todas las categorías");
+            all.setName(container.getBundle().getString("sell.all_categories"));
             all.setId(-1);
             Category favs = new Category();
-            favs.setName("★ Favoritos");
+            favs.setName("★ " + container.getBundle().getString("sell.category.favorites"));
             favs.setId(-2);
             Category promos = new Category();
-            promos.setName("% Promociones");
+            promos.setName("% " + container.getBundle().getString("sell.category.promotions"));
             promos.setId(-3);
 
             java.util.List<Category> result = new java.util.ArrayList<>();
@@ -204,7 +206,7 @@ public class SellViewController implements Injectable, CategoryMenuRenderer.Cate
     private void renderCategoryMegaMenu(List<Category> categories) {
         categoriesMegaFlowPane.getChildren().clear();
         for (Category cat : categories) {
-            Button btn = new Button(cat.getName());
+            Button btn = new Button(translateDynamic(cat.getName()));
             btn.getStyleClass().add("category-mega-button");
             // Set a more compact size for the cards
             btn.setPrefWidth(160);
@@ -230,16 +232,16 @@ public class SellViewController implements Injectable, CategoryMenuRenderer.Cate
 
     private void updateCategoryLabelFromId(int catId) {
         if (catId == -1)
-            lblSelectedCategory.setText("Todas las categorías");
+            lblSelectedCategory.setText(container.getBundle().getString("sell.all_categories"));
         else if (catId == -2)
-            lblSelectedCategory.setText("★ Favoritos");
+            lblSelectedCategory.setText("★ " + container.getBundle().getString("sell.category.favorites"));
         else if (catId == -3)
-            lblSelectedCategory.setText("% Promociones");
+            lblSelectedCategory.setText("% " + container.getBundle().getString("sell.category.promotions"));
         else {
             // Intentar buscar nombre en cache o servicio (aquí simplificado)
             container.getAsyncManager().runAsyncTask(() -> categoryUseCase.getAll(), cats -> {
                 cats.stream().filter(c -> c.getId() == catId).findFirst()
-                        .ifPresent(c -> lblSelectedCategory.setText(c.getName()));
+                        .ifPresent(c -> lblSelectedCategory.setText(translateDynamic(c.getName())));
             }, null);
         }
     }
@@ -395,13 +397,13 @@ public class SellViewController implements Injectable, CategoryMenuRenderer.Cate
     private void updateFilterUI(List<Product> products) {
         FilterType type = filterUseCase.getCurrentType();
         Object criteria = filterUseCase.getCurrentCriteria();
-        String lbl = "Todos los productos";
+        String lbl = container.getBundle().getString("sell.all_products");
         if (type == FilterType.FAVORITES)
-            lbl = "Favoritos";
+            lbl = container.getBundle().getString("sell.category.favorites");
         else if (type == FilterType.PROMOTIONS)
-            lbl = "Promociones";
+            lbl = container.getBundle().getString("sell.category.promotions");
         else if (type == FilterType.CATEGORY)
-            lbl = ((Category) criteria).getName();
+            lbl = translateDynamic(((Category) criteria).getName());
 
         filterLabel.setText(lbl + " (" + totalProductCount + ")");
     }
@@ -458,12 +460,19 @@ public class SellViewController implements Injectable, CategoryMenuRenderer.Cate
 
     private String formatPromo(com.mycompany.ventacontrolfx.domain.model.Promotion p) {
         if (p.getType() == com.mycompany.ventacontrolfx.domain.model.PromotionType.PERCENTAGE) {
-            return String.format("%.0f%% DTO", p.getValue());
+            return String.format("%.0f%% " + container.getBundle().getString("sell.promo.discount_abbr"), p.getValue());
         } else if (p.getType() == com.mycompany.ventacontrolfx.domain.model.PromotionType.FIXED_DISCOUNT) {
-            return String.format("%.2f€ DTO", p.getValue());
+            return String.format("%.2f€ " + container.getBundle().getString("sell.promo.discount_abbr"), p.getValue());
         } else if (p.getType() == com.mycompany.ventacontrolfx.domain.model.PromotionType.VOLUME_DISCOUNT) {
             return (p.getBuyQty() + p.getFreeQty()) + "x" + p.getBuyQty();
         }
         return p.getName();
+    }
+    private String translateDynamic(String text) {
+        if (text == null || text.isBlank()) return text;
+        if (container != null && container.getBundle() != null && container.getBundle().containsKey(text)) {
+            return container.getBundle().getString(text);
+        }
+        return text;
     }
 }

@@ -81,8 +81,8 @@ public class ClosureHistoryController implements Injectable {
         setupMovementsTable();
         setupFilters();
         DateFilterUtils.addQuickFilters(quickFilterContainer, datePickerStart,
-                datePickerEnd, this::loadClosures);
-        paginationHelper = new PaginationHelper<>(tableClosures, cmbRowLimit, lblCount, "arqueos");
+                datePickerEnd, container.getBundle(), this::loadClosures);
+        paginationHelper = new PaginationHelper<>(tableClosures, cmbRowLimit, lblCount, container.getBundle().getString("closure.history.label.arqueos"));
         loadClosures();
 
         tableClosures.getSelectionModel().selectedItemProperty().addListener((obs, old, nv) -> {
@@ -92,9 +92,14 @@ public class ClosureHistoryController implements Injectable {
     }
 
     private void setupFilters() {
-        cmbStatusFilter
-                .setItems(FXCollections.observableArrayList("Todos", "CUADRADO", "DESCUADRE", "REVISADO", "EXCLUIDO"));
-        cmbStatusFilter.setValue("Todos");
+        cmbStatusFilter.setItems(FXCollections.observableArrayList(
+            container.getBundle().getString("closure.history.status.all"),
+            container.getBundle().getString("closure.history.status.squared"),
+            container.getBundle().getString("closure.history.status.offset"),
+            container.getBundle().getString("closure.history.status.reviewed"),
+            container.getBundle().getString("closure.history.status.excluded")
+        ));
+        cmbStatusFilter.setValue(container.getBundle().getString("closure.history.status.all"));
         cmbStatusFilter.setOnAction(e -> applyFilters());
     }
 
@@ -120,7 +125,13 @@ public class ClosureHistoryController implements Injectable {
                     setText(null);
                     setGraphic(null);
                 } else {
-                    Label label = new Label(item);
+                    String statusKey = "closure.history.status.all"; // Default
+                    if ("CUADRADO".equals(item)) statusKey = "closure.history.status.squared";
+                    else if ("DESCUADRE".equals(item)) statusKey = "closure.history.status.offset";
+                    else if ("REVISADO".equals(item)) statusKey = "closure.history.status.reviewed";
+                    else if ("EXCLUIDO".equals(item)) statusKey = "closure.history.status.excluded";
+                    
+                    Label label = new Label(container.getBundle().getString(statusKey));
                     label.getStyleClass().add("badge-info");
                     if ("DESCUADRE".equals(item))
                         label.setStyle(
@@ -200,21 +211,22 @@ public class ClosureHistoryController implements Injectable {
                     setGraphic(null);
                     setText(null);
                 } else {
-                    Label label = new Label(item);
+                    String typeKey = "closure.history.mov.type.in"; // Default
+                    if ("RETIRADA".equals(item)) typeKey = "closure.history.mov.type.out";
+                    else if ("DEVOLUCION".equals(item)) typeKey = "closure.history.mov.type.return";
+                    
+                    Label label = new Label(container.getBundle().getString(typeKey));
                     label.setStyle(
                             "-fx-font-size: 10px; -fx-padding: 2 6; -fx-background-radius: 4; -fx-font-weight: bold;");
                     if ("INGRESO".equals(item)) {
                         label.setStyle(label.getStyle()
                                 + "-fx-background-color: -fx-custom-color-success-bg; -fx-text-fill: -fx-custom-color-success-dark;");
-                        label.setText("INGRESO");
                     } else if ("RETIRADA".equals(item)) {
                         label.setStyle(label.getStyle()
                                 + "-fx-background-color: -fx-custom-color-danger-bg; -fx-text-fill: -fx-custom-color-danger-dark;");
-                        label.setText("RETIRADA");
                     } else if ("DEVOLUCION".equals(item)) {
                         label.setStyle(label.getStyle()
                                 + "-fx-background-color: -fx-custom-color-warning-bg; -fx-text-fill: -fx-custom-color-warning-dark;");
-                        label.setText("DEV.");
                     } else {
                         label.setStyle(label.getStyle()
                                 + "-fx-background-color: -fx-neutral-100; -fx-text-fill: -fx-neutral-700;");
@@ -282,14 +294,27 @@ public class ClosureHistoryController implements Injectable {
             updateKPIs();
             handleCloseDetails();
         } catch (SQLException e) {
-            AlertUtil.showError("Error", "No se pudieron cargar los cierres.");
+            AlertUtil.showError(container.getBundle().getString("alert.error"), container.getBundle().getString("closure.history.error.load"));
         }
     }
 
     private void applyFilters() {
         String status = cmbStatusFilter.getValue();
+        String allText = container.getBundle().getString("closure.history.status.all");
+        String squaredText = container.getBundle().getString("closure.history.status.squared");
+        String offsetText = container.getBundle().getString("closure.history.status.offset");
+        String reviewedText = container.getBundle().getString("closure.history.status.reviewed");
+        String excludedText = container.getBundle().getString("closure.history.status.excluded");
+
         List<CashClosure> filtered = allClosures.stream()
-                .filter(c -> "Todos".equals(status) || status.equals(c.getStatus()))
+                .filter(c -> {
+                    if (allText.equals(status)) return true;
+                    if (squaredText.equals(status)) return "CUADRADO".equals(c.getStatus());
+                    if (offsetText.equals(status)) return "DESCUADRE".equals(c.getStatus());
+                    if (reviewedText.equals(status)) return "REVISADO".equals(c.getStatus());
+                    if (excludedText.equals(status)) return "EXCLUIDO".equals(c.getStatus());
+                    return false;
+                })
                 .collect(Collectors.toList());
         paginationHelper.setData(filtered);
     }
@@ -316,7 +341,7 @@ public class ClosureHistoryController implements Injectable {
 
     private void showClosureDetails(CashClosure closure) {
         try {
-            lblClosureDetailId.setText("AUDITORÍA CIERRE #" + closure.getClosureId());
+            lblClosureDetailId.setText(String.format(container.getBundle().getString("closure.history.detail.title"), closure.getClosureId()));
 
             // Financial Breakdown
             lblDetInitial.setText(String.format("%.2f €", closure.getInitialFund()));
@@ -329,7 +354,7 @@ public class ClosureHistoryController implements Injectable {
             lblDetExpected.setText(String.format("%.2f €", closure.getExpectedCash()));
             lblDetActual.setText(String.format("%.2f €", closure.getActualCash()));
             lblDetNotes.setText(closure.getNotes() != null && !closure.getNotes().isEmpty() ? closure.getNotes()
-                    : "Sin observaciones.");
+                    : container.getBundle().getString("closure.history.detail.notes.none"));
 
             // Movements Table
             List<CashMovement> movements = closureUseCase.getMovementsByClosure(closure.getClosureId());
@@ -345,7 +370,7 @@ public class ClosureHistoryController implements Injectable {
             detailsPanel.setVisible(true);
             detailsPanel.setManaged(true);
         } catch (SQLException e) {
-            AlertUtil.showError("Error", "No se pudieron cargar los detalles.");
+            AlertUtil.showError(container.getBundle().getString("alert.error"), container.getBundle().getString("closure.history.detail.error.load"));
         }
     }
 
@@ -360,10 +385,11 @@ public class ClosureHistoryController implements Injectable {
                     ? userSession.getCurrentUser().getUserId()
                     : 1;
             closureUseCase.markAsReviewed(closure.getClosureId(), reviewerId);
-            AlertUtil.showInfo("Éxito", "El cierre ha sido marcado como revisado.");
+            AlertUtil.showInfo(container.getBundle().getString("closure.history.mark.success"),
+                    container.getBundle().getString("closure.history.mark.success_msg"));
             loadClosures(); // Recargar para ver cambios
         } catch (SQLException e) {
-            AlertUtil.showError("Error", "No se pudo actualizar el estado.");
+            AlertUtil.showError(container.getBundle().getString("alert.error"), container.getBundle().getString("closure.history.mark.error"));
         }
     }
 
@@ -376,15 +402,15 @@ public class ClosureHistoryController implements Injectable {
         com.mycompany.ventacontrolfx.presentation.controller.dialog.EditClosureDialogController controller = ModalService
                 .showStandardModal(
                         "/view/dialog/edit_closure_dialog.fxml",
-                        "Modificar Arqueo",
+                        container.getBundle().getString("closure.history.btn.modify"),
                         container,
                         c -> {
                             ((com.mycompany.ventacontrolfx.presentation.controller.dialog.EditClosureDialogController) c)
-                                    .init(closureUseCase, userSession, closure.getClosureId(), closure.getActualCash());
-                        });
+                                     .init(closureUseCase, userSession, closure.getClosureId(), closure.getActualCash());
+                         });
 
         if (controller != null && controller.isConfirmed()) {
-            AlertUtil.showToast("Cierre modificado correctamente.");
+            AlertUtil.showToast(container.getBundle().getString("closure.history.edit.success"));
             loadClosures();
         }
     }
@@ -401,8 +427,9 @@ public class ClosureHistoryController implements Injectable {
             return;
         }
 
-        boolean confirm = AlertUtil.showConfirmation("Confirmar", "Revisión masiva de arqueos",
-                "¿Estás seguro de marcar " + pendingClosures.size() + " arqueos como revisados?");
+        boolean confirm = AlertUtil.showConfirmation(container.getBundle().getString("closure.history.bulk.confirm.title"), 
+                container.getBundle().getString("closure.history.bulk.confirm.header"),
+                String.format(container.getBundle().getString("closure.history.bulk.confirm.msg"), pendingClosures.size()));
         if (!confirm)
             return;
 
@@ -413,10 +440,10 @@ public class ClosureHistoryController implements Injectable {
             for (CashClosure closure : pendingClosures) {
                 closureUseCase.markAsReviewed(closure.getClosureId(), reviewerId);
             }
-            AlertUtil.showToast(pendingClosures.size() + " arqueos marcados como revisados.");
+            AlertUtil.showToast(String.format(container.getBundle().getString("closure.history.bulk.success"), pendingClosures.size()));
             loadClosures();
         } catch (SQLException e) {
-            AlertUtil.showError("Error", "No se pudieron actualizar todos los estados.");
+            AlertUtil.showError(container.getBundle().getString("alert.error"), container.getBundle().getString("closure.history.bulk.error"));
         }
     }
 
@@ -433,7 +460,8 @@ public class ClosureHistoryController implements Injectable {
         if (closure != null) {
             handlePrintClosure(closure);
         } else {
-            AlertUtil.showWarning("Imprimir", "Seleccione un cierre para imprimir.");
+            AlertUtil.showWarning(container.getBundle().getString("closure.history.print.warning.title"), 
+                    container.getBundle().getString("closure.history.print.warning.msg"));
         }
     }
 
@@ -443,7 +471,7 @@ public class ClosureHistoryController implements Injectable {
 
         ModalService.showStandardModal(
                 "/view/print_preview.fxml",
-                "Vista Previa de Impresión - Cierre #" + closure.getClosureId(),
+                String.format(container.getBundle().getString("closure.history.print.preview.title"), closure.getClosureId()),
                 container,
                 (PrintPreviewController controller) -> {
                     controller.setClosureData(closure);

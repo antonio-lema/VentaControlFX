@@ -239,8 +239,8 @@ public class VatManagementController implements Injectable {
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
     // ── Constantes de agrupación ──────────────────────────────────────────────
-    private static final String GROUP_CATEGORY = "Por Categoría";
-    private static final String GROUP_TOP = "Más Vendidos (Top N)";
+    private static final String GROUP_CATEGORY = "vat.group.category";
+    private static final String GROUP_TOP = "vat.group.top";
 
     private static class InitialData {
         Optional<TaxGroup> defaultGroup;
@@ -249,13 +249,17 @@ public class VatManagementController implements Injectable {
         List<PriceList> priceLists;
     }
 
-    private static final String GROUP_BOTTOM = "Menos Vendidos (Bottom N)";
-    private static final String GROUP_SLOW = "Sin Movimiento (Slow-movers)";
-    private static final String GROUP_RANGE = "Por Rango de Precio";
-    private static final String GROUP_FAVORITES = "Favoritos ★";
-    private static final String GROUP_PRODUCTS = "Productos Específicos";
-    private static final String GROUP_ALL = "Todos los Artículos";
-    private static final String GROUP_CLONE = "Clonar de otra Tarifa (Sincronizar)";
+    private static final String GROUP_BOTTOM = "vat.group.bottom";
+    private static final String GROUP_SLOW = "vat.group.slow";
+    private static final String GROUP_RANGE = "vat.group.range";
+    private static final String GROUP_FAVORITES = "vat.group.favorites";
+    private static final String GROUP_PRODUCTS = "vat.group.products";
+    private static final String GROUP_ALL = "vat.group.all";
+    private static final String GROUP_CLONE = "vat.group.clone";
+
+    private static final String OP_PERCENTAGE = "vat.update.type.percentage";
+    private static final String OP_FIXED = "vat.update.type.fixed";
+    private static final String OP_ROUNDING = "vat.update.type.rounding_full";
 
     @FXML
     public void initialize() {
@@ -495,7 +499,7 @@ public class VatManagementController implements Injectable {
                             catMenu.getItems().add(item);
                         }
                     } else {
-                        catMenu.getItems().add(new MenuItem("No hay productos en esta categoría"));
+                        catMenu.getItems().add(new MenuItem(container.getBundle().getString("vat.group.no_products")));
                     }
                 }, null);
             });
@@ -514,6 +518,19 @@ public class VatManagementController implements Injectable {
                 GROUP_SLOW,
                 GROUP_RANGE,
                 GROUP_FAVORITES));
+
+        cmbGroupingType.setConverter(new javafx.util.StringConverter<String>() {
+            @Override
+            public String toString(String object) {
+                return (object != null && container != null) ? container.getBundle().getString(object) : object;
+            }
+
+            @Override
+            public String fromString(String string) {
+                return null;
+            }
+        });
+
         cmbGroupingType.getSelectionModel().selectFirst();
 
         cmbGroupingType.getSelectionModel().selectedItemProperty().addListener((obs, old, nv) -> {
@@ -608,24 +625,37 @@ public class VatManagementController implements Injectable {
 
     private void setupOperationTypeSelector() {
         cmbPriceUpdateType.setItems(FXCollections.observableArrayList(
-                "Porcentaje (%)",
-                "Importe Fijo (€)",
-                "Redondear a (.99, .50...)"));
+                OP_PERCENTAGE,
+                OP_FIXED,
+                OP_ROUNDING));
+
+        cmbPriceUpdateType.setConverter(new javafx.util.StringConverter<String>() {
+            @Override
+            public String toString(String object) {
+                return (object != null && container != null) ? container.getBundle().getString(object) : object;
+            }
+
+            @Override
+            public String fromString(String string) {
+                return null;
+            }
+        });
+
         cmbPriceUpdateType.getSelectionModel().selectFirst();
 
         cmbPriceUpdateType.getSelectionModel().selectedItemProperty().addListener((obs, old, nv) -> {
             if (lblPriceValue == null || nv == null)
                 return;
             switch (nv) {
-                case "Porcentaje (%)" -> {
-                    lblPriceValue.setText("Porcentaje (%):");
+                case OP_PERCENTAGE -> {
+                    lblPriceValue.setText(container.getBundle().getString("vat.update.type.percentage") + ":");
                     txtPriceValue.setPromptText("Ej: 10  (negativo para bajar)");
                 }
-                case "Importe Fijo (€)" -> {
-                    lblPriceValue.setText("Importe Fijo (€):");
+                case OP_FIXED -> {
+                    lblPriceValue.setText(container.getBundle().getString("vat.update.type.fixed") + ":");
                     txtPriceValue.setPromptText("Ej: 1.00  (negativo para bajar)");
                 }
-                case "Redondear a (.99, .50...)" -> {
+                case OP_ROUNDING -> {
                     lblPriceValue.setText("Decimal objetivo:");
                     txtPriceValue.setPromptText("Ej: 0.99 o 0.50 o 0.00");
                 }
@@ -659,9 +689,9 @@ public class VatManagementController implements Injectable {
         colLogType.setCellValueFactory(cell -> {
             String type = cell.getValue().getUpdateType();
             String display = switch (type) {
-                case "percentage" -> "Porcentaje (%)";
-                case "fixed" -> "Importe Fijo (€)";
-                case "rounding" -> "Redondeo";
+                case "percentage" -> container.getBundle().getString("vat.update.type.percentage");
+                case "fixed" -> container.getBundle().getString("vat.update.type.fixed");
+                case "rounding" -> container.getBundle().getString("vat.update.type.rounding");
                 default -> type;
             };
             return new SimpleStringProperty(display);
@@ -692,7 +722,9 @@ public class VatManagementController implements Injectable {
             return;
 
         // Cargar Grupo de Impuestos Global actual
-        lblCurrentGlobalTaxGroup.setText(data.defaultGroup.map(TaxGroup::getName).orElse("No definido"));
+        lblCurrentGlobalTaxGroup.setText(
+                data.defaultGroup.map(TaxGroup::getName)
+                        .orElse(container.getBundle().getString("vat.group.undefined")));
 
         // Cargar todos los grupos para los combos
         ObservableList<TaxGroup> taxGroupsList = FXCollections.observableArrayList(data.taxGroups);
@@ -714,14 +746,16 @@ public class VatManagementController implements Injectable {
                         .map(m -> ((CustomMenuItem) m).getContent())
                         .filter(n -> n instanceof CheckBox && ((CheckBox) n).isSelected())
                         .count();
-                cmbCategory.setText(count == 0 ? "Elegir..." : count + " seleccionadas");
+                cmbCategory.setText(count == 0 ? container.getBundle().getString("vat.group.choosing")
+                        : String.format(container.getBundle().getString("vat.group.selected_count"), count));
             });
 
             CustomMenuItem item = new CustomMenuItem(cb, false);
             cmbCategory.getItems().add(item);
         }
 
-        Category allOption = new Category(0, "Todas las categorías", true, false, 0.0);
+        Category allOption = new Category(0, container.getBundle().getString("vat.group.all_categories"), true, false,
+                0.0);
         ObservableList<Category> priceCategories = FXCollections.observableArrayList();
         priceCategories.add(allOption);
         priceCategories.addAll(data.categories);
@@ -746,7 +780,9 @@ public class VatManagementController implements Injectable {
                 cell -> new SimpleStringProperty(String.format("%.2f%%", cell.getValue().getRate())));
         colRateCountry.setCellValueFactory(new PropertyValueFactory<>("country"));
         colRateStatus.setCellValueFactory(
-                cell -> new SimpleStringProperty(cell.getValue().isActive() ? "Activo" : "Inactivo"));
+                cell -> new SimpleStringProperty(cell.getValue().isActive()
+                        ? container.getBundle().getString("status.active")
+                        : container.getBundle().getString("status.inactive")));
 
         setupTaxRateActionsColumn();
 
@@ -760,7 +796,7 @@ public class VatManagementController implements Injectable {
             colGroupRates.setCellValueFactory(cell -> {
                 List<TaxRate> rates = cell.getValue().getRates();
                 if (rates == null || rates.isEmpty())
-                    return new SimpleStringProperty("Sin tasas");
+                    return new SimpleStringProperty(container.getBundle().getString("vat.group.none"));
                 return new SimpleStringProperty(rates.stream()
                         .map(r -> r.getName() + " (" + r.getRate() + "%)")
                         .collect(Collectors.joining(", ")));
@@ -782,7 +818,7 @@ public class VatManagementController implements Injectable {
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            showError("Error al cargar el catálogo de impuestos: " + e.getMessage());
+            showError(String.format(container.getBundle().getString("vat.group.error.load"), e.getMessage()));
         }
     }
 
@@ -849,12 +885,13 @@ public class VatManagementController implements Injectable {
     @FXML
     void handleUpdateGlobalTaxGroup(ActionEvent event) {
         if (container != null && !container.getUserSession().hasPermission("admin.iva")) {
-            AlertUtil.showError("Acceso Denegado", "No tiene permiso para modificar el IVA global.");
+            AlertUtil.showError(container.getBundle().getString("access.denied"),
+                    container.getBundle().getString("vat.group.error.access_denied_cat"));
             return;
         }
         TaxGroup selected = cmbGlobalTaxGroup.getSelectionModel().getSelectedItem();
         if (selected == null) {
-            showWarning("Selecciona un grupo de impuestos.");
+            showWarning(container.getBundle().getString("vat.group.error.select_group"));
             return;
         }
 
@@ -862,7 +899,7 @@ public class VatManagementController implements Injectable {
             taxManagementUseCase.setDefaultTaxGroup(selected.getTaxGroupId());
             return null;
         }, (res) -> {
-            showInfo("Grupo de impuestos global actualizado con éxito. Los nuevos productos heredarán este grupo.");
+            showInfo(container.getBundle().getString("vat.group.success.global"));
             lblCurrentGlobalTaxGroup.setText(selected.getName());
             refreshHistory();
         }, (err) -> {
@@ -873,7 +910,8 @@ public class VatManagementController implements Injectable {
     @FXML
     void handleUpdateCategoryTaxGroup(ActionEvent event) {
         if (container != null && !container.getUserSession().hasPermission("admin.iva")) {
-            AlertUtil.showError("Acceso Denegado", "No tiene permiso para modificar el IVA por categoría.");
+            AlertUtil.showError(container.getBundle().getString("access.denied"),
+                    container.getBundle().getString("vat.group.error.access_denied_cat"));
             return;
         }
         List<Category> selectedCategories = new ArrayList<>();
@@ -889,7 +927,7 @@ public class VatManagementController implements Injectable {
         TaxGroup taxGroup = cmbCategoryTaxGroup.getSelectionModel().getSelectedItem();
 
         if (selectedCategories.isEmpty()) {
-            showWarning("Selecciona al menos una categoría.");
+            showWarning(container.getBundle().getString("vat.group.error.select_cat"));
             return;
         }
         if (taxGroup == null) {
@@ -908,7 +946,7 @@ public class VatManagementController implements Injectable {
             }
 
             container.getTaxRepository().syncMirroredValues();
-            showInfo("Grupo de impuestos aplicado con éxito a " + updatedCount + " categorías.");
+            showInfo(String.format(container.getBundle().getString("vat.group.success.category"), updatedCount));
             refreshHistory();
 
             // Limpiar selección
@@ -917,7 +955,7 @@ public class VatManagementController implements Injectable {
                 if (n instanceof CheckBox)
                     ((CheckBox) n).setSelected(false);
             });
-            cmbCategory.setText("Elegir...");
+            cmbCategory.setText(container.getBundle().getString("vat.group.choosing"));
 
         } catch (Exception e) {
             showError("Error: " + e.getMessage());
@@ -995,21 +1033,22 @@ public class VatManagementController implements Injectable {
                     priceUpdateUseCase.cloneAndAdjustPrices(source.getId(), priceListId, finalValue, finalReason,
                             startDate);
                     return -1;
-                } else if ("Porcentaje (%)".equals(finalOpType)) {
+                } else if (OP_PERCENTAGE.equals(finalOpType)) {
                     return applyByGroupingPercentage(priceListId, finalGrouping, finalValue, finalReason, startDate,
                             extra);
-                } else if ("Importe Fijo (€)".equals(finalOpType)) {
+                } else if (OP_FIXED.equals(finalOpType)) {
                     return applyByGroupingFixed(priceListId, finalGrouping, finalValue, finalReason, startDate, extra);
-                } else if ("Redondear a (.99, .50...)".equals(finalOpType)) {
+                } else if (OP_ROUNDING.equals(finalOpType)) {
                     return applyByGroupingRounding(priceListId, finalGrouping, finalValue, finalReason, startDate,
                             extra);
                 }
                 throw new BusinessException("Tipo de operación no reconocido.");
             }, (res) -> {
                 int count = (int) res;
-                AlertUtil.showInfo("Éxito",
-                        "Se han actualizado " + (count == -1 ? "(Clonado)" : count) + " productos.\n" +
-                                "Agrupación: " + finalGrouping + " | Operación registrada en el historial.");
+                AlertUtil.showInfo(container.getBundle().getString("alert.success"),
+                        String.format(container.getBundle().getString("vat.price.update.success"),
+                                (count == -1 ? "(Clonado)" : count),
+                                container.getBundle().getString(finalGrouping)));
 
                 clearPriceFields();
                 refreshPriceLog();
@@ -1153,7 +1192,7 @@ public class VatManagementController implements Injectable {
             }
             case GROUP_FAVORITES -> priceUpdateUseCase.applyRoundingToFavorites(priceListId, target, reason, startDate);
             default -> throw new UnsupportedOperationException(
-                    "Operación de redondeo no soportada para agrupación: " + grouping);
+                    container.getBundle().getString("vat.price.update.error.apply") + ": " + grouping);
         };
     }
 
@@ -1191,13 +1230,15 @@ public class VatManagementController implements Injectable {
     @FXML
     private void handleUpdateProductTaxGroup(ActionEvent event) {
         if (vatSelectedProducts.isEmpty()) {
-            AlertUtil.showWarning("Sin selección", "Por favor, seleccione al menos un producto.");
+            AlertUtil.showWarning(container.getBundle().getString("vat.error.no_selection"),
+                    container.getBundle().getString("vat.error.select_one"));
             return;
         }
 
         TaxGroup selectedGroup = cmbProductTaxGroup.getSelectionModel().getSelectedItem();
         if (selectedGroup == null) {
-            AlertUtil.showWarning("Grupo no seleccionado", "Por favor, seleccione el nuevo grupo de IVA.");
+            AlertUtil.showWarning(container.getBundle().getString("vat.error.group_not_selected"),
+                    container.getBundle().getString("vat.error.select_new_group"));
             return;
         }
 
@@ -1207,14 +1248,15 @@ public class VatManagementController implements Injectable {
 
         asyncManager.runAsyncTask(() -> {
             taxManagementUseCase.updateTaxGroupForProducts(ids, selectedGroup.getTaxGroupId(),
-                    "Cambio manual por producto");
+                    container.getBundle().getString("vat.log.manual_change"));
             return ids.size();
         }, (res) -> {
-            AlertUtil.showInfo("Éxito", "IVA actualizado para " + res + " productos.");
+            AlertUtil.showInfo(container.getBundle().getString("alert.success"),
+                    String.format(container.getBundle().getString("vat.group.success.products"), res));
             vatSelectedProducts.clear();
             refreshHistory();
         }, (err) -> {
-            AlertUtil.showError("Error al actualizar IVA", err.getMessage());
+            AlertUtil.showError(container.getBundle().getString("vat.error.update_failed"), err.getMessage());
         });
     }
 
@@ -1225,7 +1267,7 @@ public class VatManagementController implements Injectable {
         newRate.setCountry("ES");
         com.mycompany.ventacontrolfx.util.ModalService.showTransparentModal(
                 "/view/dialog/tax_rate_dialog.fxml",
-                "Nueva Tasa Impositiva",
+                container.getBundle().getString("vat.dialog.tax_rate.title_new"),
                 container,
                 (com.mycompany.ventacontrolfx.presentation.controller.dialog.TaxRateDialogController ctrl) -> {
                     ctrl.init(newRate);
@@ -1236,7 +1278,7 @@ public class VatManagementController implements Injectable {
     private void handleEditTaxRate(TaxRate rate) {
         com.mycompany.ventacontrolfx.util.ModalService.showTransparentModal(
                 "/view/dialog/tax_rate_dialog.fxml",
-                "Editar Tasa Impositiva",
+                container.getBundle().getString("vat.dialog.tax_rate.title_edit"),
                 container,
                 (com.mycompany.ventacontrolfx.presentation.controller.dialog.TaxRateDialogController ctrl) -> {
                     ctrl.init(rate);
@@ -1245,16 +1287,16 @@ public class VatManagementController implements Injectable {
     }
 
     private void handleDeleteTaxRate(TaxRate rate) {
-        boolean confirmed = AlertUtil.showConfirmation("Eliminar Tasa", "Confirmar eliminación",
-                "¿Está seguro de que desea eliminar la tasa '" + rate.getName()
-                        + "'?\nEsta acción no se puede deshacer.");
+        boolean confirmed = AlertUtil.showConfirmation(container.getBundle().getString("vat.confirm.delete_rate.title"),
+                container.getBundle().getString("alert.confirm"),
+                String.format(container.getBundle().getString("vat.confirm.delete_rate.msg"), rate.getName()));
         if (confirmed) {
             try {
                 taxManagementUseCase.deleteTaxRate(rate.getTaxRateId());
                 loadTaxCatalogData();
-                showInfo("Tasa eliminada correctamente.");
+                showInfo(container.getBundle().getString("vat.dialog.tax_rate.success_delete"));
             } catch (SQLException e) {
-                showError("No se pudo eliminar la tasa. Es posible que esté en uso.");
+                showError(container.getBundle().getString("vat.dialog.tax_rate.error_delete"));
             }
         }
     }
@@ -1263,7 +1305,7 @@ public class VatManagementController implements Injectable {
     void handleAddTaxGroup(ActionEvent event) {
         com.mycompany.ventacontrolfx.util.ModalService.showTransparentModal(
                 "/view/dialog/tax_group_dialog.fxml",
-                "Nuevo Grupo de Impuestos",
+                container.getBundle().getString("vat.dialog.tax_group.title_new"),
                 container,
                 (com.mycompany.ventacontrolfx.presentation.controller.dialog.TaxGroupDialogController ctrl) -> {
                     ctrl.init(new TaxGroup());
@@ -1275,7 +1317,7 @@ public class VatManagementController implements Injectable {
     private void handleEditTaxGroup(TaxGroup group) {
         com.mycompany.ventacontrolfx.util.ModalService.showTransparentModal(
                 "/view/dialog/tax_group_dialog.fxml",
-                "Editar Grupo de Impuestos",
+                container.getBundle().getString("vat.dialog.tax_group.title_edit"),
                 container,
                 (com.mycompany.ventacontrolfx.presentation.controller.dialog.TaxGroupDialogController ctrl) -> {
                     ctrl.init(group);
@@ -1285,17 +1327,18 @@ public class VatManagementController implements Injectable {
     }
 
     private void handleDeleteTaxGroup(TaxGroup group) {
-        boolean confirmed = AlertUtil.showConfirmation("Eliminar Grupo", "Confirmar eliminación",
-                "¿Está seguro de que desea eliminar el grupo '" + group.getName()
-                        + "'?\nEsta acción no se puede deshacer.");
+        boolean confirmed = AlertUtil.showConfirmation(
+                container.getBundle().getString("vat.confirm.delete_group.title"),
+                container.getBundle().getString("alert.confirm"),
+                String.format(container.getBundle().getString("vat.confirm.delete_group.msg"), group.getName()));
         if (confirmed) {
             try {
                 taxManagementUseCase.deleteTaxGroup(group.getTaxGroupId());
                 loadTaxCatalogData();
                 fetchInitialDataAsync(null); // Refresh combos
-                showInfo("Grupo eliminado correctamente.");
+                showInfo(container.getBundle().getString("vat.dialog.tax_group.success_delete"));
             } catch (SQLException e) {
-                showError("No se pudo eliminar el grupo. Es posible que esté en uso en productos o categorías.");
+                showError(container.getBundle().getString("vat.dialog.tax_group.error_delete"));
             }
         }
     }
@@ -1321,21 +1364,16 @@ public class VatManagementController implements Injectable {
         // Al usar DateFilterUtils, el botón "Todo" se seleccionará solo si lo forzamos,
         // pero lo más sencillo es reinicializar si queremos limpiar visualmente.
         DateFilterUtils.addQuickFilters(quickFilterContainer, (label) -> {
-            switch (label) {
-                case "Hoy":
-                    histFilterDays = 1;
-                    break;
-                case "7D":
-                    histFilterDays = 7;
-                    break;
-                case "Este Mes":
-                    histFilterDays = 30;
-                    break;
-                default:
-                    histFilterDays = null;
-                    break;
+            if (label.equals(container.getBundle().getString("filter.date.today"))) {
+                histFilterDays = 1;
+            } else if (label.equals(container.getBundle().getString("filter.date.7d"))) {
+                histFilterDays = 7;
+            } else if (label.equals(container.getBundle().getString("filter.date.this_month"))) {
+                histFilterDays = 30;
+            } else {
+                histFilterDays = null;
             }
-        }, this::refreshHistory);
+        }, container.getBundle(), this::refreshHistory);
 
         refreshHistory();
         refreshPriceLog();
@@ -1348,11 +1386,11 @@ public class VatManagementController implements Injectable {
                 TaxRevision.Scope scope = null;
                 String scopeStr = cmbHistoryScope != null ? cmbHistoryScope.getSelectionModel().getSelectedItem()
                         : null;
-                if ("Global".equals(scopeStr))
+                if (container.getBundle().getString("vat.history.scope.global").equals(scopeStr))
                     scope = TaxRevision.Scope.GLOBAL;
-                else if ("Categoría (Todo)".equals(scopeStr))
+                else if (container.getBundle().getString("vat.history.scope.category").equals(scopeStr))
                     scope = TaxRevision.Scope.CATEGORY;
-                else if ("Producto (Todo)".equals(scopeStr))
+                else if (container.getBundle().getString("vat.history.scope.product").equals(scopeStr))
                     scope = TaxRevision.Scope.PRODUCT;
 
                 final TaxRevision.Scope finalScope = scope;
@@ -1369,7 +1407,7 @@ public class VatManagementController implements Injectable {
                 historyTable.setItems(FXCollections.observableArrayList(history));
             }
         } catch (Exception e) {
-            showError("Error al refrescar historial: " + e.getMessage());
+            showError(String.format(container.getBundle().getString("vat.error.refresh_failed"), e.getMessage()));
         }
         refreshPriceLog();
     }
@@ -1400,30 +1438,30 @@ public class VatManagementController implements Injectable {
 
     private int parseIntField(TextField field, String fieldName) {
         if (field == null || field.getText().isBlank())
-            throw new IllegalArgumentException("El campo '" + fieldName + "' es obligatorio.");
+            throw new IllegalArgumentException(String.format(container.getBundle().getString("common.field_required"), fieldName));
         try {
             int v = Integer.parseInt(field.getText().trim());
             if (v <= 0)
                 throw new NumberFormatException();
             return v;
         } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("El campo '" + fieldName + "' debe ser un número entero positivo.");
+            throw new IllegalArgumentException(String.format(container.getBundle().getString("common.field_positive_int"), fieldName));
         }
     }
 
     private double parseDoubleField(TextField field, String fieldName) {
         if (field == null || field.getText().isBlank())
-            throw new IllegalArgumentException("El campo '" + fieldName + "' es obligatorio.");
+            throw new IllegalArgumentException(String.format(container.getBundle().getString("common.field_required"), fieldName));
         try {
             return Double.parseDouble(field.getText().trim().replace(",", "."));
         } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("El campo '" + fieldName + "' debe ser un número válido.");
+            throw new IllegalArgumentException(String.format(container.getBundle().getString("common.field_invalid_num"), fieldName));
         }
     }
 
     private void showInfo(String message) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Información");
+        alert.setTitle(container.getBundle().getString("alert.success"));
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
@@ -1431,7 +1469,7 @@ public class VatManagementController implements Injectable {
 
     private void showWarning(String message) {
         Alert alert = new Alert(Alert.AlertType.WARNING);
-        alert.setTitle("Atención");
+        alert.setTitle(container.getBundle().getString("alert.warning"));
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
@@ -1439,7 +1477,7 @@ public class VatManagementController implements Injectable {
 
     private void showError(String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle("Error");
+        alert.setTitle(container.getBundle().getString("alert.error"));
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
@@ -1449,7 +1487,7 @@ public class VatManagementController implements Injectable {
     private void handleClearVatSelection(ActionEvent event) {
         if (vatSelectedProducts != null) {
             vatSelectedProducts.clear();
-            com.mycompany.ventacontrolfx.util.AlertUtil.showToast("Selección limpiada");
+            com.mycompany.ventacontrolfx.util.AlertUtil.showToast(container.getBundle().getString("vat.selection.cleared"));
         }
     }
 }

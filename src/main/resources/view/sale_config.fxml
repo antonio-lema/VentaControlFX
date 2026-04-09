@@ -28,12 +28,12 @@
                     <FontAwesomeIconView glyphName="COG" size="24" fill="white"/>
                 </StackPane>
                 <VBox spacing="2">
-                    <Label text="Configuración de Venta" styleClass="view-title"/>
-                    <Label text="Ajusta los parámetros generales del punto de venta" styleClass="view-subtitle"/>
+                    <Label text="%config.title" styleClass="view-title"/>
+                    <Label text="%config.subtitle" styleClass="view-subtitle"/>
                 </VBox>
                 <Region HBox.hgrow="ALWAYS"/>
                 <!-- Botón Guardar (cabecera) -->
-                <Button fx:id="btnSaveTop" text="Guardar Cambios" onAction="#handleSave" styleClass="config-btn-save" defaultButton="true">
+                <Button fx:id="btnSaveTop" text="%config.btn.save" onAction="#handleSave" styleClass="config-btn-save" defaultButton="true">
                     <graphic>
                         <HBox spacing="8" alignment="CENTER">
                             <FontAwesomeIconView glyphName="SAVE" size="14" fill="white"/>
@@ -55,85 +55,85 @@
                             <StackPane styleClass="config-card-icon-wrap config-icon-blue">
                                 <FontAwesomeIconView glyphName="BUILDING" size="16" fill="#1e88e5"/>
                             </StackPane>
-                            <Label text="Datos de la Empresa" styleClass="config-card-title"/>
+                            <Label text="%config.section.company" styleClass="config-card-title"/>
                         </HBox>
                         <Separator styleClass="config-card-separator"/>
 
                         <VBox spacing="14" styleClass="config-card-body">
                             <!-- Nombre empresa -->
                             <VBox styleClass="config-field-group">
-                                <Label text="Nombre de la empresa" styleClass="config-field-label"/>
+                                <Label text="%config.field.company_name" styleClass="config-field-label"/>
                                 <HBox styleClass="config-input-container">
                                     <FontAwesomeIconView glyphName="BRIEFCASE" size="14" styleClass="sidebar-icon"/>
-                                    <TextField fx:id="txtCompanyName" promptText="Ej: Mi Tienda S.L."
+                                    <TextField fx:id="txtCompanyName" promptText="%config.field.company_name.prompt"
                                                HBox.hgrow="ALWAYS" styleClass="modern-input-field"/>
                                 </HBox>
                             </VBox>
                             <!-- CIF/NIF -->
                             <VBox styleClass="config-field-group">
-                                <Label text="CIF / NIF" styleClass="config-field-label"/>
+                                <Label text="%config.field.cif" styleClass="config-field-label"/>
                                 <HBox styleClass="config-input-container">
                                     <FontAwesomeIconView glyphName="ID_CARD" size="14" styleClass="sidebar-icon"/>
-                                    <TextField fx:id="txtCif" promptText="Ej: B12345678"
+                                    <TextField fx:id="txtCif" promptText="%config.field.cif.prompt"
                                                HBox.hgrow="ALWAYS" styleClass="modern-input-field"/>
                                 </HBox>
                             </VBox>
                             <!-- Dirección -->
                             <VBox styleClass="config-field-group">
-                                <Label text="Dirección" styleClass="config-field-label"/>
+                                <Label text="%config.field.address" styleClass="config-field-label"/>
                                 <HBox styleClass="config-input-container">
                                     <FontAwesomeIconView glyphName="MAP_MARKER" size="14" styleClass="sidebar-icon"/>
-                                    <TextField fx:id="txtAddress" promptText="Calle, Número, Ciudad"
+                                    <TextField fx:id="txtAddress" promptText="%config.field.address.prompt"
                                                HBox.hgrow="ALWAYS" styleClass="modern-input-field"/>
                                 </HBox>
                             </VBox>
                             <!-- Teléfono -->
                             <VBox styleClass="config-field-group">
-                                <Label text="Teléfono de contacto" styleClass="config-field-label"/>
+                                <Label text="%config.field.phone" styleClass="config-field-label"/>
                                 <HBox styleClass="config-input-container">
                                     <FontAwesomeIconView glyphName="PHONE" size="14" styleClass="sidebar-icon"/>
-                                    <TextField fx:id="txtPhone" promptText="Ej: +34 600 000 000"
+                                    <TextField fx:id="txtPhone" promptText="%config.field.phone.prompt"
                                                HBox.hgrow="ALWAYS" styleClass="modern-input-field"/>
                                 </HBox>
                             </VBox>
                             <!-- Email empresa -->
                             <VBox styleClass="config-field-group">
-                                <Label text="Email de la empresa" styleClass="config-field-label"/>
+                                <Label text="%config.field.email" styleClass="config-field-label"/>
                                 <HBox styleClass="config-input-container">
                                     <FontAwesomeIconView glyphName="ENVELOPE" size="14" styleClass="sidebar-icon"/>
-                                    <TextField fx:id="txtEmail" promptText="Ej: info@mitienda.com"
+                                    <TextField fx:id="txtEmail" promptText="%config.field.email.prompt"
                                                HBox.hgrow="ALWAYS" styleClass="modern-input-field"/>
                                 </HBox>
                             </VBox>
 
                             <!-- Logo de la empresa -->
                             <VBox styleClass="config-field-group">
-                                <Label text="Logo de la empresa (Tickets)" styleClass="config-field-label"/>
+                                <Label text="%config.field.logo" styleClass="config-field-label"/>
                                 <HBox styleClass="config-input-container" spacing="10">
                                     <FontAwesomeIconView glyphName="IMAGE" size="14" styleClass="sidebar-icon"/>
-                                    <TextField fx:id="txtLogoPath" promptText="Ruta del logo para los tickets"
+                                    <TextField fx:id="txtLogoPath" promptText="%config.field.logo.prompt"
                                                HBox.hgrow="ALWAYS" styleClass="modern-input-field" editable="false"/>
-                                    <Button text="Examinar..." onAction="#handleBrowseLogo" styleClass="btn-secondary"/>
+                                    <Button text="%config.btn.browse" onAction="#handleBrowseLogo" styleClass="btn-secondary"/>
                                 </HBox>
                             </VBox>
 
                             <!-- Icono de la aplicación -->
                             <VBox styleClass="config-field-group">
-                                <Label text="Icono de la aplicación (Ventana)" styleClass="config-field-label"/>
+                                <Label text="%config.field.icon" styleClass="config-field-label"/>
                                 <HBox styleClass="config-input-container" spacing="10">
                                     <FontAwesomeIconView glyphName="DESKTOP" size="14" styleClass="sidebar-icon"/>
-                                    <TextField fx:id="txtAppIconPath" promptText="Ruta del icono de la aplicación"
+                                    <TextField fx:id="txtAppIconPath" promptText="%config.field.icon.prompt"
                                                HBox.hgrow="ALWAYS" styleClass="modern-input-field" editable="false"/>
-                                    <Button text="Examinar..." onAction="#handleBrowseIcon" styleClass="btn-secondary"/>
+                                    <Button text="%config.btn.browse" onAction="#handleBrowseIcon" styleClass="btn-secondary"/>
                                 </HBox>
                             </VBox>
 
                             <!-- Nombre de la aplicación -->
                             <VBox styleClass="config-field-group">
-                                <Label text="Nombre de la aplicación" styleClass="config-field-label"/>
+                                <Label text="%config.field.app_name" styleClass="config-field-label"/>
                                 <HBox styleClass="config-input-container">
                                     <FontAwesomeIconView glyphName="WINDOW_MAXIMIZE" size="14" styleClass="sidebar-icon"/>
-                                    <TextField fx:id="txtAppName" promptText="Ej: Mi Sistema TPV"
+                                    <TextField fx:id="txtAppName" promptText="%config.field.app_name.prompt"
                                                HBox.hgrow="ALWAYS" styleClass="modern-input-field"/>
                                 </HBox>
                             </VBox>
@@ -146,25 +146,25 @@
                             <StackPane styleClass="config-card-icon-wrap config-icon-orange">
                                 <FontAwesomeIconView glyphName="BALANCE_SCALE" size="16" fill="#fb8c00"/>
                             </StackPane>
-                            <Label text="Configuración Fiscal" styleClass="config-card-title"/>
+                            <Label text="%config.section.fiscal" styleClass="config-card-title"/>
                         </HBox>
                         <Separator styleClass="config-card-separator"/>
 
                         <VBox spacing="14" styleClass="config-card-body">
                             <!-- Impuestos incluidos -->
                             <VBox spacing="8">
-                                <CheckBox fx:id="chkPricesIncludeTax" text="Los precios ya incluyen IVA"
+                                <CheckBox fx:id="chkPricesIncludeTax" text="%config.check.tax_included"
                                           styleClass="config-checkbox"/>
-                                <Label text="Marca esta opción si los precios que introduces en el catálogo ya tienen el IVA incluido." 
+                                <Label text="%config.hint.tax_included" 
                                        styleClass="config-field-hint" wrapText="true"/>
                             </VBox>
                             
                             <Separator styleClass="config-card-separator" style="-fx-opacity: 0.3;"/>
                             
                             <VBox spacing="4">
-                                <Label text="Referencia de IVA" styleClass="config-field-label"/>
-                                <Label text="Tasa Global: 21.00%" styleClass="section-title" style="-fx-font-size: 15px;"/>
-                                <Label text="Gestionable desde Administración > IVA" 
+                                <Label text="%config.field.tax_ref" styleClass="config-field-label"/>
+                                <Label text="%config.field.tax_rate" styleClass="section-title" style="-fx-font-size: 15px;"/>
+                                <Label text="%config.hint.tax_manage" 
                                        styleClass="config-field-hint" wrapText="true"/>
                             </VBox>
                         </VBox>
@@ -178,13 +178,13 @@
                             <StackPane styleClass="config-card-icon-wrap config-icon-purple">
                                 <FontAwesomeIconView glyphName="CLOCK_ALT" size="16" fill="#7b1fa2"/>
                             </StackPane>
-                            <Label text="Horarios del Establecimiento" styleClass="config-card-title"/>
+                            <Label text="%config.section.hours" styleClass="config-card-title"/>
                         </HBox>
                         <Separator styleClass="config-card-separator"/>
                         <VBox spacing="14" styleClass="config-card-body">
-                            <Label text="Configura las horas de apertura y cierre semanales para comparativas en el monitor operativo." 
+                            <Label text="%config.hint.hours" 
                                    styleClass="config-field-hint" wrapText="true"/>
-                            <Button text="Gestionar Horarios Comerciales" onAction="#handleShowBusinessHours" 
+                            <Button text="%config.btn.manage_hours" onAction="#handleShowBusinessHours" 
                                     styleClass="btn-secondary-saas" maxWidth="Infinity">
                                 <graphic>
                                     <FontAwesomeIconView glyphName="CALENDAR" size="14" />
@@ -203,55 +203,51 @@
                             <StackPane styleClass="config-card-icon-wrap config-icon-orange">
                                 <FontAwesomeIconView glyphName="FILE_TEXT" size="16" fill="#fb8c00"/>
                             </StackPane>
-                            <Label text="Ticket / Recibo" styleClass="config-card-title"/>
+                            <Label text="%config.section.ticket" styleClass="config-card-title"/>
                         </HBox>
                         <Separator styleClass="config-card-separator"/>
 
                         <VBox spacing="14" styleClass="config-card-body">
                             <!-- Mostrar logo -->
                             <HBox spacing="12" alignment="CENTER_LEFT" styleClass="config-check-row">
-                                <CheckBox fx:id="chkShowLogo" text="Mostrar logo en el ticket"
+                                <CheckBox fx:id="chkShowLogo" text="%config.check.show_logo"
                                           styleClass="config-checkbox"/>
                             </HBox>
                             <!-- Mostrar dirección -->
                             <HBox spacing="12" alignment="CENTER_LEFT" styleClass="config-check-row">
-                                <CheckBox fx:id="chkShowAddress" text="Mostrar dirección en el ticket"
+                                <CheckBox fx:id="chkShowAddress" text="%config.check.show_address"
                                           styleClass="config-checkbox"/>
                             </HBox>
                             <!-- Mostrar teléfono -->
                             <HBox spacing="12" alignment="CENTER_LEFT" styleClass="config-check-row">
-                                <CheckBox fx:id="chkShowPhone" text="Mostrar teléfono en el ticket"
+                                <CheckBox fx:id="chkShowPhone" text="%config.check.show_phone"
                                           styleClass="config-checkbox"/>
                             </HBox>
                             <!-- Mostrar CIF -->
                             <HBox spacing="12" alignment="CENTER_LEFT" styleClass="config-check-row">
-                                <CheckBox fx:id="chkShowCif" text="Mostrar CIF/NIF en el ticket"
+                                <CheckBox fx:id="chkShowCif" text="%config.check.show_cif"
                                           styleClass="config-checkbox"/>
                             </HBox>
 
                             <!-- Mensaje pie de ticket -->
                             <VBox styleClass="config-field-group">
-                                <Label text="Mensaje al pie del ticket" styleClass="config-field-label"/>
+                                <Label text="%config.field.footer" styleClass="config-field-label"/>
                                 <HBox styleClass="config-input-container">
                                     <FontAwesomeIconView glyphName="COMMENT" size="14" styleClass="sidebar-icon"/>
-                                    <TextField fx:id="txtFooterMessage" promptText="Ej: ¡Gracias por su compra!"
+                                    <TextField fx:id="txtFooterMessage" promptText="%config.field.footer.prompt"
                                                HBox.hgrow="ALWAYS" styleClass="modern-input-field"/>
                                 </HBox>
                             </VBox>
 
                             <!-- Número de copias -->
                             <VBox styleClass="config-field-group">
-                                <Label text="Copias de ticket a imprimir" styleClass="config-field-label"/>
+                                <Label text="%config.field.copies" styleClass="config-field-label"/>
                                 <HBox styleClass="config-input-container">
                                     <FontAwesomeIconView glyphName="PRINT" size="14" styleClass="sidebar-icon"/>
                                     <ComboBox fx:id="cmbTicketCopies" maxWidth="Infinity" HBox.hgrow="ALWAYS"
                                               styleClass="modern-combo-box">
                                         <items>
-                                            <FXCollections fx:factory="observableArrayList">
-                                                <String fx:value="1 copia"/>
-                                                <String fx:value="2 copias"/>
-                                                <String fx:value="3 copias"/>
-                                            </FXCollections>
+                                            <FXCollections fx:factory="observableArrayList" />
                                         </items>
                                     </ComboBox>
                                 </HBox>
@@ -259,26 +255,22 @@
 
                             <!-- Formato de ticket -->
                             <VBox styleClass="config-field-group">
-                                <Label text="Formato de papel (Ancho)" styleClass="config-field-label"/>
+                                <Label text="%config.field.format" styleClass="config-field-label"/>
                                 <HBox styleClass="config-input-container">
                                     <FontAwesomeIconView glyphName="ARROWS_H" size="14" styleClass="sidebar-icon"/>
                                     <ComboBox fx:id="cmbTicketFormat" maxWidth="Infinity" HBox.hgrow="ALWAYS"
                                               styleClass="modern-combo-box">
                                         <items>
-                                            <FXCollections fx:factory="observableArrayList">
-                                                <String fx:value="80mm (Estándar Térmico)"/>
-                                                <String fx:value="58mm (Datáfono/Portátil)"/>
-                                                <String fx:value="A4 (Folio)"/>
-                                            </FXCollections>
+                                            <FXCollections fx:factory="observableArrayList" />
                                         </items>
                                     </ComboBox>
                                 </HBox>
-                                <Label text="Ajusta el diseño al tamaño de tu impresora" styleClass="config-field-hint"/>
+                                <Label text="%config.hint.format" styleClass="config-field-hint"/>
                             </VBox>
 
                             <!-- Imprimir automáticamente -->
                             <HBox spacing="12" alignment="CENTER_LEFT" styleClass="config-check-row">
-                                <CheckBox fx:id="chkAutoPrint" text="Imprimir ticket automáticamente tras cobro"
+                                <CheckBox fx:id="chkAutoPrint" text="%config.check.auto_print"
                                           styleClass="config-checkbox"/>
                             </HBox>
                         </VBox>
@@ -290,47 +282,47 @@
                             <StackPane styleClass="config-card-icon-wrap config-icon-blue">
                                 <FontAwesomeIconView glyphName="ENVELOPE" size="16" fill="#1e88e5"/>
                             </StackPane>
-                            <Label text="Servidor de Correo (SMTP)" styleClass="config-card-title"/>
+                            <Label text="%config.section.smtp" styleClass="config-card-title"/>
                         </HBox>
                         <Separator styleClass="config-card-separator"/>
 
                         <VBox spacing="14" styleClass="config-card-body">
                             <!-- SMTP Host -->
                             <VBox styleClass="config-field-group">
-                                <Label text="Servidor SMTP" styleClass="config-field-label"/>
+                                <Label text="%config.field.smtp_host" styleClass="config-field-label"/>
                                 <HBox styleClass="config-input-container">
                                     <FontAwesomeIconView glyphName="SERVER" size="14" styleClass="sidebar-icon"/>
-                                    <TextField fx:id="txtSmtpHost" promptText="Ej: smtp.gmail.com"
+                                    <TextField fx:id="txtSmtpHost" promptText="%config.field.smtp_host.prompt"
                                                HBox.hgrow="ALWAYS" styleClass="modern-input-field"/>
                                 </HBox>
                             </VBox>
 
                             <!-- SMTP Port -->
                             <VBox styleClass="config-field-group">
-                                <Label text="Puerto" styleClass="config-field-label"/>
+                                <Label text="%config.field.smtp_port" styleClass="config-field-label"/>
                                 <HBox styleClass="config-input-container">
                                     <FontAwesomeIconView glyphName="PLUG" size="14" styleClass="sidebar-icon"/>
-                                    <TextField fx:id="txtSmtpPort" promptText="Ej: 587"
+                                    <TextField fx:id="txtSmtpPort" promptText="%config.field.smtp_port.prompt"
                                                HBox.hgrow="ALWAYS" styleClass="modern-input-field"/>
                                 </HBox>
                             </VBox>
 
                             <!-- Email From -->
                             <VBox styleClass="config-field-group">
-                                <Label text="Correo emisor" styleClass="config-field-label"/>
+                                <Label text="%config.field.email_user" styleClass="config-field-label"/>
                                 <HBox styleClass="config-input-container">
                                     <FontAwesomeIconView glyphName="AT" size="14" styleClass="sidebar-icon"/>
-                                    <TextField fx:id="txtEmailFrom" promptText="Ej: mitienda@gmail.com"
+                                    <TextField fx:id="txtEmailFrom" promptText="%config.field.email_user.prompt"
                                                HBox.hgrow="ALWAYS" styleClass="modern-input-field"/>
                                 </HBox>
                             </VBox>
 
                             <!-- Email Password -->
                             <VBox styleClass="config-field-group">
-                                <Label text="Contraseña de aplicación" styleClass="config-field-label"/>
+                                <Label text="%config.field.email_pass" styleClass="config-field-label"/>
                                 <HBox styleClass="config-input-container">
                                     <FontAwesomeIconView glyphName="KEY" size="14" styleClass="sidebar-icon"/>
-                                    <PasswordField fx:id="txtEmailPassword" promptText="Contraseña"
+                                    <PasswordField fx:id="txtEmailPassword" promptText="%config.field.email_pass.prompt"
                                                HBox.hgrow="ALWAYS" styleClass="modern-input-field"/>
                                 </HBox>
                             </VBox>
@@ -342,14 +334,14 @@
 
                 <!-- ─── Botones de Acción finales ─── -->
                 <HBox spacing="15" alignment="CENTER_RIGHT">
-                    <Button text="Restablecer valores" onAction="#handleReset" styleClass="config-btn-reset">
+                    <Button text="%config.btn.reset" onAction="#handleReset" styleClass="config-btn-reset">
                         <graphic>
                             <HBox spacing="8" alignment="CENTER">
                                 <FontAwesomeIconView glyphName="UNDO" size="13" fill="#757575"/>
                             </HBox>
                         </graphic>
                     </Button>
-                    <Button text="Guardar Cambios" onAction="#handleSave" styleClass="config-btn-save" defaultButton="true">
+                    <Button text="%config.btn.save" onAction="#handleSave" styleClass="config-btn-save" defaultButton="true">
                         <graphic>
                             <HBox spacing="8" alignment="CENTER">
                                 <FontAwesomeIconView glyphName="CHECK" size="13" fill="white"/>
@@ -362,7 +354,7 @@
                 <HBox fx:id="bannerSaved" styleClass="config-banner-success" alignment="CENTER_LEFT" spacing="12"
                       visible="false" managed="false">
                     <FontAwesomeIconView glyphName="CHECK_CIRCLE" size="20" fill="#2e7d32"/>
-                    <Label text="✔  Configuración guardada correctamente." styleClass="config-banner-text"/>
+                    <Label text="%config.banner.success" styleClass="config-banner-text"/>
                 </HBox>
 
             </VBox>

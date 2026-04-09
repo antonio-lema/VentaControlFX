@@ -22,10 +22,11 @@ public class EditCartItemController implements Injectable {
 
     private CartItem cartItem;
     private Runnable onSaveCallback;
+    private ServiceContainer container;
 
     @Override
     public void inject(ServiceContainer container) {
-        // No services needed for this simple dialog, but required by Injectable
+        this.container = container;
     }
 
     public void setData(CartItem item, Runnable onSave) {
@@ -46,10 +47,10 @@ public class EditCartItemController implements Injectable {
         toggleDiscountType.selectedProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal) {
                 toggleDiscountType.setText("€");
-                lblDiscountHint.setText("Descuento en valor absoluto (€)");
+                lblDiscountHint.setText(container != null ? container.getBundle().getString("cart.edit.discount.hint.fixed") : "Descuento en valor absoluto (€)");
             } else {
                 toggleDiscountType.setText("%");
-                lblDiscountHint.setText("Descuento en porcentaje (%)");
+                lblDiscountHint.setText(container != null ? container.getBundle().getString("cart.edit.discount.hint.percent") : "Descuento en porcentaje (%)");
             }
         });
     }

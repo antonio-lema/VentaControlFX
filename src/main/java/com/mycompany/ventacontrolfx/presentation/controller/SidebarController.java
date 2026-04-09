@@ -186,7 +186,7 @@ public class SidebarController implements Injectable {
             } else {
                 lblAppName.setText(config.getCompanyName() != null && !config.getCompanyName().isBlank()
                         ? config.getCompanyName()
-                        : "GestionTPV");
+                        : container.getBundle().getString("app.name.default"));
             }
             // Logo: preferimos el logoPath de la empresa
             String logoPath = config.getLogoPath();
@@ -203,7 +203,7 @@ public class SidebarController implements Injectable {
             }
         } catch (Exception e) {
             // Si falla, se muestran los valores por defecto del FXML
-            lblAppName.setText("GestionTPV");
+            lblAppName.setText(container.getBundle().getString("app.name.default"));
         }
     }
 
@@ -442,7 +442,8 @@ public class SidebarController implements Injectable {
     @FXML
     private void handleShowStaffCalendar() {
         setActiveButton(btnStaffCalendar);
-        ModalService.showFullScreenModal("/view/staff_calendar.fxml", "Planificador de Personal", container, null);
+        ModalService.showFullScreenModal("/view/staff_calendar.fxml",
+                container.getBundle().getString("sidebar.staff_calendar"), container, null);
     }
 
     // ─── ADMINISTRACIÓN ──────────────────────────────────────
@@ -465,6 +466,18 @@ public class SidebarController implements Injectable {
 
     @FXML
     private void handleLock() {
-        ModalService.showFullScreenModal("/view/lock_screen.fxml", "Pantalla de Bloqueo", container, null);
+        ModalService.showFullScreenModal("/view/lock_screen.fxml",
+                container.getBundle().getString("sidebar.lock_screen"), container, null);
     }
+
+    @FXML
+    private void setLanguageEs() {
+        container.setLanguage("es");
+    }
+
+    @FXML
+    private void setLanguageEn() {
+        container.setLanguage("en");
+    }
+
 }

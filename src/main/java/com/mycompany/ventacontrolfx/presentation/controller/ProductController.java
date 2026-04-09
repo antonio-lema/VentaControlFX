@@ -82,8 +82,9 @@ public class ProductController implements Injectable, com.mycompany.ventacontrol
 
         setupTable();
         setupFilterGroup();
-        paginationHelper = new ServerPaginationHelper<>(productsTable, cmbRowLimit, lblCount, pagination, "productos",
-                this::fetchProductsPage);
+        paginationHelper = new ServerPaginationHelper<>(productsTable, cmbRowLimit, lblCount, pagination,
+                container.getBundle().getString("products.entity_plural"),
+                this::fetchProductsPage, container.getBundle());
         setupSearch();
 
         container.getEventBus().subscribe(this);
@@ -112,7 +113,23 @@ public class ProductController implements Injectable, com.mycompany.ventacontrol
 
     private void setupTable() {
         colCategoryName.setCellValueFactory(new PropertyValueFactory<>("categoryName"));
+        colCategoryName.setCellFactory(col -> new TableCell<Product, String>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                setText(empty ? null : translateDynamic(item));
+            }
+        });
+        
         colName.setCellValueFactory(new PropertyValueFactory<>("name"));
+        colName.setCellFactory(col -> new TableCell<Product, String>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                setText(empty ? null : translateDynamic(item));
+            }
+        });
+
         colSku.setCellValueFactory(new PropertyValueFactory<>("sku"));
         colStock.setCellValueFactory(new PropertyValueFactory<>("stockQuantity"));
         setupPriceColumn();
@@ -251,7 +268,8 @@ public class ProductController implements Injectable, com.mycompany.ventacontrol
                     Product p = getTableRow().getItem();
                     if (p != null) {
                         if (!container.getUserSession().hasPermission("producto.editar")) {
-                            AlertUtil.showError("Acceso Denegado", "No tiene permiso para editar productos.");
+                            AlertUtil.showError(container.getBundle().getString("alert.access_denied"),
+                                    container.getBundle().getString("error.no_permission"));
                             return;
                         }
                         try {
@@ -263,7 +281,8 @@ public class ProductController implements Injectable, com.mycompany.ventacontrol
                                 productUseCase.toggleVisibility(p.getId(), newState);
                         } catch (SQLException ex) {
                             toggle.setSwitchedOn(!toggle.isSwitchedOn());
-                            AlertUtil.showError("Error", "No se pudo actualizar el estado.");
+                            AlertUtil.showError(container.getBundle().getString("alert.error"),
+                                    container.getBundle().getString("product.error.update_status"));
                         }
                     }
                 });
@@ -301,14 +320,16 @@ public class ProductController implements Injectable, com.mycompany.ventacontrol
                     if (container.getUserSession().hasPermission("producto.editar")) {
                         openProductDialog(getTableRow().getItem());
                     } else {
-                        AlertUtil.showError("Acceso Denegado", "No tiene permiso para editar productos.");
+                        AlertUtil.showError(container.getBundle().getString("alert.access_denied"),
+                                container.getBundle().getString("error.no_permission"));
                     }
                 });
                 btnDelete.setOnAction(e -> {
                     if (container.getUserSession().hasPermission("producto.eliminar")) {
                         handleDeleteProduct(getTableRow().getItem());
                     } else {
-                        AlertUtil.showError("Acceso Denegado", "No tiene permiso para eliminar productos.");
+                        AlertUtil.showError(container.getBundle().getString("alert.access_denied"),
+                                container.getBundle().getString("error.no_permission"));
                     }
                 });
             }
@@ -338,7 +359,8 @@ public class ProductController implements Injectable, com.mycompany.ventacontrol
     private void handleImportExcel() {
         if (!container.getUserSession().hasPermission("producto.importar") &&
                 !container.getUserSession().hasPermission("PRODUCTOS")) {
-            AlertUtil.showError("Acceso Denegado", "No tiene permiso para importar productos.");
+            AlertUtil.showError(container.getBundle().getString("alert.access_denied"),
+                    container.getBundle().getString("error.no_permission"));
             return;
         }
 
@@ -352,7 +374,7 @@ public class ProductController implements Injectable, com.mycompany.ventacontrol
                 return container.getProductImportUseCase().importFromCsv(selectedFile);
             }, (Integer count) -> {
                 ModalService.showTransparentModal("/view/dialog/import_result_dialog.fxml",
-                        "Resultado de Importación",
+                        container.getBundle().getString("product.import.success_title"),
                         container,
                         (c) -> {
                             if (c instanceof com.mycompany.ventacontrolfx.presentation.controller.dialog.ImportResultDialogController)
@@ -362,7 +384,7 @@ public class ProductController implements Injectable, com.mycompany.ventacontrol
                 paginationHelper.refresh();
             }, (Throwable ex) -> {
                 ModalService.showTransparentModal("/view/dialog/import_result_dialog.fxml",
-                        "Error de Importación",
+                        container.getBundle().getString("product.import.error_title"),
                         container,
                         (c) -> {
                             if (c instanceof com.mycompany.ventacontrolfx.presentation.controller.dialog.ImportResultDialogController)
@@ -415,14 +437,17 @@ public class ProductController implements Injectable, com.mycompany.ventacontrol
     @FXML
     private void handleAddProduct() {
         if (!container.getUserSession().hasPermission("producto.crear")) {
-            AlertUtil.showError("Acceso Denegado", "No tiene permiso para crear nuevos productos.");
+            AlertUtil.showError(container.getBundle().getString("alert.access_denied"),
+                    container.getBundle().getString("error.no_permission"));
             return;
         }
         openProductDialog(null);
     }
 
     private void openProductDialog(Product p) {
-        ModalService.showStandardModal("/view/add_product.fxml", p == null ? "Nuevo Producto" : "Editar Producto",
+        ModalService.showStandardModal("/view/add_product.fxml",
+                p == null ? container.getBundle().getString("product.dialog.new")
+                        : container.getBundle().getString("product.dialog.edit"),
                 container, (AddProductController controller) -> {
                     if (p != null)
                         controller.setProduct(p);
@@ -432,17 +457,28 @@ public class ProductController implements Injectable, com.mycompany.ventacontrol
 
     private void handleDeleteProduct(Product p) {
         if (!container.getUserSession().hasPermission("producto.eliminar")) {
-            AlertUtil.showError("Acceso Denegado", "No tiene permiso para eliminar productos.");
+            AlertUtil.showError(container.getBundle().getString("alert.access_denied"),
+                    container.getBundle().getString("error.no_permission"));
             return;
         }
-        if (AlertUtil.showConfirmation("Eliminar", "¿Seguro que desea eliminar " + p.getName() + "?", "")) {
+        if (AlertUtil.showConfirmation(container.getBundle().getString("alert.delete"),
+                container.getBundle().getString("product.confirm.delete") + " " + p.getName() + "?", "")) {
             try {
                 productUseCase.deleteProduct(p.getId());
                 paginationHelper.refresh();
             } catch (SQLException e) {
-                AlertUtil.showError("Error", "No se pudo eliminar el producto.");
+                AlertUtil.showError(container.getBundle().getString("alert.error"),
+                        container.getBundle().getString("product.error.delete"));
             }
         }
+    }
+
+    private String translateDynamic(String text) {
+        if (text == null || text.isBlank()) return text;
+        if (container != null && container.getBundle() != null && container.getBundle().containsKey(text)) {
+            return container.getBundle().getString(text);
+        }
+        return text;
     }
 
     @FXML

@@ -90,7 +90,8 @@ public class CategoryController implements Injectable, com.mycompany.ventacontro
                             categoryUseCase.updateCategory(c);
                         } catch (SQLException ex) {
                             toggle.setSwitchedOn(!toggle.isSwitchedOn());
-                            AlertUtil.showError("Error", "No se pudo actualizar el estado.");
+                            AlertUtil.showError(container.getBundle().getString("alert.error"),
+                                    container.getBundle().getString("category.error.update_status"));
                         }
                     }
                 });
@@ -149,7 +150,8 @@ public class CategoryController implements Injectable, com.mycompany.ventacontro
             categoryList.setAll(categories);
             filterCategories(searchField.getText());
         } catch (SQLException e) {
-            AlertUtil.showError("Error", "No se pudieron cargar las categorías.");
+            AlertUtil.showError(container.getBundle().getString("alert.error"),
+                    container.getBundle().getString("category.error.load"));
         }
     }
 
@@ -159,13 +161,14 @@ public class CategoryController implements Injectable, com.mycompany.ventacontro
                 c -> q.isEmpty() || c.getName().toLowerCase().contains(q) || String.valueOf(c.getId()).contains(q));
         categoriesTable.setItems(filtered);
         if (lblCount != null)
-            lblCount.setText(filtered.size() + " categorías");
+            lblCount.setText(filtered.size() + " " + container.getBundle().getString("categories.entity_plural"));
     }
 
     @FXML
     private void handleAddCategory() {
         if (!container.getUserSession().hasPermission("producto.crear")) {
-            AlertUtil.showError("Acceso Denegado", "No tiene permiso para crear categorías.");
+            AlertUtil.showError(container.getBundle().getString("alert.access_denied"),
+                    container.getBundle().getString("error.no_permission"));
             return;
         }
         openCategoryDialog(null);
@@ -173,7 +176,8 @@ public class CategoryController implements Injectable, com.mycompany.ventacontro
 
     private void handleEditCategory(Category category) {
         if (!container.getUserSession().hasPermission("producto.editar")) {
-            AlertUtil.showError("Acceso Denegado", "No tiene permiso para editar categorías.");
+            AlertUtil.showError(container.getBundle().getString("alert.access_denied"),
+                    container.getBundle().getString("error.no_permission"));
             return;
         }
         openCategoryDialog(category);
@@ -181,7 +185,9 @@ public class CategoryController implements Injectable, com.mycompany.ventacontro
 
     private void openCategoryDialog(Category category) {
         ModalService.showTransparentModal("/view/add_category.fxml",
-                category == null ? "Nueva Categoría" : "Editar Categoría", container,
+                category == null ? container.getBundle().getString("category.dialog.new")
+                        : container.getBundle().getString("category.dialog.edit"),
+                container,
                 (AddCategoryController controller) -> {
                     controller.setCategory(category);
                 });
@@ -190,16 +196,18 @@ public class CategoryController implements Injectable, com.mycompany.ventacontro
 
     private void handleDeleteCategory(Category category) {
         if (!container.getUserSession().hasPermission("producto.eliminar")) {
-            AlertUtil.showError("Acceso Denegado", "No tiene permiso para eliminar categorías.");
+            AlertUtil.showError(container.getBundle().getString("alert.access_denied"),
+                    container.getBundle().getString("error.no_permission"));
             return;
         }
-        if (AlertUtil.showConfirmation("Eliminar",
-                "¿Seguro que desea eliminar la categoría '" + category.getName() + "'?", "")) {
+        if (AlertUtil.showConfirmation(container.getBundle().getString("btn.delete"),
+                container.getBundle().getString("category.confirm.delete") + " '" + category.getName() + "'?", "")) {
             try {
                 categoryUseCase.deleteCategory(category.getId());
                 loadCategories();
             } catch (SQLException e) {
-                AlertUtil.showError("Error", "No se pudo eliminar la categoría.");
+                AlertUtil.showError(container.getBundle().getString("alert.error"),
+                        container.getBundle().getString("category.error.delete"));
             }
         }
     }

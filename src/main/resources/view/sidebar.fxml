@@ -26,102 +26,111 @@
         <VBox spacing="0" style="-fx-background-color: transparent;" alignment="TOP_CENTER">
             
             <!-- SECCIÓN: VENTAS -->
-            <Button fx:id="sectionVentas" styleClass="sidebar-section-header" onAction="#toggleVentas" text="VENTAS" maxWidth="Infinity" />
+            <Button fx:id="sectionVentas" styleClass="sidebar-section-header" onAction="#toggleVentas" text="%sidebar.section.sales" maxWidth="Infinity" />
             <VBox fx:id="contentVentas" styleClass="sidebar-section-content" spacing="0" visible="false" managed="false">
-                <Button fx:id="btnSell" styleClass="sidebar-button" onAction="#showSellView" contentDisplay="TOP" maxWidth="Infinity" text="Vender">
+                <Button fx:id="btnSell" styleClass="sidebar-button" onAction="#showSellView" contentDisplay="TOP" maxWidth="Infinity" text="%sidebar.item.sell">
                     <graphic><FontAwesomeIconView glyphName="SHOPPING_CART" size="22" styleClass="sidebar-icon"/></graphic>
                 </Button>
-                <Button fx:id="btnHistory" styleClass="sidebar-button" onAction="#showHistoryView" contentDisplay="TOP" maxWidth="Infinity" text="Historial">
+                <Button fx:id="btnHistory" styleClass="sidebar-button" onAction="#showHistoryView" contentDisplay="TOP" maxWidth="Infinity" text="%sidebar.item.history">
                     <graphic><FontAwesomeIconView glyphName="HISTORY" size="22" styleClass="sidebar-icon"/></graphic>
                 </Button>
-                <Button fx:id="btnReturns" styleClass="sidebar-button" onAction="#handleShowReturns" contentDisplay="TOP" maxWidth="Infinity" text="Devoluciones">
+                <Button fx:id="btnReturns" styleClass="sidebar-button" onAction="#handleShowReturns" contentDisplay="TOP" maxWidth="Infinity" text="%sidebar.item.returns">
                     <graphic><FontAwesomeIconView glyphName="REPLY" size="22" styleClass="sidebar-icon"/></graphic>
                 </Button>
-                <Button fx:id="btnClosures" styleClass="sidebar-button" onAction="#handleShowClosures" contentDisplay="TOP" maxWidth="Infinity" text="Arqueos / Cierres">
+                <Button fx:id="btnClosures" styleClass="sidebar-button" onAction="#handleShowClosures" contentDisplay="TOP" maxWidth="Infinity" text="%sidebar.item.closures">
                     <graphic><FontAwesomeIconView glyphName="CALCULATOR" size="22" styleClass="sidebar-icon"/></graphic>
                 </Button>
             </VBox>
 
             <!-- SECCIÓN: CATÁLOGO -->
-            <Button fx:id="sectionCatalogo" styleClass="sidebar-section-header" onAction="#toggleCatalogo" text="CATÁLOGO" maxWidth="Infinity" />
+            <Button fx:id="sectionCatalogo" styleClass="sidebar-section-header" onAction="#toggleCatalogo" text="%sidebar.section.catalog" maxWidth="Infinity" />
             <VBox fx:id="contentCatalogo" styleClass="sidebar-section-content" spacing="0" visible="false" managed="false">
-                <Button fx:id="btnProducts" styleClass="sidebar-button" onAction="#showProductsView" contentDisplay="TOP" maxWidth="Infinity" text="Productos">
+                <Button fx:id="btnProducts" styleClass="sidebar-button" onAction="#showProductsView" contentDisplay="TOP" maxWidth="Infinity" text="%sidebar.item.products">
                     <graphic><FontAwesomeIconView glyphName="TAGS" size="22" styleClass="sidebar-icon"/></graphic>
                 </Button>
-                <Button fx:id="btnCategories" styleClass="sidebar-button" onAction="#handleShowCategories" contentDisplay="TOP" maxWidth="Infinity" text="Categorías">
+                <Button fx:id="btnCategories" styleClass="sidebar-button" onAction="#handleShowCategories" contentDisplay="TOP" maxWidth="Infinity" text="%sidebar.item.categories">
                     <graphic><FontAwesomeIconView glyphName="FOLDER_OPEN" size="22" styleClass="sidebar-icon"/></graphic>
                 </Button>
-                <Button fx:id="btnPriceLists" styleClass="sidebar-button" onAction="#handleShowPriceLists" contentDisplay="TOP" maxWidth="Infinity" text="Tarifas">
+                <Button fx:id="btnPriceLists" styleClass="sidebar-button" onAction="#handleShowPriceLists" contentDisplay="TOP" maxWidth="Infinity" text="%sidebar.item.pricelists">
                     <graphic><FontAwesomeIconView glyphName="MONEY" size="22" styleClass="sidebar-icon"/></graphic>
                 </Button>
-                <Button fx:id="btnPromotions" styleClass="sidebar-button" onAction="#handleShowPromotions" contentDisplay="TOP" maxWidth="Infinity" text="Promociones">
+                <Button fx:id="btnPromotions" styleClass="sidebar-button" onAction="#handleShowPromotions" contentDisplay="TOP" maxWidth="Infinity" text="%sidebar.item.promotions">
                     <graphic><FontAwesomeIconView glyphName="PERCENT" size="22" styleClass="sidebar-icon"/></graphic>
                 </Button>
             </VBox>
 
             <!-- SECCIÓN: PERSONAL -->
-            <Button fx:id="sectionPersonal" styleClass="sidebar-section-header" onAction="#togglePersonal" text="PERSONAL" maxWidth="Infinity" />
+            <Button fx:id="sectionPersonal" styleClass="sidebar-section-header" onAction="#togglePersonal" text="%sidebar.section.staff" maxWidth="Infinity" />
             <VBox fx:id="contentPersonal" styleClass="sidebar-section-content" spacing="0" visible="false" managed="false">
-                <Button fx:id="btnWorkSessions" styleClass="sidebar-button" onAction="#handleShowWorkSessions" contentDisplay="TOP" maxWidth="Infinity" text="Turnos / Descansos">
+                <Button fx:id="btnWorkSessions" styleClass="sidebar-button" onAction="#handleShowWorkSessions" contentDisplay="TOP" maxWidth="Infinity" text="%sidebar.item.work_sessions">
                     <graphic><FontAwesomeIconView glyphName="CLOCK_ALT" size="22" styleClass="sidebar-icon"/></graphic>
                 </Button>
-                <Button fx:id="btnOperativeControl" styleClass="sidebar-button" onAction="#handleShowOperativeDashboard" contentDisplay="TOP" maxWidth="Infinity" text="Monitor">
+                <Button fx:id="btnOperativeControl" styleClass="sidebar-button" onAction="#handleShowOperativeDashboard" contentDisplay="TOP" maxWidth="Infinity" text="%sidebar.item.monitor">
                     <graphic><FontAwesomeIconView glyphName="DASHBOARD" size="22" styleClass="sidebar-icon"/></graphic>
                 </Button>
-                <Button fx:id="btnStaffCalendar" styleClass="sidebar-button" onAction="#handleShowStaffCalendar" contentDisplay="TOP" maxWidth="Infinity" text="Planificador">
+                <Button fx:id="btnStaffCalendar" styleClass="sidebar-button" onAction="#handleShowStaffCalendar" contentDisplay="TOP" maxWidth="Infinity" text="%sidebar.item.planner">
                     <graphic><FontAwesomeIconView glyphName="CALENDAR" size="22" styleClass="sidebar-icon"/></graphic>
                 </Button>
-                <Button fx:id="btnPunctualityAudit" styleClass="sidebar-button" onAction="#handleShowPunctualityAudit" contentDisplay="TOP" maxWidth="Infinity" text="Auditoría">
+                <Button fx:id="btnPunctualityAudit" styleClass="sidebar-button" onAction="#handleShowPunctualityAudit" contentDisplay="TOP" maxWidth="Infinity" text="%sidebar.item.audit">
                     <graphic><FontAwesomeIconView glyphName="CHECK_SQUARE" size="22" styleClass="sidebar-icon"/></graphic>
                 </Button>
             </VBox>
 
             <!-- SECCIÓN: CLIENTES -->
-            <Button fx:id="sectionClientes" styleClass="sidebar-section-header" onAction="#toggleClientes" text="CLIENTES" maxWidth="Infinity" />
+            <Button fx:id="sectionClientes" styleClass="sidebar-section-header" onAction="#toggleClientes" text="%sidebar.section.clients" maxWidth="Infinity" />
             <VBox fx:id="contentClientes" styleClass="sidebar-section-content" spacing="0" visible="false" managed="false">
-                <Button fx:id="btnClients" styleClass="sidebar-button" onAction="#handleShowClients" contentDisplay="TOP" maxWidth="Infinity" text="Directorio">
+                <Button fx:id="btnClients" styleClass="sidebar-button" onAction="#handleShowClients" contentDisplay="TOP" maxWidth="Infinity" text="%sidebar.item.directory">
                     <graphic><FontAwesomeIconView glyphName="ADDRESS_BOOK" size="22" styleClass="sidebar-icon"/></graphic>
                 </Button>
-                <Button fx:id="btnClientReport" styleClass="sidebar-button" onAction="#handleShowClientReport" contentDisplay="TOP" maxWidth="Infinity" text="Ventas Clientes">
+                <Button fx:id="btnClientReport" styleClass="sidebar-button" onAction="#handleShowClientReport" contentDisplay="TOP" maxWidth="Infinity" text="%sidebar.item.client_sales">
                     <graphic><FontAwesomeIconView glyphName="USER" size="22" styleClass="sidebar-icon"/></graphic>
                 </Button>
             </VBox>
 
             <!-- SECCIÓN: GESTIÓN -->
-            <Button fx:id="sectionGestion" styleClass="sidebar-section-header" onAction="#toggleGestion" text="GESTIÓN" maxWidth="Infinity" />
+            <Button fx:id="sectionGestion" styleClass="sidebar-section-header" onAction="#toggleGestion" text="%sidebar.section.management" maxWidth="Infinity" />
             <VBox fx:id="contentGestion" styleClass="sidebar-section-content" spacing="0" visible="false" managed="false">
-                <Button fx:id="btnReports" styleClass="sidebar-button" onAction="#handleShowReports" contentDisplay="TOP" maxWidth="Infinity" text="Informes">
+                <Button fx:id="btnReports" styleClass="sidebar-button" onAction="#handleShowReports" contentDisplay="TOP" maxWidth="Infinity" text="%sidebar.item.reports">
                     <graphic><FontAwesomeIconView glyphName="BAR_CHART" size="22" styleClass="sidebar-icon"/></graphic>
                 </Button>
-                <Button fx:id="btnBilling" styleClass="sidebar-button" onAction="#handleShowBilling" contentDisplay="TOP" maxWidth="Infinity" text="Facturación">
+                <Button fx:id="btnBilling" styleClass="sidebar-button" onAction="#handleShowBilling" contentDisplay="TOP" maxWidth="Infinity" text="%sidebar.item.billing">
                     <graphic><FontAwesomeIconView glyphName="FILE_TEXT_ALT" size="22" styleClass="sidebar-icon"/></graphic>
                 </Button>
-                <Button fx:id="btnVat" styleClass="sidebar-button" onAction="#handleShowVat" contentDisplay="TOP" maxWidth="Infinity" text="IVA">
+                <Button fx:id="btnVat" styleClass="sidebar-button" onAction="#handleShowVat" contentDisplay="TOP" maxWidth="Infinity" text="%sidebar.item.vat">
                     <graphic><FontAwesomeIconView glyphName="PERCENT" size="22" styleClass="sidebar-icon"/></graphic>
                 </Button>
-                <Button fx:id="btnUsers" styleClass="sidebar-button" onAction="#handleShowUsers" contentDisplay="TOP" maxWidth="Infinity" text="Usuarios">
+                <Button fx:id="btnUsers" styleClass="sidebar-button" onAction="#handleShowUsers" contentDisplay="TOP" maxWidth="Infinity" text="%sidebar.item.users">
                     <graphic><FontAwesomeIconView glyphName="USER_PLUS" size="22" styleClass="sidebar-icon"/></graphic>
                 </Button>
-                <Button fx:id="btnRoles" styleClass="sidebar-button" onAction="#handleShowRoles" contentDisplay="TOP" maxWidth="Infinity" text="Roles / Permisos">
+                <Button fx:id="btnRoles" styleClass="sidebar-button" onAction="#handleShowRoles" contentDisplay="TOP" maxWidth="Infinity" text="%sidebar.item.roles">
                     <graphic><FontAwesomeIconView glyphName="SHIELD" size="22" styleClass="sidebar-icon"/></graphic>
                 </Button>
             </VBox>
 
             <!-- SECCIÓN: SISTEMA -->
-            <Button fx:id="sectionSistema" styleClass="sidebar-section-header" onAction="#toggleSistema" text="SISTEMA" maxWidth="Infinity" />
+            <Button fx:id="sectionSistema" styleClass="sidebar-section-header" onAction="#toggleSistema" text="%sidebar.section.system" maxWidth="Infinity" />
             <VBox fx:id="contentSistema" styleClass="sidebar-section-content" spacing="0" visible="false" managed="false">
-                <Button fx:id="btnConfig" styleClass="sidebar-button" onAction="#handleShowConfig" contentDisplay="TOP" maxWidth="Infinity" text="Configuración">
+                <Button fx:id="btnConfig" styleClass="sidebar-button" onAction="#handleShowConfig" contentDisplay="TOP" maxWidth="Infinity" text="%sidebar.item.config">
                     <graphic><FontAwesomeIconView glyphName="COG" size="22" styleClass="sidebar-icon"/></graphic>
                 </Button>
-                <Button fx:id="btnThemeSettings" styleClass="sidebar-button" onAction="#handleShowCustomization" contentDisplay="TOP" maxWidth="Infinity" text="Estética">
+                <Button fx:id="btnThemeSettings" styleClass="sidebar-button" onAction="#handleShowCustomization" contentDisplay="TOP" maxWidth="Infinity" text="%sidebar.item.aesthetics">
                     <graphic><FontAwesomeIconView glyphName="PAINT_BRUSH" size="22" styleClass="sidebar-icon"/></graphic>
                 </Button>
             </VBox>
         </VBox>
     </ScrollPane>
 
+    <!-- IDIOMA -->
+    <HBox spacing="10" alignment="CENTER" style="-fx-padding: 10 0;">
+        <children>
+            <Button text="ES" onAction="#setLanguageEs" styleClass="btn-link" style="-fx-font-weight: bold; -fx-text-fill: #3b82f6;"/>
+            <Label text="|" styleClass="label-muted"/>
+            <Button text="EN" onAction="#setLanguageEn" styleClass="btn-link" style="-fx-font-weight: bold; -fx-text-fill: #3b82f6;"/>
+        </children>
+    </HBox>
+
     <!-- FOOTER FIJO -->
-    <Button fx:id="btnLock" styleClass="sidebar-button" onAction="#handleLock" contentDisplay="TOP" maxWidth="Infinity" text="Bloquear">
+    <Button fx:id="btnLock" styleClass="sidebar-button" onAction="#handleLock" contentDisplay="TOP" maxWidth="Infinity" text="%sidebar.item.lock">
         <graphic><FontAwesomeIconView glyphName="LOCK" size="22" styleClass="sidebar-icon"/></graphic>
     </Button>
 </VBox>

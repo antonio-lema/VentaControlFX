@@ -1,4 +1,4 @@
-package com.mycompany.ventacontrolfx.infrastructure.persistence;
+﻿package com.mycompany.ventacontrolfx.infrastructure.persistence;
 
 import com.mycompany.ventacontrolfx.domain.model.Product;
 import com.mycompany.ventacontrolfx.domain.model.VisibilityFilter;
@@ -19,7 +19,7 @@ public class JdbcProductRepository implements IProductRepository {
         List<Product> products = new ArrayList<>();
         String priceSubquery;
         if (priceListId > 0) {
-            priceSubquery = "COALESCE((SELECT pp.price FROM product_prices pp WHERE pp.product_id = p.product_id AND pp.price_list_id = ? AND pp.start_date <= CURRENT_TIMESTAMP AND (pp.end_date IS NULL OR pp.end_date > CURRENT_TIMESTAMP) ORDER BY pp.start_date DESC LIMIT 1), 0.0)";
+            priceSubquery = "COALESCE(" + "(SELECT pp.price FROM product_prices pp WHERE pp.product_id = p.product_id AND pp.price_list_id = ? AND pp.start_date <= CURRENT_TIMESTAMP AND (pp.end_date IS NULL OR pp.end_date > CURRENT_TIMESTAMP) ORDER BY pp.start_date DESC LIMIT 1), " + "(SELECT pp.price FROM product_prices pp JOIN price_lists pl ON pp.price_list_id = pl.price_list_id WHERE pp.product_id = p.product_id AND pl.is_default = 1 AND pp.start_date <= CURRENT_TIMESTAMP AND (pp.end_date IS NULL OR pp.end_date > CURRENT_TIMESTAMP) ORDER BY pp.start_date DESC LIMIT 1), " + "0.0)";
         } else {
             priceSubquery = "COALESCE((SELECT pp.price FROM product_prices pp JOIN price_lists pl ON pp.price_list_id = pl.price_list_id WHERE pp.product_id = p.product_id AND pl.is_default = 1 AND pp.start_date <= CURRENT_TIMESTAMP AND (pp.end_date IS NULL OR pp.end_date > CURRENT_TIMESTAMP) ORDER BY pp.start_date DESC LIMIT 1), 0.0)";
         }
@@ -161,7 +161,7 @@ public class JdbcProductRepository implements IProductRepository {
         Connection conn = null;
         try {
             conn = DBConnection.getConnection();
-            conn.setAutoCommit(false); // Transacción para doble escritura
+            conn.setAutoCommit(false); // TransacciÃ³n para doble escritura
 
             String sql = "INSERT INTO products (category_id, name, is_favorite, image_path, visible, iva, tax_rate, tax_group_id, sku, cost_price, is_active, stock_quantity, min_stock, manage_stock) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
             try (PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -211,7 +211,7 @@ public class JdbcProductRepository implements IProductRepository {
                     } catch (Exception ignored) {
                     }
 
-                    String priceSql = "INSERT INTO product_prices (product_id, price_list_id, price, start_date, reason) VALUES (?, ?, ?, NOW(), 'Creación de producto')";
+                    String priceSql = "INSERT INTO product_prices (product_id, price_list_id, price, start_date, reason) VALUES (?, ?, ?, NOW(), 'CreaciÃ³n de producto')";
                     try (PreparedStatement pstmtPrice = conn.prepareStatement(priceSql)) {
                         pstmtPrice.setInt(1, product.getId());
                         pstmtPrice.setInt(2, defaultPriceListId);
@@ -307,7 +307,7 @@ public class JdbcProductRepository implements IProductRepository {
             }
 
             // 3. Insertar precios en lote
-            String priceSql = "INSERT INTO product_prices (product_id, price_list_id, price, start_date, reason) VALUES (?, ?, ?, NOW(), 'Importación masiva')";
+            String priceSql = "INSERT INTO product_prices (product_id, price_list_id, price, start_date, reason) VALUES (?, ?, ?, NOW(), 'ImportaciÃ³n masiva')";
             try (PreparedStatement pstmtPrice = conn.prepareStatement(priceSql)) {
                 for (Product product : products) {
                     if (product.getId() > 0) {
@@ -338,7 +338,7 @@ public class JdbcProductRepository implements IProductRepository {
         Connection conn = null;
         try {
             conn = DBConnection.getConnection();
-            conn.setAutoCommit(false); // Transacción para doble escritura
+            conn.setAutoCommit(false); // TransacciÃ³n para doble escritura
 
             String sql = "UPDATE products SET category_id = ?, name = ?, is_favorite = ?, image_path = ?, visible = ?, iva = ?, tax_rate = ?, tax_group_id = ?, sku = ?, cost_price = ?, is_active = ?, stock_quantity = ?, min_stock = ?, manage_stock = ? WHERE product_id = ?";
             try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -371,7 +371,7 @@ public class JdbcProductRepository implements IProductRepository {
                 pstmt.executeUpdate();
             }
 
-            // --- LÓGICA DE DOBLE ESCRITURA PARA product_prices ---
+            // --- LÃ“GICA DE DOBLE ESCRITURA PARA product_prices ---
             // 1. Obtener ID de la lista por defecto
             int defaultPriceListId = 1;
             try (Statement stmtList = conn.createStatement();
@@ -385,7 +385,7 @@ public class JdbcProductRepository implements IProductRepository {
 
             // 2. Comprobar si el precio actual es distinto (o simplemente cerrar el actual
             // e insertar nuevo)
-            // Para evitar basura, vamos a comprobar qué precio activo hay
+            // Para evitar basura, vamos a comprobar quÃ© precio activo hay
             double activePrice = -1;
             boolean hasActive = false;
             String selectSql = "SELECT price FROM product_prices WHERE product_id = ? AND price_list_id = ? AND end_date IS NULL LIMIT 1";
@@ -400,7 +400,7 @@ public class JdbcProductRepository implements IProductRepository {
                 }
             }
 
-            // Si el precio cambió, generamos el histórico
+            // Si el precio cambiÃ³, generamos el histÃ³rico
             if (!hasActive || activePrice != product.getPrice()) {
                 if (hasActive) {
                     String updateOld = "UPDATE product_prices SET end_date = NOW(), reason = 'Cambio individual de tarifa' WHERE product_id = ? AND price_list_id = ? AND end_date IS NULL";
@@ -410,7 +410,7 @@ public class JdbcProductRepository implements IProductRepository {
                         updStmt.executeUpdate();
                     }
                 }
-                String insertNew = "INSERT INTO product_prices (product_id, price_list_id, price, start_date, end_date, reason) VALUES (?, ?, ?, NOW(), NULL, 'Actualización de producto')";
+                String insertNew = "INSERT INTO product_prices (product_id, price_list_id, price, start_date, end_date, reason) VALUES (?, ?, ?, NOW(), NULL, 'ActualizaciÃ³n de producto')";
                 try (PreparedStatement insStmt = conn.prepareStatement(insertNew)) {
                     insStmt.setInt(1, product.getId());
                     insStmt.setInt(2, defaultPriceListId);
@@ -462,11 +462,15 @@ public class JdbcProductRepository implements IProductRepository {
     @Override
     public List<Product> getByCategoryPaginated(int categoryId, int limit, int offset, int priceListId)
             throws SQLException {
-        List<Product> products = new ArrayList<>();
-        String priceSubquery = "(SELECT price FROM product_prices WHERE product_id = p.product_id AND price_list_id = "
-                + (priceListId == -1 ? "(SELECT price_list_id FROM price_lists ORDER BY is_default DESC LIMIT 1)"
-                        : priceListId)
-                + " ORDER BY start_date DESC LIMIT 1)";
+        String priceSubquery;
+        if (priceListId > 0) {
+            priceSubquery = "COALESCE(" +
+                    "(SELECT pp.price FROM product_prices pp WHERE pp.product_id = p.product_id AND pp.price_list_id = ? AND pp.start_date <= CURRENT_TIMESTAMP AND (pp.end_date IS NULL OR pp.end_date > CURRENT_TIMESTAMP) ORDER BY pp.start_date DESC LIMIT 1), " +
+                    "(SELECT pp.price FROM product_prices pp JOIN price_lists pl ON pp.price_list_id = pl.price_list_id WHERE pp.product_id = p.product_id AND pl.is_default = 1 AND pp.start_date <= CURRENT_TIMESTAMP AND (pp.end_date IS NULL OR pp.end_date > CURRENT_TIMESTAMP) ORDER BY pp.start_date DESC LIMIT 1), " +
+                    "0.0)";
+        } else {
+            priceSubquery = "COALESCE((SELECT pp.price FROM product_prices pp JOIN price_lists pl ON pp.price_list_id = pl.price_list_id WHERE pp.product_id = p.product_id AND pl.is_default = 1 AND pp.start_date <= CURRENT_TIMESTAMP AND (pp.end_date IS NULL OR pp.end_date > CURRENT_TIMESTAMP) ORDER BY pp.start_date DESC LIMIT 1), 0.0)";
+        }
 
         String sql = "SELECT p.*, c.name AS category_name, c.default_iva AS category_iva, " +
                 priceSubquery + " AS current_price " +
@@ -476,9 +480,13 @@ public class JdbcProductRepository implements IProductRepository {
 
         try (Connection conn = DBConnection.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setInt(1, categoryId);
-            pstmt.setInt(2, limit);
-            pstmt.setInt(3, offset);
+            int paramIdx = 1;
+            if (priceListId > 0) {
+                pstmt.setInt(paramIdx++, priceListId);
+            }
+            pstmt.setInt(paramIdx++, categoryId);
+            pstmt.setInt(paramIdx++, limit);
+            pstmt.setInt(paramIdx, offset);
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
                     products.add(mapResultSetToProduct(rs));
@@ -734,7 +742,7 @@ public class JdbcProductRepository implements IProductRepository {
         List<Product> products = new ArrayList<>();
         String priceSubquery;
         if (priceListId > 0) {
-            priceSubquery = "COALESCE((SELECT pp.price FROM product_prices pp WHERE pp.product_id = p.product_id AND pp.price_list_id = ? AND pp.start_date <= CURRENT_TIMESTAMP AND (pp.end_date IS NULL OR pp.end_date > CURRENT_TIMESTAMP) ORDER BY pp.start_date DESC LIMIT 1), 0.0)";
+            priceSubquery = "COALESCE(" + "(SELECT pp.price FROM product_prices pp WHERE pp.product_id = p.product_id AND pp.price_list_id = ? AND pp.start_date <= CURRENT_TIMESTAMP AND (pp.end_date IS NULL OR pp.end_date > CURRENT_TIMESTAMP) ORDER BY pp.start_date DESC LIMIT 1), " + "(SELECT pp.price FROM product_prices pp JOIN price_lists pl ON pp.price_list_id = pl.price_list_id WHERE pp.product_id = p.product_id AND pl.is_default = 1 AND pp.start_date <= CURRENT_TIMESTAMP AND (pp.end_date IS NULL OR pp.end_date > CURRENT_TIMESTAMP) ORDER BY pp.start_date DESC LIMIT 1), " + "0.0)";
         } else {
             priceSubquery = "COALESCE((SELECT pp.price FROM product_prices pp JOIN price_lists pl ON pp.price_list_id = pl.price_list_id WHERE pp.product_id = p.product_id AND pl.is_default = 1 AND pp.start_date <= CURRENT_TIMESTAMP AND (pp.end_date IS NULL OR pp.end_date > CURRENT_TIMESTAMP) ORDER BY pp.start_date DESC LIMIT 1), 0.0)";
         }
@@ -807,7 +815,7 @@ public class JdbcProductRepository implements IProductRepository {
             whereClause.append(" (p.name LIKE ? OR c.name LIKE ? OR p.sku LIKE ?) ");
             safeQuery = "%" + query.trim() + "%";
         } else if (visibility == VisibilityFilter.ALL) {
-            return count(); // Rápido si no hay filtros y queremos todos
+            return count(); // RÃ¡pido si no hay filtros y queremos todos
         }
 
         String sql = "SELECT COUNT(*) FROM products p LEFT JOIN categories c ON p.category_id = c.category_id "
@@ -867,3 +875,4 @@ public class JdbcProductRepository implements IProductRepository {
         return null;
     }
 }
+

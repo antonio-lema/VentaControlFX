@@ -29,27 +29,27 @@
 
         <VBox alignment="CENTER" spacing="5">
             <Label text="VentaControl Pro" styleClass="login-title"/>
-            <Label text="Gestión Empresarial Inteligente" styleClass="login-subtitle"/>
+            <Label text="%login.subtitle" styleClass="login-subtitle"/>
         </VBox>
 
         <VBox spacing="18" maxWidth="320" alignment="CENTER_LEFT" style="-fx-padding: 10 0 0 0;">
             <VBox spacing="6">
-                <Label text="Usuario" styleClass="login-input-label"/>
-                <TextField fx:id="txtUsername" promptText="Introduce tu usuario" styleClass="login-field"/>
+                <Label text="%login.username" styleClass="login-input-label"/>
+                <TextField fx:id="txtUsername" promptText="%login.username.prompt" styleClass="login-field"/>
             </VBox>
             
             <VBox spacing="6">
-                <Label text="Contraseña" styleClass="login-input-label"/>
-                <PasswordField fx:id="txtPassword" promptText="Introduce tu contraseña" styleClass="login-field" onAction="#handleLogin"/>
+                <Label text="%login.password" styleClass="login-input-label"/>
+                <PasswordField fx:id="txtPassword" promptText="%login.password.prompt" styleClass="login-field" onAction="#handleLogin"/>
                 <Label fx:id="lblMessage" text="" styleClass="modern-error-label" visible="false" managed="false" wrapText="true"/>
             </VBox>
         </VBox>
 
         <VBox spacing="15" alignment="CENTER">
-            <Button fx:id="btnLogin" text="ACCEDER AL SISTEMA" onAction="#handleLogin" 
+            <Button fx:id="btnLogin" text="%login.btn_login" onAction="#handleLogin" 
                     styleClass="btn-login-main" maxWidth="Infinity" prefHeight="50" defaultButton="true"/>
             
-            <Button text="¿Olvidaste tu contraseña?" onAction="#handleForgotPassword" 
+            <Button text="%login.forgot_password" onAction="#handleForgotPassword" 
                     styleClass="btn-forgot-password" maxWidth="250"/>
         </VBox>
 

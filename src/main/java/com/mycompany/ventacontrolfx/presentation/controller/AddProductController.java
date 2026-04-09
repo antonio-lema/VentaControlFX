@@ -57,6 +57,7 @@ public class AddProductController implements Injectable {
     @FXML
     private Label lblTitle;
 
+    private ServiceContainer container;
     private ProductUseCase productUseCase;
     private CategoryUseCase categoryUseCase;
     private PriceListUseCase priceListUseCase;
@@ -71,6 +72,7 @@ public class AddProductController implements Injectable {
 
     @Override
     public void inject(ServiceContainer container) {
+        this.container = container;
         this.productUseCase = container.getProductUseCase();
         this.categoryUseCase = container.getCategoryUseCase();
         this.priceListUseCase = container.getPriceListUseCase();
@@ -117,7 +119,8 @@ public class AddProductController implements Injectable {
                 HBox.setHgrow(txtDynamicPrice, javafx.scene.layout.Priority.ALWAYS);
 
                 // Label para identificar la tarifa claramente
-                Label lblListName = new Label(pl.getName() + (pl.isDefault() ? " (Base):" : ":"));
+                String baseSuffix = container.getBundle().getString("product.price_list.base_suffix");
+                Label lblListName = new Label(pl.getName() + (pl.isDefault() ? " (" + baseSuffix + "):" : ":"));
                 lblListName.setMinWidth(140);
                 lblListName.setStyle("-fx-font-weight: bold; -fx-text-fill: #64748b; -fx-font-size: 13px;");
                 HBox.setMargin(lblListName, new Insets(0, 10, 0, 0));
@@ -153,7 +156,8 @@ public class AddProductController implements Injectable {
             }
 
         } catch (SQLException e) {
-            AlertUtil.showError("Error", "No se pudieron cargar las tarifas.");
+            AlertUtil.showError(container.getBundle().getString("alert.error"),
+                    container.getBundle().getString("product.error.load_price_lists"));
         }
     }
 
@@ -179,7 +183,7 @@ public class AddProductController implements Injectable {
                 Label lbl = diffLabels.get(priceListId);
 
                 if (Math.abs(diffPercent) < 0.01) {
-                    lbl.setText("Igual =");
+                    lbl.setText(container.getBundle().getString("product.price_diff.equal") + " =");
                     lbl.setStyle("-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #94a3b8;"); // slate-400
                 } else if (diffPercent > 0) {
                     lbl.setText(String.format("+%.1f%%", diffPercent));
@@ -226,7 +230,7 @@ public class AddProductController implements Injectable {
         cmbTaxGroup.setConverter(new StringConverter<>() {
             @Override
             public String toString(TaxGroup t) {
-                return t != null ? t.getName() : "Sin Grupo (Usar IVA Legacy)";
+                return t != null ? t.getName() : container.getBundle().getString("product.form.tax_group.legacy");
             }
 
             @Override
@@ -270,13 +274,14 @@ public class AddProductController implements Injectable {
             List<Category> categories = categoryUseCase.getAll();
             cmbCategory.setItems(FXCollections.observableArrayList(categories));
         } catch (SQLException e) {
-            AlertUtil.showError("Error", "No se pudieron cargar categorías.");
+            AlertUtil.showError(container.getBundle().getString("alert.error"),
+                    container.getBundle().getString("product.error.load_categories"));
         }
     }
 
     public void setProduct(Product product) {
         this.productToEdit = product;
-        lblTitle.setText("Editar Producto");
+        lblTitle.setText(container.getBundle().getString("product.form.edit_title"));
         txtName.setText(product.getName());
         chkFavorite.setSelected(product.isFavorite());
         if (product.getIva() != null) {
@@ -355,7 +360,8 @@ public class AddProductController implements Injectable {
     @FXML
     private void handleSave() {
         if (txtName.getText().isEmpty() || cmbCategory.getValue() == null) {
-            AlertUtil.showWarning("Validación", "Complete el nombre y categoría obligatoriamente.");
+            AlertUtil.showWarning(container.getBundle().getString("alert.validation"),
+                    container.getBundle().getString("product.error.name_category_required"));
             return;
         }
 
@@ -364,11 +370,13 @@ public class AddProductController implements Injectable {
             try {
                 mainPrice = Double.parseDouble(priceFields.get(defaultPriceList.getId()).getText().replace(",", "."));
             } catch (Exception ex) {
-                AlertUtil.showWarning("Validación", "El precio por defecto es inválido o está vacío.");
+                AlertUtil.showWarning(container.getBundle().getString("alert.validation"),
+                        container.getBundle().getString("product.error.invalid_base_price"));
                 return;
             }
         } else {
-            AlertUtil.showWarning("Validación", "Es obligatorio fijar un precio base.");
+            AlertUtil.showWarning(container.getBundle().getString("alert.validation"),
+                    container.getBundle().getString("product.error.base_price_required"));
             return;
         }
 
@@ -401,7 +409,8 @@ public class AddProductController implements Injectable {
                 try {
                     productToEdit.setIva(Double.parseDouble(ivaStr.replace(",", ".")));
                 } catch (NumberFormatException e) {
-                    AlertUtil.showWarning("Validación", "IVA inválido. Se usará el defecto de categoría.");
+                    AlertUtil.showWarning(container.getBundle().getString("alert.validation"),
+                            container.getBundle().getString("category.error.invalid_iva"));
                     productToEdit.setIva(null);
                 }
             }
@@ -442,9 +451,11 @@ public class AddProductController implements Injectable {
 
             handleCancel();
         } catch (NumberFormatException e) {
-            AlertUtil.showWarning("Error", "Precio inválido.");
+            AlertUtil.showWarning(container.getBundle().getString("alert.error"),
+                    container.getBundle().getString("product.error.invalid_price"));
         } catch (SQLException e) {
-            AlertUtil.showError("Error", "Error al guardar producto.");
+            AlertUtil.showError(container.getBundle().getString("alert.error"),
+                    container.getBundle().getString("product.error.save"));
         }
     }
 

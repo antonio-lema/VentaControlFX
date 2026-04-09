@@ -68,9 +68,9 @@ public class FiscalDocumentsController implements Injectable {
         setupFilters();
 
         com.mycompany.ventacontrolfx.util.DateFilterUtils.addQuickFilters(quickFilterContainer, dpFrom, dpTo,
-                this::applyFilters);
+                container.getBundle(), this::applyFilters);
 
-        paginationHelper = new PaginationHelper<>(fiscalTable, cmbRowLimit, lblCount, "documentos");
+        paginationHelper = new PaginationHelper<>(fiscalTable, cmbRowLimit, lblCount, container.getBundle().getString("fiscal.doc.label.documentos"));
         loadData();
     }
 
@@ -101,7 +101,7 @@ public class FiscalDocumentsController implements Injectable {
 
         colClient.setCellValueFactory(data -> {
             FiscalDocument doc = data.getValue();
-            String name = doc.getReceiverName() != null ? doc.getReceiverName() : "VENTA GLOBAL / SIMPLIFICADA";
+            String name = doc.getReceiverName() != null ? doc.getReceiverName() : container.getBundle().getString("fiscal.doc.client.simplified");
             return new SimpleStringProperty(name);
         });
 
@@ -117,7 +117,7 @@ public class FiscalDocumentsController implements Injectable {
                 if (empty || item == null) {
                     setGraphic(null);
                 } else {
-                    Label badge = new Label(item);
+                    Label badge = new Label(container.getBundle().getString("fiscal.doc.status." + item.toLowerCase()));
                     badge.getStyleClass().add("badge");
                     if ("EMITIDO".equals(item))
                         badge.getStyleClass().add("badge-success");
@@ -171,18 +171,22 @@ public class FiscalDocumentsController implements Injectable {
             if (Desktop.isDesktopSupported()) {
                 Desktop.getDesktop().open(file);
             } else {
-                AlertUtil.showError("Error", "Tu sistema no permite abrir archivos automáticamente.");
+                AlertUtil.showError(container.getBundle().getString("alert.error"), container.getBundle().getString("fiscal.doc.error.os_open"));
             }
         } catch (Exception e) {
-            AlertUtil.showError("Error al abrir PDF", e.getMessage());
+            AlertUtil.showError(container.getBundle().getString("fiscal.doc.error.open_pdf"), e.getMessage());
         }
     }
 
     private void setupFilters() {
-        cbType.setItems(FXCollections.observableArrayList("Todos los tipos", "TICKET", "FACTURA", "RECTIFICATIVA"));
+        cbType.setItems(FXCollections.observableArrayList(
+                container.getBundle().getString("fiscal.doc.type.all"),
+                "TICKET", "FACTURA", "RECTIFICATIVA"));
         cbType.getSelectionModel().selectFirst();
 
-        cbStatus.setItems(FXCollections.observableArrayList("Todos los estados", "EMITIDO", "ANULADO"));
+        cbStatus.setItems(FXCollections.observableArrayList(
+                container.getBundle().getString("fiscal.doc.status.all"),
+                "EMITIDO", "ANULADO"));
         cbStatus.getSelectionModel().selectFirst();
 
         dpFrom.setValue(LocalDate.now().minusDays(7));
@@ -232,8 +236,8 @@ public class FiscalDocumentsController implements Injectable {
         String search = txtSearch.getText().toLowerCase().trim();
 
         try {
-            Status statusEnum = "Todos los estados".equals(status) ? null : Status.valueOf(status);
-            String typeStr = "Todos los tipos".equals(type) ? null : type;
+            Status statusEnum = container.getBundle().getString("fiscal.doc.status.all").equals(status) ? null : Status.valueOf(status);
+            String typeStr = container.getBundle().getString("fiscal.doc.type.all").equals(type) ? null : type;
 
             LocalDate finalFrom = (from == null) ? LocalDate.of(2000, 1, 1) : from;
             LocalDate finalTo = (to == null) ? LocalDate.of(2100, 1, 1) : to;
@@ -261,7 +265,7 @@ public class FiscalDocumentsController implements Injectable {
     @FXML
     public void handleExportData(ActionEvent event) {
         if (masterList.isEmpty()) {
-            AlertUtil.showWarning("Sin datos", "No hay documentos para exportar en la vista actual.");
+            AlertUtil.showWarning(container.getBundle().getString("alert.warning"), container.getBundle().getString("fiscal.doc.archive.not_found"));
             return;
         }
 
@@ -305,9 +309,10 @@ public class FiscalDocumentsController implements Injectable {
             fos.write(content);
             fos.close();
 
-            AlertUtil.showInfo("Exportación Exitosa", "Se ha guardado el archivo " + fileName + " en tu escritorio.");
+            AlertUtil.showInfo(container.getBundle().getString("fiscal.doc.export.success"), 
+                    String.format(container.getBundle().getString("fiscal.doc.export.success_msg"), fileName));
         } catch (Exception e) {
-            AlertUtil.showError("Error al exportar", "No se pudo crear el archivo: " + e.getMessage());
+            AlertUtil.showError(container.getBundle().getString("fiscal.doc.error.export"), e.getMessage());
         }
     }
 
@@ -316,17 +321,17 @@ public class FiscalDocumentsController implements Injectable {
         try {
             File folder = new File("archivos_fiscales");
             if (!folder.exists()) {
-                AlertUtil.showWarning("Carpeta no encontrada",
-                        "La carpeta de archivos aún no se ha creado. Se creará automáticamente cuando emitas tu primer documento fiscal tras una venta.");
+                AlertUtil.showWarning(container.getBundle().getString("fiscal.doc.archive.not_found"),
+                        container.getBundle().getString("fiscal.doc.archive.not_found_msg"));
                 return;
             }
             if (Desktop.isDesktopSupported()) {
                 Desktop.getDesktop().open(folder);
             } else {
-                AlertUtil.showError("Error", "Tu sistema no permite abrir carpetas automáticamente.");
+                AlertUtil.showError(container.getBundle().getString("alert.error"), container.getBundle().getString("fiscal.doc.error.os_open"));
             }
         } catch (IOException e) {
-            AlertUtil.showError("Error", "No se pudo abrir la carpeta: " + e.getMessage());
+            AlertUtil.showError(container.getBundle().getString("alert.error"), e.getMessage());
         }
     }
 

@@ -113,7 +113,8 @@ public class NavigationService {
             } catch (SQLException ignored) {
             }
 
-            AlertUtil.showError("Acceso Denegado", "No tienes permiso para acceder a esta sección.");
+            AlertUtil.showError(container.getBundle().getString("alert.access_denied"),
+                    container.getBundle().getString("error.no_permission"));
             return;
         }
 
@@ -135,7 +136,7 @@ public class NavigationService {
         }
 
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath), container.getBundle());
             Node viewNode = loader.load();
             activeView = loader.getController();
 
@@ -163,8 +164,9 @@ public class NavigationService {
             mainContent.setContent(viewNode);
         } catch (Exception e) {
             e.printStackTrace();
-            AlertUtil.showError("Error de Navegación",
-                    "No se pudo cargar la vista: " + fxmlPath + "\nError: " + e.getMessage());
+            AlertUtil.showError(container.getBundle().getString("alert.error"),
+                    container.getBundle().getString("error.navigation") + ": " + fxmlPath + "\nError: "
+                            + e.getMessage());
         } finally {
             if (loadingOverlay != null)
                 loadingOverlay.setVisible(false);

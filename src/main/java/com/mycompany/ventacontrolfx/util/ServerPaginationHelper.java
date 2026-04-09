@@ -15,6 +15,7 @@ public class ServerPaginationHelper<T> {
     private final Label lblCount;
     private final Pagination pagination;
     private final String entityNamePlural;
+    private java.util.ResourceBundle bundle;
 
     // Callback: offset, limit
     private final BiConsumer<Integer, Integer> fetchDataCallback;
@@ -24,12 +25,19 @@ public class ServerPaginationHelper<T> {
 
     public ServerPaginationHelper(TableView<T> table, ComboBox<Integer> comboLimit, Label lblCount,
             Pagination pagination, String entityNamePlural, BiConsumer<Integer, Integer> fetchDataCallback) {
+        this(table, comboLimit, lblCount, pagination, entityNamePlural, fetchDataCallback, null);
+    }
+
+    public ServerPaginationHelper(TableView<T> table, ComboBox<Integer> comboLimit, Label lblCount,
+            Pagination pagination, String entityNamePlural, BiConsumer<Integer, Integer> fetchDataCallback,
+            java.util.ResourceBundle bundle) {
         this.table = table;
         this.comboLimit = comboLimit;
         this.lblCount = lblCount;
         this.pagination = pagination;
         this.entityNamePlural = entityNamePlural;
         this.fetchDataCallback = fetchDataCallback;
+        this.bundle = bundle;
         setup();
     }
 
@@ -112,7 +120,10 @@ public class ServerPaginationHelper<T> {
 
     private void updateCountLabel(int start, int end, int total) {
         if (lblCount != null) {
-            lblCount.setText(String.format("Mostrando %d - %d de %d %s", start, end, total, entityNamePlural));
+            String format = (bundle != null && bundle.containsKey("pagination.showing_format"))
+                    ? bundle.getString("pagination.showing_format")
+                    : "Mostrando %d - %d de %d %s";
+            lblCount.setText(String.format(format, start, end, total, entityNamePlural));
         }
     }
 }

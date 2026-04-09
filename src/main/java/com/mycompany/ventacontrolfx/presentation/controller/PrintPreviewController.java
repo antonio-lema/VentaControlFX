@@ -542,7 +542,7 @@ public class PrintPreviewController implements Injectable {
 
         String fontSize = isA4 ? "12px" : "10px";
 
-        Label lblDesc = new Label(item.getProduct().getName());
+        Label lblDesc = new Label(translateDynamic(item.getProduct().getName()));
         if (isA4) {
             lblDesc.setMinWidth(340);
             lblDesc.setPrefWidth(340);
@@ -876,5 +876,13 @@ public class PrintPreviewController implements Injectable {
         }
 
         applyPaperFormat();
+    }
+
+    private String translateDynamic(String text) {
+        if (text == null || text.isBlank()) return text;
+        if (container != null && container.getBundle() != null && container.getBundle().containsKey(text)) {
+            return container.getBundle().getString(text);
+        }
+        return text;
     }
 }

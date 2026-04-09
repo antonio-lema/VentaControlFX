@@ -15,6 +15,8 @@ import com.mycompany.ventacontrolfx.application.service.PromotionEngine;
 import com.mycompany.ventacontrolfx.application.service.PromotionService;
 import com.mycompany.ventacontrolfx.application.service.RefundCalculatorService;
 // CartService removed, replaced by CartUseCase
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 /**
  * Enterprise Service Registry (Dependency Injection Container).
@@ -88,6 +90,8 @@ public class ServiceContainer {
     private NavigationService navigationService;
     private final com.mycompany.ventacontrolfx.domain.service.TaxEngineService taxEngineService;
     private final com.mycompany.ventacontrolfx.domain.service.PriceResolutionService priceResolutionService;
+    private ResourceBundle bundle;
+    private Locale currentLocale = new Locale("es");
 
     public ServiceContainer() {
         // 1. Shared Infrastructure
@@ -380,5 +384,22 @@ public class ServiceContainer {
 
     public WorkSessionUseCase getWorkSessionUseCase() {
         return workSessionUseCase;
+    }
+
+    public ResourceBundle getBundle() {
+        if (bundle == null) {
+            bundle = ResourceBundle.getBundle("i18n/messages", currentLocale);
+        }
+        return bundle;
+    }
+
+    public void setLanguage(String langCode) {
+        this.currentLocale = new Locale(langCode);
+        this.bundle = ResourceBundle.getBundle("i18n/messages", currentLocale);
+        this.eventBus.publishLocaleChange();
+    }
+
+    public Locale getCurrentLocale() {
+        return currentLocale;
     }
 }
