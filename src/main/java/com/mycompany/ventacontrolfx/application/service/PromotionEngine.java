@@ -26,7 +26,7 @@ public class PromotionEngine {
         try {
             List<Promotion> activePromos = promotionRepository.getActive();
 
-            // 1. Simular promociones por PRODUCTO/CATEGOR\u00cdA (Nivel de \u00edtem: % o fijo)
+            // 1. Simular promociones por PRODUCTO/CATEGOR\u00cda (Nivel de \u00edtem: % o fijo)
             PromotionResult itemResult = new PromotionResult();
             for (CartItem item : items) {
                 applyItemLevelPromos(item, activePromos, itemResult);

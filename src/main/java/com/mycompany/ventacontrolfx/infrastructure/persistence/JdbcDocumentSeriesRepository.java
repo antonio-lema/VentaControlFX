@@ -6,9 +6,9 @@ import java.sql.*;
 
 /**
  * Adaptador JDBC para la gesti\u00f3n de series de numeraci\u00f3n correlativa.
- * Clean Architecture \u00e2\u20ac\u201d Capa de Infraestructura.
+ * Clean Architecture \u2014 Capa de Infraestructura.
  *
- * GARANT\u00cdA DE ATOMICIDAD:
+ * GARANT\u00cda DE ATOMICIDAD:
  * getAndIncrement usa SELECT ... FOR UPDATE dentro de la transacci\u00f3n
  * del llamador, lo que bloquea la fila en el motor InnoDB hasta el COMMIT
  * y evita que dos instancias simult\u00e1neas obtengan el mismo n\u00famero.

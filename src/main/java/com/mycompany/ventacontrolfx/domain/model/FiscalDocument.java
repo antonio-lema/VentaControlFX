@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 /**
  * Documento fiscal inmutable que representa un Ticket o Factura emitida.
  * Una vez en estado EMITIDO, sus importes no pueden modificarse.
- * Clean Architecture \u00e2\u20ac\u201d Capa de Dominio.
+ * Clean Architecture \u2014 Capa de Dominio.
  */
 public class FiscalDocument {
 

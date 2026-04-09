@@ -13,7 +13,7 @@ import java.util.Optional;
 
 /**
  * Adaptador JDBC para la persistencia de documentos fiscales.
- * Clean Architecture \u00e2\u20ac\u201d Capa de Infraestructura.
+ * Clean Architecture \u2014 Capa de Infraestructura.
  *
  * Los documentos fiscales se almacenan DIRECTAMENTE sobre la tabla `sales`
  * (columnas a\u00f1adidas por migraci\u00f3n), evitando duplicaci\u00f3n de datos y
@@ -133,7 +133,7 @@ public class JdbcFiscalDocumentRepository implements IFiscalDocumentRepository {
 
     @Override
     public Optional<FiscalDocument> findByReference(String reference) throws SQLException {
-        // reference = "2026-T-00042" \u00e2\u2020\u2019 year=2026, series="T", num=42
+        // reference = "2026-T-00042" \u2192 year=2026, series="T", num=42
         String[] parts = reference.split("-", 3);
         if (parts.length != 3)
             return Optional.empty();
@@ -156,7 +156,7 @@ public class JdbcFiscalDocumentRepository implements IFiscalDocumentRepository {
         return Optional.empty();
     }
 
-    // \u00e2\u201d\u20ac\u00e2\u201d\u20ac findByFilters \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac
+    // \u00e2\u201d\u20ac\u00e2\u201d\u20ac findByFilters \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u2500
 
     @Override
     public List<FiscalDocument> findByFilters(LocalDate from, LocalDate to,
@@ -259,7 +259,7 @@ public class JdbcFiscalDocumentRepository implements IFiscalDocumentRepository {
             }
         }
 
-        // Importes \u00e2\u20ac\u201d preferimos los del snapshot (m\u00e1s precisos)
+        // Importes \u2014 preferimos los del snapshot (m\u00e1s precisos)
         double baseAmt = rs.getDouble("base_amount");
         double vatAmt = rs.getDouble("vat_amount");
         double totAmt = rs.getDouble("total_amount");

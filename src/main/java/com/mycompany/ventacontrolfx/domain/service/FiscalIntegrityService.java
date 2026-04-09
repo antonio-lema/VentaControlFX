@@ -10,7 +10,7 @@ import java.security.NoSuchAlgorithmException;
  * Calcula y verifica el hash de control (SHA-256) que garantiza
  * que los datos del documento no han sido manipulados externamente.
  *
- * Clean Architecture \u00e2\u20ac\u201d Capa de Dominio (no tiene dependencias de
+ * Clean Architecture \u2014 Capa de Dominio (no tiene dependencias de
  * infraestructura).
  */
 public class FiscalIntegrityService {

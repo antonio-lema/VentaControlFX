@@ -84,12 +84,12 @@ public class CashClosingController {
             if (Math.abs(diff) < 0.001) {
                 lblDifference.setText(String.format("%.2f \u20ac", diff)); // Sin signo si es cero real
                 lblDifference.setStyle("-fx-font-size: 24px; -fx-font-weight: 900; -fx-text-fill: #10b981;");
-                lblDiffReason.setText("\u00e2\u0153\u2026 Caja cuadrada perfectamente");
+                lblDiffReason.setText("\u2705 Caja cuadrada perfectamente");
                 lblDiffReason.setStyle("-fx-text-fill: #16a34a; -fx-font-weight: bold;");
             } else {
                 lblDifference.setText(String.format("%+.2f \u20ac", diff)); // Forzar signo + o -
                 lblDifference.setStyle("-fx-font-size: 24px; -fx-font-weight: 900; -fx-text-fill: #ef4444;");
-                lblDiffReason.setText(diff > 0 ? "\u00e2\u0161\u00a0\u00ef\u00b8\u008f Sobante de caja detectado" : "\u00e2\u009d\u0152 Faltante de caja detectado");
+                lblDiffReason.setText(diff > 0 ? "\u00e2\u0161\u00a0\u00ef\u00b8\u008f Sobante de caja detectado" : "\u274c Faltante de caja detectado");
                 lblDiffReason.setStyle("-fx-text-fill: #dc2626; -fx-font-weight: bold;");
             }
         } catch (NumberFormatException e) {

@@ -54,7 +54,7 @@ public class TaxRevision {
     // --- Reglas de negocio ---
 
     /**
-     * Regla: \u00bfEst\u00e1 esta tasa vigente en la fecha indicada?
+     * Regla: \u00bfest\u00e1 esta tasa vigente en la fecha indicada?
      */
     public boolean isActiveAt(LocalDateTime dateTime) {
         if (dateTime == null)
@@ -64,7 +64,7 @@ public class TaxRevision {
     }
 
     /**
-     * Regla: \u00bfEs esta la tasa actualmente vigente?
+     * Regla: \u00bfes esta la tasa actualmente vigente?
      */
     public boolean isCurrentlyActive() {
         return isActiveAt(LocalDateTime.now());

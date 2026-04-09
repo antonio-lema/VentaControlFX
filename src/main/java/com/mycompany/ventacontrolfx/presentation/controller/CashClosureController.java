@@ -129,10 +129,10 @@ public class CashClosureController implements Injectable {
             double totalAll = totals.getOrDefault("total", currentCash + currentCard);
             double returnsTotal = totals.getOrDefault("returns_total", 0.0);
 
-            lblTotalCash.setText("\u00f0\u0178\u2019\u00b5 " + String.format("%.2f \u20ac", currentCash));
-            lblTotalCard.setText("\u00f0\u0178\u2019\u00b3 " + String.format("%.2f \u20ac", currentCard));
+            lblTotalCash.setText("\ud83d\udcb5 " + String.format("%.2f \u20ac", currentCash));
+            lblTotalCard.setText("\ud83d\udcb3 " + String.format("%.2f \u20ac", currentCard));
             lblTotalAll.setText(
-                    "\u00f0\u0178\u2019\u00b0 " + container.getBundle().getString("closure.net") + ": " + String.format("%.2f \u20ac", totalAll));
+                    "\ud83d\udcb0 " + container.getBundle().getString("closure.net") + ": " + String.format("%.2f \u20ac", totalAll));
 
             // Mostrar devoluciones totales
             if (lblTotalReturns != null) {
@@ -150,7 +150,7 @@ public class CashClosureController implements Injectable {
                 }
             }
 
-            lblSalesCount.setText("\u00f0\u0178\u201c\u0160 " + closureUseCase.getTodayTransactionCount());
+            lblSalesCount.setText("\ud83d\udcca " + closureUseCase.getTodayTransactionCount());
 
             List<ProductSummary> summary = closureUseCase.getPendingSummary();
             tableProductSummary.setItems(FXCollections.observableArrayList(summary));
@@ -176,7 +176,7 @@ public class CashClosureController implements Injectable {
                     && closureUseCase.getTodayTransactionCount() == 0)
                 markAsClosed();
             else {
-                lblStatus.setText(container.getBundle().getString("closure.status.in_progress") + " \u00e2\u008f\u00b3");
+                lblStatus.setText(container.getBundle().getString("closure.status.in_progress") + " \u23f3");
                 lblStatus.getStyleClass().removeAll("closure-status-done");
                 lblStatus.getStyleClass().add("closure-status-pending");
                 btnPerformClosure.setDisable(false);
@@ -195,10 +195,10 @@ public class CashClosureController implements Injectable {
             double fundAmount = closureUseCase.getActiveFundAmount();
 
             if (hasFund) {
-                lblActiveFund.setText("\u00f0\u0178\u2019\u00bc " + container.getBundle().getString("closure.fund") + ": "
+                lblActiveFund.setText("\ud83d\udcbc " + container.getBundle().getString("closure.fund") + ": "
                         + String.format("%.2f \u20ac", fundAmount));
                 lblActiveFund.setStyle("-fx-text-fill: -color-success; -fx-font-weight: bold;");
-                lblCashInDrawer.setText("\u00f0\u0178\u008f\u00a6 " + String.format("%.2f \u20ac", cashInDrawer));
+                lblCashInDrawer.setText("\ud83c\udfe6 " + String.format("%.2f \u20ac", cashInDrawer));
 
                 // Color seg\u00fan saldo
                 if (cashInDrawer < 20) {
@@ -213,7 +213,7 @@ public class CashClosureController implements Injectable {
                 }
 
                 btnOpenFund.setDisable(true);
-                btnOpenFund.setText("\u00e2\u0153\u2026 " + container.getBundle().getString("closure.status.open"));
+                btnOpenFund.setText("\u2705 " + container.getBundle().getString("closure.status.open"));
                 btnWithdrawCash.setDisable(false);
                 if (btnRegisterCashEntry != null)
                     btnRegisterCashEntry.setDisable(false);
@@ -221,27 +221,27 @@ public class CashClosureController implements Injectable {
                 // Asegurar que el bot\u00f3n de cierre est\u00e9 habilitado si hay sesi\u00f3n activa
                 btnPerformClosure.setDisable(false);
                 btnPerformClosure.setText(container.getBundle().getString("closure.btn.perform"));
-                lblStatus.setText(container.getBundle().getString("closure.status.in_progress") + " \u00e2\u008f\u00b3");
+                lblStatus.setText(container.getBundle().getString("closure.status.in_progress") + " \u23f3");
                 lblStatus.getStyleClass().removeAll("closure-status-done");
                 lblStatus.getStyleClass().add("closure-status-pending");
             } else {
                 lblActiveFund.setText("\u00e2\u0161\u00a0\u00ef\u00b8\u008f " + container.getBundle().getString("closure.no_fund"));
                 lblActiveFund.setStyle("-fx-text-fill: -color-warning; -fx-font-weight: bold;");
-                lblCashInDrawer.setText("\u00f0\u0178\u008f\u00a6 " + container.getBundle().getString("closure.no_session"));
+                lblCashInDrawer.setText("\ud83c\udfe6 " + container.getBundle().getString("closure.no_session"));
                 lblCashInDrawer.setStyle("-fx-text-fill: -text-muted; -fx-font-size: 22px;");
                 btnOpenFund.setDisable(false);
-                btnOpenFund.setText("\u00f0\u0178\u2019\u00bc " + container.getBundle().getString("closure.btn.open_fund"));
+                btnOpenFund.setText("\ud83d\udcbc " + container.getBundle().getString("closure.btn.open_fund"));
                 btnWithdrawCash.setDisable(true);
                 if (btnRegisterCashEntry != null)
                     btnRegisterCashEntry.setDisable(true);
             }
         } catch (SQLException e) {
-            lblCashInDrawer.setText("\u00f0\u0178\u008f\u00a6 " + container.getBundle().getString("error.load"));
+            lblCashInDrawer.setText("\ud83c\udfe6 " + container.getBundle().getString("error.load"));
         }
     }
 
     private void markAsClosed() {
-        lblStatus.setText(container.getBundle().getString("closure.status.completed") + " \u00e2\u0153\u2026");
+        lblStatus.setText(container.getBundle().getString("closure.status.completed") + " \u2705");
         lblStatus.getStyleClass().removeAll("closure-status-pending");
         lblStatus.getStyleClass().add("closure-status-done");
         btnPerformClosure.setDisable(true);

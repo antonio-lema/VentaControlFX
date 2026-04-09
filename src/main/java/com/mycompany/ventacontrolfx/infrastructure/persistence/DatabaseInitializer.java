@@ -572,7 +572,7 @@ public class DatabaseInitializer {
                 }
             }
 
-            // \u00e2\u201d\u20ac\u00e2\u201d\u20ac 11. Tabla de Log de Actualizaciones Masivas de Precios \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac
+            // \u00e2\u201d\u20ac\u00e2\u201d\u20ac 11. Tabla de Log de Actualizaciones Masivas de Precios \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u2500
             stmt.execute("CREATE TABLE IF NOT EXISTS price_update_log (" +
                     "  log_id INT AUTO_INCREMENT PRIMARY KEY," +
                     "  update_type VARCHAR(50) NOT NULL COMMENT 'percentage, fixed, rounding'," +
@@ -672,13 +672,13 @@ public class DatabaseInitializer {
             tryIndex(stmt, "CREATE INDEX IF NOT EXISTS idx_sales_is_return     ON sales(is_return)");
 
             // --- sale_details ---
-            // JOIN desde sales \u00e2\u2020\u2019 detalles de l\u00ednea (muy frecuente)
+            // JOIN desde sales \u2192 detalles de l\u00ednea (muy frecuente)
             tryIndex(stmt, "CREATE INDEX IF NOT EXISTS idx_sd_sale             ON sale_details(sale_id)");
             // Consultas de ventas por producto (qu\u00e9 productos se han vendido m\u00e1s)
             tryIndex(stmt, "CREATE INDEX IF NOT EXISTS idx_sd_product          ON sale_details(product_id)");
 
             // --- returns ---
-            // JOIN desde sales \u00e2\u2020\u2019 devoluciones
+            // JOIN desde sales \u2192 devoluciones
             tryIndex(stmt, "CREATE INDEX IF NOT EXISTS idx_ret_sale            ON returns(sale_id)");
             // Devoluciones realizadas por vendedor
             tryIndex(stmt, "CREATE INDEX IF NOT EXISTS idx_ret_user            ON returns(user_id)");
@@ -688,7 +688,7 @@ public class DatabaseInitializer {
             tryIndex(stmt, "CREATE INDEX IF NOT EXISTS idx_ret_datetime        ON returns(return_datetime)");
 
             // --- return_details ---
-            // JOIN desde returns \u00e2\u2020\u2019 l\u00edneas devueltas
+            // JOIN desde returns \u2192 l\u00edneas devueltas
             tryIndex(stmt, "CREATE INDEX IF NOT EXISTS idx_rd_return           ON return_details(return_id)");
             // Consultas de producto devuelto
             tryIndex(stmt, "CREATE INDEX IF NOT EXISTS idx_rd_product          ON return_details(product_id)");
@@ -793,7 +793,7 @@ public class DatabaseInitializer {
                 }
             }
 
-            // \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac SISTEMA DE HISTORIAL DE IVA (V2) \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac
+            // \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac SISTEMA DE HISTORIAL DE IVA (V2) \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u2500
             stmt.execute("CREATE TABLE IF NOT EXISTS tax_rates ("
                     + "tax_rate_id  INT AUTO_INCREMENT PRIMARY KEY, "
                     + "name         VARCHAR(100) NOT NULL, "
@@ -922,11 +922,11 @@ public class DatabaseInitializer {
             }
 
             // \u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090
-            // M\u00c3\u201cDULO: PERSISTENCIA FISCAL DE TICKETS Y FACTURAS
-            // Migraci\u00f3n aditiva \u00e2\u20ac\u201d no modifica ni elimina datos existentes.
+            // M\u00d3dULO: PERSISTENCIA FISCAL DE TICKETS Y FACTURAS
+            // Migraci\u00f3n aditiva \u2014 no modifica ni elimina datos existentes.
             // \u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090
 
-            // \u00e2\u201d\u20ac\u00e2\u201d\u20ac 1. Series de numeraci\u00f3n correlativa \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac
+            // \u00e2\u201d\u20ac\u00e2\u201d\u20ac 1. Series de numeraci\u00f3n correlativa \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u2500
             stmt.execute("CREATE TABLE IF NOT EXISTS doc_series (" +
                     "series_id   INT AUTO_INCREMENT PRIMARY KEY, " +
                     "series_code VARCHAR(10) UNIQUE NOT NULL, " +
@@ -943,7 +943,7 @@ public class DatabaseInitializer {
                     "('F', '" + currentYear + "-F-', 0, " + currentYear + ", 'Facturas Completas'), " +
                     "('R', '" + currentYear + "-R-', 0, " + currentYear + ", 'Facturas Rectificativas (Abonos)')");
 
-            // \u00e2\u201d\u20ac\u00e2\u201d\u20ac 2. Snapshot de emisor por documento \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac
+            // \u00e2\u201d\u20ac\u00e2\u201d\u20ac 2. Snapshot de emisor por documento \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u2500
             stmt.execute("CREATE TABLE IF NOT EXISTS doc_issuer_snapshots (" +
                     "snapshot_id      INT AUTO_INCREMENT PRIMARY KEY, " +
                     "sale_id          INT NOT NULL UNIQUE, " +
@@ -1073,7 +1073,7 @@ public class DatabaseInitializer {
                 if (systemCatId != -1) {
                     stmt.execute(
                             "INSERT IGNORE INTO products (category_id, name, visible, is_active, manage_stock, sku) " +
-                                    "VALUES (" + systemCatId + ", 'PRODUCTO GEN\u00c3\u2030RICO', 0, 1, 0, 'SYS-GEN-001')");
+                                    "VALUES (" + systemCatId + ", 'PRODUCTO GEN\u00c9RICO', 0, 1, 0, 'SYS-GEN-001')");
 
                     int genProductId = -1;
                     try (ResultSet rs = stmt
@@ -1105,7 +1105,7 @@ public class DatabaseInitializer {
         try {
             stmt.execute(sql);
         } catch (SQLException e) {
-            // El \u00edndice ya existe o no es soportado \u00e2\u20ac\u201d se ignora
+            // El \u00edndice ya existe o no es soportado \u2014 se ignora
         }
     }
 

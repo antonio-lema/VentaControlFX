@@ -207,7 +207,7 @@ public class PriceListContentController implements Injectable {
             txtSearch.setText("");
             lblFilterInfo.setText("Filtro: Actualizaci\u00f3n Masiva ("
                     + event.getTimestamp().format(DateTimeFormatter.ofPattern("dd/MM HH:mm")) + ")");
-            colDiff.setText("\u00e2\u2013\u00b2 vs Hoy");
+            colDiff.setText("\u25b2 vs Hoy");
         } else {
             this.currentFilterDate = null;
             this.currentSearch = event.getTargetName();
@@ -299,7 +299,7 @@ public class PriceListContentController implements Injectable {
         txtSearch.setText("");
         paneFilterInfo.setVisible(false);
         paneFilterInfo.setManaged(false);
-        colDiff.setText("\u00e2\u2013\u00b2 %");
+        colDiff.setText("\u25b2 %");
         paginationHelper.refresh();
         if (tabPane.getSelectionModel().getSelectedIndex() == 1) {
             loadHistory();

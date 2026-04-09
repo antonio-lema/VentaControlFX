@@ -171,7 +171,7 @@ public class ManageRolesController implements Injectable {
             AlertUtil.showError("Acceso Denegado", "No tiene permiso para gestionar roles.");
             return;
         }
-        if (AlertUtil.showConfirmation("Eliminar Rol", "\u00bfEliminar rol: " + role.getName() + "?",
+        if (AlertUtil.showConfirmation("Eliminar Rol", "\u00bfeliminar rol: " + role.getName() + "?",
                 "Podr\u00eda afectar a usuarios que dependan de este rol.")) {
             try {
                 if (roleUseCase.deleteRole(role.getRoleId())) {

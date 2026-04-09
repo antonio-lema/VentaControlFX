@@ -222,7 +222,7 @@ public class SaleUseCase {
         List<SaleTaxSummary> taxSummaries = taxEngineService.summarizeTaxes(lineResults);
         sale.setTaxSummaries(taxSummaries);
 
-        // \u00e2\u201d\u20ac\u00e2\u201d\u20ac PROCESAMIENTO AT\u00c3\u201cMICO EN UNA SOLA TRANSACCI\u00c3\u201cN \u00e2\u201d\u20ac\u00e2\u201d\u20ac
+        // \u00e2\u201d\u20ac\u00e2\u201d\u20ac PROCESAMIENTO AT\u00d3MICO EN UNA SOLA TRANSACCI\u00d3N \u00e2\u201d\u20ac\u00e2\u201d\u20ac
         try (Connection conn = DBConnection.getConnection()) {
             conn.setAutoCommit(false);
             try {
@@ -305,7 +305,7 @@ public class SaleUseCase {
                             saleRepository.updateDetailReturnedQuantity(d.getDetailId(), newTotalReturn, conn);
                             d.setReturnedQuantity(newTotalReturn);
 
-                            // USAR PRECIO FINAL (CON IVA) PARA LA DEVOLUCI\u00c3\u201cN
+                            // USAR PRECIO FINAL (CON IVA) PARA LA DEVOLUCI\u00d3N
                             double unitRefundPrice = d.getGrossTotal() / d.getQuantity();
                             double lineRefund = qtyToReturnNow * unitRefundPrice;
                             refundAmountForThisTransaction += lineRefund;
@@ -374,7 +374,7 @@ public class SaleUseCase {
                     newReturn.setCashAmount(cashToRefund);
                     newReturn.setCardAmount(cardToRefund);
 
-                    // \u00e2\u201d\u20ac\u00e2\u201d\u20ac GENERACI\u00c3\u201cN DE C\u00c3\u201cDIGO FISCAL \u00c3\u0161NICO PARA LA DEVOLUCI\u00c3\u201cN \u00e2\u201d\u20ac\u00e2\u201d\u20ac
+                    // \u00e2\u201d\u20ac\u00e2\u201d\u20ac GENERACI\u00d3N DE C\u00d3dIGO FISCAL \u00daNICO PARA LA DEVOLUCI\u00d3N \u00e2\u201d\u20ac\u00e2\u201d\u20ac
                     String seriesCode = "R";
                     int nextDocNumber = seriesRepository.getAndIncrement(seriesCode, conn);
 

@@ -182,7 +182,7 @@ public class PasswordRecoveryController implements Injectable {
             userUseCase.resetPassword(currentRecoveryEmail, pass1);
             return null;
         }, result -> {
-            AlertUtil.showInfo("\u00c3\u2030xito", "Contrase\u00f1a cambiada.");
+            AlertUtil.showInfo("\u00c9xito", "Contrase\u00f1a cambiada.");
             handleBack();
         }, error -> lblError.setText(error.getMessage()));
     }

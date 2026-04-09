@@ -91,7 +91,7 @@ public class RippleEffect {
 
         container.getChildren().add(circle);
 
-        // Animation \u00e2\u20ac\u201d snappy modern ripple (380ms)
+        // Animation \u2014 snappy modern ripple (380ms)
         double maxRadius = boundsWidth * 1.5;
 
         Timeline timeline = new Timeline();

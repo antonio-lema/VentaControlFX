@@ -158,7 +158,7 @@ public class ClientReportController implements Injectable {
 
     private void setupPurchaseTable() {
         colDate.setCellValueFactory(c -> new SimpleStringProperty(
-                c.getValue().getSaleDateTime() != null ? c.getValue().getSaleDateTime().format(FMT_DATE) : "\u00e2\u20ac\u201d"));
+                c.getValue().getSaleDateTime() != null ? c.getValue().getSaleDateTime().format(FMT_DATE) : "\u2014"));
 
         colItems.setCellValueFactory(c -> {
             int items = 0;
@@ -310,9 +310,9 @@ public class ClientReportController implements Injectable {
 
     private void resetKpis() {
         lblKpiActive.setText("0");
-        lblKpiTotal.setText("\u20ac0.00");
-        lblKpiAvgOrder.setText("\u20ac0.00");
-        lblKpiLtv.setText("\u20ac0.00");
+        lblKpiTotal.setText("\ud842\udec0.00");
+        lblKpiAvgOrder.setText("\ud842\udec0.00");
+        lblKpiLtv.setText("\ud842\udec0.00");
         lblKpiActiveVar.setText("-");
         lblKpiTotalVar.setText("-");
         lblKpiAvgOrderVar.setText("-");
@@ -322,7 +322,7 @@ public class ClientReportController implements Injectable {
     private void setVariation(Label lbl, double amount, boolean positive) {
         if (lbl == null)
             return;
-        lbl.setText((positive ? "\u00e2\u2020\u2018 " : "\u00e2\u2020\u201c ") + Math.abs(amount) + "%");
+        lbl.setText((positive ? "\u2191 " : "\u2193 ") + Math.abs(amount) + "%");
         if (positive) {
             lbl.setStyle(
                     "-fx-background-color: #dcfce7; -fx-text-fill: #16a34a; -fx-padding: 2 6; -fx-background-radius: 10; -fx-font-size: 11px; -fx-font-weight: bold;");
@@ -576,7 +576,7 @@ public class ClientReportController implements Injectable {
         }
     }
 
-    // \u00e2\u201d\u20ac\u00e2\u201d\u20ac Inner model \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac
+    // \u00e2\u201d\u20ac\u00e2\u201d\u20ac Inner model \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u2500
     public static class ClientRow {
         public final int clientId;
         public final String clientName;

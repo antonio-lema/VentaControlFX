@@ -432,7 +432,7 @@ public class CartController implements Injectable {
         stage.initModality(Modality.APPLICATION_MODAL);
         stage.initStyle(StageStyle.TRANSPARENT);
 
-        // CORRECCI\u00c3\u201cN: Establecer due\u00f1o para evitar fallos en algunos sistemas
+        // CORRECCI\u00d3N: Establecer due\u00f1o para evitar fallos en algunos sistemas
         if (cartItemsContainer.getScene() != null) {
             stage.initOwner(cartItemsContainer.getScene().getWindow());
         }
@@ -556,13 +556,14 @@ public class CartController implements Injectable {
                             Integer clientId = client != null ? client.getId() : null;
                             String observations = cartUseCase.getGeneralObservation();
                             int userId = container.getUserSession().getCurrentUser().getUserId();
+                            System.out.println("[CartController] Processing sale: " + items.size() + " items.");
 
                             container.getAsyncManager().runAsyncTask(() -> {
                                 // \u00e2\u201d\u20ac\u00e2\u201d\u20ac 1. PROCESAR VENTA EN HILO DE FONDO \u00e2\u201d\u20ac\u00e2\u201d\u20ac
                                 int saleId = container.getSaleUseCase().processSale(items, total, method, clientId,
                                         userId, 0.0, null, cashAmount, cardAmount, observations);
 
-                                // \u00e2\u201d\u20ac\u00e2\u201d\u20ac 2. EMISI\u00c3\u201cN FISCAL AUTOM\u00c1TICA EN HILO DE FONDO \u00e2\u201d\u20ac\u00e2\u201d\u20ac
+                                // \u00e2\u201d\u20ac\u00e2\u201d\u20ac 2. EMISI\u00d3N FISCAL AUTOM\u00c1TICA EN HILO DE FONDO \u00e2\u201d\u20ac\u00e2\u201d\u20ac
                                 try {
                                     if (client != null && client.getTaxId() != null
                                             && !client.getTaxId().trim().isEmpty()) {

@@ -36,7 +36,7 @@ public class PromotionService {
             discountedPrice = calculateDiscount(discountedPrice, p);
         }
 
-        // 2. Promociones por CATEGOR\u00cdA
+        // 2. Promociones por CATEGOR\u00cda
         List<Promotion> categoryPromos = activePromotions.stream()
                 .filter(p -> p.getScope() == PromotionScope.CATEGORY
                         && p.getAffectedIds().contains(categoryId))

@@ -74,7 +74,7 @@ public class PriceListFormController implements Injectable {
                         chkIsActive.isSelected(),
                         currentPriceList != null ? currentPriceList.getPriority() : 0);
                 priceListUseCase.save(newPL);
-                AlertUtil.showInfo("\u00c3\u2030xito", "Tarifa creada correctamente.");
+                AlertUtil.showInfo("\u00c9xito", "Tarifa creada correctamente.");
             } else {
                 currentPriceList.setName(txtName.getText().trim());
                 currentPriceList
@@ -82,7 +82,7 @@ public class PriceListFormController implements Injectable {
                 currentPriceList.setDefault(chkIsDefault.isSelected());
                 currentPriceList.setActive(chkIsActive.isSelected());
                 priceListUseCase.update(currentPriceList);
-                AlertUtil.showInfo("\u00c3\u2030xito", "Tarifa actualizada correctamente.");
+                AlertUtil.showInfo("\u00c9xito", "Tarifa actualizada correctamente.");
             }
             closeModal();
         } catch (SQLException ex) {

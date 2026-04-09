@@ -161,7 +161,7 @@ public class JdbcProductRepository implements IProductRepository {
         Connection conn = null;
         try {
             conn = DBConnection.getConnection();
-            conn.setAutoCommit(false); // Transacci\u00c3\u0192\u00c2\u00b3n para doble escritura
+            conn.setAutoCommit(false); // Transacci\u00f3n para doble escritura
 
             String sql = "INSERT INTO products (category_id, name, is_favorite, image_path, visible, iva, tax_rate, tax_group_id, sku, cost_price, is_active, stock_quantity, min_stock, manage_stock) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
             try (PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -211,7 +211,7 @@ public class JdbcProductRepository implements IProductRepository {
                     } catch (Exception ignored) {
                     }
 
-                    String priceSql = "INSERT INTO product_prices (product_id, price_list_id, price, start_date, reason) VALUES (?, ?, ?, NOW(), 'Creaci\u00c3\u0192\u00c2\u00b3n de producto')";
+                    String priceSql = "INSERT INTO product_prices (product_id, price_list_id, price, start_date, reason) VALUES (?, ?, ?, NOW(), 'Creaci\u00f3n de producto')";
                     try (PreparedStatement pstmtPrice = conn.prepareStatement(priceSql)) {
                         pstmtPrice.setInt(1, product.getId());
                         pstmtPrice.setInt(2, defaultPriceListId);
@@ -307,7 +307,7 @@ public class JdbcProductRepository implements IProductRepository {
             }
 
             // 3. Insertar precios en lote
-            String priceSql = "INSERT INTO product_prices (product_id, price_list_id, price, start_date, reason) VALUES (?, ?, ?, NOW(), 'Importaci\u00c3\u0192\u00c2\u00b3n masiva')";
+            String priceSql = "INSERT INTO product_prices (product_id, price_list_id, price, start_date, reason) VALUES (?, ?, ?, NOW(), 'Importaci\u00f3n masiva')";
             try (PreparedStatement pstmtPrice = conn.prepareStatement(priceSql)) {
                 for (Product product : products) {
                     if (product.getId() > 0) {
@@ -338,7 +338,7 @@ public class JdbcProductRepository implements IProductRepository {
         Connection conn = null;
         try {
             conn = DBConnection.getConnection();
-            conn.setAutoCommit(false); // Transacci\u00c3\u0192\u00c2\u00b3n para doble escritura
+            conn.setAutoCommit(false); // Transacci\u00f3n para doble escritura
 
             String sql = "UPDATE products SET category_id = ?, name = ?, is_favorite = ?, image_path = ?, visible = ?, iva = ?, tax_rate = ?, tax_group_id = ?, sku = ?, cost_price = ?, is_active = ?, stock_quantity = ?, min_stock = ?, manage_stock = ? WHERE product_id = ?";
             try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -385,7 +385,7 @@ public class JdbcProductRepository implements IProductRepository {
 
             // 2. Comprobar si el precio actual es distinto (o simplemente cerrar el actual
             // e insertar nuevo)
-            // Para evitar basura, vamos a comprobar qu\u00c3\u0192\u00c2\u00a9 precio activo hay
+            // Para evitar basura, vamos a comprobar qu\u00e9 precio activo hay
             double activePrice = -1;
             boolean hasActive = false;
             String selectSql = "SELECT price FROM product_prices WHERE product_id = ? AND price_list_id = ? AND end_date IS NULL LIMIT 1";
@@ -400,7 +400,7 @@ public class JdbcProductRepository implements IProductRepository {
                 }
             }
 
-            // Si el precio cambi\u00c3\u0192\u00c2\u00b3, generamos el hist\u00c3\u0192\u00c2\u00b3rico
+            // Si el precio cambi\u00f3, generamos el hist\u00f3rico
             if (!hasActive || activePrice != product.getPrice()) {
                 if (hasActive) {
                     String updateOld = "UPDATE product_prices SET end_date = NOW(), reason = 'Cambio individual de tarifa' WHERE product_id = ? AND price_list_id = ? AND end_date IS NULL";
@@ -410,7 +410,7 @@ public class JdbcProductRepository implements IProductRepository {
                         updStmt.executeUpdate();
                     }
                 }
-                String insertNew = "INSERT INTO product_prices (product_id, price_list_id, price, start_date, end_date, reason) VALUES (?, ?, ?, NOW(), NULL, 'Actualizaci\u00c3\u0192\u00c2\u00b3n de producto')";
+                String insertNew = "INSERT INTO product_prices (product_id, price_list_id, price, start_date, end_date, reason) VALUES (?, ?, ?, NOW(), NULL, 'Actualizaci\u00f3n de producto')";
                 try (PreparedStatement insStmt = conn.prepareStatement(insertNew)) {
                     insStmt.setInt(1, product.getId());
                     insStmt.setInt(2, defaultPriceListId);

@@ -235,7 +235,7 @@ public class MassivePriceUpdateUseCase {
 
     /**
      * Clona una lista de precios en otra aplicando un multiplicador masivo.
-     * \u00c3\u0161til para crear tarifas de mayoristas a partir de la general.
+     * \u00datil para crear tarifas de mayoristas a partir de la general.
      */
     public void cloneAndAdjustPrices(int sourceListId, int targetListId, double percentage, String reason,
             java.time.LocalDateTime startDate)

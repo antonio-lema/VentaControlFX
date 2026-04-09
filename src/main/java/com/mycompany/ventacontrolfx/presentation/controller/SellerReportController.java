@@ -110,7 +110,7 @@ public class SellerReportController implements Injectable {
         // Seller Table
         colRank.setCellValueFactory(
                 c -> new SimpleStringProperty(String.valueOf(sellerTable.getItems().indexOf(c.getValue()) + 1)));
-        colAvatar.setCellValueFactory(c -> new SimpleStringProperty("\u00f0\u0178\u00a7\u2018\u00e2\u20ac\u008d\u00f0\u0178\u2019\u00bc"));
+        colAvatar.setCellValueFactory(c -> new SimpleStringProperty("\ud83d\udc64")); // Bust in silhouette
         colSeller.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getSellerName()));
         colTotal.setCellValueFactory(
                 c -> new SimpleStringProperty(String.format("%.2f \u20ac", c.getValue().getTotalSales())));
@@ -131,7 +131,7 @@ public class SellerReportController implements Injectable {
 
         // Detail Table
         colDate.setCellValueFactory(c -> new SimpleStringProperty(
-                c.getValue().getSaleDateTime() != null ? c.getValue().getSaleDateTime().format(FMT) : "\u00e2\u20ac\u201d"));
+                c.getValue().getSaleDateTime() != null ? c.getValue().getSaleDateTime().format(FMT) : "\u2014"));
         colRecordType
                 .setCellValueFactory(c -> new SimpleStringProperty(c.getValue().isReturn() ? "Devoluci\u00f3n" : "Venta"));
         colMethod.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getPaymentMethod()));
@@ -320,7 +320,7 @@ public class SellerReportController implements Injectable {
             lblKpiBest.setText(best.getSellerName());
             lblBestPerformance.setText(String.format("%.2f \u20ac / Mes", best.getTotalSales()));
         } else {
-            lblKpiBest.setText("\u00e2\u20ac\u201d");
+            lblKpiBest.setText("\u2014");
             lblBestPerformance.setText("0.00 \u20ac / Mes");
         }
 
@@ -355,7 +355,7 @@ public class SellerReportController implements Injectable {
         lbl.getStyleClass().removeAll("trend-badge-up", "trend-badge-down", "trend-badge-neutral", "trend-badge-blue");
 
         if (prev == 0) {
-            lbl.setText(isCurrency ? "\u00e2\u2020\u2018 100%" : "\u00e2\u2020\u2018 " + (int) current);
+            lbl.setText(isCurrency ? "\u2191 100%" : "\u2191 " + (int) current);
             lbl.getStyleClass().add("trend-badge-up");
             return;
         }
@@ -363,7 +363,7 @@ public class SellerReportController implements Injectable {
         double diff = current - prev;
         double pct = (diff / prev) * 100;
 
-        String arrow = pct > 0.1 ? "\u00e2\u2020\u2018 " : (pct < -0.1 ? "\u00e2\u2020\u201c " : "\u2022 ");
+        String arrow = pct > 0.1 ? "\u2191 " : (pct < -0.1 ? "\u2193 " : "\u2022 ");
 
         if (isCurrency) {
             lbl.setText(String.format("%s%.1f%%", arrow, Math.abs(pct)));
@@ -380,7 +380,7 @@ public class SellerReportController implements Injectable {
     }
 
     private void showSellerDetail(SellerAnalytics sa) {
-        lblDetailTitle.setText("\u00f0\u0178\u201c\u2039 Ventas de " + sa.getSellerName());
+        lblDetailTitle.setText("\ud83d\udccb Ventas de " + sa.getSellerName());
         currentDetailSales.setAll(sa.getSales());
         filterDetailTable(txtDetailSearch.getText());
     }

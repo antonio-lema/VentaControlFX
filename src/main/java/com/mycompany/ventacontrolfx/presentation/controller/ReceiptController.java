@@ -101,15 +101,26 @@ public class ReceiptController implements Injectable {
 
         applyCompanyHeader();
         itemsContainer.getChildren().clear();
+        
+        System.out.println("[Receipt] Setting data for " + (items != null ? items.size() : "null") + " items");
+        
+        if (items == null || items.isEmpty()) {
+            Label placeholder = new Label(container.getBundle().getString("receipt.items.empty"));
+            placeholder.setStyle("-fx-text-fill: grey; -fx-font-style: italic;");
+            itemsContainer.getChildren().add(placeholder);
+        }
+
         double totalSavings = 0;
-        for (CartItem item : items) {
-            addItemRow(item, sym);
-            double disc = item.getDiscountAmount();
-            if (!cfg.isPricesIncludeTax()) {
-                double rate = item.getProduct().resolveEffectiveIva(cfg.getTaxRate());
-                disc *= (1 + (rate / 100.0));
+        if (items != null) {
+            for (CartItem item : items) {
+                addItemRow(item, sym);
+                double disc = item.getDiscountAmount();
+                if (!cfg.isPricesIncludeTax()) {
+                    double rate = item.getProduct().resolveEffectiveIva(cfg.getTaxRate());
+                    disc *= (1 + (rate / 100.0));
+                }
+                totalSavings += disc;
             }
-            totalSavings += disc;
         }
 
         if (lblSavings != null) {

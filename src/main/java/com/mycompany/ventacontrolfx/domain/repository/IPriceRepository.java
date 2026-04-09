@@ -21,7 +21,7 @@ public interface IPriceRepository {
 
         /**
          * Finaliza la vigencia del precio actual de un producto en una lista.
-         * \u00c3\u0161til antes de insertar uno nuevo.
+         * \u00datil antes de insertar uno nuevo.
          */
         void closeCurrentPrice(int productId, int priceListId) throws SQLException;
 

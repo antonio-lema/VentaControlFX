@@ -2,7 +2,7 @@ package com.mycompany.ventacontrolfx.domain.model;
 
 /**
  * Gesti\u00f3n de series de numeraci\u00f3n correlativas de documentos fiscales.
- * Clean Architecture \u00e2\u20ac\u201d Capa de Dominio.
+ * Clean Architecture \u2014 Capa de Dominio.
  */
 public class DocumentSeries {
 

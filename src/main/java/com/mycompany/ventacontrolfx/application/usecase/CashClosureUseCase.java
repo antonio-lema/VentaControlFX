@@ -182,9 +182,9 @@ public class CashClosureUseCase {
         double available = repository.getCurrentCashInDrawer();
         if (returnAmount > available) {
             throw new SQLException(String.format(
-                    "\u00e2\u009d\u0152 No hay suficiente efectivo en caja para esta devoluci\u00f3n.\n\n" +
-                            "\u00f0\u0178\u008f\u00a6 Efectivo actual: %.2f \u20ac\n" +
-                            "\u00f0\u0178\u2019\u00b8 Importe solicitado: %.2f \u20ac\n\n" +
+                    "\u274c No hay suficiente efectivo en caja para esta devoluci\u00f3n.\n\n" +
+                            "\ud83c\udfe6 Efectivo actual: %.2f \u20ac\n" +
+                            "\ud83d\udcb8 Importe solicitado: %.2f \u20ac\n\n" +
                             "\u00e2\u0161\u00a0\u00ef\u00b8\u008f Se requiere un fondo de caja mayor para cubrir este reembolso.",
                     available, returnAmount));
         }

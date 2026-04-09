@@ -146,7 +146,7 @@ public class TicketDetailController implements Injectable {
 
             // Sub-fila para precio unitario e informaci\u00f3n de devoluci\u00f3n si aplica
             if (detail.getReturnedQuantity() > 0) {
-                Label returnInfo = new Label(String.format("  \u00e2\u0161\u00a0 Devuelto: %d uds", detail.getReturnedQuantity()));
+                Label returnInfo = new Label(String.format("  \u26a0 Devuelto: %d uds", detail.getReturnedQuantity()));
                 returnInfo.setStyle("-fx-text-fill: #ef4444; -fx-font-size: 11px; -fx-font-weight: bold;");
                 itemRow.getChildren().addAll(mainRow, returnInfo);
             } else {

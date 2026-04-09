@@ -40,6 +40,6 @@
 
     <HBox spacing="10" alignment="CENTER_RIGHT">
         <Button text="Cancelar" onAction="#handleCancel" styleClass="btn-secondary"/>
-        <Button text="&#x1f68;0 Clonar Tarifa" onAction="#handleConfirm" styleClass="btn-primary" style="-fx-background-color: #be185d; -fx-text-fill: white;"/>
+        <Button text="&#x1f680; Clonar Tarifa" onAction="#handleConfirm" styleClass="btn-primary" style="-fx-background-color: #be185d; -fx-text-fill: white;"/>
     </HBox>
 </VBox>

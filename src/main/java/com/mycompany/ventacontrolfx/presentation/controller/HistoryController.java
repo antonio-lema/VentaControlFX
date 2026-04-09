@@ -132,9 +132,9 @@ public class HistoryController implements Injectable, Searchable {
                 if (empty || item == null) {
                     setText(null);
                 } else {
-                    String emoji = item.contains("Mixed") || item.contains("Mixto") ? "\u00f0\u0178\u201d\u201e "
-                            : (container.getBundle().getString("payment.method.card").equalsIgnoreCase(item) ? "\u00f0\u0178\u2019\u00b3 "
-                                    : "\u00f0\u0178\u2019\u00b5 ");
+                    String emoji = item.contains("Mixed") || item.contains("Mixto") ? "\ud83d\udd04 "
+                            : (container.getBundle().getString("payment.method.card").equalsIgnoreCase(item) ? "\ud83d\udcb3 "
+                                    : "\ud83d\udcb5 ");
                     setText(emoji + item);
                 }
             }
@@ -258,13 +258,13 @@ public class HistoryController implements Injectable, Searchable {
         }
 
         // Emojis y colores integrados en el valor
-        lblTotalSalesCount.setText("\u00f0\u0178\u201c\u0160 " + count);
-        lblTotalAmount.setText("\u00f0\u0178\u2019\u00b0 " + String.format("%.2f \u20ac", total));
-        lblTotalCash.setText("\u00f0\u0178\u2019\u00b5 " + String.format("%.2f \u20ac", cash));
-        lblTotalCard.setText("\u00f0\u0178\u2019\u00b3 " + String.format("%.2f \u20ac", card));
+        lblTotalSalesCount.setText("\ud83d\udcca " + count);
+        lblTotalAmount.setText("\ud83d\udcb0 " + String.format("%.2f \u20ac", total));
+        lblTotalCash.setText("\ud83d\udcb5 " + String.format("%.2f \u20ac", cash));
+        lblTotalCard.setText("\ud83d\udcb3 " + String.format("%.2f \u20ac", card));
 
         if (lblCount != null)
-            lblCount.setText("\u00f0\u0178\u201d\u008d " + count + " " + container.getBundle().getString("history.count_suffix"));
+            lblCount.setText("\ud83d\udd0d " + count + " " + container.getBundle().getString("history.count_suffix"));
     }
 
     private void showDetails(Sale sale) {
@@ -306,7 +306,7 @@ public class HistoryController implements Injectable, Searchable {
                 + container.getBundle().getString("receipt.attended_by") + ": " + sale.getUserName());
 
         String methodEmoji = container.getBundle().getString("payment.method.card")
-                .equalsIgnoreCase(sale.getPaymentMethod()) ? "\u00f0\u0178\u2019\u00b3 " : "\u00f0\u0178\u2019\u00b5 ";
+                .equalsIgnoreCase(sale.getPaymentMethod()) ? "\ud83d\udcb3 " : "\ud83d\udcb5 ";
         lblPaymentMethod.setText(
                 methodEmoji + (sale.getPaymentMethod().contains("Mixed") || sale.getPaymentMethod().contains("Mixto")
                         ? container.getBundle().getString("payment.method.mixed")
@@ -330,13 +330,13 @@ public class HistoryController implements Injectable, Searchable {
                     + ";");
 
             Label qtyLabel = new Label(
-                    "\u00f0\u0178\u201c\u00a6 " + detail.getQuantity() + " un. x " + String.format("%.2f", detail.getUnitPrice()) + " \u20ac");
+                    "\ud83d\udce6 " + detail.getQuantity() + " un. x " + String.format("%.2f", detail.getUnitPrice()) + " \u20ac");
             qtyLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: #95a5a6;");
             nameBox.getChildren().addAll(nameLabel, qtyLabel);
 
             Region spacer = new Region();
             HBox.setHgrow(spacer, Priority.ALWAYS);
-            Label priceLabel = new Label("\u00f0\u0178\u2019\u00b0 " + String.format("%.2f \u20ac", detail.getLineTotal()));
+            Label priceLabel = new Label("\ud83d\udcb0 " + String.format("%.2f \u20ac", detail.getLineTotal()));
             priceLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #2c3e50;");
 
             row.getChildren().addAll(nameBox, spacer, priceLabel);
@@ -468,7 +468,7 @@ public class HistoryController implements Injectable, Searchable {
 
                 if (maxCashRefundNeeded > cashInDrawer) {
                     String oldTicketHint = selected.getClosureId() != null
-                            ? "\n\n\u1f4a1 *Recuerda*: Este ticket es de una sesi\u00f3n antigua."
+                            ? "\n\n\ud83d\udca1 *Recuerda*: Este ticket es de una sesi\u00f3n antigua."
                             : "";
 
                     boolean continuar = AlertUtil.showConfirmation("\u00e2\u0161\u00a0\u00ef\u00b8\u008f Efectivo limitado",
@@ -478,7 +478,7 @@ public class HistoryController implements Injectable, Searchable {
                                             +
                                             "El sistema devolver\u00e1 %.2f \u20ac a la tarjeta automaticamente, pero solo dispone de %.2f \u20ac "
                                             + "f\u00edsicos para la parte de efectivo.%s\n\n"
-                                            + "\u00bfDeseas continuar con una devoluci\u00f3n parcial o total sabiendo que el caj\u00f3n quedar\u00e1 bajo?",
+                                            + "\ubfdeseas continuar con una devoluci\u00f3n parcial o total sabiendo que el caj\u00f3n quedar\u00e1 bajo?",
                                     cashInDrawer, maxCashRefundNeeded, maxRefundable * (1 - cashRatio), cashInDrawer,
                                     oldTicketHint));
                     if (!continuar)
@@ -504,7 +504,7 @@ public class HistoryController implements Injectable, Searchable {
                             try {
                                 container.getClosureUseCase().validateCashAvailableForReturn(refundTotal);
                             } catch (SQLException cashEx) {
-                                AlertUtil.showError("\u00e2\u009d\u0152 Efectivo insuficiente", cashEx.getMessage());
+                                AlertUtil.showError("\u274c Efectivo insuficiente", cashEx.getMessage());
                                 return;
                             }
 

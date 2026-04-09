@@ -26,7 +26,7 @@
             <children>
                 <Label text="&#x00a1;TURNO FINALIZADO!" 
                        style="-fx-font-size: 22; -fx-font-weight: 900; -fx-text-fill: #1e293b;"/>
-                <Label text="Tu horario de trabajo ha concluido. &#x00bf;Deseas realizar el cierre de caja para finalizar oficialmente tu jornada?" 
+                <Label text="Tu horario de trabajo ha concluido. &#x00bfD;eseas realizar el cierre de caja para finalizar oficialmente tu jornada?" 
                        wrapText="true" textAlignment="CENTER" 
                        style="-fx-font-size: 15; -fx-text-fill: #64748b; -fx-line-spacing: 5;"/>
             </children>

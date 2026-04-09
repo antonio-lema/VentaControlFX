@@ -56,7 +56,7 @@ public class CashEntryController {
 
     @FXML
     private void handleConfirm() {
-        // \u00e2\u20ac\u201d Validar importe
+        // \u2014 Validar importe
         String amountText = txtAmount.getText().replace(",", ".").trim();
         if (amountText.isEmpty()) {
             AlertUtil.showWarning("Campo Obligatorio", "Debes introducir el importe a ingresar.");
@@ -74,7 +74,7 @@ public class CashEntryController {
             return;
         }
 
-        // \u00e2\u20ac\u201d Validar motivo
+        // \u2014 Validar motivo
         String reason = txtReason.getText().trim();
         if (reason.isEmpty()) {
             AlertUtil.showWarning("Campo Obligatorio", "Es obligatorio introducir una justificaci\u00f3n para el ingreso.");

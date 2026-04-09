@@ -66,7 +66,7 @@ public class PaginationHelper<T> {
         if (lblCount != null) {
             String format = (bundle != null && bundle.containsKey("pagination.showing_simple"))
                     ? bundle.getString("pagination.showing_simple")
-                    : "\u00f0\u0178\u201d\u008d Mostrando %d de %d %s";
+                    : "\ud83d\udd0d Mostrando %d de %d %s";
             lblCount.setText(String.format(format, showing, total, entityNamePlural));
         }
     }

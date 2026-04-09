@@ -115,7 +115,7 @@ public class OpenPdfFiscalService implements IFiscalPdfService {
 
         PdfPTable nestedMeta = new PdfPTable(2);
         nestedMeta.setWidthPercentage(100);
-        addMetaLine(nestedMeta, "N\u00c2\u00ba Documento:", data.document.getFullReference());
+        addMetaLine(nestedMeta, "N\u00ba Documento:", data.document.getFullReference());
         addMetaLine(nestedMeta, "Fecha Emisi\u00f3n:", data.document.getIssuedAt().format(dtf));
         metaCol.addElement(nestedMeta);
         infoTable.addCell(metaCol);
@@ -139,7 +139,7 @@ public class OpenPdfFiscalService implements IFiscalPdfService {
             document.add(new Paragraph("\n"));
         } else if (isInvoice) {
             // Si es factura pero no hay cliente, mostramos un aviso
-            document.add(new Paragraph("RECEPTOR: CLIENTE GEN\u00c3\u2030RICO / CONTADO", FONT_BODY));
+            document.add(new Paragraph("RECEPTOR: CLIENTE GEN\u00c9RICO / CONTADO", FONT_BODY));
             document.add(new Paragraph("\n"));
         }
 
@@ -228,7 +228,7 @@ public class OpenPdfFiscalService implements IFiscalPdfService {
 
         // \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac PIE DE P\u00c1GINA FIXAL \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac
         document.add(new Paragraph("\n\n"));
-        Paragraph pHash = new Paragraph("C\u00f3digo \u00c3\u0161nico de Integridad (SHA-256): " + data.document.getControlHash(),
+        Paragraph pHash = new Paragraph("C\u00f3digo \u00danico de Integridad (SHA-256): " + data.document.getControlHash(),
                 FONT_HASH);
         pHash.setAlignment(Element.ALIGN_CENTER);
         document.add(pHash);

@@ -10,7 +10,7 @@ import java.util.Optional;
 
 /**
  * Puerto de acceso a la persistencia de documentos fiscales.
- * Clean Architecture \u00e2\u20ac\u201d Capa de Dominio (Interfaz / Port).
+ * Clean Architecture \u2014 Capa de Dominio (Interfaz / Port).
  * La implementaci\u00f3n concreta vive en la capa de Infraestructura.
  */
 public interface IFiscalDocumentRepository {

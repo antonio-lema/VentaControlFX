@@ -358,8 +358,9 @@ public class MainController implements Injectable, com.mycompany.ventacontrolfx.
                 ((Injectable) controller).inject(container);
             }
             target.getChildren().setAll(node);
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
+            com.mycompany.ventacontrolfx.util.AlertUtil.showError("Error loading component", "FXML: " + fxml + "\nError: " + e.getMessage());
         }
     }
 
@@ -374,8 +375,9 @@ public class MainController implements Injectable, com.mycompany.ventacontrolfx.
             }
             target.getChildren().setAll(node);
             return (T) controller;
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
+            com.mycompany.ventacontrolfx.util.AlertUtil.showError("Error loading component", "FXML: " + fxml + "\nError: " + e.getMessage());
             return null;
         }
     }

@@ -156,7 +156,7 @@ public class PrintPreviewController implements Injectable {
         lblDate.setText("Fecha: " + now.format(formatter) + " Caja: 01");
 
         // N\u00famero de ticket
-        String prefix = isGiftMode ? "Ticket regalo N\u00c2\u00ba: " : "Factura simplificada N\u00c2\u00ba: ";
+        String prefix = isGiftMode ? "Ticket regalo N\u00ba: " : "Factura simplificada N\u00ba: ";
         lblTicketTitle.setText(prefix + String.format("%03d", saleId));
 
         // Art\u00edculos
@@ -192,7 +192,7 @@ public class PrintPreviewController implements Injectable {
             lblGiftIcon.setStyle("-fx-font-size: 16; -fx-text-fill: #1a73e8;");
         }
 
-        // Totales con IVA din\u00e1mico \u00e2\u20ac\u201d agrupado por tasa
+        // Totales con IVA din\u00e1mico \u2014 agrupado por tasa
         java.util.Map<Double, Double[]> vatBreakdown = new java.util.TreeMap<>();
         boolean isInclusive = cfg != null && cfg.isPricesIncludeTax();
         double totalVatAmount = 0.0;
@@ -813,9 +813,9 @@ public class PrintPreviewController implements Injectable {
 
         // T\u00edtulo: Factura Rectificativa (Si tiene n\u00famero fiscal) o Ticket de Devoluci\u00f3n
         if (returnRecord.getDocNumber() != null) {
-            lblTicketTitle.setText("Factura Rectificativa N\u00c2\u00ba: " + returnRecord.getFullReference());
+            lblTicketTitle.setText("Factura Rectificativa N\u00ba: " + returnRecord.getFullReference());
         } else {
-            lblTicketTitle.setText("Ticket de Devoluci\u00f3n N\u00c2\u00ba: REF-" + returnRecord.getReturnId());
+            lblTicketTitle.setText("Ticket de Devoluci\u00f3n N\u00ba: REF-" + returnRecord.getReturnId());
         }
 
         // Informaci\u00f3n de referencia al ticket original

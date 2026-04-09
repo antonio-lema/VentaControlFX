@@ -83,7 +83,7 @@ public class CashWithdrawController {
 
     @FXML
     private void handleConfirm() {
-        // \u00e2\u20ac\u201d Validar importe
+        // \u2014 Validar importe
         String amountText = txtAmount.getText().replace(",", ".").trim();
         if (amountText.isEmpty()) {
             AlertUtil.showWarning("Campo Obligatorio", "Debes introducir el importe a retirar.");
@@ -101,7 +101,7 @@ public class CashWithdrawController {
             return;
         }
 
-        // \u00e2\u20ac\u201d Validar motivo
+        // \u2014 Validar motivo
         String reason = txtReason.getText().trim();
         if (reason.isEmpty()) {
             AlertUtil.showWarning("Campo Obligatorio", "Debes especificar el motivo de la retirada.");
@@ -115,7 +115,7 @@ public class CashWithdrawController {
             close();
 
         } catch (SQLException e) {
-            AlertUtil.showError("\u00e2\u009d\u0152 Sin Efectivo Suficiente", e.getMessage());
+            AlertUtil.showError("\u274c Sin Efectivo Suficiente", e.getMessage());
         }
     }
 
