@@ -32,13 +32,13 @@
             <FontAwesomeIconView glyphName="WARNING" size="14" fill="#dc2626" />
             <VBox>
                 <Label text="Efectivo disponible en caja:" styleClass="label-muted" />
-                <Label fx:id="lblAvailable" text="0,00 \u20ac" style="-fx-font-weight: bold; -fx-text-fill: #dc2626;" />
+                <Label fx:id="lblAvailable" text="0,00 &#x20ac;" style="-fx-font-weight: bold; -fx-text-fill: #dc2626;" />
             </VBox>
         </HBox>
 
         <!-- Importe -->
         <VBox spacing="8">
-            <Label text="Importe a Retirar (\u20ac):" styleClass="label" />
+            <Label text="Importe a Retirar (&#x20ac;):" styleClass="label" />
             <HBox spacing="10" alignment="CENTER_LEFT" styleClass="modern-input-container">
                 <FontAwesomeIconView glyphName="MONEY" size="20" fill="#ef4444" />
                 <TextField fx:id="txtAmount" promptText="0,00" HBox.hgrow="ALWAYS" styleClass="modern-input-field"
@@ -57,7 +57,7 @@
             </HBox>
         </VBox>
 
-        <!-- Botones de Acci\u00f3n -->
+        <!-- Botones de Acci&#x00f3;n -->
         <HBox spacing="15" alignment="CENTER_RIGHT" style="-fx-padding: 10 0 0 0;">
             <Button text="CANCELAR" onAction="#handleCancel" styleClass="btn-secondary" prefHeight="45" prefWidth="120" />
             <Button fx:id="btnConfirm" text="CONFIRMAR RETIRADA" onAction="#handleConfirm" styleClass="btn-danger" prefHeight="45" HBox.hgrow="ALWAYS" maxWidth="Infinity">

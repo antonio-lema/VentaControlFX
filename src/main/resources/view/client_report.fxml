@@ -17,7 +17,7 @@
             </StackPane>
             <VBox spacing="2">
                 <Label text="Historial de Clientes" styleClass="view-title"/>
-                <Label text="An\u00e1lisis de comportamiento y retenci\u00f3n (CRM)" styleClass="view-subtitle"/>
+                <Label text="An&#x00e1;lisis de comportamiento y retenci&#x00f3;n (CRM)" styleClass="view-subtitle"/>
             </VBox>
             <Region HBox.hgrow="ALWAYS"/>
             
@@ -50,16 +50,16 @@
                         <Label fx:id="lblKpiActiveVar" text="-" style="-fx-background-color: #dcfce7; -fx-text-fill: #16a34a; -fx-padding: 2 6; -fx-background-radius: 10; -fx-font-size: 11px; -fx-font-weight: bold;"/>
                     </HBox>
                 </VBox>
-                <!-- Facturaci\u00f3n Total -->
+                <!-- Facturaci&#x00f3;n Total -->
                 <VBox HBox.hgrow="ALWAYS" style="-fx-background-color: -fx-bg-surface; -fx-background-radius: 12; -fx-padding: 20; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.04), 10, 0, 0, 4);" minWidth="200">
                     <HBox alignment="CENTER_LEFT" spacing="10">
                         <StackPane style="-fx-background-color: #dcfce7; -fx-background-radius: 8; -fx-padding: 8; -fx-min-width: 32; -fx-min-height: 32;">
                             <FontAwesomeIconView glyphName="MONEY" fill="#16a34a" size="16"/>
                         </StackPane>
-                        <Label text="Facturaci\u00f3n Total" style="-fx-font-size: 13px; -fx-text-fill: #64748b; -fx-font-weight: bold;"/>
+                        <Label text="Facturaci&#x00f3;n Total" style="-fx-font-size: 13px; -fx-text-fill: #64748b; -fx-font-weight: bold;"/>
                     </HBox>
                     <HBox alignment="BOTTOM_LEFT" spacing="12" style="-fx-padding: 12 0 0 0;">
-                        <Label fx:id="lblKpiTotal" text="\u20ac0.00" style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: -fx-text-custom-main;"/>
+                        <Label fx:id="lblKpiTotal" text="&#x20ac;0.00" style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: -fx-text-custom-main;"/>
                         <Label fx:id="lblKpiTotalVar" text="-" style="-fx-background-color: #dcfce7; -fx-text-fill: #16a34a; -fx-padding: 2 6; -fx-background-radius: 10; -fx-font-size: 11px; -fx-font-weight: bold;"/>
                     </HBox>
                 </VBox>
@@ -72,7 +72,7 @@
                         <Label text="Compra Media" style="-fx-font-size: 13px; -fx-text-fill: #64748b; -fx-font-weight: bold;"/>
                     </HBox>
                     <HBox alignment="BOTTOM_LEFT" spacing="12" style="-fx-padding: 12 0 0 0;">
-                        <Label fx:id="lblKpiAvgOrder" text="\u20ac0.00" style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: -fx-text-custom-main;"/>
+                        <Label fx:id="lblKpiAvgOrder" text="&#x20ac;0.00" style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: -fx-text-custom-main;"/>
                         <Label fx:id="lblKpiAvgOrderVar" text="-" style="-fx-background-color: #fee2e2; -fx-text-fill: #dc2626; -fx-padding: 2 6; -fx-background-radius: 10; -fx-font-size: 11px; -fx-font-weight: bold;"/>
                     </HBox>
                 </VBox>
@@ -85,7 +85,7 @@
                         <Label text="Valor del Cliente (LTV)" style="-fx-font-size: 13px; -fx-text-fill: #64748b; -fx-font-weight: bold;"/>
                     </HBox>
                     <HBox alignment="BOTTOM_LEFT" spacing="12" style="-fx-padding: 12 0 0 0;">
-                        <Label fx:id="lblKpiLtv" text="\u20ac0.00" style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: -fx-text-custom-main;"/>
+                        <Label fx:id="lblKpiLtv" text="&#x20ac;0.00" style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: -fx-text-custom-main;"/>
                         <Label fx:id="lblKpiLtvVar" text="-" style="-fx-background-color: #dcfce7; -fx-text-fill: #16a34a; -fx-padding: 2 6; -fx-background-radius: 10; -fx-font-size: 11px; -fx-font-weight: bold;"/>
                     </HBox>
                 </VBox>
@@ -116,11 +116,11 @@
                     </TableView>
                 </VBox>
 
-                <!-- Derecha: Panel Din\u00e1mico -->
+                <!-- Derecha: Panel Din&#x00e1;mico -->
                 <VBox spacing="20" style="-fx-background-color: -fx-bg-surface; -fx-background-radius: 12; -fx-padding: 24; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.04), 10, 0, 0, 4);" minWidth="650">
                     <VBox fx:id="pnlDetailEmpty" alignment="CENTER" VBox.vgrow="ALWAYS">
                         <FontAwesomeIconView glyphName="USER_CIRCLE" fill="#e2e8f0" size="80"/>
-                        <Label text="Seleccione un perfil para ver su an\u00e1lisis" style="-fx-text-fill: #94a3b8; -fx-font-size: 15px; -fx-font-weight: bold; -fx-padding: 16 0 0 0;"/>
+                        <Label text="Seleccione un perfil para ver su an&#x00e1;lisis" style="-fx-text-fill: #94a3b8; -fx-font-size: 15px; -fx-font-weight: bold; -fx-padding: 16 0 0 0;"/>
                     </VBox>
 
                     <VBox fx:id="pnlDetailContent" spacing="24" VBox.vgrow="ALWAYS" visible="false" managed="false" style="-fx-opacity: 0;">
@@ -134,7 +134,7 @@
                                     <Label fx:id="lblDetailName" text="John Doe Company" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: -fx-text-custom-main;"/>
                                     <Label fx:id="lblDetailTier" text="Oro" style="-fx-background-color: #fef08a; -fx-text-fill: #854d0e; -fx-padding: 2 10; -fx-background-radius: 12; -fx-font-size: 11px; -fx-font-weight: bold;"/>
                                 </HBox>
-                                <Label fx:id="lblDetailInfo" text="Empresa | \u00daltima compra: 12 Ago 2026" style="-fx-text-fill: #64748b; -fx-font-size: 13px;"/>
+                                <Label fx:id="lblDetailInfo" text="Empresa | &#x00da;ltima compra: 12 Ago 2026" style="-fx-text-fill: #64748b; -fx-font-size: 13px;"/>
                             </VBox>
                             <HBox spacing="10">
                                 <Button text="Editar Perfil" style="-fx-background-color: transparent; -fx-border-color: #e2e8f0; -fx-border-radius: 6; -fx-cursor: hand; -fx-text-fill: -fx-text-custom-light; -fx-padding: 8 14; -fx-font-weight: bold;"/>
@@ -144,13 +144,13 @@
                         <Separator style="-fx-background-color: transparent; -fx-border-color: #e2e8f0; -fx-border-width: 0 0 1 0;"/>
 
                         <HBox spacing="30" VBox.vgrow="ALWAYS">
-                            <!-- Timeline e Informaci\u00f3n de Pedidos -->
+                            <!-- Timeline e Informaci&#x00f3;n de Pedidos -->
                             <VBox spacing="16" HBox.hgrow="ALWAYS" minWidth="400">
-                                <Label text="Hist\u00f3rico de Pedidos (Doble clic para ver detalle)" style="-fx-font-weight: bold; -fx-text-fill: -fx-text-custom-main; -fx-font-size: 14px;"/>
+                                <Label text="Hist&#x00f3;rico de Pedidos (Doble clic para ver detalle)" style="-fx-font-weight: bold; -fx-text-fill: -fx-text-custom-main; -fx-font-size: 14px;"/>
                                 <TableView fx:id="purchaseTable" VBox.vgrow="ALWAYS">
                                     <columns>
                                         <TableColumn fx:id="colDate" text="FECHA" minWidth="120" prefWidth="140" style="-fx-text-fill: -fx-text-custom-light;"/>
-                                        <TableColumn fx:id="colItems" text="ART\u00cdCULOS" minWidth="80" prefWidth="90" style="-fx-alignment: CENTER;"/>
+                                        <TableColumn fx:id="colItems" text="ART&#x00cd;CULOS" minWidth="80" prefWidth="90" style="-fx-alignment: CENTER;"/>
                                         <TableColumn fx:id="colMethod" text="PAGO" minWidth="100" prefWidth="110"/>
                                         <TableColumn fx:id="colAmount" text="IMPORTE" minWidth="100" prefWidth="110" style="-fx-alignment: CENTER-RIGHT; -fx-font-weight: bold; -fx-text-fill: -fx-text-custom-main;"/>
                                     </columns>
@@ -162,7 +162,7 @@
                             <!-- Pay Methods & Top Products -->
                             <VBox spacing="24" minWidth="280">
                                 <VBox spacing="10">
-                                    <Label text="Evoluci\u00f3n Facturaci\u00f3n" style="-fx-font-weight: bold; -fx-text-fill: -fx-text-custom-main; -fx-font-size: 14px;"/>
+                                    <Label text="Evoluci&#x00f3;n Facturaci&#x00f3;n" style="-fx-font-weight: bold; -fx-text-fill: -fx-text-custom-main; -fx-font-size: 14px;"/>
                                     <LineChart fx:id="chartEvolution" minHeight="180" legendVisible="false" createSymbols="false">
                                         <xAxis><CategoryAxis side="BOTTOM" tickLabelFill="#94a3b8"/></xAxis>
                                         <yAxis><NumberAxis side="LEFT" tickLabelFill="#94a3b8"/></yAxis>
@@ -180,7 +180,7 @@
                                         </StackPane>
                                         <VBox spacing="2">
                                             <Label fx:id="lblPrefPayment" text="Tarjeta" style="-fx-text-fill: -fx-text-custom-main; -fx-font-weight: bold;"/>
-                                            <Label text="M\u00e9todo Predeterminado" style="-fx-text-fill: #94a3b8; -fx-font-size: 11px;"/>
+                                            <Label text="M&#x00e9;todo Predeterminado" style="-fx-text-fill: #94a3b8; -fx-font-size: 11px;"/>
                                         </VBox>
                                     </HBox>
                                 </VBox>

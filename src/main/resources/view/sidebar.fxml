@@ -13,7 +13,7 @@
         <Insets top="0" right="0" bottom="20" left="0"/>
     </padding>
 
-    <!-- \u2500\u2500\u2500 BRANDING SECCI\u00d3N \u2500\u2500\u2500 -->
+    <!-- &#x2500;&#x2500;&#x2500; BRANDING SECCI&#x00d3;N &#x2500;&#x2500;&#x2500; -->
     <VBox alignment="CENTER" styleClass="sidebar-branding">
         <StackPane fx:id="brandIconWrap" styleClass="brand-icon-wrap" alignment="CENTER">
             <FontAwesomeIconView fx:id="brandFallbackIcon" glyphName="SHOPPING_CART" size="26" styleClass="brand-fallback-icon"/>
@@ -25,7 +25,7 @@
     <ScrollPane VBox.vgrow="ALWAYS" fitToWidth="true" styleClass="sidebar-scroll-pane">
         <VBox spacing="0" style="-fx-background-color: transparent;" alignment="TOP_CENTER">
             
-            <!-- SECCI\u00d3N: VENTAS -->
+            <!-- SECCI&#x00d3;N: VENTAS -->
             <Button fx:id="sectionVentas" styleClass="sidebar-section-header" onAction="#toggleVentas" text="%sidebar.section.sales" maxWidth="Infinity" />
             <VBox fx:id="contentVentas" styleClass="sidebar-section-content" spacing="0" visible="false" managed="false">
                 <Button fx:id="btnSell" styleClass="sidebar-button" onAction="#showSellView" contentDisplay="TOP" maxWidth="Infinity" text="%sidebar.item.sell">
@@ -42,7 +42,7 @@
                 </Button>
             </VBox>
 
-            <!-- SECCI\u00d3N: CAT\u00c1LOGO -->
+            <!-- SECCI&#x00d3;N: CAT&#x00c1;LOGO -->
             <Button fx:id="sectionCatalogo" styleClass="sidebar-section-header" onAction="#toggleCatalogo" text="%sidebar.section.catalog" maxWidth="Infinity" />
             <VBox fx:id="contentCatalogo" styleClass="sidebar-section-content" spacing="0" visible="false" managed="false">
                 <Button fx:id="btnProducts" styleClass="sidebar-button" onAction="#showProductsView" contentDisplay="TOP" maxWidth="Infinity" text="%sidebar.item.products">
@@ -59,7 +59,7 @@
                 </Button>
             </VBox>
 
-            <!-- SECCI\u00d3N: PERSONAL -->
+            <!-- SECCI&#x00d3;N: PERSONAL -->
             <Button fx:id="sectionPersonal" styleClass="sidebar-section-header" onAction="#togglePersonal" text="%sidebar.section.staff" maxWidth="Infinity" />
             <VBox fx:id="contentPersonal" styleClass="sidebar-section-content" spacing="0" visible="false" managed="false">
                 <Button fx:id="btnWorkSessions" styleClass="sidebar-button" onAction="#handleShowWorkSessions" contentDisplay="TOP" maxWidth="Infinity" text="%sidebar.item.work_sessions">
@@ -76,7 +76,7 @@
                 </Button>
             </VBox>
 
-            <!-- SECCI\u00d3N: CLIENTES -->
+            <!-- SECCI&#x00d3;N: CLIENTES -->
             <Button fx:id="sectionClientes" styleClass="sidebar-section-header" onAction="#toggleClientes" text="%sidebar.section.clients" maxWidth="Infinity" />
             <VBox fx:id="contentClientes" styleClass="sidebar-section-content" spacing="0" visible="false" managed="false">
                 <Button fx:id="btnClients" styleClass="sidebar-button" onAction="#handleShowClients" contentDisplay="TOP" maxWidth="Infinity" text="%sidebar.item.directory">
@@ -87,7 +87,7 @@
                 </Button>
             </VBox>
 
-            <!-- SECCI\u00d3N: GESTI\u00d3N -->
+            <!-- SECCI&#x00d3;N: GESTI&#x00d3;N -->
             <Button fx:id="sectionGestion" styleClass="sidebar-section-header" onAction="#toggleGestion" text="%sidebar.section.management" maxWidth="Infinity" />
             <VBox fx:id="contentGestion" styleClass="sidebar-section-content" spacing="0" visible="false" managed="false">
                 <Button fx:id="btnReports" styleClass="sidebar-button" onAction="#handleShowReports" contentDisplay="TOP" maxWidth="Infinity" text="%sidebar.item.reports">
@@ -107,7 +107,7 @@
                 </Button>
             </VBox>
 
-            <!-- SECCI\u00d3N: SISTEMA -->
+            <!-- SECCI&#x00d3;N: SISTEMA -->
             <Button fx:id="sectionSistema" styleClass="sidebar-section-header" onAction="#toggleSistema" text="%sidebar.section.system" maxWidth="Infinity" />
             <VBox fx:id="contentSistema" styleClass="sidebar-section-content" spacing="0" visible="false" managed="false">
                 <Button fx:id="btnConfig" styleClass="sidebar-button" onAction="#handleShowConfig" contentDisplay="TOP" maxWidth="Infinity" text="%sidebar.item.config">

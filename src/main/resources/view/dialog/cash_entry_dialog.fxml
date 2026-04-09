@@ -31,13 +31,13 @@
             <FontAwesomeIconView glyphName="INFO_CIRCLE" size="14" fill="#16a34a" />
             <VBox>
                 <Label text="Efectivo actual en caja:" styleClass="label-muted" />
-                <Label fx:id="lblCurrentCash" text="0,00 \u20ac" style="-fx-font-weight: bold; -fx-text-fill: #15803d;" />
+                <Label fx:id="lblCurrentCash" text="0,00 &#x20ac;" style="-fx-font-weight: bold; -fx-text-fill: #15803d;" />
             </VBox>
         </HBox>
 
         <!-- Importe -->
         <VBox spacing="8">
-            <Label text="Importe a Ingresar (\u20ac):" styleClass="label" />
+            <Label text="Importe a Ingresar (&#x20ac;):" styleClass="label" />
             <HBox spacing="10" alignment="CENTER_LEFT" styleClass="modern-input-container">
                 <FontAwesomeIconView glyphName="MONEY" size="20" fill="#22c55e" />
                 <TextField fx:id="txtAmount" promptText="0,00" HBox.hgrow="ALWAYS" styleClass="modern-input-field"
@@ -53,14 +53,14 @@
 
         <!-- Motivo -->
         <VBox spacing="8">
-            <Label text="Motivo / Justificaci\u00f3n:" styleClass="label" />
+            <Label text="Motivo / Justificaci&#x00f3;n:" styleClass="label" />
             <HBox spacing="10" alignment="CENTER_LEFT" styleClass="modern-input-container">
                 <FontAwesomeIconView glyphName="PENCIL" size="14" fill="#94a3b8" />
-                <TextField fx:id="txtReason" promptText="Escribe la justificaci\u00f3n..." HBox.hgrow="ALWAYS" styleClass="modern-input-field" />
+                <TextField fx:id="txtReason" promptText="Escribe la justificaci&#x00f3;n..." HBox.hgrow="ALWAYS" styleClass="modern-input-field" />
             </HBox>
         </VBox>
 
-        <!-- Botones de Acci\u00f3n -->
+        <!-- Botones de Acci&#x00f3;n -->
         <HBox spacing="15" alignment="CENTER_RIGHT" style="-fx-padding: 10 0 0 0;">
             <Button text="CANCELAR" onAction="#handleCancel" styleClass="btn-secondary" prefHeight="45" prefWidth="120" />
             <Button text="REGISTRAR INGRESO" onAction="#handleConfirm" styleClass="btn-primary" prefHeight="45" HBox.hgrow="ALWAYS" maxWidth="Infinity">

@@ -31,7 +31,7 @@
     </HBox>
 
     <HBox spacing="10" alignment="CENTER_LEFT" styleClass="cart-pricelist-header">
-        <!-- Secci\u00f3n Tarifa -->
+        <!-- Secci&#x00f3;n Tarifa -->
         <HBox spacing="8" alignment="CENTER_LEFT" HBox.hgrow="ALWAYS">
             <StackPane styleClass="icon-container-small" style="-fx-background-color: -fx-custom-color-primary-bg;">
                 <FontAwesomeIconView glyphName="TAG" size="12" style="-fx-fill: -fx-custom-color-primary;"/>
@@ -84,7 +84,7 @@
 
     <StackPane VBox.vgrow="ALWAYS" styleClass="cart-items-pane">
         <VBox fx:id="emptyCartView" alignment="CENTER" spacing="10">
-            <Label text="\u1f6d2" style="-fx-font-size: 60px; -fx-text-fill: #eee;"/>
+            <Label text="&#x1f6d;2" style="-fx-font-size: 60px; -fx-text-fill: #eee;"/>
         </VBox>
         <ScrollPane fitToWidth="true" style="-fx-background-color: transparent; -fx-background: transparent;" hbarPolicy="NEVER">
             <VBox fx:id="cartItemsContainer" spacing="0" styleClass="cart-list-container"/>
@@ -108,23 +108,23 @@
         <HBox alignment="CENTER_LEFT">
             <Label fx:id="itemsCountLabel" text="%cart.summary.subtotal" styleClass="summary-label"/>
             <Region HBox.hgrow="ALWAYS"/>
-            <Label fx:id="subtotalLabel" text="0,00 \u20ac" styleClass="summary-value"/>
+            <Label fx:id="subtotalLabel" text="0,00 &#x20ac;" styleClass="summary-value"/>
         </HBox>
         <HBox alignment="CENTER_LEFT">
             <Label text="%cart.summary.taxes" styleClass="summary-label"/>
             <Region HBox.hgrow="ALWAYS"/>
-            <Label fx:id="taxLabel" text="0,00 \u20ac" styleClass="summary-value"/>
+            <Label fx:id="taxLabel" text="0,00 &#x20ac;" styleClass="summary-value"/>
         </HBox>
         <HBox fx:id="hboxSavings" alignment="CENTER_LEFT" style="-fx-text-fill: -color-success;">
             <Label text="%cart.summary.savings" styleClass="summary-label" style="-fx-text-fill: -color-success;"/>
             <Region HBox.hgrow="ALWAYS"/>
-            <Label fx:id="savingsLabel" text="0,00 \u20ac" styleClass="summary-value" style="-fx-text-fill: -color-success; -fx-font-weight: bold;"/>
+            <Label fx:id="savingsLabel" text="0,00 &#x20ac;" styleClass="summary-value" style="-fx-text-fill: -color-success; -fx-font-weight: bold;"/>
         </HBox>
         <Separator/>
         <HBox alignment="CENTER_LEFT">
             <Label text="%cart.summary.total" styleClass="total-label"/>
             <Region HBox.hgrow="ALWAYS"/>
-            <Label fx:id="totalButtonLabel" text="0,00 \u20ac" styleClass="total-value"/>
+            <Label fx:id="totalButtonLabel" text="0,00 &#x20ac;" styleClass="total-value"/>
         </HBox>
         <Button fx:id="payButton" text="%cart.btn.pay" onAction="#handlePayButton" styleClass="btn-pay" maxWidth="Infinity" graphicTextGap="12">
             <graphic>

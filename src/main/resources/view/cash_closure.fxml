@@ -21,7 +21,7 @@
                 <Label text="%closure.main_title" styleClass="view-title"/>
                 <HBox spacing="10" alignment="CENTER_LEFT">
                     <Label fx:id="lblDate" text="20 Feb, 2026" styleClass="view-subtitle"/>
-                    <Label text="\u2022" styleClass="view-subtitle"/>
+                    <Label text="&#x2022;" styleClass="view-subtitle"/>
                     <Label fx:id="lblCurrentUser" text="Admin" styleClass="view-subtitle" style="-fx-font-weight: bold;"/>
                 </HBox>
             </VBox>
@@ -39,7 +39,7 @@
         <ScrollPane prefWidth="420" fitToWidth="true" hbarPolicy="NEVER" styleClass="estetica-scroll" 
                    style="-fx-background-color: transparent; -fx-background: transparent;">
             <VBox spacing="14">
-                <!-- \u2554\u2550\u2550 TARJETA: EFECTIVO EN CAJA \u2550\u2550\u2557 -->
+                <!-- &#x2554;&#x2550;&#x2550; TARJETA: EFECTIVO EN CAJA &#x2550;&#x2550;&#x2557; -->
                 <VBox fx:id="cardCash" spacing="12" styleClass="estetica-card">
                     <HBox styleClass="estetica-card-header" alignment="CENTER_LEFT" spacing="12">
                         <StackPane styleClass="estetica-card-icon-wrap, estetica-icon-green">
@@ -67,7 +67,7 @@
                                style="-fx-font-size: 12px; -fx-text-fill: -color-warning; -fx-font-weight: bold;"/>
                     </VBox>
 
-                    <!-- Botones de gesti\u00f3n de caja -->
+                    <!-- Botones de gesti&#x00f3;n de caja -->
                     <VBox styleClass="estetica-card-body" spacing="8">
                         <Button fx:id="btnOpenFund" onAction="#handleOpenFund"
                                 maxWidth="Infinity" text="%closure.btn.open_fund"
@@ -81,7 +81,7 @@
                     </VBox>
                 </VBox>
 
-                <!-- \u2554\u2550\u2550 TARJETA: CONTABILIDAD \u2550\u2550\u2557 -->
+                <!-- &#x2554;&#x2550;&#x2550; TARJETA: CONTABILIDAD &#x2550;&#x2550;&#x2557; -->
                 <VBox fx:id="cardAccounting" spacing="15" styleClass="estetica-card">
                     <HBox styleClass="estetica-card-header" alignment="CENTER_LEFT" spacing="12">
                         <StackPane styleClass="estetica-card-icon-wrap, estetica-icon-blue">
@@ -95,31 +95,31 @@
                     <VBox styleClass="estetica-card-body" spacing="18">
                         <VBox spacing="5" styleClass="closure-amount-row">
                             <Label text="%closure.cash_sold" styleClass="label-muted"/>
-                            <Label fx:id="lblTotalCash" text="0,00 \u20ac" styleClass="closure-amount-cash" style="-fx-font-size: 20px;"/>
+                            <Label fx:id="lblTotalCash" text="0,00 &#x20ac;" styleClass="closure-amount-cash" style="-fx-font-size: 20px;"/>
                         </VBox>
 
                         <VBox spacing="5" styleClass="closure-amount-row">
                             <Label text="%closure.card_sold" styleClass="label-muted"/>
-                            <Label fx:id="lblTotalCard" text="0,00 \u20ac" styleClass="closure-amount-card" style="-fx-font-size: 20px;"/>
+                            <Label fx:id="lblTotalCard" text="0,00 &#x20ac;" styleClass="closure-amount-card" style="-fx-font-size: 20px;"/>
                         </VBox>
 
                         <VBox fx:id="containerReturns" spacing="5" styleClass="closure-amount-row" visible="false" managed="false">
                             <Label text="%closure.returns" styleClass="label-muted"/>
-                            <Label fx:id="lblTotalReturns" text="0,00 \u20ac"
+                            <Label fx:id="lblTotalReturns" text="0,00 &#x20ac;"
                                    style="-fx-text-fill: -color-danger; -fx-font-weight: bold; -fx-font-size: 20px;"/>
                         </VBox>
 
                         <!-- Descuentos Aplicados -->
                         <VBox fx:id="containerDiscounts" spacing="5" styleClass="closure-amount-row" visible="false" managed="false">
                             <Label text="%closure.discounts" styleClass="label-muted"/>
-                            <Label fx:id="lblTotalDiscounts" text="0,00 \u20ac"
+                            <Label fx:id="lblTotalDiscounts" text="0,00 &#x20ac;"
                                    style="-fx-text-fill: #16a34a; -fx-font-weight: bold; -fx-font-size: 20px;"/>
                         </VBox>
 
                         <!-- Highlighted total -->
                         <VBox spacing="8" styleClass="estetica-preview-wrapper" style="-fx-alignment: center;">
                             <Label text="%closure.net_total" styleClass="estetica-preview-title"/>
-                            <Label fx:id="lblTotalAll" text="0,00 \u20ac" styleClass="closure-grand-total" style="-fx-font-size: 32px; -fx-text-fill: -color-primary;"/>
+                            <Label fx:id="lblTotalAll" text="0,00 &#x20ac;" styleClass="closure-grand-total" style="-fx-font-size: 32px; -fx-text-fill: -color-primary;"/>
                         </VBox>
                     </VBox>
                 </VBox>

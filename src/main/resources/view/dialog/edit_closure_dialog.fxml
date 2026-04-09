@@ -32,13 +32,13 @@
             <FontAwesomeIconView glyphName="INFO_CIRCLE" size="14" fill="#0284c7" />
             <VBox>
                 <Label text="Efectivo contado anterior:" styleClass="label-muted" />
-                <Label fx:id="lblPreviousCash" text="0,00 \u20ac" style="-fx-font-weight: bold; -fx-text-fill: #0284c7;" />
+                <Label fx:id="lblPreviousCash" text="0,00 &#x20ac;" style="-fx-font-weight: bold; -fx-text-fill: #0284c7;" />
             </VBox>
         </HBox>
 
         <!-- Importe Nuevo -->
         <VBox spacing="8">
-            <Label text="Nuevo Total Contado (\u20ac):" styleClass="label" />
+            <Label text="Nuevo Total Contado (&#x20ac;):" styleClass="label" />
             <HBox spacing="10" alignment="CENTER_LEFT" styleClass="modern-input-container">
                 <FontAwesomeIconView glyphName="MONEY" size="20" fill="#3b82f6" />
                 <TextField fx:id="txtAmount" promptText="0,00" HBox.hgrow="ALWAYS" styleClass="modern-input-field"
@@ -48,14 +48,14 @@
 
         <!-- Motivo -->
         <VBox spacing="8">
-            <Label text="Motivo de la Modificaci\u00f3n:" styleClass="label" />
+            <Label text="Motivo de la Modificaci&#x00f3;n:" styleClass="label" />
             <HBox spacing="10" alignment="CENTER_LEFT" styleClass="modern-input-container">
                 <FontAwesomeIconView glyphName="PENCIL" size="14" fill="#94a3b8" />
-                <TextField fx:id="txtReason" promptText="Ej: Error de digitaci\u00f3n, billete traspapelado..." HBox.hgrow="ALWAYS" styleClass="modern-input-field" />
+                <TextField fx:id="txtReason" promptText="Ej: Error de digitaci&#x00f3;n, billete traspapelado..." HBox.hgrow="ALWAYS" styleClass="modern-input-field" />
             </HBox>
         </VBox>
 
-        <!-- Botones de Acci\u00f3n -->
+        <!-- Botones de Acci&#x00f3;n -->
         <HBox spacing="15" alignment="CENTER_RIGHT" style="-fx-padding: 10 0 0 0;">
             <Button text="CANCELAR" onAction="#handleCancel" styleClass="btn-secondary" prefHeight="45" prefWidth="120" />
             <Button fx:id="btnConfirm" text="MODIFICAR ARQUEO" onAction="#handleConfirm" styleClass="btn-primary" prefHeight="45" HBox.hgrow="ALWAYS" maxWidth="Infinity">

@@ -100,7 +100,7 @@
                                               </children>
                                            </VBox>
 
-                                           <!-- Columna Derecha: Categor\u00eda -->
+                                           <!-- Columna Derecha: Categor&#x00ed;a -->
                                            <VBox spacing="0" HBox.hgrow="ALWAYS" styleClass="config-card">
                                               <children>
                                                   <HBox styleClass="config-card-header" alignment="CENTER_LEFT" spacing="12">
@@ -132,7 +132,7 @@
                                               </children>
                                            </VBox>
 
-                                           <!-- Columna: Producto Espec\u00edfico -->
+                                           <!-- Columna: Producto Espec&#x00ed;fico -->
                                            <VBox spacing="0" HBox.hgrow="ALWAYS" styleClass="config-card">
                                               <children>
                                                   <HBox styleClass="config-card-header" alignment="CENTER_LEFT" spacing="12">
@@ -180,9 +180,9 @@
                   </content>
                 </Tab>
 
-                <!-- \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550 -->
-                <!--  PESTA\u00d1A: SUBIDA MASIVA DE PRECIOS \u2014 UI DIN\u00c1MICA              -->
-                <!-- \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550 -->
+                <!-- &#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550; -->
+                <!--  PESTA&#x00d1;A: SUBIDA MASIVA DE PRECIOS &#x2014; UI DIN&#x00c1;MICA              -->
+                <!-- &#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550; -->
                 <Tab text="%vat.tab.mass_update">
                     <graphic>
                         <FontAwesomeIconView glyphName="LINE_CHART" size="14" />
@@ -216,7 +216,7 @@
                                          </VBox.margin>
                                      </HBox>
 
-                                     <!-- \u2500\u2500 STEP 1: Selecci\u00f3n de Objetivo \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 -->
+                                     <!-- &#x2500;&#x2500; STEP 1: Selecci&#x00f3;n de Objetivo &#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500; -->
                                      <VBox spacing="10.0">
                                          <children>
                                              <HBox alignment="CENTER_LEFT" spacing="10">
@@ -268,7 +268,7 @@
                                          </children>
                                      </VBox>
 
-                                     <!-- \u2500\u2500 STEP 2: Configuraci\u00f3n Detallada \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 -->
+                                     <!-- &#x2500;&#x2500; STEP 2: Configuraci&#x00f3;n Detallada &#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500; -->
                                      <VBox spacing="10.0">
                                          <children>
                                              <HBox alignment="CENTER_LEFT" spacing="10">
@@ -282,7 +282,7 @@
                                                 <children>
                                                     <VBox styleClass="estetica-card-body">
                                                         <children>
-                                                           <!-- Sub-panel: Por CATEGOR\u00cdA -->
+                                                           <!-- Sub-panel: Por CATEGOR&#x00cd;A -->
                                                            <HBox fx:id="panelCategory" alignment="CENTER_LEFT" spacing="15.0"
                                                                  visible="true" managed="true"
                                                                  styleClass="panel-accent-blue">
@@ -300,7 +300,7 @@
                                                               </children>
                                                            </HBox>
 
-                                                           <!-- Sub-panel: CLONACI\u00d3N -->
+                                                           <!-- Sub-panel: CLONACI&#x00d3;N -->
                                                            <HBox fx:id="panelClone" alignment="CENTER_LEFT" spacing="15.0"
                                                                  visible="false" managed="false"
                                                                  styleClass="panel-accent-lightblue">
@@ -441,7 +441,7 @@
                                                               </children>
                                                            </HBox>
 
-                                                           <!-- Sub-panel: PRODUCTOS ESPEC\u00cdFICOS -->
+                                                           <!-- Sub-panel: PRODUCTOS ESPEC&#x00cd;FICOS -->
                                                            <VBox fx:id="panelProducts" spacing="10.0" 
                                                                  visible="false" managed="false"
                                                                  styleClass="panel-accent-teal">
@@ -474,7 +474,7 @@
                                          </children>
                                      </VBox>
 
-                                     <!-- \u2500\u2500 STEP 3: Aplicaci\u00f3n del Reajuste \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 -->
+                                     <!-- &#x2500;&#x2500; STEP 3: Aplicaci&#x00f3;n del Reajuste &#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500; -->
                                      <VBox spacing="10.0">
                                          <children>
                                              <HBox alignment="CENTER_LEFT" spacing="10">
@@ -538,9 +538,9 @@
                   </content>
                 </Tab>
 
-                <!-- \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550 -->
-                <!--  PESTA\u00d1A: CAT\u00c1LOGO DE IMPUESTOS (MANTENIMIENTO)                -->
-                <!-- \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550 -->
+                <!-- &#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550; -->
+                <!--  PESTA&#x00d1;A: CAT&#x00c1;LOGO DE IMPUESTOS (MANTENIMIENTO)                -->
+                <!-- &#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550; -->
                 <Tab text="%vat.tab.catalog">
                     <graphic>
                         <FontAwesomeIconView glyphName="LIST_ALT" size="14" />
@@ -552,7 +552,7 @@
                              <content>
                                 <VBox spacing="25.0" styleClass="view-body-padding">
                                    <children>
-                                      <!-- Secci\u00f3n 1: Tasas Impositivas -->
+                                      <!-- Secci&#x00f3;n 1: Tasas Impositivas -->
                                       <VBox spacing="15.0" styleClass="config-card">
                                          <children>
                                             <HBox alignment="CENTER_LEFT" spacing="15.0">
@@ -591,7 +591,7 @@
                                          </children>
                                       </VBox>
 
-                                      <!-- Secci\u00f3n 2: Grupos Fiscales -->
+                                      <!-- Secci&#x00f3;n 2: Grupos Fiscales -->
                                       <VBox spacing="15.0" styleClass="config-card">
                                          <children>
                                             <HBox alignment="CENTER_LEFT" spacing="15.0">
@@ -637,9 +637,9 @@
                   </content>
                 </Tab>
 
-                <!-- \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550 -->
-                <!--  PESTA\u00d1A: HISTORIAL DE REVISIONES                             -->
-                <!-- \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550 -->
+                <!-- &#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550; -->
+                <!--  PESTA&#x00d1;A: HISTORIAL DE REVISIONES                             -->
+                <!-- &#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550; -->
                 <Tab text="%vat.tab.history">
                     <graphic>
                         <FontAwesomeIconView glyphName="HISTORY" size="14" />
@@ -687,7 +687,7 @@
                                     </TableView>
 
                                     <!-- Separador -->
-                                    <Label styleClass="history-subtitle" text="\u25bc  %vat.history.mass.title" />
+                                    <Label styleClass="history-subtitle" text="&#x25bc;  %vat.history.mass.title" />
 
                                     <!-- Tabla historial actualizaciones de precio -->
                                     <TableView fx:id="priceLogTable" prefHeight="180.0" VBox.vgrow="ALWAYS" styleClass="modern-table-view">

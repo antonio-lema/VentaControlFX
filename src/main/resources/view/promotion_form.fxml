@@ -17,7 +17,7 @@
                 </StackPane>
                 <VBox spacing="2">
                     <children>
-                        <Label fx:id="lblTitle" text="Nueva Promoci\u00f3n" styleClass="view-title" style="-fx-font-size: 18;"/>
+                        <Label fx:id="lblTitle" text="Nueva Promoci&#x00f3;n" styleClass="view-title" style="-fx-font-size: 18;"/>
                         <Label text="Configura los detalles de la oferta" styleClass="view-subtitle"/>
                     </children>
                 </VBox>
@@ -36,7 +36,7 @@
                     <children>
                         <VBox spacing="5" GridPane.columnSpan="2">
                             <children>
-                                <Label text="Nombre de la Promoci\u00f3n" styleClass="label-bold"/>
+                                <Label text="Nombre de la Promoci&#x00f3;n" styleClass="label-bold"/>
                                 <TextField fx:id="txtName" promptText="Ej: Rebajas de Verano" styleClass="modern-text-field"/>
                             </children>
                         </VBox>
@@ -57,14 +57,14 @@
 
                         <VBox spacing="5" GridPane.rowIndex="2">
                             <children>
-                                <Label text="\u00c1mbito" styleClass="label-bold"/>
+                                <Label text="&#x00c1;mbito" styleClass="label-bold"/>
                                 <ComboBox fx:id="cmbScope" maxWidth="Infinity" styleClass="modern-combo-box"/>
                             </children>
                         </VBox>
 
                         <VBox spacing="5" GridPane.rowIndex="2" GridPane.columnIndex="1" alignment="BOTTOM_LEFT">
                             <children>
-                                <CheckBox fx:id="chkActive" text="Activar promoci\u00f3n" selected="true" style="-fx-font-weight: bold;"/>
+                                <CheckBox fx:id="chkActive" text="Activar promoci&#x00f3;n" selected="true" style="-fx-font-weight: bold;"/>
                             </children>
                         </VBox>
 
@@ -74,7 +74,7 @@
                                 <HBox spacing="10">
                                     <children>
                                         <TextField fx:id="txtAffectedSearch" promptText="Buscar ID o nombre..." HBox.hgrow="ALWAYS" styleClass="modern-text-field"/>
-                                        <Button onAction="#handleAddAffected" styleClass="btn-secondary" text="A\u00f1adir" />
+                                        <Button onAction="#handleAddAffected" styleClass="btn-secondary" text="A&#x00f1;adir" />
                                     </children>
                                 </HBox>
                                 <ListView fx:id="listAffected" prefHeight="100" styleClass="modern-list-view"/>
@@ -123,7 +123,7 @@
         <HBox spacing="15" alignment="CENTER_RIGHT" style="-fx-padding: 10 0 0 0;">
             <children>
                 <Button onAction="#handleCancel" text="Cancelar" styleClass="btn-outline"/>
-                <Button onAction="#handleSave" text="Guardar Promoci\u00f3n" styleClass="btn-primary">
+                <Button onAction="#handleSave" text="Guardar Promoci&#x00f3;n" styleClass="btn-primary">
                     <graphic><FontAwesomeIconView glyphName="SAVE" fill="WHITE"/></graphic>
                 </Button>
             </children>

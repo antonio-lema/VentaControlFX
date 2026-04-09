@@ -106,7 +106,7 @@
                               <Label text="%history.stat.total" styleClass="stat-label" />
                            </children>
                         </HBox>
-                        <Label fx:id="lblTotalAmount" text="0,00 \u20ac" styleClass="stat-value, text-total" />
+                        <Label fx:id="lblTotalAmount" text="0,00 &#x20ac;" styleClass="stat-value, text-total" />
                      </children>
                   </VBox>
                   <VBox alignment="CENTER_LEFT" prefWidth="200.0" spacing="5.0" styleClass="stat-card" HBox.hgrow="ALWAYS">
@@ -119,7 +119,7 @@
                               <Label text="%history.stat.cash" styleClass="stat-label" />
                            </children>
                         </HBox>
-                        <Label fx:id="lblTotalCash" text="0,00 \u20ac" styleClass="stat-value, text-cash" />
+                        <Label fx:id="lblTotalCash" text="0,00 &#x20ac;" styleClass="stat-value, text-cash" />
                      </children>
                   </VBox>
                   <VBox alignment="CENTER_LEFT" prefWidth="200.0" spacing="5.0" styleClass="stat-card" HBox.hgrow="ALWAYS">
@@ -132,7 +132,7 @@
                               <Label text="%history.stat.card" styleClass="stat-label" />
                            </children>
                         </HBox>
-                        <Label fx:id="lblTotalCard" text="0,00 \u20ac" styleClass="stat-value, text-card" />
+                        <Label fx:id="lblTotalCard" text="0,00 &#x20ac;" styleClass="stat-value, text-card" />
                      </children>
                   </VBox>
                </children>
@@ -209,7 +209,7 @@
                                        <children>
                                           <Label text="%history.detail.total" styleClass="detail-total-label" />
                                           <Region HBox.hgrow="ALWAYS" />
-                                          <Label fx:id="lblTotalAmountDetail" text="0,00 \u20ac" styleClass="detail-total-value, text-total" />
+                                          <Label fx:id="lblTotalAmountDetail" text="0,00 &#x20ac;" styleClass="detail-total-value, text-total" />
                                        </children>
                                     </HBox>
                                  </children>

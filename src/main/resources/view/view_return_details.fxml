@@ -15,7 +15,7 @@
     <HBox alignment="CENTER_LEFT" spacing="15">
         <FontAwesomeIconView glyphName="INFO_CIRCLE" size="24" fill="#6366f1"/>
         <VBox>
-            <Label fx:id="lblTitle" text="Detalles de la Devoluci\u00f3n" style="-fx-font-size: 18; -fx-font-weight: bold; -fx-text-fill: -fx-text-custom-main;"/>
+            <Label fx:id="lblTitle" text="Detalles de la Devoluci&#x00f3;n" style="-fx-font-size: 18; -fx-font-weight: bold; -fx-text-fill: -fx-text-custom-main;"/>
             <Label fx:id="lblSubtitle" text="Desglose de productos reintegrados" style="-fx-font-size: 13; -fx-text-fill: #64748b;"/>
         </VBox>
     </HBox>

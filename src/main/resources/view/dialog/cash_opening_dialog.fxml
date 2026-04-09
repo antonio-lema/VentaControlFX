@@ -24,18 +24,18 @@
     </VBox>
 
     <VBox spacing="15" style="-fx-padding: 0 40 30 40;">
-        <!-- Informaci\u00f3n informativa -->
+        <!-- Informaci&#x00f3;n informativa -->
         <HBox spacing="10" alignment="CENTER_LEFT" styleClass="info-banner" style="-fx-background-color: #f0f7ff; -fx-padding: 10; -fx-background-radius: 8;">
             <FontAwesomeIconView glyphName="INFO_CIRCLE" size="14" fill="#3b82f6" />
             <VBox>
-                <Label text="Saldo del \u00faltimo cierre:" styleClass="label-muted" />
-                <Label fx:id="lblLastClosure" text="0,00 \u20ac" style="-fx-font-weight: bold; -fx-text-fill: #1e40af;" />
+                <Label text="Saldo del &#x00fa;ltimo cierre:" styleClass="label-muted" />
+                <Label fx:id="lblLastClosure" text="0,00 &#x20ac;" style="-fx-font-weight: bold; -fx-text-fill: #1e40af;" />
             </VBox>
         </HBox>
 
         <!-- Input Fondo Inicial -->
         <VBox spacing="8">
-            <Label text="Fondo Inicial (\u20ac):" styleClass="label" />
+            <Label text="Fondo Inicial (&#x20ac;):" styleClass="label" />
             <HBox spacing="10" alignment="CENTER_LEFT" styleClass="modern-input-container">
                 <FontAwesomeIconView glyphName="MONEY" size="16" fill="#94a3b8" />
                 <TextField fx:id="txtInitialAmount" promptText="0,00" HBox.hgrow="ALWAYS" styleClass="modern-input-field" style="-fx-font-size: 18px; -fx-font-weight: bold;" />
@@ -45,10 +45,10 @@
         <!-- Observaciones -->
         <VBox spacing="8">
             <Label text="Notas de Apertura:" styleClass="label" />
-            <TextArea fx:id="txtNotes" promptText="Opcional. Ej: Monedas de 1\u20ac extra..." prefRowCount="2" wrapText="true" styleClass="text-field" />
+            <TextArea fx:id="txtNotes" promptText="Opcional. Ej: Monedas de 1&#x20ac; extra..." prefRowCount="2" wrapText="true" styleClass="text-field" />
         </VBox>
 
-        <!-- Botones de Acci\u00f3n -->
+        <!-- Botones de Acci&#x00f3;n -->
         <HBox spacing="15" alignment="CENTER_RIGHT" style="-fx-padding: 10 0 0 0;">
             <Button text="CANCELAR" onAction="#handleCancel" styleClass="btn-secondary" prefHeight="45" prefWidth="120" />
             <Button text="ABRIR CAJA" onAction="#handleOpen" styleClass="btn-success" prefHeight="45" HBox.hgrow="ALWAYS" maxWidth="Infinity">

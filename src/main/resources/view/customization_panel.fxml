@@ -31,7 +31,7 @@
         <ScrollPane fitToWidth="true" fitToHeight="false" styleClass="estetica-scroll" hbarPolicy="NEVER" VBox.vgrow="ALWAYS">
             <VBox styleClass="estetica-content-area" spacing="18" maxWidth="Infinity">
 
-                <!-- FILA: PALETAS R\u00c1PIDAS (ancho completo) -->
+                <!-- FILA: PALETAS R&#x00c1;PIDAS (ancho completo) -->
                 <VBox styleClass="estetica-card">
                     <HBox styleClass="estetica-card-header" alignment="CENTER_LEFT" spacing="12">
                         <StackPane styleClass="estetica-card-icon-wrap, estetica-icon-amber">
@@ -132,7 +132,7 @@
                     </VBox>
                 </VBox>
 
-                <!-- FILA DOS COLUMNAS: Colores | Tipograf\u00eda + Tarjetas -->
+                <!-- FILA DOS COLUMNAS: Colores | Tipograf&#x00ed;a + Tarjetas -->
                 <HBox spacing="18" fillHeight="true" maxWidth="Infinity">
 
                     <!-- COLUMNA IZQUIERDA: Colores + Modo Tema -->
@@ -237,10 +237,10 @@
 
                     </VBox>
 
-                    <!-- COLUMNA DERECHA: Tipograf\u00eda + Tarjetas -->
+                    <!-- COLUMNA DERECHA: Tipograf&#x00ed;a + Tarjetas -->
                     <VBox spacing="18" HBox.hgrow="ALWAYS">
 
-                        <!-- TIPOGRAF\u00cdA -->
+                        <!-- TIPOGRAF&#x00cd;A -->
                         <VBox styleClass="estetica-card">
                             <HBox styleClass="estetica-card-header" alignment="CENTER_LEFT" spacing="12">
                                 <StackPane styleClass="estetica-card-icon-wrap, estetica-icon-blue">
@@ -289,7 +289,7 @@
                                     <HBox alignment="CENTER_LEFT" spacing="8">
                                         <Label text="%custom.field.card_scale" styleClass="estetica-slider-label"/>
                                         <Region HBox.hgrow="ALWAYS"/>
-                                        <Label fx:id="lblCardScaleVal" text="1.0\u00d7" styleClass="estetica-slider-value"/>
+                                        <Label fx:id="lblCardScaleVal" text="1.0&#x00d7;" styleClass="estetica-slider-value"/>
                                     </HBox>
                                     <Slider fx:id="sldCardScale" min="0.8" max="1.3" value="1.0" styleClass="estetica-slider"
                                             showTickLabels="true" showTickMarks="true" blockIncrement="0.05" maxWidth="Infinity"/>
@@ -325,7 +325,7 @@
                                     <HBox alignment="CENTER_LEFT" spacing="8">
                                         <Label text="%custom.field.hover_scale" styleClass="estetica-slider-label"/>
                                         <Region HBox.hgrow="ALWAYS"/>
-                                        <Label fx:id="lblCardHoverScaleVal" text="1.02\u00d7" styleClass="estetica-slider-value"/>
+                                        <Label fx:id="lblCardHoverScaleVal" text="1.02&#x00d7;" styleClass="estetica-slider-value"/>
                                     </HBox>
                                     <Slider fx:id="sldCardHoverScale" min="1.0" max="1.12" value="1.02" styleClass="estetica-slider"
                                             showTickLabels="true" showTickMarks="true" blockIncrement="0.01" maxWidth="Infinity"/>

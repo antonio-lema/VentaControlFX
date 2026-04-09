@@ -39,7 +39,7 @@
                 <!-- Business Info -->
                 <VBox alignment="CENTER" spacing="5">
                     <Label text="VENTA CONTROL" styleClass="receipt-brand"/>
-                    <Label text="Software de Gesti\u00f3n TPV" styleClass="receipt-small"/>
+                    <Label text="Software de Gesti&#x00f3;n TPV" styleClass="receipt-small"/>
                     <Label text="Calle Principal 123, Madrid" styleClass="receipt-small"/>
                     <Label text="NIF: B12345678" styleClass="receipt-small"/>
                 </VBox>
@@ -62,12 +62,12 @@
                 </Separator>
 
                 <!-- Status Badge (Optional) -->
-                <Label fx:id="lblReturnBadge" text="[ DEVOLUCI\u00d3N REGISTRADA ]" visible="false" managed="false" 
+                <Label fx:id="lblReturnBadge" text="[ DEVOLUCI&#x00d3;N REGISTRADA ]" visible="false" managed="false" 
                        styleClass="receipt-return-badge"/>
 
                 <!-- Items Table Header -->
                 <HBox spacing="10" style="-fx-padding: 0 0 10 0;">
-                    <Label text="DESCRIPCI\u00d3N" styleClass="receipt-col-header" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+                    <Label text="DESCRIPCI&#x00d3;N" styleClass="receipt-col-header" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
                     <Label text="UDS" styleClass="receipt-col-header" prefWidth="40" alignment="CENTER"/>
                     <Label text="TOTAL" styleClass="receipt-col-header" prefWidth="80" alignment="CENTER_RIGHT"/>
                 </HBox>
@@ -83,15 +83,15 @@
                 <VBox spacing="6">
                     <HBox alignment="CENTER_RIGHT" spacing="20">
                         <Label text="Subtotal:" styleClass="receipt-summary-label"/>
-                        <Label fx:id="lblSubtotal" text="0,00 \u20ac" styleClass="receipt-summary-value" prefWidth="100" alignment="CENTER_RIGHT"/>
+                        <Label fx:id="lblSubtotal" text="0,00 &#x20ac;" styleClass="receipt-summary-value" prefWidth="100" alignment="CENTER_RIGHT"/>
                     </HBox>
                     <HBox alignment="CENTER_RIGHT" spacing="20">
                         <Label text="Impuestos (IVA):" styleClass="receipt-summary-label"/>
-                        <Label fx:id="lblIva" text="0,00 \u20ac" styleClass="receipt-summary-value" prefWidth="100" alignment="CENTER_RIGHT"/>
+                        <Label fx:id="lblIva" text="0,00 &#x20ac;" styleClass="receipt-summary-value" prefWidth="100" alignment="CENTER_RIGHT"/>
                     </HBox>
                     <HBox alignment="CENTER_RIGHT" spacing="20" style="-fx-padding: 10 0 0 0;">
                         <Label text="TOTAL TICKET:" styleClass="receipt-total-label"/>
-                        <Label fx:id="lblTotal" text="0,00 \u20ac" styleClass="receipt-total-value" prefWidth="120" alignment="CENTER_RIGHT"/>
+                        <Label fx:id="lblTotal" text="0,00 &#x20ac;" styleClass="receipt-total-value" prefWidth="120" alignment="CENTER_RIGHT"/>
                     </HBox>
                 </VBox>
 
@@ -108,7 +108,7 @@
                 <VBox alignment="CENTER" spacing="4">
                     <Label text="Forma de Pago:" styleClass="receipt-small"/>
                     <Label fx:id="lblPayment" text="EFECTIVO" styleClass="receipt-value-bold"/>
-                    <Label text="\u00a1Gracias por su compra!" styleClass="receipt-thank-you">
+                    <Label text="&#x00a1;Gracias por su compra!" styleClass="receipt-thank-you">
                         <padding><Insets top="20"/></padding>
                     </Label>
                 </VBox>

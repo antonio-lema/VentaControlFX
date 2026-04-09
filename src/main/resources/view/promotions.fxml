@@ -24,7 +24,7 @@
                         </children>
                     </VBox>
                     <Region HBox.hgrow="ALWAYS" />
-                    <Button onAction="#handleNewPromotion" styleClass="btn-primary" text=" Nueva Promoci\u00f3n">
+                    <Button onAction="#handleNewPromotion" styleClass="btn-primary" text=" Nueva Promoci&#x00f3;n">
                         <graphic>
                             <FontAwesomeIconView glyphName="PLUS" size="14" fill="WHITE"/>
                         </graphic>
@@ -41,7 +41,7 @@
                 <children>
                     <HBox spacing="10" alignment="CENTER_LEFT" styleClass="search-bar" HBox.hgrow="ALWAYS" maxWidth="400">
                         <FontAwesomeIconView glyphName="SEARCH" size="16" styleClass="sidebar-icon"/>
-                        <TextField fx:id="searchField" promptText="Buscar promoci\u00f3n..." HBox.hgrow="ALWAYS" styleClass="search-field"/>
+                        <TextField fx:id="searchField" promptText="Buscar promoci&#x00f3;n..." HBox.hgrow="ALWAYS" styleClass="search-field"/>
                     </HBox>
                     <Region HBox.hgrow="ALWAYS" />
                     <Button onAction="#handleRefresh" styleClass="btn-icon">
@@ -56,7 +56,7 @@
                     <TableColumn fx:id="colName" prefWidth="200.0" text="NOMBRE" />
                     <TableColumn fx:id="colType" prefWidth="120.0" text="TIPO" />
                     <TableColumn fx:id="colValue" prefWidth="100.0" text="VALOR" />
-                    <TableColumn fx:id="colScope" prefWidth="120.0" text="\u00c1MBITO" />
+                    <TableColumn fx:id="colScope" prefWidth="120.0" text="&#x00c1;MBITO" />
                     <TableColumn fx:id="colDates" prefWidth="200.0" text="VIGENCIA" />
                     <TableColumn fx:id="colStatus" prefWidth="100.0" text="ESTADO" />
                     <TableColumn fx:id="colActions" prefWidth="120.0" text="ACCIONES" />

@@ -20,7 +20,7 @@
          <padding>
             <Insets bottom="20.0" left="30.0" right="30.0" top="30.0" />
          </padding>
-         <Label text="Devoluci\u00f3n de Productos" styleClass="modern-register-title" />
+         <Label text="Devoluci&#x00f3;n de Productos" styleClass="modern-register-title" />
          <Label fx:id="lblTicketInfo" text="Seleccione los productos a devolver del ticket #"
                 styleClass="modern-register-subtitle" />
       </VBox>
@@ -49,7 +49,7 @@
 
          <!-- Reason TextArea -->
          <VBox spacing="8.0" styleClass="modern-input-group">
-            <Label text="Motivo de la devoluci\u00f3n" styleClass="config-field-label" />
+            <Label text="Motivo de la devoluci&#x00f3;n" styleClass="config-field-label" />
             <TextArea fx:id="txtReason" prefHeight="70.0"
                       promptText="Motivo detallado..."
                       styleClass="modern-input-field return-reason-area"
@@ -62,7 +62,7 @@
          <Button onAction="#handleCancel" styleClass="modern-btn-secondary"
                  text="Cancelar" cancelButton="true"/>
          <Button onAction="#handleConfirm" styleClass="modern-btn-primary"
-                 text="Confirmar Devoluci\u00f3n" defaultButton="true">
+                 text="Confirmar Devoluci&#x00f3;n" defaultButton="true">
             <graphic>
                <FontAwesomeIconView glyphName="CHECK" size="14" fill="WHITE" />
             </graphic>

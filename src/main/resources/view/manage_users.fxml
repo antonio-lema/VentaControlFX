@@ -23,7 +23,7 @@
                     </StackPane>
                     <VBox spacing="2">
                         <children>
-                            <Label text="Gesti\u00f3n de Usuarios" styleClass="view-title"/>
+                            <Label text="Gesti&#x00f3;n de Usuarios" styleClass="view-title"/>
                             <Label text="Administra los accesos y roles del sistema" styleClass="view-subtitle"/>
                         </children>
                     </VBox>

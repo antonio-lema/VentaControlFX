@@ -44,7 +44,7 @@
             <Label text="Tasas impositivas incluidas:" styleClass="label" style="-fx-font-weight: bold;" />
             <ScrollPane fitToWidth="true" minHeight="200" maxHeight="300" style="-fx-background-color: transparent; -fx-background: transparent;">
                 <VBox fx:id="ratesListContainer" spacing="10" style="-fx-padding: 10; -fx-background-color: -fx-bg-main; -fx-background-radius: 8; -fx-border-color: #e2e8f0; -fx-border-radius: 8;">
-                    <!-- Los items de CheckBox se generar\u00e1n din\u00e1micamente -->
+                    <!-- Los items de CheckBox se generar&#x00e1;n din&#x00e1;micamente -->
                 </VBox>
             </ScrollPane>
         </VBox>

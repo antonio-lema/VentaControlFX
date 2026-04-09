@@ -23,7 +23,7 @@
                     </StackPane>
                     <VBox spacing="2">
                         <children>
-                            <Label text="Gesti\u00f3n de Roles" styleClass="view-title"/>
+                            <Label text="Gesti&#x00f3;n de Roles" styleClass="view-title"/>
                             <Label text="Administra los roles del sistema y sus permisos asociados" styleClass="view-subtitle"/>
                         </children>
                     </VBox>
@@ -44,7 +44,7 @@
             <HBox alignment="CENTER_LEFT" styleClass="search-bar" maxWidth="500" HBox.hgrow="ALWAYS">
                 <children>
                     <FontAwesomeIconView glyphName="SEARCH" size="16" fill="#adb5bd" />
-                    <TextField fx:id="txtSearch" promptText="Nombre del rol o descripci\u00f3n..." styleClass="search-field" HBox.hgrow="ALWAYS" />
+                    <TextField fx:id="txtSearch" promptText="Nombre del rol o descripci&#x00f3;n..." styleClass="search-field" HBox.hgrow="ALWAYS" />
                 </children>
             </HBox>
             <Region HBox.hgrow="ALWAYS" />

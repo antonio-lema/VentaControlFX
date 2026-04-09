@@ -32,7 +32,7 @@
                     <Label text="%config.subtitle" styleClass="view-subtitle"/>
                 </VBox>
                 <Region HBox.hgrow="ALWAYS"/>
-                <!-- Bot\u00f3n Guardar (cabecera) -->
+                <!-- Bot&#x00f3;n Guardar (cabecera) -->
                 <Button fx:id="btnSaveTop" text="%config.btn.save" onAction="#handleSave" styleClass="config-btn-save" defaultButton="true">
                     <graphic>
                         <HBox spacing="8" alignment="CENTER">
@@ -45,7 +45,7 @@
         <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="detail-scroll, edge-to-edge" VBox.vgrow="ALWAYS">
             <VBox spacing="20" style="-fx-padding: 30;">
 
-                <!-- \u2500\u2500\u2500 FILA 1: Empresa + Fiscal \u2500\u2500\u2500 -->
+                <!-- &#x2500;&#x2500;&#x2500; FILA 1: Empresa + Fiscal &#x2500;&#x2500;&#x2500; -->
                 <HBox spacing="20">
 
                     <!-- Tarjeta: Datos de la Empresa -->
@@ -78,7 +78,7 @@
                                                HBox.hgrow="ALWAYS" styleClass="modern-input-field"/>
                                 </HBox>
                             </VBox>
-                            <!-- Direcci\u00f3n -->
+                            <!-- Direcci&#x00f3;n -->
                             <VBox styleClass="config-field-group">
                                 <Label text="%config.field.address" styleClass="config-field-label"/>
                                 <HBox styleClass="config-input-container">
@@ -87,7 +87,7 @@
                                                HBox.hgrow="ALWAYS" styleClass="modern-input-field"/>
                                 </HBox>
                             </VBox>
-                            <!-- Tel\u00e9fono -->
+                            <!-- Tel&#x00e9;fono -->
                             <VBox styleClass="config-field-group">
                                 <Label text="%config.field.phone" styleClass="config-field-label"/>
                                 <HBox styleClass="config-input-container">
@@ -117,7 +117,7 @@
                                 </HBox>
                             </VBox>
 
-                            <!-- Icono de la aplicaci\u00f3n -->
+                            <!-- Icono de la aplicaci&#x00f3;n -->
                             <VBox styleClass="config-field-group">
                                 <Label text="%config.field.icon" styleClass="config-field-label"/>
                                 <HBox styleClass="config-input-container" spacing="10">
@@ -128,7 +128,7 @@
                                 </HBox>
                             </VBox>
 
-                            <!-- Nombre de la aplicaci\u00f3n -->
+                            <!-- Nombre de la aplicaci&#x00f3;n -->
                             <VBox styleClass="config-field-group">
                                 <Label text="%config.field.app_name" styleClass="config-field-label"/>
                                 <HBox styleClass="config-input-container">
@@ -140,7 +140,7 @@
                         </VBox>
                     </VBox>
 
-                    <!-- Tarjeta: Configuraci\u00f3n Fiscal -->
+                    <!-- Tarjeta: Configuraci&#x00f3;n Fiscal -->
                     <VBox styleClass="config-card" HBox.hgrow="ALWAYS" maxWidth="350">
                         <HBox styleClass="config-card-header" alignment="CENTER_LEFT" spacing="10">
                             <StackPane styleClass="config-card-icon-wrap config-icon-orange">
@@ -171,7 +171,7 @@
                     </VBox>
                 </HBox>
 
-                <!-- \u2500\u2500\u2500 FILA 3: Horarios \u2500\u2500\u2500 -->
+                <!-- &#x2500;&#x2500;&#x2500; FILA 3: Horarios &#x2500;&#x2500;&#x2500; -->
                 <HBox spacing="20">
                     <VBox styleClass="config-card" HBox.hgrow="ALWAYS" maxWidth="450">
                         <HBox styleClass="config-card-header" alignment="CENTER_LEFT" spacing="10">
@@ -194,7 +194,7 @@
                     </VBox>
                 </HBox>
 
-                <!-- \u2500\u2500\u2500 FILA 2: Ticket \u2500\u2500\u2500 -->
+                <!-- &#x2500;&#x2500;&#x2500; FILA 2: Ticket &#x2500;&#x2500;&#x2500; -->
                 <HBox spacing="20">
 
                     <!-- Tarjeta: Ticket / Recibo -->
@@ -213,12 +213,12 @@
                                 <CheckBox fx:id="chkShowLogo" text="%config.check.show_logo"
                                           styleClass="config-checkbox"/>
                             </HBox>
-                            <!-- Mostrar direcci\u00f3n -->
+                            <!-- Mostrar direcci&#x00f3;n -->
                             <HBox spacing="12" alignment="CENTER_LEFT" styleClass="config-check-row">
                                 <CheckBox fx:id="chkShowAddress" text="%config.check.show_address"
                                           styleClass="config-checkbox"/>
                             </HBox>
-                            <!-- Mostrar tel\u00e9fono -->
+                            <!-- Mostrar tel&#x00e9;fono -->
                             <HBox spacing="12" alignment="CENTER_LEFT" styleClass="config-check-row">
                                 <CheckBox fx:id="chkShowPhone" text="%config.check.show_phone"
                                           styleClass="config-checkbox"/>
@@ -239,7 +239,7 @@
                                 </HBox>
                             </VBox>
 
-                            <!-- N\u00famero de copias -->
+                            <!-- N&#x00fa;mero de copias -->
                             <VBox styleClass="config-field-group">
                                 <Label text="%config.field.copies" styleClass="config-field-label"/>
                                 <HBox styleClass="config-input-container">
@@ -268,7 +268,7 @@
                                 <Label text="%config.hint.format" styleClass="config-field-hint"/>
                             </VBox>
 
-                            <!-- Imprimir autom\u00e1ticamente -->
+                            <!-- Imprimir autom&#x00e1;ticamente -->
                             <HBox spacing="12" alignment="CENTER_LEFT" styleClass="config-check-row">
                                 <CheckBox fx:id="chkAutoPrint" text="%config.check.auto_print"
                                           styleClass="config-checkbox"/>
@@ -276,7 +276,7 @@
                         </VBox>
                     </VBox>
 
-                    <!-- Tarjeta: Configuraci\u00f3n de Correo (SMTP) -->
+                    <!-- Tarjeta: Configuraci&#x00f3;n de Correo (SMTP) -->
                     <VBox styleClass="config-card" HBox.hgrow="ALWAYS">
                         <HBox styleClass="config-card-header" alignment="CENTER_LEFT" spacing="10">
                             <StackPane styleClass="config-card-icon-wrap config-icon-blue">
@@ -332,7 +332,7 @@
                 </HBox>
 
 
-                <!-- \u2500\u2500\u2500 Botones de Acci\u00f3n finales \u2500\u2500\u2500 -->
+                <!-- &#x2500;&#x2500;&#x2500; Botones de Acci&#x00f3;n finales &#x2500;&#x2500;&#x2500; -->
                 <HBox spacing="15" alignment="CENTER_RIGHT">
                     <Button text="%config.btn.reset" onAction="#handleReset" styleClass="config-btn-reset">
                         <graphic>
@@ -350,7 +350,7 @@
                     </Button>
                 </HBox>
 
-                <!-- Banner de confirmaci\u00f3n -->
+                <!-- Banner de confirmaci&#x00f3;n -->
                 <HBox fx:id="bannerSaved" styleClass="config-banner-success" alignment="CENTER_LEFT" spacing="12"
                       visible="false" managed="false">
                     <FontAwesomeIconView glyphName="CHECK_CIRCLE" size="20" fill="#2e7d32"/>

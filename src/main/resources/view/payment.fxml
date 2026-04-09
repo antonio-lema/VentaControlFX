@@ -35,7 +35,7 @@
             <VBox alignment="TOP_CENTER" spacing="15.0" styleClass="payment-body">
                <!-- Total Display -->
                <VBox alignment="CENTER" spacing="5.0">
-                  <Label fx:id="lblTotalAmount" text="34,99 \u20ac" styleClass="payment-total-amount" />
+                  <Label fx:id="lblTotalAmount" text="34,99 &#x20ac;" styleClass="payment-total-amount" />
                   <Label text="%payment.total_to_charge" styleClass="label-muted" />
                   <padding><Insets bottom="20.0" top="10.0" /></padding>
                </VBox>
@@ -47,7 +47,7 @@
                      <FontAwesomeIconView glyphName="MONEY" size="16" styleClass="icon-primary" />
                      <Label text="%payment.method.cash" styleClass="payment-method-label" />
                      <Region HBox.hgrow="ALWAYS" />
-                     <Label fx:id="lblCashAmount" text="34.99 \u20ac" styleClass="badge-primary" />
+                     <Label fx:id="lblCashAmount" text="34.99 &#x20ac;" styleClass="badge-primary" />
                   </HBox>
 
                   <!-- Content -->
@@ -83,13 +83,13 @@
                        <rowConstraints>
                          <RowConstraints minHeight="35.0" vgrow="SOMETIMES" />
                        </rowConstraints>
-                        <Button fx:id="btnQuick1" text="35 \u20ac" maxWidth="Infinity" maxHeight="Infinity"
+                        <Button fx:id="btnQuick1" text="35 &#x20ac;" maxWidth="Infinity" maxHeight="Infinity"
                                 onAction="#handleQuickMoney" styleClass="btn-primary" />
-                        <Button fx:id="btnQuick2" text="36 \u20ac" maxWidth="Infinity" maxHeight="Infinity"
+                        <Button fx:id="btnQuick2" text="36 &#x20ac;" maxWidth="Infinity" maxHeight="Infinity"
                                 onAction="#handleQuickMoney" styleClass="btn-primary" GridPane.columnIndex="1" />
-                        <Button fx:id="btnQuick3" text="40 \u20ac" maxWidth="Infinity" maxHeight="Infinity"
+                        <Button fx:id="btnQuick3" text="40 &#x20ac;" maxWidth="Infinity" maxHeight="Infinity"
                                 onAction="#handleQuickMoney" styleClass="btn-primary" GridPane.columnIndex="2" />
-                        <Button fx:id="btnQuick4" text="50 \u20ac" maxWidth="Infinity" maxHeight="Infinity"
+                        <Button fx:id="btnQuick4" text="50 &#x20ac;" maxWidth="Infinity" maxHeight="Infinity"
                                 onAction="#handleQuickMoney" styleClass="btn-primary" GridPane.columnIndex="3" />
                      </GridPane>
                   </VBox>

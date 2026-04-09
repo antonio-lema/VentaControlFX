@@ -12,7 +12,7 @@
     <HBox alignment="CENTER_LEFT">
         <Label fx:id="lblTitle" text="Nueva Tarifa" styleClass="modal-title"/>
         <Region HBox.hgrow="ALWAYS"/>
-        <Button onAction="#handleCancel" styleClass="button-ghost" text="\u2715" style="-fx-font-size: 16px;"/>
+        <Button onAction="#handleCancel" styleClass="button-ghost" text="&#x2715;" style="-fx-font-size: 16px;"/>
     </HBox>
 
     <Separator/>
@@ -25,18 +25,18 @@
         </VBox>
 
         <VBox spacing="8">
-            <Label text="Descripci\u00f3n / Notas" styleClass="text-sm, font-medium, text-gray-700"/>
+            <Label text="Descripci&#x00f3;n / Notas" styleClass="text-sm, font-medium, text-gray-700"/>
             <TextArea fx:id="txtDescription" promptText="Ej: Descuento para distribuidores locales" prefHeight="80" wrapText="true" styleClass="form-control" />
         </VBox>
 
         <VBox spacing="8">
             <CheckBox fx:id="chkIsActive" text="Tarifa Activa" selected="true" styleClass="text-sm, font-medium, text-gray-800"/>
-            <Label text="Si se desactiva, no podr\u00e1 aplicarse a nuevas ventas o clientes." wrapText="true" styleClass="text-xs, text-gray-500" style="-fx-padding: 0 0 0 25;"/>
+            <Label text="Si se desactiva, no podr&#x00e1; aplicarse a nuevas ventas o clientes." wrapText="true" styleClass="text-xs, text-gray-500" style="-fx-padding: 0 0 0 25;"/>
         </VBox>
 
         <VBox spacing="8" styleClass="bg-gray-50" style="-fx-padding: 15; -fx-background-radius: -fx-radius-md;">
             <CheckBox fx:id="chkIsDefault" text="Establecer como Tarifa por Defecto" styleClass="text-sm, font-medium, text-gray-800"/>
-            <Label text="Esta ser\u00e1 la tarifa base para todos los productos y clientes nuevos." wrapText="true" styleClass="text-xs, text-gray-500" style="-fx-padding: 0 0 0 25;"/>
+            <Label text="Esta ser&#x00e1; la tarifa base para todos los productos y clientes nuevos." wrapText="true" styleClass="text-xs, text-gray-500" style="-fx-padding: 0 0 0 25;"/>
         </VBox>
     </VBox>
 

@@ -17,7 +17,7 @@
     </stylesheets>
 
     <VBox spacing="0">
-        <!-- \u2500\u2500\u2500 HEADER \u2500\u2500\u2500 -->
+        <!-- &#x2500;&#x2500;&#x2500; HEADER &#x2500;&#x2500;&#x2500; -->
         <VBox styleClass="view-header" spacing="0">
             <children>
                 <HBox spacing="16" alignment="CENTER_LEFT">
@@ -57,7 +57,7 @@
 
         <VBox spacing="20" VBox.vgrow="ALWAYS" style="-fx-padding: 30;">
 
-        <!-- \u2500\u2500\u2500 KPI CARDS \u2500\u2500\u2500 -->
+        <!-- &#x2500;&#x2500;&#x2500; KPI CARDS &#x2500;&#x2500;&#x2500; -->
         <HBox spacing="15">
             <VBox styleClass="stat-card" HBox.hgrow="ALWAYS">
                 <HBox alignment="CENTER_LEFT" spacing="15">
@@ -114,13 +114,13 @@
                     </StackPane>
                     <VBox>
                         <Label text="%fiscal.kpi.total_facturado" styleClass="stat-label"/>
-                        <Label fx:id="lblTotalAmount" text="0.00 \u20ac" styleClass="stat-value"/>
+                        <Label fx:id="lblTotalAmount" text="0.00 &#x20ac;" styleClass="stat-value"/>
                     </VBox>
                 </HBox>
             </VBox>
         </HBox>
 
-        <!-- \u2500\u2500\u2500 FILTROS \u2500\u2500\u2500 -->
+        <!-- &#x2500;&#x2500;&#x2500; FILTROS &#x2500;&#x2500;&#x2500; -->
         <HBox styleClass="filter-card" alignment="CENTER_LEFT" spacing="15">
             <padding><Insets top="15" right="20" bottom="15" left="20"/></padding>
             
@@ -157,7 +157,7 @@
             </VBox>
         </HBox>
 
-        <!-- \u2500\u2500\u2500 TABLA \u2500\u2500\u2500 -->
+        <!-- &#x2500;&#x2500;&#x2500; TABLA &#x2500;&#x2500;&#x2500; -->
         <TableView fx:id="fiscalTable" VBox.vgrow="ALWAYS" styleClass="modern-table">
             <columns>
                 <TableColumn fx:id="colDate" text="%fiscal.table.date" prefWidth="150"/>
@@ -172,7 +172,7 @@
             </columnResizePolicy>
         </TableView>
 
-        <!-- Conteo y Paginaci\u00f3n -->
+        <!-- Conteo y Paginaci&#x00f3;n -->
         <HBox alignment="CENTER_LEFT" spacing="10" styleClass="row-limit-container">
             <children>
                 <Label text="%fiscal.footer.showing" styleClass="label-limit" />
@@ -185,10 +185,10 @@
     </VBox>
     </VBox>
 
-    <!-- \u2500\u2500\u2500 PANEL DE DETALLE DESLIZANTE (OPCIONAL) \u2500\u2500\u2500 -->
+    <!-- &#x2500;&#x2500;&#x2500; PANEL DE DETALLE DESLIZANTE (OPCIONAL) &#x2500;&#x2500;&#x2500; -->
     <HBox fx:id="detailsOverlay" visible="false" managed="false" alignment="CENTER_RIGHT" style="-fx-background-color: rgba(0,0,0,0.3);">
         <VBox fx:id="detailsPanel" prefWidth="450" styleClass="detail-panel">
-             <!-- Contenido din\u00e1mico del detalle aqu\u00ed -->
+             <!-- Contenido din&#x00e1;mico del detalle aqu&#x00ed; -->
         </VBox>
     </HBox>
 

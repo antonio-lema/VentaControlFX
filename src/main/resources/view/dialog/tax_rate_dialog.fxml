@@ -45,9 +45,9 @@
             </HBox>
         </VBox>
 
-        <!-- Pa\u00eds -->
+        <!-- Pa&#x00ed;s -->
         <VBox spacing="8">
-            <Label text="Pa\u00eds (ISO):" styleClass="label" />
+            <Label text="Pa&#x00ed;s (ISO):" styleClass="label" />
             <HBox spacing="10" alignment="CENTER_LEFT" styleClass="modern-input-container">
                 <FontAwesomeIconView glyphName="GLOBE" size="16" fill="#64748b" />
                 <TextField fx:id="txtCountry" promptText="Completa si aplica, Ej: ES" HBox.hgrow="ALWAYS" styleClass="modern-input-field" />
@@ -64,7 +64,7 @@
         </VBox>
 
         <!-- Activo -->
-        <CheckBox fx:id="chkActive" text="Tasa activa para nuevos c\u00e1lculos" styleClass="permission-checkbox" />
+        <CheckBox fx:id="chkActive" text="Tasa activa para nuevos c&#x00e1;lculos" styleClass="permission-checkbox" />
 
         <!-- Barra de acciones -->
         <HBox spacing="15" alignment="CENTER_RIGHT" style="-fx-padding: 10 0 10 0;">
