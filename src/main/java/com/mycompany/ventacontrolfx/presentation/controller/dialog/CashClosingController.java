@@ -40,21 +40,21 @@ public class CashClosingController {
                     || userSession.hasPermission("USUARIOS");
 
             if (canSeeTotals) {
-                lblInitFund.setText(String.format("%.2f €", initialFund));
-                // Ventas brutas (sin restar devoluciones aún en la etiqueta de ventas)
+                lblInitFund.setText(String.format("%.2f â‚¬", initialFund));
+                // Ventas brutas (sin restar devoluciones aÃºn en la etiqueta de ventas)
                 double returnsCash = totals.getOrDefault("returns_cash", 0.0);
-                lblSales.setText(String.format("%.2f €", totals.getOrDefault("cash", 0.0) + returnsCash));
-                lblCashIn.setText(String.format("%.2f €", totals.getOrDefault("manual_in", 0.0)));
-                lblReturns.setText(String.format("%.2f €", returnsCash));
-                lblCashOut.setText(String.format("%.2f €", totals.getOrDefault("manual_out", 0.0)));
-                lblExpected.setText(String.format("%.2f €", expectedAmount));
+                lblSales.setText(String.format("%.2f â‚¬", totals.getOrDefault("cash", 0.0) + returnsCash));
+                lblCashIn.setText(String.format("%.2f â‚¬", totals.getOrDefault("manual_in", 0.0)));
+                lblReturns.setText(String.format("%.2f â‚¬", returnsCash));
+                lblCashOut.setText(String.format("%.2f â‚¬", totals.getOrDefault("manual_out", 0.0)));
+                lblExpected.setText(String.format("%.2f â‚¬", expectedAmount));
             } else {
-                lblInitFund.setText("**** €");
-                lblSales.setText("**** €");
-                lblCashIn.setText("**** €");
-                lblReturns.setText("**** €");
-                lblCashOut.setText("**** €");
-                lblExpected.setText("**** €");
+                lblInitFund.setText("**** â‚¬");
+                lblSales.setText("**** â‚¬");
+                lblCashIn.setText("**** â‚¬");
+                lblReturns.setText("**** â‚¬");
+                lblCashOut.setText("**** â‚¬");
+                lblExpected.setText("**** â‚¬");
             }
             updateDifference();
         } catch (SQLException e) {
@@ -69,9 +69,9 @@ public class CashClosingController {
 
     private void updateDifference() {
         if (!userSession.hasPermission("caja.ver_totales") && !userSession.hasPermission("USUARIOS")) {
-            lblDifference.setText("**** €");
+            lblDifference.setText("**** â‚¬");
             lblDifference.setStyle("-fx-font-size: 24px; -fx-font-weight: 900; -fx-text-fill: #94a3b8;");
-            lblDiffReason.setText("El descuadre se calculará al confirmar");
+            lblDiffReason.setText("El descuadre se calcularÃ¡ al confirmar");
             lblDiffReason.setStyle("-fx-text-fill: #64748b;");
             return;
         }
@@ -82,19 +82,19 @@ public class CashClosingController {
             double diff = actual - expectedAmount;
 
             if (Math.abs(diff) < 0.001) {
-                lblDifference.setText(String.format("%.2f €", diff)); // Sin signo si es cero real
+                lblDifference.setText(String.format("%.2f â‚¬", diff)); // Sin signo si es cero real
                 lblDifference.setStyle("-fx-font-size: 24px; -fx-font-weight: 900; -fx-text-fill: #10b981;");
-                lblDiffReason.setText("✅ Caja cuadrada perfectamente");
+                lblDiffReason.setText("âœ… Caja cuadrada perfectamente");
                 lblDiffReason.setStyle("-fx-text-fill: #16a34a; -fx-font-weight: bold;");
             } else {
-                lblDifference.setText(String.format("%+.2f €", diff)); // Forzar signo + o -
+                lblDifference.setText(String.format("%+.2f â‚¬", diff)); // Forzar signo + o -
                 lblDifference.setStyle("-fx-font-size: 24px; -fx-font-weight: 900; -fx-text-fill: #ef4444;");
-                lblDiffReason.setText(diff > 0 ? "⚠️ Sobante de caja detectado" : "❌ Faltante de caja detectado");
+                lblDiffReason.setText(diff > 0 ? "âš ï¸ Sobante de caja detectado" : "âŒ Faltante de caja detectado");
                 lblDiffReason.setStyle("-fx-text-fill: #dc2626; -fx-font-weight: bold;");
             }
         } catch (NumberFormatException e) {
-            lblDifference.setText("-- €");
-            lblDiffReason.setText("Importe no válido");
+            lblDifference.setText("-- â‚¬");
+            lblDiffReason.setText("Importe no vÃ¡lido");
         }
     }
 
@@ -112,7 +112,7 @@ public class CashClosingController {
             String notes = txtNotes.getText().trim();
 
             if (Math.abs(diff) > 0.001 && notes.isEmpty()) {
-                AlertUtil.showWarning("Justificación Necesaria",
+                AlertUtil.showWarning("JustificaciÃ³n Necesaria",
                         "Es obligatorio introducir una nota explicando el descuadre.");
                 txtNotes.requestFocus();
                 txtNotes.setStyle("-fx-border-color: #ef4444; -fx-border-width: 2;");
@@ -124,7 +124,7 @@ public class CashClosingController {
             closure.setUserId(userSession.getCurrentUser() != null ? userSession.getCurrentUser().getUserId() : 1);
             closure.setTotalCash(expectedAmount);
             // Nota: totalCard y totalAll se enriquecen en el UseCase, pero mapeamos lo
-            // básico aquí si fuera necesario
+            // bÃ¡sico aquÃ­ si fuera necesario
             // Sin embargo, el UseCase performClosure ya recalcula los totales de ventas.
             closure.setActualCash(actual);
             closure.setNotes(notes);
@@ -135,7 +135,7 @@ public class CashClosingController {
             close();
 
         } catch (NumberFormatException e) {
-            AlertUtil.showError("Error de Formato", "El importe real no es válido.");
+            AlertUtil.showError("Error de Formato", "El importe real no es vÃ¡lido.");
         } catch (SQLException e) {
             AlertUtil.showError("Error al Cerrar Caja", e.getMessage());
         }

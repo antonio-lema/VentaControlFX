@@ -41,12 +41,12 @@ public class CashEntryController {
 
         comboType.setItems(FXCollections.observableArrayList(
                 "Cambio banco", "Fondo de reserva", "Ajuste manual",
-                "Ingreso extraordinario", "Donación", "Otro"));
+                "Ingreso extraordinario", "DonaciÃ³n", "Otro"));
         comboType.setValue("Cambio banco");
 
         try {
             double current = closureUseCase.getCurrentCashInDrawer();
-            lblCurrentCash.setText(String.format("%.2f €", current));
+            lblCurrentCash.setText(String.format("%.2f â‚¬", current));
         } catch (SQLException e) {
             lblCurrentCash.setText("No disponible");
         }
@@ -56,7 +56,7 @@ public class CashEntryController {
 
     @FXML
     private void handleConfirm() {
-        // — Validar importe
+        // â€” Validar importe
         String amountText = txtAmount.getText().replace(",", ".").trim();
         if (amountText.isEmpty()) {
             AlertUtil.showWarning("Campo Obligatorio", "Debes introducir el importe a ingresar.");
@@ -66,18 +66,18 @@ public class CashEntryController {
         try {
             amount = Double.parseDouble(amountText);
         } catch (NumberFormatException e) {
-            AlertUtil.showError("Formato Inválido", "El importe introducido no es un número válido.");
+            AlertUtil.showError("Formato InvÃ¡lido", "El importe introducido no es un nÃºmero vÃ¡lido.");
             return;
         }
         if (amount <= 0) {
-            AlertUtil.showError("Importe Inválido", "El importe debe ser mayor que cero.");
+            AlertUtil.showError("Importe InvÃ¡lido", "El importe debe ser mayor que cero.");
             return;
         }
 
-        // — Validar motivo
+        // â€” Validar motivo
         String reason = txtReason.getText().trim();
         if (reason.isEmpty()) {
-            AlertUtil.showWarning("Campo Obligatorio", "Es obligatorio introducir una justificación para el ingreso.");
+            AlertUtil.showWarning("Campo Obligatorio", "Es obligatorio introducir una justificaciÃ³n para el ingreso.");
             return;
         }
 

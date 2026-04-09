@@ -10,9 +10,9 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Caso de uso: Gestión de cambios de IVA.
+ * Caso de uso: GestiÃ³n de cambios de IVA.
  * OBSOLETO: Reemplazado por el Motor Fiscal V2. Se mantiene por
- * compatibilidad temporal hasta la fase de refactorización de UI.
+ * compatibilidad temporal hasta la fase de refactorizaciÃ³n de UI.
  */
 public class ScheduleVatChangeUseCase {
 
@@ -23,24 +23,24 @@ public class ScheduleVatChangeUseCase {
     }
 
     public void applyGlobalRateChange(double newRate, LocalDateTime effectiveFrom, String reason) throws SQLException {
-        throw new UnsupportedOperationException("Operación obsoleta en V2. Utilizar TaxGroups y TaxRates.");
+        throw new UnsupportedOperationException("OperaciÃ³n obsoleta en V2. Utilizar TaxGroups y TaxRates.");
     }
 
     public int applyCategoryRateChange(int categoryId, double newRate, LocalDateTime effectiveFrom, String reason)
             throws SQLException {
-        throw new UnsupportedOperationException("Operación obsoleta en V2.");
+        throw new UnsupportedOperationException("OperaciÃ³n obsoleta en V2.");
     }
 
     public void applyProductRateChange(int productId, int categoryId, double newRate, LocalDateTime effectiveFrom,
             String reason) throws SQLException {
-        throw new UnsupportedOperationException("Operación obsoleta en V2.");
+        throw new UnsupportedOperationException("OperaciÃ³n obsoleta en V2.");
     }
 
     public double getEffectiveRate(int productId, int categoryId, LocalDateTime at) throws SQLException {
         return 21.0; // Fallback
     }
 
-    // Retorna listas vacías temporalmente
+    // Retorna listas vacÃ­as temporalmente
     public List<Object> getGlobalHistory() throws SQLException {
         return new ArrayList<>();
     }

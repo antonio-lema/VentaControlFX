@@ -13,17 +13,17 @@ import java.util.Optional;
 
 /**
  * Adaptador JDBC para la persistencia de documentos fiscales.
- * Clean Architecture — Capa de Infraestructura.
+ * Clean Architecture â€” Capa de Infraestructura.
  *
  * Los documentos fiscales se almacenan DIRECTAMENTE sobre la tabla `sales`
- * (columnas añadidas por migración), evitando duplicación de datos y
+ * (columnas aÃ±adidas por migraciÃ³n), evitando duplicaciÃ³n de datos y
  * manteniendo la atomicidad con la venta.
  *
  * Para snapshots del emisor se usa la tabla `doc_issuer_snapshots`.
  */
 public class JdbcFiscalDocumentRepository implements IFiscalDocumentRepository {
 
-    // Columnas añadidas a `sales` por la migración fiscal
+    // Columnas aÃ±adidas a `sales` por la migraciÃ³n fiscal
     private static final String SAVE_SQL = """
             UPDATE sales SET
                 doc_type        = ?,
@@ -79,11 +79,11 @@ public class JdbcFiscalDocumentRepository implements IFiscalDocumentRepository {
                   AND YEAR(s.sale_datetime) = ?
             """;
 
-    // ── save ──────────────────────────────────────────────────────────
+    // â”€â”€ save â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     @Override
     public void save(FiscalDocument doc, Connection conn) throws SQLException {
-        // 1. Actualizar la fila de sales con la numeración fiscal
+        // 1. Actualizar la fila de sales con la numeraciÃ³n fiscal
         try (PreparedStatement ps = conn.prepareStatement(SAVE_SQL)) {
             ps.setString(1, doc.getDocType().name());
             ps.setString(2, doc.getDocSeries());
@@ -114,7 +114,7 @@ public class JdbcFiscalDocumentRepository implements IFiscalDocumentRepository {
         }
     }
 
-    // ── findBySaleId ──────────────────────────────────────────────────
+    // â”€â”€ findBySaleId â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     @Override
     public Optional<FiscalDocument> findBySaleId(int saleId) throws SQLException {
@@ -129,11 +129,11 @@ public class JdbcFiscalDocumentRepository implements IFiscalDocumentRepository {
         return Optional.empty();
     }
 
-    // ── findByReference ───────────────────────────────────────────────
+    // â”€â”€ findByReference â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     @Override
     public Optional<FiscalDocument> findByReference(String reference) throws SQLException {
-        // reference = "2026-T-00042" → year=2026, series="T", num=42
+        // reference = "2026-T-00042" â†’ year=2026, series="T", num=42
         String[] parts = reference.split("-", 3);
         if (parts.length != 3)
             return Optional.empty();
@@ -156,14 +156,14 @@ public class JdbcFiscalDocumentRepository implements IFiscalDocumentRepository {
         return Optional.empty();
     }
 
-    // ── findByFilters ─────────────────────────────────────────────────
+    // â”€â”€ findByFilters â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     @Override
     public List<FiscalDocument> findByFilters(LocalDate from, LocalDate to,
             Status status, String docType) throws SQLException {
 
         // El CTE o subconsulta unificada permite aplicar filtros de forma consistente a
-        // ambos orígenes
+        // ambos orÃ­genes
         String baseSql = """
                 SELECT * FROM (
                     SELECT s.sale_id, s.doc_type, s.doc_series, s.doc_number,
@@ -226,7 +226,7 @@ public class JdbcFiscalDocumentRepository implements IFiscalDocumentRepository {
         return result;
     }
 
-    // ── updateStatus ──────────────────────────────────────────────────
+    // â”€â”€ updateStatus â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     @Override
     public void updateStatus(int saleId, Status newStatus, Connection conn) throws SQLException {
@@ -238,7 +238,7 @@ public class JdbcFiscalDocumentRepository implements IFiscalDocumentRepository {
         }
     }
 
-    // ── mapRow ────────────────────────────────────────────────────────
+    // â”€â”€ mapRow â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     private FiscalDocument mapRow(ResultSet rs) throws SQLException {
         String typeStr = rs.getString("doc_type");
@@ -259,12 +259,12 @@ public class JdbcFiscalDocumentRepository implements IFiscalDocumentRepository {
             }
         }
 
-        // Importes — preferimos los del snapshot (más precisos)
+        // Importes â€” preferimos los del snapshot (mÃ¡s precisos)
         double baseAmt = rs.getDouble("base_amount");
         double vatAmt = rs.getDouble("vat_amount");
         double totAmt = rs.getDouble("total_amount");
 
-        // Fallback a columnas de sales si el snapshot aún no existe
+        // Fallback a columnas de sales si el snapshot aÃºn no existe
         if (totAmt == 0) {
             totAmt = rs.getDouble("total");
             vatAmt = rs.getDouble("iva");

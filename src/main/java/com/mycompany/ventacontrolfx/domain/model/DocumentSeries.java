@@ -1,22 +1,22 @@
 package com.mycompany.ventacontrolfx.domain.model;
 
 /**
- * Gestión de series de numeración correlativas de documentos fiscales.
- * Clean Architecture — Capa de Dominio.
+ * GestiÃ³n de series de numeraciÃ³n correlativas de documentos fiscales.
+ * Clean Architecture â€” Capa de Dominio.
  */
 public class DocumentSeries {
 
     private int seriesId;
     private String seriesCode; // "T", "F", "R"
     private String prefix; // "2026-T-"
-    private int lastNumber; // último número asignado
+    private int lastNumber; // Ãºltimo nÃºmero asignado
     private int year;
     private String description;
 
     public DocumentSeries() {
     }
 
-    // ── Getters & Setters ──────────────────────────────────────────────
+    // â”€â”€ Getters & Setters â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     public int getSeriesId() {
         return seriesId;
@@ -66,12 +66,12 @@ public class DocumentSeries {
         this.description = description;
     }
 
-    /** Retorna el siguiente número SIN incrementar (solo lectura). */
+    /** Retorna el siguiente nÃºmero SIN incrementar (solo lectura). */
     public int peekNextNumber() {
         return lastNumber + 1;
     }
 
-    /** Genera la referencia formateada para el número dado. */
+    /** Genera la referencia formateada para el nÃºmero dado. */
     public String format(int number) {
         return String.format("%s%05d", prefix, number);
     }

@@ -129,7 +129,7 @@ public class PunctualityAuditController implements Injectable {
                         else
                             record.closingStatus = "Correcto";
                     } else {
-                        record.closingStatus = "Sesión activa";
+                        record.closingStatus = "SesiÃ³n activa";
                     }
                 }
                 records.add(record);

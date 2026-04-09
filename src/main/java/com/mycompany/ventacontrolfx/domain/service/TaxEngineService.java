@@ -13,8 +13,8 @@ import java.util.Optional;
 
 /**
  * Servicio de domino (Domain Service) responsable de calcular los impuestos
- * aplicables a una venta o línea de venta. Implementa Clean Architecture
- * separando la lógica pura de la persistencia.
+ * aplicables a una venta o lÃ­nea de venta. Implementa Clean Architecture
+ * separando la lÃ³gica pura de la persistencia.
  */
 public class TaxEngineService {
 
@@ -27,7 +27,7 @@ public class TaxEngineService {
     }
 
     /**
-     * Calcula los impuestos de una única línea de venta de producto.
+     * Calcula los impuestos de una Ãºnica lÃ­nea de venta de producto.
      */
     public TaxCalculationResult calculateLine(
             Product product,
@@ -36,7 +36,7 @@ public class TaxEngineService {
             double quantity,
             boolean pricesIncludeTax) throws SQLException {
 
-        // 1. Validar exención de cliente y regímenes especiales
+        // 1. Validar exenciÃ³n de cliente y regÃ­menes especiales
         if (client != null && client.isTaxExempt()) {
             double net = pricesIncludeTax ? extractNet(unitPrice, getEffectiveTotalRate(product)) * quantity
                     : unitPrice * quantity;
@@ -58,7 +58,7 @@ public class TaxEngineService {
             return fallbackCalculation(product, unitPrice, quantity, pricesIncludeTax);
         }
 
-        // 3. Cálculos matemáticos
+        // 3. CÃ¡lculos matemÃ¡ticos
         double totalRatePercentage = taxGroup.getRates().stream().mapToDouble(TaxRate::getRate).sum();
 
         double netUnit;
@@ -88,7 +88,7 @@ public class TaxEngineService {
     /**
      * Resuelve el grupo de impuestos aplicable al producto con herencia:
      * 1. Grupo asignado directamente al Producto.
-     * 2. Grupo asignado a la Categoría del producto.
+     * 2. Grupo asignado a la CategorÃ­a del producto.
      * 3. Grupo predeterminado del sistema.
      */
     private TaxGroup resolveTaxGroup(Product product) throws SQLException {
@@ -100,7 +100,7 @@ public class TaxEngineService {
             }
         }
 
-        // 2. Grupo de la Categoría
+        // 2. Grupo de la CategorÃ­a
         if (product.getCategoryId() > 0 && categoryRepository != null) {
             Category category = categoryRepository.getById(product.getCategoryId());
             if (category != null && category.getTaxGroupId() != null && category.getTaxGroupId() > 0) {
@@ -130,8 +130,8 @@ public class TaxEngineService {
     }
 
     /**
-     * Cálculo transitorio (Legacy Fallback) por si no hay tabla de impuestos V2
-     * configurada aún.
+     * CÃ¡lculo transitorio (Legacy Fallback) por si no hay tabla de impuestos V2
+     * configurada aÃºn.
      */
     private TaxCalculationResult fallbackCalculation(Product product, double unitPrice, double quantity,
             boolean pricesIncludeTax) {
@@ -149,7 +149,7 @@ public class TaxEngineService {
 
         List<AppliedTax> appliedTaxes = new ArrayList<>();
         if (rate > 0 || rate == 0) {
-            // Asignar ID basado en tasas estándar para evitar errores de FK
+            // Asignar ID basado en tasas estÃ¡ndar para evitar errores de FK
             int taxId = 1; // Default 21%
             if (rate == 10.0)
                 taxId = 2;
@@ -172,7 +172,7 @@ public class TaxEngineService {
     }
 
     /**
-     * Agrupa y resume los impuestos de múltiples líneas para el pie de factura.
+     * Agrupa y resume los impuestos de mÃºltiples lÃ­neas para el pie de factura.
      */
     public List<SaleTaxSummary> summarizeTaxes(List<TaxCalculationResult> lineResults) {
         Map<Integer, SaleTaxSummary> map = new HashMap<>();
@@ -182,7 +182,7 @@ public class TaxEngineService {
                 SaleTaxSummary summary = map.getOrDefault(tax.getTaxRateId(),
                         new SaleTaxSummary(0, tax.getTaxRateId(), tax.getTaxName(), tax.getTaxRate(), 0.0, 0.0));
 
-                // La suma de la base de este impuesto es el netTotal de la línea donde aplicó.
+                // La suma de la base de este impuesto es el netTotal de la lÃ­nea donde aplicÃ³.
                 summary.setTaxBasis(summary.getTaxBasis() + result.getNetTotal());
                 summary.setTaxAmount(summary.getTaxAmount() + tax.getTaxAmount());
 

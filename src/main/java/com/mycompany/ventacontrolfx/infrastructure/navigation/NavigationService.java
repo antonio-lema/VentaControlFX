@@ -81,7 +81,7 @@ public class NavigationService {
     }
 
     /**
-     * Registra el listener que MainController usará para mostrar/ocultar el
+     * Registra el listener que MainController usarÃ¡ para mostrar/ocultar el
      * carrito.
      */
     public void setCartVisibilityListener(CartVisibilityListener listener) {
@@ -120,7 +120,7 @@ public class NavigationService {
 
         // Permitido: Registrar acceso exitoso (Audit Trail)
         try {
-            audit.logAccess(userId, "NAVIGATE", fxmlPath, "Acceso a módulo");
+            audit.logAccess(userId, "NAVIGATE", fxmlPath, "Acceso a mÃ³dulo");
         } catch (SQLException ignored) {
         }
 
@@ -128,7 +128,7 @@ public class NavigationService {
             loadingOverlay.setVisible(true);
         searchHandlers.clear(); // Clear search handlers for the new view
 
-        // Notificar visibilidad del carrito y búsqueda ANTES de cargar la vista
+        // Notificar visibilidad del carrito y bÃºsqueda ANTES de cargar la vista
         boolean isSellView = SELL_VIEW.equals(fxmlPath);
 
         if (cartVisibilityListener != null) {

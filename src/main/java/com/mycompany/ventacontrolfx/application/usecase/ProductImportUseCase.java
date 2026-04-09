@@ -31,7 +31,7 @@ public class ProductImportUseCase {
     public int importFromCsv(File file) throws Exception {
         authService.checkPermission("PRODUCTOS");
 
-        // 1. Cargar categorías para mapeo por nombre
+        // 1. Cargar categorÃ­as para mapeo por nombre
         List<Category> allCategories = categoryRepository.getAll();
         Map<String, Integer> categoryMap = new HashMap<>();
         int defaultCategoryId = 0;
@@ -84,7 +84,7 @@ public class ProductImportUseCase {
 
                     productsToImport.add(p);
                 } catch (Exception e) {
-                    System.err.println("Error parseando línea: " + line + " -> " + e.getMessage());
+                    System.err.println("Error parseando lÃ­nea: " + line + " -> " + e.getMessage());
                 }
             }
         }

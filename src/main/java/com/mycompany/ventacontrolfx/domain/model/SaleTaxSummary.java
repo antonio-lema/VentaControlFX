@@ -1,7 +1,7 @@
 package com.mycompany.ventacontrolfx.domain.model;
 
 /**
- * Representa el resumen de un impuesto específico aplicado a una venta
+ * Representa el resumen de un impuesto especÃ­fico aplicado a una venta
  * completa.
  * Corresponde a la tabla `sale_tax_summary`.
  * 

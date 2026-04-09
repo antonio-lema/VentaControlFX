@@ -4,11 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Modelo que representa la configuración general de venta del TPV.
+ * Modelo que representa la configuraciÃ³n general de venta del TPV.
  */
 public class SaleConfig {
 
-    // ── Empresa ───────────────────────────────────────────────────────
+    // â”€â”€ Empresa â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     private String companyName = "";
     private String cif = "";
     private String address = "";
@@ -22,25 +22,25 @@ public class SaleConfig {
     private String emailFrom = "";
     private String emailPassword = "";
 
-    // ── Fiscal ────────────────────────────────────────────────────────
+    // â”€â”€ Fiscal â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     private double taxRate = 21.0;
     private String taxType = "IVA General (21%)";
     private boolean pricesIncludeTax = false;
-    private String currency = "EUR — Euro (€)";
+    private String currency = "EUR â€” Euro (â‚¬)";
     private String decimals = "2 decimales";
     private String roundingMethod = "LINE"; // Tax Engine V2: 'LINE' o 'GLOBAL'
 
-    // ── Ticket ────────────────────────────────────────────────────────
+    // â”€â”€ Ticket â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     private boolean showLogo = true;
     private boolean showAddress = true;
     private boolean showPhone = true;
     private boolean showCif = true;
-    private String footerMessage = "¡Gracias por su compra!";
+    private String footerMessage = "Â¡Gracias por su compra!";
     private String ticketCopies = "1 copia";
     private String ticketFormat = "80mm";
     private boolean autoPrint = false;
 
-    // ── Métodos de pago ───────────────────────────────────────────────
+    // â”€â”€ MÃ©todos de pago â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     private boolean cash = true;
     private boolean card = true;
     private boolean transfer = false;
@@ -48,7 +48,7 @@ public class SaleConfig {
     private boolean credit = false;
     private String rounding = "Sin redondeo";
 
-    // ── Opciones generales ────────────────────────────────────────────
+    // â”€â”€ Opciones generales â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     private boolean allowDiscount = false;
     private boolean allowGlobalDiscount = false;
     private boolean requireClient = false;
@@ -58,12 +58,12 @@ public class SaleConfig {
     private boolean soundOnAdd = true;
     private boolean confirmDelete = true;
 
-    // ── Horarios ──────────────────────────────────────────────────────
+    // â”€â”€ Horarios â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     private List<BusinessDay> schedule = new ArrayList<>();
     private List<SpecialDay> specialDays = new ArrayList<>();
     private int scheduleGracePeriodMins = 10;
 
-    // ── Getters & Setters ─────────────────────────────────────────────
+    // â”€â”€ Getters & Setters â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     public String getCompanyName() {
         return companyName;
@@ -457,20 +457,20 @@ public class SaleConfig {
         }
     }
 
-    // ── Helpers ───────────────────────────────────────────────────────
+    // â”€â”€ Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-    /** Devuelve el símbolo de moneda (€, $, £) según la moneda configurada. */
+    /** Devuelve el sÃ­mbolo de moneda (â‚¬, $, Â£) segÃºn la moneda configurada. */
     public String getCurrencySymbol() {
         if (currency == null)
-            return "€";
+            return "â‚¬";
         if (currency.startsWith("USD"))
             return "$";
         if (currency.startsWith("GBP"))
-            return "£";
-        return "€"; // EUR por defecto
+            return "Â£";
+        return "â‚¬"; // EUR por defecto
     }
 
-    /** Devuelve el número de decimales configurado (0, 1, 2 o 3). */
+    /** Devuelve el nÃºmero de decimales configurado (0, 1, 2 o 3). */
     public int getDecimalCount() {
         if (decimals == null)
             return 2;

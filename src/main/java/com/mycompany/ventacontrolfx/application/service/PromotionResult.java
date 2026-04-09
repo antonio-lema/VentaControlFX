@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.HashMap;
 
 /**
- * Resultado de la ejecución del motor de promociones.
+ * Resultado de la ejecuciÃ³n del motor de promociones.
  */
 public class PromotionResult {
     private double totalDiscount = 0.0;

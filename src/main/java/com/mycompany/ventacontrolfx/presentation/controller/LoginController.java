@@ -72,17 +72,17 @@ public class LoginController implements Injectable {
         }
 
         try {
-            // Delegamos toda la lógica al Caso de Uso (Clean Architecture)
+            // Delegamos toda la lÃ³gica al Caso de Uso (Clean Architecture)
             User user = loginUseCase.execute(username, password);
 
-            // Si llegamos aquí, el login fue exitoso
+            // Si llegamos aquÃ­, el login fue exitoso
             container.getUserSession().setCurrentUser(user);
 
-            // Iniciar turno automáticamente al entrar
+            // Iniciar turno automÃ¡ticamente al entrar
             try {
                 container.getWorkSessionUseCase().startShift(user.getUserId());
             } catch (Exception e) {
-                // Si ya tenía un turno abierto (ej: cierre inesperado), no hacemos nada
+                // Si ya tenÃ­a un turno abierto (ej: cierre inesperado), no hacemos nada
                 System.out.println("El usuario ya tiene un turno activo o hubo un error al iniciar: " + e.getMessage());
             }
 

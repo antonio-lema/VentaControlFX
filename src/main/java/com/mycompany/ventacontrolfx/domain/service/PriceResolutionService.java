@@ -18,18 +18,18 @@ public class PriceResolutionService {
 
     /**
      * Resuelve el precio de un producto considerando la tarifa solicitada y cayendo
-     * a la tarifa por defecto si no existe una específica, cumpliendo con las
+     * a la tarifa por defecto si no existe una especÃ­fica, cumpliendo con las
      * prioridades.
      */
     public Optional<Price> resolvePrice(int productId, int priceListId) throws SQLException {
-        // 1. Intentar obtener el precio en la tarifa específica (viva actualmente)
+        // 1. Intentar obtener el precio en la tarifa especÃ­fica (viva actualmente)
         Optional<Price> specificPrice = priceRepository.getActivePrice(productId, priceListId);
 
         if (specificPrice.isPresent()) {
             return specificPrice;
         }
 
-        // 2. Fallback a la tarifa por defecto si no hay precio específico activo
+        // 2. Fallback a la tarifa por defecto si no hay precio especÃ­fico activo
         PriceList defaultList = priceRepository.getDefaultPriceList();
         if (priceListId != defaultList.getId()) {
             return priceRepository.getActivePrice(productId, defaultList.getId());
@@ -39,7 +39,7 @@ public class PriceResolutionService {
     }
 
     /**
-     * Calcula el precio para un cliente específico considerando su lista de precios
+     * Calcula el precio para un cliente especÃ­fico considerando su lista de precios
      * asignada.
      */
     public Optional<Price> resolvePriceForClient(int productId, Integer clientId) throws SQLException {

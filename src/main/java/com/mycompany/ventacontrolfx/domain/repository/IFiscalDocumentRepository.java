@@ -10,14 +10,14 @@ import java.util.Optional;
 
 /**
  * Puerto de acceso a la persistencia de documentos fiscales.
- * Clean Architecture — Capa de Dominio (Interfaz / Port).
- * La implementación concreta vive en la capa de Infraestructura.
+ * Clean Architecture â€” Capa de Dominio (Interfaz / Port).
+ * La implementaciÃ³n concreta vive en la capa de Infraestructura.
  */
 public interface IFiscalDocumentRepository {
 
     /**
-     * Persiste el documento fiscal y actualiza la tabla sales con el número
-     * correlativo. Debe ejecutarse dentro de una transacción.
+     * Persiste el documento fiscal y actualiza la tabla sales con el nÃºmero
+     * correlativo. Debe ejecutarse dentro de una transacciÃ³n.
      */
     void save(FiscalDocument document, Connection conn) throws SQLException;
 
@@ -33,7 +33,7 @@ public interface IFiscalDocumentRepository {
 
     /**
      * Listado de documentos fiscales filtrado por rango de fechas y estado.
-     * Permite pasar null en cualquier parámetro para ignorar ese filtro.
+     * Permite pasar null en cualquier parÃ¡metro para ignorar ese filtro.
      */
     List<FiscalDocument> findByFilters(LocalDate from, LocalDate to, Status status, String docType)
             throws SQLException;

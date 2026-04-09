@@ -31,7 +31,7 @@ public class EditClosureDialogController {
         this.closureId = closureId;
         this.previousCash = previousCash;
 
-        lblPreviousCash.setText(String.format("%.2f €", previousCash));
+        lblPreviousCash.setText(String.format("%.2f â‚¬", previousCash));
         txtAmount.setText(String.valueOf(previousCash));
 
         javafx.application.Platform.runLater(txtAmount::requestFocus);
@@ -48,13 +48,13 @@ public class EditClosureDialogController {
         try {
             amount = Double.parseDouble(amountText);
         } catch (NumberFormatException e) {
-            AlertUtil.showError("Formato Inválido", "El importe introducido no es un número válido.");
+            AlertUtil.showError("Formato InvÃ¡lido", "El importe introducido no es un nÃºmero vÃ¡lido.");
             return;
         }
 
         String reason = txtReason.getText().trim();
         if (reason.isEmpty()) {
-            AlertUtil.showWarning("Campo Obligatorio", "Debes especificar el motivo de la modificación.");
+            AlertUtil.showWarning("Campo Obligatorio", "Debes especificar el motivo de la modificaciÃ³n.");
             return;
         }
 

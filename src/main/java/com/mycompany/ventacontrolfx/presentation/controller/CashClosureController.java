@@ -63,14 +63,14 @@ public class CashClosureController implements Injectable {
         if (userSession.getCurrentUser() != null) {
             lblCurrentUser.setText(userSession.getCurrentUser().getUsername());
 
-            // Verificación de permisos para Ingreso
+            // VerificaciÃ³n de permisos para Ingreso
             boolean canEnterCash = userSession.hasPermission("caja.ingresar");
             if (btnRegisterCashEntry != null) {
                 btnRegisterCashEntry.setVisible(canEnterCash);
                 btnRegisterCashEntry.setManaged(canEnterCash);
             }
 
-            // Verificación de permisos para ver totales financieros
+            // VerificaciÃ³n de permisos para ver totales financieros
             boolean canSeeTotals = userSession.hasPermission("caja.ver_totales")
                     || userSession.hasPermission("USUARIOS");
             if (cardCash != null) {
@@ -116,7 +116,7 @@ public class CashClosureController implements Injectable {
                 if (empty || item == null)
                     setText(null);
                 else
-                    setText(String.format("%.2f €", item));
+                    setText(String.format("%.2f â‚¬", item));
             }
         });
     }
@@ -129,15 +129,15 @@ public class CashClosureController implements Injectable {
             double totalAll = totals.getOrDefault("total", currentCash + currentCard);
             double returnsTotal = totals.getOrDefault("returns_total", 0.0);
 
-            lblTotalCash.setText("💵 " + String.format("%.2f €", currentCash));
-            lblTotalCard.setText("💳 " + String.format("%.2f €", currentCard));
+            lblTotalCash.setText("ðŸ’µ " + String.format("%.2f â‚¬", currentCash));
+            lblTotalCard.setText("ðŸ’³ " + String.format("%.2f â‚¬", currentCard));
             lblTotalAll.setText(
-                    "💰 " + container.getBundle().getString("closure.net") + ": " + String.format("%.2f €", totalAll));
+                    "ðŸ’° " + container.getBundle().getString("closure.net") + ": " + String.format("%.2f â‚¬", totalAll));
 
             // Mostrar devoluciones totales
             if (lblTotalReturns != null) {
                 if (returnsTotal > 0) {
-                    lblTotalReturns.setText(String.format("%.2f €", returnsTotal));
+                    lblTotalReturns.setText(String.format("%.2f â‚¬", returnsTotal));
                     if (containerReturns != null) {
                         containerReturns.setVisible(true);
                         containerReturns.setManaged(true);
@@ -150,7 +150,7 @@ public class CashClosureController implements Injectable {
                 }
             }
 
-            lblSalesCount.setText("📊 " + closureUseCase.getTodayTransactionCount());
+            lblSalesCount.setText("ðŸ“Š " + closureUseCase.getTodayTransactionCount());
 
             List<ProductSummary> summary = closureUseCase.getPendingSummary();
             tableProductSummary.setItems(FXCollections.observableArrayList(summary));
@@ -159,7 +159,7 @@ public class CashClosureController implements Injectable {
             double totalDiscounts = totals.getOrDefault("total_discounts", 0.0);
             if (lblTotalDiscounts != null) {
                 if (totalDiscounts > 0) {
-                    lblTotalDiscounts.setText(String.format("-%.2f €", totalDiscounts));
+                    lblTotalDiscounts.setText(String.format("-%.2f â‚¬", totalDiscounts));
                     if (containerDiscounts != null) {
                         containerDiscounts.setVisible(true);
                         containerDiscounts.setManaged(true);
@@ -176,7 +176,7 @@ public class CashClosureController implements Injectable {
                     && closureUseCase.getTodayTransactionCount() == 0)
                 markAsClosed();
             else {
-                lblStatus.setText(container.getBundle().getString("closure.status.in_progress") + " ⏳");
+                lblStatus.setText(container.getBundle().getString("closure.status.in_progress") + " â³");
                 lblStatus.getStyleClass().removeAll("closure-status-done");
                 lblStatus.getStyleClass().add("closure-status-pending");
                 btnPerformClosure.setDisable(false);
@@ -195,12 +195,12 @@ public class CashClosureController implements Injectable {
             double fundAmount = closureUseCase.getActiveFundAmount();
 
             if (hasFund) {
-                lblActiveFund.setText("💼 " + container.getBundle().getString("closure.fund") + ": "
-                        + String.format("%.2f €", fundAmount));
+                lblActiveFund.setText("ðŸ’¼ " + container.getBundle().getString("closure.fund") + ": "
+                        + String.format("%.2f â‚¬", fundAmount));
                 lblActiveFund.setStyle("-fx-text-fill: -color-success; -fx-font-weight: bold;");
-                lblCashInDrawer.setText("🏦 " + String.format("%.2f €", cashInDrawer));
+                lblCashInDrawer.setText("ðŸ¦ " + String.format("%.2f â‚¬", cashInDrawer));
 
-                // Color según saldo
+                // Color segÃºn saldo
                 if (cashInDrawer < 20) {
                     lblCashInDrawer
                             .setStyle("-fx-text-fill: -color-danger; -fx-font-weight: bold; -fx-font-size: 22px;");
@@ -213,35 +213,35 @@ public class CashClosureController implements Injectable {
                 }
 
                 btnOpenFund.setDisable(true);
-                btnOpenFund.setText("✅ " + container.getBundle().getString("closure.status.open"));
+                btnOpenFund.setText("âœ… " + container.getBundle().getString("closure.status.open"));
                 btnWithdrawCash.setDisable(false);
                 if (btnRegisterCashEntry != null)
                     btnRegisterCashEntry.setDisable(false);
 
-                // Asegurar que el botón de cierre esté habilitado si hay sesión activa
+                // Asegurar que el botÃ³n de cierre estÃ© habilitado si hay sesiÃ³n activa
                 btnPerformClosure.setDisable(false);
                 btnPerformClosure.setText(container.getBundle().getString("closure.btn.perform"));
-                lblStatus.setText(container.getBundle().getString("closure.status.in_progress") + " ⏳");
+                lblStatus.setText(container.getBundle().getString("closure.status.in_progress") + " â³");
                 lblStatus.getStyleClass().removeAll("closure-status-done");
                 lblStatus.getStyleClass().add("closure-status-pending");
             } else {
-                lblActiveFund.setText("⚠️ " + container.getBundle().getString("closure.no_fund"));
+                lblActiveFund.setText("âš ï¸ " + container.getBundle().getString("closure.no_fund"));
                 lblActiveFund.setStyle("-fx-text-fill: -color-warning; -fx-font-weight: bold;");
-                lblCashInDrawer.setText("🏦 " + container.getBundle().getString("closure.no_session"));
+                lblCashInDrawer.setText("ðŸ¦ " + container.getBundle().getString("closure.no_session"));
                 lblCashInDrawer.setStyle("-fx-text-fill: -text-muted; -fx-font-size: 22px;");
                 btnOpenFund.setDisable(false);
-                btnOpenFund.setText("💼 " + container.getBundle().getString("closure.btn.open_fund"));
+                btnOpenFund.setText("ðŸ’¼ " + container.getBundle().getString("closure.btn.open_fund"));
                 btnWithdrawCash.setDisable(true);
                 if (btnRegisterCashEntry != null)
                     btnRegisterCashEntry.setDisable(true);
             }
         } catch (SQLException e) {
-            lblCashInDrawer.setText("🏦 " + container.getBundle().getString("error.load"));
+            lblCashInDrawer.setText("ðŸ¦ " + container.getBundle().getString("error.load"));
         }
     }
 
     private void markAsClosed() {
-        lblStatus.setText(container.getBundle().getString("closure.status.completed") + " ✅");
+        lblStatus.setText(container.getBundle().getString("closure.status.completed") + " âœ…");
         lblStatus.getStyleClass().removeAll("closure-status-pending");
         lblStatus.getStyleClass().add("closure-status-done");
         btnPerformClosure.setDisable(true);

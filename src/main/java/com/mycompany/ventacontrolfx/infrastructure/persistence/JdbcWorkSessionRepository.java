@@ -92,9 +92,9 @@ public class JdbcWorkSessionRepository implements IWorkSessionRepository {
                 ResultSet rs = pstmt.executeQuery()) {
             while (rs.next()) {
                 WorkSession session = mapResultSetToWorkSession(rs);
-                // Podemos usar el campo notes temporalmente o añadir un campo transient en el
+                // Podemos usar el campo notes temporalmente o aÃ±adir un campo transient en el
                 // modelo
-                // Pero por ahora lo dejamos así y lo manejaremos en el ViewModel
+                // Pero por ahora lo dejamos asÃ­ y lo manejaremos en el ViewModel
                 sessions.add(session);
             }
         } catch (SQLException e) {
@@ -133,13 +133,13 @@ public class JdbcWorkSessionRepository implements IWorkSessionRepository {
         session.setStatus(WorkSession.SessionStatus.valueOf(rs.getString("status")));
         session.setNotes(rs.getString("notes"));
 
-        // Cargar nombre de usuario si se incluyó en el JOIN (usado en panel operativo)
+        // Cargar nombre de usuario si se incluyÃ³ en el JOIN (usado en panel operativo)
         try {
             String uname = rs.getString("user_name");
             if (uname != null)
                 session.setUserName(uname);
         } catch (SQLException e) {
-            // Ignorar si la columna no existe en este ResultSet específico
+            // Ignorar si la columna no existe en este ResultSet especÃ­fico
         }
 
         return session;

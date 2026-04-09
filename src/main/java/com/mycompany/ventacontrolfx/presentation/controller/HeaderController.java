@@ -43,7 +43,7 @@ public class HeaderController implements Injectable {
         setupSearch();
         checkStockAlerts();
 
-        // Suscribirse a cambios globales para refrescar alertas (ej: después de una
+        // Suscribirse a cambios globales para refrescar alertas (ej: despuÃ©s de una
         // venta)
         if (container.getEventBus() != null) {
             this.stockRefreshListener = this::refreshStockAlerts;
@@ -74,7 +74,7 @@ public class HeaderController implements Injectable {
     }
 
     private void setupUserMenu() {
-        // Mostrar nombre del usuario en sesión
+        // Mostrar nombre del usuario en sesiÃ³n
         if (lblHeaderUsername != null && container.getUserSession() != null) {
             var currentUser = container.getUserSession().getCurrentUser();
             if (currentUser != null) {
@@ -151,8 +151,8 @@ public class HeaderController implements Injectable {
             });
         }
 
-        // Evitar que el campo de búsqueda robe el foco al arrancar, pero asegurar que
-        // el foco esté en el campo de texto real
+        // Evitar que el campo de bÃºsqueda robe el foco al arrancar, pero asegurar que
+        // el foco estÃ© en el campo de texto real
         Platform.runLater(() -> {
             if (searchField != null) {
                 searchField.requestFocus();
@@ -182,16 +182,16 @@ public class HeaderController implements Injectable {
                 return;
             }
 
-            // 1. Confirmación de Cierre de Sesión
+            // 1. ConfirmaciÃ³n de Cierre de SesiÃ³n
             if (AlertUtil.showConfirmation(container.getBundle().getString("header.logout.title"),
                     container.getBundle().getString("header.logout.confirm"),
                     container.getBundle().getString("header.logout.msg"))) {
 
-                // Finalizar turno automáticamente si hay uno activo
+                // Finalizar turno automÃ¡ticamente si hay uno activo
                 try {
                     container.getWorkSessionUseCase().endSession(user.getUserId());
                 } catch (Exception e) {
-                    System.err.println("Error finalizando turno al cerrar sesión: " + e.getMessage());
+                    System.err.println("Error finalizando turno al cerrar sesiÃ³n: " + e.getMessage());
                 }
 
                 performLogout();

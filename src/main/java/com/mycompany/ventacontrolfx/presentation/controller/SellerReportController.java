@@ -110,19 +110,19 @@ public class SellerReportController implements Injectable {
         // Seller Table
         colRank.setCellValueFactory(
                 c -> new SimpleStringProperty(String.valueOf(sellerTable.getItems().indexOf(c.getValue()) + 1)));
-        colAvatar.setCellValueFactory(c -> new SimpleStringProperty("🧑‍💼"));
+        colAvatar.setCellValueFactory(c -> new SimpleStringProperty("ðŸ§‘â€ðŸ’¼"));
         colSeller.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getSellerName()));
         colTotal.setCellValueFactory(
-                c -> new SimpleStringProperty(String.format("%.2f €", c.getValue().getTotalSales())));
+                c -> new SimpleStringProperty(String.format("%.2f â‚¬", c.getValue().getTotalSales())));
         colAvgTicket.setCellValueFactory(
-                c -> new SimpleStringProperty(String.format("%.2f €", c.getValue().getAverageTicket())));
+                c -> new SimpleStringProperty(String.format("%.2f â‚¬", c.getValue().getAverageTicket())));
         colParticip.setCellValueFactory(c -> new SimpleStringProperty(
                 String.format("%.1f%%", c.getValue().getParticipationPercentage() * 100)));
         colGoal.setCellValueFactory(
                 c -> new SimpleStringProperty(
-                        String.format("%.1f%% (Obj 3000€)", c.getValue().getGoalReachedPercentage() * 100)));
+                        String.format("%.1f%% (Obj 3000â‚¬)", c.getValue().getGoalReachedPercentage() * 100)));
         colReturns.setCellValueFactory(
-                c -> new SimpleStringProperty(String.format("%.2f €", c.getValue().getReturnsTotal())));
+                c -> new SimpleStringProperty(String.format("%.2f â‚¬", c.getValue().getReturnsTotal())));
 
         sellerTable.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal != null)
@@ -131,9 +131,9 @@ public class SellerReportController implements Injectable {
 
         // Detail Table
         colDate.setCellValueFactory(c -> new SimpleStringProperty(
-                c.getValue().getSaleDateTime() != null ? c.getValue().getSaleDateTime().format(FMT) : "—"));
+                c.getValue().getSaleDateTime() != null ? c.getValue().getSaleDateTime().format(FMT) : "â€”"));
         colRecordType
-                .setCellValueFactory(c -> new SimpleStringProperty(c.getValue().isReturn() ? "Devolución" : "Venta"));
+                .setCellValueFactory(c -> new SimpleStringProperty(c.getValue().isReturn() ? "DevoluciÃ³n" : "Venta"));
         colMethod.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getPaymentMethod()));
         colClient.setCellValueFactory(c -> {
             Integer cid = c.getValue().getClientId();
@@ -146,7 +146,7 @@ public class SellerReportController implements Injectable {
                 return new SimpleStringProperty("Cliente #" + cid);
             }
         });
-        colAmount.setCellValueFactory(c -> new SimpleStringProperty(String.format("%.2f €", c.getValue().getTotal())));
+        colAmount.setCellValueFactory(c -> new SimpleStringProperty(String.format("%.2f â‚¬", c.getValue().getTotal())));
     }
 
     @FXML
@@ -208,21 +208,21 @@ public class SellerReportController implements Injectable {
         double marginPrev = totalPrev * 0.35;
 
         // KPIs
-        lblKpiTotal.setText(String.format("%.2f €", totalCurrentNet));
-        lblKpiMargin.setText(String.format("%.2f €", marginCurrent));
+        lblKpiTotal.setText(String.format("%.2f â‚¬", totalCurrentNet));
+        lblKpiMargin.setText(String.format("%.2f â‚¬", marginCurrent));
         lblKpiCount.setText(String.valueOf(currentSales.size()));
         lblKpiAvg.setText(
-                currentSales.isEmpty() ? "0.00 €" : String.format("%.2f €", totalCurrentNet / currentSales.size()));
+                currentSales.isEmpty() ? "0.00 â‚¬" : String.format("%.2f â‚¬", totalCurrentNet / currentSales.size()));
 
         // Devoluciones Label
-        lblReturnsTotal.setText(String.format("-%.2f €", totalReturnsAmount));
+        lblReturnsTotal.setText(String.format("-%.2f â‚¬", totalReturnsAmount));
 
         // Goal Tracking (Supongamos un objetivo global de 15,000 para todo el equipo)
         double teamGoal = 15000.0;
         double goalPct = totalCurrentNet / teamGoal;
         lblGoalPct.setText(String.format("%.1f%%", goalPct * 100));
         progressGoal.setProgress(Math.min(goalPct, 1.0));
-        lblGoalText.setText(String.format("%.0f / %.0f €", totalCurrentNet, teamGoal));
+        lblGoalText.setText(String.format("%.0f / %.0f â‚¬", totalCurrentNet, teamGoal));
 
         // Trends
         updateTrendLabel(lblTrendTotal, totalCurrentNet, totalPrev, true);
@@ -241,8 +241,8 @@ public class SellerReportController implements Injectable {
         Map<Integer, User> userMap = allUsers.stream().collect(Collectors.toMap(User::getUserId, u -> u));
 
         List<SellerAnalytics> analyticsList = new ArrayList<>();
-        XYChart.Series<String, Number> seriesBar = new XYChart.Series<>(); // Para de gráfico de barras
-        XYChart.Series<String, Number> seriesLine = new XYChart.Series<>(); // Evolución temporal
+        XYChart.Series<String, Number> seriesBar = new XYChart.Series<>(); // Para de grÃ¡fico de barras
+        XYChart.Series<String, Number> seriesLine = new XYChart.Series<>(); // EvoluciÃ³n temporal
 
         Set<Integer> allUserIdsInPeriod = new HashSet<>(byUser.keySet());
         allUserIdsInPeriod.addAll(returnsByUser.keySet());
@@ -285,21 +285,21 @@ public class SellerReportController implements Injectable {
 
             analyticsList.add(sa);
 
-            // Agregar al gráfico de barras (Ventas Netas)
+            // Agregar al grÃ¡fico de barras (Ventas Netas)
             seriesBar.getData().add(new XYChart.Data<>(name, sellerNet));
         }
 
         analyticsList.sort((a, b) -> Double.compare(b.getTotalSales(), a.getTotalSales()));
         sellerTable.setItems(FXCollections.observableArrayList(analyticsList));
 
-        // Evolución LineChart por día (Ventas Netas)
+        // EvoluciÃ³n LineChart por dÃ­a (Ventas Netas)
         Map<LocalDate, Double> dailySalesNet = currentSales.stream()
                 .collect(Collectors.groupingBy(
                         s -> s.getSaleDateTime().toLocalDate(),
                         TreeMap::new,
                         Collectors.summingDouble(Sale::getTotal)));
 
-        // Restar devoluciones por día
+        // Restar devoluciones por dÃ­a
         currentReturnsList.forEach(r -> {
             LocalDate date = r.getReturnDatetime().toLocalDate();
             dailySalesNet.put(date, dailySalesNet.getOrDefault(date, 0.0) - r.getTotalRefunded());
@@ -318,13 +318,13 @@ public class SellerReportController implements Injectable {
         if (!analyticsList.isEmpty()) {
             SellerAnalytics best = analyticsList.get(0);
             lblKpiBest.setText(best.getSellerName());
-            lblBestPerformance.setText(String.format("%.2f € / Mes", best.getTotalSales()));
+            lblBestPerformance.setText(String.format("%.2f â‚¬ / Mes", best.getTotalSales()));
         } else {
-            lblKpiBest.setText("—");
-            lblBestPerformance.setText("0.00 € / Mes");
+            lblKpiBest.setText("â€”");
+            lblBestPerformance.setText("0.00 â‚¬ / Mes");
         }
 
-        // Gráfico Pie: Distribución por Pagos (Global)
+        // GrÃ¡fico Pie: DistribuciÃ³n por Pagos (Global)
         pieChartDistribution.setLabelsVisible(false);
         pieChartDistribution.setLegendVisible(false);
         double globalCash = currentSales.stream().filter(s -> "Efectivo".equalsIgnoreCase(s.getPaymentMethod()))
@@ -343,8 +343,8 @@ public class SellerReportController implements Injectable {
         pieChartDistribution.setData(pieData);
 
         // Resumen Global de Pagos Labels
-        lblCashTotal.setText(String.format("%.2f €", globalCash));
-        lblCardTotal.setText(String.format("%.2f €", globalCard));
+        lblCashTotal.setText(String.format("%.2f â‚¬", globalCash));
+        lblCardTotal.setText(String.format("%.2f â‚¬", globalCard));
 
         double totalPay = globalCash + globalCard;
         progressCash.setProgress(totalPay > 0 ? globalCash / totalPay : 0);
@@ -355,7 +355,7 @@ public class SellerReportController implements Injectable {
         lbl.getStyleClass().removeAll("trend-badge-up", "trend-badge-down", "trend-badge-neutral", "trend-badge-blue");
 
         if (prev == 0) {
-            lbl.setText(isCurrency ? "↑ 100%" : "↑ " + (int) current);
+            lbl.setText(isCurrency ? "â†‘ 100%" : "â†‘ " + (int) current);
             lbl.getStyleClass().add("trend-badge-up");
             return;
         }
@@ -363,7 +363,7 @@ public class SellerReportController implements Injectable {
         double diff = current - prev;
         double pct = (diff / prev) * 100;
 
-        String arrow = pct > 0.1 ? "↑ " : (pct < -0.1 ? "↓ " : "• ");
+        String arrow = pct > 0.1 ? "â†‘ " : (pct < -0.1 ? "â†“ " : "â€¢ ");
 
         if (isCurrency) {
             lbl.setText(String.format("%s%.1f%%", arrow, Math.abs(pct)));
@@ -380,7 +380,7 @@ public class SellerReportController implements Injectable {
     }
 
     private void showSellerDetail(SellerAnalytics sa) {
-        lblDetailTitle.setText("📋 Ventas de " + sa.getSellerName());
+        lblDetailTitle.setText("ðŸ“‹ Ventas de " + sa.getSellerName());
         currentDetailSales.setAll(sa.getSales());
         filterDetailTable(txtDetailSearch.getText());
     }

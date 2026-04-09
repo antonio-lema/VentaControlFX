@@ -192,3 +192,50 @@
     -fx-border-color: -fx-neutral-200;
     -fx-border-width: 1px;
 }
+
+/* ════════ SKELTON SCREEN (LOADING PLACEHOLDERS) ════════ */
+
+.skeleton-box {
+    -fx-background-color: -fx-bg-surface;
+    -fx-background-radius: -fx-radius-lg;
+    -fx-border-color: -fx-neutral-100;
+    -fx-border-width: 1px;
+    -fx-border-radius: -fx-radius-lg;
+    -fx-padding: 0px;
+    -fx-min-width: 200px;
+    -fx-pref-width: 200px;
+}
+
+.skeleton-image {
+    -fx-background-color: -fx-neutral-100;
+    -fx-background-radius: -fx-radius-lg -fx-radius-lg 0px 0px;
+    -fx-min-height: 150px;
+}
+
+.skeleton-text {
+    -fx-background-color: -fx-neutral-100;
+    -fx-background-radius: -fx-radius-md;
+}
+
+.skeleton-title {
+    -fx-min-height: 18px;
+    -fx-pref-width: 140px;
+    -fx-max-width: 140px;
+}
+
+.skeleton-subtitle {
+    -fx-min-height: 14px;
+    -fx-pref-width: 100px;
+    -fx-max-width: 100px;
+}
+
+.skeleton-button {
+    -fx-background-color: -fx-neutral-50;
+    -fx-min-height: 38px;
+    -fx-background-radius: 0px 0px -fx-radius-lg -fx-radius-lg;
+}
+
+/* Base Pulse Animation Class */
+.skeleton-pulse {
+    -fx-opacity: 1.0;
+}

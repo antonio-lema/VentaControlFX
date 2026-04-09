@@ -5,9 +5,9 @@ import javafx.util.Duration;
 import java.util.function.Consumer;
 
 /**
- * Utilidad para retrasar la ejecución de una acción hasta que el usuario
+ * Utilidad para retrasar la ejecuciÃ³n de una acciÃ³n hasta que el usuario
  * deje de escribir por un tiempo determinado (Debounce).
- * Evita la saturación del hilo de UI y de la base de datos.
+ * Evita la saturaciÃ³n del hilo de UI y de la base de datos.
  */
 public class SearchDebouncer {
     private final PauseTransition delay;

@@ -290,7 +290,7 @@ public class JdbcSaleRepository implements ISaleRepository {
                     returnRecord.setReturnId(id);
                     return id;
                 } else {
-                    throw new SQLException("Error al crear la devolución, no se obtuvo el ID generado.");
+                    throw new SQLException("Error al crear la devoluciÃ³n, no se obtuvo el ID generado.");
                 }
             }
         }

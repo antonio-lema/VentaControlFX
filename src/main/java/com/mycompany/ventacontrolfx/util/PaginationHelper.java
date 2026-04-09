@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.stream.Collectors;
 
 /**
- * Utilidad para gestionar la paginación y limitación de filas en TableViews.
+ * Utilidad para gestionar la paginaciÃ³n y limitaciÃ³n de filas en TableViews.
  */
 public class PaginationHelper<T> {
 
@@ -66,7 +66,7 @@ public class PaginationHelper<T> {
         if (lblCount != null) {
             String format = (bundle != null && bundle.containsKey("pagination.showing_simple"))
                     ? bundle.getString("pagination.showing_simple")
-                    : "🔍 Mostrando %d de %d %s";
+                    : "ðŸ” Mostrando %d de %d %s";
             lblCount.setText(String.format(format, showing, total, entityNamePlural));
         }
     }

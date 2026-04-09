@@ -8,7 +8,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 /**
- * Caso de uso para la gestión administrativa de promociones.
+ * Caso de uso para la gestiÃ³n administrativa de promociones.
  */
 public class PromotionUseCase {
     private final IPromotionRepository repository;

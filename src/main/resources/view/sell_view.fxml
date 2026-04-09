@@ -94,9 +94,8 @@
                             </children>
                         </VBox>
 
-                        <VBox fx:id="loadingOverlay" visible="false" alignment="CENTER" styleClass="loading-overlay">
-                            <ProgressIndicator />
-                            <Label text="%sell.loading_products" styleClass="label-muted"/>
+                        <VBox fx:id="loadingOverlay" visible="false" alignment="CENTER" styleClass="loading-overlay" mouseTransparent="false">
+                            <!-- Skeletons are shown in the productsPane below this transparent layer -->
                         </VBox>
                     </StackPane>
 

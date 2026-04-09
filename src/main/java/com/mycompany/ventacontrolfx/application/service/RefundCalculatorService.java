@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 
 /**
- * Servicio puro de cálculo para reembolsos y prorrateos.
+ * Servicio puro de cÃ¡lculo para reembolsos y prorrateos.
  */
 public class RefundCalculatorService {
 

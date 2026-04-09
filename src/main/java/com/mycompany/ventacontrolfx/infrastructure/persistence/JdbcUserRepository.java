@@ -157,7 +157,7 @@ public class JdbcUserRepository implements IUserRepository {
             user.setCompanyId(rs.getInt("company_id"));
             user.setCompanyName(rs.getString("company_name"));
         } catch (SQLException e) {
-            // Se ignoran columnas si no existen en esta versión de la DB
+            // Se ignoran columnas si no existen en esta versiÃ³n de la DB
         }
 
         // Cargar permisos del ROL
@@ -247,10 +247,10 @@ public class JdbcUserRepository implements IUserRepository {
 
     @Override
     public boolean verifyRecoveryCode(String email, String code) throws SQLException {
-        // 1. Verificar que no se hayan superado los intentos máximos (fix V-01: Rate
+        // 1. Verificar que no se hayan superado los intentos mÃ¡ximos (fix V-01: Rate
         // Limiting)
         if (getRecoveryAttempts(email) >= 5) {
-            return false; // Código bloqueado por demasiados intentos
+            return false; // CÃ³digo bloqueado por demasiados intentos
         }
 
         String sql = "SELECT code_hash FROM password_recoveries WHERE email = ? AND is_used = FALSE AND expires_at > ? ORDER BY created_at DESC";
@@ -267,7 +267,7 @@ public class JdbcUserRepository implements IUserRepository {
                     }
                 }
 
-                // Si salimos del bucle y nada coincidió, sumamos intento fallido
+                // Si salimos del bucle y nada coincidiÃ³, sumamos intento fallido
                 incrementRecoveryAttempts(email);
             }
         }
@@ -284,13 +284,13 @@ public class JdbcUserRepository implements IUserRepository {
         }
     }
 
-    // ─────────────────────────────────────────────────────────────
-    // Fix V-01: Métodos de seguridad para recuperación de contraseña
-    // ─────────────────────────────────────────────────────────────
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // Fix V-01: MÃ©todos de seguridad para recuperaciÃ³n de contraseÃ±a
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     @Override
     public String findEmailByUsername(String username) throws SQLException {
-        // Este método NO requiere permisos. Solo devuelve el email, sin datos
+        // Este mÃ©todo NO requiere permisos. Solo devuelve el email, sin datos
         // sensibles.
         String sql = "SELECT email FROM users WHERE username = ?";
         try (Connection conn = DBConnection.getConnection();
@@ -326,7 +326,7 @@ public class JdbcUserRepository implements IUserRepository {
 
     @Override
     public void incrementRecoveryAttempts(String email) throws SQLException {
-        // Incrementa el contador de intentos; si llega a 5, invalida el código
+        // Incrementa el contador de intentos; si llega a 5, invalida el cÃ³digo
         String sql = "UPDATE password_recoveries SET attempts = attempts + 1, " +
                 "is_used = CASE WHEN attempts + 1 >= 5 THEN TRUE ELSE FALSE END " +
                 "WHERE email = ? AND is_used = FALSE AND expires_at > ?";

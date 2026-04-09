@@ -88,7 +88,7 @@ public class ManageRolesController implements Injectable {
         info.setAlignment(Pos.CENTER);
         Label name = new Label(role.getName().toUpperCase());
         name.getStyleClass().add("user-name-label"); // Reusing class
-        Label description = new Label(role.getDescription() != null ? role.getDescription() : "Sin descripción");
+        Label description = new Label(role.getDescription() != null ? role.getDescription() : "Sin descripciÃ³n");
         description.getStyleClass().add("user-email-label"); // Reusing class
         info.getChildren().addAll(name, description);
 
@@ -171,8 +171,8 @@ public class ManageRolesController implements Injectable {
             AlertUtil.showError("Acceso Denegado", "No tiene permiso para gestionar roles.");
             return;
         }
-        if (AlertUtil.showConfirmation("Eliminar Rol", "¿Eliminar rol: " + role.getName() + "?",
-                "Podría afectar a usuarios que dependan de este rol.")) {
+        if (AlertUtil.showConfirmation("Eliminar Rol", "Â¿Eliminar rol: " + role.getName() + "?",
+                "PodrÃ­a afectar a usuarios que dependan de este rol.")) {
             try {
                 if (roleUseCase.deleteRole(role.getRoleId())) {
                     loadRoles();

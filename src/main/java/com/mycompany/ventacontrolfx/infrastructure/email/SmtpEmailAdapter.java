@@ -29,7 +29,7 @@ public class SmtpEmailAdapter implements IEmailSender {
         String emailPassword = configRepository.getValue("email_password");
 
         if (smtpHost == null || smtpPort == null || emailFrom == null || emailPassword == null) {
-            throw new Exception("Configuración SMTP incompleta en la base de datos.");
+            throw new Exception("ConfiguraciÃ³n SMTP incompleta en la base de datos.");
         }
 
         Properties props = new Properties();

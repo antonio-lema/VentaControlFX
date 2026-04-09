@@ -126,7 +126,7 @@ public class ClientReportController implements Injectable {
     private void setupClientTable() {
         colClientName.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().clientName));
         colClientOrders.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().count + ""));
-        colClientTotal.setCellValueFactory(c -> new SimpleStringProperty(String.format("€%.2f", c.getValue().total)));
+        colClientTotal.setCellValueFactory(c -> new SimpleStringProperty(String.format("â‚¬%.2f", c.getValue().total)));
 
         colClientStatus.setCellFactory(col -> new TableCell<>() {
             @Override
@@ -158,7 +158,7 @@ public class ClientReportController implements Injectable {
 
     private void setupPurchaseTable() {
         colDate.setCellValueFactory(c -> new SimpleStringProperty(
-                c.getValue().getSaleDateTime() != null ? c.getValue().getSaleDateTime().format(FMT_DATE) : "—"));
+                c.getValue().getSaleDateTime() != null ? c.getValue().getSaleDateTime().format(FMT_DATE) : "â€”"));
 
         colItems.setCellValueFactory(c -> {
             int items = 0;
@@ -175,7 +175,7 @@ public class ClientReportController implements Injectable {
         });
 
         colMethod.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getPaymentMethod()));
-        colAmount.setCellValueFactory(c -> new SimpleStringProperty(String.format("€%.2f", c.getValue().getTotal())));
+        colAmount.setCellValueFactory(c -> new SimpleStringProperty(String.format("â‚¬%.2f", c.getValue().getTotal())));
 
         purchaseTable.setRowFactory(tv -> {
             TableRow<Sale> row = new TableRow<>();
@@ -297,9 +297,9 @@ public class ClientReportController implements Injectable {
         double ltv = totalRev / rows.size();
 
         lblKpiActive.setText(String.valueOf(activeCount));
-        lblKpiTotal.setText(String.format("€%.2f", totalRev));
-        lblKpiAvgOrder.setText(String.format("€%.2f", avgOrder));
-        lblKpiLtv.setText(String.format("€%.2f", ltv));
+        lblKpiTotal.setText(String.format("â‚¬%.2f", totalRev));
+        lblKpiAvgOrder.setText(String.format("â‚¬%.2f", avgOrder));
+        lblKpiLtv.setText(String.format("â‚¬%.2f", ltv));
 
         // Mock variations
         setVariation(lblKpiActiveVar, 5.2, true);
@@ -310,9 +310,9 @@ public class ClientReportController implements Injectable {
 
     private void resetKpis() {
         lblKpiActive.setText("0");
-        lblKpiTotal.setText("€0.00");
-        lblKpiAvgOrder.setText("€0.00");
-        lblKpiLtv.setText("€0.00");
+        lblKpiTotal.setText("â‚¬0.00");
+        lblKpiAvgOrder.setText("â‚¬0.00");
+        lblKpiLtv.setText("â‚¬0.00");
         lblKpiActiveVar.setText("-");
         lblKpiTotalVar.setText("-");
         lblKpiAvgOrderVar.setText("-");
@@ -322,7 +322,7 @@ public class ClientReportController implements Injectable {
     private void setVariation(Label lbl, double amount, boolean positive) {
         if (lbl == null)
             return;
-        lbl.setText((positive ? "↑ " : "↓ ") + Math.abs(amount) + "%");
+        lbl.setText((positive ? "â†‘ " : "â†“ ") + Math.abs(amount) + "%");
         if (positive) {
             lbl.setStyle(
                     "-fx-background-color: #dcfce7; -fx-text-fill: #16a34a; -fx-padding: 2 6; -fx-background-radius: 10; -fx-font-size: 11px; -fx-font-weight: bold;");
@@ -391,8 +391,8 @@ public class ClientReportController implements Injectable {
         XYChart.Series<String, Number> series = new XYChart.Series<>();
 
         // 1. Determine granularity based on ComboBox
-        String filter = cmbDateRange != null ? cmbDateRange.getValue() : "Este año";
-        boolean groupByDay = filter.contains("día") || filter.contains("Hoy") || filter.contains("mes");
+        String filter = cmbDateRange != null ? cmbDateRange.getValue() : "Este aÃ±o";
+        boolean groupByDay = filter.contains("dÃ­a") || filter.contains("Hoy") || filter.contains("mes");
 
         if (groupByDay) {
             // Group by Day
@@ -406,7 +406,7 @@ public class ClientReportController implements Injectable {
 
             // Fill filler for last N days based on filter type
             LocalDate end = LocalDate.now();
-            LocalDate start = filter.equals("7 días") ? end.minusDays(7) : end.minusDays(30);
+            LocalDate start = filter.equals("7 dÃ­as") ? end.minusDays(7) : end.minusDays(30);
 
             // Adjust start to first sale index if oldest sale is before start
             Optional<LocalDate> firstSale = byDay.keySet().stream().findFirst();
@@ -543,7 +543,7 @@ public class ClientReportController implements Injectable {
 
         StringBuilder csv = new StringBuilder();
         // Encabezado
-        csv.append("ID;Nombre;Información;Total Facturado;Pedidos;Estado;Nivel\n");
+        csv.append("ID;Nombre;InformaciÃ³n;Total Facturado;Pedidos;Estado;Nivel\n");
 
         for (ClientRow row : allRows) {
             String totalStr = String.format(Locale.getDefault(), "%.2f", row.total);
@@ -576,7 +576,7 @@ public class ClientReportController implements Injectable {
         }
     }
 
-    // ── Inner model ─────────────────────────────────────────────────────────
+    // â”€â”€ Inner model â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     public static class ClientRow {
         public final int clientId;
         public final String clientName;

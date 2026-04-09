@@ -43,7 +43,7 @@ public class PaymentController implements Injectable {
         this.totalAmount = amount;
         this.callback = callback;
 
-        String formatted = String.format("%.2f €", amount);
+        String formatted = String.format("%.2f â‚¬", amount);
         lblTotalAmount.setText(formatted);
         lblCashAmount.setText(formatted);
         txtGivenAmount.setText(String.format("%.2f", amount).replace(',', '.'));
@@ -72,16 +72,16 @@ public class PaymentController implements Injectable {
         if (btn4Val <= btn3Val)
             btn4Val += 10;
 
-        btnQuick1.setText(btn1Val + " €");
-        btnQuick2.setText(btn2Val + " €");
-        btnQuick3.setText(btn3Val + " €");
-        btnQuick4.setText(btn4Val + " €");
+        btnQuick1.setText(btn1Val + " â‚¬");
+        btnQuick2.setText(btn2Val + " â‚¬");
+        btnQuick3.setText(btn3Val + " â‚¬");
+        btnQuick4.setText(btn4Val + " â‚¬");
     }
 
     @FXML
     private void handleQuickMoney(javafx.event.ActionEvent event) {
         Button clicked = (Button) event.getSource();
-        String text = clicked.getText().replace(" €", "").replace(",", ".");
+        String text = clicked.getText().replace(" â‚¬", "").replace(",", ".");
         txtGivenAmount.setText(text);
     }
 

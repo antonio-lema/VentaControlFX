@@ -1,7 +1,7 @@
 package com.mycompany.ventacontrolfx.domain.exception;
 
 /**
- * Excepción base para errores de lógica de negocio.
+ * ExcepciÃ³n base para errores de lÃ³gica de negocio.
  */
 public class BusinessException extends RuntimeException {
     public BusinessException(String message) {

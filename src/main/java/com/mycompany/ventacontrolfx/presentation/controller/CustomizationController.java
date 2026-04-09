@@ -16,14 +16,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Controlador del panel de personalización estética premium.
- * Permite ajustar colores, tipografía, tarjetas y modo en tiempo real.
+ * Controlador del panel de personalizaciÃ³n estÃ©tica premium.
+ * Permite ajustar colores, tipografÃ­a, tarjetas y modo en tiempo real.
  */
 public class CustomizationController implements Injectable {
 
-    // ─────────────────────────────────────────
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     // FXML: Colores
-    // ─────────────────────────────────────────
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     @FXML
     private ColorPicker cpPrimary;
     @FXML
@@ -41,9 +41,9 @@ public class CustomizationController implements Injectable {
     @FXML
     private ColorPicker cpSidebarText;
 
-    // ─────────────────────────────────────────
-    // FXML: Tipografía
-    // ─────────────────────────────────────────
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // FXML: TipografÃ­a
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     @FXML
     private Slider sldFontSize;
     @FXML
@@ -53,9 +53,9 @@ public class CustomizationController implements Injectable {
     @FXML
     private Label lblBorderRadiusVal;
 
-    // ─────────────────────────────────────────
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     // FXML: Tarjetas
-    // ─────────────────────────────────────────
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     @FXML
     private Slider sldCardScale;
     @FXML
@@ -77,22 +77,22 @@ public class CustomizationController implements Injectable {
     @FXML
     private Label lblCardHoverScaleVal;
 
-    // ─────────────────────────────────────────
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     // FXML: Tema (Light / Dark cards)
-    // ─────────────────────────────────────────
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     private boolean isDarkMode = false;
 
-    // ─────────────────────────────────────────
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     // Servicios
-    // ─────────────────────────────────────────
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     private ServiceContainer container;
     private ThemeManager themeManager;
     private IAppSettingsRepository repository;
 
-    // ─────────────────────────────────────────
-    // Inicialización
-    // ─────────────────────────────────────────
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // InicializaciÃ³n
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     @FXML
     public void initialize() {
         setupSliderLabels();
@@ -107,11 +107,11 @@ public class CustomizationController implements Injectable {
         loadCurrentSettings();
     }
 
-    // ─────────────────────────────────────────
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     // Configurar etiquetas de valor en sliders
-    // ─────────────────────────────────────────
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     private void setupSliderLabels() {
-        // Labels de tipografía
+        // Labels de tipografÃ­a
         bindSliderLabel(sldFontSize, lblFontSizeVal, v -> (int) (double) v + "px");
         bindSliderLabel(sldBorderRadius, lblBorderRadiusVal, v -> (int) (double) v + "px");
         // Labels de tarjetas
@@ -119,7 +119,7 @@ public class CustomizationController implements Injectable {
         bindSliderLabel(sldCardShadow, lblCardShadowVal, v -> (int) (double) v + "");
         bindSliderLabel(sldCardHoverLift, lblCardHoverLiftVal, v -> (int) (double) v + "px");
         bindSliderLabel(sldCardBorderWidth, lblCardBorderWidthVal, v -> String.format("%.1fpx", v));
-        bindSliderLabel(sldCardHoverScale, lblCardHoverScaleVal, v -> String.format("%.2f×", v));
+        bindSliderLabel(sldCardHoverScale, lblCardHoverScaleVal, v -> String.format("%.2fÃ—", v));
     }
 
     private void bindSliderLabel(Slider slider, Label label, java.util.function.Function<Double, String> formatter) {
@@ -129,9 +129,9 @@ public class CustomizationController implements Injectable {
         slider.valueProperty().addListener((obs, o, n) -> label.setText(formatter.apply(n.doubleValue())));
     }
 
-    // ─────────────────────────────────────────
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     // Listeners
-    // ─────────────────────────────────────────
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     private void setupListeners() {
         if (cpPrimary != null)
             cpPrimary.valueProperty().addListener((obs, o, n) -> updatePreview());
@@ -149,7 +149,7 @@ public class CustomizationController implements Injectable {
             cpSidebar.valueProperty().addListener((obs, o, n) -> updatePreview());
         if (cpSidebarText != null)
             cpSidebarText.valueProperty().addListener((obs, o, n) -> updatePreview());
-        // Tipografía
+        // TipografÃ­a
         if (sldFontSize != null)
             sldFontSize.valueProperty().addListener((obs, o, n) -> updatePreview());
         if (sldBorderRadius != null)
@@ -167,9 +167,9 @@ public class CustomizationController implements Injectable {
             sldCardHoverScale.valueProperty().addListener((obs, o, n) -> updatePreview());
     }
 
-    // ─────────────────────────────────────────
-    // Cargar configuración guardada
-    // ─────────────────────────────────────────
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // Cargar configuraciÃ³n guardada
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     private void loadCurrentSettings() {
         if (repository == null)
             return;
@@ -197,7 +197,7 @@ public class CustomizationController implements Injectable {
             isDarkMode = "DARK".equals(settings.getOrDefault("ui.theme_mode", "LIGHT"));
 
         } catch (SQLException | IllegalArgumentException e) {
-            System.err.println("Error cargando ajustes estéticos: " + e.getMessage());
+            System.err.println("Error cargando ajustes estÃ©ticos: " + e.getMessage());
         }
     }
 
@@ -219,9 +219,9 @@ public class CustomizationController implements Injectable {
         }
     }
 
-    // ─────────────────────────────────────────
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     // Preview en tiempo real
-    // ─────────────────────────────────────────
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     private void updatePreview() {
         if (themeManager == null || cpPrimary == null || cpPrimary.getScene() == null)
             return;
@@ -266,13 +266,13 @@ public class CustomizationController implements Injectable {
         return t;
     }
 
-    // ─────────────────────────────────────────
-    // Selección de tema visual
-    // ─────────────────────────────────────────
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // SelecciÃ³n de tema visual
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-    // ─────────────────────────────────────────
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     // Guardar
-    // ─────────────────────────────────────────
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     @FXML
     private void handleSave() {
         if (repository == null)
@@ -285,15 +285,15 @@ public class CustomizationController implements Injectable {
             if (cpPrimary != null && cpPrimary.getScene() != null) {
                 themeManager.applyTheme(cpPrimary.getScene());
             }
-            showInfo("✅ Guardado", "La configuración estética se ha guardado correctamente.");
+            showInfo("âœ… Guardado", "La configuraciÃ³n estÃ©tica se ha guardado correctamente.");
         } catch (SQLException e) {
             showError("Error", "No se pudo guardar: " + e.getMessage());
         }
     }
 
-    // ─────────────────────────────────────────
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     // Restablecer
-    // ─────────────────────────────────────────
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     @FXML
     private void handleReset() {
         applyPalette("#1e88e5", "#64748b", "#fafbfc", "#2c3e50", "#2c3e50", "#2c3e50", "#1e88e5");
@@ -308,9 +308,9 @@ public class CustomizationController implements Injectable {
         updatePreview();
     }
 
-    // ─────────────────────────────────────────
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     // Paletas predefinidas
-    // ─────────────────────────────────────────
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     @FXML
     private void applyPremiumDark() {
         // Indigo, Muted, Bg, Text, TextCards, TextPrice, Sidebar
@@ -321,39 +321,39 @@ public class CustomizationController implements Injectable {
 
     @FXML
     private void applyClassicBlue() {
-        // Sidebar = azul eléctrico. Gradiente: #1e88e5 → azul oscuro → azul casi negro
+        // Sidebar = azul elÃ©ctrico. Gradiente: #1e88e5 â†’ azul oscuro â†’ azul casi negro
         applyPalette("#1e88e5", "#64748b", "#fafbfc", "#2c3e50", "#2c3e50", "#2c3e50", "#1e88e5");
     }
 
     @FXML
     private void applyEmeraldGreen() {
-        // Sidebar = verde esmeralda. Gradiente: #2e7d32 → verde oscuro → verde casi
+        // Sidebar = verde esmeralda. Gradiente: #2e7d32 â†’ verde oscuro â†’ verde casi
         // negro
         applyPalette("#2e7d32", "#455a64", "#f1f8e9", "#1b5e20", "#1b5e20", "#10b981", "#2e7d32");
     }
 
     @FXML
     private void applyMidnightPurple() {
-        // Sidebar = púrpura regio. Gradiente: #6a1b9a → violeta oscuro → negro violeta
+        // Sidebar = pÃºrpura regio. Gradiente: #6a1b9a â†’ violeta oscuro â†’ negro violeta
         applyPalette("#6a1b9a", "#37474f", "#f3e5f5", "#4a148c", "#4a148c", "#4a148c", "#6a1b9a");
     }
 
     @FXML
     private void applySunsetAmber() {
-        // Sidebar = ámbar ardiente. Gradiente: #ef6c00 → naranja oscuro → marrón casi
+        // Sidebar = Ã¡mbar ardiente. Gradiente: #ef6c00 â†’ naranja oscuro â†’ marrÃ³n casi
         // negro
         applyPalette("#ef6c00", "#4e342e", "#fff8e1", "#3e2723", "#3e2723", "#e65100", "#ef6c00");
     }
 
     @FXML
     private void applySoftRose() {
-        // Sidebar = rosa oscuro. Gradiente: #d81b60 → rosa oscuro → granate casi negro
+        // Sidebar = rosa oscuro. Gradiente: #d81b60 â†’ rosa oscuro â†’ granate casi negro
         applyPalette("#d81b60", "#4a148c", "#fce4ec", "#880e4f", "#880e4f", "#880e4f", "#d81b60");
     }
 
     @FXML
     private void applyOceanTeal() {
-        // Sidebar = turquesa océano. Gradiente: #0d9488 → teal oscuro → azul-verde casi
+        // Sidebar = turquesa ocÃ©ano. Gradiente: #0d9488 â†’ teal oscuro â†’ azul-verde casi
         // negro
         applyPalette("#0d9488", "#1e293b", "#f0fdfa", "#134e4a", "#134e4a", "#134e4a", "#0d9488");
     }
@@ -372,9 +372,9 @@ public class CustomizationController implements Injectable {
         showThemePreviewPopup(primary, bg, text);
     }
 
-    // ─────────────────────────────────────────
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     // Mini popup de preview de paleta
-    // ─────────────────────────────────────────
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     private void showThemePreviewPopup(String primary, String bg, String text) {
         javafx.stage.Stage stage = new javafx.stage.Stage();
         stage.initStyle(javafx.stage.StageStyle.TRANSPARENT);
@@ -391,15 +391,15 @@ public class CustomizationController implements Injectable {
                 "-fx-effect:dropshadow(three-pass-box,rgba(0,0,0,0.28),20,0,0,10);");
         root.setAlignment(javafx.geometry.Pos.CENTER);
 
-        Label title = new Label("✨ Paleta Aplicada");
+        Label title = new Label("âœ¨ Paleta Aplicada");
         title.setStyle("-fx-text-fill:" + primary + ";-fx-font-weight:bold;-fx-font-size:17px;");
 
-        Label sub = new Label("Así lucirán tus colores en la app.");
+        Label sub = new Label("AsÃ­ lucirÃ¡n tus colores en la app.");
         sub.setStyle("-fx-text-fill:" + text + ";-fx-font-size:12px;");
         sub.setWrapText(true);
         sub.setTextAlignment(javafx.scene.text.TextAlignment.CENTER);
 
-        Button btn = new Button("¡Perfecto!");
+        Button btn = new Button("Â¡Perfecto!");
         btn.setStyle("-fx-background-color:" + primary + ";-fx-text-fill:white;-fx-font-weight:bold;" +
                 "-fx-background-radius:20;-fx-padding:9 28;-fx-cursor:hand;");
         btn.setOnAction(e -> stage.close());
@@ -425,9 +425,9 @@ public class CustomizationController implements Injectable {
         }).start();
     }
 
-    // ─────────────────────────────────────────
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     // Helpers
-    // ─────────────────────────────────────────
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     private String toHex(Color c) {
         return String.format("#%02X%02X%02X",
                 (int) (c.getRed() * 255), (int) (c.getGreen() * 255), (int) (c.getBlue() * 255));

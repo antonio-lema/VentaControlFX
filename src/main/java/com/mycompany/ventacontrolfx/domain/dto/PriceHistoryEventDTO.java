@@ -12,7 +12,7 @@ public class PriceHistoryEventDTO {
     private final String title;
     private final String description;
     private final String reason;
-    private final String details; // e.g., "Afecado a 20 productos" or "Anterior: 10.00 €"
+    private final String details; // e.g., "Afecado a 20 productos" or "Anterior: 10.00 â‚¬"
     private final String targetName;
 
     public PriceHistoryEventDTO(EventType type, LocalDateTime timestamp, String title, String description,

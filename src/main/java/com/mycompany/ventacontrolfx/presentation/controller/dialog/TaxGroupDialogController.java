@@ -55,7 +55,7 @@ public class TaxGroupDialogController implements Injectable {
                 cb.setMaxWidth(Double.MAX_VALUE);
                 cb.setCursor(javafx.scene.Cursor.HAND);
 
-                // Preseleccionar si ya está en el grupo
+                // Preseleccionar si ya estÃ¡ en el grupo
                 if (currentGroup != null && currentGroup.getRates() != null) {
                     boolean isIncluded = currentGroup.getRates().stream()
                             .anyMatch(r -> r.getTaxRateId() == rate.getTaxRateId());
@@ -73,7 +73,7 @@ public class TaxGroupDialogController implements Injectable {
     @FXML
     private void handleSave() {
         if (txtName.getText().trim().isEmpty()) {
-            AlertUtil.showWarning("Validación", "El nombre es obligatorio.");
+            AlertUtil.showWarning("ValidaciÃ³n", "El nombre es obligatorio.");
             return;
         }
 

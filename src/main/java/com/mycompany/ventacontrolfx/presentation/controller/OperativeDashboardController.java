@@ -151,7 +151,7 @@ public class OperativeDashboardController implements Injectable {
             Platform.runLater(() -> {
                 lblCashStatus.setText(container.getBundle().getString("dashboard.cash." + (isCashOpen ? "open" : "closed")));
                 lblCashStatus.setStyle(isCashOpen ? "-fx-text-fill: #16a34a;" : "-fx-text-fill: #ef4444;");
-                lblCashAmount.setText(String.format("%.2f €", currentCash));
+                lblCashAmount.setText(String.format("%.2f â‚¬", currentCash));
             });
 
             // 4. Business Opening Time

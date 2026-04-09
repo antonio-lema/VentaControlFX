@@ -71,8 +71,8 @@ public class PasswordRecoveryController implements Injectable {
         boxSelection.setManaged(false);
         step1Box.setVisible(true);
         step1Box.setManaged(true);
-        lblTitle.setText("Recuperar Contraseña");
-        lblStatus.setText("Paso 1: Identificación");
+        lblTitle.setText("Recuperar ContraseÃ±a");
+        lblStatus.setText("Paso 1: IdentificaciÃ³n");
     }
 
     @FXML
@@ -96,21 +96,21 @@ public class PasswordRecoveryController implements Injectable {
         asyncManager.runAsyncTask(() -> {
             try {
                 // Fix V-02: Usar findEmailByUsername que NO requiere permiso admin
-                // Fix V-04 (anti-enumeración): No distinguimos en el catch si el usuario existe
+                // Fix V-04 (anti-enumeraciÃ³n): No distinguimos en el catch si el usuario existe
                 // o no
                 String email = userUseCase.findEmailByUsername(username);
 
                 if (email == null || email.isEmpty()) {
                     // No revelamos si el usuario no existe; dejamos pasar igual
                     // para que el siguiente paso muestre el mismo mensaje
-                    currentRecoveryEmail = "__invalid__@noreply.com"; // Correo fake, el envío fallará silenciosamente
+                    currentRecoveryEmail = "__invalid__@noreply.com"; // Correo fake, el envÃ­o fallarÃ¡ silenciosamente
                 } else {
                     currentRecoveryEmail = email;
                     userUseCase.recoverPassword(currentRecoveryEmail);
                 }
                 return null;
             } catch (Exception e) {
-                // No propagamos el error para evitar revelar información
+                // No propagamos el error para evitar revelar informaciÃ³n
                 currentRecoveryEmail = "__invalid__@noreply.com";
                 return null;
             }
@@ -119,12 +119,12 @@ public class PasswordRecoveryController implements Injectable {
             step1Box.setManaged(false);
             step2Box.setVisible(true);
             step2Box.setManaged(true);
-            lblStatus.setText("Paso 2: Verificación");
-            // Fix V-04: Mensaje genérico independientemente de si el usuario existe
-            lblError.setText("Si el usuario existe y tiene correo asociado, recibirá un código en breve.");
+            lblStatus.setText("Paso 2: VerificaciÃ³n");
+            // Fix V-04: Mensaje genÃ©rico independientemente de si el usuario existe
+            lblError.setText("Si el usuario existe y tiene correo asociado, recibirÃ¡ un cÃ³digo en breve.");
         }, error -> {
-            // Mensaje genérico para no revelar detalles internos
-            lblError.setText("Si el usuario existe y tiene correo asociado, recibirá un código en breve.");
+            // Mensaje genÃ©rico para no revelar detalles internos
+            lblError.setText("Si el usuario existe y tiene correo asociado, recibirÃ¡ un cÃ³digo en breve.");
         });
     }
 
@@ -132,7 +132,7 @@ public class PasswordRecoveryController implements Injectable {
     private void handleVerifyCode() {
         String code = txtCode.getText().trim();
         if (code.isEmpty()) {
-            lblError.setText("Introduce el código.");
+            lblError.setText("Introduce el cÃ³digo.");
             return;
         }
 
@@ -144,25 +144,25 @@ public class PasswordRecoveryController implements Injectable {
                 step2Box.setManaged(false);
                 step3Box.setVisible(true);
                 step3Box.setManaged(true);
-                lblStatus.setText("Paso 3: Nueva Contraseña");
+                lblStatus.setText("Paso 3: Nueva ContraseÃ±a");
                 lblError.setText("");
             } else {
-                // Fix V-01: Comprobar si está bloqueado por exceso de intentos
+                // Fix V-01: Comprobar si estÃ¡ bloqueado por exceso de intentos
                 try {
                     boolean blocked = userUseCase.isRecoveryBlocked(currentRecoveryEmail);
                     if (blocked) {
-                        lblError.setText("Código bloqueado por demasiados intentos. Solicita un nuevo código.");
+                        lblError.setText("CÃ³digo bloqueado por demasiados intentos. Solicita un nuevo cÃ³digo.");
                         // Volver al paso 1 para que solicite otro
                         step2Box.setVisible(false);
                         step2Box.setManaged(false);
                         step1Box.setVisible(true);
                         step1Box.setManaged(true);
-                        lblStatus.setText("Paso 1: Identificación");
+                        lblStatus.setText("Paso 1: IdentificaciÃ³n");
                     } else {
-                        lblError.setText("Código incorrecto o expirado. Te quedan pocos intentos.");
+                        lblError.setText("CÃ³digo incorrecto o expirado. Te quedan pocos intentos.");
                     }
                 } catch (Exception ex) {
-                    lblError.setText("Código incorrecto o expirado.");
+                    lblError.setText("CÃ³digo incorrecto o expirado.");
                 }
             }
         }, error -> lblError.setText("Error: " + error.getMessage()));
@@ -174,7 +174,7 @@ public class PasswordRecoveryController implements Injectable {
         String pass2 = txtConfirmPass.getText();
 
         if (pass1.length() < 4 || !pass1.equals(pass2)) {
-            lblError.setText("Contraseñas no válidas o no coinciden.");
+            lblError.setText("ContraseÃ±as no vÃ¡lidas o no coinciden.");
             return;
         }
 
@@ -182,7 +182,7 @@ public class PasswordRecoveryController implements Injectable {
             userUseCase.resetPassword(currentRecoveryEmail, pass1);
             return null;
         }, result -> {
-            AlertUtil.showInfo("Éxito", "Contraseña cambiada.");
+            AlertUtil.showInfo("Ã‰xito", "ContraseÃ±a cambiada.");
             handleBack();
         }, error -> lblError.setText(error.getMessage()));
     }

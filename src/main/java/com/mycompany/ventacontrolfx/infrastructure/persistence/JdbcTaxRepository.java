@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Implementación JDBC para el nuevo Tax Engine V2.
+ * ImplementaciÃ³n JDBC para el nuevo Tax Engine V2.
  */
 public class JdbcTaxRepository implements ITaxRepository {
 
@@ -292,7 +292,7 @@ public class JdbcTaxRepository implements ITaxRepository {
     private void bindTaxRate(PreparedStatement ps, TaxRate rate) throws SQLException {
         ps.setString(1, rate.getName());
         ps.setDouble(2, rate.getRate());
-        ps.setString(3, rate.getCountry() != null ? rate.getCountry() : "España");
+        ps.setString(3, rate.getCountry() != null ? rate.getCountry() : "EspaÃ±a");
 
         if (rate.getRegion() != null) {
             ps.setString(4, rate.getRegion());
@@ -341,8 +341,8 @@ public class JdbcTaxRepository implements ITaxRepository {
 
     @Override
     public void syncMirroredValues() throws SQLException {
-        // 1. Actualizar categorías que tienen un grupo asignado
-        // Solo sumamos tasas que estén ACTIVAS hoy (valid_from <= NOW y valid_to > NOW)
+        // 1. Actualizar categorÃ­as que tienen un grupo asignado
+        // Solo sumamos tasas que estÃ©n ACTIVAS hoy (valid_from <= NOW y valid_to > NOW)
         String sqlCategories = "UPDATE categories c SET " +
                 "c.default_iva = COALESCE((SELECT SUM(tr.rate) FROM tax_rates tr " +
                 "JOIN tax_group_items tgi ON tr.tax_rate_id = tgi.tax_rate_id " +
@@ -374,7 +374,7 @@ public class JdbcTaxRepository implements ITaxRepository {
                 "AND (tr.valid_to IS NULL OR tr.valid_to > CURRENT_TIMESTAMP)), 0.0) " +
                 "WHERE p.tax_group_id IS NOT NULL";
 
-        // 3. Propagar IVA de categoría a productos que NO tienen grupo propio
+        // 3. Propagar IVA de categorÃ­a a productos que NO tienen grupo propio
         // (Herencia)
         String sqlProductsInherited = "UPDATE products p " +
                 "JOIN categories c ON p.category_id = c.category_id " +

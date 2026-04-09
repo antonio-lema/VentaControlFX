@@ -15,8 +15,8 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Caso de Uso para la autenticación de usuarios.
- * Sigue los principios de Clean Architecture separando la lógica de negocio del
+ * Caso de Uso para la autenticaciÃ³n de usuarios.
+ * Sigue los principios de Clean Architecture separando la lÃ³gica de negocio del
  * controlador.
  */
 public class LoginUseCase {
@@ -39,10 +39,10 @@ public class LoginUseCase {
      * Valida las credenciales y carga el perfil completo del usuario.
      * 
      * @param username Nombre de usuario.
-     * @param password Contraseña plana (se comparará con el hash almacenado).
+     * @param password ContraseÃ±a plana (se compararÃ¡ con el hash almacenado).
      * @return El usuario autenticado con todos sus permisos cargados.
      * @throws UserNotFoundException    Si el nombre de usuario no existe.
-     * @throws InvalidPasswordException Si la contraseña es incorrecta.
+     * @throws InvalidPasswordException Si la contraseÃ±a es incorrecta.
      * @throws SQLException             Si hay un error persistente.
      */
     public User execute(String username, String password) throws SQLException {
@@ -53,17 +53,17 @@ public class LoginUseCase {
             throw new UserNotFoundException(username);
         }
 
-        // 2. Validar contraseña con BCrypt
+        // 2. Validar contraseÃ±a con BCrypt
         if (!BCrypt.checkpw(password, user.getPasswordHash())) {
-            logFailedAttempt(username, "Contraseña incorrecta");
+            logFailedAttempt(username, "ContraseÃ±a incorrecta");
             throw new InvalidPasswordException();
         }
 
         // 3. Cargar perfil extendido (Roles y Permisos)
         loadExtendedProfile(user);
 
-        // 4. Auditoría de éxito
-        auditRepository.logAccess(user.getUserId(), "LOGIN", "AUTH", "Inicio de sesión exitoso");
+        // 4. AuditorÃ­a de Ã©xito
+        auditRepository.logAccess(user.getUserId(), "LOGIN", "AUTH", "Inicio de sesiÃ³n exitoso");
 
         return user;
     }

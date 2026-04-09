@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Resultado completo del cálculo fiscal de una línea de venta o de todo el
+ * Resultado completo del cÃ¡lculo fiscal de una lÃ­nea de venta o de todo el
  * carrito.
  */
 public class TaxCalculationResult {

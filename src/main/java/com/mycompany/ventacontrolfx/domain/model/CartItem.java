@@ -43,14 +43,14 @@ public class CartItem {
 
     /**
      * Actualiza el precio unitario reactivamente.
-     * Al llamar a este método, la UI se refresca automáticamente.
+     * Al llamar a este mÃ©todo, la UI se refresca automÃ¡ticamente.
      */
     public void updateUnitPrice(double newPrice) {
-        // Forzamos una notificación aunque el valor sea el mismo
+        // Forzamos una notificaciÃ³n aunque el valor sea el mismo
         // (evita el bug de JavaFX donde set() no dispara si el valor no cambia)
         double prev = this.unitPrice.get();
         if (prev == newPrice) {
-            // Truco: cambiar a NaN y luego al valor para forzar la notificación
+            // Truco: cambiar a NaN y luego al valor para forzar la notificaciÃ³n
             this.unitPrice.set(Double.NaN);
         }
         this.unitPrice.set(newPrice);

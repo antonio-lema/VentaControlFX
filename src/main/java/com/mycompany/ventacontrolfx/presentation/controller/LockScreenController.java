@@ -56,7 +56,7 @@ public class LockScreenController implements Injectable {
     private void handleUnlock() {
         String password = passwordField.getText();
         if (password.isEmpty()) {
-            showInPlaceError("Por favor, introduce tu contraseña.");
+            showInPlaceError("Por favor, introduce tu contraseÃ±a.");
             return;
         }
 
@@ -70,7 +70,7 @@ public class LockScreenController implements Injectable {
                 stage.setFullScreen(false);
                 stage.close();
             } else {
-                showInPlaceError("Contraseña incorrecta.");
+                showInPlaceError("ContraseÃ±a incorrecta.");
                 passwordField.clear();
             }
         } catch (SQLException e) {

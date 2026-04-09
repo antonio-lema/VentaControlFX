@@ -111,7 +111,7 @@ public class SuspendedCartsDialogController implements Injectable {
                         if (empty || price == null) {
                             setText(null);
                         } else {
-                            setText(String.format("%.2f €", price));
+                            setText(String.format("%.2f â‚¬", price));
                         }
                     }
                 };
@@ -162,7 +162,7 @@ public class SuspendedCartsDialogController implements Injectable {
 
     private void loadCarts() {
         try {
-            // Podríamos filtrar por usuario actual, pero solemos mostrar todos para que un
+            // PodrÃ­amos filtrar por usuario actual, pero solemos mostrar todos para que un
             // admin ayude
             List<SuspendedCart> carts = suspendedCartUseCase.listAllSuspended();
             cartList.setAll(carts);

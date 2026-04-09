@@ -1,7 +1,7 @@
 package com.mycompany.ventacontrolfx.domain.exception;
 
 /**
- * Excepción lanzada cuando no se encuentra un usuario por su nombre de usuario.
+ * ExcepciÃ³n lanzada cuando no se encuentra un usuario por su nombre de usuario.
  */
 public class UserNotFoundException extends BusinessException {
     public UserNotFoundException(String username) {

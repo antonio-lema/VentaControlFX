@@ -9,9 +9,9 @@ import com.mycompany.ventacontrolfx.domain.model.PriceUpdateLog;
 import java.sql.SQLException;
 
 /**
- * Caso de uso: Actualización masiva de precios.
+ * Caso de uso: ActualizaciÃ³n masiva de precios.
  *
- * Responsabilidad: Orquestar la lógica de negocio (validación, cálculo del
+ * Responsabilidad: Orquestar la lÃ³gica de negocio (validaciÃ³n, cÃ¡lculo del
  * multiplicador) y delegar la persistencia al repositorio via interfaz.
  *
  * IMPORTANTE (Clean Architecture): Esta clase NO debe contener SQL, Connection,
@@ -39,7 +39,7 @@ public class MassivePriceUpdateUseCase {
      * @param priceListId ID de la lista de precios a actualizar.
      * @param percentage  Porcentaje a aplicar (ej: 5.0 = +5%, -3.0 = -3%).
      * @param reason      Motivo del cambio (para trazabilidad en base de datos).
-     * @return Número de productos actualizados.
+     * @return NÃºmero de productos actualizados.
      */
     public int applyPercentageIncreaseToAll(int priceListId, double percentage, String reason,
             java.time.LocalDateTime startDate)
@@ -48,19 +48,19 @@ public class MassivePriceUpdateUseCase {
         validatePercentage(percentage);
         double multiplier = 1.0 + (percentage / 100.0);
         int updated = priceRepository.applyBulkMultiplier(priceListId, null, multiplier, reason, startDate);
-        saveLog("percentage", "Todos los Artículos", percentage, updated, null, reason, startDate);
+        saveLog("percentage", "Todos los ArtÃ­culos", percentage, updated, null, reason, startDate);
         return updated;
     }
 
     /**
      * Aplica una subida (o bajada) porcentual a todos los productos de una
-     * categoría específica.
+     * categorÃ­a especÃ­fica.
      *
      * @param priceListId ID de la lista de precios.
-     * @param categoryId  ID de la categoría cuyos productos serán afectados.
+     * @param categoryId  ID de la categorÃ­a cuyos productos serÃ¡n afectados.
      * @param percentage  Porcentaje a aplicar.
      * @param reason      Motivo del cambio.
-     * @return Número de productos actualizados.
+     * @return NÃºmero de productos actualizados.
      */
     public int applyPercentageIncreaseToCategory(int priceListId, int categoryId,
             double percentage, String reason, java.time.LocalDateTime startDate) throws SQLException {
@@ -68,7 +68,7 @@ public class MassivePriceUpdateUseCase {
         validatePercentage(percentage);
         double multiplier = 1.0 + (percentage / 100.0);
         int updated = priceRepository.applyBulkMultiplier(priceListId, categoryId, multiplier, reason, startDate);
-        saveLog("percentage", "Por Categoría", percentage, updated, categoryId, reason, startDate);
+        saveLog("percentage", "Por CategorÃ­a", percentage, updated, categoryId, reason, startDate);
         return updated;
     }
 
@@ -81,19 +81,19 @@ public class MassivePriceUpdateUseCase {
         startDate = (startDate != null) ? startDate.withNano(0) : java.time.LocalDateTime.now().withNano(0);
         validateAmount(amount);
         int updated = priceRepository.applyBulkFixedAmount(priceListId, null, amount, reason, startDate);
-        saveLog("fixed_amount", "Todos los Artículos", amount, updated, null, reason, startDate);
+        saveLog("fixed_amount", "Todos los ArtÃ­culos", amount, updated, null, reason, startDate);
         return updated;
     }
 
     /**
-     * Aplica una subida (o bajada) por importe fijo a una categoría.
+     * Aplica una subida (o bajada) por importe fijo a una categorÃ­a.
      */
     public int applyFixedAmountIncreaseToCategory(int priceListId, int categoryId,
             double amount, String reason, java.time.LocalDateTime startDate) throws SQLException {
         startDate = (startDate != null) ? startDate.withNano(0) : java.time.LocalDateTime.now().withNano(0);
         validateAmount(amount);
         int updated = priceRepository.applyBulkFixedAmount(priceListId, categoryId, amount, reason, startDate);
-        saveLog("fixed_amount", "Por Categoría", amount, updated, categoryId, reason, startDate);
+        saveLog("fixed_amount", "Por CategorÃ­a", amount, updated, categoryId, reason, startDate);
         return updated;
     }
 
@@ -104,24 +104,24 @@ public class MassivePriceUpdateUseCase {
             java.time.LocalDateTime startDate) throws SQLException {
         startDate = (startDate != null) ? startDate.withNano(0) : java.time.LocalDateTime.now().withNano(0);
         int updated = priceRepository.applyBulkRounding(priceListId, null, targetDecimal, reason, startDate);
-        saveLog("rounding", "Todos los Artículos", targetDecimal, updated, null, reason, startDate);
+        saveLog("rounding", "Todos los ArtÃ­culos", targetDecimal, updated, null, reason, startDate);
         return updated;
     }
 
     /**
-     * Redondea precios de una categoría a un decimal objetivo (ej: .99).
+     * Redondea precios de una categorÃ­a a un decimal objetivo (ej: .99).
      */
     public int applyRoundingToCategory(int priceListId, int categoryId, double targetDecimal, String reason,
             java.time.LocalDateTime startDate)
             throws SQLException {
         startDate = (startDate != null) ? startDate.withNano(0) : java.time.LocalDateTime.now().withNano(0);
         int updated = priceRepository.applyBulkRounding(priceListId, categoryId, targetDecimal, reason, startDate);
-        saveLog("rounding", "Por Categoría", targetDecimal, updated, categoryId, reason, startDate);
+        saveLog("rounding", "Por CategorÃ­a", targetDecimal, updated, categoryId, reason, startDate);
         return updated;
     }
 
     /**
-     * Aplica un ajuste (porcentual o fijo) a los N artículos más vendidos.
+     * Aplica un ajuste (porcentual o fijo) a los N artÃ­culos mÃ¡s vendidos.
      */
     public int applyToTopSellers(int priceListId, int topN, int daysBack, double value, String reason,
             boolean isPercentage, java.time.LocalDateTime startDate)
@@ -132,9 +132,9 @@ public class MassivePriceUpdateUseCase {
         else
             validateAmount(value);
         if (topN <= 0)
-            throw new BusinessException("El número de artículos Top debe ser mayor que 0.");
+            throw new BusinessException("El nÃºmero de artÃ­culos Top debe ser mayor que 0.");
         if (daysBack <= 0)
-            throw new BusinessException("Los días de análisis deben ser mayores que 0.");
+            throw new BusinessException("Los dÃ­as de anÃ¡lisis deben ser mayores que 0.");
 
         double repoValue = isPercentage ? (1.0 + (value / 100.0)) : value;
         int updated = priceRepository.applyBulkMultiplierToTopSellers(priceListId, topN, daysBack, repoValue, reason,
@@ -145,7 +145,7 @@ public class MassivePriceUpdateUseCase {
     }
 
     /**
-     * Aplica un ajuste (porcentual o fijo) a artículos sin ventas (slow-movers).
+     * Aplica un ajuste (porcentual o fijo) a artÃ­culos sin ventas (slow-movers).
      */
     public int applyToSlowMovers(int priceListId, int daysWithoutSale, double value, String reason,
             boolean isPercentage, java.time.LocalDateTime startDate)
@@ -156,7 +156,7 @@ public class MassivePriceUpdateUseCase {
         else
             validateAmount(value);
         if (daysWithoutSale <= 0)
-            throw new BusinessException("Los días sin venta deben ser mayores que 0.");
+            throw new BusinessException("Los dÃ­as sin venta deben ser mayores que 0.");
 
         double repoValue = isPercentage ? (1.0 + (value / 100.0)) : value;
         int updated = priceRepository.applyBulkMultiplierToSlowMovers(priceListId, daysWithoutSale, repoValue, reason,
@@ -178,9 +178,9 @@ public class MassivePriceUpdateUseCase {
         else
             validateAmount(value);
         if (minPrice < 0)
-            throw new BusinessException("El precio mínimo no puede ser negativo.");
+            throw new BusinessException("El precio mÃ­nimo no puede ser negativo.");
         if (maxPrice <= minPrice)
-            throw new BusinessException("El precio máximo debe ser mayor que el mínimo.");
+            throw new BusinessException("El precio mÃ¡ximo debe ser mayor que el mÃ­nimo.");
 
         double repoValue = isPercentage ? (1.0 + (value / 100.0)) : value;
         int updated = priceRepository.applyBulkMultiplierToPriceRange(priceListId, minPrice, maxPrice, repoValue,
@@ -205,12 +205,12 @@ public class MassivePriceUpdateUseCase {
         double repoValue = isPercentage ? (1.0 + (value / 100.0)) : value;
         int updated = priceRepository.applyBulkMultiplierToFavorites(priceListId, repoValue, reason, isPercentage,
                 startDate);
-        saveLog(isPercentage ? "percentage" : "fixed_amount", "Favoritos ★", value, updated, null, reason, startDate);
+        saveLog(isPercentage ? "percentage" : "fixed_amount", "Favoritos â˜…", value, updated, null, reason, startDate);
         return updated;
     }
 
     /**
-     * Aplica un ajuste (porcentual o fijo) a los N artículos MENOS vendidos.
+     * Aplica un ajuste (porcentual o fijo) a los N artÃ­culos MENOS vendidos.
      */
     public int applyToBottomSellers(int priceListId, int bottomN, int daysBack, double value, String reason,
             boolean isPercentage, java.time.LocalDateTime startDate)
@@ -221,9 +221,9 @@ public class MassivePriceUpdateUseCase {
         else
             validateAmount(value);
         if (bottomN <= 0)
-            throw new BusinessException("El número de artículos a actualizar debe ser mayor que 0.");
+            throw new BusinessException("El nÃºmero de artÃ­culos a actualizar debe ser mayor que 0.");
         if (daysBack <= 0)
-            throw new BusinessException("Los días de análisis deben ser mayores que 0.");
+            throw new BusinessException("Los dÃ­as de anÃ¡lisis deben ser mayores que 0.");
 
         double repoValue = isPercentage ? (1.0 + (value / 100.0)) : value;
         int updated = priceRepository.applyBulkMultiplierToBottomSellers(priceListId, bottomN, daysBack, repoValue,
@@ -235,7 +235,7 @@ public class MassivePriceUpdateUseCase {
 
     /**
      * Clona una lista de precios en otra aplicando un multiplicador masivo.
-     * Útil para crear tarifas de mayoristas a partir de la general.
+     * Ãštil para crear tarifas de mayoristas a partir de la general.
      */
     public void cloneAndAdjustPrices(int sourceListId, int targetListId, double percentage, String reason,
             java.time.LocalDateTime startDate)
@@ -251,18 +251,18 @@ public class MassivePriceUpdateUseCase {
      */
     public int applyTaxToAll(double taxRate, String reason) throws SQLException {
         productRepository.updateTaxRateToAll(taxRate);
-        int updated = productRepository.count(); // Aproximado o exacto según repo
-        saveLog("tax_change", "Todos los Artículos", taxRate, updated, null, reason, java.time.LocalDateTime.now());
+        int updated = productRepository.count(); // Aproximado o exacto segÃºn repo
+        saveLog("tax_change", "Todos los ArtÃ­culos", taxRate, updated, null, reason, java.time.LocalDateTime.now());
         return updated;
     }
 
     /**
-     * Aplica un nuevo tipo de IVA a todos los productos de una categoría.
+     * Aplica un nuevo tipo de IVA a todos los productos de una categorÃ­a.
      */
     public int applyTaxToCategory(int categoryId, double taxRate, String reason) throws SQLException {
         productRepository.updateTaxRateByCategory(categoryId, taxRate);
-        // Aquí no tenemos un count exacto fácil sin query extra, pero guardamos el log.
-        saveLog("tax_change_legacy", "Por Categoría", taxRate, -1, categoryId, reason, java.time.LocalDateTime.now());
+        // AquÃ­ no tenemos un count exacto fÃ¡cil sin query extra, pero guardamos el log.
+        saveLog("tax_change_legacy", "Por CategorÃ­a", taxRate, -1, categoryId, reason, java.time.LocalDateTime.now());
         return 1; // Indicativo
     }
 
@@ -272,23 +272,23 @@ public class MassivePriceUpdateUseCase {
     public int applyTaxGroupToAll(int taxGroupId, String reason) throws SQLException {
         productRepository.updateTaxGroupToAll(taxGroupId);
         int updated = productRepository.count();
-        saveLog("tax_group_change", "Todos los Artículos (V2)", taxGroupId, updated, null, reason,
+        saveLog("tax_group_change", "Todos los ArtÃ­culos (V2)", taxGroupId, updated, null, reason,
                 java.time.LocalDateTime.now());
         return updated;
     }
 
     /**
-     * Aplica un grupo de impuestos V2 (TaxEngine) a una categoría.
+     * Aplica un grupo de impuestos V2 (TaxEngine) a una categorÃ­a.
      */
     public int applyTaxGroupToCategory(int categoryId, int taxGroupId, String reason) throws SQLException {
         productRepository.updateTaxGroupByCategory(categoryId, taxGroupId);
-        saveLog("tax_group_change", "Por Categoría (V2)", taxGroupId, -1, categoryId, reason,
+        saveLog("tax_group_change", "Por CategorÃ­a (V2)", taxGroupId, -1, categoryId, reason,
                 java.time.LocalDateTime.now());
         return 1;
     }
 
     /**
-     * Redondea precios de los artículos Top Sellers.
+     * Redondea precios de los artÃ­culos Top Sellers.
      */
     public int applyRoundingToTopSellers(int priceListId, int topN, int daysBack, double targetDecimal, String reason,
             java.time.LocalDateTime startDate)
@@ -301,7 +301,7 @@ public class MassivePriceUpdateUseCase {
     }
 
     /**
-     * Redondea precios de los artículos Bottom Sellers.
+     * Redondea precios de los artÃ­culos Bottom Sellers.
      */
     public int applyRoundingToBottomSellers(int priceListId, int bottomN, int daysBack, double targetDecimal,
             String reason, java.time.LocalDateTime startDate)
@@ -314,7 +314,7 @@ public class MassivePriceUpdateUseCase {
     }
 
     /**
-     * Redondea precios de los artículos Sin Movimiento (Slow-movers).
+     * Redondea precios de los artÃ­culos Sin Movimiento (Slow-movers).
      */
     public int applyRoundingToSlowMovers(int priceListId, int daysWithoutSale, double targetDecimal, String reason,
             java.time.LocalDateTime startDate)
@@ -327,7 +327,7 @@ public class MassivePriceUpdateUseCase {
     }
 
     /**
-     * Redondea precios de artículos en un rango de precio.
+     * Redondea precios de artÃ­culos en un rango de precio.
      */
     public int applyRoundingToPriceRange(int priceListId, double minPrice, double maxPrice, double targetDecimal,
             String reason, java.time.LocalDateTime startDate) throws SQLException {
@@ -340,13 +340,13 @@ public class MassivePriceUpdateUseCase {
     }
 
     /**
-     * Redondea precios de artículos favoritos.
+     * Redondea precios de artÃ­culos favoritos.
      */
     public int applyRoundingToFavorites(int priceListId, double targetDecimal, String reason,
             java.time.LocalDateTime startDate) throws SQLException {
         startDate = (startDate != null) ? startDate.withNano(0) : java.time.LocalDateTime.now().withNano(0);
         int updated = priceRepository.applyBulkRoundingToFavorites(priceListId, targetDecimal, reason, startDate);
-        saveLog("rounding", "Favoritos ★", targetDecimal, updated, null, reason, startDate);
+        saveLog("rounding", "Favoritos â˜…", targetDecimal, updated, null, reason, startDate);
         return updated;
     }
 
@@ -358,7 +358,7 @@ public class MassivePriceUpdateUseCase {
 
     /**
      * Reglas de negocio sobre el porcentaje permitido.
-     * El dominio decide qué valores son aceptables, no la UI.
+     * El dominio decide quÃ© valores son aceptables, no la UI.
      */
     private void validatePercentage(double percentage) {
         if (percentage == 0) {
@@ -366,7 +366,7 @@ public class MassivePriceUpdateUseCase {
         }
         if (percentage < -99) {
             throw new BusinessException(
-                    "No se puede reducir el precio más de un 99%. Valor recibido: " + percentage + "%");
+                    "No se puede reducir el precio mÃ¡s de un 99%. Valor recibido: " + percentage + "%");
         }
         if (percentage > 200) {
             throw new BusinessException(
@@ -390,8 +390,8 @@ public class MassivePriceUpdateUseCase {
             log.setAppliedAt(appliedAt != null ? appliedAt.withNano(0) : java.time.LocalDateTime.now().withNano(0));
             priceLogRepository.save(log);
         } catch (Exception ex) {
-            // Log simple, no interrumpir la operación principal
-            System.err.println("Error guardando log de auditoría: " + ex.getMessage());
+            // Log simple, no interrumpir la operaciÃ³n principal
+            System.err.println("Error guardando log de auditorÃ­a: " + ex.getMessage());
         }
     }
 

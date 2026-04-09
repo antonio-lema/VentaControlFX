@@ -324,7 +324,7 @@ public class JdbcCashClosureRepository implements ICashClosureRepository {
             pstmt.executeUpdate();
             if (type == MovementType.INGRESO || type == MovementType.RETIRADA || type == MovementType.DEVOLUCION) {
                 registerAudit(connection, userId, "CASH_" + type.toString(),
-                        String.format("Importe: %.2f€. Motivo: %s", amount, reason), ip);
+                        String.format("Importe: %.2fâ‚¬. Motivo: %s", amount, reason), ip);
             }
         }
     }
@@ -393,7 +393,7 @@ public class JdbcCashClosureRepository implements ICashClosureRepository {
 
     @Override
     public double getActiveFundAmount() throws SQLException {
-        // Obtenemos solo el fondo de la sesión activa más reciente
+        // Obtenemos solo el fondo de la sesiÃ³n activa mÃ¡s reciente
         // Si hay varias abiertas por error, no las sumamos para no inflar el esperado
         String sql = "SELECT initial_amount FROM cash_fund_sessions WHERE is_closed = FALSE ORDER BY created_at DESC LIMIT 1";
         try (Connection connection = DBConnection.getConnection();
@@ -475,7 +475,7 @@ public class JdbcCashClosureRepository implements ICashClosureRepository {
         String sql = "UPDATE cash_closures SET " +
                 "actual_cash = ?, " +
                 "difference = ? - expected_cash, " +
-                "notes = CONCAT(IFNULL(notes, ''), '\n[Editado: ', ?, ' | Antiguo: ', ?, ' €]'), " +
+                "notes = CONCAT(IFNULL(notes, ''), '\n[Editado: ', ?, ' | Antiguo: ', ?, ' â‚¬]'), " +
                 "reviewed_by = ?, " +
                 "reviewed_at = CURRENT_TIMESTAMP, " +
                 "status = CASE WHEN ABS(? - expected_cash) < 0.01 THEN 'CUADRADO' ELSE 'DESCUADRE' END " +

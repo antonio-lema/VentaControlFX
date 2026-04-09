@@ -25,8 +25,8 @@ public interface ICashClosureRepository {
 
     int getPendingTransactionCount() throws SQLException;
 
-    // ── Gestión de fondo de caja ────────────────────────────────────────
-    /** Abre una sesión de caja con el fondo inicial indicado. */
+    // â”€â”€ GestiÃ³n de fondo de caja â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    /** Abre una sesiÃ³n de caja con el fondo inicial indicado. */
     void openCashFund(double initialAmount, String notes, int userId) throws SQLException;
 
     enum MovementType {
@@ -43,8 +43,8 @@ public interface ICashClosureRepository {
     void registerCashEntry(double amount, String reason, int userId) throws SQLException;
 
     /**
-     * Registra una devolución de efectivo en el libro mayor de caja.
-     * Requiere que haya una sesión de caja activa.
+     * Registra una devoluciÃ³n de efectivo en el libro mayor de caja.
+     * Requiere que haya una sesiÃ³n de caja activa.
      */
     void registerCashReturn(double amount, String reason, int userId) throws SQLException;
 
@@ -52,20 +52,20 @@ public interface ICashClosureRepository {
 
     /**
      * Devuelve el efectivo actual en caja:
-     * fondo_inicial + ventas_efectivo – devoluciones_efectivo – retiradas.
+     * fondo_inicial + ventas_efectivo â€“ devoluciones_efectivo â€“ retiradas.
      */
     double getCurrentCashInDrawer() throws SQLException;
 
-    /** Indica si hay una sesión de caja activa (abierta hoy sin cerrar). */
+    /** Indica si hay una sesiÃ³n de caja activa (abierta hoy sin cerrar). */
     boolean hasActiveFund() throws SQLException;
 
-    /** Devuelve el fondo inicial de la sesión activa (0 si no hay sesión). */
+    /** Devuelve el fondo inicial de la sesiÃ³n activa (0 si no hay sesiÃ³n). */
     double getActiveFundAmount() throws SQLException;
 
-    /** Devuelve el importe real con el que se cerró la última vez. */
+    /** Devuelve el importe real con el que se cerrÃ³ la Ãºltima vez. */
     double getLastClosureAmount() throws SQLException;
 
-    /** Comprueba si hay sesiones de días anteriores sin cerrar. */
+    /** Comprueba si hay sesiones de dÃ­as anteriores sin cerrar. */
     boolean hasUnclosedPreviousSession() throws SQLException;
 
     /**
@@ -76,14 +76,14 @@ public interface ICashClosureRepository {
     /** Marca un cierre como revisado por un administrador. */
     void markAsReviewed(int closureId, int reviewerId) throws SQLException;
 
-    /** Marca un cierre como excluido de las estadísticas global. */
+    /** Marca un cierre como excluido de las estadÃ­sticas global. */
     void markAsExcluded(int closureId, int reviewerId) throws SQLException;
 
-    /** Modifica el importe real de un cierre y añade una nota de auditoría. */
+    /** Modifica el importe real de un cierre y aÃ±ade una nota de auditorÃ­a. */
     void updateClosure(int closureId, double actualCash, String reason, int reviewerId, double previousCash)
             throws SQLException;
 
-    /** Representa un movimiento de efectivo con detalles para auditoría. */
+    /** Representa un movimiento de efectivo con detalles para auditorÃ­a. */
     class CashMovement {
         public int movementId;
         public String type;

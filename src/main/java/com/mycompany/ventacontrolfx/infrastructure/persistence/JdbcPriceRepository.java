@@ -46,7 +46,7 @@ public class JdbcPriceRepository implements IPriceRepository {
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     Price fallback = mapPrice(rs);
-                    // Ajustamos el price_list_id para que coincida con la tarifa buscada y así se
+                    // Ajustamos el price_list_id para que coincida con la tarifa buscada y asÃ­ se
                     // muestre
                     fallback.setPriceListId(priceListId);
                     return Optional.of(fallback);
@@ -409,7 +409,7 @@ public class JdbcPriceRepository implements IPriceRepository {
         return false;
     }
 
-    // ─── HELPER PARA AUTORRELLENAR TARIFAS VACÍAS ───
+    // â”€â”€â”€ HELPER PARA AUTORRELLENAR TARIFAS VACÃAS â”€â”€â”€
     private void ensurePricesExist(int targetPriceListId, Integer categoryId, Connection conn) throws SQLException {
         int defaultPriceListId = -1;
         try (Statement stmt = conn.createStatement();
@@ -426,7 +426,7 @@ public class JdbcPriceRepository implements IPriceRepository {
         StringBuilder sql = new StringBuilder();
         sql.append("INSERT INTO product_prices (product_id, price_list_id, price, start_date, reason) ");
         sql.append(
-                "SELECT p.product_id, ?, COALESCE(pp_def.price, 0), NOW(), 'Copia implícita de tarifa base por Subida Masiva' ");
+                "SELECT p.product_id, ?, COALESCE(pp_def.price, 0), NOW(), 'Copia implÃ­cita de tarifa base por Subida Masiva' ");
         sql.append("FROM products p ");
         sql.append("LEFT JOIN product_prices pp_target ON p.product_id = pp_target.product_id ");
         sql.append("  AND pp_target.price_list_id = ? AND pp_target.end_date IS NULL ");
@@ -449,11 +449,11 @@ public class JdbcPriceRepository implements IPriceRepository {
         }
     }
 
-    // ─── Implementación de helper privado reutilizado ───
+    // â”€â”€â”€ ImplementaciÃ³n de helper privado reutilizado â”€â”€â”€
 
     /**
-     * Lógica de cierre+inserción en batch a partir de un ResultSet ya abierto.
-     * Soporta operación porcentual o de importe fijo.
+     * LÃ³gica de cierre+inserciÃ³n en batch a partir de un ResultSet ya abierto.
+     * Soporta operaciÃ³n porcentual o de importe fijo.
      */
     private int executeBulkUpdate(Connection conn, PreparedStatement selectStmt,
             int priceListId, double value, String reason,
@@ -505,7 +505,7 @@ public class JdbcPriceRepository implements IPriceRepository {
         return count;
     }
 
-    // ─── TOP SELLERS ─────────────────────────────────────────────────────────────
+    // â”€â”€â”€ TOP SELLERS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     @Override
     public int applyBulkMultiplierToTopSellers(int priceListId, int topN, int daysBack,
@@ -549,7 +549,7 @@ public class JdbcPriceRepository implements IPriceRepository {
         }
     }
 
-    // ─── BOTTOM SELLERS (Menos Vendidos) ─────────────────────────────────────────
+    // â”€â”€â”€ BOTTOM SELLERS (Menos Vendidos) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     @Override
     public int applyBulkMultiplierToBottomSellers(int priceListId, int bottomN, int daysBack,
@@ -596,7 +596,7 @@ public class JdbcPriceRepository implements IPriceRepository {
         }
     }
 
-    // ─── SLOW MOVERS ─────────────────────────────────────────────────────
+    // â”€â”€â”€ SLOW MOVERS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     @Override
     public int applyBulkMultiplierToSlowMovers(int priceListId, int daysWithoutSale,
@@ -636,7 +636,7 @@ public class JdbcPriceRepository implements IPriceRepository {
         }
     }
 
-    // ─── RANGO DE PRECIO ─────────────────────────────────────────────────────────
+    // â”€â”€â”€ RANGO DE PRECIO â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     @Override
     public int applyBulkMultiplierToPriceRange(int priceListId, double minPrice, double maxPrice,
@@ -671,7 +671,7 @@ public class JdbcPriceRepository implements IPriceRepository {
         }
     }
 
-    // ─── FAVORITOS ───────────────────────────────────────────────────────────────
+    // â”€â”€â”€ FAVORITOS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     @Override
     public int applyBulkMultiplierToFavorites(int priceListId, double value, String reason, boolean isPercentage,
@@ -707,7 +707,7 @@ public class JdbcPriceRepository implements IPriceRepository {
 
     @Override
     public void clonePriceList(int sourceId, int targetId) throws SQLException {
-        cloneAndAdjustPriceList(sourceId, targetId, 1.0, "Clonación desde tarifa ID " + sourceId,
+        cloneAndAdjustPriceList(sourceId, targetId, 1.0, "ClonaciÃ³n desde tarifa ID " + sourceId,
                 LocalDateTime.now());
     }
 

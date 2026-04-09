@@ -5,21 +5,21 @@ import java.time.LocalDateTime;
 /**
  * Entidad de dominio: Representa una vigencia de tasa de IVA.
  *
- * Cada vez que cambia el IVA de un producto, categoría o de forma global,
+ * Cada vez que cambia el IVA de un producto, categorÃ­a o de forma global,
  * se crea un nuevo TaxRevision con start_date y se cierra el anterior con
- * end_date. Esto garantiza trazabilidad total sin modificar datos históricos.
+ * end_date. Esto garantiza trazabilidad total sin modificar datos histÃ³ricos.
  *
- * Jerarquía de aplicación (de mayor a menor prioridad):
+ * JerarquÃ­a de aplicaciÃ³n (de mayor a menor prioridad):
  * PRODUCT > CATEGORY > GLOBAL
  */
 public class TaxRevision {
 
     public enum Scope {
-        /** Aplica a un producto específico. */
+        /** Aplica a un producto especÃ­fico. */
         PRODUCT,
-        /** Aplica a todos los productos de una categoría. */
+        /** Aplica a todos los productos de una categorÃ­a. */
         CATEGORY,
-        /** Aplica a todos los productos sin IVA propio o de categoría. */
+        /** Aplica a todos los productos sin IVA propio o de categorÃ­a. */
         GLOBAL
     }
 
@@ -54,7 +54,7 @@ public class TaxRevision {
     // --- Reglas de negocio ---
 
     /**
-     * Regla: ¿Está esta tasa vigente en la fecha indicada?
+     * Regla: Â¿EstÃ¡ esta tasa vigente en la fecha indicada?
      */
     public boolean isActiveAt(LocalDateTime dateTime) {
         if (dateTime == null)
@@ -64,7 +64,7 @@ public class TaxRevision {
     }
 
     /**
-     * Regla: ¿Es esta la tasa actualmente vigente?
+     * Regla: Â¿Es esta la tasa actualmente vigente?
      */
     public boolean isCurrentlyActive() {
         return isActiveAt(LocalDateTime.now());

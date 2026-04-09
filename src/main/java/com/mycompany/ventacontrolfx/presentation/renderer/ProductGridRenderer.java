@@ -38,6 +38,19 @@ public class ProductGridRenderer {
         for (Product p : products) {
             addProductToGrid(p);
         }
+
+        // Animation de entrada
+        javafx.animation.FadeTransition ft = new javafx.animation.FadeTransition(javafx.util.Duration.millis(300), productsPane);
+        ft.setFromValue(0.0);
+        ft.setToValue(1.0);
+        ft.play();
+    }
+
+    public void showSkeleton(int count) {
+        productsPane.getChildren().clear();
+        for (int i = 0; i < count; i++) {
+            productsPane.getChildren().add(new com.mycompany.ventacontrolfx.component.SkeletonProductBox());
+        }
     }
 
     public void append(List<Product> products) {

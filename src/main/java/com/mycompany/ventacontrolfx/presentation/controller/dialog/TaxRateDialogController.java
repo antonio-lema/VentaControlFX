@@ -54,12 +54,12 @@ public class TaxRateDialogController implements Injectable {
     @FXML
     private void handleSave() {
         if (txtName.getText().trim().isEmpty()) {
-            AlertUtil.showWarning("Validación", "El nombre es obligatorio.");
+            AlertUtil.showWarning("ValidaciÃ³n", "El nombre es obligatorio.");
             return;
         }
 
         if (txtRate.getText().trim().isEmpty()) {
-            AlertUtil.showWarning("Validación", "El porcentaje es obligatorio.");
+            AlertUtil.showWarning("ValidaciÃ³n", "El porcentaje es obligatorio.");
             return;
         }
 
@@ -86,7 +86,7 @@ public class TaxRateDialogController implements Injectable {
             saveClicked = true;
             close();
         } catch (NumberFormatException e) {
-            AlertUtil.showWarning("Validación", "Por favor, introduce un porcentaje válido.");
+            AlertUtil.showWarning("ValidaciÃ³n", "Por favor, introduce un porcentaje vÃ¡lido.");
         } catch (SQLException e) {
             AlertUtil.showError("Error", "No se pudo guardar la tasa: " + e.getMessage());
         }

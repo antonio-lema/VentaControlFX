@@ -108,7 +108,7 @@ public class CartController implements Injectable {
         hboxSavings.managedProperty().bind(hboxSavings.visibleProperty());
 
         totalButtonLabel.textProperty().bind(Bindings.createStringBinding(
-                () -> String.format("%.2f €", cartUseCase.getGrandTotal()),
+                () -> String.format("%.2f â‚¬", cartUseCase.getGrandTotal()),
                 cartUseCase.grandTotalProperty()));
         itemsCountLabel.textProperty().bind(Bindings.createStringBinding(
                 () -> String.format(container.getBundle().getString("cart.summary.items_count_format"),
@@ -134,10 +134,10 @@ public class CartController implements Injectable {
                         refreshPriceListLabel();
                         // Esperamos- [x] Investigar el estado de `CartController` para asegurar que la
                         // funcionalidad de borrado existe
-                        // - [x] Corregir lógica de visibilidad en `CartController.java` (añadidos logs)
-                        // - [x] Añadir `fx:id` en `cart_panel.fxml`
+                        // - [x] Corregir lÃ³gica de visibilidad en `CartController.java` (aÃ±adidos logs)
+                        // - [x] AÃ±adir `fx:id` en `cart_panel.fxml`
                         // - [x] Restaurar y simplificar estilos en `carrito.css`
-                        // - [x] Forzar visibilidad y color en FXML para diagnóstico
+                        // - [x] Forzar visibilidad y color en FXML para diagnÃ³stico
                         // - [x] Verificar la visibilidad del icono de papelera
                         // a que el hilo de fondo de CartUseCase actualice los precios
                         // y luego forzamos un re-render completo de las filas del carrito.
@@ -317,7 +317,7 @@ public class CartController implements Injectable {
             }
             stage.setScene(scene);
 
-            // Animación sutil
+            // AnimaciÃ³n sutil
             root.setOpacity(0);
             root.setScaleX(0.9);
             root.setScaleY(0.9);
@@ -391,7 +391,7 @@ public class CartController implements Injectable {
         de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView icon = new de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView(
                 de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon.PAUSE_CIRCLE);
         icon.setSize("45px");
-        icon.setFill(javafx.scene.paint.Color.valueOf("#fb8c00")); // Naranja cálido (brand warning)
+        icon.setFill(javafx.scene.paint.Color.valueOf("#fb8c00")); // Naranja cÃ¡lido (brand warning)
 
         Label title = new Label(container.getBundle().getString("cart.suspend.title"));
         title.getStyleClass().add("custom-modal-title");
@@ -432,7 +432,7 @@ public class CartController implements Injectable {
         stage.initModality(Modality.APPLICATION_MODAL);
         stage.initStyle(StageStyle.TRANSPARENT);
 
-        // CORRECCIÓN: Establecer dueño para evitar fallos en algunos sistemas
+        // CORRECCIÃ“N: Establecer dueÃ±o para evitar fallos en algunos sistemas
         if (cartItemsContainer.getScene() != null) {
             stage.initOwner(cartItemsContainer.getScene().getWindow());
         }
@@ -444,7 +444,7 @@ public class CartController implements Injectable {
         }
         stage.setScene(scene);
 
-        // Animación sutil
+        // AnimaciÃ³n sutil
         root.setOpacity(0);
         root.setScaleX(0.9);
         root.setScaleY(0.9);
@@ -558,11 +558,11 @@ public class CartController implements Injectable {
                             int userId = container.getUserSession().getCurrentUser().getUserId();
 
                             container.getAsyncManager().runAsyncTask(() -> {
-                                // ── 1. PROCESAR VENTA EN HILO DE FONDO ──
+                                // â”€â”€ 1. PROCESAR VENTA EN HILO DE FONDO â”€â”€
                                 int saleId = container.getSaleUseCase().processSale(items, total, method, clientId,
                                         userId, 0.0, null, cashAmount, cardAmount, observations);
 
-                                // ── 2. EMISIÓN FISCAL AUTOMÁTICA EN HILO DE FONDO ──
+                                // â”€â”€ 2. EMISIÃ“N FISCAL AUTOMÃTICA EN HILO DE FONDO â”€â”€
                                 try {
                                     if (client != null && client.getTaxId() != null
                                             && !client.getTaxId().trim().isEmpty()) {
@@ -588,12 +588,12 @@ public class CartController implements Injectable {
                                         container.getEmitFiscalDocumentUseCase().emitTicket(saleId);
                                     }
                                 } catch (Exception fiscalEx) {
-                                    System.err.println("Error en emisión fiscal: " + fiscalEx.getMessage());
+                                    System.err.println("Error en emisiÃ³n fiscal: " + fiscalEx.getMessage());
                                 }
                                 return saleId;
 
                             }, (Integer saleId) -> {
-                                // ── 3. ACTUALIZAR UI EN HILO PRINCIPAL ──
+                                // â”€â”€ 3. ACTUALIZAR UI EN HILO PRINCIPAL â”€â”€
                                 cartUseCase.clear();
                                 container.getEventBus().publishDataChange();
 
@@ -625,7 +625,7 @@ public class CartController implements Injectable {
     }
 
     /**
-     * Muestra un popup visualmente coherente informando que la caja no está
+     * Muestra un popup visualmente coherente informando que la caja no estÃ¡
      * abierta.
      */
     private void showCashNotOpenAlert(String message) {
@@ -682,7 +682,7 @@ public class CartController implements Injectable {
 
         btnClose.setOnAction(e -> stage.close());
 
-        // Animación de entrada
+        // AnimaciÃ³n de entrada
         root.setOpacity(0);
         root.setScaleX(0.9);
         root.setScaleY(0.9);
@@ -731,7 +731,7 @@ public class CartController implements Injectable {
         txtPrice.setPromptText("0.00");
         txtPrice.getStyleClass().add("input-field-modern");
 
-        // Solo permitir números y punto en el precio
+        // Solo permitir nÃºmeros y punto en el precio
         txtPrice.textProperty().addListener((obs, oldVal, newVal) -> {
             if (!newVal.matches("\\d*(\\.\\d*)?")) {
                 txtPrice.setText(oldVal);

@@ -21,7 +21,7 @@ import com.mycompany.ventacontrolfx.util.AlertUtil;
 
 public class SaleConfigController implements Injectable {
 
-    // ── Datos empresa ──────────────────────────────────────────────────
+    // â”€â”€ Datos empresa â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     @FXML
     private TextField txtCompanyName;
     @FXML
@@ -39,7 +39,7 @@ public class SaleConfigController implements Injectable {
     @FXML
     private TextField txtAppName;
 
-    // ── Email / SMTP ──────────────────────────────────────────────────
+    // â”€â”€ Email / SMTP â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     @FXML
     private TextField txtSmtpHost;
     @FXML
@@ -49,11 +49,11 @@ public class SaleConfigController implements Injectable {
     @FXML
     private PasswordField txtEmailPassword;
 
-    // ── Fiscal ────────────────────────────────────────────────────────
+    // â”€â”€ Fiscal â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     @FXML
     private CheckBox chkPricesIncludeTax;
 
-    // ── Ticket ────────────────────────────────────────────────────────
+    // â”€â”€ Ticket â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     @FXML
     private CheckBox chkShowLogo;
     @FXML
@@ -71,7 +71,7 @@ public class SaleConfigController implements Injectable {
     @FXML
     private CheckBox chkAutoPrint;
 
-    // ── Banner ────────────────────────────────────────────────────────
+    // â”€â”€ Banner â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     @FXML
     private HBox bannerSaved;
 
@@ -85,13 +85,13 @@ public class SaleConfigController implements Injectable {
         loadConfig();
     }
 
-    // ─────────────────────────────────────────────────────────────────
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     @FXML
     public void initialize() {
-        // Se carga la configuración en inject()
+        // Se carga la configuraciÃ³n en inject()
     }
 
-    // ─────────────────────────────────────────────────────────────────
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     private void loadConfig() {
         if (configUseCase == null)
             return;
@@ -132,7 +132,7 @@ public class SaleConfigController implements Injectable {
         txtEmailPassword.setText(cfg.getEmailPassword());
     }
 
-    // ─────────────────────────────────────────────────────────────────
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     @FXML
     private void handleSave() {
         if (configUseCase == null)
@@ -142,7 +142,7 @@ public class SaleConfigController implements Injectable {
         showBanner();
     }
 
-    // ─────────────────────────────────────────────────────────────────
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     @FXML
     private void handleReset() {
         if (configUseCase != null) {
@@ -151,7 +151,7 @@ public class SaleConfigController implements Injectable {
         }
     }
 
-    // ─────────────────────────────────────────────────────────────────
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     @FXML
     private void handleBrowseLogo() {
         FileChooser fileChooser = new FileChooser();
@@ -176,7 +176,7 @@ public class SaleConfigController implements Injectable {
         }
     }
 
-    // ─────────────────────────────────────────────────────────────────
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     private SaleConfig buildConfig() {
         SaleConfig cfg = new SaleConfig();
 
@@ -204,7 +204,7 @@ public class SaleConfigController implements Injectable {
         } else {
             cfg.setPricesIncludeTax(true);
         }
-        cfg.setCurrency("EUR — Euro (€)");
+        cfg.setCurrency("EUR â€” Euro (â‚¬)");
         cfg.setDecimals("2 decimales");
 
         // Ticket
@@ -226,7 +226,7 @@ public class SaleConfigController implements Injectable {
         return cfg;
     }
 
-    // ─────────────────────────────────────────────────────────────────
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     private void showBanner() {
         bannerSaved.setVisible(true);
         bannerSaved.setManaged(true);
@@ -239,7 +239,7 @@ public class SaleConfigController implements Injectable {
         pause.play();
     }
 
-    // ─────────────────────────────────────────────────────────────────
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     /** Selecciona el elemento en el ComboBox que contenga el texto dado */
     private void setComboValue(ComboBox<String> combo, String value) {
         if (value == null || combo == null)

@@ -27,7 +27,7 @@ public class ProductBox extends VBox {
         this.setCache(true);
         this.setCacheHint(javafx.scene.CacheHint.SPEED);
 
-        // ── IMAGE SECTION (StackPane allows overlay of price badge) ──
+        // â”€â”€ IMAGE SECTION (StackPane allows overlay of price badge) â”€â”€
         StackPane imageContainer = new StackPane();
         imageContainer.getStyleClass().add("product-image-container");
         imageContainer.setPrefHeight(150);
@@ -35,7 +35,7 @@ public class ProductBox extends VBox {
         imageContainer.setMaxHeight(150);
         imageContainer.setAlignment(Pos.CENTER);
 
-        // Clip dinámico: se ajusta al ancho del contenedor y solo redondea arriba
+        // Clip dinÃ¡mico: se ajusta al ancho del contenedor y solo redondea arriba
         Rectangle clip = new Rectangle();
         clip.widthProperty().bind(imageContainer.widthProperty());
         clip.heightProperty().bind(imageContainer.heightProperty().add(30)); // Altura extra para que el redondeo
@@ -79,7 +79,7 @@ public class ProductBox extends VBox {
             displayPrice = product.getCurrentPrice() * (1 + (rate / 100.0));
         }
 
-        Label priceBadge = new Label(String.format("%.2f€", displayPrice));
+        Label priceBadge = new Label(String.format("%.2fâ‚¬", displayPrice));
         priceBadge.getStyleClass().add("product-price-badge");
         StackPane.setAlignment(priceBadge, Pos.TOP_RIGHT);
         StackPane.setMargin(priceBadge, new Insets(10, 10, 0, 0));
@@ -93,7 +93,7 @@ public class ProductBox extends VBox {
             imageContainer.getChildren().add(discountBadge);
         }
 
-        // ── INFO SECTION ──
+        // â”€â”€ INFO SECTION â”€â”€
         VBox infoBox = new VBox(4);
         infoBox.getStyleClass().add("product-info");
         infoBox.setAlignment(Pos.TOP_LEFT);
@@ -131,7 +131,7 @@ public class ProductBox extends VBox {
             infoBox.getChildren().add(skuLabel);
         }
 
-        // ── ADD BUTTON ──
+        // â”€â”€ ADD BUTTON â”€â”€
         FontAwesomeIconView addIcon = new FontAwesomeIconView();
         addIcon.setGlyphName("PLUS");
         addIcon.setSize("11");

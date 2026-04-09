@@ -215,7 +215,7 @@ public class AddProductController implements Injectable {
 
         cmbCategory.getSelectionModel().selectedItemProperty().addListener((obs, old, nv) -> {
             if (nv != null && nv.getTaxGroupId() != null) {
-                // Heredar grupo de impuestos de la categoría de forma inteligente
+                // Heredar grupo de impuestos de la categorÃ­a de forma inteligente
                 for (TaxGroup tg : cmbTaxGroup.getItems()) {
                     if (tg.getId().equals(nv.getTaxGroupId())) {
                         cmbTaxGroup.setValue(tg);
@@ -239,7 +239,7 @@ public class AddProductController implements Injectable {
             }
         });
 
-        // Listener para sincronización espejo (Mirrored Sync)
+        // Listener para sincronizaciÃ³n espejo (Mirrored Sync)
         cmbTaxGroup.valueProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal != null) {
                 // Modo V2: Calcular tasa total y sincronizar con campo IVA
@@ -249,7 +249,7 @@ public class AddProductController implements Injectable {
                 txtIva.setText(String.valueOf(totalRate));
                 txtIva.setDisable(true);
             } else {
-                // Modo Legacy: Habilitar edición manual
+                // Modo Legacy: Habilitar ediciÃ³n manual
                 txtIva.setDisable(false);
                 if (productToEdit != null && productToEdit.getIva() != null) {
                     txtIva.setText(String.valueOf(productToEdit.getIva()));
@@ -307,7 +307,7 @@ public class AddProductController implements Injectable {
             for (TaxGroup tg : cmbTaxGroup.getItems()) {
                 if (tg.getId() == product.getTaxGroupId()) {
                     cmbTaxGroup.setValue(tg);
-                    // Sincronización inicial
+                    // SincronizaciÃ³n inicial
                     double totalRate = tg.getRates().stream().mapToDouble(r -> r.getRate()).sum();
                     txtIva.setText(String.valueOf(totalRate));
                     txtIva.setDisable(true);
@@ -434,7 +434,7 @@ public class AddProductController implements Injectable {
             for (Map.Entry<Integer, TextField> entry : priceFields.entrySet()) {
                 int priceListId = entry.getKey();
                 if (defaultPriceList != null && priceListId == defaultPriceList.getId()) {
-                    continue; // Ya guardado automáticamente como fallback en productUseCase.saveProduct
+                    continue; // Ya guardado automÃ¡ticamente como fallback en productUseCase.saveProduct
                 }
 
                 String rawPrice = entry.getValue().getText();
@@ -444,7 +444,7 @@ public class AddProductController implements Injectable {
                     Optional<Price> activePrice = priceUseCase.getActivePrice(productToEdit.getId(), priceListId);
                     if (activePrice.isEmpty() || activePrice.get().getValue() != listPrice) {
                         priceUseCase.updateProductPrice(productToEdit.getId(), priceListId, listPrice,
-                                "Actualización de tarifa", LocalDateTime.now());
+                                "ActualizaciÃ³n de tarifa", LocalDateTime.now());
                     }
                 }
             }

@@ -5,21 +5,21 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 /**
- * Puerto para la gestión de series de numeración correlativa.
- * Clean Architecture — Capa de Dominio (Interfaz / Port).
+ * Puerto para la gestiÃ³n de series de numeraciÃ³n correlativa.
+ * Clean Architecture â€” Capa de Dominio (Interfaz / Port).
  *
- * CRÍTICO: getAndIncrement debe ser atómico (SELECT FOR UPDATE en SQL)
- * para garantizar unicidad del número en entornos multi-caja.
+ * CRÃTICO: getAndIncrement debe ser atÃ³mico (SELECT FOR UPDATE en SQL)
+ * para garantizar unicidad del nÃºmero en entornos multi-caja.
  */
 public interface IDocumentSeriesRepository {
 
     /**
-     * Obtiene el siguiente número disponible para la serie indicada
-     * e incrementa el contador de forma ATÓMICA dentro de la transacción.
+     * Obtiene el siguiente nÃºmero disponible para la serie indicada
+     * e incrementa el contador de forma ATÃ“MICA dentro de la transacciÃ³n.
      *
      * @param seriesCode "T" (Ticket), "F" (Factura)
-     * @param conn       transacción activa — NUNCA commit aquí
-     * @return el número asignado (ya incrementado en BD)
+     * @param conn       transacciÃ³n activa â€” NUNCA commit aquÃ­
+     * @return el nÃºmero asignado (ya incrementado en BD)
      */
     int getAndIncrement(String seriesCode, Connection conn) throws SQLException;
 

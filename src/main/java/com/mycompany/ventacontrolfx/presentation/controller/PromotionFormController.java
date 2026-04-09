@@ -124,7 +124,7 @@ public class PromotionFormController implements Injectable {
         cmbType.getSelectionModel().selectFirst();
         cmbScope.getSelectionModel().select(PromotionScope.PRODUCT);
 
-        // Sugerencias de búsqueda
+        // Sugerencias de bÃºsqueda
         searchContextMenu = new ContextMenu();
         txtAffectedSearch.textProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal == null || newVal.trim().isEmpty()) {
@@ -170,7 +170,7 @@ public class PromotionFormController implements Injectable {
     public void setPromotion(Promotion p) {
         this.promotion = p;
         if (p != null) {
-            lblTitle.setText("Editar Promoción");
+            lblTitle.setText("Editar PromociÃ³n");
             txtName.setText(p.getName());
             cmbType.setValue(p.getType());
             txtValue.setText(String.valueOf(p.getValue()));

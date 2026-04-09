@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Caso de uso para la gestión de ventas, incluyendo el procesamiento de nuevas
+ * Caso de uso para la gestiÃ³n de ventas, incluyendo el procesamiento de nuevas
  * ventas,
  * historial, detalles y devoluciones.
  */
@@ -78,7 +78,7 @@ public class SaleUseCase {
         this.integrityService = new FiscalIntegrityService();
     }
 
-    /** Inyecta el use case de caja para registrar movimientos de devolución. */
+    /** Inyecta el use case de caja para registrar movimientos de devoluciÃ³n. */
     public void setCashClosureUseCase(CashClosureUseCase cashClosureUseCase) {
         this.cashClosureUseCase = cashClosureUseCase;
     }
@@ -99,7 +99,7 @@ public class SaleUseCase {
             throws SQLException {
         authService.checkPermission("VENTAS");
 
-        // ── REGLA DE NEGOCIO: Validar caja abierta ──
+        // â”€â”€ REGLA DE NEGOCIO: Validar caja abierta â”€â”€
         if (cashClosureUseCase != null && !cashClosureUseCase.hasActiveFund()) {
             throw new SQLException(
                     "OPERACION_BLOQUEADA: La caja no ha sido abierta. Debe establecer un fondo de caja antes de realizar ventas.");
@@ -132,14 +132,14 @@ public class SaleUseCase {
             // Precio unitario original (con tarifa de cliente ya aplicada)
             double unitPrice = item.getUnitPrice();
 
-            // Calculamos el total de la línea YA con descuento para que el TaxEngine
+            // Calculamos el total de la lÃ­nea YA con descuento para que el TaxEngine
             // recalcule la base e IVA
             double grossLineTotal = (unitPrice * item.getQuantity()) - totalLineDiscount;
 
             // Simulamos un precio unitario efectivo para el motor de impuestos
             double effectiveUnitPrice = item.getQuantity() > 0 ? (grossLineTotal / item.getQuantity()) : 0.0;
 
-            // Usar el motor fiscal para calcular impuestos de esta línea
+            // Usar el motor fiscal para calcular impuestos de esta lÃ­nea
             TaxCalculationResult result = taxEngineService.calculateLine(product, client, effectiveUnitPrice,
                     item.getQuantity(), isInclusive);
             lineResults.add(result);
@@ -222,7 +222,7 @@ public class SaleUseCase {
         List<SaleTaxSummary> taxSummaries = taxEngineService.summarizeTaxes(lineResults);
         sale.setTaxSummaries(taxSummaries);
 
-        // ── PROCESAMIENTO ATÓMICO EN UNA SOLA TRANSACCIÓN ──
+        // â”€â”€ PROCESAMIENTO ATÃ“MICO EN UNA SOLA TRANSACCIÃ“N â”€â”€
         try (Connection conn = DBConnection.getConnection()) {
             conn.setAutoCommit(false);
             try {
@@ -232,7 +232,7 @@ public class SaleUseCase {
                 // 2. Guardar Detalles
                 saleRepository.saveSaleDetails(details, saleId, conn);
 
-                // 3. Guardar Resúmenes de Impuestos
+                // 3. Guardar ResÃºmenes de Impuestos
                 saleRepository.saveSaleTaxSummaries(taxSummaries, saleId, conn);
 
                 // 4. Actualizar Stock
@@ -241,10 +241,10 @@ public class SaleUseCase {
                         int newStock = productRepository.updateStock(item.getProduct().getId(), -item.getQuantity(),
                                 conn);
 
-                        // Notificar si el stock ha bajado del mínimo (opcional: lanzar evento o log)
+                        // Notificar si el stock ha bajado del mÃ­nimo (opcional: lanzar evento o log)
                         if (newStock <= item.getProduct().getMinStock()) {
                             System.out.println("ALERTA STOCK: El producto " + item.getProduct().getName() +
-                                    " ha alcanzado el stock mínimo (" + newStock + ")");
+                                    " ha alcanzado el stock mÃ­nimo (" + newStock + ")");
                         }
                     }
                 }
@@ -276,7 +276,7 @@ public class SaleUseCase {
     }
 
     /**
-     * Registra una devolución parcial o total de una venta.
+     * Registra una devoluciÃ³n parcial o total de una venta.
      */
     public void registerPartialReturn(int saleId, Map<Integer, Integer> returnItems, String reason, int userId)
             throws SQLException {
@@ -305,7 +305,7 @@ public class SaleUseCase {
                             saleRepository.updateDetailReturnedQuantity(d.getDetailId(), newTotalReturn, conn);
                             d.setReturnedQuantity(newTotalReturn);
 
-                            // USAR PRECIO FINAL (CON IVA) PARA LA DEVOLUCIÓN
+                            // USAR PRECIO FINAL (CON IVA) PARA LA DEVOLUCIÃ“N
                             double unitRefundPrice = d.getGrossTotal() / d.getQuantity();
                             double lineRefund = qtyToReturnNow * unitRefundPrice;
                             refundAmountForThisTransaction += lineRefund;
@@ -358,7 +358,7 @@ public class SaleUseCase {
                     cashToRefund = Math.min(cashToRefund, availableCash);
                     cardToRefund = Math.min(cardToRefund, availableCard);
 
-                    // Validación de efectivo disponible para la devolución (solo la parte que
+                    // ValidaciÃ³n de efectivo disponible para la devoluciÃ³n (solo la parte que
                     // devolvemos en cash)
                     if (cashToRefund > 0 && cashClosureUseCase != null) {
                         cashClosureUseCase.validateCashAvailableForReturn(cashToRefund);
@@ -374,7 +374,7 @@ public class SaleUseCase {
                     newReturn.setCashAmount(cashToRefund);
                     newReturn.setCardAmount(cardToRefund);
 
-                    // ── GENERACIÓN DE CÓDIGO FISCAL ÚNICO PARA LA DEVOLUCIÓN ──
+                    // â”€â”€ GENERACIÃ“N DE CÃ“DIGO FISCAL ÃšNICO PARA LA DEVOLUCIÃ“N â”€â”€
                     String seriesCode = "R";
                     int nextDocNumber = seriesRepository.getAndIncrement(seriesCode, conn);
 
@@ -402,12 +402,12 @@ public class SaleUseCase {
 
                     // Registrar en caja SOLO la parte devuelta en efectivo
                     if (cashToRefund > 0 && cashClosureUseCase != null) {
-                        String cashReason = String.format("[Devolución Ticket #%d - Origen: %s] %s", saleId,
+                        String cashReason = String.format("[DevoluciÃ³n Ticket #%d - Origen: %s] %s", saleId,
                                 sale.getPaymentMethod(), reason);
                         cashClosureUseCase.registerCashReturn(cashToRefund, cashReason, userId, conn);
                     }
 
-                    // Archivamos el PDF fiscal de la devolución antes del commit (para asegurar
+                    // Archivamos el PDF fiscal de la devoluciÃ³n antes del commit (para asegurar
                     // integridad)
                     archiveReturnInPdf(newReturn, newReturnDetails);
 
@@ -418,7 +418,7 @@ public class SaleUseCase {
                 conn.rollback();
                 if (e instanceof SQLException)
                     throw (SQLException) e;
-                throw new SQLException("Error durante la transacción de devolución: " + e.getMessage(), e);
+                throw new SQLException("Error durante la transacciÃ³n de devoluciÃ³n: " + e.getMessage(), e);
             }
         }
     }
@@ -453,7 +453,7 @@ public class SaleUseCase {
     }
 
     /**
-     * Genera y archiva el PDF de la devolución (Factura Rectificativa).
+     * Genera y archiva el PDF de la devoluciÃ³n (Factura Rectificativa).
      * Sincronizado con el motor de ReturnUseCase para mantener coherencia.
      */
     private void archiveReturnInPdf(Return r, List<ReturnDetail> details) {
@@ -463,7 +463,7 @@ public class SaleUseCase {
             // Cargar la venta original para contexto
             Sale sale = saleRepository.getById(r.getSaleId());
 
-            // Conversión para compatibilidad con IFiscalPdfService.PrintData
+            // ConversiÃ³n para compatibilidad con IFiscalPdfService.PrintData
             FiscalDocument doc = FiscalDocument.builder()
                     .saleId(r.getSaleId())
                     .type(FiscalDocument.Type.RECTIFICATIVA)
@@ -502,7 +502,7 @@ public class SaleUseCase {
 
             pdfService.generateInvoicePdf(data, fullPath);
         } catch (Exception ex) {
-            System.err.println("[SaleUseCase] Error archivando PDF de devolución: " + ex.getMessage());
+            System.err.println("[SaleUseCase] Error archivando PDF de devoluciÃ³n: " + ex.getMessage());
         }
     }
 }

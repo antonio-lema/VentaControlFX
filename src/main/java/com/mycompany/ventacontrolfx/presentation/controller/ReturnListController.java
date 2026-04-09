@@ -106,7 +106,7 @@ public class ReturnListController implements Injectable {
 
         loadReturns();
 
-        // Listeners para búsqueda en tiempo real
+        // Listeners para bÃºsqueda en tiempo real
         if (txtSearch != null)
             RealTimeSearchBinder.bind(txtSearch, query -> applyFilters());
         if (datePickerStart != null)
@@ -145,7 +145,7 @@ public class ReturnListController implements Injectable {
                     setGraphic(null);
                     getStyleClass().remove("text-danger");
                 } else {
-                    setText(String.format("%.2f €", item));
+                    setText(String.format("%.2f â‚¬", item));
                     getStyleClass().add("text-danger");
                     setStyle("-fx-font-weight: 800;");
                 }
@@ -162,7 +162,7 @@ public class ReturnListController implements Injectable {
                     setGraphic(null);
                 } else {
                     Label badge = new Label(item.toUpperCase());
-                    badge.getStyleClass().add("badge-info"); // Clase estándar
+                    badge.getStyleClass().add("badge-info"); // Clase estÃ¡ndar
                     if ("admin".equalsIgnoreCase(item) || "administrador".equalsIgnoreCase(item)) {
                         badge.setStyle(
                                 "-fx-background-color: -fx-custom-color-primary-bg; -fx-text-fill: -fx-custom-color-primary;");
@@ -269,7 +269,7 @@ public class ReturnListController implements Injectable {
             if (lblDetailUser != null)
                 lblDetailUser.setText(returnRecord.getUserName() != null ? returnRecord.getUserName() : "-");
             if (lblDetailTotal != null)
-                lblDetailTotal.setText(String.format("%.2f €", returnRecord.getTotalRefunded()));
+                lblDetailTotal.setText(String.format("%.2f â‚¬", returnRecord.getTotalRefunded()));
 
             if (detailsItemsContainer != null) {
                 detailsItemsContainer.getChildren().clear();
@@ -285,14 +285,14 @@ public class ReturnListController implements Injectable {
                     Region spacer = new Region();
                     HBox.setHgrow(spacer, Priority.ALWAYS);
 
-                    Label subtotalLabel = new Label(String.format("%.2f €", detail.getSubtotal()));
+                    Label subtotalLabel = new Label(String.format("%.2f â‚¬", detail.getSubtotal()));
                     subtotalLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #1e293b;");
 
                     topRow.getChildren().addAll(nameLabel, spacer, subtotalLabel);
 
                     HBox bottomRow = new HBox();
                     Label qtyLabel = new Label(
-                            detail.getQuantity() + " x " + String.format("%.2f €", detail.getUnitPrice()));
+                            detail.getQuantity() + " x " + String.format("%.2f â‚¬", detail.getUnitPrice()));
                     qtyLabel.setStyle("-fx-text-fill: #64748b; -fx-font-size: 11px;");
                     bottomRow.getChildren().add(qtyLabel);
 
@@ -361,7 +361,7 @@ public class ReturnListController implements Injectable {
                 matchesText = reason.contains(filterText) || user.contains(filterText) || ticket.contains(filterText);
             }
 
-            // Filtro por método de pago
+            // Filtro por mÃ©todo de pago
             boolean matchesPayment = true;
             if (paymentFilter != null && !container.getBundle().getString("returns.filter.all").equals(paymentFilter)) {
                 if (container.getBundle().getString("returns.filter.cash").equalsIgnoreCase(paymentFilter)) {
@@ -397,14 +397,14 @@ public class ReturnListController implements Injectable {
         if (lblCount != null)
             lblCount.setText(String.format(container.getBundle().getString("returns.footer.records"), count));
         if (lblTotalRefunded != null)
-            lblTotalRefunded.setText(String.format("%.2f €", total));
+            lblTotalRefunded.setText(String.format("%.2f â‚¬", total));
 
         if (lblKpiTotal != null)
-            lblKpiTotal.setText(String.format("%.2f €", total));
+            lblKpiTotal.setText(String.format("%.2f â‚¬", total));
         if (lblKpiCount != null)
             lblKpiCount.setText(String.valueOf(count));
         if (lblKpiAverage != null)
-            lblKpiAverage.setText(String.format("%.2f €", average));
+            lblKpiAverage.setText(String.format("%.2f â‚¬", average));
         if (lblKpiLast != null)
             lblKpiLast.setText(lastReturnDate);
     }
@@ -422,7 +422,7 @@ public class ReturnListController implements Injectable {
         loadReturns();
     }
 
-    // Filtros Rápidos
+    // Filtros RÃ¡pidos
     @FXML
     private void handleFilterToday() {
         if (datePickerStart != null)

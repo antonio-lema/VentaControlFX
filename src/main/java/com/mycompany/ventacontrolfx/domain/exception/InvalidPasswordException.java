@@ -1,11 +1,11 @@
 package com.mycompany.ventacontrolfx.domain.exception;
 
 /**
- * Excepción lanzada cuando la contraseña proporcionada no coincide con la
+ * ExcepciÃ³n lanzada cuando la contraseÃ±a proporcionada no coincide con la
  * almacenada.
  */
 public class InvalidPasswordException extends BusinessException {
     public InvalidPasswordException() {
-        super("La contraseña proporcionada es incorrecta.");
+        super("La contraseÃ±a proporcionada es incorrecta.");
     }
 }

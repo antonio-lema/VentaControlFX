@@ -8,7 +8,7 @@ public class Category {
     private double defaultIva = 21.0;
     private Integer taxGroupId; // Tax Engine V2
     private String taxGroupName;
-    private Integer parentCategoryId; // Jerarquías (Subcategorías)
+    private Integer parentCategoryId; // JerarquÃ­as (SubcategorÃ­as)
 
     public Category() {
         this.visible = true;

@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Motor avanzado de promociones que orquestra la aplicación de reglas
+ * Motor avanzado de promociones que orquestra la aplicaciÃ³n de reglas
  * complejas.
  */
 public class PromotionEngine {
@@ -26,7 +26,7 @@ public class PromotionEngine {
         try {
             List<Promotion> activePromos = promotionRepository.getActive();
 
-            // 1. Simular promociones por PRODUCTO/CATEGORÍA (Nivel de ítem: % o fijo)
+            // 1. Simular promociones por PRODUCTO/CATEGORÃA (Nivel de Ã­tem: % o fijo)
             PromotionResult itemResult = new PromotionResult();
             for (CartItem item : items) {
                 applyItemLevelPromos(item, activePromos, itemResult);
@@ -67,7 +67,7 @@ public class PromotionEngine {
 
         for (Promotion p : promos) {
             if (p.getType() == PromotionType.VOLUME_DISCOUNT)
-                continue; // Saltamos volumen aquí
+                continue; // Saltamos volumen aquÃ­
 
             boolean appliesByProduct = p.getScope() == PromotionScope.PRODUCT && p.getAffectedIds().contains(productId);
             boolean appliesByCategory = p.getScope() == PromotionScope.CATEGORY
@@ -117,10 +117,10 @@ public class PromotionEngine {
                 int applications = totalQty / (buyQty + freeQty);
                 int totalFreeUnits = applications * freeQty;
 
-                // 2. Ordenar por precio ascendente (REGLA: el más barato es gratis)
+                // 2. Ordenar por precio ascendente (REGLA: el mÃ¡s barato es gratis)
                 allUnits.sort(java.util.Comparator.comparingDouble(u -> u.price));
 
-                // 3. Aplicar el descuento unitario a las N unidades más baratas
+                // 3. Aplicar el descuento unitario a las N unidades mÃ¡s baratas
                 for (int i = 0; i < totalFreeUnits; i++) {
                     UnitPriceRecord freeUnit = allUnits.get(i);
                     res.addDiscount(freeUnit.productId, freeUnit.price,
@@ -144,7 +144,7 @@ public class PromotionEngine {
                 double discount = calculateDiscount(currentSubtotal, p);
                 if (discount > 0) {
                     res.addDiscount(-1, discount, p.getName());
-                    currentSubtotal -= discount; // Aplicación cascada
+                    currentSubtotal -= discount; // AplicaciÃ³n cascada
                 }
             }
         }

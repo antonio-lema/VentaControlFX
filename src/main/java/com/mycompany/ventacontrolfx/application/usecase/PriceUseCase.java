@@ -29,15 +29,15 @@ public class PriceUseCase {
         Optional<Price> priceOpt = priceRepository.getActivePrice(productId, priceListId);
 
         if (priceOpt.isEmpty()) {
-            throw new BusinessException("No se encontró un precio activo para el producto ID: " + productId);
+            throw new BusinessException("No se encontrÃ³ un precio activo para el producto ID: " + productId);
         }
 
         Price p = priceOpt.get();
-        // Nota: En una implementación más completa, buscaríamos el nombre de la lista.
+        // Nota: En una implementaciÃ³n mÃ¡s completa, buscarÃ­amos el nombre de la lista.
         // Por ahora simplificamos o usamos un valor fijo si solo hay una lista inicial.
         return new PriceInfoDTO(
                 p.getValue(),
-                "Lista #" + priceListId, // Podríamos cargar el nombre real desde el repo
+                "Lista #" + priceListId, // PodrÃ­amos cargar el nombre real desde el repo
                 p.getStartDate(),
                 p.getReason(),
                 p.isActiveAt(date));
@@ -52,11 +52,11 @@ public class PriceUseCase {
 
     /**
      * Actualiza el precio de un producto.
-     * Cierra el actual y abre uno nuevo de forma atómica.
+     * Cierra el actual y abre uno nuevo de forma atÃ³mica.
      */
     public void updateProductPrice(int productId, int priceListId, double newValue, String reason,
             LocalDateTime effectiveFrom) throws SQLException {
-        // 1. Validaciones básicas
+        // 1. Validaciones bÃ¡sicas
         if (newValue < 0) {
             throw new BusinessException("El precio no puede ser negativo.");
         }
@@ -67,7 +67,7 @@ public class PriceUseCase {
         Price newPrice = new Price(productId, priceListId, newValue, reason);
         newPrice.setStartDate(startDate);
 
-        // 3. Persistencia atómica (Cerrar anterior + Insertar nuevo)
+        // 3. Persistencia atÃ³mica (Cerrar anterior + Insertar nuevo)
         priceRepository.updateCurrentAndSave(newPrice);
 
         // 4. MANTENIMIENTO LACY: Actualizar campo denormalizado en la tabla products
@@ -78,12 +78,12 @@ public class PriceUseCase {
 
     /**
      * Sincroniza el precio con la columna antigua de la tabla products.
-     * Esto es temporal según la estrategia Expand & Contract.
+     * Esto es temporal segÃºn la estrategia Expand & Contract.
      */
     private void updateLegacyProductPrice(int productId, double price) throws SQLException {
-        // En una arquitectura ideal, esto lo haría un Event Handler,
-        // pero por simplicidad de migración lo ejecutamos aquí.
-        // Nota: Requeriría acceso al ProductRepository.
+        // En una arquitectura ideal, esto lo harÃ­a un Event Handler,
+        // pero por simplicidad de migraciÃ³n lo ejecutamos aquÃ­.
+        // Nota: RequerirÃ­a acceso al ProductRepository.
         // Si no queremos inyectar otro repo, podemos usar una query directa sencilla.
         try (java.sql.Connection conn = com.mycompany.ventacontrolfx.infrastructure.persistence.DBConnection
                 .getConnection()) {

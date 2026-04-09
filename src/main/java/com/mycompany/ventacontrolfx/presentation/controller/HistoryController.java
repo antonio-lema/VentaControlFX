@@ -87,7 +87,7 @@ public class HistoryController implements Injectable, Searchable {
             RealTimeSearchBinder.bind(txtSearchId, query -> handleSearch());
         }
 
-        // Verificación de permisos para Devoluciones
+        // VerificaciÃ³n de permisos para Devoluciones
         boolean canReturn = container.getUserSession().hasPermission("venta.devolucion");
         btnReturn.setVisible(canReturn);
         btnReturn.setManaged(canReturn);
@@ -110,7 +110,7 @@ public class HistoryController implements Injectable, Searchable {
                     setStyle("");
                 } else {
                     Sale s = getTableRow().getItem();
-                    setText(String.format("%.2f €", item)); // Formato de moneda sigue igual por ahora, pero podríamos
+                    setText(String.format("%.2f â‚¬", item)); // Formato de moneda sigue igual por ahora, pero podrÃ­amos
                                                             // usar cfg
                     if (s != null) {
                         if (s.isReturn()) {
@@ -132,9 +132,9 @@ public class HistoryController implements Injectable, Searchable {
                 if (empty || item == null) {
                     setText(null);
                 } else {
-                    String emoji = item.contains("Mixed") || item.contains("Mixto") ? "🔄 "
-                            : (container.getBundle().getString("payment.method.card").equalsIgnoreCase(item) ? "💳 "
-                                    : "💵 ");
+                    String emoji = item.contains("Mixed") || item.contains("Mixto") ? "ðŸ”„ "
+                            : (container.getBundle().getString("payment.method.card").equalsIgnoreCase(item) ? "ðŸ’³ "
+                                    : "ðŸ’µ ");
                     setText(emoji + item);
                 }
             }
@@ -258,17 +258,17 @@ public class HistoryController implements Injectable, Searchable {
         }
 
         // Emojis y colores integrados en el valor
-        lblTotalSalesCount.setText("📊 " + count);
-        lblTotalAmount.setText("💰 " + String.format("%.2f €", total));
-        lblTotalCash.setText("💵 " + String.format("%.2f €", cash));
-        lblTotalCard.setText("💳 " + String.format("%.2f €", card));
+        lblTotalSalesCount.setText("ðŸ“Š " + count);
+        lblTotalAmount.setText("ðŸ’° " + String.format("%.2f â‚¬", total));
+        lblTotalCash.setText("ðŸ’µ " + String.format("%.2f â‚¬", cash));
+        lblTotalCard.setText("ðŸ’³ " + String.format("%.2f â‚¬", card));
 
         if (lblCount != null)
-            lblCount.setText("🔍 " + count + " " + container.getBundle().getString("history.count_suffix"));
+            lblCount.setText("ðŸ” " + count + " " + container.getBundle().getString("history.count_suffix"));
     }
 
     private void showDetails(Sale sale) {
-        // Cargar detalles si no están presentes
+        // Cargar detalles si no estÃ¡n presentes
         if (sale.getDetails() == null || sale.getDetails().isEmpty()) {
             try {
                 List<SaleDetail> details = saleUseCase.getSaleDetails(sale.getSaleId()).getDetails();
@@ -300,18 +300,18 @@ public class HistoryController implements Injectable, Searchable {
         }
 
         btnReturn.setDisable(sale.isReturn());
-        // La opacidad y el color ahora se gestionan vía CSS (.btn-warning:disabled)
+        // La opacidad y el color ahora se gestionan vÃ­a CSS (.btn-warning:disabled)
 
         lblSaleFullDate.setText(sale.getSaleDateTime().format(fullFormatter) + "\n"
                 + container.getBundle().getString("receipt.attended_by") + ": " + sale.getUserName());
 
         String methodEmoji = container.getBundle().getString("payment.method.card")
-                .equalsIgnoreCase(sale.getPaymentMethod()) ? "💳 " : "💵 ";
+                .equalsIgnoreCase(sale.getPaymentMethod()) ? "ðŸ’³ " : "ðŸ’µ ";
         lblPaymentMethod.setText(
                 methodEmoji + (sale.getPaymentMethod().contains("Mixed") || sale.getPaymentMethod().contains("Mixto")
                         ? container.getBundle().getString("payment.method.mixed")
                         : sale.getPaymentMethod()));
-        lblTotalAmountDetail.setText(String.format("%.2f €", sale.getTotal()));
+        lblTotalAmountDetail.setText(String.format("%.2f â‚¬", sale.getTotal()));
         // El color se gestiona mediante clases de utilidad
         lblTotalAmountDetail.getStyleClass().removeAll("text-total", "text-error");
         lblTotalAmountDetail.getStyleClass().add(sale.isReturn() ? "text-error" : "text-total");
@@ -330,13 +330,13 @@ public class HistoryController implements Injectable, Searchable {
                     + ";");
 
             Label qtyLabel = new Label(
-                    "📦 " + detail.getQuantity() + " un. x " + String.format("%.2f", detail.getUnitPrice()) + " €");
+                    "ðŸ“¦ " + detail.getQuantity() + " un. x " + String.format("%.2f", detail.getUnitPrice()) + " â‚¬");
             qtyLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: #95a5a6;");
             nameBox.getChildren().addAll(nameLabel, qtyLabel);
 
             Region spacer = new Region();
             HBox.setHgrow(spacer, Priority.ALWAYS);
-            Label priceLabel = new Label("💰 " + String.format("%.2f €", detail.getLineTotal()));
+            Label priceLabel = new Label("ðŸ’° " + String.format("%.2f â‚¬", detail.getLineTotal()));
             priceLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #2c3e50;");
 
             row.getChildren().addAll(nameBox, spacer, priceLabel);
@@ -360,13 +360,13 @@ public class HistoryController implements Injectable, Searchable {
             return;
         }
 
-        // 1. Garantizar que los detalles estén cargados
+        // 1. Garantizar que los detalles estÃ©n cargados
         if (selected.getDetails() == null || selected.getDetails().isEmpty()) {
             try {
                 Sale fullSale = saleUseCase.getSaleDetails(selected.getSaleId());
                 if (fullSale != null && fullSale.getDetails() != null) {
                     selected.setDetails(fullSale.getDetails());
-                    // También actualizar clientId si no lo tiene (aunque debería)
+                    // TambiÃ©n actualizar clientId si no lo tiene (aunque deberÃ­a)
                     if (selected.getClientId() == null) {
                         selected.setClientId(fullSale.getClientId());
                     }
@@ -384,7 +384,7 @@ public class HistoryController implements Injectable, Searchable {
             return;
         }
 
-        // 2. Abrir vista previa de impresión
+        // 2. Abrir vista previa de impresiÃ³n
         ModalService.showStandardModal("/view/print_preview.fxml",
                 selected.getClientId() != null ? container.getBundle().getString("receipt.title.invoice")
                         : container.getBundle().getString("receipt.title.simplified"),
@@ -397,7 +397,7 @@ public class HistoryController implements Injectable, Searchable {
                             Product p = new Product();
                             p.setName(detail.getProductName());
                             p.setPrice(detail.getUnitPrice());
-                            p.setIva(detail.getIvaRate()); // Usar IVA histórico
+                            p.setIva(detail.getIvaRate()); // Usar IVA histÃ³rico
                             cartItems.add(new CartItem(p, detail.getQuantity()));
                         }
 
@@ -428,7 +428,7 @@ public class HistoryController implements Injectable, Searchable {
         if (selected == null)
             return;
 
-        // Garantizar que los detalles estén cargados antes de abrir el diálogo
+        // Garantizar que los detalles estÃ©n cargados antes de abrir el diÃ¡logo
         if (selected.getDetails() == null || selected.getDetails().isEmpty()) {
             try {
                 Sale fullSale = saleUseCase.getSaleDetails(selected.getSaleId());
@@ -448,7 +448,7 @@ public class HistoryController implements Injectable, Searchable {
             return;
         }
 
-        // Calcular el máximo devolvible (productos aún no devueltos) usando el precio
+        // Calcular el mÃ¡ximo devolvible (productos aÃºn no devueltos) usando el precio
         // real pagado
         double maxRefundable = selected.getDetails().stream()
                 .mapToDouble(d -> (d.getQuantity() - d.getReturnedQuantity()) * (d.getLineTotal() / d.getQuantity()))
@@ -460,7 +460,7 @@ public class HistoryController implements Injectable, Searchable {
                         .getClosureUseCase();
                 double cashInDrawer = closureUseCase.getCurrentCashInDrawer();
 
-                // Calcular cuánto del reembolso total es OBLIGATORIAMENTE en efectivo (basado
+                // Calcular cuÃ¡nto del reembolso total es OBLIGATORIAMENTE en efectivo (basado
                 // en el pago original)
                 double currentGrossTotal = selected.getTotal() + selected.getDiscountAmount();
                 double cashRatio = (currentGrossTotal > 0) ? selected.getCashAmount() / currentGrossTotal : 1.0;
@@ -468,17 +468,17 @@ public class HistoryController implements Injectable, Searchable {
 
                 if (maxCashRefundNeeded > cashInDrawer) {
                     String oldTicketHint = selected.getClosureId() != null
-                            ? "\n\n💡 *Recuerda*: Este ticket es de una sesión antigua."
+                            ? "\n\nðŸ’¡ *Recuerda*: Este ticket es de una sesiÃ³n antigua."
                             : "";
 
-                    boolean continuar = AlertUtil.showConfirmation("⚠️ Efectivo limitado",
-                            "Efectivo insuficiente para la parte de metálico",
+                    boolean continuar = AlertUtil.showConfirmation("âš ï¸ Efectivo limitado",
+                            "Efectivo insuficiente para la parte de metÃ¡lico",
                             String.format(
-                                    "El efectivo en caja (%.2f €) es menor que la parte pagada en efectivo del ticket (%.2f €).\n\n"
+                                    "El efectivo en caja (%.2f â‚¬) es menor que la parte pagada en efectivo del ticket (%.2f â‚¬).\n\n"
                                             +
-                                            "El sistema devolverá %.2f € a la tarjeta automaticamente, pero solo dispone de %.2f € "
-                                            + "físicos para la parte de efectivo.%s\n\n"
-                                            + "¿Deseas continuar con una devolución parcial o total sabiendo que el cajón quedará bajo?",
+                                            "El sistema devolverÃ¡ %.2f â‚¬ a la tarjeta automaticamente, pero solo dispone de %.2f â‚¬ "
+                                            + "fÃ­sicos para la parte de efectivo.%s\n\n"
+                                            + "Â¿Deseas continuar con una devoluciÃ³n parcial o total sabiendo que el cajÃ³n quedarÃ¡ bajo?",
                                     cashInDrawer, maxCashRefundNeeded, maxRefundable * (1 - cashRatio), cashInDrawer,
                                     oldTicketHint));
                     if (!continuar)
@@ -495,7 +495,7 @@ public class HistoryController implements Injectable, Searchable {
                     controller.init(selected);
                     controller.setOnSuccess((reason, items) -> {
                         try {
-                            // Validación final de efectivo justo antes de confirmar
+                            // ValidaciÃ³n final de efectivo justo antes de confirmar
                             double refundTotal = selected.getDetails().stream()
                                     .filter(d -> items.containsKey(d.getDetailId()))
                                     .mapToDouble(d -> items.get(d.getDetailId()) * (d.getLineTotal() / d.getQuantity()))
@@ -504,7 +504,7 @@ public class HistoryController implements Injectable, Searchable {
                             try {
                                 container.getClosureUseCase().validateCashAvailableForReturn(refundTotal);
                             } catch (SQLException cashEx) {
-                                AlertUtil.showError("❌ Efectivo insuficiente", cashEx.getMessage());
+                                AlertUtil.showError("âŒ Efectivo insuficiente", cashEx.getMessage());
                                 return;
                             }
 
@@ -515,7 +515,7 @@ public class HistoryController implements Injectable, Searchable {
                             loadSalesDirect();
                         } catch (SQLException e) {
                             e.printStackTrace();
-                            AlertUtil.showError("Error", "No se pudo procesar la devolución: " + e.getMessage());
+                            AlertUtil.showError("Error", "No se pudo procesar la devoluciÃ³n: " + e.getMessage());
                         }
                     });
                 });

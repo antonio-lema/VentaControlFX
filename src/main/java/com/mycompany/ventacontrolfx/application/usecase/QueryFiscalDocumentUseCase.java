@@ -14,13 +14,13 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Caso de uso: Consulta y verificación de documentos fiscales emitidos.
- * Clean Architecture — Capa de Aplicación.
+ * Caso de uso: Consulta y verificaciÃ³n de documentos fiscales emitidos.
+ * Clean Architecture â€” Capa de AplicaciÃ³n.
  *
  * Responsabilidades:
  * - Buscar documentos por referencia, venta, cliente o rango de fechas.
  * - Verificar integridad de los documentos (hash control).
- * - Proporcionar los datos para reimpresión/regeneración de PDF.
+ * - Proporcionar los datos para reimpresiÃ³n/regeneraciÃ³n de PDF.
  */
 public class QueryFiscalDocumentUseCase {
 
@@ -38,7 +38,7 @@ public class QueryFiscalDocumentUseCase {
         this.integrityService = new FiscalIntegrityService();
     }
 
-    // ── BÚSQUEDAS ──────────────────────────────────────────────────────
+    // â”€â”€ BÃšSQUEDAS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     /** Busca el documento de una venta concreta. */
     public Optional<FiscalDocument> findBySaleId(int saleId) throws SQLException {
@@ -52,31 +52,31 @@ public class QueryFiscalDocumentUseCase {
 
     /**
      * Listado filtrado para la pantalla de consulta.
-     * Cualquier parámetro puede ser null para ignorar ese filtro.
+     * Cualquier parÃ¡metro puede ser null para ignorar ese filtro.
      */
     public List<FiscalDocument> search(LocalDate from, LocalDate to,
             Status status, String docType) throws SQLException {
         return fiscalRepository.findByFilters(from, to, status, docType);
     }
 
-    // ── INTEGRIDAD ─────────────────────────────────────────────────────
+    // â”€â”€ INTEGRIDAD â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     /**
      * Verifica la integridad de un documento.
-     * Retorna false si el hash no coincide → posible manipulación en BD.
+     * Retorna false si el hash no coincide â†’ posible manipulaciÃ³n en BD.
      */
     public boolean verifyIntegrity(FiscalDocument doc) {
         return integrityService.verify(doc);
     }
 
-    // ── DATOS PARA REIMPRESIÓN ─────────────────────────────────────────
+    // â”€â”€ DATOS PARA REIMPRESIÃ“N â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     /**
-     * Reúne todos los datos necesarios para regenerar el PDF/ticket
+     * ReÃºne todos los datos necesarios para regenerar el PDF/ticket
      * desde los snapshots almacenados. El resultado es reproducible
      * en cualquier momento futuro con exactitud.
      *
-     * @return PrintData con toda la información necesaria para imprimir.
+     * @return PrintData con toda la informaciÃ³n necesaria para imprimir.
      */
     public PrintData getDataForReprint(int saleId) throws SQLException {
         Optional<FiscalDocument> docOpt = fiscalRepository.findBySaleId(saleId);
@@ -90,7 +90,7 @@ public class QueryFiscalDocumentUseCase {
         return new PrintData(doc, sale, lines);
     }
 
-    // ── DTO interno para reimpresión ────────────────────────────────────
+    // â”€â”€ DTO interno para reimpresiÃ³n â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     public static class PrintData {
         public final FiscalDocument document;

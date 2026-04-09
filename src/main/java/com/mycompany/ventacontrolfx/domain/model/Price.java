@@ -29,7 +29,7 @@ public class Price {
     }
 
     /**
-     * Regla de negocio: Verifica si el precio está vigente en una fecha dada.
+     * Regla de negocio: Verifica si el precio estÃ¡ vigente en una fecha dada.
      */
     public boolean isActiveAt(LocalDateTime dateTime) {
         if (dateTime == null)
@@ -71,7 +71,7 @@ public class Price {
 
     public void setProductId(int productId) {
         if (productId <= 0)
-            throw new IllegalArgumentException("ID de producto inválido");
+            throw new IllegalArgumentException("ID de producto invÃ¡lido");
         this.productId = productId;
     }
 
@@ -81,7 +81,7 @@ public class Price {
 
     public void setPriceListId(int priceListId) {
         if (priceListId <= 0)
-            throw new IllegalArgumentException("ID de lista de precios inválido");
+            throw new IllegalArgumentException("ID de lista de precios invÃ¡lido");
         this.priceListId = priceListId;
     }
 

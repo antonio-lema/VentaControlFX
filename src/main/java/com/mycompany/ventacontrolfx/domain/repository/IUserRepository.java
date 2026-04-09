@@ -23,12 +23,12 @@ public interface IUserRepository {
 
     int count() throws SQLException;
 
-    // Gestión de permisos individuales
+    // GestiÃ³n de permisos individuales
     boolean addIndividualPermission(int userId, int permissionId) throws SQLException;
 
     boolean removeIndividualPermission(int userId, int permissionId) throws SQLException;
 
-    // Métodos para recuperación de contraseña (Fix V-01)
+    // MÃ©todos para recuperaciÃ³n de contraseÃ±a (Fix V-01)
     void saveRecoveryCode(String email, String codeHash, java.time.LocalDateTime expiresAt) throws SQLException;
 
     boolean verifyRecoveryCode(String email, String code) throws SQLException;
@@ -36,23 +36,23 @@ public interface IUserRepository {
     void markRecoveryCodeAsUsed(String email, String code) throws SQLException;
 
     /**
-     * Busca el email asociado a un nombre de usuario SIN requerir sesión activa.
+     * Busca el email asociado a un nombre de usuario SIN requerir sesiÃ³n activa.
      * Solo devuelve el email, sin exponer datos sensibles del usuario.
-     * Usado para el flujo de recuperación de contraseña anónimo.
+     * Usado para el flujo de recuperaciÃ³n de contraseÃ±a anÃ³nimo.
      */
     String findEmailByUsername(String username) throws SQLException;
 
     /**
-     * Cuenta cuántos intentos de verificación fallidos hay para un email/código
+     * Cuenta cuÃ¡ntos intentos de verificaciÃ³n fallidos hay para un email/cÃ³digo
      * activo.
-     * Usado para implementar rate limiting en la recuperación de contraseña.
+     * Usado para implementar rate limiting en la recuperaciÃ³n de contraseÃ±a.
      */
     int getRecoveryAttempts(String email) throws SQLException;
 
     /**
-     * Incrementa el contador de intentos fallidos para los códigos activos de ese
+     * Incrementa el contador de intentos fallidos para los cÃ³digos activos de ese
      * email.
-     * Si supera el límite (MAX_ATTEMPTS=5), invalida el código automáticamente.
+     * Si supera el lÃ­mite (MAX_ATTEMPTS=5), invalida el cÃ³digo automÃ¡ticamente.
      */
     void incrementRecoveryAttempts(String email) throws SQLException;
 }

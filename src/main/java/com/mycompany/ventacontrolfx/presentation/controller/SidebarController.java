@@ -65,7 +65,7 @@ public class SidebarController implements Injectable {
 
         try {
             setActiveButton(btnSell);
-            // Asegurar que el foco inicial no caiga en el botón de bloquear al final del
+            // Asegurar que el foco inicial no caiga en el botÃ³n de bloquear al final del
             // VBox
             Platform.runLater(() -> {
                 if (btnSell != null)
@@ -116,7 +116,7 @@ public class SidebarController implements Injectable {
             return;
         boolean wasVisible = container.isVisible();
 
-        // Acordeón estricto: forzar cierre de todo lo demás
+        // AcordeÃ³n estricto: forzar cierre de todo lo demÃ¡s
         collapseAll(true);
 
         if (!wasVisible) {
@@ -179,7 +179,7 @@ public class SidebarController implements Injectable {
     private void loadBranding(ServiceContainer container) {
         try {
             SaleConfig config = container.getICompanyConfigRepository().load();
-            // Nombre de la aplicación guardado
+            // Nombre de la aplicaciÃ³n guardado
             String appName = config.getAppName();
             if (appName != null && !appName.isBlank()) {
                 lblAppName.setText(appName);
@@ -225,7 +225,7 @@ public class SidebarController implements Injectable {
         if (authService == null)
             return;
 
-        // Forzamos visibilidad de Vender para evitar sidebar vacío
+        // Forzamos visibilidad de Vender para evitar sidebar vacÃ­o
         setVisible(btnSell, true);
 
         setVisible(btnHistory,
@@ -329,7 +329,7 @@ public class SidebarController implements Injectable {
         return null;
     }
 
-    // ─── PRINCIPAL ──────────────────────────────────────────
+    // â”€â”€â”€ PRINCIPAL â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     @FXML
     private void showSellView() {
@@ -446,9 +446,9 @@ public class SidebarController implements Injectable {
                 container.getBundle().getString("sidebar.staff_calendar"), container, null);
     }
 
-    // ─── ADMINISTRACIÓN ──────────────────────────────────────
+    // â”€â”€â”€ ADMINISTRACIÃ“N â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-    // ─── ADMINISTRACIÓN ──────────────────────────────────────
+    // â”€â”€â”€ ADMINISTRACIÃ“N â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     @FXML
     private void handleShowConfig() {
@@ -462,7 +462,7 @@ public class SidebarController implements Injectable {
         navigationService.navigateTo("/view/customization_panel.fxml");
     }
 
-    // ─── ACCIONES INFERIORES ─────────────────────────────────
+    // â”€â”€â”€ ACCIONES INFERIORES â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     @FXML
     private void handleLock() {

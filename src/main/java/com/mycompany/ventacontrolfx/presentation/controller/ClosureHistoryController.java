@@ -162,7 +162,7 @@ public class ClosureHistoryController implements Injectable {
                     setText(null);
                     setStyle("");
                 } else {
-                    setText(String.format("%+.2f €", item));
+                    setText(String.format("%+.2f â‚¬", item));
                     if (Math.abs(item) < 0.01)
                         setStyle("-fx-text-fill: -fx-custom-color-success-dark; -fx-font-weight: bold;");
                     else
@@ -181,7 +181,7 @@ public class ClosureHistoryController implements Injectable {
                 if (empty || item == null)
                     setText(null);
                 else
-                    setText(String.format("%.2f €", item));
+                    setText(String.format("%.2f â‚¬", item));
             }
         });
     }
@@ -263,10 +263,10 @@ public class ClosureHistoryController implements Injectable {
                 } else {
                     CashMovement mov = getTableRow().getItem();
                     if (mov != null && ("RETIRADA".equals(mov.getType()) || "DEVOLUCION".equals(mov.getType()))) {
-                        setText(String.format("-%.2f €", item));
+                        setText(String.format("-%.2f â‚¬", item));
                         setStyle("-fx-text-fill: #dc2626; -fx-font-weight: bold;");
                     } else {
-                        setText(String.format("+%.2f €", item));
+                        setText(String.format("+%.2f â‚¬", item));
                         setStyle("-fx-text-fill: #16a34a; -fx-font-weight: bold;");
                     }
                 }
@@ -329,11 +329,11 @@ public class ClosureHistoryController implements Injectable {
                 .count();
 
         lblTotalClosures.setText(String.valueOf(allClosures.size()));
-        lblTotalDifference.setText(String.format("%+.2f €", totalDiff));
+        lblTotalDifference.setText(String.format("%+.2f â‚¬", totalDiff));
         lblPendingReview.setText(String.valueOf(pending));
 
         try {
-            lblCurrentCash.setText(String.format("%.2f €", closureUseCase.getCurrentCashInDrawer()));
+            lblCurrentCash.setText(String.format("%.2f â‚¬", closureUseCase.getCurrentCashInDrawer()));
         } catch (SQLException e) {
             lblCurrentCash.setText("---");
         }
@@ -344,15 +344,15 @@ public class ClosureHistoryController implements Injectable {
             lblClosureDetailId.setText(String.format(container.getBundle().getString("closure.history.detail.title"), closure.getClosureId()));
 
             // Financial Breakdown
-            lblDetInitial.setText(String.format("%.2f €", closure.getInitialFund()));
-            // Simulación de desglose si no hay campos específicos aún
-            // En una versión real, esto vendría de una consulta agregada de movimientos
-            lblDetSales.setText(String.format("%.2f €",
+            lblDetInitial.setText(String.format("%.2f â‚¬", closure.getInitialFund()));
+            // SimulaciÃ³n de desglose si no hay campos especÃ­ficos aÃºn
+            // En una versiÃ³n real, esto vendrÃ­a de una consulta agregada de movimientos
+            lblDetSales.setText(String.format("%.2f â‚¬",
                     closure.getTotalCash() - closure.getInitialFund() - closure.getCashIn() + closure.getCashOut()));
-            lblDetIn.setText(String.format("%.2f €", closure.getCashIn()));
-            lblDetOut.setText(String.format("%.2f €", closure.getCashOut()));
-            lblDetExpected.setText(String.format("%.2f €", closure.getExpectedCash()));
-            lblDetActual.setText(String.format("%.2f €", closure.getActualCash()));
+            lblDetIn.setText(String.format("%.2f â‚¬", closure.getCashIn()));
+            lblDetOut.setText(String.format("%.2f â‚¬", closure.getCashOut()));
+            lblDetExpected.setText(String.format("%.2f â‚¬", closure.getExpectedCash()));
+            lblDetActual.setText(String.format("%.2f â‚¬", closure.getActualCash()));
             lblDetNotes.setText(closure.getNotes() != null && !closure.getNotes().isEmpty() ? closure.getNotes()
                     : container.getBundle().getString("closure.history.detail.notes.none"));
 

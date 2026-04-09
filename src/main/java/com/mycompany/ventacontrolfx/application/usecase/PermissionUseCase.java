@@ -9,8 +9,8 @@ import java.util.List;
 
 /**
  * Caso de uso para gestionar permisos de usuarios.
- * Orquesta la lógica entre la UI y el repositorio de permisos.
- * Fix V-03: Los métodos de escritura requieren el permiso USUARIOS.
+ * Orquesta la lÃ³gica entre la UI y el repositorio de permisos.
+ * Fix V-03: Los mÃ©todos de escritura requieren el permiso USUARIOS.
  */
 public class PermissionUseCase {
 
@@ -23,7 +23,7 @@ public class PermissionUseCase {
     }
 
     /**
-     * Obtiene el catálogo completo de permisos disponibles en el sistema.
+     * Obtiene el catÃ¡logo completo de permisos disponibles en el sistema.
      */
     public List<Permission> getAllPermissions() throws SQLException {
         return permissionRepository.listAll();
@@ -42,7 +42,7 @@ public class PermissionUseCase {
      * Fix V-03: Requiere permiso USUARIOS.
      *
      * @param userId ID del usuario
-     * @param codes  Lista de códigos de permisos a asignar (e.g. ["VENTAS",
+     * @param codes  Lista de cÃ³digos de permisos a asignar (e.g. ["VENTAS",
      *               "HISTORIAL"])
      */
     public void savePermissionsForUser(int userId, List<String> codes) throws SQLException {
@@ -56,7 +56,7 @@ public class PermissionUseCase {
      * Fix V-03: Requiere permiso USUARIOS.
      *
      * @param roleId ID del rol
-     * @param codes  Lista de códigos de permisos a asignar
+     * @param codes  Lista de cÃ³digos de permisos a asignar
      */
     public void savePermissionsForRole(int roleId, List<String> codes) throws SQLException {
         authService.checkPermission("USUARIOS"); // Fix V-03

@@ -27,8 +27,8 @@ public class JdbcAppSettingsRepository implements IAppSettingsRepository {
         String sql = "INSERT INTO app_settings (setting_key, setting_value) VALUES (?, ?) " +
                 "ON DUPLICATE KEY UPDATE setting_value = ?, updated_at = CURRENT_TIMESTAMP";
         // Nota: ON DUPLICATE KEY es MySQL. Para SQLite usamos INSERT OR REPLACE.
-        // Como el proyecto parece usar SQLite/H2 estándar en algunos puntos, usaré una
-        // lógica más portable.
+        // Como el proyecto parece usar SQLite/H2 estÃ¡ndar en algunos puntos, usarÃ© una
+        // lÃ³gica mÃ¡s portable.
 
         try (Connection conn = DBConnection.getConnection()) {
             boolean exists = false;
