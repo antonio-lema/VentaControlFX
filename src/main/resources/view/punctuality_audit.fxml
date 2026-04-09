@@ -14,7 +14,7 @@
             <children>
                 <VBox spacing="5" HBox.hgrow="ALWAYS">
                     <children>
-                        <Label styleClass="text-title" text="Auditoría de Puntualidad" />
+                        <Label styleClass="text-title" text="Auditor\u00eda de Puntualidad" />
                         <Label styleClass="text-subtitle" text="Comparativa entre turnos programados y asistencia real" />
                     </children>
                 </VBox>

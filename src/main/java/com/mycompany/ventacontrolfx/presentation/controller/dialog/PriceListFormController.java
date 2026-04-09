@@ -46,7 +46,7 @@ public class PriceListFormController implements Injectable {
             chkIsActive.setSelected(priceList.isActive());
             chkIsDefault.setSelected(priceList.isDefault());
 
-            // Si es la tarifa por defecto, no dejamos desmarcarla desde aquÃ­ (para evitar
+            // Si es la tarifa por defecto, no dejamos desmarcarla desde aqu\u00c3\u00ad (para evitar
             // quedarnos sin ninguna)
             if (priceList.isDefault() || priceList.getId() == 1) {
                 chkIsDefault.setDisable(true);
@@ -61,7 +61,7 @@ public class PriceListFormController implements Injectable {
     @FXML
     private void handleSave() {
         if (txtName.getText() == null || txtName.getText().trim().isEmpty()) {
-            AlertUtil.showWarning("Campos vacÃ­os", "El nombre de la tarifa no puede estar vacÃ­o.");
+            AlertUtil.showWarning("Campos vac\u00c3\u00ados", "El nombre de la tarifa no puede estar vac\u00c3\u00ado.");
             return;
         }
 
@@ -74,7 +74,7 @@ public class PriceListFormController implements Injectable {
                         chkIsActive.isSelected(),
                         currentPriceList != null ? currentPriceList.getPriority() : 0);
                 priceListUseCase.save(newPL);
-                AlertUtil.showInfo("Ã‰xito", "Tarifa creada correctamente.");
+                AlertUtil.showInfo("\u00c3\u2030xito", "Tarifa creada correctamente.");
             } else {
                 currentPriceList.setName(txtName.getText().trim());
                 currentPriceList
@@ -82,11 +82,11 @@ public class PriceListFormController implements Injectable {
                 currentPriceList.setDefault(chkIsDefault.isSelected());
                 currentPriceList.setActive(chkIsActive.isSelected());
                 priceListUseCase.update(currentPriceList);
-                AlertUtil.showInfo("Ã‰xito", "Tarifa actualizada correctamente.");
+                AlertUtil.showInfo("\u00c3\u2030xito", "Tarifa actualizada correctamente.");
             }
             closeModal();
         } catch (SQLException ex) {
-            AlertUtil.showError("Error", "OcurriÃ³ un error al guardar la tarifa: " + ex.getMessage());
+            AlertUtil.showError("Error", "Ocurri\u00c3\u00b3 un error al guardar la tarifa: " + ex.getMessage());
         }
     }
 

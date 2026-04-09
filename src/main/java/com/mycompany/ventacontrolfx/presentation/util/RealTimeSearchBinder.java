@@ -4,17 +4,17 @@ import javafx.scene.control.TextField;
 import java.util.function.Consumer;
 
 /**
- * Binder central para aplicar el comportamiento de bÃºsqueda en tiempo real
- * a cualquier campo de texto de la aplicaciÃ³n.
+ * Binder central para aplicar el comportamiento de b\u00c3\u00basqueda en tiempo real
+ * a cualquier campo de texto de la aplicaci\u00c3\u00b3n.
  */
 public class RealTimeSearchBinder {
 
     /**
-     * Vincula un TextField con una acciÃ³n de bÃºsqueda aplicando un debounce
-     * estÃ¡ndar de 300ms.
+     * Vincula un TextField con una acci\u00c3\u00b3n de b\u00c3\u00basqueda aplicando un debounce
+     * est\u00c3\u00a1ndar de 300ms.
      * 
-     * @param searchField    El campo de texto de bÃºsqueda.
-     * @param onSearchAction La acciÃ³n a ejecutar (normalmente una llamada a un caso
+     * @param searchField    El campo de texto de b\u00c3\u00basqueda.
+     * @param onSearchAction La acci\u00c3\u00b3n a ejecutar (normalmente una llamada a un caso
      *                       de uso).
      */
     public static void bind(TextField searchField, Consumer<String> onSearchAction) {
@@ -22,13 +22,13 @@ public class RealTimeSearchBinder {
     }
 
     /**
-     * Vincula un TextField con una acciÃ³n de bÃºsqueda con delay personalizable.
+     * Vincula un TextField con una acci\u00c3\u00b3n de b\u00c3\u00basqueda con delay personalizable.
      */
     public static void bind(TextField searchField, double delayMs, Consumer<String> onSearchAction) {
         SearchDebouncer debouncer = new SearchDebouncer(delayMs, onSearchAction);
 
         searchField.textProperty().addListener((observable, oldValue, newValue) -> {
-            // No disparamos bÃºsqueda si el texto es nulo (por seguridad)
+            // No disparamos b\u00c3\u00basqueda si el texto es nulo (por seguridad)
             String query = (newValue == null) ? "" : newValue.trim();
             debouncer.feed(query);
         });

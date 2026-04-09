@@ -43,11 +43,11 @@ import com.mycompany.ventacontrolfx.infrastructure.config.Injectable;
 import com.mycompany.ventacontrolfx.infrastructure.config.ServiceContainer;
 
 /**
- * Controlador de la pantalla de GestiÃ³n de IVA y Subida Masiva de Precios.
+ * Controlador de la pantalla de Gesti\u00c3\u00b3n de IVA y Subida Masiva de Precios.
  *
- * Soporta 5 tipos de agrupaciÃ³n para la actualizaciÃ³n masiva:
- * 1. Por CategorÃ­a (o todas)
- * 2. Top Vendidos (Top N en Ãºltimos N dÃ­as)
+ * Soporta 5 tipos de agrupaci\u00c3\u00b3n para la actualizaci\u00c3\u00b3n masiva:
+ * 1. Por Categor\u00c3\u00ada (o todas)
+ * 2. Top Vendidos (Top N en \u00c3\u00baltimos N d\u00c3\u00adas)
  * 3. Sin Movimiento / Slow-movers
  * 4. Rango de Precio
  * 5. Favoritos
@@ -62,7 +62,7 @@ public class VatManagementController implements Injectable {
         postInject();
     }
 
-    // â”€â”€ TAX GROUP CONFIG (V2.0) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // \u00e2\u201d\u20ac\u00e2\u201d\u20ac TAX GROUP CONFIG (V2.0) \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac
     @FXML
     private Label lblCurrentGlobalTaxGroup;
     @FXML
@@ -76,7 +76,7 @@ public class VatManagementController implements Injectable {
     @FXML
     private TextField txtCategoryReason;
 
-    // â”€â”€ SUBIDA MASIVA: selectores principales â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // \u00e2\u201d\u20ac\u00e2\u201d\u20ac SUBIDA MASIVA: selectores principales \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac
     @FXML
     private ComboBox<PriceList> cmbPriceListUpdate;
     @FXML
@@ -90,7 +90,7 @@ public class VatManagementController implements Injectable {
     @FXML
     private TextField txtPriceReason;
 
-    // â”€â”€ SUBIDA MASIVA: sub-paneles dinÃ¡micos â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // \u00e2\u201d\u20ac\u00e2\u201d\u20ac SUBIDA MASIVA: sub-paneles din\u00c3\u00a1micos \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac
     @FXML
     private HBox panelClone;
     @FXML
@@ -140,7 +140,7 @@ public class VatManagementController implements Injectable {
     @FXML
     private HBox panelFavorites;
 
-    // â”€â”€ HISTORIAL IVA â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // \u00e2\u201d\u20ac\u00e2\u201d\u20ac HISTORIAL IVA \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac
     @FXML
     private ComboBox<String> cmbHistoryScope;
     @FXML
@@ -158,7 +158,7 @@ public class VatManagementController implements Injectable {
     @FXML
     private TableColumn<TaxRevision, String> colReason;
 
-    // â”€â”€ QUICK DATE FILTERS (V2.0) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // \u00e2\u201d\u20ac\u00e2\u201d\u20ac QUICK DATE FILTERS (V2.0) \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac
     @FXML
     private HBox quickFilterContainer;
     @FXML
@@ -166,7 +166,7 @@ public class VatManagementController implements Injectable {
     private ToggleGroup histToggleGroup;
     private Integer histFilterDays = null;
 
-    // â”€â”€ IVA POR PRODUCTO â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // \u00e2\u201d\u20ac\u00e2\u201d\u20ac IVA POR PRODUCTO \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac
     @FXML
     private TextField txtVatProductSearch;
     @FXML
@@ -179,7 +179,7 @@ public class VatManagementController implements Injectable {
     private ObservableList<com.mycompany.ventacontrolfx.domain.model.Product> vatSelectedProducts = FXCollections
             .observableArrayList();
 
-    // â”€â”€ MANTENIMIENTO: TAX RATES â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // \u00e2\u201d\u20ac\u00e2\u201d\u20ac MANTENIMIENTO: TAX RATES \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac
     @FXML
     private TableView<TaxRate> taxRatesTable;
     @FXML
@@ -193,7 +193,7 @@ public class VatManagementController implements Injectable {
     @FXML
     private TableColumn<TaxRate, Void> colRateActions;
 
-    // â”€â”€ MANTENIMIENTO: TAX GROUPS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // \u00e2\u201d\u20ac\u00e2\u201d\u20ac MANTENIMIENTO: TAX GROUPS \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac
     @FXML
     private TableView<TaxGroup> taxGroupsTable;
     @FXML
@@ -205,7 +205,7 @@ public class VatManagementController implements Injectable {
     @FXML
     private TableColumn<TaxGroup, Void> colGroupActions;
 
-    // â”€â”€ HISTORIAL ACTUALIZACIONES DE PRECIO â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // \u00e2\u201d\u20ac\u00e2\u201d\u20ac HISTORIAL ACTUALIZACIONES DE PRECIO \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac
     @FXML
     private TableView<PriceUpdateLog> priceLogTable;
     @FXML
@@ -223,7 +223,7 @@ public class VatManagementController implements Injectable {
     @FXML
     private TableColumn<PriceUpdateLog, String> colLogReason;
 
-    // â”€â”€ Servicios â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // \u00e2\u201d\u20ac\u00e2\u201d\u20ac Servicios \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac
     private MassivePriceUpdateUseCase priceUpdateUseCase;
     private ICategoryRepository categoryRepository;
     private ITaxRepository taxRepository;
@@ -238,7 +238,7 @@ public class VatManagementController implements Injectable {
 
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
-    // â”€â”€ Constantes de agrupaciÃ³n â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // \u00e2\u201d\u20ac\u00e2\u201d\u20ac Constantes de agrupaci\u00c3\u00b3n \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac
     private static final String GROUP_CATEGORY = "vat.group.category";
     private static final String GROUP_TOP = "vat.group.top";
 
@@ -332,7 +332,7 @@ public class VatManagementController implements Injectable {
                         txtVatProductSearch.clear();
                     }
                 } else {
-                    AlertUtil.showWarning("No encontrado", "No se encontrÃ³ ningÃºn producto con ese nombre o SKU.");
+                    AlertUtil.showWarning("No encontrado", "No se encontr\u00c3\u00b3 ning\u00c3\u00ban producto con ese nombre o SKU.");
                 }
             }, null);
         });
@@ -354,7 +354,7 @@ public class VatManagementController implements Injectable {
                 setupHistoryFilter();
                 loadTaxCatalogData();
             });
-            // Cargar catÃ¡logo de impuestos inicial
+            // Cargar cat\u00c3\u00a1logo de impuestos inicial
             loadTaxCatalogData();
         }
     }
@@ -384,11 +384,11 @@ public class VatManagementController implements Injectable {
     }
 
     private void setupTaxGroupComboBoxes() {
-        // Configurar cÃ³mo se muestran los grupos en los combos
+        // Configurar c\u00c3\u00b3mo se muestran los grupos en los combos
         javafx.util.StringConverter<TaxGroup> converter = new javafx.util.StringConverter<>() {
             @Override
             public String toString(TaxGroup group) {
-                return group == null ? "â€”" : group.getName();
+                return group == null ? "\u00e2\u20ac\u201d" : group.getName();
             }
 
             @Override
@@ -400,9 +400,9 @@ public class VatManagementController implements Injectable {
         cmbCategoryTaxGroup.setConverter(converter);
     }
 
-    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+    // \u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090
     // SETUP
-    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+    // \u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090
 
     private void setupVatProductExplorer(List<Category> categories) {
         if (btnVatProductExplorer == null)
@@ -416,7 +416,7 @@ public class VatManagementController implements Injectable {
 
         for (Category cat : categories) {
             Menu catMenu = new Menu(cat.getName());
-            // Placeholder para forzar que el menÃº sea expandible
+            // Placeholder para forzar que el men\u00c3\u00ba sea expandible
             catMenu.getItems().add(new MenuItem("Cargando..."));
 
             catMenu.setOnShowing(e -> {
@@ -436,7 +436,7 @@ public class VatManagementController implements Injectable {
                     @SuppressWarnings("unchecked")
                     List<com.mycompany.ventacontrolfx.domain.model.Product> products = (List<com.mycompany.ventacontrolfx.domain.model.Product>) res;
 
-                    // OpciÃ³n para seleccionar TODOS
+                    // Opci\u00c3\u00b3n para seleccionar TODOS
                     Label lblSelectAll = new Label("   --- Seleccionar TODOS ---   ");
                     lblSelectAll.getStyleClass().add("menu-item-bold");
                     lblSelectAll.setStyle("-fx-text-fill: -color-primary; -fx-cursor: hand;");
@@ -458,7 +458,7 @@ public class VatManagementController implements Injectable {
                                     }
                                 }
                             }
-                            // Forzar actualizaciÃ³n de los checkboxes visibles en este menÃº
+                            // Forzar actualizaci\u00c3\u00b3n de los checkboxes visibles en este men\u00c3\u00ba
                             catMenu.getItems().forEach(item -> {
                                 if (item instanceof CustomMenuItem cmi && cmi.getContent() instanceof CheckBox cb) {
                                     // El listener del checkbox ya se encarga de la lista, solo actualizamos UI
@@ -483,8 +483,8 @@ public class VatManagementController implements Injectable {
                             cb.setPrefWidth(250);
 
                             CustomMenuItem item = new CustomMenuItem(cb, false);
-                            item.setUserData(p); // Guardar producto para facilitar actualizaciÃ³n masiva
-                            item.setHideOnClick(false); // Mantener el menÃº abierto para selecciÃ³n mÃºltiple
+                            item.setUserData(p); // Guardar producto para facilitar actualizaci\u00c3\u00b3n masiva
+                            item.setHideOnClick(false); // Mantener el men\u00c3\u00ba abierto para selecci\u00c3\u00b3n m\u00c3\u00baltiple
                             item.getStyleClass().add("vat-custom-menu-item");
 
                             cb.selectedProperty().addListener((obs, old, nv) -> {
@@ -581,7 +581,7 @@ public class VatManagementController implements Injectable {
                     String displayText = item.getName()
                             + (sku != null && !sku.trim().isEmpty() ? " (" + sku + ")" : "");
                     setText(displayText);
-                    // BotÃ³n para eliminar de la selecciÃ³n
+                    // Bot\u00c3\u00b3n para eliminar de la selecci\u00c3\u00b3n
                     Button btnRemove = new Button();
                     btnRemove.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.TRASH));
                     btnRemove.getStyleClass().add("estetica-btn-icon-danger");
@@ -613,14 +613,14 @@ public class VatManagementController implements Injectable {
                         updateSelectedCountText();
                     }
                 } else {
-                    AlertUtil.showWarning("No encontrado", "No se encontrÃ³ ningÃºn producto con ese nombre o SKU.");
+                    AlertUtil.showWarning("No encontrado", "No se encontr\u00c3\u00b3 ning\u00c3\u00ban producto con ese nombre o SKU.");
                 }
             }, null);
         });
     }
 
     private void updateSelectedCountText() {
-        lblSelectedCount.setText(selectedProducts.size() + " artÃ­culos seleccionados");
+        lblSelectedCount.setText(selectedProducts.size() + " art\u00c3\u00adculos seleccionados");
     }
 
     private void setupOperationTypeSelector() {
@@ -699,14 +699,14 @@ public class VatManagementController implements Injectable {
         colLogScope.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getScope()));
         colLogCategory.setCellValueFactory(cell -> {
             String catName = cell.getValue().getCategoryName();
-            return new SimpleStringProperty(catName != null ? catName : "â€”");
+            return new SimpleStringProperty(catName != null ? catName : "\u00e2\u20ac\u201d");
         });
         colLogValue.setCellValueFactory(cell -> {
             String type = cell.getValue().getUpdateType();
             double val = cell.getValue().getValue();
             String display = switch (type) {
                 case "percentage" -> String.format("%.2f%%", val);
-                case "fixed" -> String.format("%.2f â‚¬", val);
+                case "fixed" -> String.format("%.2f \u20AC", val);
                 case "rounding" -> String.format("x.%02.0f", val * 100);
                 default -> String.valueOf(val);
             };
@@ -733,7 +733,7 @@ public class VatManagementController implements Injectable {
 
         data.defaultGroup.ifPresent(dg -> cmbGlobalTaxGroup.getSelectionModel().select(dg));
 
-        // CategorÃ­as
+        // Categor\u00c3\u00adas
         cmbCategory.getItems().clear();
         for (Category cat : data.categories) {
             CheckBox cb = new CheckBox(cat.getName());
@@ -762,7 +762,7 @@ public class VatManagementController implements Injectable {
         cmbPriceCategory.setItems(priceCategories);
         cmbPriceCategory.getSelectionModel().selectFirst();
 
-        // Cargar listas de precios para el selector de actualizaciÃ³n masiva
+        // Cargar listas de precios para el selector de actualizaci\u00c3\u00b3n masiva
         ObservableList<PriceList> priceListsList = FXCollections.observableArrayList(data.priceLists);
         cmbPriceListUpdate.setItems(priceListsList);
         // Seleccionar la por defecto
@@ -791,7 +791,7 @@ public class VatManagementController implements Injectable {
             colGroupName.setCellValueFactory(new PropertyValueFactory<>("name"));
         if (colGroupDefault != null)
             colGroupDefault
-                    .setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().isDefault() ? "SÃ" : "â€”"));
+                    .setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().isDefault() ? "S\u00c3\u008d" : "\u00e2\u20ac\u201d"));
         if (colGroupRates != null)
             colGroupRates.setCellValueFactory(cell -> {
                 List<TaxRate> rates = cell.getValue().getRates();
@@ -871,16 +871,16 @@ public class VatManagementController implements Injectable {
     }
 
     private void setupHistoryFilter() {
-        cmbHistoryScope.setItems(FXCollections.observableArrayList("Global", "CategorÃ­a (Todo)", "Producto (Todo)"));
+        cmbHistoryScope.setItems(FXCollections.observableArrayList("Global", "Categor\u00c3\u00ada (Todo)", "Producto (Todo)"));
         cmbHistoryScope.getSelectionModel().selectFirst();
         cmbHistoryScope.getSelectionModel().selectedItemProperty()
                 .addListener((obs, old, nv) -> refreshHistory());
         refreshHistory();
     }
 
-    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-    // HANDLERS â€” IVA
-    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+    // \u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090
+    // HANDLERS \u00e2\u20ac\u201d IVA
+    // \u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090
 
     @FXML
     void handleUpdateGlobalTaxGroup(ActionEvent event) {
@@ -949,7 +949,7 @@ public class VatManagementController implements Injectable {
             showInfo(String.format(container.getBundle().getString("vat.group.success.category"), updatedCount));
             refreshHistory();
 
-            // Limpiar selecciÃ³n
+            // Limpiar selecci\u00c3\u00b3n
             cmbCategory.getItems().forEach(item -> {
                 javafx.scene.Node n = ((CustomMenuItem) item).getContent();
                 if (n instanceof CheckBox)
@@ -962,9 +962,9 @@ public class VatManagementController implements Injectable {
         }
     }
 
-    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-    // HANDLER â€” SUBIDA MASIVA DE PRECIOS
-    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+    // \u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090
+    // HANDLER \u00e2\u20ac\u201d SUBIDA MASIVA DE PRECIOS
+    // \u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090
 
     @FXML
     void handleMassivePriceUpdate(ActionEvent event) {
@@ -979,7 +979,7 @@ public class VatManagementController implements Injectable {
         String reason = txtPriceReason.getText();
 
         if (grouping == null) {
-            showWarning("Selecciona el tipo de agrupaciÃ³n.");
+            showWarning("Selecciona el tipo de agrupaci\u00c3\u00b3n.");
             return;
         }
         if (valueStr == null || valueStr.isBlank()) {
@@ -987,7 +987,7 @@ public class VatManagementController implements Injectable {
             return;
         }
         if (reason == null || reason.isBlank()) {
-            showWarning("El motivo es obligatorio para la auditorÃ­a.");
+            showWarning("El motivo es obligatorio para la auditor\u00c3\u00ada.");
             return;
         }
 
@@ -1015,10 +1015,10 @@ public class VatManagementController implements Injectable {
                 case GROUP_CATEGORY -> getCategoryIdFromPanel();
                 case GROUP_PRODUCTS -> selectedProducts.stream().map(p -> p.getId()).collect(Collectors.toList());
                 case GROUP_TOP ->
-                    new int[] { parseIntField(txtTopN, "NÃºmero Top"), parseIntField(txtTopDays, "DÃ­as Top") };
-                case GROUP_BOTTOM -> new int[] { parseIntField(txtBottomN, "NÃºmero Bottom"),
-                        parseIntField(txtBottomDays, "DÃ­as Bottom") };
-                case GROUP_SLOW -> parseIntField(txtSlowDays, "DÃ­as Slow");
+                    new int[] { parseIntField(txtTopN, "N\u00c3\u00bamero Top"), parseIntField(txtTopDays, "D\u00c3\u00adas Top") };
+                case GROUP_BOTTOM -> new int[] { parseIntField(txtBottomN, "N\u00c3\u00bamero Bottom"),
+                        parseIntField(txtBottomDays, "D\u00c3\u00adas Bottom") };
+                case GROUP_SLOW -> parseIntField(txtSlowDays, "D\u00c3\u00adas Slow");
                 case GROUP_RANGE ->
                     new double[] { parseDoubleField(txtMinPrice, "Min"), parseDoubleField(txtMaxPrice, "Max") };
                 case GROUP_CLONE -> cmbSourcePriceList.getSelectionModel().getSelectedItem();
@@ -1029,7 +1029,7 @@ public class VatManagementController implements Injectable {
                 if (GROUP_CLONE.equals(finalGrouping)) {
                     PriceList source = (PriceList) extra;
                     if (source == null)
-                        throw new BusinessException("No se seleccionÃ³ tarifa de origen.");
+                        throw new BusinessException("No se seleccion\u00c3\u00b3 tarifa de origen.");
                     priceUpdateUseCase.cloneAndAdjustPrices(source.getId(), priceListId, finalValue, finalReason,
                             startDate);
                     return -1;
@@ -1053,17 +1053,17 @@ public class VatManagementController implements Injectable {
                 clearPriceFields();
                 refreshPriceLog();
             }, (err) -> {
-                showError("Error al aplicar actualizaciÃ³n: " + err.getMessage());
+                showError("Error al aplicar actualizaci\u00c3\u00b3n: " + err.getMessage());
             });
 
         } catch (NumberFormatException e) {
-            showWarning("El valor introducido no es un nÃºmero vÃ¡lido.");
+            showWarning("El valor introducido no es un n\u00c3\u00bamero v\u00c3\u00a1lido.");
         } catch (Exception e) {
-            showError("Error en la preparaciÃ³n de la subida: " + e.getMessage());
+            showError("Error en la preparaci\u00c3\u00b3n de la subida: " + e.getMessage());
         }
     }
 
-    /** Aplica un porcentaje segÃºn la agrupaciÃ³n seleccionada. */
+    /** Aplica un porcentaje seg\u00c3\u00ban la agrupaci\u00c3\u00b3n seleccionada. */
     private int applyByGroupingPercentage(int priceListId, String grouping, double pct, String reason,
             java.time.LocalDateTime startDate, Object extra)
             throws Exception {
@@ -1103,11 +1103,11 @@ public class VatManagementController implements Injectable {
                         startDate);
             }
             case GROUP_FAVORITES -> priceUpdateUseCase.applyToFavorites(priceListId, pct, reason, true, startDate);
-            default -> throw new IllegalStateException("AgrupaciÃ³n no reconocida: " + grouping);
+            default -> throw new IllegalStateException("Agrupaci\u00c3\u00b3n no reconocida: " + grouping);
         };
     }
 
-    /** Aplica importe fijo segÃºn la agrupaciÃ³n seleccionada. */
+    /** Aplica importe fijo seg\u00c3\u00ban la agrupaci\u00c3\u00b3n seleccionada. */
     private int applyByGroupingFixed(int priceListId, String grouping, double amount, String reason,
             java.time.LocalDateTime startDate, Object extra) throws Exception {
         return switch (grouping) {
@@ -1148,11 +1148,11 @@ public class VatManagementController implements Injectable {
                         startDate);
             }
             case GROUP_FAVORITES -> priceUpdateUseCase.applyToFavorites(priceListId, amount, reason, false, startDate);
-            default -> throw new IllegalStateException("AgrupaciÃ³n no reconocida: " + grouping);
+            default -> throw new IllegalStateException("Agrupaci\u00c3\u00b3n no reconocida: " + grouping);
         };
     }
 
-    /** Aplica redondeo segÃºn la agrupaciÃ³n seleccionada. */
+    /** Aplica redondeo seg\u00c3\u00ban la agrupaci\u00c3\u00b3n seleccionada. */
     private int applyByGroupingRounding(int priceListId, String grouping, double target, String reason,
             java.time.LocalDateTime startDate, Object extra)
             throws Exception {
@@ -1196,7 +1196,7 @@ public class VatManagementController implements Injectable {
         };
     }
 
-    /** Devuelve el categoryId seleccionado o null si se eligiÃ³ "Todas". */
+    /** Devuelve el categoryId seleccionado o null si se eligi\u00c3\u00b3 "Todas". */
     private Integer getCategoryIdFromPanel() {
         Category selected = cmbPriceCategory != null
                 ? cmbPriceCategory.getSelectionModel().getSelectedItem()
@@ -1223,9 +1223,9 @@ public class VatManagementController implements Injectable {
             txtMaxPrice.clear();
     }
 
-    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+    // \u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090
     // HISTORIAL
-    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+    // \u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090
 
     @FXML
     private void handleUpdateProductTaxGroup(ActionEvent event) {
@@ -1361,8 +1361,8 @@ public class VatManagementController implements Injectable {
     public void handleRefreshHistory() {
         // Al refrescar quitamos filtros temporales para ver si hay algo nuevo
         histFilterDays = null;
-        // Al usar DateFilterUtils, el botÃ³n "Todo" se seleccionarÃ¡ solo si lo forzamos,
-        // pero lo mÃ¡s sencillo es reinicializar si queremos limpiar visualmente.
+        // Al usar DateFilterUtils, el bot\u00c3\u00b3n "Todo" se seleccionar\u00c3\u00a1 solo si lo forzamos,
+        // pero lo m\u00c3\u00a1s sencillo es reinicializar si queremos limpiar visualmente.
         DateFilterUtils.addQuickFilters(quickFilterContainer, (label) -> {
             if (label.equals(container.getBundle().getString("filter.date.today"))) {
                 histFilterDays = 1;
@@ -1428,13 +1428,13 @@ public class VatManagementController implements Injectable {
 
             priceLogTable.setItems(FXCollections.observableArrayList(logs));
         } catch (Exception ignored) {
-            // Tabla puede no existir aÃºn en BD antigua
+            // Tabla puede no existir a\u00c3\u00ban en BD antigua
         }
     }
 
-    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+    // \u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090
     // HELPERS
-    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+    // \u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090\u00e2\u2022\u0090
 
     private int parseIntField(TextField field, String fieldName) {
         if (field == null || field.getText().isBlank())

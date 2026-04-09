@@ -57,7 +57,7 @@ public class BusinessHoursController implements Injectable {
     private void setupUI() {
         gridSchedule.getChildren().clear();
         List<BusinessDay> schedule = currentConfig.getSchedule();
-        String[] dayNames = { "", "Lunes", "Martes", "MiÃ©rcoles", "Jueves", "Viernes", "SÃ¡bado", "Domingo" };
+        String[] dayNames = { "", "Lunes", "Martes", "Mi\u00c3\u00a9rcoles", "Jueves", "Viernes", "S\u00c3\u00a1bado", "Domingo" };
 
         for (int i = 1; i <= 7; i++) {
             final int dayIdx = i;
@@ -71,7 +71,7 @@ public class BusinessHoursController implements Injectable {
             vBoxShifts.setPadding(new javafx.geometry.Insets(5, 0, 5, 0));
             shiftContainers.put(dayIdx, vBoxShifts);
 
-            closedChecks[i] = new CheckBox("DÃ­a Cerrado");
+            closedChecks[i] = new CheckBox("D\u00c3\u00ada Cerrado");
             closedChecks[i].setSelected(dayData.isClosed());
             vBoxShifts.disableProperty().bind(closedChecks[i].selectedProperty());
 
@@ -88,14 +88,14 @@ public class BusinessHoursController implements Injectable {
             Button btnAdd = new Button();
             btnAdd.setGraphic(new FontAwesomeIconView(de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon.PLUS_CIRCLE));
             btnAdd.getStyleClass().add("btn-icon-primary");
-            btnAdd.setTooltip(new Tooltip("AÃ±adir otro turno"));
+            btnAdd.setTooltip(new Tooltip("A\u00c3\u00b1adir otro turno"));
             btnAdd.setOnAction(e -> addShiftRow(dayIdx, LocalTime.of(17, 0), LocalTime.of(21, 0), new ArrayList<>()));
             btnAdd.disableProperty().bind(closedChecks[i].selectedProperty());
 
             Button btnCopy = new Button();
             btnCopy.setGraphic(new FontAwesomeIconView(de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon.COPY));
             btnCopy.getStyleClass().add("btn-icon-secondary");
-            btnCopy.setTooltip(new Tooltip("Copiar a todos los demÃ¡s dÃ­as"));
+            btnCopy.setTooltip(new Tooltip("Copiar a todos los dem\u00c3\u00a1s d\u00c3\u00adas"));
             btnCopy.setOnAction(e -> copyShiftsToAll(dayIdx));
             btnCopy.disableProperty().bind(closedChecks[i].selectedProperty());
 
@@ -274,7 +274,7 @@ public class BusinessHoursController implements Injectable {
             configUseCase.saveConfig(currentConfig);
             closeWindow();
         } catch (Exception e) {
-            AlertUtil.showError("Error", "Formato de hora invÃ¡lido (HH:mm) en algÃºn campo.");
+            AlertUtil.showError("Error", "Formato de hora inv\u00c3\u00a1lido (HH:mm) en alg\u00c3\u00ban campo.");
         }
     }
 

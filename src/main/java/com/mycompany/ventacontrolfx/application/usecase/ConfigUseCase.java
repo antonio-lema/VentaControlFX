@@ -15,7 +15,7 @@ public class ConfigUseCase {
     }
 
     public void saveConfig(SaleConfig config) {
-        // PodrÃ­amos realizar validaciones de negocio aquÃ­,
+        // Podr\u00c3\u00adamos realizar validaciones de negocio aqu\u00c3\u00ad,
         // por ejemplo validar el formato del CIF o Email.
         repository.save(config);
     }

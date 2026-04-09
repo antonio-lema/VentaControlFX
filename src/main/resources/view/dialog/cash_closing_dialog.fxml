@@ -39,36 +39,36 @@
                 
                 <HBox alignment="CENTER_LEFT" spacing="10">
                     <Label text="Fondo Inicial:" styleClass="label-muted" minWidth="140" />
-                    <Label fx:id="lblInitFund" text="0,00 €" style="-fx-font-weight: bold;" HBox.hgrow="ALWAYS" maxWidth="Infinity" alignment="CENTER_RIGHT" />
+                    <Label fx:id="lblInitFund" text="0,00 \u20ac" style="-fx-font-weight: bold;" HBox.hgrow="ALWAYS" maxWidth="Infinity" alignment="CENTER_RIGHT" />
                 </HBox>
                 <HBox alignment="CENTER_LEFT" spacing="10">
                     <Label text="Ventas (+):" styleClass="label-muted" minWidth="140" />
-                    <Label fx:id="lblSales" text="0,00 €" style="-fx-text-fill: #16a34a; -fx-font-weight: bold;" HBox.hgrow="ALWAYS" maxWidth="Infinity" alignment="CENTER_RIGHT" />
+                    <Label fx:id="lblSales" text="0,00 \u20ac" style="-fx-text-fill: #16a34a; -fx-font-weight: bold;" HBox.hgrow="ALWAYS" maxWidth="Infinity" alignment="CENTER_RIGHT" />
                 </HBox>
                 <HBox alignment="CENTER_LEFT" spacing="10">
                     <Label text="Otros Ingresos (+):" styleClass="label-muted" minWidth="140" />
-                    <Label fx:id="lblCashIn" text="0,00 €" HBox.hgrow="ALWAYS" maxWidth="Infinity" alignment="CENTER_RIGHT" />
+                    <Label fx:id="lblCashIn" text="0,00 \u20ac" HBox.hgrow="ALWAYS" maxWidth="Infinity" alignment="CENTER_RIGHT" />
                 </HBox>
                 <HBox alignment="CENTER_LEFT" spacing="10">
                     <Label text="Devoluciones (-):" styleClass="label-muted" minWidth="140" />
-                    <Label fx:id="lblReturns" text="0,00 €" style="-fx-text-fill: #ef4444; -fx-font-weight: bold;" HBox.hgrow="ALWAYS" maxWidth="Infinity" alignment="CENTER_RIGHT" />
+                    <Label fx:id="lblReturns" text="0,00 \u20ac" style="-fx-text-fill: #ef4444; -fx-font-weight: bold;" HBox.hgrow="ALWAYS" maxWidth="Infinity" alignment="CENTER_RIGHT" />
                 </HBox>
                 <HBox alignment="CENTER_LEFT" spacing="10">
                     <Label text="Retiradas (-):" styleClass="label-muted" minWidth="140" />
-                    <Label fx:id="lblCashOut" text="0,00 €" HBox.hgrow="ALWAYS" maxWidth="Infinity" alignment="CENTER_RIGHT" />
+                    <Label fx:id="lblCashOut" text="0,00 \u20ac" HBox.hgrow="ALWAYS" maxWidth="Infinity" alignment="CENTER_RIGHT" />
                 </HBox>
                 
                 <Separator style="-fx-padding: 10 0;" />
                 
                 <VBox spacing="2">
                     <Label text="Efectivo Esperado:" styleClass="label-muted" />
-                    <Label fx:id="lblExpected" text="0,00 €" style="-fx-font-size: 20px; -fx-font-weight: 900; -fx-text-fill: -color-primary;" />
+                    <Label fx:id="lblExpected" text="0,00 \u20ac" style="-fx-font-size: 20px; -fx-font-weight: 900; -fx-text-fill: -color-primary;" />
                 </VBox>
             </VBox>
 
             <!-- Real (Input destacado) -->
             <VBox spacing="8" GridPane.columnIndex="1" GridPane.rowIndex="0">
-                <Label text="Efectivo Real Contado (€):" styleClass="label" />
+                <Label text="Efectivo Real Contado (\u20ac):" styleClass="label" />
                 <HBox spacing="10" alignment="CENTER_LEFT" styleClass="modern-input-container">
                     <FontAwesomeIconView glyphName="MONEY" size="20" fill="#22c55e" />
                     <TextField fx:id="txtActualAmount" promptText="0,00" HBox.hgrow="ALWAYS" styleClass="modern-input-field" style="-fx-font-size: 22px; -fx-font-weight: 900; -fx-text-fill: -fx-text-custom-main;" />
@@ -79,18 +79,18 @@
             <VBox spacing="5" GridPane.columnIndex="1" GridPane.rowIndex="1" 
                   alignment="CENTER" style="-fx-background-color: #f8fafc; -fx-padding: 15; -fx-background-radius: 12;">
                 <Label text="Diferencia / Descuadre" styleClass="label-muted" />
-                <Label fx:id="lblDifference" text="0,00 €" style="-fx-font-size: 24px; -fx-font-weight: 900; -fx-text-fill: #10b981;" />
-                <Label fx:id="lblDiffReason" text="✅ Caja cuadrada perfectamente" styleClass="trend-text" style="-fx-text-fill: #16a34a; -fx-font-weight: bold;" />
+                <Label fx:id="lblDifference" text="0,00 \u20ac" style="-fx-font-size: 24px; -fx-font-weight: 900; -fx-text-fill: #10b981;" />
+                <Label fx:id="lblDiffReason" text="\u2705 Caja cuadrada perfectamente" styleClass="trend-text" style="-fx-text-fill: #16a34a; -fx-font-weight: bold;" />
             </VBox>
         </GridPane>
 
         <!-- Observaciones / Notas -->
         <VBox spacing="8">
-            <Label text="Observaciones / Justificación:" styleClass="label" />
+            <Label text="Observaciones / Justificaci\u00f3n:" styleClass="label" />
             <TextArea fx:id="txtNotes" promptText="Motivo del descuadre, incidencias..." prefRowCount="3" wrapText="true" styleClass="text-field" />
         </VBox>
 
-        <!-- Botones de Acción -->
+        <!-- Botones de Acci\u00f3n -->
         <HBox spacing="15" alignment="CENTER_RIGHT" style="-fx-padding: 10 0 0 0;">
             <Button text="CANCELAR" onAction="#handleCancel" styleClass="btn-secondary" prefHeight="50" prefWidth="140" />
             <Button text="CONFIRMAR CIERRE" onAction="#handleClose" styleClass="btn-primary" prefHeight="50" HBox.hgrow="ALWAYS" maxWidth="Infinity">

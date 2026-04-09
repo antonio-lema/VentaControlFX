@@ -65,7 +65,7 @@ public class SidebarController implements Injectable {
 
         try {
             setActiveButton(btnSell);
-            // Asegurar que el foco inicial no caiga en el botÃ³n de bloquear al final del
+            // Asegurar que el foco inicial no caiga en el bot\u00c3\u00b3n de bloquear al final del
             // VBox
             Platform.runLater(() -> {
                 if (btnSell != null)
@@ -116,7 +116,7 @@ public class SidebarController implements Injectable {
             return;
         boolean wasVisible = container.isVisible();
 
-        // AcordeÃ³n estricto: forzar cierre de todo lo demÃ¡s
+        // Acorde\u00c3\u00b3n estricto: forzar cierre de todo lo dem\u00c3\u00a1s
         collapseAll(true);
 
         if (!wasVisible) {
@@ -179,7 +179,7 @@ public class SidebarController implements Injectable {
     private void loadBranding(ServiceContainer container) {
         try {
             SaleConfig config = container.getICompanyConfigRepository().load();
-            // Nombre de la aplicaciÃ³n guardado
+            // Nombre de la aplicaci\u00c3\u00b3n guardado
             String appName = config.getAppName();
             if (appName != null && !appName.isBlank()) {
                 lblAppName.setText(appName);
@@ -225,7 +225,7 @@ public class SidebarController implements Injectable {
         if (authService == null)
             return;
 
-        // Forzamos visibilidad de Vender para evitar sidebar vacÃ­o
+        // Forzamos visibilidad de Vender para evitar sidebar vac\u00c3\u00ado
         setVisible(btnSell, true);
 
         setVisible(btnHistory,
@@ -329,7 +329,7 @@ public class SidebarController implements Injectable {
         return null;
     }
 
-    // â”€â”€â”€ PRINCIPAL â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac PRINCIPAL \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac
 
     @FXML
     private void showSellView() {
@@ -446,9 +446,9 @@ public class SidebarController implements Injectable {
                 container.getBundle().getString("sidebar.staff_calendar"), container, null);
     }
 
-    // â”€â”€â”€ ADMINISTRACIÃ“N â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac ADMINISTRACI\u00c3\u201cN \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac
 
-    // â”€â”€â”€ ADMINISTRACIÃ“N â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac ADMINISTRACI\u00c3\u201cN \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac
 
     @FXML
     private void handleShowConfig() {
@@ -462,7 +462,7 @@ public class SidebarController implements Injectable {
         navigationService.navigateTo("/view/customization_panel.fxml");
     }
 
-    // â”€â”€â”€ ACCIONES INFERIORES â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac ACCIONES INFERIORES \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac
 
     @FXML
     private void handleLock() {

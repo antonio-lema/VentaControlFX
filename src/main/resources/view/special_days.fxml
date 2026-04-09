@@ -25,7 +25,7 @@
                 <VBox spacing="2" HBox.hgrow="ALWAYS">
                     <children>
                         <Label text="Festivos y Excepciones" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #1e293b;" />
-                        <Label text="Configura días que anulan el horario semanal estándar." style="-fx-text-fill: #64748b;" />
+                        <Label text="Configura d\u00edas que anulan el horario semanal est\u00e1ndar." style="-fx-text-fill: #64748b;" />
                     </children>
                 </VBox>
             </children>
@@ -36,7 +36,7 @@
         <!-- Input Card -->
         <VBox spacing="15" style="-fx-background-color: #f8fafc; -fx-padding: 20; -fx-background-radius: 12; -fx-border-color: #e2e8f0; -fx-border-radius: 12;">
             <children>
-                <Label text="AÑADIR NUEVA EXCEPCIÓN" style="-fx-font-weight: bold; -fx-font-size: 11px; -fx-text-fill: #94a3b8; -fx-letter-spacing: 1px;" />
+                <Label text="A\u00d1ADIR NUEVA EXCEPCI\u00d3N" style="-fx-font-weight: bold; -fx-font-size: 11px; -fx-text-fill: #94a3b8; -fx-letter-spacing: 1px;" />
                 <HBox spacing="15" alignment="BOTTOM_LEFT">
                     <children>
                         <VBox spacing="8" prefWidth="160">
@@ -47,7 +47,7 @@
                         </VBox>
                         <VBox spacing="8" HBox.hgrow="ALWAYS">
                             <children>
-                                <Label text="Motivo / Descripción" style="-fx-font-weight: bold; -fx-font-size: 12px;" />
+                                <Label text="Motivo / Descripci\u00f3n" style="-fx-font-weight: bold; -fx-font-size: 12px;" />
                                 <TextField fx:id="txtReason" promptText="Ej: Navidad, Reformas, Festivo Local..." prefHeight="35" style="-fx-background-radius: 6;" />
                             </children>
                         </VBox>
@@ -55,9 +55,9 @@
                 </HBox>
                 <HBox spacing="20" alignment="CENTER_LEFT">
                     <children>
-                        <CheckBox fx:id="chkClosed" text="Negocio Cerrado (Todo el día)" selected="true" style="-fx-font-weight: bold;" />
+                        <CheckBox fx:id="chkClosed" text="Negocio Cerrado (Todo el d\u00eda)" selected="true" style="-fx-font-weight: bold;" />
                         <Region HBox.hgrow="ALWAYS" />
-                        <Button text="AÑADIR A LA LISTA" onAction="#handleAdd" styleClass="btn-primary-saas" prefHeight="35" prefWidth="160">
+                        <Button text="A\u00d1ADIR A LA LISTA" onAction="#handleAdd" styleClass="btn-primary-saas" prefHeight="35" prefWidth="160">
                             <graphic><FontAwesomeIconView glyphName="PLUS" fill="white" /></graphic>
                         </Button>
                     </children>
@@ -68,7 +68,7 @@
         <!-- List Section -->
         <VBox spacing="10" VBox.vgrow="ALWAYS">
             <children>
-                <Label text="DÍAS CONFIGURADOS" style="-fx-font-weight: bold; -fx-font-size: 11px; -fx-text-fill: #94a3b8; -fx-letter-spacing: 1px;" />
+                <Label text="D\u00cdAS CONFIGURADOS" style="-fx-font-weight: bold; -fx-font-size: 11px; -fx-text-fill: #94a3b8; -fx-letter-spacing: 1px;" />
                 <ListView fx:id="listSpecials" VBox.vgrow="ALWAYS" style="-fx-background-radius: 12; -fx-border-radius: 12; -fx-border-color: #e2e8f0; -fx-background-insets: 0;" />
             </children>
         </VBox>

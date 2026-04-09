@@ -22,7 +22,7 @@ import java.util.Map;
 
 /**
  * Caso de Uso: Registro de Devoluciones (Refacturado por Swarm Agent).
- * Se encarga de la lÃ³gica transaccional de abonos y rectificativas.
+ * Se encarga de la l\u00c3\u00b3gica transaccional de abonos y rectificativas.
  */
 public class ReturnUseCase {
 
@@ -65,7 +65,7 @@ public class ReturnUseCase {
                 BigDecimal totalRefund = BigDecimal.ZERO;
                 boolean allReturned = true;
 
-                // 1. Validar y Calcular lÃ­neas de devoluciÃ³n
+                // 1. Validar y Calcular l\u00c3\u00adneas de devoluci\u00c3\u00b3n
                 for (SaleDetail d : saleDetails) {
                     if (quantitiesToReturn.containsKey(d.getProductId())) {
                         int qtyToReturnNow = quantitiesToReturn.get(d.getProductId());
@@ -101,17 +101,17 @@ public class ReturnUseCase {
                     BigDecimal cashToRefund = split[0];
                     BigDecimal cardToRefund = split[1];
 
-                    // 3. ValidaciÃ³n de Efectivo en Caja
+                    // 3. Validaci\u00c3\u00b3n de Efectivo en Caja
                     if (cashToRefund.compareTo(BigDecimal.ZERO) > 0 && cashClosureUseCase != null) {
                         try {
                             cashClosureUseCase.validateCashAvailableForReturn(cashToRefund.doubleValue());
                         } catch (Exception e) {
                             throw new InsufficientCashInDrawerException(
-                                    "No hay suficiente efectivo en el cierre actual para esta devoluciÃ³n.");
+                                    "No hay suficiente efectivo en el cierre actual para esta devoluci\u00c3\u00b3n.");
                         }
                     }
 
-                    // 4. GeneraciÃ³n de Factura Rectificativa (Documento)
+                    // 4. Generaci\u00c3\u00b3n de Factura Rectificativa (Documento)
                     String seriesCode = "R";
                     int nextNum = seriesRepository.getAndIncrement(seriesCode, conn);
                     SaleConfig company = configRepository.load();
@@ -142,7 +142,7 @@ public class ReturnUseCase {
 
                     // 6. Registrar en caja
                     if (cashToRefund.compareTo(BigDecimal.ZERO) > 0 && cashClosureUseCase != null) {
-                        String cashReason = String.format("[DevoluciÃ³n Ticket #%d] %s", saleId, reason);
+                        String cashReason = String.format("[Devoluci\u00c3\u00b3n Ticket #%d] %s", saleId, reason);
                         cashClosureUseCase.registerCashReturn(cashToRefund.doubleValue(), cashReason, userId, conn);
                     }
 
@@ -156,7 +156,7 @@ public class ReturnUseCase {
                 if (e instanceof InsufficientCashInDrawerException || e instanceof RefundLimitExceededException) {
                     throw e;
                 }
-                throw new SQLException("Error durante la transacciÃ³n de devoluciÃ³n: " + e.getMessage(), e);
+                throw new SQLException("Error durante la transacci\u00c3\u00b3n de devoluci\u00c3\u00b3n: " + e.getMessage(), e);
             }
         }
     }
@@ -165,7 +165,7 @@ public class ReturnUseCase {
         if (pdfService == null)
             return;
         try {
-            // ConversiÃ³n para compatibilidad con IFiscalPdfService.PrintData
+            // Conversi\u00c3\u00b3n para compatibilidad con IFiscalPdfService.PrintData
             FiscalDocument doc = FiscalDocument.builder()
                     .saleId(r.getSaleId())
                     .type(FiscalDocument.Type.RECTIFICATIVA)

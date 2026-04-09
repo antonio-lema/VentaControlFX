@@ -12,7 +12,7 @@
                 <FontAwesomeIconView glyphName="MONEY" size="24" fill="white"/>
             </StackPane>
             <VBox spacing="2">
-                <Label text="Gestión de Tarifas" styleClass="view-title"/>
+                <Label text="Gesti\u00f3n de Tarifas" styleClass="view-title"/>
                 <Label text="Administra las listas de precios aplicables a ventas y clientes" styleClass="view-subtitle"/>
             </VBox>
             <Region HBox.hgrow="ALWAYS" />
@@ -35,7 +35,7 @@
                 <padding>
                     <Insets top="5" right="5" bottom="5" left="5"/>
                 </padding>
-                <!-- Las tarjetas de tarifas se generarán aquí dinámicamente -->
+                <!-- Las tarjetas de tarifas se generar\u00e1n aqu\u00ed din\u00e1micamente -->
             </FlowPane>
         </ScrollPane>
     </VBox>

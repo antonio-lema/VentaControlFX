@@ -19,7 +19,7 @@ public class ViewReturnDetailsController {
     public void setData(Return returnRecord) {
         if (returnRecord == null) return;
 
-        if (lblTitle != null) lblTitle.setText("DevoluciÃ³n #" + returnRecord.getReturnId());
+        if (lblTitle != null) lblTitle.setText("Devoluci\u00c3\u00b3n #" + returnRecord.getReturnId());
         if (lblSubtitle != null) lblSubtitle.setText("Relacionada con el Ticket #" + returnRecord.getSaleId());
         if (lblReason != null) lblReason.setText(returnRecord.getReason() != null ? returnRecord.getReason() : "Sin motivo registrado");
 
@@ -42,14 +42,14 @@ public class ViewReturnDetailsController {
             @Override protected void updateItem(Double price, boolean empty) {
                 super.updateItem(price, empty);
                 if (empty || price == null) setText(null);
-                else setText(String.format("%.2f â‚¬", price));
+                else setText(String.format("%.2f \u20AC", price));
             }
         });
         colSubtotal.setCellFactory(tc -> new TableCell<ReturnDetail, Double>() {
             @Override protected void updateItem(Double subtotal, boolean empty) {
                 super.updateItem(subtotal, empty);
                 if (empty || subtotal == null) setText(null);
-                else setText(String.format("%.2f â‚¬", subtotal));
+                else setText(String.format("%.2f \u20AC", subtotal));
             }
         });
     }

@@ -6,8 +6,8 @@
 
 <!--
     Layout:
-    [Sidebar (full-height) │ Header (abarca contenido + carrito)  ]
-    [                      │ Contenido principal   │ Carrito panel ]
+    [Sidebar (full-height) \u2502 Header (abarca contenido + carrito)  ]
+    [                      \u2502 Contenido principal   \u2502 Carrito panel ]
 -->
 <BorderPane xmlns:fx="http://javafx.com/fxml/1"
             fx:id="rootPane"

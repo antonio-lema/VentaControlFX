@@ -34,7 +34,7 @@
                     <Label text="Introduce los datos del nuevo usuario" styleClass="modern-register-subtitle"/>
                 </VBox>
 
-                <!-- ── DATOS BÁSICOS ── -->
+                <!-- \u2500\u2500 DATOS B\u00c1SICOS \u2500\u2500 -->
                 <VBox spacing="12">
 
                     <!-- Full Name -->
@@ -81,7 +81,7 @@
                         <VBox styleClass="modern-input-group" HBox.hgrow="ALWAYS">
                             <HBox styleClass="modern-input-container">
                                 <FontAwesomeIconView glyphName="LOCK" size="18" styleClass="sidebar-icon"/>
-                                <PasswordField fx:id="txtPassword" promptText="Contraseña" HBox.hgrow="ALWAYS" styleClass="modern-input-field"/>
+                                <PasswordField fx:id="txtPassword" promptText="Contrase\u00f1a" HBox.hgrow="ALWAYS" styleClass="modern-input-field"/>
                             </HBox>
                         </VBox>
                         <VBox styleClass="modern-input-group" HBox.hgrow="ALWAYS">
@@ -93,22 +93,22 @@
                     </HBox>
                 </VBox>
 
-                <!-- ── SECCIÓN DE PERMISOS ── -->
+                <!-- \u2500\u2500 SECCI\u00d3N DE PERMISOS \u2500\u2500 -->
                 <VBox spacing="10" style="-fx-padding: 16 0 0 0;">
-                    <!-- Cabecera de la sección -->
+                    <!-- Cabecera de la secci\u00f3n -->
                     <HBox alignment="CENTER_LEFT" spacing="8">
                         <FontAwesomeIconView glyphName="SHIELD" size="16" styleClass="sidebar-icon"/>
                         <Label text="Zonas de Acceso" styleClass="permission-section-title"/>
                     </HBox>
-                    <Label text="Selecciona las secciones a las que tendrá acceso este usuario"
+                    <Label text="Selecciona las secciones a las que tendr\u00e1 acceso este usuario"
                            styleClass="permission-section-subtitle" wrapText="true"/>
 
-                    <!-- Contenedor donde el controller renderiza los checkboxes dinámicamente -->
+                    <!-- Contenedor donde el controller renderiza los checkboxes din\u00e1micamente -->
                     <VBox fx:id="permissionsContainer" spacing="8" styleClass="permissions-box">
                         <padding>
                             <Insets top="10" right="15" bottom="10" left="15"/>
                         </padding>
-                        <!-- Los CheckBox se inyectan dinámicamente desde RegisterUserController -->
+                        <!-- Los CheckBox se inyectan din\u00e1micamente desde RegisterUserController -->
                     </VBox>
                 </VBox>
 

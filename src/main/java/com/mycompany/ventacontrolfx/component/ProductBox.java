@@ -27,7 +27,7 @@ public class ProductBox extends VBox {
         this.setCache(true);
         this.setCacheHint(javafx.scene.CacheHint.SPEED);
 
-        // â”€â”€ IMAGE SECTION (StackPane allows overlay of price badge) â”€â”€
+        // \u00e2\u201d\u20ac\u00e2\u201d\u20ac IMAGE SECTION (StackPane allows overlay of price badge) \u00e2\u201d\u20ac\u00e2\u201d\u20ac
         StackPane imageContainer = new StackPane();
         imageContainer.getStyleClass().add("product-image-container");
         imageContainer.setPrefHeight(150);
@@ -35,7 +35,7 @@ public class ProductBox extends VBox {
         imageContainer.setMaxHeight(150);
         imageContainer.setAlignment(Pos.CENTER);
 
-        // Clip dinÃ¡mico: se ajusta al ancho del contenedor y solo redondea arriba
+        // Clip din\u00c3\u00a1mico: se ajusta al ancho del contenedor y solo redondea arriba
         Rectangle clip = new Rectangle();
         clip.widthProperty().bind(imageContainer.widthProperty());
         clip.heightProperty().bind(imageContainer.heightProperty().add(30)); // Altura extra para que el redondeo
@@ -93,7 +93,7 @@ public class ProductBox extends VBox {
             imageContainer.getChildren().add(discountBadge);
         }
 
-        // â”€â”€ INFO SECTION â”€â”€
+        // \u00e2\u201d\u20ac\u00e2\u201d\u20ac INFO SECTION \u00e2\u201d\u20ac\u00e2\u201d\u20ac
         VBox infoBox = new VBox(4);
         infoBox.getStyleClass().add("product-info");
         infoBox.setAlignment(Pos.TOP_LEFT);
@@ -131,7 +131,7 @@ public class ProductBox extends VBox {
             infoBox.getChildren().add(skuLabel);
         }
 
-        // â”€â”€ ADD BUTTON â”€â”€
+        // \u00e2\u201d\u20ac\u00e2\u201d\u20ac ADD BUTTON \u00e2\u201d\u20ac\u00e2\u201d\u20ac
         FontAwesomeIconView addIcon = new FontAwesomeIconView();
         addIcon.setGlyphName("PLUS");
         addIcon.setSize("11");

@@ -38,7 +38,7 @@
                                 <children>
                                     <FontAwesomeIconView glyphName="CALENDAR" fill="#94a3b8" size="14" />
                                     <DatePicker fx:id="datePickerStart" onAction="#loadClosures" promptText="%closure_history.filter.from" prefWidth="145"/>
-                                    <Label text="—" textFill="#94a3b8"/>
+                                    <Label text="\u2014" textFill="#94a3b8"/>
                                     <DatePicker fx:id="datePickerEnd" onAction="#loadClosures" promptText="%closure_history.filter.to" prefWidth="145"/>
                                 </children>
                             </HBox>
@@ -82,7 +82,7 @@
                                                 <StackPane styleClass="icon-bg-red"><FontAwesomeIconView glyphName="EXCLAMATION_TRIANGLE" fill="#dc2626" size="16"/></StackPane>
                                                 <Label text="%closure_history.kpi.total_difference" styleClass="kpi-label-saas" />
                                             </HBox>
-                                            <Label fx:id="lblTotalDifference" text="0.00 €" styleClass="kpi-value-saas" style="-fx-text-fill: #dc2626;" />
+                                            <Label fx:id="lblTotalDifference" text="0.00 \u20ac" styleClass="kpi-value-saas" style="-fx-text-fill: #dc2626;" />
                                             <Label text="%closure_history.kpi.desc.difference" styleClass="trend-text" />
                                         </children>
                                     </VBox>
@@ -104,7 +104,7 @@
                                                 <StackPane styleClass="icon-bg-green"><FontAwesomeIconView glyphName="MONEY" fill="#16a34a" size="16"/></StackPane>
                                                 <Label text="%closure_history.kpi.current_cash" styleClass="kpi-label-saas" />
                                             </HBox>
-                                            <Label fx:id="lblCurrentCash" text="0.00 €" styleClass="kpi-value-saas" style="-fx-text-fill: #16a34a;" />
+                                            <Label fx:id="lblCurrentCash" text="0.00 \u20ac" styleClass="kpi-value-saas" style="-fx-text-fill: #16a34a;" />
                                             <Label text="%closure_history.kpi.desc.theoretical" styleClass="trend-text" />
                                         </children>
                                     </VBox>
@@ -178,24 +178,24 @@
                                                         </columnConstraints>
                                                         <children>
                                                             <Label text="%closure_history.detail.initial_decl" GridPane.rowIndex="0" styleClass="trend-text"/>
-                                                            <Label fx:id="lblDetInitial" text="0.00 €" GridPane.rowIndex="0" GridPane.columnIndex="1" style="-fx-font-weight: bold;"/>
+                                                            <Label fx:id="lblDetInitial" text="0.00 \u20ac" GridPane.rowIndex="0" GridPane.columnIndex="1" style="-fx-font-weight: bold;"/>
                                                             
                                                             <Label text="%closure_history.detail.cash_sales" GridPane.rowIndex="1" styleClass="trend-text"/>
-                                                            <Label fx:id="lblDetSales" text="0.00 €" GridPane.rowIndex="1" GridPane.columnIndex="1" style="-fx-text-fill: #16a34a;"/>
+                                                            <Label fx:id="lblDetSales" text="0.00 \u20ac" GridPane.rowIndex="1" GridPane.columnIndex="1" style="-fx-text-fill: #16a34a;"/>
                                                             
                                                             <Label text="%closure_history.detail.manual_in" GridPane.rowIndex="2" styleClass="trend-text"/>
-                                                            <Label fx:id="lblDetIn" text="0.00 €" GridPane.rowIndex="2" GridPane.columnIndex="1" style="-fx-text-fill: #16a34a;"/>
+                                                            <Label fx:id="lblDetIn" text="0.00 \u20ac" GridPane.rowIndex="2" GridPane.columnIndex="1" style="-fx-text-fill: #16a34a;"/>
                                                             
                                                             <Label text="%closure_history.detail.manual_out" GridPane.rowIndex="3" styleClass="trend-text"/>
-                                                            <Label fx:id="lblDetOut" text="0.00 €" GridPane.rowIndex="3" GridPane.columnIndex="1" style="-fx-text-fill: #dc2626;"/>
+                                                            <Label fx:id="lblDetOut" text="0.00 \u20ac" GridPane.rowIndex="3" GridPane.columnIndex="1" style="-fx-text-fill: #dc2626;"/>
                                                             
                                                             <Label text="%closure_history.detail.total_expected" GridPane.rowIndex="4" style="-fx-font-weight: bold;"/>
-                                                            <Label fx:id="lblDetExpected" text="0.00 €" GridPane.rowIndex="4" GridPane.columnIndex="1" style="-fx-font-weight: bold;"/>
+                                                            <Label fx:id="lblDetExpected" text="0.00 \u20ac" GridPane.rowIndex="4" GridPane.columnIndex="1" style="-fx-font-weight: bold;"/>
                                                             
                                                             <Separator GridPane.rowIndex="5" GridPane.columnSpan="2" style="-fx-padding: 5 0;"/>
                                                             
                                                             <Label text="%closure_history.detail.total_counted" GridPane.rowIndex="6" style="-fx-font-weight: bold;"/>
-                                                            <Label fx:id="lblDetActual" text="0.00 €" GridPane.rowIndex="6" GridPane.columnIndex="1" style="-fx-font-weight: bold; -fx-font-size: 16px; -fx-text-fill: -fx-text-custom-main;"/>
+                                                            <Label fx:id="lblDetActual" text="0.00 \u20ac" GridPane.rowIndex="6" GridPane.columnIndex="1" style="-fx-font-weight: bold; -fx-font-size: 16px; -fx-text-fill: -fx-text-custom-main;"/>
                                                         </children>
                                                     </GridPane>
                                                 </children>

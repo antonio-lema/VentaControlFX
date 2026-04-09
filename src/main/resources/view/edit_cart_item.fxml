@@ -25,7 +25,7 @@
     <VBox spacing="15">
         <!-- Price Field -->
         <VBox spacing="8">
-            <Label text="Precio Unitario (€):" style="-fx-font-weight: bold; -fx-text-fill: #555;"/>
+            <Label text="Precio Unitario (\u20ac):" style="-fx-font-weight: bold; -fx-text-fill: #555;"/>
             <TextField fx:id="txtUnitPrice" styleClass="input-field-modern" prefHeight="45"/>
         </VBox>
 
@@ -34,14 +34,14 @@
             <Label text="Descuento Manual:" style="-fx-font-weight: bold; -fx-text-fill: #555;"/>
             <HBox spacing="10" alignment="CENTER_LEFT">
                 <TextField fx:id="txtDiscount" styleClass="input-field-modern" prefHeight="45" HBox.hgrow="ALWAYS" promptText="0.00"/>
-                <ToggleButton fx:id="toggleDiscountType" text="€" prefHeight="45" prefWidth="50" styleClass="toggle-button-modern-euro" selected="true"/>
+                <ToggleButton fx:id="toggleDiscountType" text="\u20ac" prefHeight="45" prefWidth="50" styleClass="toggle-button-modern-euro" selected="true"/>
             </HBox>
             <Label fx:id="lblDiscountHint" text="Descuento en valor absoluto" style="-fx-text-fill: #999; -fx-font-size: 11px;"/>
         </VBox>
 
         <!-- Observations Field -->
         <VBox spacing="8">
-            <Label text="Observación/Sugerencia:" style="-fx-font-weight: bold; -fx-text-fill: #555;"/>
+            <Label text="Observaci\u00f3n/Sugerencia:" style="-fx-font-weight: bold; -fx-text-fill: #555;"/>
             <TextArea fx:id="txtObservations" prefHeight="80" wrapText="true" promptText="Ej: Sin cebolla, poco hecho..."/>
         </VBox>
     </VBox>

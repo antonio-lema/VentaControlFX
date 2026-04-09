@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Entidad de dominio que representa una promociÃ³n o descuento.
+ * Entidad de dominio que representa una promoci\u00c3\u00b3n o descuento.
  */
 public class Promotion {
     private Integer id;
@@ -18,10 +18,10 @@ public class Promotion {
     private boolean active;
     private PromotionScope scope;
 
-    // IDs de productos o categorÃ­as afectados segÃºn el scope
+    // IDs de productos o categor\u00c3\u00adas afectados seg\u00c3\u00ban el scope
     private List<Integer> affectedIds = new ArrayList<>();
 
-    // LÃ³gica de Volumen (2x1, 3x2, etc.)
+    // L\u00c3\u00b3gica de Volumen (2x1, 3x2, etc.)
     private int buyQty;
     private int freeQty;
 
@@ -135,7 +135,7 @@ public class Promotion {
     }
 
     /**
-     * Verifica si la promociÃ³n es vÃ¡lida en el momento actual.
+     * Verifica si la promoci\u00c3\u00b3n es v\u00c3\u00a1lida en el momento actual.
      */
     public boolean isValidNow() {
         if (!active)

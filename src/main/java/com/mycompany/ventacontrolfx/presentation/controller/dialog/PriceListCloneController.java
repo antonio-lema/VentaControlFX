@@ -49,13 +49,13 @@ public class PriceListCloneController implements Injectable {
     @FXML
     private void handleConfirm() {
         if (getName().isEmpty()) {
-            AlertUtil.showWarning("Campo vacÃ­o", "El nombre de la tarifa no puede estar vacÃ­o.");
+            AlertUtil.showWarning("Campo vac\u00c3\u00ado", "El nombre de la tarifa no puede estar vac\u00c3\u00ado.");
             return;
         }
         try {
             getPercentage(); // Solo para verificar que no cause crash, aunque devuelve 0 si falla
         } catch (Exception e) {
-            AlertUtil.showWarning("Formato invÃ¡lido", "El porcentaje de ajuste debe ser un nÃºmero.");
+            AlertUtil.showWarning("Formato inv\u00c3\u00a1lido", "El porcentaje de ajuste debe ser un n\u00c3\u00bamero.");
             return;
         }
         confirmed = true;

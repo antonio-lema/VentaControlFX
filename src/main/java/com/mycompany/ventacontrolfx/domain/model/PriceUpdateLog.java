@@ -3,7 +3,7 @@ package com.mycompany.ventacontrolfx.domain.model;
 import java.time.LocalDateTime;
 
 /**
- * Registro histÃ³rico de una actualizaciÃ³n masiva de precios.
+ * Registro hist\u00c3\u00b3rico de una actualizaci\u00c3\u00b3n masiva de precios.
  */
 public class PriceUpdateLog {
     private int logId;

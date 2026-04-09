@@ -31,7 +31,7 @@
                     <Label text="Define el conjunto de permisos para este rol" styleClass="modern-register-subtitle"/>
                 </VBox>
 
-                <!-- ── DATOS DEL ROL ── -->
+                <!-- \u2500\u2500 DATOS DEL ROL \u2500\u2500 -->
                 <VBox spacing="12">
                     
                     <VBox styleClass="modern-input-group">
@@ -44,25 +44,25 @@
                     <VBox styleClass="modern-input-group">
                         <HBox styleClass="modern-input-container" style="-fx-alignment: top-left; -fx-padding: 8;">
                             <FontAwesomeIconView glyphName="INFO_CIRCLE" size="16" styleClass="sidebar-icon" style="-fx-translate-y: 5;"/>
-                            <TextArea fx:id="txtDescription" promptText="Descripción" wrapText="true" prefRowCount="3" HBox.hgrow="ALWAYS" styleClass="modern-input-field" style="-fx-background-color: transparent; -fx-border-width: 0;"/>
+                            <TextArea fx:id="txtDescription" promptText="Descripci\u00f3n" wrapText="true" prefRowCount="3" HBox.hgrow="ALWAYS" styleClass="modern-input-field" style="-fx-background-color: transparent; -fx-border-width: 0;"/>
                         </HBox>
                     </VBox>
                 </VBox>
 
-                <!-- ── SECCIÓN DE PERMISOS ── -->
+                <!-- \u2500\u2500 SECCI\u00d3N DE PERMISOS \u2500\u2500 -->
                 <VBox spacing="10" style="-fx-padding: 16 0 0 0;">
                     <HBox alignment="CENTER_LEFT" spacing="8">
                         <FontAwesomeIconView glyphName="SHIELD" size="16" styleClass="sidebar-icon"/>
                         <Label text="Permisos del Rol" styleClass="permission-section-title"/>
                     </HBox>
-                    <Label text="Selecciona qué acciones estarán permitidas para los usuarios con este rol"
+                    <Label text="Selecciona qu\u00e9 acciones estar\u00e1n permitidas para los usuarios con este rol"
                            styleClass="permission-section-subtitle" wrapText="true"/>
 
                     <VBox fx:id="permissionsContainer" spacing="8" styleClass="permissions-box">
                         <padding>
                             <Insets top="10" right="15" bottom="10" left="15"/>
                         </padding>
-                        <!-- Los CheckBox se inyectan dinámicamente desde el controlador -->
+                        <!-- Los CheckBox se inyectan din\u00e1micamente desde el controlador -->
                     </VBox>
                 </VBox>
 

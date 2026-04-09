@@ -26,7 +26,7 @@
                         <children>
                             <Label text="CONTROL DE TURNOS, VACACIONES Y FESTIVOS NACIONALES" style="-fx-text-fill: #94a3b8; -fx-font-size: 11px; -fx-font-weight: bold; -fx-letter-spacing: 1px;" />
                             <Region style="-fx-background-color: #3b82f6; -fx-min-width: 4; -fx-min-height: 4; -fx-background-radius: 2;" />
-                            <Label fx:id="lblSummary" text="España (Nacional)" style="-fx-text-fill: #3b82f6; -fx-font-size: 11px; -fx-font-weight: bold;" />
+                            <Label fx:id="lblSummary" text="Espa\u00f1a (Nacional)" style="-fx-text-fill: #3b82f6; -fx-font-size: 11px; -fx-font-weight: bold;" />
                         </children>
                     </HBox>
                 </children>
@@ -63,10 +63,10 @@
         <children>
             <Label text="LUNES" style="-fx-font-weight: 800; -fx-font-size: 12px; -fx-text-fill: #64748b; -fx-padding: 15;" GridPane.columnIndex="0" />
             <Label text="MARTES" style="-fx-font-weight: 800; -fx-font-size: 12px; -fx-text-fill: #64748b; -fx-padding: 15;" GridPane.columnIndex="1" />
-            <Label text="MIÉRCOLES" style="-fx-font-weight: 800; -fx-font-size: 12px; -fx-text-fill: #64748b; -fx-padding: 15;" GridPane.columnIndex="2" />
+            <Label text="MI\u00c9RCOLES" style="-fx-font-weight: 800; -fx-font-size: 12px; -fx-text-fill: #64748b; -fx-padding: 15;" GridPane.columnIndex="2" />
             <Label text="JUEVES" style="-fx-font-weight: 800; -fx-font-size: 12px; -fx-text-fill: #64748b; -fx-padding: 15;" GridPane.columnIndex="3" />
             <Label text="VIERNES" style="-fx-font-weight: 800; -fx-font-size: 12px; -fx-text-fill: #64748b; -fx-padding: 15;" GridPane.columnIndex="4" />
-            <Label text="SÁBADO" style="-fx-font-weight: 800; -fx-font-size: 12px; -fx-text-fill: #64748b; -fx-padding: 15;" GridPane.columnIndex="5" />
+            <Label text="S\u00c1BADO" style="-fx-font-weight: 800; -fx-font-size: 12px; -fx-text-fill: #64748b; -fx-padding: 15;" GridPane.columnIndex="5" />
             <Label text="DOMINGO" style="-fx-font-weight: 800; -fx-font-size: 12px; -fx-text-fill: #1e293b; -fx-padding: 15;" GridPane.columnIndex="6" />
         </children>
     </GridPane>

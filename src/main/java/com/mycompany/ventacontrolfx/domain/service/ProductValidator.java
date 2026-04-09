@@ -38,7 +38,7 @@ public class ProductValidator {
         }
 
         if (product.getCategoryId() <= 0) {
-            result.addError("Debe seleccionar una categorÃ­a vÃ¡lida.");
+            result.addError("Debe seleccionar una categor\u00c3\u00ada v\u00c3\u00a1lida.");
         }
 
         return result;

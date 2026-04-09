@@ -44,7 +44,7 @@ public class CategoryUseCase {
         authService.checkPermission("PRODUCTOS");
         repository.update(category);
 
-        // Propagar cambios a productos de esta categorÃ­a
+        // Propagar cambios a productos de esta categor\u00c3\u00ada
         productRepository.updateTaxRateByCategory(category.getId(), category.getDefaultIva());
         if (category.getTaxGroupId() != null) {
             productRepository.updateTaxGroupByCategory(category.getId(), category.getTaxGroupId());

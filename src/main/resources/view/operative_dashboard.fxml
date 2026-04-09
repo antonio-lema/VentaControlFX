@@ -11,7 +11,7 @@
       xmlns:fx="http://javafx.com/fxml/1" 
       fx:controller="com.mycompany.ventacontrolfx.presentation.controller.OperativeDashboardController">
     
-    <!-- ─── HEADER ─── -->
+    <!-- \u2500\u2500\u2500 HEADER \u2500\u2500\u2500 -->
     <HBox alignment="CENTER_LEFT" spacing="20" styleClass="dashboard-header">
         <padding><Insets top="25" right="30" bottom="25" left="30"/></padding>
         <children>
@@ -49,7 +49,7 @@
             <VBox spacing="30" style="-fx-padding: 30;">
                 <children>
                     
-                    <!-- ─── KPI CARDS ROW ─── -->
+                    <!-- \u2500\u2500\u2500 KPI CARDS ROW \u2500\u2500\u2500 -->
                     <HBox spacing="25" alignment="CENTER">
                         <children>
                             <!-- Card: Personal -->
@@ -73,7 +73,7 @@
                                         <Region HBox.hgrow="ALWAYS" />
                                         <Label fx:id="lblCashStatus" text="%dashboard.kpi.cash_open" style="-fx-font-weight: bold; -fx-font-size: 10px;" />
                                     </HBox>
-                                    <Label fx:id="lblCashAmount" text="0.00 €" styleClass="kpi-value" />
+                                    <Label fx:id="lblCashAmount" text="0.00 \u20ac" styleClass="kpi-value" />
                                     <Label text="%dashboard.kpi.cash_desc" styleClass="kpi-hint" />
                                 </children>
                             </VBox>
@@ -104,7 +104,7 @@
                         </children>
                     </HBox>
 
-                    <!-- ─── CONTENT AREA (Grid) ─── -->
+                    <!-- \u2500\u2500\u2500 CONTENT AREA (Grid) \u2500\u2500\u2500 -->
                     <GridPane hgap="30" vgap="30">
                         <columnConstraints>
                             <ColumnConstraints hgrow="ALWAYS" minWidth="600" />

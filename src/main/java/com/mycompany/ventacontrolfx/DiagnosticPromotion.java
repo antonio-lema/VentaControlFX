@@ -10,7 +10,7 @@ public class DiagnosticPromotion {
             JdbcPromotionRepository repo = new JdbcPromotionRepository();
             List<Promotion> activePromos = repo.getActive();
 
-            System.out.println("=== DIAGNÃ“STICO DE PROMOCIONES ACTIVAS ===");
+            System.out.println("=== DIAGN\u00c3\u201cSTICO DE PROMOCIONES ACTIVAS ===");
             if (activePromos.isEmpty()) {
                 System.out.println("No hay promociones activas en la base de datos.");
             } else {

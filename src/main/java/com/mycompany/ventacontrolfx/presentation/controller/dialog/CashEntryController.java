@@ -41,12 +41,12 @@ public class CashEntryController {
 
         comboType.setItems(FXCollections.observableArrayList(
                 "Cambio banco", "Fondo de reserva", "Ajuste manual",
-                "Ingreso extraordinario", "DonaciÃ³n", "Otro"));
+                "Ingreso extraordinario", "Donaci\u00c3\u00b3n", "Otro"));
         comboType.setValue("Cambio banco");
 
         try {
             double current = closureUseCase.getCurrentCashInDrawer();
-            lblCurrentCash.setText(String.format("%.2f â‚¬", current));
+            lblCurrentCash.setText(String.format("%.2f \u20AC", current));
         } catch (SQLException e) {
             lblCurrentCash.setText("No disponible");
         }
@@ -56,7 +56,7 @@ public class CashEntryController {
 
     @FXML
     private void handleConfirm() {
-        // â€” Validar importe
+        // \u00e2\u20ac\u201d Validar importe
         String amountText = txtAmount.getText().replace(",", ".").trim();
         if (amountText.isEmpty()) {
             AlertUtil.showWarning("Campo Obligatorio", "Debes introducir el importe a ingresar.");
@@ -66,18 +66,18 @@ public class CashEntryController {
         try {
             amount = Double.parseDouble(amountText);
         } catch (NumberFormatException e) {
-            AlertUtil.showError("Formato InvÃ¡lido", "El importe introducido no es un nÃºmero vÃ¡lido.");
+            AlertUtil.showError("Formato Inv\u00c3\u00a1lido", "El importe introducido no es un n\u00c3\u00bamero v\u00c3\u00a1lido.");
             return;
         }
         if (amount <= 0) {
-            AlertUtil.showError("Importe InvÃ¡lido", "El importe debe ser mayor que cero.");
+            AlertUtil.showError("Importe Inv\u00c3\u00a1lido", "El importe debe ser mayor que cero.");
             return;
         }
 
-        // â€” Validar motivo
+        // \u00e2\u20ac\u201d Validar motivo
         String reason = txtReason.getText().trim();
         if (reason.isEmpty()) {
-            AlertUtil.showWarning("Campo Obligatorio", "Es obligatorio introducir una justificaciÃ³n para el ingreso.");
+            AlertUtil.showWarning("Campo Obligatorio", "Es obligatorio introducir una justificaci\u00c3\u00b3n para el ingreso.");
             return;
         }
 

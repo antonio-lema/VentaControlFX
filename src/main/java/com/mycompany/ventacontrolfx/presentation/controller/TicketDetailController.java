@@ -27,9 +27,9 @@ import java.util.List;
 import java.util.ArrayList;
 
 /**
- * Controlador para la visualizaciÃ³n detallada de un ticket de venta.
- * RediseÃ±ado para ofrecer una estÃ©tica de ticket tÃ©rmico profesional
- * y coherente con la UI de la aplicaciÃ³n.
+ * Controlador para la visualizaci\u00c3\u00b3n detallada de un ticket de venta.
+ * Redise\u00c3\u00b1ado para ofrecer una est\u00c3\u00a9tica de ticket t\u00c3\u00a9rmico profesional
+ * y coherente con la UI de la aplicaci\u00c3\u00b3n.
  */
 public class TicketDetailController implements Injectable {
 
@@ -72,7 +72,7 @@ public class TicketDetailController implements Injectable {
             lblTicketId.setText("Ticket #" + sale.getSaleId());
             lblDate.setText(sale.getSaleDateTime() != null ? sale.getSaleDateTime().format(FMT) : "-");
 
-            // Estado de devoluciÃ³n
+            // Estado de devoluci\u00c3\u00b3n
             if (lblReturnBadge != null) {
                 lblReturnBadge.setVisible(sale.isReturn());
                 lblReturnBadge.setManaged(sale.isReturn());
@@ -95,11 +95,11 @@ public class TicketDetailController implements Injectable {
             lblPayment.setText(sale.getPaymentMethod() != null ? sale.getPaymentMethod().toUpperCase() : "N/D");
 
             // Totales
-            lblTotal.setText(String.format("%.2f â‚¬", sale.getTotal()));
-            lblIva.setText(String.format("%.2f â‚¬", sale.getIva()));
-            lblSubtotal.setText(String.format("%.2f â‚¬", sale.getTotal() - sale.getIva()));
+            lblTotal.setText(String.format("%.2f \u20AC", sale.getTotal()));
+            lblIva.setText(String.format("%.2f \u20AC", sale.getIva()));
+            lblSubtotal.setText(String.format("%.2f \u20AC", sale.getTotal() - sale.getIva()));
 
-            // ConstrucciÃ³n dinÃ¡mica de la lista de productos ( Receipt Look )
+            // Construcci\u00c3\u00b3n din\u00c3\u00a1mica de la lista de productos ( Receipt Look )
             renderItems(sale);
 
             // Desglose de impuestos detallado (V2)
@@ -137,16 +137,16 @@ public class TicketDetailController implements Injectable {
             qtyLabel.setPrefWidth(40);
             qtyLabel.setAlignment(javafx.geometry.Pos.CENTER);
 
-            Label totalLabel = new Label(String.format("%.2f â‚¬", detail.getLineTotal()));
+            Label totalLabel = new Label(String.format("%.2f \u20AC", detail.getLineTotal()));
             totalLabel.getStyleClass().add("item-total");
             totalLabel.setPrefWidth(80);
             totalLabel.setAlignment(javafx.geometry.Pos.CENTER_RIGHT);
 
             mainRow.getChildren().addAll(nameLabel, spacer, qtyLabel, totalLabel);
 
-            // Sub-fila para precio unitario e informaciÃ³n de devoluciÃ³n si aplica
+            // Sub-fila para precio unitario e informaci\u00c3\u00b3n de devoluci\u00c3\u00b3n si aplica
             if (detail.getReturnedQuantity() > 0) {
-                Label returnInfo = new Label(String.format("  âš  Devuelto: %d uds", detail.getReturnedQuantity()));
+                Label returnInfo = new Label(String.format("  \u00e2\u0161\u00a0 Devuelto: %d uds", detail.getReturnedQuantity()));
                 returnInfo.setStyle("-fx-text-fill: #ef4444; -fx-font-size: 11px; -fx-font-weight: bold;");
                 itemRow.getChildren().addAll(mainRow, returnInfo);
             } else {
@@ -185,12 +185,12 @@ public class TicketDetailController implements Injectable {
             Region spacer = new Region();
             HBox.setHgrow(spacer, Priority.ALWAYS);
 
-            Label basisLabel = new Label(String.format("Base: %.2fâ‚¬", summary.getTaxBasis()));
+            Label basisLabel = new Label(String.format("Base: %.2f\u20AC", summary.getTaxBasis()));
             basisLabel.getStyleClass().add("tax-detail-basis");
             basisLabel.setMinWidth(90);
             basisLabel.setAlignment(javafx.geometry.Pos.CENTER_RIGHT);
 
-            Label amountLabel = new Label(String.format("Cuota: %.2fâ‚¬", summary.getTaxAmount()));
+            Label amountLabel = new Label(String.format("Cuota: %.2f\u20AC", summary.getTaxAmount()));
             amountLabel.getStyleClass().add("tax-detail-amount");
             amountLabel.setMinWidth(90);
             amountLabel.setAlignment(javafx.geometry.Pos.CENTER_RIGHT);
@@ -215,7 +215,7 @@ public class TicketDetailController implements Injectable {
                             Product p = new Product();
                             p.setName(detail.getProductName());
                             p.setPrice(detail.getUnitPrice());
-                            p.setIva(detail.getIvaRate()); // Usar IVA histÃ³rico
+                            p.setIva(detail.getIvaRate()); // Usar IVA hist\u00c3\u00b3rico
                             cartItems.add(new CartItem(p, detail.getQuantity()));
                         }
 
@@ -231,7 +231,7 @@ public class TicketDetailController implements Injectable {
 
                     } catch (Exception e) {
                         e.printStackTrace();
-                        AlertUtil.showError("Error", "Error al preparar la vista previa de impresiÃ³n.");
+                        AlertUtil.showError("Error", "Error al preparar la vista previa de impresi\u00c3\u00b3n.");
                     }
                 });
     }

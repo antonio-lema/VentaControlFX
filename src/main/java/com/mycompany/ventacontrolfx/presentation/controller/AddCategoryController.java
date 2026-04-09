@@ -45,7 +45,7 @@ public class AddCategoryController implements Injectable {
         setupTaxGroupComboBox();
         loadTaxGroups();
 
-        // Listener para exclusiÃ³n mutua y sincronizaciÃ³n espejo
+        // Listener para exclusi\u00c3\u00b3n mutua y sincronizaci\u00c3\u00b3n espejo
         cmbTaxGroup.valueProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal != null) {
                 // Modo V2: Sincronizar campo IVA con el total del grupo
@@ -55,7 +55,7 @@ public class AddCategoryController implements Injectable {
                 txtIva.setText(String.valueOf(totalRate));
                 txtIva.setDisable(true);
             } else {
-                // Modo Legacy: Habilitar ediciÃ³n manual
+                // Modo Legacy: Habilitar edici\u00c3\u00b3n manual
                 txtIva.setDisable(false);
                 if (categoryToEdit != null) {
                     txtIva.setText(String.valueOf(categoryToEdit.getDefaultIva()));
@@ -86,7 +86,7 @@ public class AddCategoryController implements Injectable {
                 cmbTaxGroup.setValue(null);
             }
 
-            // Forzar actualizaciÃ³n de estado y sincronizaciÃ³n del campo IVA
+            // Forzar actualizaci\u00c3\u00b3n de estado y sincronizaci\u00c3\u00b3n del campo IVA
             if (category.getTaxGroupId() != null) {
                 TaxGroup currentGroup = cmbTaxGroup.getValue();
                 if (currentGroup != null) {

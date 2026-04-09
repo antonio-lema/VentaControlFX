@@ -65,7 +65,7 @@ public class PriceListUseCase {
         // 3. Clonar los precios con el multiplicador
         double multiplier = 1.0 + (percentage / 100.0);
         priceRepository.cloneAndAdjustPriceList(sourceId, targetId, multiplier,
-                "ClonaciÃ³n con ajuste del " + percentage + "%", java.time.LocalDateTime.now());
+                "Clonaci\u00c3\u00b3n con ajuste del " + percentage + "%", java.time.LocalDateTime.now());
 
         return new PriceList(targetId, newName, description, false, true, 0);
     }

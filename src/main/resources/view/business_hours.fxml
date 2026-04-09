@@ -23,7 +23,7 @@
                     </StackPane>
                     <VBox spacing="2">
                         <children>
-                            <Label text="Configuración de Horarios" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #1e293b;" />
+                            <Label text="Configuraci\u00f3n de Horarios" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #1e293b;" />
                             <Label text="Gestiona los turnos de apertura para el control de cumplimiento." style="-fx-text-fill: #64748b;" />
                         </children>
                     </VBox>
@@ -59,7 +59,7 @@
                 <children>
                     <HBox spacing="10" alignment="CENTER_LEFT">
                         <children>
-                            <Label text="Margen de cortesía:" style="-fx-font-weight: bold; -fx-text-fill: #475569;" />
+                            <Label text="Margen de cortes\u00eda:" style="-fx-font-weight: bold; -fx-text-fill: #475569;" />
                             <TextField fx:id="txtGracePeriod" prefWidth="50" style="-fx-background-radius: 4;" />
                             <Label text="minutos" style="-fx-text-fill: #64748b;" />
                             <Label>
@@ -76,7 +76,7 @@
                     <HBox spacing="10">
                         <children>
                             <Button text="CANCELAR" onAction="#handleCancel" styleClass="btn-secondary-saas" prefWidth="120" prefHeight="35" />
-                            <Button text="GUARDAR CONFIGURACIÓN" onAction="#handleSave" styleClass="btn-primary-saas" prefWidth="220" prefHeight="35" />
+                            <Button text="GUARDAR CONFIGURACI\u00d3N" onAction="#handleSave" styleClass="btn-primary-saas" prefWidth="220" prefHeight="35" />
                         </children>
                     </HBox>
                 </children>

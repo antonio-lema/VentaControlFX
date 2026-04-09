@@ -8,8 +8,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * ImplementaciÃ³n JDBC del repositorio de permisos.
- * Gestiona el catÃ¡logo de permisos y la asignaciÃ³n usuario-permiso.
+ * Implementaci\u00c3\u00b3n JDBC del repositorio de permisos.
+ * Gestiona el cat\u00c3\u00a1logo de permisos y la asignaci\u00c3\u00b3n usuario-permiso.
  */
 public class JdbcPermissionRepository implements IPermissionRepository {
 

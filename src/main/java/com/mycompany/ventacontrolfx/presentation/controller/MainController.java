@@ -337,7 +337,7 @@ public class MainController implements Injectable, com.mycompany.ventacontrolfx.
         loadComponent("/view/sidebar.fxml", sidebarContainer);
         loadComponent("/view/cart_panel.fxml", cartContainer);
 
-        // Conectar la visibilidad de la barra de bÃºsqueda con el header
+        // Conectar la visibilidad de la barra de b\u00c3\u00basqueda con el header
         if (headerController != null) {
             navigationService.setSearchBarVisibilityListener(shouldShow -> {
                 headerController.setSearchBarVisible(shouldShow);

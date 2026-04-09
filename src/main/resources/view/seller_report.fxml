@@ -23,8 +23,8 @@
                 <FontAwesomeIconView glyphName="LINE_CHART" size="24" fill="white"/>
             </StackPane>
             <VBox spacing="2">
-                <Label text="Análisis de Ventas por Vendedor" styleClass="view-title"/>
-                <Label text="Monitorización dinámica de KPIs de tu equipo comercial" styleClass="view-subtitle"/>
+                <Label text="An\u00e1lisis de Ventas por Vendedor" styleClass="view-title"/>
+                <Label text="Monitorizaci\u00f3n din\u00e1mica de KPIs de tu equipo comercial" styleClass="view-subtitle"/>
             </VBox>
             <Region HBox.hgrow="ALWAYS"/>
             
@@ -61,7 +61,7 @@
                         <Region HBox.hgrow="ALWAYS"/>
                         <StackPane styleClass="icon-bg-green"><FontAwesomeIconView glyphName="DOLLAR" fill="#10b981"/></StackPane>
                     </HBox>
-                    <Label fx:id="lblKpiTotal" text="0.00 €" styleClass="kpi-value-saas"/>
+                    <Label fx:id="lblKpiTotal" text="0.00 \u20ac" styleClass="kpi-value-saas"/>
                     <HBox alignment="CENTER_LEFT" spacing="6">
                         <Label fx:id="lblTrendTotal" text="+0%" styleClass="trend-badge-up"/>
                         <Label text="vs anterior" styleClass="trend-text"/>
@@ -75,7 +75,7 @@
                         <Region HBox.hgrow="ALWAYS"/>
                         <StackPane styleClass="icon-bg-purple"><FontAwesomeIconView glyphName="PIE_CHART" fill="#8b5cf6"/></StackPane>
                     </HBox>
-                    <Label fx:id="lblKpiMargin" text="0.00 €" styleClass="kpi-value-saas"/>
+                    <Label fx:id="lblKpiMargin" text="0.00 \u20ac" styleClass="kpi-value-saas"/>
                     <HBox alignment="CENTER_LEFT" spacing="6">
                         <Label fx:id="lblTrendMargin" text="+0%" styleClass="trend-badge-up"/>
                         <Label text="vs anterior" styleClass="trend-text"/>
@@ -89,7 +89,7 @@
                         <Region HBox.hgrow="ALWAYS"/>
                         <StackPane styleClass="icon-bg-blue"><FontAwesomeIconView glyphName="TAG" fill="#3b82f6"/></StackPane>
                     </HBox>
-                    <Label fx:id="lblKpiAvg" text="0.00 €" styleClass="kpi-value-saas"/>
+                    <Label fx:id="lblKpiAvg" text="0.00 \u20ac" styleClass="kpi-value-saas"/>
                     <HBox alignment="CENTER_LEFT" spacing="6">
                         <Label fx:id="lblTrendAvg" text="+0%" styleClass="trend-badge-neutral"/>
                         <Label text="vs anterior" styleClass="trend-text"/>
@@ -99,7 +99,7 @@
                 <!-- Transacciones -->
                 <VBox styleClass="kpi-card-saas, kpi-card-gray" prefWidth="250">
                     <HBox alignment="CENTER_LEFT" spacing="10">
-                        <Label text="Nº Transacciones" styleClass="kpi-label-saas"/>
+                        <Label text="N\u00ba Transacciones" styleClass="kpi-label-saas"/>
                         <Region HBox.hgrow="ALWAYS"/>
                         <StackPane styleClass="icon-bg-gray"><FontAwesomeIconView glyphName="SHOPPING_BASKET" fill="#64748b"/></StackPane>
                     </HBox>
@@ -117,8 +117,8 @@
                         <Region HBox.hgrow="ALWAYS"/>
                         <StackPane styleClass="icon-bg-gold"><FontAwesomeIconView glyphName="TROPHY" fill="#f59e0b"/></StackPane>
                     </HBox>
-                    <Label fx:id="lblKpiBest" text="—" styleClass="kpi-value-saas"/>
-                    <Label fx:id="lblBestPerformance" text="0.00 € / Mes" styleClass="trend-text"/>
+                    <Label fx:id="lblKpiBest" text="\u2014" styleClass="kpi-value-saas"/>
+                    <Label fx:id="lblBestPerformance" text="0.00 \u20ac / Mes" styleClass="trend-text"/>
                 </VBox>
                 
                 <!-- Objetivo -->
@@ -129,13 +129,13 @@
                         <Label fx:id="lblGoalPct" text="0%" styleClass="kpi-label-saas" style="-fx-font-weight: bold;"/>
                     </HBox>
                     <ProgressBar fx:id="progressGoal" progress="0.0" prefWidth="230" styleClass="progress-saas" style="-fx-min-height: 12px; -fx-translate-y: 8;"/>
-                    <Label fx:id="lblGoalText" text="0 / 15000 €" styleClass="trend-text" style="-fx-translate-y: 12;"/>
+                    <Label fx:id="lblGoalText" text="0 / 15000 \u20ac" styleClass="trend-text" style="-fx-translate-y: 12;"/>
                 </VBox>
             </FlowPane>
 
             <!-- ROW 2: Charts & Leaderboard -->
             <HBox spacing="24">
-                <!-- GRÁFICAS (Evolución y barras) -->
+                <!-- GR\u00c1FICAS (Evoluci\u00f3n y barras) -->
                 <VBox styleClass="widget-panel" HBox.hgrow="ALWAYS" spacing="16">
                     <HBox alignment="CENTER_LEFT">
                         <Label text="Rendimiento Comercial" styleClass="widget-title"/>
@@ -147,11 +147,11 @@
                              <Label text="Ventas Totales por Agente" styleClass="chart-label"/>
                              <BarChart fx:id="salesBarChart" legendVisible="false" VBox.vgrow="ALWAYS" animated="true">
                                 <xAxis><CategoryAxis label="Vendedor"/></xAxis>
-                                <yAxis><NumberAxis label="Ventas (€)"/></yAxis>
+                                <yAxis><NumberAxis label="Ventas (\u20ac)"/></yAxis>
                             </BarChart>
                         </VBox>
                         <VBox HBox.hgrow="ALWAYS">
-                            <Label text="Evolución Acumulada del Periodo" styleClass="chart-label"/>
+                            <Label text="Evoluci\u00f3n Acumulada del Periodo" styleClass="chart-label"/>
                             <LineChart fx:id="trendLineChart" legendVisible="true" VBox.vgrow="ALWAYS" animated="true" createSymbols="false">
                                 <xAxis><CategoryAxis label="Fecha"/></xAxis>
                                 <yAxis><NumberAxis/></yAxis>
@@ -174,7 +174,7 @@
                             <TableColumn fx:id="colTotal" text="Ventas Netas" prefWidth="120"/>
                             <TableColumn fx:id="colReturns" text="Devoluciones" prefWidth="110"/>
                             <TableColumn fx:id="colParticip" text="Contrib.% (Share)" prefWidth="120"/>
-                            <TableColumn fx:id="colGoal" text="Objetivo (3K€)" prefWidth="180"/>
+                            <TableColumn fx:id="colGoal" text="Objetivo (3K\u20ac)" prefWidth="180"/>
                             <TableColumn fx:id="colAvgTicket" text="Ticket Med." prefWidth="90"/>
                         </columns>
                     </TableView>
@@ -183,9 +183,9 @@
                 <!-- Right column: Pies -->
                 <VBox spacing="24" prefWidth="400" minWidth="380">
                     <VBox styleClass="widget-panel" VBox.vgrow="ALWAYS" spacing="15">
-                        <Label text="Distribución por Pagos" styleClass="widget-title"/>
+                        <Label text="Distribuci\u00f3n por Pagos" styleClass="widget-title"/>
                         <HBox alignment="CENTER" spacing="20" VBox.vgrow="ALWAYS">
-                            <!-- El gráfico circular ocupará una porción pero sin constreñirlo excesivamente -->
+                            <!-- El gr\u00e1fico circular ocupar\u00e1 una porci\u00f3n pero sin constre\u00f1irlo excesivamente -->
                             <PieChart fx:id="pieChartDistribution" legendVisible="false" minHeight="160" minWidth="160" prefHeight="180" prefWidth="180"/>
                             
                             <!-- Columna separada y ancla para las leyendas y progresos, forzando buen espaciado -->
@@ -196,7 +196,7 @@
                                         <StackPane styleClass="dot-cash"/>
                                         <Label text="Efectivo" styleClass="pie-label" style="-fx-font-weight: bold;"/>
                                         <Region HBox.hgrow="ALWAYS"/>
-                                        <Label fx:id="lblCashTotal" text="0 €" styleClass="pie-value" style="-fx-text-fill: #10b981; -fx-font-weight: bold;"/>
+                                        <Label fx:id="lblCashTotal" text="0 \u20ac" styleClass="pie-value" style="-fx-text-fill: #10b981; -fx-font-weight: bold;"/>
                                     </HBox>
                                     <ProgressBar fx:id="progressCash" progress="0.0" prefWidth="200" maxWidth="Infinity" styleClass="progress-saas" style="-fx-accent: #10b981;"/>
                                 </VBox>
@@ -207,7 +207,7 @@
                                         <StackPane styleClass="dot-card"/>
                                         <Label text="Tarjeta" styleClass="pie-label" style="-fx-font-weight: bold;"/>
                                         <Region HBox.hgrow="ALWAYS"/>
-                                        <Label fx:id="lblCardTotal" text="0 €" styleClass="pie-value" style="-fx-text-fill: #3b82f6; -fx-font-weight: bold;"/>
+                                        <Label fx:id="lblCardTotal" text="0 \u20ac" styleClass="pie-value" style="-fx-text-fill: #3b82f6; -fx-font-weight: bold;"/>
                                     </HBox>
                                     <ProgressBar fx:id="progressCard" progress="0.0" prefWidth="200" maxWidth="Infinity" styleClass="progress-saas" style="-fx-accent: #3b82f6;"/>
                                 </VBox>
@@ -221,7 +221,7 @@
                             <Region HBox.hgrow="ALWAYS"/>
                             <StackPane styleClass="icon-bg-red"><FontAwesomeIconView glyphName="REPLY" fill="#ef4444"/></StackPane>
                         </HBox>
-                        <Label fx:id="lblReturnsTotal" text="0.00 €" styleClass="kpi-value-saas" style="-fx-text-fill: #ef4444;"/>
+                        <Label fx:id="lblReturnsTotal" text="0.00 \u20ac" styleClass="kpi-value-saas" style="-fx-text-fill: #ef4444;"/>
                         <Label text="Total descontado en devoluciones este periodo" styleClass="trend-text"/>
                     </VBox>
                 </VBox>
@@ -239,7 +239,7 @@
                 </HBox>
                 <TableView fx:id="detailTable" VBox.vgrow="ALWAYS" styleClass="table-saas" prefHeight="250">
                     <columns>
-                        <TableColumn fx:id="colDate" text="Fecha Operación" prefWidth="180"/>
+                        <TableColumn fx:id="colDate" text="Fecha Operaci\u00f3n" prefWidth="180"/>
                         <TableColumn fx:id="colRecordType" text="Tipo" prefWidth="100"/>
                         <TableColumn fx:id="colMethod" text="Medio Pago" prefWidth="120"/>
                         <TableColumn fx:id="colClient" text="Cliente Registrado" prefWidth="180"/>

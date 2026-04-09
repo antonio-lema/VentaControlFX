@@ -11,8 +11,8 @@ import java.net.URL;
 import javafx.scene.paint.Color;
 
 /**
- * Gestor dinÃ¡mico de la estÃ©tica de la aplicaciÃ³n.
- * Permite cambiar colores y tamaÃ±os en caliente inyectando CSS dinÃ¡mico.
+ * Gestor din\u00c3\u00a1mico de la est\u00c3\u00a9tica de la aplicaci\u00c3\u00b3n.
+ * Permite cambiar colores y tama\u00c3\u00b1os en caliente inyectando CSS din\u00c3\u00a1mico.
  */
 public class ThemeManager {
 
@@ -47,7 +47,7 @@ public class ThemeManager {
     }
 
     /**
-     * Aplica el sistema modular de estilos base y el tema dinÃ¡mico a una escena.
+     * Aplica el sistema modular de estilos base y el tema din\u00c3\u00a1mico a una escena.
      */
     public void applyFullTheme(Scene scene) {
         // 1. Aplicar estilos base (archivos CSS)
@@ -60,7 +60,7 @@ public class ThemeManager {
             }
         }
 
-        // 2. Aplicar personalizaciones dinÃ¡micas (desde BD)
+        // 2. Aplicar personalizaciones din\u00c3\u00a1micas (desde BD)
         applyTheme(scene);
     }
 
@@ -71,7 +71,7 @@ public class ThemeManager {
         try {
             applyTheme(scene, settingsRepository.getAllSettings());
         } catch (SQLException e) {
-            System.err.println("Error cargando configuraciÃ³n estÃ©tica: " + e.getMessage());
+            System.err.println("Error cargando configuraci\u00c3\u00b3n est\u00c3\u00a9tica: " + e.getMessage());
         }
     }
 
@@ -87,14 +87,14 @@ public class ThemeManager {
         String encodedCss = Base64.getEncoder().encodeToString(css.getBytes(StandardCharsets.UTF_8));
         String newUrl = "data:text/css;base64," + encodedCss;
 
-        // Limpiar cualquier stylesheet dinÃ¡mico previo de ESTA escena especÃ­fica
+        // Limpiar cualquier stylesheet din\u00c3\u00a1mico previo de ESTA escena espec\u00c3\u00adfica
         scene.getStylesheets().removeIf(url -> url.startsWith("data:text/css;base64,"));
 
-        // AÃ±adir el nuevo
+        // A\u00c3\u00b1adir el nuevo
         scene.getStylesheets().add(newUrl);
         this.dynamicStylesheetUrl = newUrl;
 
-        // Aplicar clase de modo oscuro automÃ¡ticamente si es necesario
+        // Aplicar clase de modo oscuro autom\u00c3\u00a1ticamente si es necesario
         String bg = settings.get("ui.bg_main");
         setTheme(scene.getRoot(), bg != null && !isLightColor(bg));
     }
@@ -102,7 +102,7 @@ public class ThemeManager {
     /**
      * Alterna entre modo claro y oscuro aplicando una clase al root.
      * 
-     * @param root   El nodo raÃ­z
+     * @param root   El nodo ra\u00c3\u00adz
      * @param isDark true para modo oscuro
      */
     public void setTheme(Parent root, boolean isDark) {
@@ -125,7 +125,7 @@ public class ThemeManager {
     private String generateCss(Map<String, String> settings) {
         StringBuilder sb = new StringBuilder();
         String bg = settings.get("ui.bg_main");
-        // Calcular si es oscuro automÃ¡ticamente segÃºn el color de fondo para evitar
+        // Calcular si es oscuro autom\u00c3\u00a1ticamente seg\u00c3\u00ban el color de fondo para evitar
         // mezclas
         boolean isDark = bg != null && !isLightColor(bg);
 
@@ -147,14 +147,14 @@ public class ThemeManager {
             sb.append("  -fx-custom-color-primary-alpha40: ").append(primary).append("66;\n");
             sb.append("  -fx-custom-color-primary-alpha60: ").append(primary).append("99;\n");
 
-            // Sombras dinÃ¡micas - Look Premium (Glow Effect)
+            // Sombras din\u00c3\u00a1micas - Look Premium (Glow Effect)
             sb.append("  -fx-shadow-color-primary: ").append(primaryGlow).append(";\n");
             sb.append("  -fx-shadow-primary: dropshadow(three-pass-box, ").append(primaryGlow)
                     .append(", 40, 0.0, 0, 12);\n");
             sb.append("  -fx-shadow-primary-intense: dropshadow(three-pass-box, ").append(primary)
                     .append("CC, 20, 0.0, 0, 6);\n");
 
-            // Gradientes dinÃ¡micos - Reales (Light -> Dark)
+            // Gradientes din\u00c3\u00a1micos - Reales (Light -> Dark)
             sb.append("  -fx-grad-primary: linear-gradient(to bottom right, ").append(primaryLight).append(", ")
                     .append(primaryDark).append(");\n");
             sb.append("  -fx-grad-primary-soft: linear-gradient(to bottom right, ").append(primary).append("4D, ")
@@ -202,8 +202,8 @@ public class ThemeManager {
         }
 
         // El color elegido por el usuario ES el color SUPERIOR del gradiente.
-        // Gradiente: vibrante (top) â†’ 35% mÃ¡s oscuro (mid) â†’ 65% mÃ¡s oscuro (bot)
-        // AsÃ­, con sidebar = #1e88e5 (azul) se verÃ¡: azul â†’ azul medio â†’ azul casi
+        // Gradiente: vibrante (top) \u00e2\u2020\u2019 35% m\u00c3\u00a1s oscuro (mid) \u00e2\u2020\u2019 65% m\u00c3\u00a1s oscuro (bot)
+        // As\u00c3\u00ad, con sidebar = #1e88e5 (azul) se ver\u00c3\u00a1: azul \u00e2\u2020\u2019 azul medio \u00e2\u2020\u2019 azul casi
         // negro
         final String sidebarTop = settings.getOrDefault("ui.sidebar_bg", "#0f172a");
         final String sidebarMid = darken(sidebarTop, 0.35);
@@ -300,7 +300,7 @@ public class ThemeManager {
         } catch (java.lang.Exception ignored) {
         }
 
-        // 2. Tema Claro/Oscuro dinÃ¡mico
+        // 2. Tema Claro/Oscuro din\u00c3\u00a1mico
         // String bg ya declarada arriba
 
         if (bg != null) {
@@ -410,11 +410,11 @@ public class ThemeManager {
             }
         }
 
-        // â”€â”€ BLOQUE .sidebar con gradiente directo â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // \u00e2\u201d\u20ac\u00e2\u201d\u20ac BLOQUE .sidebar con gradiente directo \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac
         // JavaFX NO puede resolver variables CSS que contienen linear-gradient.
         // Por eso escribimos el valor del gradiente directamente en la regla CSS.
         // El color elegido (sidebarTop) es el vibrante de arriba;
-        // sidebarMid y sidebarBot son versiones progresivamente mÃ¡s oscuras.
+        // sidebarMid y sidebarBot son versiones progresivamente m\u00c3\u00a1s oscuras.
         sb.append(".sidebar {\n");
         sb.append("  -fx-background-color: linear-gradient(to bottom, ")
                 .append(sidebarTop).append(" 0%, ")
@@ -422,8 +422,8 @@ public class ThemeManager {
                 .append(sidebarBot).append(" 100%);\n");
         sb.append("}\n");
 
-        // â”€â”€ BLOQUE .search-bar con tinte del color primario â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-        // La barra de bÃºsqueda usa un tinte muy sutil del color primario.
+        // \u00e2\u201d\u20ac\u00e2\u201d\u20ac BLOQUE .search-bar con tinte del color primario \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac
+        // La barra de b\u00c3\u00basqueda usa un tinte muy sutil del color primario.
         // En reposo: 5% de tinte. Al hacer foco: borde del color primario.
         if (primary != null) {
             String baseBg = isDark ? "#0f172a" : "#f8fafc";
@@ -452,7 +452,7 @@ public class ThemeManager {
         }
     }
 
-    // --- Helpers de ManipulaciÃ³n de Color ---
+    // --- Helpers de Manipulaci\u00c3\u00b3n de Color ---
 
     private String brightenAbsolute(String hex, double amount) {
         try {
@@ -462,7 +462,7 @@ public class ThemeManager {
             double b = c.getBrightness();
 
             double bNew = Math.min(1.0, b + amount);
-            // Desaturamos un poco al elevar para crear superficies mÃ¡s neutras en SaaS
+            // Desaturamos un poco al elevar para crear superficies m\u00c3\u00a1s neutras en SaaS
             // style
             double sNew = Math.max(0.0, s - (amount * 0.4));
 
@@ -497,7 +497,7 @@ public class ThemeManager {
      * 
      * @param base  Color base (hex)
      * @param blend Color a mezclar (hex)
-     * @param ratio ProporciÃ³n del color blend (0.0 = solo base, 1.0 = solo blend)
+     * @param ratio Proporci\u00c3\u00b3n del color blend (0.0 = solo base, 1.0 = solo blend)
      */
     private String blendColors(String base, String blend, double ratio) {
         try {

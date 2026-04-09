@@ -1,22 +1,22 @@
 package com.mycompany.ventacontrolfx.domain.model;
 
 /**
- * GestiÃ³n de series de numeraciÃ³n correlativas de documentos fiscales.
- * Clean Architecture â€” Capa de Dominio.
+ * Gesti\u00c3\u00b3n de series de numeraci\u00c3\u00b3n correlativas de documentos fiscales.
+ * Clean Architecture \u00e2\u20ac\u201d Capa de Dominio.
  */
 public class DocumentSeries {
 
     private int seriesId;
     private String seriesCode; // "T", "F", "R"
     private String prefix; // "2026-T-"
-    private int lastNumber; // Ãºltimo nÃºmero asignado
+    private int lastNumber; // \u00c3\u00baltimo n\u00c3\u00bamero asignado
     private int year;
     private String description;
 
     public DocumentSeries() {
     }
 
-    // â”€â”€ Getters & Setters â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // \u00e2\u201d\u20ac\u00e2\u201d\u20ac Getters & Setters \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac
 
     public int getSeriesId() {
         return seriesId;
@@ -66,12 +66,12 @@ public class DocumentSeries {
         this.description = description;
     }
 
-    /** Retorna el siguiente nÃºmero SIN incrementar (solo lectura). */
+    /** Retorna el siguiente n\u00c3\u00bamero SIN incrementar (solo lectura). */
     public int peekNextNumber() {
         return lastNumber + 1;
     }
 
-    /** Genera la referencia formateada para el nÃºmero dado. */
+    /** Genera la referencia formateada para el n\u00c3\u00bamero dado. */
     public String format(int number) {
         return String.format("%s%05d", prefix, number);
     }

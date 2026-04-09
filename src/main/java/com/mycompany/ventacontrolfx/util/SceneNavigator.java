@@ -22,12 +22,12 @@ public class SceneNavigator {
                 ((Injectable) controller).inject(container);
             }
 
-            // Aplicar sistema modular de estilos dinÃ¡micos
+            // Aplicar sistema modular de estilos din\u00c3\u00a1micos
             if (container != null) {
                 container.getThemeManager().applyFullTheme(scene);
             }
 
-            // Configurar icono de la aplicaciÃ³n y tÃ­tulo
+            // Configurar icono de la aplicaci\u00c3\u00b3n y t\u00c3\u00adtulo
             if (container != null) {
                 var cfg = container.getConfigUseCase().getConfig();
                 String iconPath = cfg.getAppIconPath();

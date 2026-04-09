@@ -129,7 +129,7 @@ public class PriceListContentController implements Injectable {
                 if (empty || getTableRow() == null || getTableRow().getItem() == null)
                     setText(null);
                 else
-                    setText(String.format("%.2f â‚¬", getTableRow().getItem().getDefaultPrice()));
+                    setText(String.format("%.2f \u20AC", getTableRow().getItem().getDefaultPrice()));
             }
         });
         colListPrice.setCellFactory(column -> new javafx.scene.control.TableCell<>() {
@@ -139,7 +139,7 @@ public class PriceListContentController implements Injectable {
                 if (empty || getTableRow() == null || getTableRow().getItem() == null)
                     setText(null);
                 else
-                    setText(String.format("%.2f â‚¬", getTableRow().getItem().getPrice()));
+                    setText(String.format("%.2f \u20AC", getTableRow().getItem().getPrice()));
             }
         });
         colListPvp.setCellFactory(column -> new javafx.scene.control.TableCell<>() {
@@ -149,7 +149,7 @@ public class PriceListContentController implements Injectable {
                 if (empty || getTableRow() == null || getTableRow().getItem() == null)
                     setText(null);
                 else
-                    setText(String.format("%.2f â‚¬", getTableRow().getItem().getListPvp()));
+                    setText(String.format("%.2f \u20AC", getTableRow().getItem().getListPvp()));
             }
         });
         colDiff.setCellValueFactory(cellData -> {
@@ -205,9 +205,9 @@ public class PriceListContentController implements Injectable {
             this.currentFilterDate = event.getTimestamp();
             this.currentSearch = "";
             txtSearch.setText("");
-            lblFilterInfo.setText("Filtro: ActualizaciÃ³n Masiva ("
+            lblFilterInfo.setText("Filtro: Actualizaci\u00c3\u00b3n Masiva ("
                     + event.getTimestamp().format(DateTimeFormatter.ofPattern("dd/MM HH:mm")) + ")");
-            colDiff.setText("â–² vs Hoy");
+            colDiff.setText("\u00e2\u2013\u00b2 vs Hoy");
         } else {
             this.currentFilterDate = null;
             this.currentSearch = event.getTargetName();
@@ -248,10 +248,10 @@ public class PriceListContentController implements Injectable {
                 events.add(new PriceHistoryEventDTO(
                         PriceHistoryEventDTO.EventType.BULK_UPDATE,
                         log.getAppliedAt(),
-                        "ActualizaciÃ³n Masiva: " + log.getUpdateType(),
-                        "ModificaciÃ³n de " + log.getValue() + " aplicada a " + log.getScope(),
+                        "Actualizaci\u00c3\u00b3n Masiva: " + log.getUpdateType(),
+                        "Modificaci\u00c3\u00b3n de " + log.getValue() + " aplicada a " + log.getScope(),
                         log.getReason(),
-                        "AfectÃ³ a " + log.getProductsUpdated() + " productos",
+                        "Afect\u00c3\u00b3 a " + log.getProductsUpdated() + " productos",
                         null));
             }
 
@@ -262,7 +262,7 @@ public class PriceListContentController implements Injectable {
                             PriceHistoryEventDTO.EventType.MANUAL_CHANGE,
                             hist.getEndDate(),
                             "Cambio Manual: " + hist.getProductName(),
-                            "Precio anterior: " + String.format("%.2f â‚¬", hist.getPrice()),
+                            "Precio anterior: " + String.format("%.2f \u20AC", hist.getPrice()),
                             hist.getReason(),
                             "Sustituido por nueva vigencia",
                             hist.getProductName()));
@@ -299,7 +299,7 @@ public class PriceListContentController implements Injectable {
         txtSearch.setText("");
         paneFilterInfo.setVisible(false);
         paneFilterInfo.setManaged(false);
-        colDiff.setText("â–² %");
+        colDiff.setText("\u00e2\u2013\u00b2 %");
         paginationHelper.refresh();
         if (tabPane.getSelectionModel().getSelectedIndex() == 1) {
             loadHistory();

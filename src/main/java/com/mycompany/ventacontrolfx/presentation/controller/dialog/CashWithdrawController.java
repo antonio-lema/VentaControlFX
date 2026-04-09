@@ -43,12 +43,12 @@ public class CashWithdrawController {
 
         try {
             this.availableAmount = closureUseCase.getCurrentCashInDrawer();
-            lblAvailable.setText(String.format("%.2f â‚¬", availableAmount));
+            lblAvailable.setText(String.format("%.2f \u20AC", availableAmount));
         } catch (SQLException e) {
             lblAvailable.setText("Error al cargar");
         }
 
-        // Listener para validaciÃ³n visual de saldo en tiempo real
+        // Listener para validaci\u00c3\u00b3n visual de saldo en tiempo real
         txtAmount.textProperty().addListener((obs, old, newVal) -> validateAmountRealtime(newVal));
 
         javafx.application.Platform.runLater(txtAmount::requestFocus);
@@ -62,9 +62,9 @@ public class CashWithdrawController {
                         || userSession.hasPermission("USUARIOS");
                 if (canSeeTotals) {
                     lblWarning.setText(String.format(
-                            "âš ï¸ Saldo insuficiente. Disponible: %.2f â‚¬", availableAmount));
+                            "\u00e2\u0161\u00a0\u00ef\u00b8\u008f Saldo insuficiente. Disponible: %.2f \u20AC", availableAmount));
                 } else {
-                    lblWarning.setText("âš ï¸ Saldo insuficiente.");
+                    lblWarning.setText("\u00e2\u0161\u00a0\u00ef\u00b8\u008f Saldo insuficiente.");
                 }
                 lblWarning.setVisible(true);
                 lblWarning.setManaged(true);
@@ -83,7 +83,7 @@ public class CashWithdrawController {
 
     @FXML
     private void handleConfirm() {
-        // â€” Validar importe
+        // \u00e2\u20ac\u201d Validar importe
         String amountText = txtAmount.getText().replace(",", ".").trim();
         if (amountText.isEmpty()) {
             AlertUtil.showWarning("Campo Obligatorio", "Debes introducir el importe a retirar.");
@@ -93,15 +93,15 @@ public class CashWithdrawController {
         try {
             amount = Double.parseDouble(amountText);
         } catch (NumberFormatException e) {
-            AlertUtil.showError("Formato InvÃ¡lido", "El importe introducido no es un nÃºmero vÃ¡lido.");
+            AlertUtil.showError("Formato Inv\u00c3\u00a1lido", "El importe introducido no es un n\u00c3\u00bamero v\u00c3\u00a1lido.");
             return;
         }
         if (amount <= 0) {
-            AlertUtil.showError("Importe InvÃ¡lido", "El importe debe ser mayor que cero.");
+            AlertUtil.showError("Importe Inv\u00c3\u00a1lido", "El importe debe ser mayor que cero.");
             return;
         }
 
-        // â€” Validar motivo
+        // \u00e2\u20ac\u201d Validar motivo
         String reason = txtReason.getText().trim();
         if (reason.isEmpty()) {
             AlertUtil.showWarning("Campo Obligatorio", "Debes especificar el motivo de la retirada.");
@@ -115,7 +115,7 @@ public class CashWithdrawController {
             close();
 
         } catch (SQLException e) {
-            AlertUtil.showError("âŒ Sin Efectivo Suficiente", e.getMessage());
+            AlertUtil.showError("\u00e2\u009d\u0152 Sin Efectivo Suficiente", e.getMessage());
         }
     }
 

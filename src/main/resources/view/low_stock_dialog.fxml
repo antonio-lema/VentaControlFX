@@ -15,7 +15,7 @@
         <FontAwesomeIconView glyphName="EXCLAMATION_TRIANGLE" size="24" fill="#e53935"/>
         <VBox>
             <Label text="Productos con Stock Bajo" style="-fx-font-size: 18px; -fx-font-weight: bold;"/>
-            <Label text="Estos productos han alcanzado o superado el límite mínimo." styleClass="label-muted"/>
+            <Label text="Estos productos han alcanzado o superado el l\u00edmite m\u00ednimo." styleClass="label-muted"/>
         </VBox>
     </HBox>
 
@@ -23,7 +23,7 @@
         <columns>
             <TableColumn fx:id="colName" text="Producto" prefWidth="200"/>
             <TableColumn fx:id="colCurrentStock" text="Actual" prefWidth="100" style="-fx-alignment: CENTER;"/>
-            <TableColumn fx:id="colMinStock" text="Mínimo" prefWidth="100" style="-fx-alignment: CENTER;"/>
+            <TableColumn fx:id="colMinStock" text="M\u00ednimo" prefWidth="100" style="-fx-alignment: CENTER;"/>
         </columns>
     </TableView>
 

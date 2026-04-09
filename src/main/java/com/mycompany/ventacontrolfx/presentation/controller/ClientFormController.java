@@ -77,7 +77,7 @@ public class ClientFormController implements Injectable {
                     txtTaxId.setPromptText("A12345678");
                     break;
                 case "Pasaporte":
-                    txtTaxId.setPromptText("NÃºmero de pasaporte");
+                    txtTaxId.setPromptText("N\u00c3\u00bamero de pasaporte");
                     break;
             }
         });
@@ -222,7 +222,7 @@ public class ClientFormController implements Injectable {
             case "CIF":
                 return validateCIF(id);
             case "Pasaporte":
-                return id.length() >= 5; // ValidaciÃ³n bÃ¡sica
+                return id.length() >= 5; // Validaci\u00c3\u00b3n b\u00c3\u00a1sica
             default:
                 return true;
         }
@@ -261,7 +261,7 @@ public class ClientFormController implements Injectable {
 
         for (int i = 0; i < digits.length(); i++) {
             int digit = Character.getNumericValue(digits.charAt(i));
-            if (i % 2 == 0) { // Posiciones impares de la cadena (1, 3, 5, 7) -> Ã­ndices pares 0, 2, 4, 6
+            if (i % 2 == 0) { // Posiciones impares de la cadena (1, 3, 5, 7) -> \u00c3\u00adndices pares 0, 2, 4, 6
                 int doubleDigit = digit * 2;
                 sumOdd += (doubleDigit / 10) + (doubleDigit % 10);
             } else {

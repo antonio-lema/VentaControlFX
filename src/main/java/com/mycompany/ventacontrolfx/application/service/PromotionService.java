@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Servicio encargado de la lÃ³gica de aplicaciÃ³n de promociones.
+ * Servicio encargado de la l\u00c3\u00b3gica de aplicaci\u00c3\u00b3n de promociones.
  */
 public class PromotionService {
     private final IPromotionRepository promotionRepository;
@@ -26,7 +26,7 @@ public class PromotionService {
         List<Promotion> activePromotions = promotionRepository.getActive();
         double discountedPrice = basePrice;
 
-        // 1. Promociones por PRODUCTO especÃ­fico
+        // 1. Promociones por PRODUCTO espec\u00c3\u00adfico
         List<Promotion> productPromos = activePromotions.stream()
                 .filter(p -> p.getScope() == PromotionScope.PRODUCT
                         && p.getAffectedIds().contains(productId))
@@ -36,7 +36,7 @@ public class PromotionService {
             discountedPrice = calculateDiscount(discountedPrice, p);
         }
 
-        // 2. Promociones por CATEGORÃA
+        // 2. Promociones por CATEGOR\u00c3\u008dA
         List<Promotion> categoryPromos = activePromotions.stream()
                 .filter(p -> p.getScope() == PromotionScope.CATEGORY
                         && p.getAffectedIds().contains(categoryId))
@@ -50,7 +50,7 @@ public class PromotionService {
     }
 
     /**
-     * Aplica promociones de Ã¡mbito GLOBAL a los totales finales si cumple
+     * Aplica promociones de \u00c3\u00a1mbito GLOBAL a los totales finales si cumple
      * condiciones.
      * (Simplificado: aplica a la suma de la base)
      */

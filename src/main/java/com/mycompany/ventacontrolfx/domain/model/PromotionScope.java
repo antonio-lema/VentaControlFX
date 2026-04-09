@@ -1,12 +1,12 @@
 package com.mycompany.ventacontrolfx.domain.model;
 
 /**
- * Define el alcance de aplicaciÃ³n de la promociÃ³n.
+ * Define el alcance de aplicaci\u00c3\u00b3n de la promoci\u00c3\u00b3n.
  */
 public enum PromotionScope {
     GLOBAL("Toda la Venta"),
-    CATEGORY("Por CategorÃ­a"),
-    PRODUCT("Producto EspecÃ­fico");
+    CATEGORY("Por Categor\u00c3\u00ada"),
+    PRODUCT("Producto Espec\u00c3\u00adfico");
 
     private final String displayName;
 

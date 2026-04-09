@@ -165,7 +165,7 @@ public class SellViewController implements Injectable, CategoryMenuRenderer.Cate
             filterUseCase.applyPromotions(activePromotions);
             refreshProductsWithNewPriceList();
         } else {
-            // CategorÃ­a especÃ­fica
+            // Categor\u00c3\u00ada espec\u00c3\u00adfica
             container.getAsyncManager().runAsyncTask(() -> categoryUseCase.getAll(), cats -> {
                 cats.stream().filter(c -> c.getId() == catId).findFirst().ifPresent(c -> {
                     filterUseCase.applyCategory(c);
@@ -185,7 +185,7 @@ public class SellViewController implements Injectable, CategoryMenuRenderer.Cate
             all.setName(container.getBundle().getString("sell.all_categories"));
             all.setId(-1);
             Category favs = new Category();
-            favs.setName("â˜… " + container.getBundle().getString("sell.category.favorites"));
+            favs.setName("\u2605 " + container.getBundle().getString("sell.category.favorites"));
             favs.setId(-2);
             Category promos = new Category();
             promos.setName("% " + container.getBundle().getString("sell.category.promotions"));
@@ -222,7 +222,7 @@ public class SellViewController implements Injectable, CategoryMenuRenderer.Cate
                 else
                     onCategorySelected(cat);
 
-                // Actualizar estado global y cerrar menÃº
+                // Actualizar estado global y cerrar men\u00c3\u00ba
                 container.getCartUseCase().setSelectedCategoryId(cat.getId());
                 handleToggleCategoryMenu();
             });
@@ -234,11 +234,11 @@ public class SellViewController implements Injectable, CategoryMenuRenderer.Cate
         if (catId == -1)
             lblSelectedCategory.setText(container.getBundle().getString("sell.all_categories"));
         else if (catId == -2)
-            lblSelectedCategory.setText("â˜… " + container.getBundle().getString("sell.category.favorites"));
+            lblSelectedCategory.setText("\u2605 " + container.getBundle().getString("sell.category.favorites"));
         else if (catId == -3)
             lblSelectedCategory.setText("% " + container.getBundle().getString("sell.category.promotions"));
         else {
-            // Intentar buscar nombre en cache o servicio (aquÃ­ simplificado)
+            // Intentar buscar nombre en cache o servicio (aqu\u00c3\u00ad simplificado)
             container.getAsyncManager().runAsyncTask(() -> categoryUseCase.getAll(), cats -> {
                 cats.stream().filter(c -> c.getId() == catId).findFirst()
                         .ifPresent(c -> lblSelectedCategory.setText(translateDynamic(c.getName())));
@@ -291,7 +291,7 @@ public class SellViewController implements Injectable, CategoryMenuRenderer.Cate
             if (toSelect != null) {
                 comboPriceList.getSelectionModel().select(toSelect);
                 selectedPriceListId = toSelect.getId();
-                // Sincronizamos por si acaso venÃ­amos de un ID <= 0
+                // Sincronizamos por si acaso ven\u00c3\u00adamos de un ID <= 0
                 if (container.getCartUseCase().getPriceListId() != selectedPriceListId) {
                     container.getCartUseCase().setPriceListId(selectedPriceListId);
                 }
@@ -304,7 +304,7 @@ public class SellViewController implements Injectable, CategoryMenuRenderer.Cate
                         container.getCartUseCase().setPriceListId(newVal.getId());
                     }
 
-                    // Si el ID cambiÃ³ respecto a lo que tenemos renderizado, refrescamos
+                    // Si el ID cambi\u00c3\u00b3 respecto a lo que tenemos renderizado, refrescamos
                     if (newVal.getId() != selectedPriceListId) {
                         selectedPriceListId = newVal.getId();
                         refreshProductsWithNewPriceList();
@@ -335,7 +335,7 @@ public class SellViewController implements Injectable, CategoryMenuRenderer.Cate
                 products = container.getProductRepository().getByCategoryPaginated(cat.getId(), PAGE_SIZE,
                         currentOffset, selectedPriceListId);
             } else if (type == FilterType.FAVORITES) {
-                // Para favoritos, la paginaciÃ³n es en memoria o podrÃ­amos implementarla en repo
+                // Para favoritos, la paginaci\u00c3\u00b3n es en memoria o podr\u00c3\u00adamos implementarla en repo
                 List<Product> allFavs = productUseCase.getFavorites(selectedPriceListId);
                 count = allFavs.size();
                 int end = Math.min(currentOffset + PAGE_SIZE, allFavs.size());
@@ -466,7 +466,7 @@ public class SellViewController implements Injectable, CategoryMenuRenderer.Cate
         if (p.getType() == com.mycompany.ventacontrolfx.domain.model.PromotionType.PERCENTAGE) {
             return String.format("%.0f%% " + container.getBundle().getString("sell.promo.discount_abbr"), p.getValue());
         } else if (p.getType() == com.mycompany.ventacontrolfx.domain.model.PromotionType.FIXED_DISCOUNT) {
-            return String.format("%.2fâ‚¬ " + container.getBundle().getString("sell.promo.discount_abbr"), p.getValue());
+            return String.format("%.2f\u20AC " + container.getBundle().getString("sell.promo.discount_abbr"), p.getValue());
         } else if (p.getType() == com.mycompany.ventacontrolfx.domain.model.PromotionType.VOLUME_DISCOUNT) {
             return (p.getBuyQty() + p.getFreeQty()) + "x" + p.getBuyQty();
         }

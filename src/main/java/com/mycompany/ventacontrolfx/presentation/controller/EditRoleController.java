@@ -71,7 +71,7 @@ public class EditRoleController implements Injectable {
                 if (perm.getCode().contains(".")) {
                     category = perm.getCode().split("\\.")[0].toUpperCase();
                 } else {
-                    // Fallback para cÃ³digos sin punto
+                    // Fallback para c\u00c3\u00b3digos sin punto
                     category = perm.getCode().toUpperCase();
                 }
                 grouped.computeIfAbsent(category, k -> new ArrayList<>()).add(perm);
@@ -84,7 +84,7 @@ public class EditRoleController implements Injectable {
                 VBox groupContainer = new VBox(8);
                 groupContainer.setPadding(new Insets(10, 0, 15, 0));
 
-                // Header de categorÃ­a con CheckBox "Seleccionar Todo"
+                // Header de categor\u00c3\u00ada con CheckBox "Seleccionar Todo"
                 CheckBox chkSelectAll = new CheckBox(categoryName);
                 chkSelectAll.setStyle("-fx-font-weight: bold; -fx-text-fill: -color-primary; -fx-font-size: 14px;");
 
@@ -104,7 +104,7 @@ public class EditRoleController implements Injectable {
                     groupCheckboxes.add(cb);
                     permsBox.getChildren().add(cb);
 
-                    // LÃ³gica para actualizar el "Seleccionar Todo" si se cambia uno individual
+                    // L\u00c3\u00b3gica para actualizar el "Seleccionar Todo" si se cambia uno individual
                     cb.selectedProperty().addListener((obs, old, val) -> {
                         if (!val) {
                             chkSelectAll.setSelected(false);
@@ -131,7 +131,7 @@ public class EditRoleController implements Injectable {
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            showError("No se pudo cargar el catÃ¡logo de permisos.");
+            showError("No se pudo cargar el cat\u00c3\u00a1logo de permisos.");
         }
     }
 
@@ -142,8 +142,8 @@ public class EditRoleController implements Injectable {
             txtRoleName.setText(role.getName());
             txtDescription.setText(role.getDescription());
 
-            // Bloquear la ediciÃ³n del nombre si el rol es 'admin' o 'cajero' para evitar
-            // romper lÃ³gica dura
+            // Bloquear la edici\u00c3\u00b3n del nombre si el rol es 'admin' o 'cajero' para evitar
+            // romper l\u00c3\u00b3gica dura
             if ("admin".equalsIgnoreCase(role.getName()) || "cajero".equalsIgnoreCase(role.getName())) {
                 txtRoleName.setDisable(true);
             }
@@ -218,9 +218,9 @@ public class EditRoleController implements Injectable {
                 Role newRole = new Role(0, name, description);
                 if (roleUseCase.createRole(newRole)) {
                     // Update the automatically loaded ID into newRole
-                    // En este sistema no tenemos un mÃ©todo "asigna_permisos_a_rol" directamente en
-                    // el repository todavÃ­a.
-                    // Oh, no aÃ±adimos un saveRolePermissions a IRoleRepository o
+                    // En este sistema no tenemos un m\u00c3\u00a9todo "asigna_permisos_a_rol" directamente en
+                    // el repository todav\u00c3\u00ada.
+                    // Oh, no a\u00c3\u00b1adimos un saveRolePermissions a IRoleRepository o
                     // PermissionRepository!
                     saveRolePermissions(newRole.getRoleId(), selectedPermissions);
                     closeWindow();

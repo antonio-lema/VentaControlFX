@@ -23,12 +23,12 @@ public interface IUserRepository {
 
     int count() throws SQLException;
 
-    // GestiÃ³n de permisos individuales
+    // Gesti\u00c3\u00b3n de permisos individuales
     boolean addIndividualPermission(int userId, int permissionId) throws SQLException;
 
     boolean removeIndividualPermission(int userId, int permissionId) throws SQLException;
 
-    // MÃ©todos para recuperaciÃ³n de contraseÃ±a (Fix V-01)
+    // M\u00c3\u00a9todos para recuperaci\u00c3\u00b3n de contrase\u00c3\u00b1a (Fix V-01)
     void saveRecoveryCode(String email, String codeHash, java.time.LocalDateTime expiresAt) throws SQLException;
 
     boolean verifyRecoveryCode(String email, String code) throws SQLException;
@@ -36,23 +36,23 @@ public interface IUserRepository {
     void markRecoveryCodeAsUsed(String email, String code) throws SQLException;
 
     /**
-     * Busca el email asociado a un nombre de usuario SIN requerir sesiÃ³n activa.
+     * Busca el email asociado a un nombre de usuario SIN requerir sesi\u00c3\u00b3n activa.
      * Solo devuelve el email, sin exponer datos sensibles del usuario.
-     * Usado para el flujo de recuperaciÃ³n de contraseÃ±a anÃ³nimo.
+     * Usado para el flujo de recuperaci\u00c3\u00b3n de contrase\u00c3\u00b1a an\u00c3\u00b3nimo.
      */
     String findEmailByUsername(String username) throws SQLException;
 
     /**
-     * Cuenta cuÃ¡ntos intentos de verificaciÃ³n fallidos hay para un email/cÃ³digo
+     * Cuenta cu\u00c3\u00a1ntos intentos de verificaci\u00c3\u00b3n fallidos hay para un email/c\u00c3\u00b3digo
      * activo.
-     * Usado para implementar rate limiting en la recuperaciÃ³n de contraseÃ±a.
+     * Usado para implementar rate limiting en la recuperaci\u00c3\u00b3n de contrase\u00c3\u00b1a.
      */
     int getRecoveryAttempts(String email) throws SQLException;
 
     /**
-     * Incrementa el contador de intentos fallidos para los cÃ³digos activos de ese
+     * Incrementa el contador de intentos fallidos para los c\u00c3\u00b3digos activos de ese
      * email.
-     * Si supera el lÃ­mite (MAX_ATTEMPTS=5), invalida el cÃ³digo automÃ¡ticamente.
+     * Si supera el l\u00c3\u00admite (MAX_ATTEMPTS=5), invalida el c\u00c3\u00b3digo autom\u00c3\u00a1ticamente.
      */
     void incrementRecoveryAttempts(String email) throws SQLException;
 }

@@ -99,7 +99,7 @@ public class SpecialDaysController implements Injectable {
                     lblReason.setStyle("-fx-font-weight: bold; -fx-text-fill: #334155;");
                     Label lblSub = new Label(container != null 
                             ? String.format(container.getBundle().getString("special.days.label.year"), item.getDate().getYear())
-                            : "AÃ±o " + item.getDate().getYear());
+                            : "A\u00c3\u00b1o " + item.getDate().getYear());
                     lblSub.setStyle("-fx-font-size: 11px; -fx-text-fill: #94a3b8;");
                     vInfo.getChildren().addAll(lblReason, lblSub);
 

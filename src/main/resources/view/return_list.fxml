@@ -104,7 +104,7 @@
                     <Label fx:id="lblCount" text="0 registros" styleClass="label-muted"/>
                 </HBox>
                 <Label text="%returns.footer.total_refunded" styleClass="footer-label"/>
-                <Label fx:id="lblTotalRefunded" text="0,00 €" styleClass="footer-value-danger"/>
+                <Label fx:id="lblTotalRefunded" text="0,00 \u20ac" styleClass="footer-value-danger"/>
             </HBox>
         </VBox>
 
@@ -115,7 +115,7 @@
                 <VBox alignment="CENTER" spacing="5">
                     <Label text="%returns.detail.title" styleClass="filter-label-cap" />
                     <HBox spacing="10" alignment="CENTER">
-                        <Label fx:id="lblDetailReturnId" text="Devolución #0000" styleClass="detail-sale-id" />
+                        <Label fx:id="lblDetailReturnId" text="Devoluci\u00f3n #0000" styleClass="detail-sale-id" />
                         <Label fx:id="lblDetailSaleId" text="Ticket #0000" styleClass="badge-primary" />
                     </HBox>
                     <Label fx:id="lblDetailDate" text="18/02/2026 15:30" styleClass="label-muted" />
@@ -146,7 +146,7 @@
                     <HBox alignment="CENTER_LEFT" style="-fx-padding: 10 0 0 0;">
                         <Label text="%returns.detail.total_label" styleClass="detail-total-label" />
                         <Region HBox.hgrow="ALWAYS" />
-                        <Label fx:id="lblDetailTotal" text="0,00 €" styleClass="detail-total-value text-danger" />
+                        <Label fx:id="lblDetailTotal" text="0,00 \u20ac" styleClass="detail-total-value text-danger" />
                     </HBox>
                 </VBox>
 

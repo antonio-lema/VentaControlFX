@@ -25,8 +25,8 @@ public interface ICashClosureRepository {
 
     int getPendingTransactionCount() throws SQLException;
 
-    // â”€â”€ GestiÃ³n de fondo de caja â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    /** Abre una sesiÃ³n de caja con el fondo inicial indicado. */
+    // \u00e2\u201d\u20ac\u00e2\u201d\u20ac Gesti\u00c3\u00b3n de fondo de caja \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac
+    /** Abre una sesi\u00c3\u00b3n de caja con el fondo inicial indicado. */
     void openCashFund(double initialAmount, String notes, int userId) throws SQLException;
 
     enum MovementType {
@@ -43,8 +43,8 @@ public interface ICashClosureRepository {
     void registerCashEntry(double amount, String reason, int userId) throws SQLException;
 
     /**
-     * Registra una devoluciÃ³n de efectivo en el libro mayor de caja.
-     * Requiere que haya una sesiÃ³n de caja activa.
+     * Registra una devoluci\u00c3\u00b3n de efectivo en el libro mayor de caja.
+     * Requiere que haya una sesi\u00c3\u00b3n de caja activa.
      */
     void registerCashReturn(double amount, String reason, int userId) throws SQLException;
 
@@ -52,20 +52,20 @@ public interface ICashClosureRepository {
 
     /**
      * Devuelve el efectivo actual en caja:
-     * fondo_inicial + ventas_efectivo â€“ devoluciones_efectivo â€“ retiradas.
+     * fondo_inicial + ventas_efectivo \u00e2\u20ac\u201c devoluciones_efectivo \u00e2\u20ac\u201c retiradas.
      */
     double getCurrentCashInDrawer() throws SQLException;
 
-    /** Indica si hay una sesiÃ³n de caja activa (abierta hoy sin cerrar). */
+    /** Indica si hay una sesi\u00c3\u00b3n de caja activa (abierta hoy sin cerrar). */
     boolean hasActiveFund() throws SQLException;
 
-    /** Devuelve el fondo inicial de la sesiÃ³n activa (0 si no hay sesiÃ³n). */
+    /** Devuelve el fondo inicial de la sesi\u00c3\u00b3n activa (0 si no hay sesi\u00c3\u00b3n). */
     double getActiveFundAmount() throws SQLException;
 
-    /** Devuelve el importe real con el que se cerrÃ³ la Ãºltima vez. */
+    /** Devuelve el importe real con el que se cerr\u00c3\u00b3 la \u00c3\u00baltima vez. */
     double getLastClosureAmount() throws SQLException;
 
-    /** Comprueba si hay sesiones de dÃ­as anteriores sin cerrar. */
+    /** Comprueba si hay sesiones de d\u00c3\u00adas anteriores sin cerrar. */
     boolean hasUnclosedPreviousSession() throws SQLException;
 
     /**
@@ -76,14 +76,14 @@ public interface ICashClosureRepository {
     /** Marca un cierre como revisado por un administrador. */
     void markAsReviewed(int closureId, int reviewerId) throws SQLException;
 
-    /** Marca un cierre como excluido de las estadÃ­sticas global. */
+    /** Marca un cierre como excluido de las estad\u00c3\u00adsticas global. */
     void markAsExcluded(int closureId, int reviewerId) throws SQLException;
 
-    /** Modifica el importe real de un cierre y aÃ±ade una nota de auditorÃ­a. */
+    /** Modifica el importe real de un cierre y a\u00c3\u00b1ade una nota de auditor\u00c3\u00ada. */
     void updateClosure(int closureId, double actualCash, String reason, int reviewerId, double previousCash)
             throws SQLException;
 
-    /** Representa un movimiento de efectivo con detalles para auditorÃ­a. */
+    /** Representa un movimiento de efectivo con detalles para auditor\u00c3\u00ada. */
     class CashMovement {
         public int movementId;
         public String type;

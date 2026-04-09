@@ -123,7 +123,7 @@ public class RegisterUserController implements Injectable {
     }
 
     /**
-     * Carga el catÃ¡logo de permisos desde la BD y genera checkboxes dinÃ¡micamente.
+     * Carga el cat\u00c3\u00a1logo de permisos desde la BD y genera checkboxes din\u00c3\u00a1micamente.
      */
     private void loadAndRenderPermissions() {
         if (permissionsContainer == null)
@@ -131,7 +131,7 @@ public class RegisterUserController implements Injectable {
         permissionsContainer.getChildren().clear();
         permissionCheckboxes.clear();
 
-        // Checkbox maestro para habilitar personalizaciÃ³n
+        // Checkbox maestro para habilitar personalizaci\u00c3\u00b3n
         chkAllowExtraPerms = new CheckBox(container.getBundle().getString("user.register.perms.extra"));
         chkAllowExtraPerms.setStyle("-fx-text-fill: -color-primary; -fx-font-weight: bold; -fx-padding: 0 0 10 0;");
         chkAllowExtraPerms.selectedProperty()
@@ -180,7 +180,7 @@ public class RegisterUserController implements Injectable {
                     groupCheckboxes.add(cb);
                     permsBox.getChildren().add(cb);
 
-                    // LÃ³gica para actualizar el "Seleccionar Todo"
+                    // L\u00c3\u00b3gica para actualizar el "Seleccionar Todo"
                     cb.selectedProperty().addListener((obs, old, val) -> {
                         if (!val && !cb.isDisabled()) {
                             chkSelectAll.setSelected(false);
@@ -274,8 +274,8 @@ public class RegisterUserController implements Injectable {
                 userCodes.add(p.getCode());
             }
 
-            // Si el usuario tiene permisos que NO estÃ¡n en su rol, habilitamos el toggle de
-            // personalizaciÃ³n
+            // Si el usuario tiene permisos que NO est\u00c3\u00a1n en su rol, habilitamos el toggle de
+            // personalizaci\u00c3\u00b3n
             Role role = roleUseCase.getRoleByName(cmbRole.getValue());
             if (role != null) {
                 List<String> roleCodes = role.getPermissions().stream().map(Permission::getCode).toList();
@@ -317,8 +317,8 @@ public class RegisterUserController implements Injectable {
                         } else {
                             chkAll.setSelected(false);
                         }
-                        // Si hay permisos deshabilitados (por el rol), el "Seleccionar Todo" tambiÃ©n
-                        // deberÃ­a
+                        // Si hay permisos deshabilitados (por el rol), el "Seleccionar Todo" tambi\u00c3\u00a9n
+                        // deber\u00c3\u00ada
                         // estar deshabilitado
                         // para evitar que el usuario crea que puede cambiar algo que no puede.
                         chkAll.setDisable(anyDisabled);
@@ -358,7 +358,7 @@ public class RegisterUserController implements Injectable {
             }
         }
 
-        // Recopilar los cÃ³digos de permisos marcados
+        // Recopilar los c\u00c3\u00b3digos de permisos marcados
         List<String> selectedPermissions = new ArrayList<>();
         for (CheckBox cb : permissionCheckboxes) {
             if (cb.isSelected()) {
@@ -383,7 +383,7 @@ public class RegisterUserController implements Injectable {
 
                 userUseCase.registerUser(newUser);
 
-                // Obtener el ID del usuario reciÃ©n creado para asignar permisos
+                // Obtener el ID del usuario reci\u00c3\u00a9n creado para asignar permisos
                 User created = userUseCase.getUserByUsername(username);
                 if (created != null) {
                     permissionUseCase.savePermissionsForUser(created.getUserId(), selectedPermissions);

@@ -27,7 +27,7 @@ public class ImportResultDialogController {
         lblCount.setText(String.valueOf(count));
 
         if (!success) {
-            lblTitle.setText("Error en la ImportaciÃ³n");
+            lblTitle.setText("Error en la Importaci\u00c3\u00b3n");
             lblSubtitle.setText("No se pudieron procesar los productos");
             lblMessage.setText(errorMessage);
             lblCount.setStyle("-fx-text-fill: -fx-custom-color-danger;");

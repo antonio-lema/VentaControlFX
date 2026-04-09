@@ -10,7 +10,7 @@
       fx:controller="com.mycompany.ventacontrolfx.presentation.controller.HeaderController"
       spacing="0" alignment="CENTER_LEFT" styleClass="top-bar">
 
-    <!-- ====== BARRA DE BÚSQUEDA (izquierda) ====== -->
+    <!-- ====== BARRA DE B\u00daSQUEDA (izquierda) ====== -->
     <HBox fx:id="searchBarContainer" alignment="CENTER_LEFT" spacing="10" styleClass="search-bar"
           HBox.hgrow="ALWAYS" maxWidth="480">
         <FontAwesomeIconView glyphName="SEARCH" size="16" fill="#adb5bd"/>
@@ -29,7 +29,7 @@
             <Insets right="15"/>
         </padding>
 
-        <!-- Botón de Alertas de Stock -->
+        <!-- Bot\u00f3n de Alertas de Stock -->
         <HBox fx:id="btnStockAlerts" alignment="CENTER" onMouseClicked="#handleShowStockAlerts" styleClass="header-alert-button" visible="false" managed="false">
             <StackPane>
                 <FontAwesomeIconView glyphName="BELL" size="18" fill="#e53935"/>
@@ -41,7 +41,7 @@
             <HBox.margin><Insets right="10"/></HBox.margin>
         </HBox>
 
-        <!-- Menú de usuario -->
+        <!-- Men\u00fa de usuario -->
         <MenuButton fx:id="userMenuButton" styleClass="user-menu-button">
             <graphic>
                 <HBox spacing="10" alignment="CENTER_LEFT">

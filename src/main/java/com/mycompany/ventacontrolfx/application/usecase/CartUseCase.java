@@ -116,11 +116,11 @@ public class CartUseCase {
                 }
             }
 
-            // 3. Aplicamos SOLO si la tarifa no cambiÃ³ mientras consultÃ¡bamos la BD
-            // Esto evita el race condition cuando el usuario cambia la tarifa rÃ¡pidamente
+            // 3. Aplicamos SOLO si la tarifa no cambi\u00c3\u00b3 mientras consult\u00c3\u00a1bamos la BD
+            // Esto evita el race condition cuando el usuario cambia la tarifa r\u00c3\u00a1pidamente
             javafx.application.Platform.runLater(() -> {
                 if (priceListId.get() != newListId) {
-                    // El usuario cambiÃ³ la tarifa de nuevo: descartamos esta actualizaciÃ³n obsoleta
+                    // El usuario cambi\u00c3\u00b3 la tarifa de nuevo: descartamos esta actualizaci\u00c3\u00b3n obsoleta
                     System.out.println("[CartUseCase] Descartando precios obsoletos de tarifa " + newListId
                             + " (tarifa actual: " + priceListId.get() + ")");
                     return;
@@ -153,7 +153,7 @@ public class CartUseCase {
         for (CartItem item : cartItems) {
             Product product = item.getProduct();
             try {
-                // Obtener descuento especÃ­fico para este producto desde el motor
+                // Obtener descuento espec\u00c3\u00adfico para este producto desde el motor
                 double autoDiscount = promoResult.getItemDiscounts().getOrDefault(product.getId(), 0.0);
                 double totalLineDiscount = Math.min(autoDiscount + item.getManualDiscountAmount(),
                         item.getUnitPrice() * item.getQuantity());
@@ -167,7 +167,7 @@ public class CartUseCase {
                 // Precio unitario original (con tarifa de cliente ya aplicada)
                 double unitPrice = item.getUnitPrice();
 
-                // Calculamos el total de la lÃ­nea YA con descuento para que el TaxEngine
+                // Calculamos el total de la l\u00c3\u00adnea YA con descuento para que el TaxEngine
                 // recalcule la base e IVA
                 double grossLineTotal = (unitPrice * item.getQuantity()) - totalLineDiscount;
 
@@ -294,7 +294,7 @@ public class CartUseCase {
     public void addItem(Product product) {
         if (locked.get()) {
             throw new IllegalStateException(
-                    "El carrito estÃ¡ BLOQUEADO temporalmente. Debe realizar el cierre de caja o fichar inicio de turno.");
+                    "El carrito est\u00c3\u00a1 BLOQUEADO temporalmente. Debe realizar el cierre de caja o fichar inicio de turno.");
         }
         addItem(product, 1);
     }
@@ -327,7 +327,7 @@ public class CartUseCase {
         try {
             Product genericProduct = productRepository.findBySku("SYS-GEN-001");
             if (genericProduct != null) {
-                // Creamos un producto virtual basado en el genÃ©rico
+                // Creamos un producto virtual basado en el gen\u00c3\u00a9rico
                 Product customProduct = new Product(
                         genericProduct.getId(),
                         genericProduct.getCategoryId(),

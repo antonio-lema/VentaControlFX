@@ -285,7 +285,7 @@ public class ReceiptController implements Injectable {
             QueryFiscalDocumentUseCase queryUseCase = container.getQueryFiscalDocumentUseCase();
             QueryFiscalDocumentUseCase.PrintData data = queryUseCase.getDataForReprint(currentSaleId);
 
-            // 2. Adjuntar logo si estÃ¡ disponible
+            // 2. Adjuntar logo si est\u00c3\u00a1 disponible
             if (cfg != null && cfg.getLogoPath() != null && !cfg.getLogoPath().trim().isEmpty()) {
                 data.logoPath = cfg.getLogoPath();
             }
@@ -387,11 +387,11 @@ public class ReceiptController implements Injectable {
         }
         itemsContainer.getChildren().add(row);
 
-        // Si hay descuento, aÃ±adir una lÃ­nea extra negativa justo debajo
+        // Si hay descuento, a\u00c3\u00b1adir una l\u00c3\u00adnea extra negativa justo debajo
         if (!isGiftMode && item.getDiscountAmount() > 0) {
             HBox discountRow = new HBox(10);
             discountRow.setAlignment(Pos.CENTER_LEFT);
-            discountRow.setStyle("-fx-padding: 2 0 5 15;"); // IndentaciÃ³n
+            discountRow.setStyle("-fx-padding: 2 0 5 15;"); // Indentaci\u00c3\u00b3n
             Label discDesc = new Label("[DESC] " + container.getBundle().getString("receipt.savings_label"));
             discDesc.setStyle("-fx-font-size: 10; -fx-text-fill: #666; -fx-font-style: italic;");
             HBox.setHgrow(discDesc, Priority.ALWAYS);

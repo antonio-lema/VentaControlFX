@@ -10,13 +10,13 @@ import java.security.NoSuchAlgorithmException;
  * Calcula y verifica el hash de control (SHA-256) que garantiza
  * que los datos del documento no han sido manipulados externamente.
  *
- * Clean Architecture â€” Capa de Dominio (no tiene dependencias de
+ * Clean Architecture \u00e2\u20ac\u201d Capa de Dominio (no tiene dependencias de
  * infraestructura).
  */
 public class FiscalIntegrityService {
 
     /**
-     * Clave secreta del sistema. En producciÃ³n, debe cargarse desde
+     * Clave secreta del sistema. En producci\u00c3\u00b3n, debe cargarse desde
      * system_config encriptado o una variable de entorno.
      */
     private static final String SECRET = "VENTA_CTRL_FX_2026";
@@ -33,7 +33,7 @@ public class FiscalIntegrityService {
     /**
      * Verifica que el hash del documento no ha sido alterado.
      * 
-     * @return true si el documento es Ã­ntegro, false si fue manipulado.
+     * @return true si el documento es \u00c3\u00adntegro, false si fue manipulado.
      */
     public boolean verify(FiscalDocument doc) {
         if (doc.getControlHash() == null || doc.getControlHash().isBlank()) {
@@ -43,7 +43,7 @@ public class FiscalIntegrityService {
         return expected.equals(doc.getControlHash());
     }
 
-    // â”€â”€ private helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // \u00e2\u201d\u20ac\u00e2\u201d\u20ac private helpers \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac
 
     private String buildRaw(FiscalDocument doc) {
         return doc.getSaleId()

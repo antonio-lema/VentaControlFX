@@ -26,8 +26,8 @@
                                 </StackPane>
                                 <VBox spacing="2">
                                     <children>
-                                        <Label text="Gestión de Turnos y Descansos" styleClass="view-title"/>
-                                        <Label text="Registra tus entradas, salidas y tiempos de descanso ⏱️" styleClass="view-subtitle"/>
+                                        <Label text="Gesti\u00f3n de Turnos y Descansos" styleClass="view-title"/>
+                                        <Label text="Registra tus entradas, salidas y tiempos de descanso \u23f1\ufe0f" styleClass="view-subtitle"/>
                                     </children>
                                 </VBox>
                             </children>
@@ -117,7 +117,7 @@
                                         <TableColumn fx:id="colType" prefWidth="150.0" text="TIPO" />
                                         <TableColumn fx:id="colStart" prefWidth="200.0" text="INICIO" />
                                         <TableColumn fx:id="colEnd" prefWidth="200.0" text="FIN" />
-                                        <TableColumn fx:id="colDuration" prefWidth="150.0" text="DURACIÓN" />
+                                        <TableColumn fx:id="colDuration" prefWidth="150.0" text="DURACI\u00d3N" />
                                         <TableColumn fx:id="colStatus" prefWidth="120.0" text="ESTADO" />
                                     </columns>
                                     <columnResizePolicy>

@@ -12,7 +12,7 @@ import java.util.List;
 public class JdbcPriceUpdateLogRepository implements IPriceUpdateLogRepository {
 
     /**
-     * Guarda un nuevo registro de actualizaciÃ³n masiva.
+     * Guarda un nuevo registro de actualizaci\u00c3\u00b3n masiva.
      */
     @Override
     public void save(PriceUpdateLog log) throws SQLException {
