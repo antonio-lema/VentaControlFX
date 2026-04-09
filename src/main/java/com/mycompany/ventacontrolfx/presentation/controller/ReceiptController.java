@@ -90,8 +90,8 @@ public class ReceiptController implements Injectable {
                         + LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd MMM, yyyy '"
                                 + container.getBundle().getString("receipt.info.time") + ":' HH:mm:ss")));
         lblTicketTitle.setText(
-                (isGiftMode ? container.getBundle().getString("receipt.title.gift") + " NÂº: "
-                        : container.getBundle().getString("receipt.title.invoice") + " NÂº: ")
+                (isGiftMode ? container.getBundle().getString("receipt.title.gift") + " N\u00BA: "
+                        : container.getBundle().getString("receipt.title.invoice") + " N\u00BA: ")
                         + String.format("%03d", saleId));
 
         if (lblSuccessMessage != null) {

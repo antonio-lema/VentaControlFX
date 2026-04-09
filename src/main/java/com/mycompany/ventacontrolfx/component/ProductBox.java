@@ -79,7 +79,7 @@ public class ProductBox extends VBox {
             displayPrice = product.getCurrentPrice() * (1 + (rate / 100.0));
         }
 
-        Label priceBadge = new Label(String.format("%.2fâ‚¬", displayPrice));
+        Label priceBadge = new Label(String.format("%.2f\u20AC", displayPrice));
         priceBadge.getStyleClass().add("product-price-badge");
         StackPane.setAlignment(priceBadge, Pos.TOP_RIGHT);
         StackPane.setMargin(priceBadge, new Insets(10, 10, 0, 0));

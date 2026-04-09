@@ -153,22 +153,22 @@ public class CartItemRow extends HBox {
 
             if (discountValueToSubtract > 0) {
                 // Show original price small and crossed out (or just muted)
-                priceLabel.setText(String.format("%.2f â‚¬", originalLineTotal));
+                priceLabel.setText(String.format("%.2f \u20AC", originalLineTotal));
                 priceLabel.setVisible(true);
                 priceLabel.setManaged(true);
                 priceLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: #999;");
 
-                discountLabel.setText(String.format("-%.2f â‚¬", discountValueToSubtract));
+                discountLabel.setText(String.format("-%.2f \u20AC", discountValueToSubtract));
                 discountLabel.setVisible(true);
                 discountLabel.setManaged(true);
 
-                finalPriceLabel.setText(String.format("%.2f â‚¬", finalLineTotal));
+                finalPriceLabel.setText(String.format("%.2f \u20AC", finalLineTotal));
             } else {
                 priceLabel.setVisible(false);
                 priceLabel.setManaged(false);
                 discountLabel.setVisible(false);
                 discountLabel.setManaged(false);
-                finalPriceLabel.setText(String.format("%.2f â‚¬", originalLineTotal));
+                finalPriceLabel.setText(String.format("%.2f \u20AC", originalLineTotal));
             }
         };
         refreshPrice.run(); // Pintar el valor inicial

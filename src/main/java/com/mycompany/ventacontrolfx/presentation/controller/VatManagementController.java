@@ -1042,7 +1042,7 @@ public class VatManagementController implements Injectable {
                     return applyByGroupingRounding(priceListId, finalGrouping, finalValue, finalReason, startDate,
                             extra);
                 }
-                throw new BusinessException("Tipo de operaciÃ³n no reconocido.");
+                throw new BusinessException("Tipo de operaci\u00F3n no reconocido.");
             }, (res) -> {
                 int count = (int) res;
                 AlertUtil.showInfo(container.getBundle().getString("alert.success"),
