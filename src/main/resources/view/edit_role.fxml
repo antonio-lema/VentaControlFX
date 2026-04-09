@@ -31,7 +31,7 @@
                     <Label text="Define el conjunto de permisos para este rol" styleClass="modern-register-subtitle"/>
                 </VBox>
 
-                <!-- &#x2500;&#x2500; DATOS DEL ROL &#x2500;&#x2500; -->
+                <!--  DATOS DEL ROL  -->
                 <VBox spacing="12">
                     
                     <VBox styleClass="modern-input-group">
@@ -49,7 +49,7 @@
                     </VBox>
                 </VBox>
 
-                <!-- &#x2500;&#x2500; SECCI&#x00d3;N DE PERMISOS &#x2500;&#x2500; -->
+                <!--  SECCI&#x00d3;N DE PERMISOS  -->
                 <VBox spacing="10" style="-fx-padding: 16 0 0 0;">
                     <HBox alignment="CENTER_LEFT" spacing="8">
                         <FontAwesomeIconView glyphName="SHIELD" size="16" styleClass="sidebar-icon"/>

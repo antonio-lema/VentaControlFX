@@ -59,7 +59,7 @@
                         <Label text="Facturaci&#x00f3;n Total" style="-fx-font-size: 13px; -fx-text-fill: #64748b; -fx-font-weight: bold;"/>
                     </HBox>
                     <HBox alignment="BOTTOM_LEFT" spacing="12" style="-fx-padding: 12 0 0 0;">
-                        <Label fx:id="lblKpiTotal" text="&#x20ac;0.00" style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: -fx-text-custom-main;"/>
+                        <Label fx:id="lblKpiTotal" text="&#x20ac0;.00" style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: -fx-text-custom-main;"/>
                         <Label fx:id="lblKpiTotalVar" text="-" style="-fx-background-color: #dcfce7; -fx-text-fill: #16a34a; -fx-padding: 2 6; -fx-background-radius: 10; -fx-font-size: 11px; -fx-font-weight: bold;"/>
                     </HBox>
                 </VBox>
@@ -72,7 +72,7 @@
                         <Label text="Compra Media" style="-fx-font-size: 13px; -fx-text-fill: #64748b; -fx-font-weight: bold;"/>
                     </HBox>
                     <HBox alignment="BOTTOM_LEFT" spacing="12" style="-fx-padding: 12 0 0 0;">
-                        <Label fx:id="lblKpiAvgOrder" text="&#x20ac;0.00" style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: -fx-text-custom-main;"/>
+                        <Label fx:id="lblKpiAvgOrder" text="&#x20ac0;.00" style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: -fx-text-custom-main;"/>
                         <Label fx:id="lblKpiAvgOrderVar" text="-" style="-fx-background-color: #fee2e2; -fx-text-fill: #dc2626; -fx-padding: 2 6; -fx-background-radius: 10; -fx-font-size: 11px; -fx-font-weight: bold;"/>
                     </HBox>
                 </VBox>
@@ -85,7 +85,7 @@
                         <Label text="Valor del Cliente (LTV)" style="-fx-font-size: 13px; -fx-text-fill: #64748b; -fx-font-weight: bold;"/>
                     </HBox>
                     <HBox alignment="BOTTOM_LEFT" spacing="12" style="-fx-padding: 12 0 0 0;">
-                        <Label fx:id="lblKpiLtv" text="&#x20ac;0.00" style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: -fx-text-custom-main;"/>
+                        <Label fx:id="lblKpiLtv" text="&#x20ac0;.00" style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: -fx-text-custom-main;"/>
                         <Label fx:id="lblKpiLtvVar" text="-" style="-fx-background-color: #dcfce7; -fx-text-fill: #16a34a; -fx-padding: 2 6; -fx-background-radius: 10; -fx-font-size: 11px; -fx-font-weight: bold;"/>
                     </HBox>
                 </VBox>
@@ -150,7 +150,7 @@
                                 <TableView fx:id="purchaseTable" VBox.vgrow="ALWAYS">
                                     <columns>
                                         <TableColumn fx:id="colDate" text="FECHA" minWidth="120" prefWidth="140" style="-fx-text-fill: -fx-text-custom-light;"/>
-                                        <TableColumn fx:id="colItems" text="ART&#x00cd;CULOS" minWidth="80" prefWidth="90" style="-fx-alignment: CENTER;"/>
+                                        <TableColumn fx:id="colItems" text="ART&#x00cdC;ULOS" minWidth="80" prefWidth="90" style="-fx-alignment: CENTER;"/>
                                         <TableColumn fx:id="colMethod" text="PAGO" minWidth="100" prefWidth="110"/>
                                         <TableColumn fx:id="colAmount" text="IMPORTE" minWidth="100" prefWidth="110" style="-fx-alignment: CENTER-RIGHT; -fx-font-weight: bold; -fx-text-fill: -fx-text-custom-main;"/>
                                     </columns>

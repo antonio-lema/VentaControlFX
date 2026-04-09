@@ -15,6 +15,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>21</java.version>
         <javafx.version>21</javafx.version>
+        <exec.mainClass>com.mycompany.ventacontrolfx.Launcher</exec.mainClass>
     </properties>
 
     <dependencies>
@@ -183,7 +184,7 @@
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>3.1.0</version>
                 <configuration>
-                    <mainClass>com.mycompany.ventacontrolfx.Launcher</mainClass>
+                    <mainClass>${exec.mainClass}</mainClass>
                 </configuration>
             </plugin>
 

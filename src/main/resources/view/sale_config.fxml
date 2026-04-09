@@ -45,7 +45,7 @@
         <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="detail-scroll, edge-to-edge" VBox.vgrow="ALWAYS">
             <VBox spacing="20" style="-fx-padding: 30;">
 
-                <!-- &#x2500;&#x2500;&#x2500; FILA 1: Empresa + Fiscal &#x2500;&#x2500;&#x2500; -->
+                <!--  FILA 1: Empresa + Fiscal  -->
                 <HBox spacing="20">
 
                     <!-- Tarjeta: Datos de la Empresa -->
@@ -87,7 +87,7 @@
                                                HBox.hgrow="ALWAYS" styleClass="modern-input-field"/>
                                 </HBox>
                             </VBox>
-                            <!-- Tel&#x00e9;fono -->
+                            <!-- Tel&#x00e9f;ono -->
                             <VBox styleClass="config-field-group">
                                 <Label text="%config.field.phone" styleClass="config-field-label"/>
                                 <HBox styleClass="config-input-container">
@@ -171,7 +171,7 @@
                     </VBox>
                 </HBox>
 
-                <!-- &#x2500;&#x2500;&#x2500; FILA 3: Horarios &#x2500;&#x2500;&#x2500; -->
+                <!--  FILA 3: Horarios  -->
                 <HBox spacing="20">
                     <VBox styleClass="config-card" HBox.hgrow="ALWAYS" maxWidth="450">
                         <HBox styleClass="config-card-header" alignment="CENTER_LEFT" spacing="10">
@@ -194,7 +194,7 @@
                     </VBox>
                 </HBox>
 
-                <!-- &#x2500;&#x2500;&#x2500; FILA 2: Ticket &#x2500;&#x2500;&#x2500; -->
+                <!--  FILA 2: Ticket  -->
                 <HBox spacing="20">
 
                     <!-- Tarjeta: Ticket / Recibo -->
@@ -218,7 +218,7 @@
                                 <CheckBox fx:id="chkShowAddress" text="%config.check.show_address"
                                           styleClass="config-checkbox"/>
                             </HBox>
-                            <!-- Mostrar tel&#x00e9;fono -->
+                            <!-- Mostrar tel&#x00e9f;ono -->
                             <HBox spacing="12" alignment="CENTER_LEFT" styleClass="config-check-row">
                                 <CheckBox fx:id="chkShowPhone" text="%config.check.show_phone"
                                           styleClass="config-checkbox"/>
@@ -332,7 +332,7 @@
                 </HBox>
 
 
-                <!-- &#x2500;&#x2500;&#x2500; Botones de Acci&#x00f3;n finales &#x2500;&#x2500;&#x2500; -->
+                <!--  Botones de Acci&#x00f3;n finales  -->
                 <HBox spacing="15" alignment="CENTER_RIGHT">
                     <Button text="%config.btn.reset" onAction="#handleReset" styleClass="config-btn-reset">
                         <graphic>

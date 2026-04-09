@@ -59,7 +59,7 @@
                 <children>
                     <HBox spacing="10" alignment="CENTER_LEFT">
                         <children>
-                            <Label text="Margen de cortes&#x00ed;a:" style="-fx-font-weight: bold; -fx-text-fill: #475569;" />
+                            <Label text="Margen de cortes&#x00eda;:" style="-fx-font-weight: bold; -fx-text-fill: #475569;" />
                             <TextField fx:id="txtGracePeriod" prefWidth="50" style="-fx-background-radius: 4;" />
                             <Label text="minutos" style="-fx-text-fill: #64748b;" />
                             <Label>

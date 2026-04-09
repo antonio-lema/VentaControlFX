@@ -135,7 +135,7 @@
 
             <!-- ROW 2: Charts & Leaderboard -->
             <HBox spacing="24">
-                <!-- GR&#x00c1;FICAS (Evoluci&#x00f3;n y barras) -->
+                <!-- GR&#x00c1F;ICAS (Evoluci&#x00f3;n y barras) -->
                 <VBox styleClass="widget-panel" HBox.hgrow="ALWAYS" spacing="16">
                     <HBox alignment="CENTER_LEFT">
                         <Label text="Rendimiento Comercial" styleClass="widget-title"/>
@@ -185,7 +185,7 @@
                     <VBox styleClass="widget-panel" VBox.vgrow="ALWAYS" spacing="15">
                         <Label text="Distribuci&#x00f3;n por Pagos" styleClass="widget-title"/>
                         <HBox alignment="CENTER" spacing="20" VBox.vgrow="ALWAYS">
-                            <!-- El gr&#x00e1;fico circular ocupar&#x00e1; una porci&#x00f3;n pero sin constre&#x00f1;irlo excesivamente -->
+                            <!-- El gr&#x00e1f;ico circular ocupar&#x00e1; una porci&#x00f3;n pero sin constre&#x00f1;irlo excesivamente -->
                             <PieChart fx:id="pieChartDistribution" legendVisible="false" minHeight="160" minWidth="160" prefHeight="180" prefWidth="180"/>
                             
                             <!-- Columna separada y ancla para las leyendas y progresos, forzando buen espaciado -->

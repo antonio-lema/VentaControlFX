@@ -34,7 +34,7 @@
                     <Label text="Introduce los datos del nuevo usuario" styleClass="modern-register-subtitle"/>
                 </VBox>
 
-                <!-- &#x2500;&#x2500; DATOS B&#x00c1;SICOS &#x2500;&#x2500; -->
+                <!--  DATOS B&#x00c1;SICOS  -->
                 <VBox spacing="12">
 
                     <!-- Full Name -->
@@ -81,7 +81,7 @@
                         <VBox styleClass="modern-input-group" HBox.hgrow="ALWAYS">
                             <HBox styleClass="modern-input-container">
                                 <FontAwesomeIconView glyphName="LOCK" size="18" styleClass="sidebar-icon"/>
-                                <PasswordField fx:id="txtPassword" promptText="Contrase&#x00f1;a" HBox.hgrow="ALWAYS" styleClass="modern-input-field"/>
+                                <PasswordField fx:id="txtPassword" promptText="Contrase&#x00f1a;" HBox.hgrow="ALWAYS" styleClass="modern-input-field"/>
                             </HBox>
                         </VBox>
                         <VBox styleClass="modern-input-group" HBox.hgrow="ALWAYS">
@@ -93,7 +93,7 @@
                     </HBox>
                 </VBox>
 
-                <!-- &#x2500;&#x2500; SECCI&#x00d3;N DE PERMISOS &#x2500;&#x2500; -->
+                <!--  SECCI&#x00d3;N DE PERMISOS  -->
                 <VBox spacing="10" style="-fx-padding: 16 0 0 0;">
                     <!-- Cabecera de la secci&#x00f3;n -->
                     <HBox alignment="CENTER_LEFT" spacing="8">

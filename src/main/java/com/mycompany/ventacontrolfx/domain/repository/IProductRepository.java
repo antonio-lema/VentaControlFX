@@ -23,6 +23,10 @@ public interface IProductRepository {
 
         List<Product> getFavorites(int priceListId) throws SQLException;
 
+        java.util.List<Product> getFavoritesPaginated(int limit, int offset, int priceListId) throws SQLException;
+
+        int countFavorites() throws SQLException;
+
         Product getById(int id) throws SQLException;
 
         void save(Product product) throws SQLException;
@@ -64,4 +68,5 @@ public interface IProductRepository {
 
         Product findBySku(String sku) throws SQLException;
 
+        java.util.List<Product> getBasicMetadata() throws SQLException;
 }

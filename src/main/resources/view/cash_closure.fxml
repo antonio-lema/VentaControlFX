@@ -39,7 +39,7 @@
         <ScrollPane prefWidth="420" fitToWidth="true" hbarPolicy="NEVER" styleClass="estetica-scroll" 
                    style="-fx-background-color: transparent; -fx-background: transparent;">
             <VBox spacing="14">
-                <!-- &#x2554;&#x2550;&#x2550; TARJETA: EFECTIVO EN CAJA &#x2550;&#x2550;&#x2557; -->
+                <!-- TPP TARJETA: EFECTIVO EN CAJA PPW -->
                 <VBox fx:id="cardCash" spacing="12" styleClass="estetica-card">
                     <HBox styleClass="estetica-card-header" alignment="CENTER_LEFT" spacing="12">
                         <StackPane styleClass="estetica-card-icon-wrap, estetica-icon-green">
@@ -81,7 +81,7 @@
                     </VBox>
                 </VBox>
 
-                <!-- &#x2554;&#x2550;&#x2550; TARJETA: CONTABILIDAD &#x2550;&#x2550;&#x2557; -->
+                <!-- TPP TARJETA: CONTABILIDAD PPW -->
                 <VBox fx:id="cardAccounting" spacing="15" styleClass="estetica-card">
                     <HBox styleClass="estetica-card-header" alignment="CENTER_LEFT" spacing="12">
                         <StackPane styleClass="estetica-card-icon-wrap, estetica-icon-blue">

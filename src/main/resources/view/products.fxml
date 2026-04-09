@@ -102,21 +102,23 @@
                           <Region HBox.hgrow="ALWAYS" />
 
                           <!-- Jump Buttons and Pagination -->
-                          <HBox alignment="CENTER" spacing="0">
+                          <HBox alignment="CENTER" spacing="8" styleClass="modern-pagination-container">
                               <children>
-                                  <Button onAction="#handleJumpBack10" style="-fx-background-color: transparent; -fx-cursor: hand; -fx-padding: 4;">
-                                      <graphic><FontAwesomeIconView glyphName="ANGLE_DOUBLE_LEFT" size="20" fill="#3498db"/></graphic>
+                                  <Button onAction="#handleJumpBack10" styleClass="pagination-jump-btn">
+                                      <tooltip><javafx.scene.control.Tooltip text="%products.pagination.back10"/></tooltip>
+                                      <graphic><FontAwesomeIconView glyphName="ANGLE_DOUBLE_LEFT" size="16" /></graphic>
                                   </Button>
                                   
-                                  <javafx.scene.control.Pagination fx:id="pagination" maxPageIndicatorCount="7" styleClass="server-pagination" />
+                                  <javafx.scene.control.Pagination fx:id="pagination" maxPageIndicatorCount="7" styleClass="modern-server-pagination" />
                                   
-                                  <Button onAction="#handleJumpForward10" style="-fx-background-color: transparent; -fx-cursor: hand; -fx-padding: 4;">
-                                      <graphic><FontAwesomeIconView glyphName="ANGLE_DOUBLE_RIGHT" size="20" fill="#3498db"/></graphic>
+                                  <Button onAction="#handleJumpForward10" styleClass="pagination-jump-btn">
+                                      <tooltip><javafx.scene.control.Tooltip text="%products.pagination.forward10"/></tooltip>
+                                      <graphic><FontAwesomeIconView glyphName="ANGLE_DOUBLE_RIGHT" size="16" /></graphic>
                                   </Button>
                               </children>
                           </HBox>
 
-                          <Label fx:id="lblCount" text="0 productos encontrados" style="-fx-text-fill: #7f8c8d; -fx-font-weight: bold; -fx-min-width: 200; -fx-alignment: CENTER_RIGHT;"/>
+                          <Label fx:id="lblCount" text="0 productos encontrados" styleClass="pagination-stats-label"/>
                       </children>
                   </HBox>
                </children>

@@ -19,7 +19,10 @@ public class JdbcProductRepository implements IProductRepository {
         List<Product> products = new ArrayList<>();
         String priceSubquery;
         if (priceListId > 0) {
-            priceSubquery = "COALESCE(" + "(SELECT pp.price FROM product_prices pp WHERE pp.product_id = p.product_id AND pp.price_list_id = ? AND pp.start_date <= CURRENT_TIMESTAMP AND (pp.end_date IS NULL OR pp.end_date > CURRENT_TIMESTAMP) ORDER BY pp.start_date DESC LIMIT 1), " + "(SELECT pp.price FROM product_prices pp JOIN price_lists pl ON pp.price_list_id = pl.price_list_id WHERE pp.product_id = p.product_id AND pl.is_default = 1 AND pp.start_date <= CURRENT_TIMESTAMP AND (pp.end_date IS NULL OR pp.end_date > CURRENT_TIMESTAMP) ORDER BY pp.start_date DESC LIMIT 1), " + "0.0)";
+            priceSubquery = "COALESCE("
+                    + "(SELECT pp.price FROM product_prices pp WHERE pp.product_id = p.product_id AND pp.price_list_id = ? AND pp.start_date <= CURRENT_TIMESTAMP AND (pp.end_date IS NULL OR pp.end_date > CURRENT_TIMESTAMP) ORDER BY pp.start_date DESC LIMIT 1), "
+                    + "(SELECT pp.price FROM product_prices pp JOIN price_lists pl ON pp.price_list_id = pl.price_list_id WHERE pp.product_id = p.product_id AND pl.is_default = 1 AND pp.start_date <= CURRENT_TIMESTAMP AND (pp.end_date IS NULL OR pp.end_date > CURRENT_TIMESTAMP) ORDER BY pp.start_date DESC LIMIT 1), "
+                    + "0.0)";
         } else {
             priceSubquery = "COALESCE((SELECT pp.price FROM product_prices pp JOIN price_lists pl ON pp.price_list_id = pl.price_list_id WHERE pp.product_id = p.product_id AND pl.is_default = 1 AND pp.start_date <= CURRENT_TIMESTAMP AND (pp.end_date IS NULL OR pp.end_date > CURRENT_TIMESTAMP) ORDER BY pp.start_date DESC LIMIT 1), 0.0)";
         }
@@ -125,27 +128,30 @@ public class JdbcProductRepository implements IProductRepository {
 
     @Override
     public List<Product> getFavorites(int priceListId) throws SQLException {
+        // Redirigir al paginado con un l\u00edmite razonable por defecto si se usa sin
+        // paginar
+        return getFavoritesPaginated(1000, 0, priceListId);
+    }
+
+    @Override
+    public List<Product> getFavoritesPaginated(int limit, int offset, int priceListId) throws SQLException {
         List<Product> products = new ArrayList<>();
-        String priceSubquery;
-        if (priceListId > 0) {
-            priceSubquery = "COALESCE(" +
-                    "(SELECT pp.price FROM product_prices pp WHERE pp.product_id = p.product_id AND pp.price_list_id = ? AND pp.start_date <= CURRENT_TIMESTAMP AND (pp.end_date IS NULL OR pp.end_date > CURRENT_TIMESTAMP) ORDER BY pp.start_date DESC LIMIT 1), "
-                    +
-                    "(SELECT pp.price FROM product_prices pp JOIN price_lists pl ON pp.price_list_id = pl.price_list_id WHERE pp.product_id = p.product_id AND pl.is_default = 1 AND pp.start_date <= CURRENT_TIMESTAMP AND (pp.end_date IS NULL OR pp.end_date > CURRENT_TIMESTAMP) ORDER BY pp.start_date DESC LIMIT 1), "
-                    +
-                    "0.0)";
-        } else {
-            priceSubquery = "COALESCE((SELECT pp.price FROM product_prices pp JOIN price_lists pl ON pp.price_list_id = pl.price_list_id WHERE pp.product_id = p.product_id AND pl.is_default = 1 AND pp.start_date <= CURRENT_TIMESTAMP AND (pp.end_date IS NULL OR pp.end_date > CURRENT_TIMESTAMP) ORDER BY pp.start_date DESC LIMIT 1), 0.0)";
-        }
+        String priceSubquery = buildPriceSubquery(priceListId);
 
         String sql = "SELECT p.*, c.name AS category_name, c.default_iva AS category_iva, " +
                 priceSubquery + " AS current_price " +
-                "FROM products p LEFT JOIN categories c ON p.category_id = c.category_id WHERE p.visible = TRUE AND p.is_favorite = TRUE";
+                "FROM products p LEFT JOIN categories c ON p.category_id = c.category_id " +
+                "WHERE p.visible = TRUE AND p.is_favorite = TRUE LIMIT ? OFFSET ?";
+
         try (Connection conn = DBConnection.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            int paramIndex = 1;
             if (priceListId > 0) {
-                pstmt.setInt(1, priceListId);
+                pstmt.setInt(paramIndex++, priceListId);
             }
+            pstmt.setInt(paramIndex++, limit);
+            pstmt.setInt(paramIndex++, offset);
+
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
                     products.add(mapResultSetToProduct(rs));
@@ -153,6 +159,32 @@ public class JdbcProductRepository implements IProductRepository {
             }
         }
         return products;
+    }
+
+    @Override
+    public int countFavorites() throws SQLException {
+        String sql = "SELECT COUNT(*) FROM products WHERE visible = TRUE AND is_favorite = TRUE";
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(sql);
+                ResultSet rs = pstmt.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        }
+        return 0;
+    }
+
+    private String buildPriceSubquery(int priceListId) {
+        if (priceListId > 0) {
+            return "COALESCE(" +
+                    "(SELECT pp.price FROM product_prices pp WHERE pp.product_id = p.product_id AND pp.price_list_id = ? AND pp.start_date <= CURRENT_TIMESTAMP AND (pp.end_date IS NULL OR pp.end_date > CURRENT_TIMESTAMP) ORDER BY pp.start_date DESC LIMIT 1), "
+                    +
+                    "(SELECT pp.price FROM product_prices pp JOIN price_lists pl ON pp.price_list_id = pl.price_list_id WHERE pp.product_id = p.product_id AND pl.is_default = 1 AND pp.start_date <= CURRENT_TIMESTAMP AND (pp.end_date IS NULL OR pp.end_date > CURRENT_TIMESTAMP) ORDER BY pp.start_date DESC LIMIT 1), "
+                    +
+                    "0.0)";
+        } else {
+            return "COALESCE((SELECT pp.price FROM product_prices pp JOIN price_lists pl ON pp.price_list_id = pl.price_list_id WHERE pp.product_id = p.product_id AND pl.is_default = 1 AND pp.start_date <= CURRENT_TIMESTAMP AND (pp.end_date IS NULL OR pp.end_date > CURRENT_TIMESTAMP) ORDER BY pp.start_date DESC LIMIT 1), 0.0)";
+        }
     }
 
     @Override
@@ -371,7 +403,8 @@ public class JdbcProductRepository implements IProductRepository {
                 pstmt.executeUpdate();
             }
 
-            // --- L\u00c3\u0192\u00e2\u20ac\u0153GICA DE DOBLE ESCRITURA PARA product_prices ---
+            // --- L\u00c3\u0192\u00e2\u20ac\u0153GICA DE DOBLE ESCRITURA PARA
+            // product_prices ---
             // 1. Obtener ID de la lista por defecto
             int defaultPriceListId = 1;
             try (Statement stmtList = conn.createStatement();
@@ -466,8 +499,10 @@ public class JdbcProductRepository implements IProductRepository {
         String priceSubquery;
         if (priceListId > 0) {
             priceSubquery = "COALESCE(" +
-                    "(SELECT pp.price FROM product_prices pp WHERE pp.product_id = p.product_id AND pp.price_list_id = ? AND pp.start_date <= CURRENT_TIMESTAMP AND (pp.end_date IS NULL OR pp.end_date > CURRENT_TIMESTAMP) ORDER BY pp.start_date DESC LIMIT 1), " +
-                    "(SELECT pp.price FROM product_prices pp JOIN price_lists pl ON pp.price_list_id = pl.price_list_id WHERE pp.product_id = p.product_id AND pl.is_default = 1 AND pp.start_date <= CURRENT_TIMESTAMP AND (pp.end_date IS NULL OR pp.end_date > CURRENT_TIMESTAMP) ORDER BY pp.start_date DESC LIMIT 1), " +
+                    "(SELECT pp.price FROM product_prices pp WHERE pp.product_id = p.product_id AND pp.price_list_id = ? AND pp.start_date <= CURRENT_TIMESTAMP AND (pp.end_date IS NULL OR pp.end_date > CURRENT_TIMESTAMP) ORDER BY pp.start_date DESC LIMIT 1), "
+                    +
+                    "(SELECT pp.price FROM product_prices pp JOIN price_lists pl ON pp.price_list_id = pl.price_list_id WHERE pp.product_id = p.product_id AND pl.is_default = 1 AND pp.start_date <= CURRENT_TIMESTAMP AND (pp.end_date IS NULL OR pp.end_date > CURRENT_TIMESTAMP) ORDER BY pp.start_date DESC LIMIT 1), "
+                    +
                     "0.0)";
         } else {
             priceSubquery = "COALESCE((SELECT pp.price FROM product_prices pp JOIN price_lists pl ON pp.price_list_id = pl.price_list_id WHERE pp.product_id = p.product_id AND pl.is_default = 1 AND pp.start_date <= CURRENT_TIMESTAMP AND (pp.end_date IS NULL OR pp.end_date > CURRENT_TIMESTAMP) ORDER BY pp.start_date DESC LIMIT 1), 0.0)";
@@ -743,7 +778,10 @@ public class JdbcProductRepository implements IProductRepository {
         List<Product> products = new ArrayList<>();
         String priceSubquery;
         if (priceListId > 0) {
-            priceSubquery = "COALESCE(" + "(SELECT pp.price FROM product_prices pp WHERE pp.product_id = p.product_id AND pp.price_list_id = ? AND pp.start_date <= CURRENT_TIMESTAMP AND (pp.end_date IS NULL OR pp.end_date > CURRENT_TIMESTAMP) ORDER BY pp.start_date DESC LIMIT 1), " + "(SELECT pp.price FROM product_prices pp JOIN price_lists pl ON pp.price_list_id = pl.price_list_id WHERE pp.product_id = p.product_id AND pl.is_default = 1 AND pp.start_date <= CURRENT_TIMESTAMP AND (pp.end_date IS NULL OR pp.end_date > CURRENT_TIMESTAMP) ORDER BY pp.start_date DESC LIMIT 1), " + "0.0)";
+            priceSubquery = "COALESCE("
+                    + "(SELECT pp.price FROM product_prices pp WHERE pp.product_id = p.product_id AND pp.price_list_id = ? AND pp.start_date <= CURRENT_TIMESTAMP AND (pp.end_date IS NULL OR pp.end_date > CURRENT_TIMESTAMP) ORDER BY pp.start_date DESC LIMIT 1), "
+                    + "(SELECT pp.price FROM product_prices pp JOIN price_lists pl ON pp.price_list_id = pl.price_list_id WHERE pp.product_id = p.product_id AND pl.is_default = 1 AND pp.start_date <= CURRENT_TIMESTAMP AND (pp.end_date IS NULL OR pp.end_date > CURRENT_TIMESTAMP) ORDER BY pp.start_date DESC LIMIT 1), "
+                    + "0.0)";
         } else {
             priceSubquery = "COALESCE((SELECT pp.price FROM product_prices pp JOIN price_lists pl ON pp.price_list_id = pl.price_list_id WHERE pp.product_id = p.product_id AND pl.is_default = 1 AND pp.start_date <= CURRENT_TIMESTAMP AND (pp.end_date IS NULL OR pp.end_date > CURRENT_TIMESTAMP) ORDER BY pp.start_date DESC LIMIT 1), 0.0)";
         }
@@ -875,5 +913,28 @@ public class JdbcProductRepository implements IProductRepository {
         }
         return null;
     }
-}
 
+    @Override
+    public List<Product> getBasicMetadata() throws SQLException {
+        List<Product> products = new ArrayList<>();
+        String sql = "SELECT product_id, category_id, name, sku, stock_quantity, image_path, is_favorite, visible, is_active FROM products WHERE visible = TRUE";
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(sql);
+                ResultSet rs = pstmt.executeQuery()) {
+            while (rs.next()) {
+                Product p = new Product();
+                p.setId(rs.getInt("product_id"));
+                p.setCategoryId(rs.getInt("category_id"));
+                p.setName(rs.getString("name"));
+                p.setSku(rs.getString("sku"));
+                p.setStockQuantity(rs.getInt("stock_quantity"));
+                p.setImagePath(rs.getString("image_path"));
+                p.setFavorite(rs.getBoolean("is_favorite"));
+                p.setVisible(rs.getBoolean("visible"));
+                p.setActive(rs.getBoolean("is_active"));
+                products.add(p);
+            }
+        }
+        return products;
+    }
+}

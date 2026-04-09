@@ -43,7 +43,8 @@ public class HeaderController implements Injectable {
         setupSearch();
         checkStockAlerts();
 
-        // Suscribirse a cambios globales para refrescar alertas (ej: despu\u00e9s de una
+        // Suscribirse a cambios globales para refrescar alertas (ej: despu\u00e9s de
+        // una
         // venta)
         if (container.getEventBus() != null) {
             this.stockRefreshListener = this::refreshStockAlerts;
@@ -144,15 +145,21 @@ public class HeaderController implements Injectable {
 
     private void setupSearch() {
         if (searchField != null) {
-            searchField.textProperty().addListener((obs, oldVal, newVal) -> {
+            // Debounce logic: wait 300ms after last key stroke before searching
+            PauseTransition debounce = new PauseTransition(Duration.millis(300));
+            debounce.setOnFinished(e -> {
                 if (navigationService != null) {
-                    navigationService.search(newVal);
+                    navigationService.search(searchField.getText());
                 }
+            });
+
+            searchField.textProperty().addListener((obs, oldVal, newVal) -> {
+                debounce.playFromStart();
             });
         }
 
-        // Evitar que el campo de b\u00fasqueda robe el foco al arrancar, pero asegurar que
-        // el foco est\u00e9 en el campo de texto real
+        // Evitar que el campo de búsqueda robe el foco al arrancar, pero asegurar que
+        // el foco esté en el campo de texto real
         Platform.runLater(() -> {
             if (searchField != null) {
                 searchField.requestFocus();

@@ -27,7 +27,8 @@ public class ProductBox extends VBox {
         this.setCache(true);
         this.setCacheHint(javafx.scene.CacheHint.SPEED);
 
-        // \u00e2\u201d\u20ac\u00e2\u201d\u20ac IMAGE SECTION (StackPane allows overlay of price badge) \u00e2\u201d\u20ac\u00e2\u201d\u20ac
+        // \u00e2\u201d\u20ac\u00e2\u201d\u20ac IMAGE SECTION (StackPane allows overlay
+        // of price badge) \u00e2\u201d\u20ac\u00e2\u201d\u20ac
         StackPane imageContainer = new StackPane();
         imageContainer.getStyleClass().add("product-image-container");
         imageContainer.setPrefHeight(150);
@@ -35,11 +36,8 @@ public class ProductBox extends VBox {
         imageContainer.setMaxHeight(150);
         imageContainer.setAlignment(Pos.CENTER);
 
-        // Clip din\u00e1mico: se ajusta al ancho del contenedor y solo redondea arriba
-        Rectangle clip = new Rectangle();
-        clip.widthProperty().bind(imageContainer.widthProperty());
-        clip.heightProperty().bind(imageContainer.heightProperty().add(30)); // Altura extra para que el redondeo
-                                                                             // inferior no se vea
+        // Clip estático: ya que el tamaño del card es fijo (200x150 para imagen)
+        Rectangle clip = new Rectangle(200, 180); // 180 para que el redondeo inferior no se vea
         clip.setArcWidth(28);
         clip.setArcHeight(28);
         imageContainer.setClip(clip);
@@ -93,7 +91,8 @@ public class ProductBox extends VBox {
             imageContainer.getChildren().add(discountBadge);
         }
 
-        // \u00e2\u201d\u20ac\u00e2\u201d\u20ac INFO SECTION \u00e2\u201d\u20ac\u00e2\u201d\u20ac
+        // \u00e2\u201d\u20ac\u00e2\u201d\u20ac INFO SECTION
+        // \u00e2\u201d\u20ac\u00e2\u201d\u20ac
         VBox infoBox = new VBox(4);
         infoBox.getStyleClass().add("product-info");
         infoBox.setAlignment(Pos.TOP_LEFT);
@@ -131,7 +130,8 @@ public class ProductBox extends VBox {
             infoBox.getChildren().add(skuLabel);
         }
 
-        // \u00e2\u201d\u20ac\u00e2\u201d\u20ac ADD BUTTON \u00e2\u201d\u20ac\u00e2\u201d\u20ac
+        // \u00e2\u201d\u20ac\u00e2\u201d\u20ac ADD BUTTON
+        // \u00e2\u201d\u20ac\u00e2\u201d\u20ac
         FontAwesomeIconView addIcon = new FontAwesomeIconView();
         addIcon.setGlyphName("PLUS");
         addIcon.setSize("11");
@@ -193,7 +193,8 @@ public class ProductBox extends VBox {
     }
 
     private String translateDynamic(String text) {
-        if (text == null || text.isBlank()) return text;
+        if (text == null || text.isBlank())
+            return text;
         if (bundle != null && bundle.containsKey(text)) {
             return bundle.getString(text);
         }

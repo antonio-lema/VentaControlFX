@@ -46,7 +46,6 @@ public class SellViewController implements Injectable, CategoryMenuRenderer.Cate
     private VBox loadingOverlay;
 
     private ServiceContainer container;
-    private ProductUseCase productUseCase;
     private CategoryUseCase categoryUseCase;
     private PriceListUseCase priceListUseCase;
     private ProductFilterUseCase filterUseCase;
@@ -54,14 +53,13 @@ public class SellViewController implements Injectable, CategoryMenuRenderer.Cate
 
     private int selectedPriceListId = -1;
     private int currentOffset = 0;
-    private static final int PAGE_SIZE = 500;
+    private static final int PAGE_SIZE = 60;
     private int totalProductCount = 0;
     private java.util.List<com.mycompany.ventacontrolfx.domain.model.Promotion> activePromotions = new java.util.ArrayList<>();
 
     @Override
     public void inject(ServiceContainer container) {
         this.container = container;
-        this.productUseCase = container.getProductUseCase();
         this.categoryUseCase = container.getCategoryUseCase();
         this.priceListUseCase = container.getPriceListUseCase();
         this.filterUseCase = container.createProductFilterUseCase();
@@ -123,6 +121,52 @@ public class SellViewController implements Injectable, CategoryMenuRenderer.Cate
         container.getEventBus().subscribe(this);
 
         loadInitialData();
+        setupScrollListener();
+    }
+
+    private void setupScrollListener() {
+        productsScrollPane.vvalueProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal.doubleValue() >= 0.95 && !loadingOverlay.isVisible()
+                    && productsPane.getChildren().size() < totalProductCount) {
+                loadNextPage();
+            }
+        });
+    }
+
+    private synchronized void loadNextPage() {
+        this.currentOffset += PAGE_SIZE;
+        loadingOverlay.setVisible(true);
+
+        container.getAsyncManager().runAsyncTask(() -> {
+            FilterType type = filterUseCase.getCurrentType();
+            Object criteria = filterUseCase.getCurrentCriteria();
+            List<Product> products;
+
+            if (type == FilterType.CATEGORY && criteria != null) {
+                products = container.getProductRepository().getByCategoryPaginated(((Category) criteria).getId(),
+                        PAGE_SIZE,
+                        currentOffset, selectedPriceListId);
+            } else if (type == FilterType.SEARCH && criteria != null) {
+                products = container.getProductRepository().searchPaginated((String) criteria, PAGE_SIZE, currentOffset,
+                        selectedPriceListId, VisibilityFilter.VISIBLE);
+            } else if (type == FilterType.FAVORITES) {
+                products = container.getProductRepository().getFavoritesPaginated(PAGE_SIZE, currentOffset,
+                        selectedPriceListId);
+            } else if (type == FilterType.PROMOTIONS) {
+                // Promotions are complex to paginate on server,
+                // but since they were limited to 1000 in refresh,
+                // scrolling might not be needed or would need a similar sublist logic.
+                // For now, return empty to avoid errors
+                products = new java.util.ArrayList<>();
+            } else {
+                products = container.getProductRepository().searchPaginated("", PAGE_SIZE, currentOffset,
+                        selectedPriceListId, VisibilityFilter.VISIBLE);
+            }
+            return products;
+        }, products -> {
+            productRenderer.append(products);
+            loadingOverlay.setVisible(false);
+        }, null);
     }
 
     @Override
@@ -131,12 +175,10 @@ public class SellViewController implements Injectable, CategoryMenuRenderer.Cate
     }
 
     private void loadInitialData() {
-        productRenderer.showSkeleton(16);
-        loadingOverlay.setVisible(true);
-        loadingOverlay.setStyle("-fx-background-color: transparent;");
-
+        productRenderer.showSkeleton(12);
         this.selectedPriceListId = container.getCartUseCase().getPriceListId();
 
+        // Load Promos in background
         container.getAsyncManager().runAsyncTask(() -> {
             try {
                 return container.getPromotionUseCase().getActivePromotions();
@@ -145,11 +187,13 @@ public class SellViewController implements Injectable, CategoryMenuRenderer.Cate
             }
         }, promos -> {
             this.activePromotions = promos;
-            int initialCatId = container.getCartUseCase().getSelectedCategoryId();
-            updateCategoryLabelFromId(initialCatId);
-            applyCategoryFilterById(initialCatId);
-            loadingOverlay.setVisible(false);
+            // No refresh needed here, it's started below
         }, null);
+
+        // Load Products in parallel background
+        int initialCatId = container.getCartUseCase().getSelectedCategoryId();
+        updateCategoryLabelFromId(initialCatId);
+        applyCategoryFilterById(initialCatId);
     }
 
     private void applyCategoryFilterById(int catId) {
@@ -157,13 +201,8 @@ public class SellViewController implements Injectable, CategoryMenuRenderer.Cate
             filterUseCase.applyAll();
             refreshProductsWithNewPriceList();
         } else if (catId == -2) {
-            loadingOverlay.setVisible(true);
-            container.getAsyncManager().runAsyncTask(() -> productUseCase.getFavorites(selectedPriceListId),
-                    products -> {
-                        filterUseCase.updateSourceData(products);
-                        renderProducts(products);
-                        loadingOverlay.setVisible(false);
-                    }, null);
+            filterUseCase.applyFavorites();
+            refreshProductsWithNewPriceList();
         } else if (catId == -3) {
             filterUseCase.applyPromotions(activePromotions);
             refreshProductsWithNewPriceList();
@@ -320,7 +359,7 @@ public class SellViewController implements Injectable, CategoryMenuRenderer.Cate
     private void refreshProductsWithNewPriceList() {
         this.currentOffset = 0;
         productsScrollPane.setVvalue(0);
-        
+
         // Show skeleton instead of blocking overlay if possible, or use both
         productRenderer.showSkeleton(12);
         loadingOverlay.setVisible(true);
@@ -338,30 +377,27 @@ public class SellViewController implements Injectable, CategoryMenuRenderer.Cate
                 products = container.getProductRepository().getByCategoryPaginated(cat.getId(), PAGE_SIZE,
                         currentOffset, selectedPriceListId);
             } else if (type == FilterType.FAVORITES) {
-                // Para favoritos, la paginaci\u00f3n es en memoria o podr\u00edamos implementarla en repo
-                List<Product> allFavs = productUseCase.getFavorites(selectedPriceListId);
-                count = allFavs.size();
-                int end = Math.min(currentOffset + PAGE_SIZE, allFavs.size());
-                products = (currentOffset < allFavs.size()) ? allFavs.subList(currentOffset, end)
-                        : new java.util.ArrayList<>();
+                count = container.getProductRepository().countFavorites();
+                products = container.getProductRepository().getFavoritesPaginated(PAGE_SIZE, currentOffset,
+                        selectedPriceListId);
             } else if (type == FilterType.PROMOTIONS) {
-                // Fetch reasonably large page representing 'all' to filter in memory
-                List<Product> allProducts = container.getProductRepository().searchPaginated("", 5000, 0,
+                // Optimized: instead of fetching 5000, we fetch a smaller buffer or
+                // ideally this should be a JOIN in the repository.
+                // For now, let's limit to 1000 to reduce memory pressure.
+                List<Product> productsToFilter = container.getProductRepository().searchPaginated("", 1000, 0,
                         selectedPriceListId, VisibilityFilter.VISIBLE);
 
-                List<Product> filtered = allProducts.stream()
+                List<Product> filtered = productsToFilter.stream()
                         .filter(p -> {
                             boolean hasProductPromo = activePromotions.stream().anyMatch(
                                     promo -> promo
                                             .getScope() == com.mycompany.ventacontrolfx.domain.model.PromotionScope.PRODUCT
-                                            &&
-                                            promo.getAffectedIds().contains(p.getId()));
+                                            && promo.getAffectedIds().contains(p.getId()));
 
                             boolean hasCategoryPromo = activePromotions.stream().anyMatch(
                                     promo -> promo
                                             .getScope() == com.mycompany.ventacontrolfx.domain.model.PromotionScope.CATEGORY
-                                            &&
-                                            promo.getAffectedIds().contains(p.getCategoryId()));
+                                            && promo.getAffectedIds().contains(p.getCategoryId()));
 
                             boolean hasGlobal = activePromotions.stream().anyMatch(
                                     promo -> promo
@@ -469,14 +505,17 @@ public class SellViewController implements Injectable, CategoryMenuRenderer.Cate
         if (p.getType() == com.mycompany.ventacontrolfx.domain.model.PromotionType.PERCENTAGE) {
             return String.format("%.0f%% " + container.getBundle().getString("sell.promo.discount_abbr"), p.getValue());
         } else if (p.getType() == com.mycompany.ventacontrolfx.domain.model.PromotionType.FIXED_DISCOUNT) {
-            return String.format("%.2f\u20ac " + container.getBundle().getString("sell.promo.discount_abbr"), p.getValue());
+            return String.format("%.2f\u20ac " + container.getBundle().getString("sell.promo.discount_abbr"),
+                    p.getValue());
         } else if (p.getType() == com.mycompany.ventacontrolfx.domain.model.PromotionType.VOLUME_DISCOUNT) {
             return (p.getBuyQty() + p.getFreeQty()) + "x" + p.getBuyQty();
         }
         return p.getName();
     }
+
     private String translateDynamic(String text) {
-        if (text == null || text.isBlank()) return text;
+        if (text == null || text.isBlank())
+            return text;
         if (container != null && container.getBundle() != null && container.getBundle().containsKey(text)) {
             return container.getBundle().getString(text);
         }

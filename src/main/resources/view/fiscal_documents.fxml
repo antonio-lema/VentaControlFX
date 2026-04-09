@@ -17,7 +17,7 @@
     </stylesheets>
 
     <VBox spacing="0">
-        <!-- &#x2500;&#x2500;&#x2500; HEADER &#x2500;&#x2500;&#x2500; -->
+        <!--  HEADER  -->
         <VBox styleClass="view-header" spacing="0">
             <children>
                 <HBox spacing="16" alignment="CENTER_LEFT">
@@ -37,17 +37,14 @@
                         <Region HBox.hgrow="ALWAYS" />
 
                         <HBox spacing="10" alignment="CENTER_RIGHT">
-                            <Button styleClass="btn-secondary" onAction="#handleOpenArchiveDir">
+                            <Button styleClass="btn-secondary" onAction="#handleOpenArchiveDir" text="%fiscal.btn.open_folder">
                                 <graphic><FontAwesomeIconView glyphName="FOLDER_OPEN" size="14"/></graphic>
-                                <text>%fiscal.btn.open_folder</text>
                             </Button>
-                            <Button styleClass="btn-secondary" onAction="#refresh">
+                            <Button styleClass="btn-secondary" onAction="#refresh" text="%fiscal.btn.refresh">
                                 <graphic><FontAwesomeIconView glyphName="REFRESH" size="14"/></graphic>
-                                <text>%fiscal.btn.refresh</text>
                             </Button>
-                            <Button styleClass="btn-primary" onAction="#handleExportData">
+                            <Button styleClass="btn-primary" onAction="#handleExportData" text="%fiscal.btn.export">
                                 <graphic><FontAwesomeIconView glyphName="FILE_EXCEL_ALT" size="14" fill="#ffffff"/></graphic>
-                                <text>%fiscal.btn.export</text>
                             </Button>
                         </HBox>
                     </children>
@@ -57,7 +54,7 @@
 
         <VBox spacing="20" VBox.vgrow="ALWAYS" style="-fx-padding: 30;">
 
-        <!-- &#x2500;&#x2500;&#x2500; KPI CARDS &#x2500;&#x2500;&#x2500; -->
+        <!--  KPI CARDS  -->
         <HBox spacing="15">
             <VBox styleClass="stat-card" HBox.hgrow="ALWAYS">
                 <HBox alignment="CENTER_LEFT" spacing="15">
@@ -120,7 +117,7 @@
             </VBox>
         </HBox>
 
-        <!-- &#x2500;&#x2500;&#x2500; FILTROS &#x2500;&#x2500;&#x2500; -->
+        <!--  FILTROS  -->
         <HBox styleClass="filter-card" alignment="CENTER_LEFT" spacing="15">
             <padding><Insets top="15" right="20" bottom="15" left="20"/></padding>
             
@@ -157,7 +154,7 @@
             </VBox>
         </HBox>
 
-        <!-- &#x2500;&#x2500;&#x2500; TABLA &#x2500;&#x2500;&#x2500; -->
+        <!--  TABLA  -->
         <TableView fx:id="fiscalTable" VBox.vgrow="ALWAYS" styleClass="modern-table">
             <columns>
                 <TableColumn fx:id="colDate" text="%fiscal.table.date" prefWidth="150"/>
@@ -185,7 +182,7 @@
     </VBox>
     </VBox>
 
-    <!-- &#x2500;&#x2500;&#x2500; PANEL DE DETALLE DESLIZANTE (OPCIONAL) &#x2500;&#x2500;&#x2500; -->
+    <!--  PANEL DE DETALLE DESLIZANTE (OPCIONAL)  -->
     <HBox fx:id="detailsOverlay" visible="false" managed="false" alignment="CENTER_RIGHT" style="-fx-background-color: rgba(0,0,0,0.3);">
         <VBox fx:id="detailsPanel" prefWidth="450" styleClass="detail-panel">
              <!-- Contenido din&#x00e1;mico del detalle aqu&#x00ed; -->

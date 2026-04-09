@@ -25,7 +25,7 @@
                 <VBox spacing="2" HBox.hgrow="ALWAYS">
                     <children>
                         <Label text="Festivos y Excepciones" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #1e293b;" />
-                        <Label text="Configura d&#x00ed;as que anulan el horario semanal est&#x00e1;ndar." style="-fx-text-fill: #64748b;" />
+                        <Label text="Configura d&#x00eda;s que anulan el horario semanal est&#x00e1;ndar." style="-fx-text-fill: #64748b;" />
                     </children>
                 </VBox>
             </children>
@@ -36,7 +36,7 @@
         <!-- Input Card -->
         <VBox spacing="15" style="-fx-background-color: #f8fafc; -fx-padding: 20; -fx-background-radius: 12; -fx-border-color: #e2e8f0; -fx-border-radius: 12;">
             <children>
-                <Label text="A&#x00d1;ADIR NUEVA EXCEPCI&#x00d3;N" style="-fx-font-weight: bold; -fx-font-size: 11px; -fx-text-fill: #94a3b8; -fx-letter-spacing: 1px;" />
+                <Label text="A&#x00d1A;DIR NUEVA EXCEPCI&#x00d3;N" style="-fx-font-weight: bold; -fx-font-size: 11px; -fx-text-fill: #94a3b8; -fx-letter-spacing: 1px;" />
                 <HBox spacing="15" alignment="BOTTOM_LEFT">
                     <children>
                         <VBox spacing="8" prefWidth="160">
@@ -55,9 +55,9 @@
                 </HBox>
                 <HBox spacing="20" alignment="CENTER_LEFT">
                     <children>
-                        <CheckBox fx:id="chkClosed" text="Negocio Cerrado (Todo el d&#x00ed;a)" selected="true" style="-fx-font-weight: bold;" />
+                        <CheckBox fx:id="chkClosed" text="Negocio Cerrado (Todo el d&#x00eda;)" selected="true" style="-fx-font-weight: bold;" />
                         <Region HBox.hgrow="ALWAYS" />
-                        <Button text="A&#x00d1;ADIR A LA LISTA" onAction="#handleAdd" styleClass="btn-primary-saas" prefHeight="35" prefWidth="160">
+                        <Button text="A&#x00d1A;DIR A LA LISTA" onAction="#handleAdd" styleClass="btn-primary-saas" prefHeight="35" prefWidth="160">
                             <graphic><FontAwesomeIconView glyphName="PLUS" fill="white" /></graphic>
                         </Button>
                     </children>
@@ -68,7 +68,7 @@
         <!-- List Section -->
         <VBox spacing="10" VBox.vgrow="ALWAYS">
             <children>
-                <Label text="D&#x00cd;AS CONFIGURADOS" style="-fx-font-weight: bold; -fx-font-size: 11px; -fx-text-fill: #94a3b8; -fx-letter-spacing: 1px;" />
+                <Label text="D&#x00cdA;S CONFIGURADOS" style="-fx-font-weight: bold; -fx-font-size: 11px; -fx-text-fill: #94a3b8; -fx-letter-spacing: 1px;" />
                 <ListView fx:id="listSpecials" VBox.vgrow="ALWAYS" style="-fx-background-radius: 12; -fx-border-radius: 12; -fx-border-color: #e2e8f0; -fx-background-insets: 0;" />
             </children>
         </VBox>

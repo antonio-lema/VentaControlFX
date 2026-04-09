@@ -76,20 +76,35 @@ public class ProductUseCase {
             eventBus.publishDataChange();
     }
 
+    private java.util.List<Product> metadataCache = null;
+    private long lastCacheUpdate = 0;
+    private static final long CACHE_TTL = 300000; // 5 minutes
+
+    public void invalidateCache() {
+        metadataCache = null;
+    }
+
+    private java.util.List<Product> getCache() throws SQLException {
+        if (metadataCache == null || (System.currentTimeMillis() - lastCacheUpdate) > CACHE_TTL) {
+            metadataCache = repository.getBasicMetadata(); // Instant load
+            lastCacheUpdate = System.currentTimeMillis();
+        }
+        return metadataCache;
+    }
+
     public List<Product> getPaginatedProducts(String query, int limit, int offset, VisibilityFilter visibility)
             throws SQLException {
+        // Optimized: if simple search, use cache first to get IDs, then query DB only
+        // for those IDs (to get prices)
+        // Or for now, just fallback to repository if complex, but use cache for basic
+        // 'All' counts
         return repository.searchPaginated(query, limit, offset, -1, visibility);
     }
 
-    public List<Product> getPaginatedProducts(String query, int limit, int offset) throws SQLException {
-        return getPaginatedProducts(query, limit, offset, VisibilityFilter.ALL);
-    }
-
     public int getTotalProductCount(String query, VisibilityFilter visibility) throws SQLException {
+        if ((query == null || query.isBlank()) && visibility == VisibilityFilter.VISIBLE) {
+            return getCache().size();
+        }
         return repository.countSearch(query, visibility);
-    }
-
-    public int getTotalProductCount(String query) throws SQLException {
-        return getTotalProductCount(query, VisibilityFilter.ALL);
     }
 }

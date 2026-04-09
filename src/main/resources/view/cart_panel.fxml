@@ -84,7 +84,7 @@
 
     <StackPane VBox.vgrow="ALWAYS" styleClass="cart-items-pane">
         <VBox fx:id="emptyCartView" alignment="CENTER" spacing="10">
-            <Label text="&#x1f6d;2" style="-fx-font-size: 60px; -fx-text-fill: #eee;"/>
+            <Label text="&#x1f6d2;" style="-fx-font-size: 60px; -fx-text-fill: #eee;"/>
         </VBox>
         <ScrollPane fitToWidth="true" style="-fx-background-color: transparent; -fx-background: transparent;" hbarPolicy="NEVER">
             <VBox fx:id="cartItemsContainer" spacing="0" styleClass="cart-list-container"/>

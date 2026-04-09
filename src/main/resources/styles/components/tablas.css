@@ -154,3 +154,109 @@
     -fx-border-color: #1e88e5;
     -fx-effect: dropshadow(three-pass-box, -fx-shadow-color-subtle, 8, 0, 0, 2);
 }
+
+/* ─────────────────────────────────────────────────────────
+   PAGINACIÓN MODERNA
+   ───────────────────────────────────────────────────────── */
+.modern-pagination-container {
+    -fx-background-color: white;
+    -fx-background-radius: 50;
+    -fx-padding: 8 20;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.08), 10, 0, 0, 2);
+    -fx-border-color: -fx-color-border-main;
+    -fx-border-width: 1;
+}
+
+.modern-server-pagination {
+    -fx-min-height: 60;
+    -fx-max-height: 60;
+}
+
+.modern-server-pagination .pagination-control {
+    -fx-background-color: transparent;
+}
+
+.modern-server-pagination .number-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: -fx-custom-color-primary;
+    /* Usar el color primario para que se vea más oscuro y vibrante */
+    -fx-background-radius: 50;
+    -fx-min-width: 38;
+    -fx-min-height: 38;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+}
+
+.modern-server-pagination .number-button:selected {
+    -fx-background-color: -fx-custom-color-primary;
+    -fx-text-fill: white;
+    -fx-effect: dropshadow(three-pass-box, -fx-shadow-color-primary, 8, 0, 0, 3);
+}
+
+.modern-server-pagination .number-button:hover {
+    -fx-background-color: -fx-custom-color-primary-bg;
+    -fx-text-fill: -fx-custom-color-primary;
+}
+
+/* Flechas internas de la paginación (OJO: JavaFX las oculta a veces si hay maxPageIndicatorCount) */
+.modern-server-pagination .left-arrow-button,
+.modern-server-pagination .right-arrow-button {
+    -fx-background-color: transparent;
+    -fx-padding: 0 4;
+}
+
+.modern-server-pagination .left-arrow,
+.modern-server-pagination .right-arrow {
+    -fx-background-color: -fx-text-custom-muted;
+    -fx-padding: 4;
+}
+
+.modern-server-pagination .page-information {
+    -fx-visible: false;
+    -fx-managed: false;
+}
+
+/* Botones de salto (Jump Buttons) */
+.pagination-jump-btn {
+    -fx-background-color: -fx-bg-surface;
+    -fx-background-radius: 50;
+    -fx-min-width: 36;
+    -fx-min-height: 36;
+    -fx-text-fill: -fx-custom-color-primary;
+    -fx-cursor: hand;
+    -fx-border-color: -fx-color-border-main;
+    -fx-border-radius: 50;
+    -fx-effect: -fx-shadow-premium-sm;
+    -fx-padding: 0;
+    -fx-alignment: center;
+}
+
+.pagination-jump-btn:hover {
+    -fx-background-color: -fx-custom-color-primary;
+    -fx-border-color: -fx-custom-color-primary-dark;
+}
+
+.pagination-jump-btn:hover .glyph-icon {
+    -fx-fill: white;
+}
+
+.pagination-jump-btn .glyph-icon {
+    -fx-fill: -fx-custom-color-primary;
+}
+
+/* Dark Theme Overrides for Pagination */
+.dark-theme .modern-pagination-container {
+    -fx-background-color: #18181b;
+}
+
+.dark-theme .pagination-jump-btn {
+    -fx-background-color: #09090b;
+}
+
+.pagination-stats-label {
+    -fx-text-fill: -fx-text-custom-muted;
+    -fx-font-weight: bold;
+    -fx-min-width: 300;
+    -fx-alignment: CENTER_RIGHT;
+    -fx-font-size: 13px;
+}
