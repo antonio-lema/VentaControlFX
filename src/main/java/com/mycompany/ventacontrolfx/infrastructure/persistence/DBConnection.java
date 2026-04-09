@@ -38,9 +38,9 @@ public class DBConnection {
             // Cargar el driver de MySQL
             Class.forName("com.mysql.cj.jdbc.Driver");
         } catch (ClassNotFoundException e) {
-            System.err.println("Error: no se encontr\u00c3\u00b3 el driver de MySQL");
+            System.err.println("Error: no se encontr\u00f3 el driver de MySQL");
         }
-        // Devolver la conexi\u00c3\u00b3n
+        // Devolver la conexi\u00f3n
         return DriverManager.getConnection(URL, USER, PASS);
     }
 }

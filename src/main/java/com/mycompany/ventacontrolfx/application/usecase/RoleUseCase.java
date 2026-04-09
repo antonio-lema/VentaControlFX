@@ -9,7 +9,7 @@ import java.util.List;
 
 /**
  * Caso de uso para gestionar roles del sistema.
- * Fix V-03: Todos los m\u00c3\u00a9todos de escritura ahora requieren el permiso USUARIOS.
+ * Fix V-03: Todos los m\u00e9todos de escritura ahora requieren el permiso USUARIOS.
  */
 public class RoleUseCase {
 

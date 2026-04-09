@@ -10,7 +10,7 @@ import java.util.List;
  */
 public interface IPermissionRepository {
 
-    /** Obtiene el cat\u00c3\u00a1logo completo de permisos disponibles en el sistema. */
+    /** Obtiene el cat\u00e1logo completo de permisos disponibles en el sistema. */
     List<Permission> listAll() throws SQLException;
 
     /** Obtiene los permisos asignados a un usuario concreto. */
@@ -21,13 +21,13 @@ public interface IPermissionRepository {
 
     /**
      * Reemplaza TODOS los permisos de un usuario.
-     * Borra los anteriores y asigna los nuevos c\u00c3\u00b3digos facilitados.
+     * Borra los anteriores y asigna los nuevos c\u00f3digos facilitados.
      */
     void setUserPermissions(int userId, List<String> codes) throws SQLException;
 
     /**
      * Reemplaza TODOS los permisos de un rol.
-     * Borra los anteriores y asigna los nuevos c\u00c3\u00b3digos facilitados.
+     * Borra los anteriores y asigna los nuevos c\u00f3digos facilitados.
      */
     void setRolePermissions(int roleId, List<String> codes) throws SQLException;
 }

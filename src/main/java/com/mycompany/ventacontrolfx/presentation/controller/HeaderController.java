@@ -43,7 +43,7 @@ public class HeaderController implements Injectable {
         setupSearch();
         checkStockAlerts();
 
-        // Suscribirse a cambios globales para refrescar alertas (ej: despu\u00c3\u00a9s de una
+        // Suscribirse a cambios globales para refrescar alertas (ej: despu\u00e9s de una
         // venta)
         if (container.getEventBus() != null) {
             this.stockRefreshListener = this::refreshStockAlerts;
@@ -74,7 +74,7 @@ public class HeaderController implements Injectable {
     }
 
     private void setupUserMenu() {
-        // Mostrar nombre del usuario en sesi\u00c3\u00b3n
+        // Mostrar nombre del usuario en sesi\u00f3n
         if (lblHeaderUsername != null && container.getUserSession() != null) {
             var currentUser = container.getUserSession().getCurrentUser();
             if (currentUser != null) {
@@ -151,8 +151,8 @@ public class HeaderController implements Injectable {
             });
         }
 
-        // Evitar que el campo de b\u00c3\u00basqueda robe el foco al arrancar, pero asegurar que
-        // el foco est\u00c3\u00a9 en el campo de texto real
+        // Evitar que el campo de b\u00fasqueda robe el foco al arrancar, pero asegurar que
+        // el foco est\u00e9 en el campo de texto real
         Platform.runLater(() -> {
             if (searchField != null) {
                 searchField.requestFocus();
@@ -182,16 +182,16 @@ public class HeaderController implements Injectable {
                 return;
             }
 
-            // 1. Confirmaci\u00c3\u00b3n de Cierre de Sesi\u00c3\u00b3n
+            // 1. Confirmaci\u00f3n de Cierre de Sesi\u00f3n
             if (AlertUtil.showConfirmation(container.getBundle().getString("header.logout.title"),
                     container.getBundle().getString("header.logout.confirm"),
                     container.getBundle().getString("header.logout.msg"))) {
 
-                // Finalizar turno autom\u00c3\u00a1ticamente si hay uno activo
+                // Finalizar turno autom\u00e1ticamente si hay uno activo
                 try {
                     container.getWorkSessionUseCase().endSession(user.getUserId());
                 } catch (Exception e) {
-                    System.err.println("Error finalizando turno al cerrar sesi\u00c3\u00b3n: " + e.getMessage());
+                    System.err.println("Error finalizando turno al cerrar sesi\u00f3n: " + e.getMessage());
                 }
 
                 performLogout();

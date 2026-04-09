@@ -8,8 +8,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 /**
- * Servicio encargado de migrar contrase\u00c3\u00b1as en texto plano a BCrypt.
- * Detecta si una contrase\u00c3\u00b1a no tiene el prefijo de BCrypt ($2a$) y la hashea.
+ * Servicio encargado de migrar contrase\u00f1as en texto plano a BCrypt.
+ * Detecta si una contrase\u00f1a no tiene el prefijo de BCrypt ($2a$) y la hashea.
  */
 public class BCryptMigrationService {
 
@@ -23,10 +23,10 @@ public class BCryptMigrationService {
                 int userId = rs.getInt("user_id");
                 String currentPass = rs.getString("password_hash");
 
-                // Si la contrase\u00c3\u00b1a no parece un hash de BCrypt (empiezan por $2a$, $2b$ o $2y$)
+                // Si la contrase\u00f1a no parece un hash de BCrypt (empiezan por $2a$, $2b$ o $2y$)
                 if (currentPass != null && !currentPass.startsWith("$2a$") && !currentPass.startsWith("$2b$")
                         && !currentPass.startsWith("$2y$")) {
-                    System.out.println("Migrando contrase\u00c3\u00b1a de usuario ID: " + userId + " a BCrypt...");
+                    System.out.println("Migrando contrase\u00f1a de usuario ID: " + userId + " a BCrypt...");
 
                     String hashedPassword = BCrypt.hashpw(currentPass, BCrypt.gensalt());
                     updatePassword(conn, userId, hashedPassword);
@@ -34,7 +34,7 @@ public class BCryptMigrationService {
             }
 
         } catch (SQLException e) {
-            System.err.println("Error durante la migraci\u00c3\u00b3n de contrase\u00c3\u00b1as: " + e.getMessage());
+            System.err.println("Error durante la migraci\u00f3n de contrase\u00f1as: " + e.getMessage());
         }
     }
 

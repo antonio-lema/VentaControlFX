@@ -43,12 +43,12 @@ public class CashWithdrawController {
 
         try {
             this.availableAmount = closureUseCase.getCurrentCashInDrawer();
-            lblAvailable.setText(String.format("%.2f \u20AC", availableAmount));
+            lblAvailable.setText(String.format("%.2f \u20ac", availableAmount));
         } catch (SQLException e) {
             lblAvailable.setText("Error al cargar");
         }
 
-        // Listener para validaci\u00c3\u00b3n visual de saldo en tiempo real
+        // Listener para validaci\u00f3n visual de saldo en tiempo real
         txtAmount.textProperty().addListener((obs, old, newVal) -> validateAmountRealtime(newVal));
 
         javafx.application.Platform.runLater(txtAmount::requestFocus);
@@ -62,7 +62,7 @@ public class CashWithdrawController {
                         || userSession.hasPermission("USUARIOS");
                 if (canSeeTotals) {
                     lblWarning.setText(String.format(
-                            "\u00e2\u0161\u00a0\u00ef\u00b8\u008f Saldo insuficiente. Disponible: %.2f \u20AC", availableAmount));
+                            "\u00e2\u0161\u00a0\u00ef\u00b8\u008f Saldo insuficiente. Disponible: %.2f \u20ac", availableAmount));
                 } else {
                     lblWarning.setText("\u00e2\u0161\u00a0\u00ef\u00b8\u008f Saldo insuficiente.");
                 }
@@ -93,11 +93,11 @@ public class CashWithdrawController {
         try {
             amount = Double.parseDouble(amountText);
         } catch (NumberFormatException e) {
-            AlertUtil.showError("Formato Inv\u00c3\u00a1lido", "El importe introducido no es un n\u00c3\u00bamero v\u00c3\u00a1lido.");
+            AlertUtil.showError("Formato Inv\u00e1lido", "El importe introducido no es un n\u00famero v\u00e1lido.");
             return;
         }
         if (amount <= 0) {
-            AlertUtil.showError("Importe Inv\u00c3\u00a1lido", "El importe debe ser mayor que cero.");
+            AlertUtil.showError("Importe Inv\u00e1lido", "El importe debe ser mayor que cero.");
             return;
         }
 

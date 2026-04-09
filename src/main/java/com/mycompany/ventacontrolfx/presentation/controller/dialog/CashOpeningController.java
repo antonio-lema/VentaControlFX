@@ -31,10 +31,10 @@ public class CashOpeningController {
         try {
             double lastClosure = closureUseCase.getLastClosureAmount();
             if (userSession.hasPermission("caja.ver_totales") || userSession.hasPermission("USUARIOS")) {
-                lblLastClosure.setText(String.format("%.2f \u20AC", lastClosure));
+                lblLastClosure.setText(String.format("%.2f \u20ac", lastClosure));
                 txtInitialAmount.setText(String.format("%.2f", lastClosure).replace(".", ","));
             } else {
-                lblLastClosure.setText("**** \u20AC");
+                lblLastClosure.setText("**** \u20ac");
                 txtInitialAmount.setText(""); // Obligar a contar manualmente
             }
         } catch (SQLException e) {
@@ -53,7 +53,7 @@ public class CashOpeningController {
             // without clearing the old one.
             if (closureUseCase.getTodayTransactionCount() > 0) {
                 AlertUtil.showWarning("Cierre Pendiente",
-                        "Existen ventas o movimientos sin cerrar de una sesi\u00c3\u00b3n anterior.\n" +
+                        "Existen ventas o movimientos sin cerrar de una sesi\u00f3n anterior.\n" +
                                 "Debe realizar el Arqueo y Cierre antes de abrir un nuevo turno.");
                 // Optionally redirect or just inform
                 return;
@@ -67,7 +67,7 @@ public class CashOpeningController {
 
             double amount = Double.parseDouble(amountText);
             if (amount < 0) {
-                AlertUtil.showError("Importe Inv\u00c3\u00a1lido", "El fondo inicial no puede ser negativo.");
+                AlertUtil.showError("Importe Inv\u00e1lido", "El fondo inicial no puede ser negativo.");
                 return;
             }
 
@@ -79,7 +79,7 @@ public class CashOpeningController {
             close();
 
         } catch (NumberFormatException e) {
-            AlertUtil.showError("Error de Formato", "El importe introducido no es un n\u00c3\u00bamero v\u00c3\u00a1lido.");
+            AlertUtil.showError("Error de Formato", "El importe introducido no es un n\u00famero v\u00e1lido.");
         } catch (SQLException e) {
             AlertUtil.showError("Error al Abrir Caja", e.getMessage());
         }

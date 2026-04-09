@@ -67,7 +67,7 @@ public class OpenPdfFiscalService implements IFiscalPdfService {
                 logo.setAlignment(Element.ALIGN_LEFT);
                 document.add(logo);
             } catch (Exception e) {
-                // Si falla la carga del logo, simplemente no se a\u00c3\u00b1ade
+                // Si falla la carga del logo, simplemente no se a\u00f1ade
                 System.err.println("No se pudo cargar el logotipo desde: " + data.logoPath);
             }
         }
@@ -108,7 +108,7 @@ public class OpenPdfFiscalService implements IFiscalPdfService {
         issuerCol.addElement(new Paragraph(data.document.getIssuerAddress(), FONT_BODY));
         infoTable.addCell(issuerCol);
 
-        // Columna Derecha: Datos de Facturaci\u00c3\u00b3n
+        // Columna Derecha: Datos de Facturaci\u00f3n
         PdfPCell metaCol = new PdfPCell();
         metaCol.setBorder(com.lowagie.text.Rectangle.NO_BORDER);
         metaCol.setHorizontalAlignment(Element.ALIGN_RIGHT);
@@ -116,13 +116,13 @@ public class OpenPdfFiscalService implements IFiscalPdfService {
         PdfPTable nestedMeta = new PdfPTable(2);
         nestedMeta.setWidthPercentage(100);
         addMetaLine(nestedMeta, "N\u00c2\u00ba Documento:", data.document.getFullReference());
-        addMetaLine(nestedMeta, "Fecha Emisi\u00c3\u00b3n:", data.document.getIssuedAt().format(dtf));
+        addMetaLine(nestedMeta, "Fecha Emisi\u00f3n:", data.document.getIssuedAt().format(dtf));
         metaCol.addElement(nestedMeta);
         infoTable.addCell(metaCol);
         document.add(infoTable);
         document.add(new Paragraph("\n"));
 
-        // \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac DATOS DEL RECEPTOR (S\u00c3\u00b3lo si existe) \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac
+        // \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac DATOS DEL RECEPTOR (S\u00f3lo si existe) \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac
         if (data.document.getReceiverName() != null && !data.document.getReceiverName().trim().isEmpty()) {
             PdfPTable clientBox = new PdfPTable(1);
             clientBox.setWidthPercentage(100);
@@ -146,13 +146,13 @@ public class OpenPdfFiscalService implements IFiscalPdfService {
         document.add(new LineSeparator());
         document.add(new Paragraph("\n"));
 
-        // \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac L\u00c3\u008dNEAS DE DETALLE \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac
+        // \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac L\u00cdNEAS DE DETALLE \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac
         PdfPTable table = new PdfPTable(5);
         table.setWidthPercentage(100);
         table.setWidths(new float[] { 4f, 1f, 1.5f, 1f, 1.5f });
         table.setHeaderRows(1);
 
-        addTableHeader(table, "Producto / Descripci\u00c3\u00b3n");
+        addTableHeader(table, "Producto / Descripci\u00f3n");
         addTableHeader(table, "Cant.");
         addTableHeader(table, "Precio Ud.");
         addTableHeader(table, "IVA %");
@@ -161,9 +161,9 @@ public class OpenPdfFiscalService implements IFiscalPdfService {
         for (SaleDetail detail : data.lines) {
             table.addCell(createCell(detail.getProductName(), Element.ALIGN_LEFT));
             table.addCell(createCell(String.valueOf(detail.getQuantity()), Element.ALIGN_CENTER));
-            table.addCell(createCell(String.format("%.2f \u20AC", detail.getUnitPrice()), Element.ALIGN_RIGHT));
+            table.addCell(createCell(String.format("%.2f \u20ac", detail.getUnitPrice()), Element.ALIGN_RIGHT));
             table.addCell(createCell(String.format("%.0f%%", detail.getIvaRate()), Element.ALIGN_CENTER));
-            table.addCell(createCell(String.format("%.2f \u20AC", detail.getLineTotal()), Element.ALIGN_RIGHT));
+            table.addCell(createCell(String.format("%.2f \u20ac", detail.getLineTotal()), Element.ALIGN_RIGHT));
         }
         document.add(table);
 
@@ -184,16 +184,16 @@ public class OpenPdfFiscalService implements IFiscalPdfService {
         totalsCol.setBorder(com.lowagie.text.Rectangle.NO_BORDER);
         PdfPTable nestedTotals = new PdfPTable(2);
         nestedTotals.setWidthPercentage(100);
-        addTotalLine(nestedTotals, "Base Imponible:", String.format("%.2f \u20AC", data.document.getBaseAmount()));
+        addTotalLine(nestedTotals, "Base Imponible:", String.format("%.2f \u20ac", data.document.getBaseAmount()));
 
         // \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac DESGLOSE DE IVA DESDE EL SNAPSHOT FISCAL (V2.0) \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac
         if (data.sale.getTaxSummaries() != null && !data.sale.getTaxSummaries().isEmpty()) {
             for (com.mycompany.ventacontrolfx.domain.model.SaleTaxSummary summary : data.sale.getTaxSummaries()) {
                 addTotalLine(nestedTotals, String.format("%s (%.1f%%):", summary.getTaxName(), summary.getTaxRate()),
-                        String.format("%.2f \u20AC", summary.getTaxAmount()));
+                        String.format("%.2f \u20ac", summary.getTaxAmount()));
             }
         } else {
-            // Fallback para ventas hist\u00c3\u00b3ricas sin snapshot V2.0 (C\u00c3\u00a1lculo simplificado)
+            // Fallback para ventas hist\u00f3ricas sin snapshot V2.0 (C\u00e1lculo simplificado)
             java.util.Map<Double, Double[]> breakdown = new java.util.TreeMap<>();
             for (SaleDetail line : data.lines) {
                 double rate = line.getIvaRate();
@@ -204,11 +204,11 @@ public class OpenPdfFiscalService implements IFiscalPdfService {
             }
             for (java.util.Map.Entry<Double, Double[]> entry : breakdown.entrySet()) {
                 addTotalLine(nestedTotals, String.format("IVA %.0f%%:", entry.getKey()),
-                        String.format("%.2f \u20AC", entry.getValue()[1]));
+                        String.format("%.2f \u20ac", entry.getValue()[1]));
             }
         }
 
-        addTotalLine(nestedTotals, "Total Impuestos:", String.format("%.2f \u20AC", data.document.getVatAmount()));
+        addTotalLine(nestedTotals, "Total Impuestos:", String.format("%.2f \u20ac", data.document.getVatAmount()));
 
         PdfPCell grandTotalLabel = new PdfPCell(new Phrase("TOTAL A PAGAR:", FONT_TOTAL));
         grandTotalLabel.setBorder(com.lowagie.text.Rectangle.TOP);
@@ -216,7 +216,7 @@ public class OpenPdfFiscalService implements IFiscalPdfService {
         nestedTotals.addCell(grandTotalLabel);
 
         PdfPCell grandTotalValue = new PdfPCell(
-                new Phrase(String.format("%.2f \u20AC", data.document.getTotalAmount()), FONT_TOTAL));
+                new Phrase(String.format("%.2f \u20ac", data.document.getTotalAmount()), FONT_TOTAL));
         grandTotalValue.setBorder(com.lowagie.text.Rectangle.TOP);
         grandTotalValue.setPaddingTop(10);
         grandTotalValue.setHorizontalAlignment(Element.ALIGN_RIGHT);
@@ -226,9 +226,9 @@ public class OpenPdfFiscalService implements IFiscalPdfService {
         summaryTable.addCell(totalsCol);
         document.add(summaryTable);
 
-        // \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac PIE DE P\u00c3\u0081GINA FIXAL \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac
+        // \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac PIE DE P\u00c1GINA FIXAL \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac
         document.add(new Paragraph("\n\n"));
-        Paragraph pHash = new Paragraph("C\u00c3\u00b3digo \u00c3\u0161nico de Integridad (SHA-256): " + data.document.getControlHash(),
+        Paragraph pHash = new Paragraph("C\u00f3digo \u00c3\u0161nico de Integridad (SHA-256): " + data.document.getControlHash(),
                 FONT_HASH);
         pHash.setAlignment(Element.ALIGN_CENTER);
         document.add(pHash);

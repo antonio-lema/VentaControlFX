@@ -28,7 +28,7 @@ public class User {
     private List<Permission> individualPermissions = new ArrayList<>();
 
     public User() {
-        // Constructor vac\u00c3\u00ado
+        // Constructor vac\u00edo
     }
 
     public User(int userId, String username, String passwordHash, String fullName, String role, String email) {
@@ -133,7 +133,7 @@ public class User {
     }
 
     /**
-     * Retorna la uni\u00c3\u00b3n de permisos del rol y permisos individuales.
+     * Retorna la uni\u00f3n de permisos del rol y permisos individuales.
      */
     public List<Permission> getEffectivePermissions() {
         List<Permission> effective = new ArrayList<>(rolePermissions);

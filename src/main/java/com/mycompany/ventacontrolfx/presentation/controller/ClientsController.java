@@ -122,7 +122,7 @@ public class ClientsController implements Injectable, com.mycompany.ventacontrol
         nameBox.getChildren().addAll(nameLabel, typeLabel);
         header.getChildren().addAll(icon, nameBox);
 
-        // Info: CIF, Email, Tel\u00c3\u00a9fono
+        // Info: CIF, Email, Tel\u00e9fono
         VBox info = new VBox(8);
         info.getChildren().addAll(
                 createDetailItem(FontAwesomeIcon.ID_CARD, client.getTaxId()),
@@ -130,7 +130,7 @@ public class ClientsController implements Injectable, com.mycompany.ventacontrol
                 createDetailItem(FontAwesomeIcon.ENVELOPE, client.getEmail()),
                 createDetailItem(FontAwesomeIcon.PHONE, client.getPhone()));
 
-        // Footer: Ubicaci\u00c3\u00b3n y Botones
+        // Footer: Ubicaci\u00f3n y Botones
         HBox footer = new HBox();
         footer.setAlignment(Pos.CENTER_LEFT);
 

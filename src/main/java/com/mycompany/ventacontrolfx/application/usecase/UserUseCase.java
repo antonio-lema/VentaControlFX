@@ -29,7 +29,7 @@ public class UserUseCase {
     /**
      * Obtiene el email de un usuario por su nombre de usuario SIN requerir
      * permisos.
-     * Dise\u00c3\u00b1ado para el flujo de recuperaci\u00c3\u00b3n de contrase\u00c3\u00b1a an\u00c3\u00b3nimo (Fix V-01).
+     * Dise\u00f1ado para el flujo de recuperaci\u00f3n de contrase\u00f1a an\u00f3nimo (Fix V-01).
      * No expone datos sensibles del usuario, solo el email enmascarado.
      */
     public String findEmailByUsername(String username) throws SQLException {
@@ -91,19 +91,19 @@ public class UserUseCase {
     public void recoverPassword(String email) throws Exception {
         User user = userRepository.findByEmail(email);
         if (user == null) {
-            throw new Exception("No existe ning\u00c3\u00ban usuario con ese correo electr\u00c3\u00b3nico.");
+            throw new Exception("No existe ning\u00fan usuario con ese correo electr\u00f3nico.");
         }
 
-        // Generar c\u00c3\u00b3digo seguro de 6 d\u00c3\u00adgitos
+        // Generar c\u00f3digo seguro de 6 d\u00edgitos
         String code = String.format("%06d", secureRandom.nextInt(1000000));
 
-        // Persistir en DB con expiraci\u00c3\u00b3n (15 minutos)
+        // Persistir en DB con expiraci\u00f3n (15 minutos)
         String codeHash = BCrypt.hashpw(code, BCrypt.gensalt());
         userRepository.saveRecoveryCode(email, codeHash, LocalDateTime.now().plusMinutes(15));
 
-        String subject = "C\u00c3\u00b3digo de Recuperaci\u00c3\u00b3n de Contrase\u00c3\u00b1a - TPV";
-        String body = "Hola " + user.getFullName() + ",\n\nTu c\u00c3\u00b3digo de recuperaci\u00c3\u00b3n es: " + code +
-                "\n\nEste c\u00c3\u00b3digo expirar\u00c3\u00a1 en 15 minutos.";
+        String subject = "C\u00f3digo de Recuperaci\u00f3n de Contrase\u00f1a - TPV";
+        String body = "Hola " + user.getFullName() + ",\n\nTu c\u00f3digo de recuperaci\u00f3n es: " + code +
+                "\n\nEste c\u00f3digo expirar\u00e1 en 15 minutos.";
 
         emailSender.send(email, subject, body);
     }
@@ -113,7 +113,7 @@ public class UserUseCase {
     }
 
     /**
-     * Verifica si el c\u00c3\u00b3digo de recuperaci\u00c3\u00b3n est\u00c3\u00a1 bloqueado por exceso de intentos.
+     * Verifica si el c\u00f3digo de recuperaci\u00f3n est\u00e1 bloqueado por exceso de intentos.
      * Retorna true si se han superado los 5 intentos fallidos.
      */
     public boolean isRecoveryBlocked(String email) throws SQLException {
@@ -128,7 +128,7 @@ public class UserUseCase {
         String hashedPassword = BCrypt.hashpw(newPassword, BCrypt.gensalt());
         userRepository.changePassword(user.getUserId(), hashedPassword);
 
-        // Marcar c\u00c3\u00b3digo como usado para evitar reutilizaci\u00c3\u00b3n
+        // Marcar c\u00f3digo como usado para evitar reutilizaci\u00f3n
         userRepository.markRecoveryCodeAsUsed(email, null);
     }
 

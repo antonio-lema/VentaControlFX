@@ -108,7 +108,7 @@ public class CartController implements Injectable {
         hboxSavings.managedProperty().bind(hboxSavings.visibleProperty());
 
         totalButtonLabel.textProperty().bind(Bindings.createStringBinding(
-                () -> String.format("%.2f \u20AC", cartUseCase.getGrandTotal()),
+                () -> String.format("%.2f \u20ac", cartUseCase.getGrandTotal()),
                 cartUseCase.grandTotalProperty()));
         itemsCountLabel.textProperty().bind(Bindings.createStringBinding(
                 () -> String.format(container.getBundle().getString("cart.summary.items_count_format"),
@@ -134,10 +134,10 @@ public class CartController implements Injectable {
                         refreshPriceListLabel();
                         // Esperamos- [x] Investigar el estado de `CartController` para asegurar que la
                         // funcionalidad de borrado existe
-                        // - [x] Corregir l\u00c3\u00b3gica de visibilidad en `CartController.java` (a\u00c3\u00b1adidos logs)
-                        // - [x] A\u00c3\u00b1adir `fx:id` en `cart_panel.fxml`
+                        // - [x] Corregir l\u00f3gica de visibilidad en `CartController.java` (a\u00f1adidos logs)
+                        // - [x] A\u00f1adir `fx:id` en `cart_panel.fxml`
                         // - [x] Restaurar y simplificar estilos en `carrito.css`
-                        // - [x] Forzar visibilidad y color en FXML para diagn\u00c3\u00b3stico
+                        // - [x] Forzar visibilidad y color en FXML para diagn\u00f3stico
                         // - [x] Verificar la visibilidad del icono de papelera
                         // a que el hilo de fondo de CartUseCase actualice los precios
                         // y luego forzamos un re-render completo de las filas del carrito.
@@ -317,7 +317,7 @@ public class CartController implements Injectable {
             }
             stage.setScene(scene);
 
-            // Animaci\u00c3\u00b3n sutil
+            // Animaci\u00f3n sutil
             root.setOpacity(0);
             root.setScaleX(0.9);
             root.setScaleY(0.9);
@@ -391,7 +391,7 @@ public class CartController implements Injectable {
         de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView icon = new de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView(
                 de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon.PAUSE_CIRCLE);
         icon.setSize("45px");
-        icon.setFill(javafx.scene.paint.Color.valueOf("#fb8c00")); // Naranja c\u00c3\u00a1lido (brand warning)
+        icon.setFill(javafx.scene.paint.Color.valueOf("#fb8c00")); // Naranja c\u00e1lido (brand warning)
 
         Label title = new Label(container.getBundle().getString("cart.suspend.title"));
         title.getStyleClass().add("custom-modal-title");
@@ -432,7 +432,7 @@ public class CartController implements Injectable {
         stage.initModality(Modality.APPLICATION_MODAL);
         stage.initStyle(StageStyle.TRANSPARENT);
 
-        // CORRECCI\u00c3\u201cN: Establecer due\u00c3\u00b1o para evitar fallos en algunos sistemas
+        // CORRECCI\u00c3\u201cN: Establecer due\u00f1o para evitar fallos en algunos sistemas
         if (cartItemsContainer.getScene() != null) {
             stage.initOwner(cartItemsContainer.getScene().getWindow());
         }
@@ -444,7 +444,7 @@ public class CartController implements Injectable {
         }
         stage.setScene(scene);
 
-        // Animaci\u00c3\u00b3n sutil
+        // Animaci\u00f3n sutil
         root.setOpacity(0);
         root.setScaleX(0.9);
         root.setScaleY(0.9);
@@ -562,7 +562,7 @@ public class CartController implements Injectable {
                                 int saleId = container.getSaleUseCase().processSale(items, total, method, clientId,
                                         userId, 0.0, null, cashAmount, cardAmount, observations);
 
-                                // \u00e2\u201d\u20ac\u00e2\u201d\u20ac 2. EMISI\u00c3\u201cN FISCAL AUTOM\u00c3\u0081TICA EN HILO DE FONDO \u00e2\u201d\u20ac\u00e2\u201d\u20ac
+                                // \u00e2\u201d\u20ac\u00e2\u201d\u20ac 2. EMISI\u00c3\u201cN FISCAL AUTOM\u00c1TICA EN HILO DE FONDO \u00e2\u201d\u20ac\u00e2\u201d\u20ac
                                 try {
                                     if (client != null && client.getTaxId() != null
                                             && !client.getTaxId().trim().isEmpty()) {
@@ -588,7 +588,7 @@ public class CartController implements Injectable {
                                         container.getEmitFiscalDocumentUseCase().emitTicket(saleId);
                                     }
                                 } catch (Exception fiscalEx) {
-                                    System.err.println("Error en emisi\u00c3\u00b3n fiscal: " + fiscalEx.getMessage());
+                                    System.err.println("Error en emisi\u00f3n fiscal: " + fiscalEx.getMessage());
                                 }
                                 return saleId;
 
@@ -625,7 +625,7 @@ public class CartController implements Injectable {
     }
 
     /**
-     * Muestra un popup visualmente coherente informando que la caja no est\u00c3\u00a1
+     * Muestra un popup visualmente coherente informando que la caja no est\u00e1
      * abierta.
      */
     private void showCashNotOpenAlert(String message) {
@@ -682,7 +682,7 @@ public class CartController implements Injectable {
 
         btnClose.setOnAction(e -> stage.close());
 
-        // Animaci\u00c3\u00b3n de entrada
+        // Animaci\u00f3n de entrada
         root.setOpacity(0);
         root.setScaleX(0.9);
         root.setScaleY(0.9);
@@ -731,7 +731,7 @@ public class CartController implements Injectable {
         txtPrice.setPromptText("0.00");
         txtPrice.getStyleClass().add("input-field-modern");
 
-        // Solo permitir n\u00c3\u00bameros y punto en el precio
+        // Solo permitir n\u00fameros y punto en el precio
         txtPrice.textProperty().addListener((obs, oldVal, newVal) -> {
             if (!newVal.matches("\\d*(\\.\\d*)?")) {
                 txtPrice.setText(oldVal);

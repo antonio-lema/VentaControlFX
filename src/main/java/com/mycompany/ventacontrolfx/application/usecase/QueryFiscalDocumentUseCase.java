@@ -14,13 +14,13 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Caso de uso: Consulta y verificaci\u00c3\u00b3n de documentos fiscales emitidos.
- * Clean Architecture \u00e2\u20ac\u201d Capa de Aplicaci\u00c3\u00b3n.
+ * Caso de uso: Consulta y verificaci\u00f3n de documentos fiscales emitidos.
+ * Clean Architecture \u00e2\u20ac\u201d Capa de Aplicaci\u00f3n.
  *
  * Responsabilidades:
  * - Buscar documentos por referencia, venta, cliente o rango de fechas.
  * - Verificar integridad de los documentos (hash control).
- * - Proporcionar los datos para reimpresi\u00c3\u00b3n/regeneraci\u00c3\u00b3n de PDF.
+ * - Proporcionar los datos para reimpresi\u00f3n/regeneraci\u00f3n de PDF.
  */
 public class QueryFiscalDocumentUseCase {
 
@@ -52,7 +52,7 @@ public class QueryFiscalDocumentUseCase {
 
     /**
      * Listado filtrado para la pantalla de consulta.
-     * Cualquier par\u00c3\u00a1metro puede ser null para ignorar ese filtro.
+     * Cualquier par\u00e1metro puede ser null para ignorar ese filtro.
      */
     public List<FiscalDocument> search(LocalDate from, LocalDate to,
             Status status, String docType) throws SQLException {
@@ -63,7 +63,7 @@ public class QueryFiscalDocumentUseCase {
 
     /**
      * Verifica la integridad de un documento.
-     * Retorna false si el hash no coincide \u00e2\u2020\u2019 posible manipulaci\u00c3\u00b3n en BD.
+     * Retorna false si el hash no coincide \u00e2\u2020\u2019 posible manipulaci\u00f3n en BD.
      */
     public boolean verifyIntegrity(FiscalDocument doc) {
         return integrityService.verify(doc);
@@ -72,11 +72,11 @@ public class QueryFiscalDocumentUseCase {
     // \u00e2\u201d\u20ac\u00e2\u201d\u20ac DATOS PARA REIMPRESI\u00c3\u201cN \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac
 
     /**
-     * Re\u00c3\u00bane todos los datos necesarios para regenerar el PDF/ticket
+     * Re\u00fane todos los datos necesarios para regenerar el PDF/ticket
      * desde los snapshots almacenados. El resultado es reproducible
      * en cualquier momento futuro con exactitud.
      *
-     * @return PrintData con toda la informaci\u00c3\u00b3n necesaria para imprimir.
+     * @return PrintData con toda la informaci\u00f3n necesaria para imprimir.
      */
     public PrintData getDataForReprint(int saleId) throws SQLException {
         Optional<FiscalDocument> docOpt = fiscalRepository.findBySaleId(saleId);
@@ -90,7 +90,7 @@ public class QueryFiscalDocumentUseCase {
         return new PrintData(doc, sale, lines);
     }
 
-    // \u00e2\u201d\u20ac\u00e2\u201d\u20ac DTO interno para reimpresi\u00c3\u00b3n \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac
+    // \u00e2\u201d\u20ac\u00e2\u201d\u20ac DTO interno para reimpresi\u00f3n \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac
 
     public static class PrintData {
         public final FiscalDocument document;

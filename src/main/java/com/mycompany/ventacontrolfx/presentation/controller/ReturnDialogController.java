@@ -55,7 +55,7 @@ public class ReturnDialogController {
 
             // Mostrar el precio real pagado (Gross Price) para que coincida con el ticket
             double actualGrossPrice = detail.getLineTotal() / detail.getQuantity();
-            Label priceLabel = new Label(String.format("%.2f \u20AC / ud.", actualGrossPrice));
+            Label priceLabel = new Label(String.format("%.2f \u20ac / ud.", actualGrossPrice));
             priceLabel.getStyleClass().add("return-product-price");
             info.getChildren().addAll(nameLabel, priceLabel);
             HBox.setHgrow(info, Priority.ALWAYS);

@@ -10,7 +10,7 @@ public interface IPriceRepository {
 
         /**
          * Recupera el precio actualmente vigente para un producto y una lista
-         * espec\u00c3\u00adfica.
+         * espec\u00edfica.
          */
         Optional<Price> getActivePrice(int productId, int priceListId) throws SQLException;
 
@@ -26,8 +26,8 @@ public interface IPriceRepository {
         void closeCurrentPrice(int productId, int priceListId) throws SQLException;
 
         /**
-         * Operaci\u00c3\u00b3n at\u00c3\u00b3mica: Cierra el precio actual e inserta el nuevo en una
-         * transacci\u00c3\u00b3n.
+         * Operaci\u00f3n at\u00f3mica: Cierra el precio actual e inserta el nuevo en una
+         * transacci\u00f3n.
          */
         void updateCurrentAndSave(Price newPrice) throws SQLException;
 
@@ -47,62 +47,62 @@ public interface IPriceRepository {
         PriceList getDefaultPriceList() throws SQLException;
 
         /**
-         * Operaci\u00c3\u00b3n masiva y at\u00c3\u00b3mica: cierra todos los precios activos de la lista
-         * (opcionalmente filtrados por categor\u00c3\u00ada) y crea nuevos aplicando un
+         * Operaci\u00f3n masiva y at\u00f3mica: cierra todos los precios activos de la lista
+         * (opcionalmente filtrados por categor\u00eda) y crea nuevos aplicando un
          * multiplicador. El motivo queda trazado en la columna 'reason'.
          *
          * @param priceListId ID de la lista de precios a actualizar.
-         * @param categoryId  Filtra por categor\u00c3\u00ada; null = todos los productos.
-         * @param multiplier  Factor de multiplicaci\u00c3\u00b3n (ej. 1.05 = +5%, 0.95 = -5%).
+         * @param categoryId  Filtra por categor\u00eda; null = todos los productos.
+         * @param multiplier  Factor de multiplicaci\u00f3n (ej. 1.05 = +5%, 0.95 = -5%).
          * @param reason      Motivo del cambio para trazabilidad.
-         * @return N\u00c3\u00bamero de productos actualizados.
+         * @return N\u00famero de productos actualizados.
          */
         int applyBulkMultiplier(int priceListId, Integer categoryId, double multiplier, String reason,
                         java.time.LocalDateTime startDate)
                         throws SQLException;
 
         /**
-         * Operaci\u00c3\u00b3n masiva y at\u00c3\u00b3mica: cierra todos los precios activos y crea nuevos
+         * Operaci\u00f3n masiva y at\u00f3mica: cierra todos los precios activos y crea nuevos
          * sumando/restando
          * un importe fijo.
          *
          * @param priceListId ID de la lista de precios a actualizar.
-         * @param categoryId  Filtra por categor\u00c3\u00ada; null = todos los productos.
+         * @param categoryId  Filtra por categor\u00eda; null = todos los productos.
          * @param amount      Importe a sumar (positivo) o restar (negativo).
          * @param reason      Motivo del cambio.
-         * @return N\u00c3\u00bamero de productos actualizados.
+         * @return N\u00famero de productos actualizados.
          */
         int applyBulkFixedAmount(int priceListId, Integer categoryId, double amount, String reason,
                         java.time.LocalDateTime startDate)
                         throws SQLException;
 
         /**
-         * Operaci\u00c3\u00b3n masiva y at\u00c3\u00b3mica: redondea los precios actuales al decimal deseado.
-         * Ejemplo: roundingTarget = 0.99 redondear\u00c3\u00a1 10.45 -> 10.99.
+         * Operaci\u00f3n masiva y at\u00f3mica: redondea los precios actuales al decimal deseado.
+         * Ejemplo: roundingTarget = 0.99 redondear\u00e1 10.45 -> 10.99.
          *
          * @param priceListId    ID de la lista de precios.
-         * @param categoryId     Filtra por categor\u00c3\u00ada; null = todos.
+         * @param categoryId     Filtra por categor\u00eda; null = todos.
          * @param roundingTarget Valor decimal objetivo (ej. 0.99, 0.50, 0.00).
          * @param reason         Motivo del cambio.
-         * @return N\u00c3\u00bamero de productos actualizados.
+         * @return N\u00famero de productos actualizados.
          */
         int applyBulkRounding(int priceListId, Integer categoryId, double roundingTarget, String reason,
                         java.time.LocalDateTime startDate)
                         throws SQLException;
 
         /**
-         * Aplica un ajuste (multiplicador o importe fijo) a los N productos m\u00c3\u00a1s
+         * Aplica un ajuste (multiplicador o importe fijo) a los N productos m\u00e1s
          * vendidos.
          *
          * @param priceListId  ID de la lista de precios.
-         * @param topN         N\u00c3\u00bamero de productos top a actualizar.
-         * @param daysBack     D\u00c3\u00adas hacia atr\u00c3\u00a1s para calcular ventas.
+         * @param topN         N\u00famero de productos top a actualizar.
+         * @param daysBack     D\u00edas hacia atr\u00e1s para calcular ventas.
          * @param value        Valor (multiplicador si isPercentage=true, incremento si
          *                     false).
          * @param reason       Motivo del cambio.
          * @param isPercentage True si 'value' es un multiplicador porcentual, false si
          *                     es importe fijo.
-         * @return N\u00c3\u00bamero de productos actualizados.
+         * @return N\u00famero de productos actualizados.
          */
         int applyBulkMultiplierToTopSellers(int priceListId, int topN, int daysBack, double value, String reason,
                         boolean isPercentage, java.time.LocalDateTime startDate)
@@ -123,7 +123,7 @@ public interface IPriceRepository {
                         throws SQLException;
 
         /**
-         * Aplica un ajuste a productos cuyo precio activo est\u00c3\u00a1 en el rango [minPrice,
+         * Aplica un ajuste a productos cuyo precio activo est\u00e1 en el rango [minPrice,
          * maxPrice].
          */
         int applyBulkMultiplierToPriceRange(int priceListId, double minPrice, double maxPrice, double value,
@@ -131,14 +131,14 @@ public interface IPriceRepository {
                         throws SQLException;
 
         /**
-         * Aplica un ajuste s\u00c3\u00b3lo a los productos marcados como favoritos.
+         * Aplica un ajuste s\u00f3lo a los productos marcados como favoritos.
          */
         int applyBulkMultiplierToFavorites(int priceListId, double value, String reason, boolean isPercentage,
                         java.time.LocalDateTime startDate)
                         throws SQLException;
 
         /**
-         * Redondea precios de los N productos m\u00c3\u00a1s vendidos.
+         * Redondea precios de los N productos m\u00e1s vendidos.
          */
         int applyBulkRoundingToTopSellers(int priceListId, int topN, int daysBack, double roundingTarget, String reason,
                         java.time.LocalDateTime startDate)
@@ -198,13 +198,13 @@ public interface IPriceRepository {
                         String reason, java.time.LocalDateTime startDate) throws SQLException;
 
         /**
-         * Obtiene el log de actualizaciones masivas para una lista espec\u00c3\u00adfica.
+         * Obtiene el log de actualizaciones masivas para una lista espec\u00edfica.
          */
         List<com.mycompany.ventacontrolfx.domain.dto.PriceUpdateLogDTO> findBulkUpdateLog(int priceListId)
                         throws SQLException;
 
         /**
-         * Obtiene todos los precios hist\u00c3\u00b3ricos (no vigentes) de una lista.
+         * Obtiene todos los precios hist\u00f3ricos (no vigentes) de una lista.
          */
         List<com.mycompany.ventacontrolfx.domain.dto.ProductPriceDTO> findAllPriceHistory(int priceListId)
                         throws SQLException;

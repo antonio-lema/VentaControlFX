@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Modelo que representa la configuraci\u00c3\u00b3n general de venta del TPV.
+ * Modelo que representa la configuraci\u00f3n general de venta del TPV.
  */
 public class SaleConfig {
 
@@ -26,7 +26,7 @@ public class SaleConfig {
     private double taxRate = 21.0;
     private String taxType = "IVA General (21%)";
     private boolean pricesIncludeTax = false;
-    private String currency = "EUR \u00e2\u20ac\u201d Euro (\u20AC)";
+    private String currency = "EUR \u00e2\u20ac\u201d Euro (\u20ac)";
     private String decimals = "2 decimales";
     private String roundingMethod = "LINE"; // Tax Engine V2: 'LINE' o 'GLOBAL'
 
@@ -35,12 +35,12 @@ public class SaleConfig {
     private boolean showAddress = true;
     private boolean showPhone = true;
     private boolean showCif = true;
-    private String footerMessage = "\u00c2\u00a1Gracias por su compra!";
+    private String footerMessage = "\u00a1Gracias por su compra!";
     private String ticketCopies = "1 copia";
     private String ticketFormat = "80mm";
     private boolean autoPrint = false;
 
-    // \u00e2\u201d\u20ac\u00e2\u201d\u20ac M\u00c3\u00a9todos de pago \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac
+    // \u00e2\u201d\u20ac\u00e2\u201d\u20ac M\u00e9todos de pago \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac
     private boolean cash = true;
     private boolean card = true;
     private boolean transfer = false;
@@ -459,18 +459,18 @@ public class SaleConfig {
 
     // \u00e2\u201d\u20ac\u00e2\u201d\u20ac Helpers \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac
 
-    /** Devuelve el s\u00c3\u00admbolo de moneda (\u20AC, $, \u00c2\u00a3) seg\u00c3\u00ban la moneda configurada. */
+    /** Devuelve el s\u00edmbolo de moneda (\u20ac, $, \u00c2\u00a3) seg\u00fan la moneda configurada. */
     public String getCurrencySymbol() {
         if (currency == null)
-            return "\u20AC";
+            return "\u20ac";
         if (currency.startsWith("USD"))
             return "$";
         if (currency.startsWith("GBP"))
             return "\u00c2\u00a3";
-        return "\u20AC"; // EUR por defecto
+        return "\u20ac"; // EUR por defecto
     }
 
-    /** Devuelve el n\u00c3\u00bamero de decimales configurado (0, 1, 2 o 3). */
+    /** Devuelve el n\u00famero de decimales configurado (0, 1, 2 o 3). */
     public int getDecimalCount() {
         if (decimals == null)
             return 2;

@@ -16,7 +16,7 @@ import java.security.NoSuchAlgorithmException;
 public class FiscalIntegrityService {
 
     /**
-     * Clave secreta del sistema. En producci\u00c3\u00b3n, debe cargarse desde
+     * Clave secreta del sistema. En producci\u00f3n, debe cargarse desde
      * system_config encriptado o una variable de entorno.
      */
     private static final String SECRET = "VENTA_CTRL_FX_2026";
@@ -33,7 +33,7 @@ public class FiscalIntegrityService {
     /**
      * Verifica que el hash del documento no ha sido alterado.
      * 
-     * @return true si el documento es \u00c3\u00adntegro, false si fue manipulado.
+     * @return true si el documento es \u00edntegro, false si fue manipulado.
      */
     public boolean verify(FiscalDocument doc) {
         if (doc.getControlHash() == null || doc.getControlHash().isBlank()) {

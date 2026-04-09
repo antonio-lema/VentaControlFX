@@ -46,7 +46,7 @@ public class PriceListFormController implements Injectable {
             chkIsActive.setSelected(priceList.isActive());
             chkIsDefault.setSelected(priceList.isDefault());
 
-            // Si es la tarifa por defecto, no dejamos desmarcarla desde aqu\u00c3\u00ad (para evitar
+            // Si es la tarifa por defecto, no dejamos desmarcarla desde aqu\u00ed (para evitar
             // quedarnos sin ninguna)
             if (priceList.isDefault() || priceList.getId() == 1) {
                 chkIsDefault.setDisable(true);
@@ -61,7 +61,7 @@ public class PriceListFormController implements Injectable {
     @FXML
     private void handleSave() {
         if (txtName.getText() == null || txtName.getText().trim().isEmpty()) {
-            AlertUtil.showWarning("Campos vac\u00c3\u00ados", "El nombre de la tarifa no puede estar vac\u00c3\u00ado.");
+            AlertUtil.showWarning("Campos vac\u00edos", "El nombre de la tarifa no puede estar vac\u00edo.");
             return;
         }
 
@@ -86,7 +86,7 @@ public class PriceListFormController implements Injectable {
             }
             closeModal();
         } catch (SQLException ex) {
-            AlertUtil.showError("Error", "Ocurri\u00c3\u00b3 un error al guardar la tarifa: " + ex.getMessage());
+            AlertUtil.showError("Error", "Ocurri\u00f3 un error al guardar la tarifa: " + ex.getMessage());
         }
     }
 

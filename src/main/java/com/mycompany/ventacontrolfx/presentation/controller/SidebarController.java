@@ -65,7 +65,7 @@ public class SidebarController implements Injectable {
 
         try {
             setActiveButton(btnSell);
-            // Asegurar que el foco inicial no caiga en el bot\u00c3\u00b3n de bloquear al final del
+            // Asegurar que el foco inicial no caiga en el bot\u00f3n de bloquear al final del
             // VBox
             Platform.runLater(() -> {
                 if (btnSell != null)
@@ -116,7 +116,7 @@ public class SidebarController implements Injectable {
             return;
         boolean wasVisible = container.isVisible();
 
-        // Acorde\u00c3\u00b3n estricto: forzar cierre de todo lo dem\u00c3\u00a1s
+        // Acorde\u00f3n estricto: forzar cierre de todo lo dem\u00e1s
         collapseAll(true);
 
         if (!wasVisible) {
@@ -179,7 +179,7 @@ public class SidebarController implements Injectable {
     private void loadBranding(ServiceContainer container) {
         try {
             SaleConfig config = container.getICompanyConfigRepository().load();
-            // Nombre de la aplicaci\u00c3\u00b3n guardado
+            // Nombre de la aplicaci\u00f3n guardado
             String appName = config.getAppName();
             if (appName != null && !appName.isBlank()) {
                 lblAppName.setText(appName);
@@ -225,7 +225,7 @@ public class SidebarController implements Injectable {
         if (authService == null)
             return;
 
-        // Forzamos visibilidad de Vender para evitar sidebar vac\u00c3\u00ado
+        // Forzamos visibilidad de Vender para evitar sidebar vac\u00edo
         setVisible(btnSell, true);
 
         setVisible(btnHistory,

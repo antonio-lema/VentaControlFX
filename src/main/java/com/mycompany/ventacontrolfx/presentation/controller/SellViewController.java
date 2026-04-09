@@ -165,7 +165,7 @@ public class SellViewController implements Injectable, CategoryMenuRenderer.Cate
             filterUseCase.applyPromotions(activePromotions);
             refreshProductsWithNewPriceList();
         } else {
-            // Categor\u00c3\u00ada espec\u00c3\u00adfica
+            // Categor\u00eda espec\u00edfica
             container.getAsyncManager().runAsyncTask(() -> categoryUseCase.getAll(), cats -> {
                 cats.stream().filter(c -> c.getId() == catId).findFirst().ifPresent(c -> {
                     filterUseCase.applyCategory(c);
@@ -222,7 +222,7 @@ public class SellViewController implements Injectable, CategoryMenuRenderer.Cate
                 else
                     onCategorySelected(cat);
 
-                // Actualizar estado global y cerrar men\u00c3\u00ba
+                // Actualizar estado global y cerrar men\u00fa
                 container.getCartUseCase().setSelectedCategoryId(cat.getId());
                 handleToggleCategoryMenu();
             });
@@ -238,7 +238,7 @@ public class SellViewController implements Injectable, CategoryMenuRenderer.Cate
         else if (catId == -3)
             lblSelectedCategory.setText("% " + container.getBundle().getString("sell.category.promotions"));
         else {
-            // Intentar buscar nombre en cache o servicio (aqu\u00c3\u00ad simplificado)
+            // Intentar buscar nombre en cache o servicio (aqu\u00ed simplificado)
             container.getAsyncManager().runAsyncTask(() -> categoryUseCase.getAll(), cats -> {
                 cats.stream().filter(c -> c.getId() == catId).findFirst()
                         .ifPresent(c -> lblSelectedCategory.setText(translateDynamic(c.getName())));
@@ -291,7 +291,7 @@ public class SellViewController implements Injectable, CategoryMenuRenderer.Cate
             if (toSelect != null) {
                 comboPriceList.getSelectionModel().select(toSelect);
                 selectedPriceListId = toSelect.getId();
-                // Sincronizamos por si acaso ven\u00c3\u00adamos de un ID <= 0
+                // Sincronizamos por si acaso ven\u00edamos de un ID <= 0
                 if (container.getCartUseCase().getPriceListId() != selectedPriceListId) {
                     container.getCartUseCase().setPriceListId(selectedPriceListId);
                 }
@@ -304,7 +304,7 @@ public class SellViewController implements Injectable, CategoryMenuRenderer.Cate
                         container.getCartUseCase().setPriceListId(newVal.getId());
                     }
 
-                    // Si el ID cambi\u00c3\u00b3 respecto a lo que tenemos renderizado, refrescamos
+                    // Si el ID cambi\u00f3 respecto a lo que tenemos renderizado, refrescamos
                     if (newVal.getId() != selectedPriceListId) {
                         selectedPriceListId = newVal.getId();
                         refreshProductsWithNewPriceList();
@@ -335,7 +335,7 @@ public class SellViewController implements Injectable, CategoryMenuRenderer.Cate
                 products = container.getProductRepository().getByCategoryPaginated(cat.getId(), PAGE_SIZE,
                         currentOffset, selectedPriceListId);
             } else if (type == FilterType.FAVORITES) {
-                // Para favoritos, la paginaci\u00c3\u00b3n es en memoria o podr\u00c3\u00adamos implementarla en repo
+                // Para favoritos, la paginaci\u00f3n es en memoria o podr\u00edamos implementarla en repo
                 List<Product> allFavs = productUseCase.getFavorites(selectedPriceListId);
                 count = allFavs.size();
                 int end = Math.min(currentOffset + PAGE_SIZE, allFavs.size());
@@ -466,7 +466,7 @@ public class SellViewController implements Injectable, CategoryMenuRenderer.Cate
         if (p.getType() == com.mycompany.ventacontrolfx.domain.model.PromotionType.PERCENTAGE) {
             return String.format("%.0f%% " + container.getBundle().getString("sell.promo.discount_abbr"), p.getValue());
         } else if (p.getType() == com.mycompany.ventacontrolfx.domain.model.PromotionType.FIXED_DISCOUNT) {
-            return String.format("%.2f\u20AC " + container.getBundle().getString("sell.promo.discount_abbr"), p.getValue());
+            return String.format("%.2f\u20ac " + container.getBundle().getString("sell.promo.discount_abbr"), p.getValue());
         } else if (p.getType() == com.mycompany.ventacontrolfx.domain.model.PromotionType.VOLUME_DISCOUNT) {
             return (p.getBuyQty() + p.getFreeQty()) + "x" + p.getBuyQty();
         }

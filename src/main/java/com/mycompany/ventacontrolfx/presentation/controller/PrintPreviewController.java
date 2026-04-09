@@ -155,11 +155,11 @@ public class PrintPreviewController implements Injectable {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMM, yyyy 'Hora:' HH:mm:ss");
         lblDate.setText("Fecha: " + now.format(formatter) + " Caja: 01");
 
-        // N\u00c3\u00bamero de ticket
+        // N\u00famero de ticket
         String prefix = isGiftMode ? "Ticket regalo N\u00c2\u00ba: " : "Factura simplificada N\u00c2\u00ba: ";
         lblTicketTitle.setText(prefix + String.format("%03d", saleId));
 
-        // Art\u00c3\u00adculos
+        // Art\u00edculos
         itemsContainer.getChildren().clear();
         if (items != null) {
             for (CartItem item : items) {
@@ -181,7 +181,7 @@ public class PrintPreviewController implements Injectable {
         paymentInfoContainer.setVisible(!isGiftMode);
         paymentInfoContainer.setManaged(!isGiftMode);
 
-        // Estilo bot\u00c3\u00b3n regalo
+        // Estilo bot\u00f3n regalo
         if (isGiftMode) {
             btnGiftTicket.setStyle(
                     "-fx-background-color: #1a73e8; -fx-text-fill: white; -fx-background-radius: 25; -fx-font-weight: bold; -fx-padding: 8 20; -fx-cursor: hand;");
@@ -192,7 +192,7 @@ public class PrintPreviewController implements Injectable {
             lblGiftIcon.setStyle("-fx-font-size: 16; -fx-text-fill: #1a73e8;");
         }
 
-        // Totales con IVA din\u00c3\u00a1mico \u00e2\u20ac\u201d agrupado por tasa
+        // Totales con IVA din\u00e1mico \u00e2\u20ac\u201d agrupado por tasa
         java.util.Map<Double, Double[]> vatBreakdown = new java.util.TreeMap<>();
         boolean isInclusive = cfg != null && cfg.isPricesIncludeTax();
         double totalVatAmount = 0.0;
@@ -287,13 +287,13 @@ public class PrintPreviewController implements Injectable {
             }
         }
 
-        // Ocultar bot\u00c3\u00b3n de ticket regalo que no aplica a arqueos
+        // Ocultar bot\u00f3n de ticket regalo que no aplica a arqueos
         if (btnGiftTicket != null) {
             btnGiftTicket.setVisible(false);
             btnGiftTicket.setManaged(false);
         }
 
-        // Ocultar bot\u00c3\u00b3n de Nueva Venta que no aplica a arqueos
+        // Ocultar bot\u00f3n de Nueva Venta que no aplica a arqueos
         if (btnNewSale != null) {
             btnNewSale.setVisible(false);
             btnNewSale.setManaged(false);
@@ -339,14 +339,14 @@ public class PrintPreviewController implements Injectable {
 
         int row = 0;
         addGridRow(grid, row++, "Cajero:", closure.getUsername() != null ? closure.getUsername() : "N/D");
-        addGridRow(grid, row++, "Fondo Inicial:", String.format("%.2f \u20AC", closure.getInitialFund()));
-        addGridRow(grid, row++, "(+) Ventas:", String.format("%.2f \u20AC",
+        addGridRow(grid, row++, "Fondo Inicial:", String.format("%.2f \u20ac", closure.getInitialFund()));
+        addGridRow(grid, row++, "(+) Ventas:", String.format("%.2f \u20ac",
                 closure.getTotalCash() - closure.getInitialFund() - closure.getCashIn() + closure.getCashOut()));
-        addGridRow(grid, row++, "(+) Entradas:", String.format("%.2f \u20AC", closure.getCashIn()));
-        addGridRow(grid, row++, "(-) Retiradas:", String.format("%.2f \u20AC", closure.getCashOut()));
-        addGridRow(grid, row++, "Total Esperado:", String.format("%.2f \u20AC", closure.getExpectedCash()));
-        addGridRow(grid, row++, "Total Contado:", String.format("%.2f \u20AC", closure.getActualCash()));
-        addGridRow(grid, row++, "Diferencia:", String.format("%+.2f \u20AC", closure.getDifference()));
+        addGridRow(grid, row++, "(+) Entradas:", String.format("%.2f \u20ac", closure.getCashIn()));
+        addGridRow(grid, row++, "(-) Retiradas:", String.format("%.2f \u20ac", closure.getCashOut()));
+        addGridRow(grid, row++, "Total Esperado:", String.format("%.2f \u20ac", closure.getExpectedCash()));
+        addGridRow(grid, row++, "Total Contado:", String.format("%.2f \u20ac", closure.getActualCash()));
+        addGridRow(grid, row++, "Diferencia:", String.format("%+.2f \u20ac", closure.getDifference()));
 
         closureDetails.getChildren().add(grid);
 
@@ -405,7 +405,7 @@ public class PrintPreviewController implements Injectable {
             paperSheet.setMaxWidth(750);
             paperSheet.setStyle("-fx-background-color: white; -fx-padding: 40 50 40 50;");
 
-            // Redise\u00c3\u00b1ar el \u00c3\u00a1rbol visual para A4 de forma condicional
+            // Redise\u00f1ar el \u00e1rbol visual para A4 de forma condicional
             paperSheet.getChildren().clear();
 
             // Cabecera top: Datos empresa (Izda) + Datos ticket (Derecha)
@@ -526,7 +526,7 @@ public class PrintPreviewController implements Injectable {
 
     private void addItemRow(CartItem item, String sym) {
         HBox row = new HBox(10);
-        // Sincronizar detecci\u00c3\u00b3n de A4 con applyPaperFormat
+        // Sincronizar detecci\u00f3n de A4 con applyPaperFormat
         boolean isA4 = (cfg != null && cfg.getTicketFormat().contains("A4")) || currentClient != null;
 
         if (isA4) {
@@ -644,7 +644,7 @@ public class PrintPreviewController implements Injectable {
         String footer = cfg.getFooterMessage();
         setLabelText(lblFooterMessage, (footer != null && !footer.isEmpty()) ? footer : "GRACIAS POR SU VISITA");
 
-        // Usuario en sesi\u00c3\u00b3n (cajero que atiende)
+        // Usuario en sesi\u00f3n (cajero que atiende)
         if (lblAttendedBy != null) {
             try {
                 if (container != null && container.getUserSession() != null
@@ -703,7 +703,7 @@ public class PrintPreviewController implements Injectable {
                 fullAddress += "\n" + client.getPostalCode() + " " + client.getCity() + " (" + client.getProvince()
                         + ")";
             }
-            if (client.getCountry() != null && !client.getCountry().equalsIgnoreCase("Espa\u00c3\u00b1a")) {
+            if (client.getCountry() != null && !client.getCountry().equalsIgnoreCase("Espa\u00f1a")) {
                 fullAddress += "\n" + client.getCountry();
             }
             if (lblClientAddress != null) {
@@ -752,10 +752,10 @@ public class PrintPreviewController implements Injectable {
             // o A4)
             String format = cfg.getTicketFormat();
             if (currentClient != null)
-                format = "A4"; // Forzar l\u00c3\u00b3gica A4 para facturas
+                format = "A4"; // Forzar l\u00f3gica A4 para facturas
 
             if (format != null && !format.contains("A4")) {
-                // Ancho f\u00c3\u00adsico aproximado en puntos (58mm ~ 164pt, 80mm ~ 226pt)
+                // Ancho f\u00edsico aproximado en puntos (58mm ~ 164pt, 80mm ~ 226pt)
                 double maxTicketPoints = format.contains("58mm") ? 180 : 250;
                 if (pageWidth > maxTicketPoints) {
                     scale = maxTicketPoints / contentWidth;
@@ -797,7 +797,7 @@ public class PrintPreviewController implements Injectable {
         if (configUseCase != null) {
             this.cfg = configUseCase.getConfig();
         }
-        String sym = cfg != null ? cfg.getCurrencySymbol() : "\u20AC";
+        String sym = cfg != null ? cfg.getCurrencySymbol() : "\u20ac";
         String fmt = "%." + (cfg != null ? cfg.getDecimalCount() : 2) + "f " + sym;
 
         // Impresoras disponibles
@@ -807,24 +807,24 @@ public class PrintPreviewController implements Injectable {
             cmbPrinters.getSelectionModel().select(defaultPrinter);
         }
 
-        // Fecha y hora de la devoluci\u00c3\u00b3n
+        // Fecha y hora de la devoluci\u00f3n
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMM, yyyy 'Hora:' HH:mm:ss");
         lblDate.setText("Fecha Dev: " + returnRecord.getReturnDatetime().format(formatter));
 
-        // T\u00c3\u00adtulo: Factura Rectificativa (Si tiene n\u00c3\u00bamero fiscal) o Ticket de Devoluci\u00c3\u00b3n
+        // T\u00edtulo: Factura Rectificativa (Si tiene n\u00famero fiscal) o Ticket de Devoluci\u00f3n
         if (returnRecord.getDocNumber() != null) {
             lblTicketTitle.setText("Factura Rectificativa N\u00c2\u00ba: " + returnRecord.getFullReference());
         } else {
-            lblTicketTitle.setText("Ticket de Devoluci\u00c3\u00b3n N\u00c2\u00ba: REF-" + returnRecord.getReturnId());
+            lblTicketTitle.setText("Ticket de Devoluci\u00f3n N\u00c2\u00ba: REF-" + returnRecord.getReturnId());
         }
 
-        // Informaci\u00c3\u00b3n de referencia al ticket original
+        // Informaci\u00f3n de referencia al ticket original
         Label lblRef = new Label("Ref. Ticket Original: #" + originalSale.getSaleId());
         lblRef.setStyle("-fx-font-size: 11px; -fx-text-fill: #666; -fx-padding: 5 0;");
         if (ticketInfoSection != null)
             ticketInfoSection.getChildren().add(lblRef);
 
-        // Art\u00c3\u00adculos devueltos
+        // Art\u00edculos devueltos
         itemsContainer.getChildren().clear();
         for (com.mycompany.ventacontrolfx.domain.model.ReturnDetail detail : details) {
             HBox row = new HBox(10);
@@ -864,7 +864,7 @@ public class PrintPreviewController implements Injectable {
         // Datos de empresa
         applyCompanyHeader();
 
-        // Si la venta original ten\u00c3\u00ada cliente, configurarlo para A4
+        // Si la venta original ten\u00eda cliente, configurarlo para A4
         if (originalSale.getClientId() != null) {
             try {
                 com.mycompany.ventacontrolfx.domain.model.Client client = container.getClientUseCase()

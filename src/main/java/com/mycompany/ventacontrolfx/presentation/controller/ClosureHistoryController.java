@@ -162,7 +162,7 @@ public class ClosureHistoryController implements Injectable {
                     setText(null);
                     setStyle("");
                 } else {
-                    setText(String.format("%+.2f \u20AC", item));
+                    setText(String.format("%+.2f \u20ac", item));
                     if (Math.abs(item) < 0.01)
                         setStyle("-fx-text-fill: -fx-custom-color-success-dark; -fx-font-weight: bold;");
                     else
@@ -181,7 +181,7 @@ public class ClosureHistoryController implements Injectable {
                 if (empty || item == null)
                     setText(null);
                 else
-                    setText(String.format("%.2f \u20AC", item));
+                    setText(String.format("%.2f \u20ac", item));
             }
         });
     }
@@ -263,10 +263,10 @@ public class ClosureHistoryController implements Injectable {
                 } else {
                     CashMovement mov = getTableRow().getItem();
                     if (mov != null && ("RETIRADA".equals(mov.getType()) || "DEVOLUCION".equals(mov.getType()))) {
-                        setText(String.format("-%.2f \u20AC", item));
+                        setText(String.format("-%.2f \u20ac", item));
                         setStyle("-fx-text-fill: #dc2626; -fx-font-weight: bold;");
                     } else {
-                        setText(String.format("+%.2f \u20AC", item));
+                        setText(String.format("+%.2f \u20ac", item));
                         setStyle("-fx-text-fill: #16a34a; -fx-font-weight: bold;");
                     }
                 }
@@ -329,11 +329,11 @@ public class ClosureHistoryController implements Injectable {
                 .count();
 
         lblTotalClosures.setText(String.valueOf(allClosures.size()));
-        lblTotalDifference.setText(String.format("%+.2f \u20AC", totalDiff));
+        lblTotalDifference.setText(String.format("%+.2f \u20ac", totalDiff));
         lblPendingReview.setText(String.valueOf(pending));
 
         try {
-            lblCurrentCash.setText(String.format("%.2f \u20AC", closureUseCase.getCurrentCashInDrawer()));
+            lblCurrentCash.setText(String.format("%.2f \u20ac", closureUseCase.getCurrentCashInDrawer()));
         } catch (SQLException e) {
             lblCurrentCash.setText("---");
         }
@@ -344,15 +344,15 @@ public class ClosureHistoryController implements Injectable {
             lblClosureDetailId.setText(String.format(container.getBundle().getString("closure.history.detail.title"), closure.getClosureId()));
 
             // Financial Breakdown
-            lblDetInitial.setText(String.format("%.2f \u20AC", closure.getInitialFund()));
-            // Simulaci\u00c3\u00b3n de desglose si no hay campos espec\u00c3\u00adficos a\u00c3\u00ban
-            // En una versi\u00c3\u00b3n real, esto vendr\u00c3\u00ada de una consulta agregada de movimientos
-            lblDetSales.setText(String.format("%.2f \u20AC",
+            lblDetInitial.setText(String.format("%.2f \u20ac", closure.getInitialFund()));
+            // Simulaci\u00f3n de desglose si no hay campos espec\u00edficos a\u00fan
+            // En una versi\u00f3n real, esto vendr\u00eda de una consulta agregada de movimientos
+            lblDetSales.setText(String.format("%.2f \u20ac",
                     closure.getTotalCash() - closure.getInitialFund() - closure.getCashIn() + closure.getCashOut()));
-            lblDetIn.setText(String.format("%.2f \u20AC", closure.getCashIn()));
-            lblDetOut.setText(String.format("%.2f \u20AC", closure.getCashOut()));
-            lblDetExpected.setText(String.format("%.2f \u20AC", closure.getExpectedCash()));
-            lblDetActual.setText(String.format("%.2f \u20AC", closure.getActualCash()));
+            lblDetIn.setText(String.format("%.2f \u20ac", closure.getCashIn()));
+            lblDetOut.setText(String.format("%.2f \u20ac", closure.getCashOut()));
+            lblDetExpected.setText(String.format("%.2f \u20ac", closure.getExpectedCash()));
+            lblDetActual.setText(String.format("%.2f \u20ac", closure.getActualCash()));
             lblDetNotes.setText(closure.getNotes() != null && !closure.getNotes().isEmpty() ? closure.getNotes()
                     : container.getBundle().getString("closure.history.detail.notes.none"));
 

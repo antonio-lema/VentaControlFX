@@ -816,7 +816,7 @@ public class JdbcProductRepository implements IProductRepository {
             whereClause.append(" (p.name LIKE ? OR c.name LIKE ? OR p.sku LIKE ?) ");
             safeQuery = "%" + query.trim() + "%";
         } else if (visibility == VisibilityFilter.ALL) {
-            return count(); // R\u00c3\u0192\u00c2\u00a1pido si no hay filtros y queremos todos
+            return count(); // R\u00c3\u0192\u00a1pido si no hay filtros y queremos todos
         }
 
         String sql = "SELECT COUNT(*) FROM products p LEFT JOIN categories c ON p.category_id = c.category_id "

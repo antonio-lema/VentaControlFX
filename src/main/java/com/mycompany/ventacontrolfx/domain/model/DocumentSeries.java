@@ -1,7 +1,7 @@
 package com.mycompany.ventacontrolfx.domain.model;
 
 /**
- * Gesti\u00c3\u00b3n de series de numeraci\u00c3\u00b3n correlativas de documentos fiscales.
+ * Gesti\u00f3n de series de numeraci\u00f3n correlativas de documentos fiscales.
  * Clean Architecture \u00e2\u20ac\u201d Capa de Dominio.
  */
 public class DocumentSeries {
@@ -9,7 +9,7 @@ public class DocumentSeries {
     private int seriesId;
     private String seriesCode; // "T", "F", "R"
     private String prefix; // "2026-T-"
-    private int lastNumber; // \u00c3\u00baltimo n\u00c3\u00bamero asignado
+    private int lastNumber; // \u00faltimo n\u00famero asignado
     private int year;
     private String description;
 
@@ -66,12 +66,12 @@ public class DocumentSeries {
         this.description = description;
     }
 
-    /** Retorna el siguiente n\u00c3\u00bamero SIN incrementar (solo lectura). */
+    /** Retorna el siguiente n\u00famero SIN incrementar (solo lectura). */
     public int peekNextNumber() {
         return lastNumber + 1;
     }
 
-    /** Genera la referencia formateada para el n\u00c3\u00bamero dado. */
+    /** Genera la referencia formateada para el n\u00famero dado. */
     public String format(int number) {
         return String.format("%s%05d", prefix, number);
     }

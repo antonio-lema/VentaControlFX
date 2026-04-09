@@ -1,9 +1,9 @@
 package com.mycompany.ventacontrolfx.domain.model;
 
 /**
- * Representa un impuesto calculado sobre una l\u00c3\u00adnea de venta o un total.
+ * Representa un impuesto calculado sobre una l\u00ednea de venta o un total.
  * Contiene el detalle del impuesto aplicado (nombre, porcentaje) y el importe
- * econ\u00c3\u00b3mico.
+ * econ\u00f3mico.
  */
 public class AppliedTax {
     private final int taxRateId;

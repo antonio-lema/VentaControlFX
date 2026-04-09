@@ -31,7 +31,7 @@ public class ProductImportUseCase {
     public int importFromCsv(File file) throws Exception {
         authService.checkPermission("PRODUCTOS");
 
-        // 1. Cargar categor\u00c3\u00adas para mapeo por nombre
+        // 1. Cargar categor\u00edas para mapeo por nombre
         List<Category> allCategories = categoryRepository.getAll();
         Map<String, Integer> categoryMap = new HashMap<>();
         int defaultCategoryId = 0;
@@ -84,7 +84,7 @@ public class ProductImportUseCase {
 
                     productsToImport.add(p);
                 } catch (Exception e) {
-                    System.err.println("Error parseando l\u00c3\u00adnea: " + line + " -> " + e.getMessage());
+                    System.err.println("Error parseando l\u00ednea: " + line + " -> " + e.getMessage());
                 }
             }
         }

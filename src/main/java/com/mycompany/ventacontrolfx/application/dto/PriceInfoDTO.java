@@ -3,8 +3,8 @@ package com.mycompany.ventacontrolfx.application.dto;
 import java.time.LocalDateTime;
 
 /**
- * DTO para transportar informaci\u00c3\u00b3n de precio a la capa de presentaci\u00c3\u00b3n.
- * A\u00c3\u00adsla a la UI de las reglas internas de la entidad Price.
+ * DTO para transportar informaci\u00f3n de precio a la capa de presentaci\u00f3n.
+ * A\u00edsla a la UI de las reglas internas de la entidad Price.
  */
 public class PriceInfoDTO {
     private final double value;
@@ -44,6 +44,6 @@ public class PriceInfoDTO {
 
     @Override
     public String toString() {
-        return String.format("%.2f \u20AC (%s)", value, priceListName);
+        return String.format("%.2f \u20ac (%s)", value, priceListName);
     }
 }

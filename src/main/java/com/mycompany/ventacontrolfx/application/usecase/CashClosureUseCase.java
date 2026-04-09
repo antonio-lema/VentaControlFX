@@ -22,7 +22,7 @@ public class CashClosureUseCase {
 
     public void performClosure(CashClosure closure) throws SQLException {
         authService.checkPermission("CIERRES");
-        // Enriquecer el cierre con datos de auditor\u00c3\u00ada antes de guardar
+        // Enriquecer el cierre con datos de auditor\u00eda antes de guardar
         Map<String, Double> totals = repository.getPendingTotals();
 
         double cashSales = totals.getOrDefault("cash", 0.0);
@@ -41,7 +41,7 @@ public class CashClosureUseCase {
         closure.setTotalCard(totals.getOrDefault("card", 0.0));
         closure.setTotalAll(totals.getOrDefault("total", 0.0));
 
-        // Determinamos el estado seg\u00c3\u00ban la diferencia
+        // Determinamos el estado seg\u00fan la diferencia
         double diff = closure.getActualCash() - currentCash;
         closure.setDifference(diff);
 
@@ -51,13 +51,13 @@ public class CashClosureUseCase {
             closure.setStatus("DESCUADRE");
         }
 
-        // El repositorio.save usar\u00c3\u00a1 estos campos para la auditor\u00c3\u00ada
+        // El repositorio.save usar\u00e1 estos campos para la auditor\u00eda
         repository.save(closure);
     }
 
     /**
      * Realiza un cierre parcial (Informe X).
-     * Muestra/Imprime los totales actuales sin cerrar la sesi\u00c3\u00b3n de caja.
+     * Muestra/Imprime los totales actuales sin cerrar la sesi\u00f3n de caja.
      */
     public void performPartialClosure(int userId) throws java.sql.SQLException {
         authService.checkPermission("CIERRES");
@@ -66,9 +66,9 @@ public class CashClosureUseCase {
 
         System.out.println("--- CIERRE PARCIAL (INFORME X) ---");
         System.out.println("Usuario: " + userId);
-        System.out.println("Efectivo en Caj\u00c3\u00b3n: " + currentCash);
+        System.out.println("Efectivo en Caj\u00f3n: " + currentCash);
         System.out.println("Ventas Totales: " + totals.getOrDefault("sales_total", 0.0));
-        // Aqu\u00c3\u00ad se llamar\u00c3\u00ada al servicio de impresi\u00c3\u00b3n de tickets
+        // Aqu\u00ed se llamar\u00eda al servicio de impresi\u00f3n de tickets
     }
 
     public List<CashClosure> getHistory(LocalDate start, LocalDate end) throws SQLException {
@@ -95,11 +95,11 @@ public class CashClosureUseCase {
         return repository.getPendingProductSummary();
     }
 
-    // \u00e2\u201d\u20ac\u00e2\u201d\u20ac Gesti\u00c3\u00b3n de fondo de caja \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac
+    // \u00e2\u201d\u20ac\u00e2\u201d\u20ac Gesti\u00f3n de fondo de caja \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac
 
     /**
      * Abre la caja con el fondo inicial indicado.
-     * Lanza excepci\u00c3\u00b3n si ya hay una sesi\u00c3\u00b3n activa hoy.
+     * Lanza excepci\u00f3n si ya hay una sesi\u00f3n activa hoy.
      */
     public void openCashFund(double initialAmount, String notes, int userId) throws SQLException {
         authService.checkPermission("CIERRES");
@@ -124,7 +124,7 @@ public class CashClosureUseCase {
         double available = repository.getCurrentCashInDrawer();
         if (amount > available) {
             throw new SQLException(String.format(
-                    "Efectivo insuficiente en caja. Disponible: %.2f \u20AC. Solicitado: %.2f \u20AC",
+                    "Efectivo insuficiente en caja. Disponible: %.2f \u20ac. Solicitado: %.2f \u20ac",
                     available, amount));
         }
         repository.withdrawCash(amount, reason, userId);
@@ -138,23 +138,23 @@ public class CashClosureUseCase {
         return repository.getCurrentCashInDrawer();
     }
 
-    /** Indica si hay una sesi\u00c3\u00b3n de caja abierta hoy. */
+    /** Indica si hay una sesi\u00f3n de caja abierta hoy. */
     public boolean hasActiveFund() throws SQLException {
         return repository.hasActiveFund();
     }
 
-    /** Fondo inicial de la sesi\u00c3\u00b3n activa. */
+    /** Fondo inicial de la sesi\u00f3n activa. */
     public double getActiveFundAmount() throws SQLException {
         return repository.getActiveFundAmount();
     }
 
-    /** Obtiene el saldo real del \u00c3\u00baltimo cierre realizado. */
+    /** Obtiene el saldo real del \u00faltimo cierre realizado. */
     public double getLastClosureAmount() throws SQLException {
         return repository.getLastClosureAmount();
     }
 
     /**
-     * Valida que haya suficiente efectivo en caja para procesar una devoluci\u00c3\u00b3n en
+     * Valida que haya suficiente efectivo en caja para procesar una devoluci\u00f3n en
      * efectivo.
      * 
      * @param returnAmount cantidad a devolver
@@ -172,7 +172,7 @@ public class CashClosureUseCase {
     }
 
     /**
-     * Valida que haya suficiente efectivo en caja para procesar una devoluci\u00c3\u00b3n en
+     * Valida que haya suficiente efectivo en caja para procesar una devoluci\u00f3n en
      * efectivo.
      * 
      * @param returnAmount cantidad a devolver
@@ -182,34 +182,34 @@ public class CashClosureUseCase {
         double available = repository.getCurrentCashInDrawer();
         if (returnAmount > available) {
             throw new SQLException(String.format(
-                    "\u00e2\u009d\u0152 No hay suficiente efectivo en caja para esta devoluci\u00c3\u00b3n.\n\n" +
-                            "\u00f0\u0178\u008f\u00a6 Efectivo actual: %.2f \u20AC\n" +
-                            "\u00f0\u0178\u2019\u00b8 Importe solicitado: %.2f \u20AC\n\n" +
+                    "\u00e2\u009d\u0152 No hay suficiente efectivo en caja para esta devoluci\u00f3n.\n\n" +
+                            "\u00f0\u0178\u008f\u00a6 Efectivo actual: %.2f \u20ac\n" +
+                            "\u00f0\u0178\u2019\u00b8 Importe solicitado: %.2f \u20ac\n\n" +
                             "\u00e2\u0161\u00a0\u00ef\u00b8\u008f Se requiere un fondo de caja mayor para cubrir este reembolso.",
                     available, returnAmount));
         }
     }
 
     /**
-     * Registra una devoluci\u00c3\u00b3n en efectivo en el libro mayor de caja.
-     * Valida el saldo disponible antes de permitir la operaci\u00c3\u00b3n.
+     * Registra una devoluci\u00f3n en efectivo en el libro mayor de caja.
+     * Valida el saldo disponible antes de permitir la operaci\u00f3n.
      *
      * @param amount importe a devolver
-     * @param reason motivo de la devoluci\u00c3\u00b3n
-     * @param userId usuario que realiza la devoluci\u00c3\u00b3n
+     * @param reason motivo de la devoluci\u00f3n
+     * @param userId usuario que realiza la devoluci\u00f3n
      * @throws SQLException si el efectivo es insuficiente o falla la BD
      */
     public void registerCashReturn(double amount, String reason, int userId) throws SQLException {
         authService.checkPermission("CIERRES");
         if (amount <= 0) {
-            throw new SQLException("El importe de la devoluci\u00c3\u00b3n debe ser mayor que cero.");
+            throw new SQLException("El importe de la devoluci\u00f3n debe ser mayor que cero.");
         }
         validateCashAvailableForReturn(amount);
         repository.registerCashReturn(amount, reason, userId);
     }
 
     public void registerCashReturn(double amount, String reason, int userId, Connection conn) throws SQLException {
-        // Validaci\u00c3\u00b3n obligatoria de saldo incluso en transacciones
+        // Validaci\u00f3n obligatoria de saldo incluso en transacciones
         validateCashAvailableForReturn(amount);
         repository.registerCashReturn(amount, reason, userId, conn);
     }

@@ -15,8 +15,8 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Caso de Uso para la autenticaci\u00c3\u00b3n de usuarios.
- * Sigue los principios de Clean Architecture separando la l\u00c3\u00b3gica de negocio del
+ * Caso de Uso para la autenticaci\u00f3n de usuarios.
+ * Sigue los principios de Clean Architecture separando la l\u00f3gica de negocio del
  * controlador.
  */
 public class LoginUseCase {
@@ -39,10 +39,10 @@ public class LoginUseCase {
      * Valida las credenciales y carga el perfil completo del usuario.
      * 
      * @param username Nombre de usuario.
-     * @param password Contrase\u00c3\u00b1a plana (se comparar\u00c3\u00a1 con el hash almacenado).
+     * @param password Contrase\u00f1a plana (se comparar\u00e1 con el hash almacenado).
      * @return El usuario autenticado con todos sus permisos cargados.
      * @throws UserNotFoundException    Si el nombre de usuario no existe.
-     * @throws InvalidPasswordException Si la contrase\u00c3\u00b1a es incorrecta.
+     * @throws InvalidPasswordException Si la contrase\u00f1a es incorrecta.
      * @throws SQLException             Si hay un error persistente.
      */
     public User execute(String username, String password) throws SQLException {
@@ -53,17 +53,17 @@ public class LoginUseCase {
             throw new UserNotFoundException(username);
         }
 
-        // 2. Validar contrase\u00c3\u00b1a con BCrypt
+        // 2. Validar contrase\u00f1a con BCrypt
         if (!BCrypt.checkpw(password, user.getPasswordHash())) {
-            logFailedAttempt(username, "Contrase\u00c3\u00b1a incorrecta");
+            logFailedAttempt(username, "Contrase\u00f1a incorrecta");
             throw new InvalidPasswordException();
         }
 
         // 3. Cargar perfil extendido (Roles y Permisos)
         loadExtendedProfile(user);
 
-        // 4. Auditor\u00c3\u00ada de \u00c3\u00a9xito
-        auditRepository.logAccess(user.getUserId(), "LOGIN", "AUTH", "Inicio de sesi\u00c3\u00b3n exitoso");
+        // 4. Auditor\u00eda de \u00e9xito
+        auditRepository.logAccess(user.getUserId(), "LOGIN", "AUTH", "Inicio de sesi\u00f3n exitoso");
 
         return user;
     }

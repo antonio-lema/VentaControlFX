@@ -23,11 +23,11 @@ public class FiscalDocument {
     private int docNumber; // correlativo dentro de la serie
     private Status docStatus;
 
-    // Snapshot del emisor en el momento de la emisi\u00c3\u00b3n
+    // Snapshot del emisor en el momento de la emisi\u00f3n
     private String issuerName;
     private String issuerTaxId;
     private String issuerAddress;
-    private String issuerPhone; // Snapshot del tel\u00c3\u00a9fono del emisor
+    private String issuerPhone; // Snapshot del tel\u00e9fono del emisor
 
     // Snapshot del receptor (solo en FACTURA)
     private String receiverName;

@@ -12,8 +12,8 @@ public class Product {
     private int id;
     private int categoryId;
     private String name;
-    private String sku; // Identificador \u00c3\u00banico / C\u00c3\u00b3digo de Barras
-    private double costPrice; // Precio de coste base para m\u00c3\u00a1rgenes
+    private String sku; // Identificador \u00fanico / C\u00f3digo de Barras
+    private double costPrice; // Precio de coste base para m\u00e1rgenes
     private double price;
     private boolean isFavorite;
     private String imagePath;
@@ -22,7 +22,7 @@ public class Product {
     private Double iva; // Legacy fallback
     private Double categoryIva; // Legacy fallback
     private Integer taxGroupId; // Tax Engine V2
-    private double currentPrice; // Precio calculado por la vista seg\u00c3\u00ban tarifa activa actual
+    private double currentPrice; // Precio calculado por la vista seg\u00fan tarifa activa actual
     private boolean isActive = true;
 
     // Stock Management

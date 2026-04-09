@@ -24,13 +24,13 @@ import com.mycompany.ventacontrolfx.application.ports.IFiscalPdfService;
 import com.mycompany.ventacontrolfx.application.usecase.QueryFiscalDocumentUseCase.PrintData;
 
 /**
- * Caso de uso: Emisi\u00c3\u00b3n de documentos fiscales (Ticket y Factura).
- * Clean Architecture \u00e2\u20ac\u201d Capa de Aplicaci\u00c3\u00b3n.
+ * Caso de uso: Emisi\u00f3n de documentos fiscales (Ticket y Factura).
+ * Clean Architecture \u00e2\u20ac\u201d Capa de Aplicaci\u00f3n.
  *
- * Coordina sin contener l\u00c3\u00b3gica de negocio propia:
+ * Coordina sin contener l\u00f3gica de negocio propia:
  * 1. Recoge los datos de la venta (snapshot).
- * 2. Asigna n\u00c3\u00bamero correlativo de forma at\u00c3\u00b3mica.
- * 3. Calcula hash de integridad (v\u00c3\u00ada Domain Service).
+ * 2. Asigna n\u00famero correlativo de forma at\u00f3mica.
+ * 3. Calcula hash de integridad (v\u00eda Domain Service).
  * 4. Persiste el documento fiscal.
  */
 public class EmitFiscalDocumentUseCase {
@@ -40,7 +40,7 @@ public class EmitFiscalDocumentUseCase {
     private final IDocumentSeriesRepository seriesRepository;
     private final ICompanyConfigRepository configRepository;
     private final FiscalIntegrityService integrityService;
-    private IFiscalPdfService pdfService; // Opcional, inyectado v\u00c3\u00ada setter
+    private IFiscalPdfService pdfService; // Opcional, inyectado v\u00eda setter
 
     public EmitFiscalDocumentUseCase(
             ISaleRepository saleRepository,
@@ -65,7 +65,7 @@ public class EmitFiscalDocumentUseCase {
      * Si la venta ya tiene un documento emitido, lo retorna sin crear duplicados.
      *
      * @param saleId ID de la venta en la tabla `sales`
-     * @return El documento fiscal emitido con su n\u00c3\u00bamero correlativo.
+     * @return El documento fiscal emitido con su n\u00famero correlativo.
      */
     public FiscalDocument emitTicket(int saleId) throws SQLException {
         // Idempotencia: si ya tiene documento, retornarlo
@@ -80,9 +80,9 @@ public class EmitFiscalDocumentUseCase {
      * Emite una Factura Completa. Requiere los datos fiscales del receptor.
      *
      * @param saleId          ID de la venta
-     * @param receiverName    Nombre o raz\u00c3\u00b3n social del cliente
+     * @param receiverName    Nombre o raz\u00f3n social del cliente
      * @param receiverTaxId   NIF/CIF del cliente
-     * @param receiverAddress Direcci\u00c3\u00b3n fiscal del cliente
+     * @param receiverAddress Direcci\u00f3n fiscal del cliente
      */
     public FiscalDocument emitInvoice(int saleId,
             String receiverName, String receiverTaxId, String receiverAddress)
@@ -103,7 +103,7 @@ public class EmitFiscalDocumentUseCase {
             throw new IllegalStateException("No existe documento fiscal para la venta #" + saleId);
         }
         if (!doc.get().canTransitionTo(Status.ANULADO)) {
-            throw new IllegalStateException("El documento ya est\u00c3\u00a1 en estado: " + doc.get().getDocStatus());
+            throw new IllegalStateException("El documento ya est\u00e1 en estado: " + doc.get().getDocStatus());
         }
         try (Connection conn = DBConnection.getConnection()) {
             conn.setAutoCommit(false);
@@ -131,7 +131,7 @@ public class EmitFiscalDocumentUseCase {
                 fiscalRepository.save(doc, conn);
                 conn.commit();
 
-                // \u00e2\u201d\u20ac\u00e2\u201d\u20ac ARCHIVADO AUTOM\u00c3\u0081TICO EN PDF \u00e2\u201d\u20ac\u00e2\u201d\u20ac
+                // \u00e2\u201d\u20ac\u00e2\u201d\u20ac ARCHIVADO AUTOM\u00c1TICO EN PDF \u00e2\u201d\u20ac\u00e2\u201d\u20ac
                 if (pdfService != null) {
                     archiveInPdf(doc);
                 }
@@ -156,7 +156,7 @@ public class EmitFiscalDocumentUseCase {
             String year = String.valueOf(doc.getIssuedAt().getYear());
             String month = String.format("%02d", doc.getIssuedAt().getMonthValue());
 
-            // Clasificaci\u00c3\u00b3n por tipo de documento
+            // Clasificaci\u00f3n por tipo de documento
             String typeFolder;
             if (doc.getDocType() == Type.FACTURA)
                 typeFolder = "Facturas";
@@ -178,7 +178,7 @@ public class EmitFiscalDocumentUseCase {
             System.out.println("PDF FISCAL ARCHIVADO: " + fullPath);
 
         } catch (Exception e) {
-            System.err.println("CR\u00c3\u008dTICO: Fallo al archivar PDF fiscal de seguridad: " + e.getMessage());
+            System.err.println("CR\u00cdTICO: Fallo al archivar PDF fiscal de seguridad: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -192,7 +192,7 @@ public class EmitFiscalDocumentUseCase {
             throw new IllegalArgumentException("Venta no encontrada: #" + saleId);
         }
 
-        // N\u00c3\u00bamero correlativo (AT\u00c3\u201cMICO dentro de la transacci\u00c3\u00b3n)
+        // N\u00famero correlativo (AT\u00c3\u201cMICO dentro de la transacci\u00f3n)
         int docNumber = seriesRepository.getAndIncrement(seriesCode, conn);
 
         // Desgloses de IVA

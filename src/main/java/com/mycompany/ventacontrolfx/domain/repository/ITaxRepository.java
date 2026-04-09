@@ -43,9 +43,9 @@ public interface ITaxRepository {
         void setDefaultTaxGroup(int taxGroupId) throws SQLException;
 
         /**
-         * Sincroniza los valores num\u00c3\u00a9ricos de IVA (mirrored fields) en categor\u00c3\u00adas y
+         * Sincroniza los valores num\u00e9ricos de IVA (mirrored fields) en categor\u00edas y
          * productos
-         * bas\u00c3\u00a1ndose en la configuraci\u00c3\u00b3n actual de los Grupos de Impuestos.
+         * bas\u00e1ndose en la configuraci\u00f3n actual de los Grupos de Impuestos.
          */
         void syncMirroredValues() throws SQLException;
 

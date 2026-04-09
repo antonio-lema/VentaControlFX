@@ -87,7 +87,7 @@ public class HistoryController implements Injectable, Searchable {
             RealTimeSearchBinder.bind(txtSearchId, query -> handleSearch());
         }
 
-        // Verificaci\u00c3\u00b3n de permisos para Devoluciones
+        // Verificaci\u00f3n de permisos para Devoluciones
         boolean canReturn = container.getUserSession().hasPermission("venta.devolucion");
         btnReturn.setVisible(canReturn);
         btnReturn.setManaged(canReturn);
@@ -110,7 +110,7 @@ public class HistoryController implements Injectable, Searchable {
                     setStyle("");
                 } else {
                     Sale s = getTableRow().getItem();
-                    setText(String.format("%.2f \u20AC", item)); // Formato de moneda sigue igual por ahora, pero podr\u00c3\u00adamos
+                    setText(String.format("%.2f \u20ac", item)); // Formato de moneda sigue igual por ahora, pero podr\u00edamos
                                                             // usar cfg
                     if (s != null) {
                         if (s.isReturn()) {
@@ -259,16 +259,16 @@ public class HistoryController implements Injectable, Searchable {
 
         // Emojis y colores integrados en el valor
         lblTotalSalesCount.setText("\u00f0\u0178\u201c\u0160 " + count);
-        lblTotalAmount.setText("\u00f0\u0178\u2019\u00b0 " + String.format("%.2f \u20AC", total));
-        lblTotalCash.setText("\u00f0\u0178\u2019\u00b5 " + String.format("%.2f \u20AC", cash));
-        lblTotalCard.setText("\u00f0\u0178\u2019\u00b3 " + String.format("%.2f \u20AC", card));
+        lblTotalAmount.setText("\u00f0\u0178\u2019\u00b0 " + String.format("%.2f \u20ac", total));
+        lblTotalCash.setText("\u00f0\u0178\u2019\u00b5 " + String.format("%.2f \u20ac", cash));
+        lblTotalCard.setText("\u00f0\u0178\u2019\u00b3 " + String.format("%.2f \u20ac", card));
 
         if (lblCount != null)
             lblCount.setText("\u00f0\u0178\u201d\u008d " + count + " " + container.getBundle().getString("history.count_suffix"));
     }
 
     private void showDetails(Sale sale) {
-        // Cargar detalles si no est\u00c3\u00a1n presentes
+        // Cargar detalles si no est\u00e1n presentes
         if (sale.getDetails() == null || sale.getDetails().isEmpty()) {
             try {
                 List<SaleDetail> details = saleUseCase.getSaleDetails(sale.getSaleId()).getDetails();
@@ -300,7 +300,7 @@ public class HistoryController implements Injectable, Searchable {
         }
 
         btnReturn.setDisable(sale.isReturn());
-        // La opacidad y el color ahora se gestionan v\u00c3\u00ada CSS (.btn-warning:disabled)
+        // La opacidad y el color ahora se gestionan v\u00eda CSS (.btn-warning:disabled)
 
         lblSaleFullDate.setText(sale.getSaleDateTime().format(fullFormatter) + "\n"
                 + container.getBundle().getString("receipt.attended_by") + ": " + sale.getUserName());
@@ -311,7 +311,7 @@ public class HistoryController implements Injectable, Searchable {
                 methodEmoji + (sale.getPaymentMethod().contains("Mixed") || sale.getPaymentMethod().contains("Mixto")
                         ? container.getBundle().getString("payment.method.mixed")
                         : sale.getPaymentMethod()));
-        lblTotalAmountDetail.setText(String.format("%.2f \u20AC", sale.getTotal()));
+        lblTotalAmountDetail.setText(String.format("%.2f \u20ac", sale.getTotal()));
         // El color se gestiona mediante clases de utilidad
         lblTotalAmountDetail.getStyleClass().removeAll("text-total", "text-error");
         lblTotalAmountDetail.getStyleClass().add(sale.isReturn() ? "text-error" : "text-total");
@@ -330,13 +330,13 @@ public class HistoryController implements Injectable, Searchable {
                     + ";");
 
             Label qtyLabel = new Label(
-                    "\u00f0\u0178\u201c\u00a6 " + detail.getQuantity() + " un. x " + String.format("%.2f", detail.getUnitPrice()) + " \u20AC");
+                    "\u00f0\u0178\u201c\u00a6 " + detail.getQuantity() + " un. x " + String.format("%.2f", detail.getUnitPrice()) + " \u20ac");
             qtyLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: #95a5a6;");
             nameBox.getChildren().addAll(nameLabel, qtyLabel);
 
             Region spacer = new Region();
             HBox.setHgrow(spacer, Priority.ALWAYS);
-            Label priceLabel = new Label("\u00f0\u0178\u2019\u00b0 " + String.format("%.2f \u20AC", detail.getLineTotal()));
+            Label priceLabel = new Label("\u00f0\u0178\u2019\u00b0 " + String.format("%.2f \u20ac", detail.getLineTotal()));
             priceLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #2c3e50;");
 
             row.getChildren().addAll(nameBox, spacer, priceLabel);
@@ -360,13 +360,13 @@ public class HistoryController implements Injectable, Searchable {
             return;
         }
 
-        // 1. Garantizar que los detalles est\u00c3\u00a9n cargados
+        // 1. Garantizar que los detalles est\u00e9n cargados
         if (selected.getDetails() == null || selected.getDetails().isEmpty()) {
             try {
                 Sale fullSale = saleUseCase.getSaleDetails(selected.getSaleId());
                 if (fullSale != null && fullSale.getDetails() != null) {
                     selected.setDetails(fullSale.getDetails());
-                    // Tambi\u00c3\u00a9n actualizar clientId si no lo tiene (aunque deber\u00c3\u00ada)
+                    // Tambi\u00e9n actualizar clientId si no lo tiene (aunque deber\u00eda)
                     if (selected.getClientId() == null) {
                         selected.setClientId(fullSale.getClientId());
                     }
@@ -384,7 +384,7 @@ public class HistoryController implements Injectable, Searchable {
             return;
         }
 
-        // 2. Abrir vista previa de impresi\u00c3\u00b3n
+        // 2. Abrir vista previa de impresi\u00f3n
         ModalService.showStandardModal("/view/print_preview.fxml",
                 selected.getClientId() != null ? container.getBundle().getString("receipt.title.invoice")
                         : container.getBundle().getString("receipt.title.simplified"),
@@ -397,7 +397,7 @@ public class HistoryController implements Injectable, Searchable {
                             Product p = new Product();
                             p.setName(detail.getProductName());
                             p.setPrice(detail.getUnitPrice());
-                            p.setIva(detail.getIvaRate()); // Usar IVA hist\u00c3\u00b3rico
+                            p.setIva(detail.getIvaRate()); // Usar IVA hist\u00f3rico
                             cartItems.add(new CartItem(p, detail.getQuantity()));
                         }
 
@@ -428,7 +428,7 @@ public class HistoryController implements Injectable, Searchable {
         if (selected == null)
             return;
 
-        // Garantizar que los detalles est\u00c3\u00a9n cargados antes de abrir el di\u00c3\u00a1logo
+        // Garantizar que los detalles est\u00e9n cargados antes de abrir el di\u00e1logo
         if (selected.getDetails() == null || selected.getDetails().isEmpty()) {
             try {
                 Sale fullSale = saleUseCase.getSaleDetails(selected.getSaleId());
@@ -448,7 +448,7 @@ public class HistoryController implements Injectable, Searchable {
             return;
         }
 
-        // Calcular el m\u00c3\u00a1ximo devolvible (productos a\u00c3\u00ban no devueltos) usando el precio
+        // Calcular el m\u00e1ximo devolvible (productos a\u00fan no devueltos) usando el precio
         // real pagado
         double maxRefundable = selected.getDetails().stream()
                 .mapToDouble(d -> (d.getQuantity() - d.getReturnedQuantity()) * (d.getLineTotal() / d.getQuantity()))
@@ -460,7 +460,7 @@ public class HistoryController implements Injectable, Searchable {
                         .getClosureUseCase();
                 double cashInDrawer = closureUseCase.getCurrentCashInDrawer();
 
-                // Calcular cu\u00c3\u00a1nto del reembolso total es OBLIGATORIAMENTE en efectivo (basado
+                // Calcular cu\u00e1nto del reembolso total es OBLIGATORIAMENTE en efectivo (basado
                 // en el pago original)
                 double currentGrossTotal = selected.getTotal() + selected.getDiscountAmount();
                 double cashRatio = (currentGrossTotal > 0) ? selected.getCashAmount() / currentGrossTotal : 1.0;
@@ -468,17 +468,17 @@ public class HistoryController implements Injectable, Searchable {
 
                 if (maxCashRefundNeeded > cashInDrawer) {
                     String oldTicketHint = selected.getClosureId() != null
-                            ? "\n\n\u00f0\u0178\u2019\u00a1 *Recuerda*: Este ticket es de una sesi\u00c3\u00b3n antigua."
+                            ? "\n\n\u1f4a1 *Recuerda*: Este ticket es de una sesi\u00f3n antigua."
                             : "";
 
                     boolean continuar = AlertUtil.showConfirmation("\u00e2\u0161\u00a0\u00ef\u00b8\u008f Efectivo limitado",
-                            "Efectivo insuficiente para la parte de met\u00c3\u00a1lico",
+                            "Efectivo insuficiente para la parte de met\u00e1lico",
                             String.format(
-                                    "El efectivo en caja (%.2f \u20AC) es menor que la parte pagada en efectivo del ticket (%.2f \u20AC).\n\n"
+                                    "El efectivo en caja (%.2f \u20ac) es menor que la parte pagada en efectivo del ticket (%.2f \u20ac).\n\n"
                                             +
-                                            "El sistema devolver\u00c3\u00a1 %.2f \u20AC a la tarjeta automaticamente, pero solo dispone de %.2f \u20AC "
-                                            + "f\u00c3\u00adsicos para la parte de efectivo.%s\n\n"
-                                            + "\u00c2\u00bfDeseas continuar con una devoluci\u00c3\u00b3n parcial o total sabiendo que el caj\u00c3\u00b3n quedar\u00c3\u00a1 bajo?",
+                                            "El sistema devolver\u00e1 %.2f \u20ac a la tarjeta automaticamente, pero solo dispone de %.2f \u20ac "
+                                            + "f\u00edsicos para la parte de efectivo.%s\n\n"
+                                            + "\u00bfDeseas continuar con una devoluci\u00f3n parcial o total sabiendo que el caj\u00f3n quedar\u00e1 bajo?",
                                     cashInDrawer, maxCashRefundNeeded, maxRefundable * (1 - cashRatio), cashInDrawer,
                                     oldTicketHint));
                     if (!continuar)
@@ -495,7 +495,7 @@ public class HistoryController implements Injectable, Searchable {
                     controller.init(selected);
                     controller.setOnSuccess((reason, items) -> {
                         try {
-                            // Validaci\u00c3\u00b3n final de efectivo justo antes de confirmar
+                            // Validaci\u00f3n final de efectivo justo antes de confirmar
                             double refundTotal = selected.getDetails().stream()
                                     .filter(d -> items.containsKey(d.getDetailId()))
                                     .mapToDouble(d -> items.get(d.getDetailId()) * (d.getLineTotal() / d.getQuantity()))
@@ -515,7 +515,7 @@ public class HistoryController implements Injectable, Searchable {
                             loadSalesDirect();
                         } catch (SQLException e) {
                             e.printStackTrace();
-                            AlertUtil.showError("Error", "No se pudo procesar la devoluci\u00c3\u00b3n: " + e.getMessage());
+                            AlertUtil.showError("Error", "No se pudo procesar la devoluci\u00f3n: " + e.getMessage());
                         }
                     });
                 });

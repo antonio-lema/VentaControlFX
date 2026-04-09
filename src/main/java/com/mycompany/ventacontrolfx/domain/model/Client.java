@@ -13,7 +13,7 @@ public class Client {
     private final StringProperty email = new SimpleStringProperty();
     private final StringProperty phone = new SimpleStringProperty();
     private final BooleanProperty isCompany = new SimpleBooleanProperty(false);
-    private final StringProperty country = new SimpleStringProperty("Espa\u00c3\u00b1a");
+    private final StringProperty country = new SimpleStringProperty("Espa\u00f1a");
     private final IntegerProperty priceListId = new SimpleIntegerProperty();
 
     // Tax Engine V2

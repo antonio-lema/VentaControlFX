@@ -117,7 +117,7 @@ public class TaxManagementUseCase {
                 double totalRate = group.getRates().stream().mapToDouble(r -> r.getRate()).sum();
                 TaxRevision revision = new TaxRevision(null, categoryId, TaxRevision.Scope.CATEGORY,
                         totalRate, group.getName(), java.time.LocalDateTime.now(),
-                        reason != null ? reason : "Cambio de IVA por categor\u00c3\u00ada");
+                        reason != null ? reason : "Cambio de IVA por categor\u00eda");
                 taxRepository.saveTaxRevision(revision);
             } catch (SQLException ignored) {
             }

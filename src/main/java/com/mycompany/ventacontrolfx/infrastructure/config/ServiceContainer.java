@@ -183,11 +183,11 @@ public class ServiceContainer {
         this.saleUseCase.setPdfService(this.pdfService); // Inyectamos el servicio de PDF para archivado de devoluciones
 
         this.returnUseCase.setPdfService(this.pdfService);
-        // El ReturnUseCase necesita el closure inyectado ahora que ya est\u00c3\u00a1 creado
-        // Nota: Si ReturnUseCase no tiene setter, habr\u00c3\u00a1 que crearlo o usar reflexi\u00c3\u00b3n si
+        // El ReturnUseCase necesita el closure inyectado ahora que ya est\u00e1 creado
+        // Nota: Si ReturnUseCase no tiene setter, habr\u00e1 que crearlo o usar reflexi\u00f3n si
         // es singleton
-        // Para simplificar, lo inyectamos aqu\u00c3\u00ad (asumiendo que tiene acceso o setter)
-        // en esta versi\u00c3\u00b3n lo inyectaremos via setter o crearemos el objeto despu\u00c3\u00a9s.
+        // Para simplificar, lo inyectamos aqu\u00ed (asumiendo que tiene acceso o setter)
+        // en esta versi\u00f3n lo inyectaremos via setter o crearemos el objeto despu\u00e9s.
 
         // Vamos a modificar SaleUseCase para que use el nuevo ReturnUseCase si es
         // necesario,

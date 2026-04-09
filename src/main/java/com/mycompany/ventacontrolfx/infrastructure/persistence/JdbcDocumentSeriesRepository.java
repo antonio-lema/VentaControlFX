@@ -5,13 +5,13 @@ import com.mycompany.ventacontrolfx.domain.repository.IDocumentSeriesRepository;
 import java.sql.*;
 
 /**
- * Adaptador JDBC para la gesti\u00c3\u00b3n de series de numeraci\u00c3\u00b3n correlativa.
+ * Adaptador JDBC para la gesti\u00f3n de series de numeraci\u00f3n correlativa.
  * Clean Architecture \u00e2\u20ac\u201d Capa de Infraestructura.
  *
- * GARANT\u00c3\u008dA DE ATOMICIDAD:
- * getAndIncrement usa SELECT ... FOR UPDATE dentro de la transacci\u00c3\u00b3n
+ * GARANT\u00cdA DE ATOMICIDAD:
+ * getAndIncrement usa SELECT ... FOR UPDATE dentro de la transacci\u00f3n
  * del llamador, lo que bloquea la fila en el motor InnoDB hasta el COMMIT
- * y evita que dos instancias simult\u00c3\u00a1neas obtengan el mismo n\u00c3\u00bamero.
+ * y evita que dos instancias simult\u00e1neas obtengan el mismo n\u00famero.
  */
 public class JdbcDocumentSeriesRepository implements IDocumentSeriesRepository {
 
@@ -30,7 +30,7 @@ public class JdbcDocumentSeriesRepository implements IDocumentSeriesRepository {
             }
         }
 
-        // 2. Incrementar el contador en la misma transacci\u00c3\u00b3n
+        // 2. Incrementar el contador en la misma transacci\u00f3n
         int nextNumber = currentLast + 1;
         String updateSql = "UPDATE doc_series SET last_number = ? WHERE series_code = ?";
         try (PreparedStatement ps = conn.prepareStatement(updateSql)) {

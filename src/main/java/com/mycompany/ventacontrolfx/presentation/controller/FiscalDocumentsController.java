@@ -106,7 +106,7 @@ public class FiscalDocumentsController implements Injectable {
         });
 
         colTotal.setCellValueFactory(
-                data -> new SimpleStringProperty(String.format("%.2f \u20AC", data.getValue().getTotalAmount())));
+                data -> new SimpleStringProperty(String.format("%.2f \u20ac", data.getValue().getTotalAmount())));
         colTotal.setStyle("-fx-alignment: CENTER-RIGHT; -fx-font-weight: bold;");
 
         colStatus.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getDocStatus().name()));
@@ -129,7 +129,7 @@ public class FiscalDocumentsController implements Injectable {
         });
 
         // Eliminamos fiscalTable.setItems(masterList) ya que PaginationHelper lo
-        // gestionar\u00c3\u00a1 internamente
+        // gestionar\u00e1 internamente
 
         // Doble clic para abrir PDF
         fiscalTable.setRowFactory(tv -> {
@@ -163,7 +163,7 @@ public class FiscalDocumentsController implements Injectable {
 
             if (!file.exists()) {
                 AlertUtil.showWarning("Archivo no encontrado",
-                        "No se encontr\u00c3\u00b3 el PDF en: " + file.getPath() +
+                        "No se encontr\u00f3 el PDF en: " + file.getPath() +
                                 "\nEs posible que se haya movido o que el documento sea antiguo.");
                 return;
             }
@@ -211,9 +211,9 @@ public class FiscalDocumentsController implements Injectable {
         long returns = docs.stream().filter(d -> d.getDocType() == Type.RECTIFICATIVA).count();
         long cancelled = docs.stream().filter(d -> d.getDocStatus() == Status.ANULADO).count();
 
-        // El total facturado neto suele ser Ventas - Devoluciones, pero aqu\u00c3\u00ad mostramos
-        // el bruto emitido seg\u00c3\u00ban requisito.
-        // Si el usuario prefiere restar devoluciones, se puede ajustar aqu\u00c3\u00ad.
+        // El total facturado neto suele ser Ventas - Devoluciones, pero aqu\u00ed mostramos
+        // el bruto emitido seg\u00fan requisito.
+        // Si el usuario prefiere restar devoluciones, se puede ajustar aqu\u00ed.
         double total = docs.stream()
                 .filter(d -> d.getDocStatus() == Status.EMITIDO)
                 .mapToDouble(d -> d.getDocType() == Type.RECTIFICATIVA ? -d.getTotalAmount() : d.getTotalAmount())
@@ -224,7 +224,7 @@ public class FiscalDocumentsController implements Injectable {
         if (lblTotalReturns != null)
             lblTotalReturns.setText(String.valueOf(returns));
         lblTotalCancelled.setText(String.valueOf(cancelled));
-        lblTotalAmount.setText(String.format("%.2f \u20AC", total));
+        lblTotalAmount.setText(String.format("%.2f \u20ac", total));
     }
 
     @FXML
@@ -243,7 +243,7 @@ public class FiscalDocumentsController implements Injectable {
             LocalDate finalTo = (to == null) ? LocalDate.of(2100, 1, 1) : to;
 
             List<FiscalDocument> docs = queryUseCase.search(finalFrom, finalTo, statusEnum, typeStr);
-            masterList.setAll(docs); // Necesario para la exportaci\u00c3\u00b3n que usa masterList
+            masterList.setAll(docs); // Necesario para la exportaci\u00f3n que usa masterList
 
             List<FiscalDocument> filtered = docs.stream()
                     .filter(d -> search.isEmpty() || d.getFullReference().toLowerCase().contains(search)

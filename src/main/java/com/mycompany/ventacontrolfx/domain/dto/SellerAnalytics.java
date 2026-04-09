@@ -47,7 +47,7 @@ public class SellerAnalytics {
     public List<Sale> getSales() { return sales; }
     public void setSales(List<Sale> sales) { this.sales = sales; }
 
-    // Nuevas m\u00c3\u00a9tricas para el Dashboard SaaS Avanzado
+    // Nuevas m\u00e9tricas para el Dashboard SaaS Avanzado
     private double margin;
     private double goalReachedPercentage;
     private double returnsTotal;

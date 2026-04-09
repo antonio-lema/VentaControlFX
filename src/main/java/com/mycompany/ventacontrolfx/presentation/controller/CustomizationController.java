@@ -16,8 +16,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Controlador del panel de personalizaci\u00c3\u00b3n est\u00c3\u00a9tica premium.
- * Permite ajustar colores, tipograf\u00c3\u00ada, tarjetas y modo en tiempo real.
+ * Controlador del panel de personalizaci\u00f3n est\u00e9tica premium.
+ * Permite ajustar colores, tipograf\u00eda, tarjetas y modo en tiempo real.
  */
 public class CustomizationController implements Injectable {
 
@@ -42,7 +42,7 @@ public class CustomizationController implements Injectable {
     private ColorPicker cpSidebarText;
 
     // \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac
-    // FXML: Tipograf\u00c3\u00ada
+    // FXML: Tipograf\u00eda
     // \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac
     @FXML
     private Slider sldFontSize;
@@ -91,7 +91,7 @@ public class CustomizationController implements Injectable {
     private IAppSettingsRepository repository;
 
     // \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac
-    // Inicializaci\u00c3\u00b3n
+    // Inicializaci\u00f3n
     // \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac
     @FXML
     public void initialize() {
@@ -111,7 +111,7 @@ public class CustomizationController implements Injectable {
     // Configurar etiquetas de valor en sliders
     // \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac
     private void setupSliderLabels() {
-        // Labels de tipograf\u00c3\u00ada
+        // Labels de tipograf\u00eda
         bindSliderLabel(sldFontSize, lblFontSizeVal, v -> (int) (double) v + "px");
         bindSliderLabel(sldBorderRadius, lblBorderRadiusVal, v -> (int) (double) v + "px");
         // Labels de tarjetas
@@ -149,7 +149,7 @@ public class CustomizationController implements Injectable {
             cpSidebar.valueProperty().addListener((obs, o, n) -> updatePreview());
         if (cpSidebarText != null)
             cpSidebarText.valueProperty().addListener((obs, o, n) -> updatePreview());
-        // Tipograf\u00c3\u00ada
+        // Tipograf\u00eda
         if (sldFontSize != null)
             sldFontSize.valueProperty().addListener((obs, o, n) -> updatePreview());
         if (sldBorderRadius != null)
@@ -168,7 +168,7 @@ public class CustomizationController implements Injectable {
     }
 
     // \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac
-    // Cargar configuraci\u00c3\u00b3n guardada
+    // Cargar configuraci\u00f3n guardada
     // \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac
     private void loadCurrentSettings() {
         if (repository == null)
@@ -197,7 +197,7 @@ public class CustomizationController implements Injectable {
             isDarkMode = "DARK".equals(settings.getOrDefault("ui.theme_mode", "LIGHT"));
 
         } catch (SQLException | IllegalArgumentException e) {
-            System.err.println("Error cargando ajustes est\u00c3\u00a9ticos: " + e.getMessage());
+            System.err.println("Error cargando ajustes est\u00e9ticos: " + e.getMessage());
         }
     }
 
@@ -267,7 +267,7 @@ public class CustomizationController implements Injectable {
     }
 
     // \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac
-    // Selecci\u00c3\u00b3n de tema visual
+    // Selecci\u00f3n de tema visual
     // \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac
 
     // \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac
@@ -285,7 +285,7 @@ public class CustomizationController implements Injectable {
             if (cpPrimary != null && cpPrimary.getScene() != null) {
                 themeManager.applyTheme(cpPrimary.getScene());
             }
-            showInfo("\u00e2\u0153\u2026 Guardado", "La configuraci\u00c3\u00b3n est\u00c3\u00a9tica se ha guardado correctamente.");
+            showInfo("\u00e2\u0153\u2026 Guardado", "La configuraci\u00f3n est\u00e9tica se ha guardado correctamente.");
         } catch (SQLException e) {
             showError("Error", "No se pudo guardar: " + e.getMessage());
         }
@@ -321,7 +321,7 @@ public class CustomizationController implements Injectable {
 
     @FXML
     private void applyClassicBlue() {
-        // Sidebar = azul el\u00c3\u00a9ctrico. Gradiente: #1e88e5 \u00e2\u2020\u2019 azul oscuro \u00e2\u2020\u2019 azul casi negro
+        // Sidebar = azul el\u00e9ctrico. Gradiente: #1e88e5 \u00e2\u2020\u2019 azul oscuro \u00e2\u2020\u2019 azul casi negro
         applyPalette("#1e88e5", "#64748b", "#fafbfc", "#2c3e50", "#2c3e50", "#2c3e50", "#1e88e5");
     }
 
@@ -334,13 +334,13 @@ public class CustomizationController implements Injectable {
 
     @FXML
     private void applyMidnightPurple() {
-        // Sidebar = p\u00c3\u00barpura regio. Gradiente: #6a1b9a \u00e2\u2020\u2019 violeta oscuro \u00e2\u2020\u2019 negro violeta
+        // Sidebar = p\u00farpura regio. Gradiente: #6a1b9a \u00e2\u2020\u2019 violeta oscuro \u00e2\u2020\u2019 negro violeta
         applyPalette("#6a1b9a", "#37474f", "#f3e5f5", "#4a148c", "#4a148c", "#4a148c", "#6a1b9a");
     }
 
     @FXML
     private void applySunsetAmber() {
-        // Sidebar = \u00c3\u00a1mbar ardiente. Gradiente: #ef6c00 \u00e2\u2020\u2019 naranja oscuro \u00e2\u2020\u2019 marr\u00c3\u00b3n casi
+        // Sidebar = \u00e1mbar ardiente. Gradiente: #ef6c00 \u00e2\u2020\u2019 naranja oscuro \u00e2\u2020\u2019 marr\u00f3n casi
         // negro
         applyPalette("#ef6c00", "#4e342e", "#fff8e1", "#3e2723", "#3e2723", "#e65100", "#ef6c00");
     }
@@ -353,7 +353,7 @@ public class CustomizationController implements Injectable {
 
     @FXML
     private void applyOceanTeal() {
-        // Sidebar = turquesa oc\u00c3\u00a9ano. Gradiente: #0d9488 \u00e2\u2020\u2019 teal oscuro \u00e2\u2020\u2019 azul-verde casi
+        // Sidebar = turquesa oc\u00e9ano. Gradiente: #0d9488 \u00e2\u2020\u2019 teal oscuro \u00e2\u2020\u2019 azul-verde casi
         // negro
         applyPalette("#0d9488", "#1e293b", "#f0fdfa", "#134e4a", "#134e4a", "#134e4a", "#0d9488");
     }
@@ -394,12 +394,12 @@ public class CustomizationController implements Injectable {
         Label title = new Label("\u00e2\u0153\u00a8 Paleta Aplicada");
         title.setStyle("-fx-text-fill:" + primary + ";-fx-font-weight:bold;-fx-font-size:17px;");
 
-        Label sub = new Label("As\u00c3\u00ad lucir\u00c3\u00a1n tus colores en la app.");
+        Label sub = new Label("As\u00ed lucir\u00e1n tus colores en la app.");
         sub.setStyle("-fx-text-fill:" + text + ";-fx-font-size:12px;");
         sub.setWrapText(true);
         sub.setTextAlignment(javafx.scene.text.TextAlignment.CENTER);
 
-        Button btn = new Button("\u00c2\u00a1Perfecto!");
+        Button btn = new Button("\u00a1Perfecto!");
         btn.setStyle("-fx-background-color:" + primary + ";-fx-text-fill:white;-fx-font-weight:bold;" +
                 "-fx-background-radius:20;-fx-padding:9 28;-fx-cursor:hand;");
         btn.setOnAction(e -> stage.close());

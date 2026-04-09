@@ -35,7 +35,7 @@ public class ProductBox extends VBox {
         imageContainer.setMaxHeight(150);
         imageContainer.setAlignment(Pos.CENTER);
 
-        // Clip din\u00c3\u00a1mico: se ajusta al ancho del contenedor y solo redondea arriba
+        // Clip din\u00e1mico: se ajusta al ancho del contenedor y solo redondea arriba
         Rectangle clip = new Rectangle();
         clip.widthProperty().bind(imageContainer.widthProperty());
         clip.heightProperty().bind(imageContainer.heightProperty().add(30)); // Altura extra para que el redondeo
@@ -79,7 +79,7 @@ public class ProductBox extends VBox {
             displayPrice = product.getCurrentPrice() * (1 + (rate / 100.0));
         }
 
-        Label priceBadge = new Label(String.format("%.2f\u20AC", displayPrice));
+        Label priceBadge = new Label(String.format("%.2f\u20ac", displayPrice));
         priceBadge.getStyleClass().add("product-price-badge");
         StackPane.setAlignment(priceBadge, Pos.TOP_RIGHT);
         StackPane.setMargin(priceBadge, new Insets(10, 10, 0, 0));

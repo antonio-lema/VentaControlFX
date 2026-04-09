@@ -111,7 +111,7 @@ public class JdbcCompanyConfigRepository implements ICompanyConfigRepository {
         cfg.setEmailFrom(getFromCache(cache, K_EMAIL_FROM, d.getEmailFrom()));
         cfg.setEmailPassword(getFromCache(cache, K_EMAIL_PASS, d.getEmailPassword()));
 
-        // Cargar horario semanal din\u00c3\u00a1mico
+        // Cargar horario semanal din\u00e1mico
         List<BusinessDay> schedule = new ArrayList<>();
         for (int i = 1; i <= 7; i++) {
             boolean isClosed = getBooleanFromCache(cache, "schedule." + i + ".closed", false);
@@ -145,7 +145,7 @@ public class JdbcCompanyConfigRepository implements ICompanyConfigRepository {
         }
         cfg.setSchedule(schedule);
 
-        // Cargar d\u00c3\u00adas especiales
+        // Cargar d\u00edas especiales
         List<SaleConfig.SpecialDay> specials = new ArrayList<>();
         int specCount = Integer.parseInt(getFromCache(cache, "schedule.special.count", "0"));
         for (int i = 0; i < specCount; i++) {
@@ -235,7 +235,7 @@ public class JdbcCompanyConfigRepository implements ICompanyConfigRepository {
         setValue(K_EMAIL_FROM, orEmpty(cfg.getEmailFrom()));
         setValue(K_EMAIL_PASS, orEmpty(cfg.getEmailPassword()));
 
-        // Guardar horario semanal din\u00c3\u00a1mico
+        // Guardar horario semanal din\u00e1mico
         if (cfg.getSchedule() != null) {
             for (BusinessDay day : cfg.getSchedule()) {
                 setValue("schedule." + day.getDayOfWeek() + ".closed", String.valueOf(day.isClosed()));
@@ -251,7 +251,7 @@ public class JdbcCompanyConfigRepository implements ICompanyConfigRepository {
             }
         }
 
-        // Guardar d\u00c3\u00adas especiales
+        // Guardar d\u00edas especiales
         setValue("schedule.special.count", String.valueOf(cfg.getSpecialDays().size()));
         for (int i = 0; i < cfg.getSpecialDays().size(); i++) {
             SaleConfig.SpecialDay sd = cfg.getSpecialDays().get(i);

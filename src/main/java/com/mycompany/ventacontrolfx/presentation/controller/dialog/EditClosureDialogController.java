@@ -31,7 +31,7 @@ public class EditClosureDialogController {
         this.closureId = closureId;
         this.previousCash = previousCash;
 
-        lblPreviousCash.setText(String.format("%.2f \u20AC", previousCash));
+        lblPreviousCash.setText(String.format("%.2f \u20ac", previousCash));
         txtAmount.setText(String.valueOf(previousCash));
 
         javafx.application.Platform.runLater(txtAmount::requestFocus);
@@ -48,13 +48,13 @@ public class EditClosureDialogController {
         try {
             amount = Double.parseDouble(amountText);
         } catch (NumberFormatException e) {
-            AlertUtil.showError("Formato Inv\u00c3\u00a1lido", "El importe introducido no es un n\u00c3\u00bamero v\u00c3\u00a1lido.");
+            AlertUtil.showError("Formato Inv\u00e1lido", "El importe introducido no es un n\u00famero v\u00e1lido.");
             return;
         }
 
         String reason = txtReason.getText().trim();
         if (reason.isEmpty()) {
-            AlertUtil.showWarning("Campo Obligatorio", "Debes especificar el motivo de la modificaci\u00c3\u00b3n.");
+            AlertUtil.showWarning("Campo Obligatorio", "Debes especificar el motivo de la modificaci\u00f3n.");
             return;
         }
 

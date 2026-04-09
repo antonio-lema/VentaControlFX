@@ -46,7 +46,7 @@ public class JdbcPriceRepository implements IPriceRepository {
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     Price fallback = mapPrice(rs);
-                    // Ajustamos el price_list_id para que coincida con la tarifa buscada y as\u00c3\u00ad se
+                    // Ajustamos el price_list_id para que coincida con la tarifa buscada y as\u00ed se
                     // muestre
                     fallback.setPriceListId(priceListId);
                     return Optional.of(fallback);
@@ -409,7 +409,7 @@ public class JdbcPriceRepository implements IPriceRepository {
         return false;
     }
 
-    // \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac HELPER PARA AUTORRELLENAR TARIFAS VAC\u00c3\u008dAS \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac
+    // \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac HELPER PARA AUTORRELLENAR TARIFAS VAC\u00cdAS \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac
     private void ensurePricesExist(int targetPriceListId, Integer categoryId, Connection conn) throws SQLException {
         int defaultPriceListId = -1;
         try (Statement stmt = conn.createStatement();
@@ -426,7 +426,7 @@ public class JdbcPriceRepository implements IPriceRepository {
         StringBuilder sql = new StringBuilder();
         sql.append("INSERT INTO product_prices (product_id, price_list_id, price, start_date, reason) ");
         sql.append(
-                "SELECT p.product_id, ?, COALESCE(pp_def.price, 0), NOW(), 'Copia impl\u00c3\u00adcita de tarifa base por Subida Masiva' ");
+                "SELECT p.product_id, ?, COALESCE(pp_def.price, 0), NOW(), 'Copia impl\u00edcita de tarifa base por Subida Masiva' ");
         sql.append("FROM products p ");
         sql.append("LEFT JOIN product_prices pp_target ON p.product_id = pp_target.product_id ");
         sql.append("  AND pp_target.price_list_id = ? AND pp_target.end_date IS NULL ");
@@ -449,11 +449,11 @@ public class JdbcPriceRepository implements IPriceRepository {
         }
     }
 
-    // \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac Implementaci\u00c3\u00b3n de helper privado reutilizado \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac
+    // \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac Implementaci\u00f3n de helper privado reutilizado \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac
 
     /**
-     * L\u00c3\u00b3gica de cierre+inserci\u00c3\u00b3n en batch a partir de un ResultSet ya abierto.
-     * Soporta operaci\u00c3\u00b3n porcentual o de importe fijo.
+     * L\u00f3gica de cierre+inserci\u00f3n en batch a partir de un ResultSet ya abierto.
+     * Soporta operaci\u00f3n porcentual o de importe fijo.
      */
     private int executeBulkUpdate(Connection conn, PreparedStatement selectStmt,
             int priceListId, double value, String reason,
@@ -707,7 +707,7 @@ public class JdbcPriceRepository implements IPriceRepository {
 
     @Override
     public void clonePriceList(int sourceId, int targetId) throws SQLException {
-        cloneAndAdjustPriceList(sourceId, targetId, 1.0, "Clonaci\u00c3\u00b3n desde tarifa ID " + sourceId,
+        cloneAndAdjustPriceList(sourceId, targetId, 1.0, "Clonaci\u00f3n desde tarifa ID " + sourceId,
                 LocalDateTime.now());
     }
 

@@ -46,8 +46,8 @@ public class EditCartItemController implements Injectable {
     private void setupListeners() {
         toggleDiscountType.selectedProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal) {
-                toggleDiscountType.setText("\u20AC");
-                lblDiscountHint.setText(container != null ? container.getBundle().getString("cart.edit.discount.hint.fixed") : "Descuento en valor absoluto (\u20AC)");
+                toggleDiscountType.setText("\u20ac");
+                lblDiscountHint.setText(container != null ? container.getBundle().getString("cart.edit.discount.hint.fixed") : "Descuento en valor absoluto (\u20ac)");
             } else {
                 toggleDiscountType.setText("%");
                 lblDiscountHint.setText(container != null ? container.getBundle().getString("cart.edit.discount.hint.percent") : "Descuento en porcentaje (%)");

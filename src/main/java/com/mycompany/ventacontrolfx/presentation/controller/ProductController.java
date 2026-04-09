@@ -153,7 +153,7 @@ public class ProductController implements Injectable, com.mycompany.ventacontrol
                     setGraphic(null);
                     setStyle("");
                 } else {
-                    setText(String.format("%.2f \u20AC", price));
+                    setText(String.format("%.2f \u20ac", price));
                     setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #10b981;");
                     setAlignment(Pos.CENTER_RIGHT);
                 }
@@ -205,7 +205,7 @@ public class ProductController implements Injectable, com.mycompany.ventacontrol
                     icon.setFill(Color.web("#bdc3c7"));
                     setGraphic(new StackPane(icon));
                 } else {
-                    // Placeholder mientras carga asincr\u00c3\u00b3nicamente
+                    // Placeholder mientras carga asincr\u00f3nicamente
                     FontAwesomeIconView iconLoading = new FontAwesomeIconView(FontAwesomeIcon.IMAGE);
                     iconLoading.setSize("24");
                     iconLoading.setFill(Color.web("#bdc3c7"));
@@ -215,7 +215,7 @@ public class ProductController implements Injectable, com.mycompany.ventacontrol
                     asyncManager.runAsyncTask(() -> {
                         return resolveFile(imagePath);
                     }, (File file) -> {
-                        // Confirmar que la celda a\u00c3\u00ban muestra el mismo path (protecci\u00c3\u00b3n de reciclaje de
+                        // Confirmar que la celda a\u00fan muestra el mismo path (protecci\u00f3n de reciclaje de
                         // celdas TableView)
                         if (imagePath.equals(getItem())) {
                             if (file != null) {

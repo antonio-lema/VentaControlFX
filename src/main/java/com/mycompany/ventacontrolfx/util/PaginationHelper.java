@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.stream.Collectors;
 
 /**
- * Utilidad para gestionar la paginaci\u00c3\u00b3n y limitaci\u00c3\u00b3n de filas en TableViews.
+ * Utilidad para gestionar la paginaci\u00f3n y limitaci\u00f3n de filas en TableViews.
  */
 public class PaginationHelper<T> {
 

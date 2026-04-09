@@ -63,14 +63,14 @@ public class CashClosureController implements Injectable {
         if (userSession.getCurrentUser() != null) {
             lblCurrentUser.setText(userSession.getCurrentUser().getUsername());
 
-            // Verificaci\u00c3\u00b3n de permisos para Ingreso
+            // Verificaci\u00f3n de permisos para Ingreso
             boolean canEnterCash = userSession.hasPermission("caja.ingresar");
             if (btnRegisterCashEntry != null) {
                 btnRegisterCashEntry.setVisible(canEnterCash);
                 btnRegisterCashEntry.setManaged(canEnterCash);
             }
 
-            // Verificaci\u00c3\u00b3n de permisos para ver totales financieros
+            // Verificaci\u00f3n de permisos para ver totales financieros
             boolean canSeeTotals = userSession.hasPermission("caja.ver_totales")
                     || userSession.hasPermission("USUARIOS");
             if (cardCash != null) {
@@ -116,7 +116,7 @@ public class CashClosureController implements Injectable {
                 if (empty || item == null)
                     setText(null);
                 else
-                    setText(String.format("%.2f \u20AC", item));
+                    setText(String.format("%.2f \u20ac", item));
             }
         });
     }
@@ -129,15 +129,15 @@ public class CashClosureController implements Injectable {
             double totalAll = totals.getOrDefault("total", currentCash + currentCard);
             double returnsTotal = totals.getOrDefault("returns_total", 0.0);
 
-            lblTotalCash.setText("\u00f0\u0178\u2019\u00b5 " + String.format("%.2f \u20AC", currentCash));
-            lblTotalCard.setText("\u00f0\u0178\u2019\u00b3 " + String.format("%.2f \u20AC", currentCard));
+            lblTotalCash.setText("\u00f0\u0178\u2019\u00b5 " + String.format("%.2f \u20ac", currentCash));
+            lblTotalCard.setText("\u00f0\u0178\u2019\u00b3 " + String.format("%.2f \u20ac", currentCard));
             lblTotalAll.setText(
-                    "\u00f0\u0178\u2019\u00b0 " + container.getBundle().getString("closure.net") + ": " + String.format("%.2f \u20AC", totalAll));
+                    "\u00f0\u0178\u2019\u00b0 " + container.getBundle().getString("closure.net") + ": " + String.format("%.2f \u20ac", totalAll));
 
             // Mostrar devoluciones totales
             if (lblTotalReturns != null) {
                 if (returnsTotal > 0) {
-                    lblTotalReturns.setText(String.format("%.2f \u20AC", returnsTotal));
+                    lblTotalReturns.setText(String.format("%.2f \u20ac", returnsTotal));
                     if (containerReturns != null) {
                         containerReturns.setVisible(true);
                         containerReturns.setManaged(true);
@@ -159,7 +159,7 @@ public class CashClosureController implements Injectable {
             double totalDiscounts = totals.getOrDefault("total_discounts", 0.0);
             if (lblTotalDiscounts != null) {
                 if (totalDiscounts > 0) {
-                    lblTotalDiscounts.setText(String.format("-%.2f \u20AC", totalDiscounts));
+                    lblTotalDiscounts.setText(String.format("-%.2f \u20ac", totalDiscounts));
                     if (containerDiscounts != null) {
                         containerDiscounts.setVisible(true);
                         containerDiscounts.setManaged(true);
@@ -196,11 +196,11 @@ public class CashClosureController implements Injectable {
 
             if (hasFund) {
                 lblActiveFund.setText("\u00f0\u0178\u2019\u00bc " + container.getBundle().getString("closure.fund") + ": "
-                        + String.format("%.2f \u20AC", fundAmount));
+                        + String.format("%.2f \u20ac", fundAmount));
                 lblActiveFund.setStyle("-fx-text-fill: -color-success; -fx-font-weight: bold;");
-                lblCashInDrawer.setText("\u00f0\u0178\u008f\u00a6 " + String.format("%.2f \u20AC", cashInDrawer));
+                lblCashInDrawer.setText("\u00f0\u0178\u008f\u00a6 " + String.format("%.2f \u20ac", cashInDrawer));
 
-                // Color seg\u00c3\u00ban saldo
+                // Color seg\u00fan saldo
                 if (cashInDrawer < 20) {
                     lblCashInDrawer
                             .setStyle("-fx-text-fill: -color-danger; -fx-font-weight: bold; -fx-font-size: 22px;");
@@ -218,7 +218,7 @@ public class CashClosureController implements Injectable {
                 if (btnRegisterCashEntry != null)
                     btnRegisterCashEntry.setDisable(false);
 
-                // Asegurar que el bot\u00c3\u00b3n de cierre est\u00c3\u00a9 habilitado si hay sesi\u00c3\u00b3n activa
+                // Asegurar que el bot\u00f3n de cierre est\u00e9 habilitado si hay sesi\u00f3n activa
                 btnPerformClosure.setDisable(false);
                 btnPerformClosure.setText(container.getBundle().getString("closure.btn.perform"));
                 lblStatus.setText(container.getBundle().getString("closure.status.in_progress") + " \u00e2\u008f\u00b3");
