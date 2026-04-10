@@ -28,7 +28,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Caso de uso para la gesti\u00f3n de ventas, incluyendo el procesamiento de nuevas
+ * Caso de uso para la gesti\u00f3n de ventas, incluyendo el procesamiento de
+ * nuevas
  * ventas,
  * historial, detalles y devoluciones.
  */
@@ -78,7 +79,9 @@ public class SaleUseCase {
         this.integrityService = new FiscalIntegrityService();
     }
 
-    /** Inyecta el use case de caja para registrar movimientos de devoluci\u00f3n. */
+    /**
+     * Inyecta el use case de caja para registrar movimientos de devoluci\u00f3n.
+     */
     public void setCashClosureUseCase(CashClosureUseCase cashClosureUseCase) {
         this.cashClosureUseCase = cashClosureUseCase;
     }
@@ -99,7 +102,8 @@ public class SaleUseCase {
             throws SQLException {
         authService.checkPermission("VENTAS");
 
-        // \u00e2\u201d\u20ac\u00e2\u201d\u20ac REGLA DE NEGOCIO: Validar caja abierta \u00e2\u201d\u20ac\u00e2\u201d\u20ac
+        // \u00e2\u201d\u20ac\u00e2\u201d\u20ac REGLA DE NEGOCIO: Validar caja abierta
+        // \u00e2\u201d\u20ac\u00e2\u201d\u20ac
         if (cashClosureUseCase != null && !cashClosureUseCase.hasActiveFund()) {
             throw new SQLException(
                     "OPERACION_BLOQUEADA: La caja no ha sido abierta. Debe establecer un fondo de caja antes de realizar ventas.");
@@ -222,7 +226,8 @@ public class SaleUseCase {
         List<SaleTaxSummary> taxSummaries = taxEngineService.summarizeTaxes(lineResults);
         sale.setTaxSummaries(taxSummaries);
 
-        // \u00e2\u201d\u20ac\u00e2\u201d\u20ac PROCESAMIENTO AT\u00d3MICO EN UNA SOLA TRANSACCI\u00d3N \u00e2\u201d\u20ac\u00e2\u201d\u20ac
+        // \u00e2\u201d\u20ac\u00e2\u201d\u20ac PROCESAMIENTO AT\u00d3MICO EN UNA SOLA
+        // TRANSACCI\u00d3N \u00e2\u201d\u20ac\u00e2\u201d\u20ac
         try (Connection conn = DBConnection.getConnection()) {
             conn.setAutoCommit(false);
             try {
@@ -241,7 +246,8 @@ public class SaleUseCase {
                         int newStock = productRepository.updateStock(item.getProduct().getId(), -item.getQuantity(),
                                 conn);
 
-                        // Notificar si el stock ha bajado del m\u00ednimo (opcional: lanzar evento o log)
+                        // Notificar si el stock ha bajado del m\u00ednimo (opcional: lanzar evento o
+                        // log)
                         if (newStock <= item.getProduct().getMinStock()) {
                             System.out.println("ALERTA STOCK: El producto " + item.getProduct().getName() +
                                     " ha alcanzado el stock m\u00ednimo (" + newStock + ")");
@@ -358,7 +364,8 @@ public class SaleUseCase {
                     cashToRefund = Math.min(cashToRefund, availableCash);
                     cardToRefund = Math.min(cardToRefund, availableCard);
 
-                    // Validaci\u00f3n de efectivo disponible para la devoluci\u00f3n (solo la parte que
+                    // Validaci\u00f3n de efectivo disponible para la devoluci\u00f3n (solo la parte
+                    // que
                     // devolvemos en cash)
                     if (cashToRefund > 0 && cashClosureUseCase != null) {
                         cashClosureUseCase.validateCashAvailableForReturn(cashToRefund);
@@ -374,7 +381,8 @@ public class SaleUseCase {
                     newReturn.setCashAmount(cashToRefund);
                     newReturn.setCardAmount(cardToRefund);
 
-                    // \u00e2\u201d\u20ac\u00e2\u201d\u20ac GENERACI\u00d3N DE C\u00d3dIGO FISCAL \u00daNICO PARA LA DEVOLUCI\u00d3N \u00e2\u201d\u20ac\u00e2\u201d\u20ac
+                    // \u00e2\u201d\u20ac\u00e2\u201d\u20ac GENERACI\u00d3N DE C\u00d3dIGO FISCAL
+                    // \u00daNICO PARA LA DEVOLUCI\u00d3N \u00e2\u201d\u20ac\u00e2\u201d\u20ac
                     String seriesCode = "R";
                     int nextDocNumber = seriesRepository.getAndIncrement(seriesCode, conn);
 
@@ -407,7 +415,8 @@ public class SaleUseCase {
                         cashClosureUseCase.registerCashReturn(cashToRefund, cashReason, userId, conn);
                     }
 
-                    // Archivamos el PDF fiscal de la devoluci\u00f3n antes del commit (para asegurar
+                    // Archivamos el PDF fiscal de la devoluci\u00f3n antes del commit (para
+                    // asegurar
                     // integridad)
                     archiveReturnInPdf(newReturn, newReturnDetails);
 
@@ -428,7 +437,16 @@ public class SaleUseCase {
     }
 
     public List<Sale> getSalesByRange(LocalDate from, LocalDate to) throws SQLException {
-        return saleRepository.getByRange(from, to);
+        return saleRepository.getByRange(from, to, 1000); // Default safety limit
+    }
+
+    public List<Sale> getSalesByRange(LocalDate from, LocalDate to, int limit) throws SQLException {
+        return saleRepository.getByRange(from, to, limit);
+    }
+
+    public com.mycompany.ventacontrolfx.domain.model.HistoryStats getHistoryStats(LocalDate start, LocalDate end)
+            throws SQLException {
+        return saleRepository.getStatsByRange(start, end);
     }
 
     public List<Sale> getSalesByUser(int userId, LocalDate from, LocalDate to) throws SQLException {
@@ -450,6 +468,19 @@ public class SaleUseCase {
     public List<Return> getReturnsHistory(LocalDate start, LocalDate end) throws SQLException {
         authService.checkPermission("HISTORIAL");
         return saleRepository.getReturnsByRange(start, end);
+    }
+
+    public List<ProductSummary> getTopProductsByClient(int clientId, int limit) throws SQLException {
+        return saleRepository.getTopProductsByClient(clientId, limit);
+    }
+
+    public List<com.mycompany.ventacontrolfx.domain.model.ClientSaleSummary> getClientSalesSummary(LocalDate start,
+            LocalDate end) throws SQLException {
+        return saleRepository.getClientSalesSummary(start, end);
+    }
+
+    public List<Sale> getSalesByClient(int clientId) throws SQLException {
+        return saleRepository.getByClient(clientId);
     }
 
     /**

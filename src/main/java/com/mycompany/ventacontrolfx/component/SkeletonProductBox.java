@@ -1,7 +1,5 @@
 package com.mycompany.ventacontrolfx.component;
 
-import javafx.animation.Animation;
-import javafx.animation.TranslateTransition;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.layout.Priority;
@@ -9,15 +7,14 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.Rectangle;
-import javafx.util.Duration;
 
 public class SkeletonProductBox extends StackPane {
 
     public SkeletonProductBox() {
         this.getStyleClass().add("skeleton-box");
-        this.setPrefWidth(200);
-        this.setMaxWidth(200);
-        this.setPrefHeight(320); // Aproximado al ProductBox original
+        this.setPrefWidth(180);
+        this.setMaxWidth(180);
+        this.setPrefHeight(280);
 
         VBox content = new VBox();
         content.setSpacing(0);
@@ -25,13 +22,12 @@ public class SkeletonProductBox extends StackPane {
 
         // 1. Image Placeholder Section
         StackPane imageContainer = new StackPane();
-        imageContainer.setPrefHeight(150);
-        imageContainer.setMinHeight(150);
+        imageContainer.setPrefHeight(140);
         imageContainer.getStyleClass().add("skeleton-image-container");
 
         Region imageFiller = new Region();
         imageFiller.getStyleClass().add("skeleton-image-filler");
-        StackPane.setMargin(imageFiller, new Insets(8));
+        StackPane.setMargin(imageFiller, new Insets(10));
 
         Region priceBadge = new Region();
         priceBadge.getStyleClass().add("skeleton-price-badge");
@@ -41,45 +37,44 @@ public class SkeletonProductBox extends StackPane {
         imageContainer.getChildren().addAll(imageFiller, priceBadge);
 
         // 2. Info Section
-        VBox infoSkeleton = new VBox(10);
-        infoSkeleton.getStyleClass().add("product-info");
+        VBox infoSkeleton = new VBox(12);
         infoSkeleton.setPadding(new Insets(15));
-        
+
         Region titleSkeleton = new Region();
         titleSkeleton.getStyleClass().addAll("skeleton-text", "skeleton-title");
-        
+
         Region categorySkeleton = new Region();
         categorySkeleton.getStyleClass().addAll("skeleton-text", "skeleton-subtitle");
 
         Region stockSkeleton = new Region();
         stockSkeleton.getStyleClass().addAll("skeleton-text", "skeleton-stock");
-        
+
         infoSkeleton.getChildren().addAll(titleSkeleton, categorySkeleton, stockSkeleton);
         VBox.setVgrow(infoSkeleton, Priority.ALWAYS);
 
         // 3. Button Placeholder
         Region buttonSkeleton = new Region();
         buttonSkeleton.getStyleClass().add("skeleton-button");
-        buttonSkeleton.setMinHeight(40);
+        buttonSkeleton.setMinHeight(38);
 
         content.getChildren().addAll(imageContainer, infoSkeleton, buttonSkeleton);
 
         // --- EFECTO DE BRILLO (SHIMMER) ---
-        Region shimmer = new Region();
-        shimmer.setStyle("-fx-background-color: linear-gradient(to right, " +
-                         "transparent 0%, " +
-                         "rgba(255, 255, 255, 0.05) 25%, " +
-                         "rgba(255, 250, 200, 0.6) 50%, " +
-                         "rgba(255, 255, 255, 0.05) 75%, " +
-                         "transparent 100%);");
-        shimmer.setMouseTransparent(true);
-        shimmer.setPrefWidth(1000); // Muy ancho para cubrir la rotaci\u00f3n
-        shimmer.setPrefHeight(1000); 
-        shimmer.setRotate(20);      // Inclinaci\u00f3n m\u00e1s pronunciada
+        // Optimización: Rectángulo más pequeño y cache para evitar lag
+        Rectangle shimmerLine = new Rectangle(50, 400);
+        shimmerLine.setFill(
+                new javafx.scene.paint.LinearGradient(0, 0, 1, 0, true, javafx.scene.paint.CycleMethod.NO_CYCLE,
+                        new javafx.scene.paint.Stop(0, javafx.scene.paint.Color.TRANSPARENT),
+                        new javafx.scene.paint.Stop(0.5, javafx.scene.paint.Color.web("#ffffff", 0.7)),
+                        new javafx.scene.paint.Stop(1, javafx.scene.paint.Color.TRANSPARENT)));
+        shimmerLine.setRotate(15);
+        shimmerLine.setMouseTransparent(true);
+        shimmerLine.setCache(true);
+        shimmerLine.setCacheHint(javafx.scene.CacheHint.SPEED);
 
-        this.getChildren().addAll(content, shimmer);
+        this.getChildren().addAll(content, shimmerLine);
 
-        // Clip para que el brillo no se salga de los bordes redondeados de la caja
+        // Clip
         Rectangle clip = new Rectangle();
         clip.widthProperty().bind(this.widthProperty());
         clip.heightProperty().bind(this.heightProperty());
@@ -87,11 +82,24 @@ public class SkeletonProductBox extends StackPane {
         clip.setArcHeight(16);
         this.setClip(clip);
 
-        // Animaci\u00f3n de traslaci\u00f3n infinita (aumentamos el rango para asegurar que pase por todo)
-        TranslateTransition tt = new TranslateTransition(Duration.seconds(1.8), shimmer);
-        tt.setFromX(-600);
-        tt.setToX(600);
-        tt.setCycleCount(Animation.INDEFINITE);
-        tt.play();
+        // Iniciar animaciones con un pequeño delay seguro
+        javafx.application.Platform.runLater(() -> {
+            javafx.animation.TranslateTransition tt = new javafx.animation.TranslateTransition(
+                    javafx.util.Duration.seconds(3.0), shimmerLine);
+            tt.setFromX(-250);
+            tt.setToX(250);
+            tt.setCycleCount(javafx.animation.Animation.INDEFINITE);
+            tt.setInterpolator(javafx.animation.Interpolator.EASE_BOTH);
+
+            javafx.animation.FadeTransition ft = new javafx.animation.FadeTransition(javafx.util.Duration.seconds(2.0),
+                    content);
+            ft.setFromValue(0.7);
+            ft.setToValue(1.0);
+            ft.setAutoReverse(true);
+            ft.setCycleCount(javafx.animation.Animation.INDEFINITE);
+
+            tt.play();
+            ft.play();
+        });
     }
 }

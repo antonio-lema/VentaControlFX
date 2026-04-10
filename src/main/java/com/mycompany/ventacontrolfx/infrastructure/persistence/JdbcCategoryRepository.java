@@ -8,57 +8,36 @@ import java.util.List;
 
 public class JdbcCategoryRepository implements ICategoryRepository {
 
-    private void ensureFavoriteColumnExists(Connection connection) {
-        try (Statement stmt = connection.createStatement()) {
-            stmt.execute("ALTER TABLE categories ADD COLUMN is_favorite BOOLEAN DEFAULT 0");
-        } catch (SQLException e) {
-            // Column likely exists or other harmless error
-        }
-    }
-
     @Override
     public List<Category> getAll() throws SQLException {
         List<Category> categories = new ArrayList<>();
         String sql = "SELECT c.*, tg.name as tax_group_name FROM categories c LEFT JOIN tax_groups tg ON c.tax_group_id = tg.tax_group_id";
 
-        try (Connection connection = DBConnection.getConnection()) {
-            ensureFavoriteColumnExists(connection);
-            try (Statement stmt = connection.createStatement();
-                    ResultSet rs = stmt.executeQuery(sql)) {
-                while (rs.next()) {
-                    boolean isFavorite = false;
-                    try {
-                        isFavorite = rs.getBoolean("is_favorite");
-                    } catch (SQLException e) {
-                    }
+        try (Connection connection = DBConnection.getConnection();
+                Statement stmt = connection.createStatement();
+                ResultSet rs = stmt.executeQuery(sql)) {
+            while (rs.next()) {
+                boolean isFavorite = rs.getBoolean("is_favorite");
+                double defaultIva = rs.getDouble("default_iva");
 
-                    double defaultIva = 21.0;
-                    try {
-                        defaultIva = rs.getDouble("default_iva");
-                    } catch (SQLException e) {
-                    }
+                Integer parentCategoryId = rs.getInt("parent_category_id");
+                if (rs.wasNull())
+                    parentCategoryId = null;
 
-                    Integer parentCategoryId = rs.getInt("parent_category_id");
-                    if (rs.wasNull())
-                        parentCategoryId = null;
+                Category category = new Category(
+                        rs.getInt("category_id"),
+                        rs.getString("name"),
+                        rs.getBoolean("visible"),
+                        isFavorite,
+                        defaultIva);
+                category.setParentCategoryId(parentCategoryId);
 
-                    Category category = new Category(
-                            rs.getInt("category_id"),
-                            rs.getString("name"),
-                            rs.getBoolean("visible"),
-                            isFavorite,
-                            defaultIva);
-                    category.setParentCategoryId(parentCategoryId);
-                    try {
-                        int taxGroupId = rs.getInt("tax_group_id");
-                        if (!rs.wasNull()) {
-                            category.setTaxGroupId(taxGroupId);
-                            category.setTaxGroupName(rs.getString("tax_group_name"));
-                        }
-                    } catch (SQLException e) {
-                    }
-                    categories.add(category);
+                int taxGroupId = rs.getInt("tax_group_id");
+                if (!rs.wasNull()) {
+                    category.setTaxGroupId(taxGroupId);
+                    category.setTaxGroupName(rs.getString("tax_group_name"));
                 }
+                categories.add(category);
             }
         }
         return categories;
@@ -72,17 +51,8 @@ public class JdbcCategoryRepository implements ICategoryRepository {
                 Statement stmt = connection.createStatement();
                 ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
-                boolean isFavorite = false;
-                try {
-                    isFavorite = rs.getBoolean("is_favorite");
-                } catch (SQLException e) {
-                }
-
-                double defaultIva = 21.0;
-                try {
-                    defaultIva = rs.getDouble("default_iva");
-                } catch (SQLException e) {
-                }
+                boolean isFavorite = rs.getBoolean("is_favorite");
+                double defaultIva = rs.getDouble("default_iva");
 
                 Integer parentCategoryId = rs.getInt("parent_category_id");
                 if (rs.wasNull())
@@ -95,13 +65,11 @@ public class JdbcCategoryRepository implements ICategoryRepository {
                         isFavorite,
                         defaultIva);
                 category.setParentCategoryId(parentCategoryId);
-                try {
-                    int taxGroupId = rs.getInt("tax_group_id");
-                    if (!rs.wasNull()) {
-                        category.setTaxGroupId(taxGroupId);
-                        category.setTaxGroupName(rs.getString("tax_group_name"));
-                    }
-                } catch (SQLException e) {
+
+                int taxGroupId = rs.getInt("tax_group_id");
+                if (!rs.wasNull()) {
+                    category.setTaxGroupId(taxGroupId);
+                    category.setTaxGroupName(rs.getString("tax_group_name"));
                 }
                 categories.add(category);
             }
@@ -113,38 +81,30 @@ public class JdbcCategoryRepository implements ICategoryRepository {
     public List<Category> getFavorites() throws SQLException {
         List<Category> categories = new ArrayList<>();
         String sql = "SELECT c.*, tg.name as tax_group_name FROM categories c LEFT JOIN tax_groups tg ON c.tax_group_id = tg.tax_group_id WHERE c.visible = 1 AND c.is_favorite = 1";
-        try (Connection connection = DBConnection.getConnection()) {
-            ensureFavoriteColumnExists(connection);
-            try (Statement stmt = connection.createStatement();
-                    ResultSet rs = stmt.executeQuery(sql)) {
-                while (rs.next()) {
-                    double defaultIva = 21.0;
-                    try {
-                        defaultIva = rs.getDouble("default_iva");
-                    } catch (SQLException e) {
-                    }
+        try (Connection connection = DBConnection.getConnection();
+                Statement stmt = connection.createStatement();
+                ResultSet rs = stmt.executeQuery(sql)) {
+            while (rs.next()) {
+                double defaultIva = rs.getDouble("default_iva");
 
-                    Category category = new Category(
-                            rs.getInt("category_id"),
-                            rs.getString("name"),
-                            rs.getBoolean("visible"),
-                            rs.getBoolean("is_favorite"),
-                            defaultIva);
+                Category category = new Category(
+                        rs.getInt("category_id"),
+                        rs.getString("name"),
+                        rs.getBoolean("visible"),
+                        rs.getBoolean("is_favorite"),
+                        defaultIva);
 
-                    Integer parentCategoryId = rs.getInt("parent_category_id");
-                    if (!rs.wasNull()) {
-                        category.setParentCategoryId(parentCategoryId);
-                    }
-                    try {
-                        int taxGroupId = rs.getInt("tax_group_id");
-                        if (!rs.wasNull()) {
-                            category.setTaxGroupId(taxGroupId);
-                            category.setTaxGroupName(rs.getString("tax_group_name"));
-                        }
-                    } catch (SQLException e) {
-                    }
-                    categories.add(category);
+                Integer parentCategoryId = rs.getInt("parent_category_id");
+                if (!rs.wasNull()) {
+                    category.setParentCategoryId(parentCategoryId);
                 }
+
+                int taxGroupId = rs.getInt("tax_group_id");
+                if (!rs.wasNull()) {
+                    category.setTaxGroupId(taxGroupId);
+                    category.setTaxGroupName(rs.getString("tax_group_name"));
+                }
+                categories.add(category);
             }
         }
         return categories;
@@ -230,17 +190,8 @@ public class JdbcCategoryRepository implements ICategoryRepository {
             pstmt.setInt(1, id);
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
-                    boolean isFavorite = false;
-                    try {
-                        isFavorite = rs.getBoolean("is_favorite");
-                    } catch (SQLException e) {
-                    }
-
-                    double defaultIva = 21.0;
-                    try {
-                        defaultIva = rs.getDouble("default_iva");
-                    } catch (SQLException e) {
-                    }
+                    boolean isFavorite = rs.getBoolean("is_favorite");
+                    double defaultIva = rs.getDouble("default_iva");
 
                     Integer parentCategoryId = rs.getInt("parent_category_id");
                     if (rs.wasNull())
@@ -253,13 +204,11 @@ public class JdbcCategoryRepository implements ICategoryRepository {
                             isFavorite,
                             defaultIva);
                     category.setParentCategoryId(parentCategoryId);
-                    try {
-                        int taxGroupId = rs.getInt("tax_group_id");
-                        if (!rs.wasNull()) {
-                            category.setTaxGroupId(taxGroupId);
-                            category.setTaxGroupName(rs.getString("tax_group_name"));
-                        }
-                    } catch (SQLException e) {
+
+                    int taxGroupId = rs.getInt("tax_group_id");
+                    if (!rs.wasNull()) {
+                        category.setTaxGroupId(taxGroupId);
+                        category.setTaxGroupName(rs.getString("tax_group_name"));
                     }
                     return category;
                 }

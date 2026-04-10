@@ -14,6 +14,9 @@ import com.mycompany.ventacontrolfx.infrastructure.navigation.NavigationService;
 import com.mycompany.ventacontrolfx.application.service.PromotionEngine;
 import com.mycompany.ventacontrolfx.application.service.PromotionService;
 import com.mycompany.ventacontrolfx.application.service.RefundCalculatorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 // CartService removed, replaced by CartUseCase
 import java.util.Locale;
 import java.util.ResourceBundle;
@@ -150,6 +153,7 @@ public class ServiceContainer {
         this.userUseCase = new com.mycompany.ventacontrolfx.application.usecase.UserUseCase(userRepository, emailSender,
                 authService);
         this.closureUseCase = new CashClosureUseCase(closureRepository, authService);
+        this.closureUseCase.setBackupService(new BackupService()); // Inject BackupService for auto-backups
         this.configUseCase = new ConfigUseCase(configRepository);
         this.dashboardUseCase = new DashboardUseCase(productRepository, categoryRepository, saleRepository,
                 closureRepository, clientRepository, userRepository);
@@ -173,6 +177,18 @@ public class ServiceContainer {
         this.promotionUseCase = new PromotionUseCase(promotionRepository);
         this.productImportUseCase = new ProductImportUseCase(productRepository, categoryRepository, authService);
         this.workSessionUseCase = new WorkSessionUseCase(workSessionRepository);
+        this.workSessionUseCase.setBackupService(new BackupService());
+
+        // 6. Scheduled Tasks: Daily Auto-Backup
+        ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor(r -> {
+            Thread t = new Thread(r, "BackupScheduler");
+            t.setDaemon(true);
+            return t;
+        });
+        scheduler.scheduleAtFixedRate(() -> {
+            System.out.println("[AutoBackup] Ejecutando backup diario programado...");
+            new BackupService().createDefaultBackup();
+        }, 1, 24, TimeUnit.HOURS); // Cada 24h, empezando en 1h
 
         // 4. Domain Services
         // taxEngineService is now initialized above
@@ -184,10 +200,13 @@ public class ServiceContainer {
 
         this.returnUseCase.setPdfService(this.pdfService);
         // El ReturnUseCase necesita el closure inyectado ahora que ya est\u00e1 creado
-        // Nota: Si ReturnUseCase no tiene setter, habr\u00e1 que crearlo o usar reflexi\u00f3n si
+        // Nota: Si ReturnUseCase no tiene setter, habr\u00e1 que crearlo o usar
+        // reflexi\u00f3n si
         // es singleton
-        // Para simplificar, lo inyectamos aqu\u00ed (asumiendo que tiene acceso o setter)
-        // en esta versi\u00f3n lo inyectaremos via setter o crearemos el objeto despu\u00e9s.
+        // Para simplificar, lo inyectamos aqu\u00ed (asumiendo que tiene acceso o
+        // setter)
+        // en esta versi\u00f3n lo inyectaremos via setter o crearemos el objeto
+        // despu\u00e9s.
 
         // Vamos a modificar SaleUseCase para que use el nuevo ReturnUseCase si es
         // necesario,

@@ -116,6 +116,9 @@
                 <Button fx:id="btnThemeSettings" styleClass="sidebar-button" onAction="#handleShowCustomization" contentDisplay="TOP" maxWidth="Infinity" text="%sidebar.item.aesthetics">
                     <graphic><FontAwesomeIconView glyphName="PAINT_BRUSH" size="22" styleClass="sidebar-icon"/></graphic>
                 </Button>
+                <Button fx:id="btnBackup" styleClass="sidebar-button" onAction="#handleShowBackup" contentDisplay="TOP" maxWidth="Infinity" text="%sidebar.item.backup">
+                    <graphic><FontAwesomeIconView glyphName="DATABASE" size="22" styleClass="sidebar-icon"/></graphic>
+                </Button>
             </VBox>
         </VBox>
     </ScrollPane>

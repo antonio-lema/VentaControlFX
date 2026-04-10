@@ -8,9 +8,14 @@ import java.util.Optional;
 
 public class WorkSessionUseCase {
     private final IWorkSessionRepository repository;
+    private com.mycompany.ventacontrolfx.infrastructure.persistence.BackupService backupService;
 
     public WorkSessionUseCase(IWorkSessionRepository repository) {
         this.repository = repository;
+    }
+
+    public void setBackupService(com.mycompany.ventacontrolfx.infrastructure.persistence.BackupService backupService) {
+        this.backupService = backupService;
     }
 
     public void startShift(Integer userId) {
@@ -28,6 +33,13 @@ public class WorkSessionUseCase {
             session.setEndTime(LocalDateTime.now());
             session.setStatus(WorkSession.SessionStatus.COMPLETED);
             repository.update(session);
+
+            // AUTO BACKUP ON END SHIFT
+            if (backupService != null) {
+                new Thread(() -> {
+                    backupService.createDefaultBackup();
+                }).start();
+            }
         } else {
             throw new IllegalStateException("No active shift found to end");
         }

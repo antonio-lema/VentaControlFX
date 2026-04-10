@@ -7,15 +7,23 @@ import java.util.Map;
 
 public class JdbcAppSettingsRepository implements IAppSettingsRepository {
 
+    private static Map<String, String> settingsCache = null;
+
     @Override
     public String getSetting(String key) throws SQLException {
+        if (settingsCache != null && settingsCache.containsKey(key)) {
+            return settingsCache.get(key);
+        }
         String sql = "SELECT setting_value FROM app_settings WHERE setting_key = ?";
         try (Connection conn = DBConnection.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, key);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    return rs.getString("setting_value");
+                    String val = rs.getString("setting_value");
+                    if (settingsCache != null)
+                        settingsCache.put(key, val);
+                    return val;
                 }
             }
         }
@@ -24,11 +32,9 @@ public class JdbcAppSettingsRepository implements IAppSettingsRepository {
 
     @Override
     public void saveSetting(String key, String value) throws SQLException {
+        settingsCache = null; // Invalidate
         String sql = "INSERT INTO app_settings (setting_key, setting_value) VALUES (?, ?) " +
                 "ON DUPLICATE KEY UPDATE setting_value = ?, updated_at = CURRENT_TIMESTAMP";
-        // Nota: ON DUPLICATE KEY es MySQL. Para SQLite usamos INSERT OR REPLACE.
-        // Como el proyecto parece usar SQLite/H2 est\u00e1ndar en algunos puntos, usar\u00e9 una
-        // l\u00f3gica m\u00e1s portable.
 
         try (Connection conn = DBConnection.getConnection()) {
             boolean exists = false;
@@ -60,6 +66,9 @@ public class JdbcAppSettingsRepository implements IAppSettingsRepository {
 
     @Override
     public Map<String, String> getAllSettings() throws SQLException {
+        if (settingsCache != null) {
+            return new HashMap<>(settingsCache);
+        }
         Map<String, String> settings = new HashMap<>();
         String sql = "SELECT setting_key, setting_value FROM app_settings";
         try (Connection conn = DBConnection.getConnection();
@@ -69,6 +78,7 @@ public class JdbcAppSettingsRepository implements IAppSettingsRepository {
                 settings.put(rs.getString("setting_key"), rs.getString("setting_value"));
             }
         }
+        settingsCache = new HashMap<>(settings);
         return settings;
     }
 }

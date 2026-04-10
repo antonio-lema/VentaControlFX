@@ -13,38 +13,6 @@ import java.util.List;
 public class JdbcPriceListRepository implements IPriceListRepository {
 
     public JdbcPriceListRepository() {
-        checkAndAddColumns();
-    }
-
-    private void checkAndAddColumns() {
-        try (Connection conn = DBConnection.getConnection();
-                Statement stmt = conn.createStatement()) {
-
-            // Revisa si existe columna description
-            try {
-                stmt.executeQuery("SELECT description FROM price_lists LIMIT 1");
-            } catch (SQLException e) {
-                stmt.executeUpdate("ALTER TABLE price_lists ADD COLUMN description VARCHAR(255) AFTER name");
-            }
-
-            // Revisa si existe columna is_active
-            try {
-                stmt.executeQuery("SELECT is_active FROM price_lists LIMIT 1");
-            } catch (SQLException e) {
-                stmt.executeUpdate(
-                        "ALTER TABLE price_lists ADD COLUMN is_active BOOLEAN DEFAULT TRUE AFTER is_default");
-            }
-
-            // Revisa si existe columna priority
-            try {
-                stmt.executeQuery("SELECT priority FROM price_lists LIMIT 1");
-            } catch (SQLException e) {
-                stmt.executeUpdate("ALTER TABLE price_lists ADD COLUMN priority INT DEFAULT 0 AFTER is_active");
-            }
-        } catch (SQLException e) {
-            // Error al verificar o alterar, probablemente por inexistencia de la tabla o
-            // permisos
-        }
     }
 
     @Override

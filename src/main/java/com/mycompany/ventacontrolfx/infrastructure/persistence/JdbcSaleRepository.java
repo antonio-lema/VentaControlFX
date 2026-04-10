@@ -13,23 +13,6 @@ import java.util.List;
 public class JdbcSaleRepository implements ISaleRepository {
 
     public JdbcSaleRepository() {
-        ensureSchema();
-    }
-
-    private void ensureSchema() {
-        try (Connection conn = DBConnection.getConnection();
-                Statement stmt = conn.createStatement()) {
-            try {
-                stmt.execute("ALTER TABLE returns ADD COLUMN cash_amount DOUBLE DEFAULT 0");
-            } catch (Exception e) {
-            }
-            try {
-                stmt.execute("ALTER TABLE returns ADD COLUMN card_amount DOUBLE DEFAULT 0");
-            } catch (Exception e) {
-            }
-        } catch (SQLException e) {
-            System.err.println("Error verifying schemas: " + e.getMessage());
-        }
     }
 
     @Override
@@ -228,15 +211,22 @@ public class JdbcSaleRepository implements ISaleRepository {
 
     @Override
     public List<Sale> getByRange(LocalDate start, LocalDate end) throws SQLException {
+        return getByRange(start, end, Integer.MAX_VALUE);
+    }
+
+    @Override
+    public List<Sale> getByRange(LocalDate start, LocalDate end, int limit) throws SQLException {
         List<Sale> sales = new ArrayList<>();
+        // Optimized: Avoid DATE() function to allow index usage
         String sql = "SELECT s.*, u.username FROM sales s " +
                 "LEFT JOIN users u ON s.user_id = u.user_id " +
-                "WHERE DATE(s.sale_datetime) BETWEEN ? AND ? " +
-                "ORDER BY s.sale_datetime DESC";
+                "WHERE s.sale_datetime >= ? AND s.sale_datetime <= ? " +
+                "ORDER BY s.sale_datetime DESC LIMIT ?";
         try (Connection conn = DBConnection.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setDate(1, Date.valueOf(start));
-            pstmt.setDate(2, Date.valueOf(end));
+            pstmt.setTimestamp(1, java.sql.Timestamp.valueOf(start.atStartOfDay()));
+            pstmt.setTimestamp(2, java.sql.Timestamp.valueOf(end.atTime(java.time.LocalTime.MAX)));
+            pstmt.setInt(3, limit);
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
                     sales.add(mapResultSetToSale(rs));
@@ -244,6 +234,33 @@ public class JdbcSaleRepository implements ISaleRepository {
             }
         }
         return sales;
+    }
+
+    @Override
+    public com.mycompany.ventacontrolfx.domain.model.HistoryStats getStatsByRange(LocalDate start, LocalDate end)
+            throws SQLException {
+        String sql = "SELECT COUNT(*) as total_count, " +
+                "SUM(total - returned_amount) as net_total, " +
+                "SUM(cash_amount * ((total - returned_amount) / CASE WHEN total = 0 THEN 1 ELSE total END)) as net_cash, "
+                +
+                "SUM(card_amount * ((total - returned_amount) / CASE WHEN total = 0 THEN 1 ELSE total END)) as net_card "
+                +
+                "FROM sales WHERE sale_datetime >= ? AND sale_datetime <= ?";
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setTimestamp(1, java.sql.Timestamp.valueOf(start.atStartOfDay()));
+            pstmt.setTimestamp(2, java.sql.Timestamp.valueOf(end.atTime(java.time.LocalTime.MAX)));
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return new com.mycompany.ventacontrolfx.domain.model.HistoryStats(
+                            rs.getInt("total_count"),
+                            rs.getDouble("net_total"),
+                            rs.getDouble("net_cash"),
+                            rs.getDouble("net_card"));
+                }
+            }
+        }
+        return new com.mycompany.ventacontrolfx.domain.model.HistoryStats(0, 0, 0, 0);
     }
 
     @Override
@@ -485,6 +502,79 @@ public class JdbcSaleRepository implements ISaleRepository {
             }
         }
         return 0;
+    }
+
+    @Override
+    public List<com.mycompany.ventacontrolfx.domain.model.ProductSummary> getTopProductsByClient(int clientId,
+            int limit)
+            throws SQLException {
+        List<com.mycompany.ventacontrolfx.domain.model.ProductSummary> list = new ArrayList<>();
+        String sql = "SELECT sd.product_name_snapshot as name, SUM(sd.quantity) as total_qty, SUM(sd.line_total) as total_amount "
+                +
+                "FROM sale_details sd JOIN sales s ON sd.sale_id = s.sale_id " +
+                "WHERE s.client_id = ? AND s.is_return = FALSE " +
+                "GROUP BY sd.product_name_snapshot " +
+                "ORDER BY total_qty DESC LIMIT ?";
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, clientId);
+            pstmt.setInt(2, limit);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    list.add(new com.mycompany.ventacontrolfx.domain.model.ProductSummary(
+                            rs.getString("name"),
+                            rs.getInt("total_qty"),
+                            rs.getDouble("total_amount")));
+                }
+            }
+        }
+        return list;
+    }
+
+    @Override
+    public List<com.mycompany.ventacontrolfx.domain.model.ClientSaleSummary> getClientSalesSummary(LocalDate start,
+            LocalDate end) throws SQLException {
+        List<com.mycompany.ventacontrolfx.domain.model.ClientSaleSummary> list = new ArrayList<>();
+        String sql = "SELECT client_id, COUNT(sale_id) as orders, SUM(total) as spent, MAX(sale_datetime) as last_date "
+                +
+                "FROM sales WHERE DATE(sale_datetime) BETWEEN ? AND ? AND is_return = FALSE AND client_id IS NOT NULL "
+                +
+                "GROUP BY client_id";
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setDate(1, Date.valueOf(start));
+            pstmt.setDate(2, Date.valueOf(end));
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    Timestamp ts = rs.getTimestamp("last_date");
+                    list.add(new com.mycompany.ventacontrolfx.domain.model.ClientSaleSummary(
+                            rs.getInt("client_id"),
+                            rs.getInt("orders"),
+                            rs.getDouble("spent"),
+                            ts != null ? ts.toLocalDateTime() : null));
+                }
+            }
+        }
+        return list;
+    }
+
+    @Override
+    public List<Sale> getByClient(int clientId) throws SQLException {
+        List<Sale> sales = new ArrayList<>();
+        String sql = "SELECT s.*, u.username FROM sales s " +
+                "LEFT JOIN users u ON s.user_id = u.user_id " +
+                "WHERE s.client_id = ? " +
+                "ORDER BY s.sale_datetime DESC";
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, clientId);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    sales.add(mapResultSetToSale(rs));
+                }
+            }
+        }
+        return sales;
     }
 
     private Sale mapResultSetToSale(ResultSet rs) throws SQLException {

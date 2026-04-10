@@ -54,8 +54,14 @@ public class JdbcCompanyConfigRepository implements ICompanyConfigRepository {
     private static final String K_EMAIL_FROM = "email_from";
     private static final String K_EMAIL_PASS = "email_password";
 
+    private static SaleConfig cachedConfig = null;
+
     @Override
     public SaleConfig load() {
+        if (cachedConfig != null) {
+            return cachedConfig;
+        }
+
         java.util.Map<String, String> cache = new java.util.HashMap<>();
         String sql = "SELECT config_key, config_value FROM system_config";
         try (Connection conn = DBConnection.getConnection();
@@ -68,8 +74,8 @@ public class JdbcCompanyConfigRepository implements ICompanyConfigRepository {
             e.printStackTrace();
         }
 
-        SaleConfig d = new SaleConfig();
         SaleConfig cfg = new SaleConfig();
+        SaleConfig d = new SaleConfig();
         cfg.setCompanyName(getFromCache(cache, K_COMPANY_NAME, d.getCompanyName()));
         cfg.setCif(getFromCache(cache, K_CIF, d.getCif()));
         cfg.setAddress(getFromCache(cache, K_ADDRESS, d.getAddress()));
@@ -167,6 +173,7 @@ public class JdbcCompanyConfigRepository implements ICompanyConfigRepository {
         cfg.setSpecialDays(specials);
         cfg.setScheduleGracePeriodMins(Integer.parseInt(getFromCache(cache, "schedule.grace", "10")));
 
+        cachedConfig = cfg;
         return cfg;
     }
 
@@ -194,6 +201,7 @@ public class JdbcCompanyConfigRepository implements ICompanyConfigRepository {
 
     @Override
     public void save(SaleConfig cfg) {
+        cachedConfig = null; // Invalidate cache
         setValue(K_COMPANY_NAME, orEmpty(cfg.getCompanyName()));
         setValue(K_CIF, orEmpty(cfg.getCif()));
         setValue(K_ADDRESS, orEmpty(cfg.getAddress()));

@@ -33,6 +33,11 @@ public interface ISaleRepository {
 
         List<Sale> getByRange(LocalDate start, LocalDate end) throws SQLException;
 
+        List<Sale> getByRange(LocalDate start, LocalDate end, int limit) throws SQLException;
+
+        com.mycompany.ventacontrolfx.domain.model.HistoryStats getStatsByRange(LocalDate start, LocalDate end)
+                        throws SQLException;
+
         int saveReturn(Return returnRecord) throws SQLException;
 
         int saveReturn(Return returnRecord, Connection conn) throws SQLException;
@@ -58,4 +63,12 @@ public interface ISaleRepository {
         List<ReturnDetail> getReturnDetailsByReturnId(int returnId) throws SQLException;
 
         int count() throws SQLException;
+
+        List<com.mycompany.ventacontrolfx.domain.model.ProductSummary> getTopProductsByClient(int clientId, int limit)
+                        throws SQLException;
+
+        List<com.mycompany.ventacontrolfx.domain.model.ClientSaleSummary> getClientSalesSummary(LocalDate start,
+                        LocalDate end) throws SQLException;
+
+        List<Sale> getByClient(int clientId) throws SQLException;
 }

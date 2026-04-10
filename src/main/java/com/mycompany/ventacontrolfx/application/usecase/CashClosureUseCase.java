@@ -13,6 +13,7 @@ import java.util.Map;
 public class CashClosureUseCase {
     private final ICashClosureRepository repository;
     private final com.mycompany.ventacontrolfx.util.AuthorizationService authService;
+    private com.mycompany.ventacontrolfx.infrastructure.persistence.BackupService backupService;
 
     public CashClosureUseCase(ICashClosureRepository repository,
             com.mycompany.ventacontrolfx.util.AuthorizationService authService) {
@@ -20,9 +21,13 @@ public class CashClosureUseCase {
         this.authService = authService;
     }
 
+    public void setBackupService(com.mycompany.ventacontrolfx.infrastructure.persistence.BackupService backupService) {
+        this.backupService = backupService;
+    }
+
     public void performClosure(CashClosure closure) throws SQLException {
         authService.checkPermission("CIERRES");
-        // Enriquecer el cierre con datos de auditor\u00eda antes de guardar
+        // Enrich closure with audit data before saving
         Map<String, Double> totals = repository.getPendingTotals();
 
         double cashSales = totals.getOrDefault("cash", 0.0);
@@ -41,7 +46,7 @@ public class CashClosureUseCase {
         closure.setTotalCard(totals.getOrDefault("card", 0.0));
         closure.setTotalAll(totals.getOrDefault("total", 0.0));
 
-        // Determinamos el estado seg\u00fan la diferencia
+        // Determine status based on difference
         double diff = closure.getActualCash() - currentCash;
         closure.setDifference(diff);
 
@@ -51,8 +56,22 @@ public class CashClosureUseCase {
             closure.setStatus("DESCUADRE");
         }
 
-        // El repositorio.save usar\u00e1 estos campos para la auditor\u00eda
+        // The repository.save will use these fields for auditing
         repository.save(closure);
+
+        // AUTO BACKUP ON CLOSURE
+        if (backupService != null) {
+            new Thread(() -> {
+                System.out.println("[AutoBackup] Iniciando backup automático tras cierre de caja...");
+                com.mycompany.ventacontrolfx.infrastructure.persistence.BackupService.BackupResult result = backupService
+                        .createDefaultBackup();
+                if (result.success) {
+                    System.out.println("[AutoBackup] Backup completado exitosamente: " + result.filePath);
+                } else {
+                    System.err.println("[AutoBackup] Error en backup automático: " + result.message);
+                }
+            }).start();
+        }
     }
 
     /**
@@ -95,7 +114,8 @@ public class CashClosureUseCase {
         return repository.getPendingProductSummary();
     }
 
-    // \u00e2\u201d\u20ac\u00e2\u201d\u20ac Gesti\u00f3n de fondo de caja \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac
+    // \u00e2\u201d\u20ac\u00e2\u201d\u20ac Gesti\u00f3n de fondo de caja
+    // \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac
 
     /**
      * Abre la caja con el fondo inicial indicado.
@@ -154,7 +174,8 @@ public class CashClosureUseCase {
     }
 
     /**
-     * Valida que haya suficiente efectivo en caja para procesar una devoluci\u00f3n en
+     * Valida que haya suficiente efectivo en caja para procesar una devoluci\u00f3n
+     * en
      * efectivo.
      * 
      * @param returnAmount cantidad a devolver
@@ -172,7 +193,8 @@ public class CashClosureUseCase {
     }
 
     /**
-     * Valida que haya suficiente efectivo en caja para procesar una devoluci\u00f3n en
+     * Valida que haya suficiente efectivo en caja para procesar una devoluci\u00f3n
+     * en
      * efectivo.
      * 
      * @param returnAmount cantidad a devolver

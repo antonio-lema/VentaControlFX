@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
+
+<VBox xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.mycompany.ventacontrolfx.presentation.controller.BackupController"
+      styleClass="main-content-area" spacing="0">
+    
+    <VBox styleClass="view-header">
+        <HBox alignment="CENTER_LEFT" spacing="16">
+            <StackPane styleClass="view-header-icon-wrap">
+                <FontAwesomeIconView glyphName="DATABASE" size="24" fill="white"/>
+            </StackPane>
+            <VBox spacing="2">
+                <Label text="%backup.title" styleClass="view-title"/>
+                <Label text="%backup.subtitle" styleClass="view-subtitle"/>
+            </VBox>
+        </HBox>
+    </VBox>
+
+    <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="detail-scroll, edge-to-edge" VBox.vgrow="ALWAYS">
+        <VBox spacing="20" style="-fx-padding: 30;">
+            
+            <VBox styleClass="config-card" maxWidth="600">
+                <HBox styleClass="config-card-header" alignment="CENTER_LEFT" spacing="10">
+                    <StackPane styleClass="config-card-icon-wrap config-icon-blue">
+                        <FontAwesomeIconView glyphName="SAVE" size="16" fill="#1e88e5"/>
+                    </StackPane>
+                    <Label text="%backup.section.manual" styleClass="config-card-title"/>
+                </HBox>
+                <Separator styleClass="config-card-separator"/>
+
+                <VBox spacing="20" styleClass="config-card-body">
+                    <Label text="%backup.description" wrapText="true" styleClass="label-muted"/>
+                    
+                        <HBox spacing="10" alignment="CENTER">
+                            <Button text="%backup.btn.create" onAction="#handleCreateBackup" styleClass="btn-primary" prefHeight="45" prefWidth="250">
+                                <graphic>
+                                    <FontAwesomeIconView glyphName="DOWNLOAD" size="16" fill="white"/>
+                                </graphic>
+                            </Button>
+                            <Button text="%backup.btn.open_folder" onAction="#handleOpenFolder" styleClass="btn-secondary" prefHeight="45">
+                                <graphic>
+                                    <FontAwesomeIconView glyphName="FOLDER_OPEN" size="16" />
+                                </graphic>
+                            </Button>
+                        </HBox>
+                        
+                        <VBox fx:id="statusContainer" spacing="10" alignment="CENTER">
+                            <ProgressBar fx:id="progressBar" progress="-1" prefWidth="300" />
+                            <Label fx:id="lblStatus" text="" styleClass="label-info"/>
+                        </VBox>
+                    </VBox>
+                </VBox>
+
+            <VBox styleClass="config-card" maxWidth="600">
+                <HBox styleClass="config-card-header" alignment="CENTER_LEFT" spacing="10">
+                    <StackPane styleClass="config-card-icon-wrap config-icon-orange">
+                        <FontAwesomeIconView glyphName="INFO_CIRCLE" size="16" fill="#fb8c00"/>
+                    </StackPane>
+                    <Label text="%backup.section.info" styleClass="config-card-title"/>
+                </HBox>
+                <Separator styleClass="config-card-separator"/>
+                <VBox spacing="10" styleClass="config-card-body">
+                    <Label text="%backup.info.location" style="-fx-font-weight: bold;"/>
+                    <Label text="~/VentaControl/backups/" styleClass="code-label"/>
+                    <Label text="%backup.info.requirement" wrapText="true" styleClass="label-muted"/>
+                </VBox>
+            </VBox>
+
+            <VBox styleClass="config-card" maxWidth="600">
+                <HBox styleClass="config-card-header" alignment="CENTER_LEFT" spacing="10">
+                    <StackPane styleClass="config-card-icon-wrap config-icon-green">
+                        <FontAwesomeIconView glyphName="HISTORY" size="16" fill="#4caf50"/>
+                    </StackPane>
+                    <Label text="%backup.section.available" styleClass="config-card-title"/>
+                </HBox>
+                <Separator styleClass="config-card-separator"/>
+                <VBox spacing="15" styleClass="config-card-body">
+                    <Label text="%backup.description.restore" wrapText="true" styleClass="label-muted"/>
+                    
+                    <ListView fx:id="lvBackups" prefHeight="200" styleClass="backup-list"/>
+                    
+                    <HBox alignment="CENTER_RIGHT" spacing="10">
+                        <Button text="%backup.btn.restore" onAction="#handleRestoreBackup" styleClass="btn-success">
+                            <graphic>
+                                <FontAwesomeIconView glyphName="UPLOAD" size="14" fill="white"/>
+                            </graphic>
+                        </Button>
+                    </HBox>
+                </VBox>
+            </VBox>
+
+        </VBox>
+    </ScrollPane>
+</VBox>

@@ -110,8 +110,9 @@ public class HistoryController implements Injectable, Searchable {
                     setStyle("");
                 } else {
                     Sale s = getTableRow().getItem();
-                    setText(String.format("%.2f \u20ac", item)); // Formato de moneda sigue igual por ahora, pero podr\u00edamos
-                                                            // usar cfg
+                    setText(String.format("%.2f \u20ac", item)); // Formato de moneda sigue igual por ahora, pero
+                                                                 // podr\u00edamos
+                    // usar cfg
                     if (s != null) {
                         if (s.isReturn()) {
                             setStyle("-fx-font-weight: bold; -fx-text-fill: #ef4444; -fx-strikethrough: true;");
@@ -133,7 +134,8 @@ public class HistoryController implements Injectable, Searchable {
                     setText(null);
                 } else {
                     String emoji = item.contains("Mixed") || item.contains("Mixto") ? "\ud83d\udd04 "
-                            : (container.getBundle().getString("payment.method.card").equalsIgnoreCase(item) ? "\ud83d\udcb3 "
+                            : (container.getBundle().getString("payment.method.card").equalsIgnoreCase(item)
+                                    ? "\ud83d\udcb3 "
                                     : "\ud83d\udcb5 ");
                     setText(emoji + item);
                 }
@@ -165,30 +167,45 @@ public class HistoryController implements Injectable, Searchable {
     }
 
     private void loadSalesDirect() {
-        try {
-            LocalDate start = datePickerStart.getValue();
-            LocalDate end = datePickerEnd.getValue();
+        LocalDate start = datePickerStart.getValue();
+        LocalDate end = datePickerEnd.getValue();
 
-            List<Sale> sales;
-            if (start == null || end == null) {
-                // All time (wide range)
-                sales = saleUseCase.getHistory(LocalDate.of(2000, 1, 1), LocalDate.of(2100, 1, 1));
-            } else {
-                if (start.isAfter(end)) {
-                    AlertUtil.showError(container.getBundle().getString("alert.error"),
-                            container.getBundle().getString("history.error.date_range"));
-                    return;
-                }
-                sales = saleUseCase.getHistory(start, end);
+        if (start == null || end == null) {
+            start = LocalDate.now().minusDays(30);
+            end = LocalDate.now();
+            datePickerStart.setValue(start);
+            datePickerEnd.setValue(end);
+        }
+
+        if (start.isAfter(end)) {
+            AlertUtil.showError(container.getBundle().getString("alert.error"),
+                    container.getBundle().getString("history.error.date_range"));
+            return;
+        }
+
+        final LocalDate finalStart = start;
+        final LocalDate finalEnd = end;
+
+        // ASYNC LOADING: Prevents UI from freezing during DB queries
+        container.getAsyncManager().runAsyncTask(() -> {
+            try {
+                com.mycompany.ventacontrolfx.domain.model.HistoryStats stats = saleUseCase.getHistoryStats(finalStart,
+                        finalEnd);
+                List<Sale> sales = saleUseCase.getSalesByRange(finalStart, finalEnd, 500);
+
+                return new Object[] { stats, sales };
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
             }
-            paginationHelper.setData(sales);
-            updateSummaries(sales);
+        }, result -> {
+            Object[] data = (Object[]) result;
+            updateSummaries((com.mycompany.ventacontrolfx.domain.model.HistoryStats) data[0]);
+            paginationHelper.setData((List<Sale>) data[1]);
             handleCloseDetails();
-        } catch (SQLException e) {
-            e.printStackTrace();
+        }, e -> {
             AlertUtil.showError(container.getBundle().getString("alert.error"),
                     container.getBundle().getString("history.error.load") + ": " + e.getMessage());
-        }
+        });
     }
 
     @Override
@@ -211,7 +228,11 @@ public class HistoryController implements Injectable, Searchable {
             Sale s = saleUseCase.getSaleDetails(id);
             if (s != null) {
                 paginationHelper.setData(java.util.Collections.singletonList(s));
-                updateSummaries(java.util.Collections.singletonList(s));
+                // Update stats to show ONLY this sale info in the KPIs temporarily?
+                // Or just keep the general stats. For UX, showing the current sale stats is
+                // okay.
+                updateSummaries(new com.mycompany.ventacontrolfx.domain.model.HistoryStats(1, s.getTotal(),
+                        s.getCashAmount(), s.getCardAmount()));
                 salesTable.getSelectionModel().select(s);
             } else {
                 AlertUtil.showInfo(container.getBundle().getString("alert.not_found"),
@@ -235,54 +256,46 @@ public class HistoryController implements Injectable, Searchable {
         loadSalesDirect();
     }
 
-    private void updateSummaries(List<Sale> sales) {
-        int count = sales.size();
-        double total = 0, cash = 0, card = 0;
-        for (Sale s : sales) {
-            double netRatio = (s.getTotal() - s.getReturnedAmount()) / (s.getTotal() == 0 ? 1 : s.getTotal());
-            total += (s.getTotal() - s.getReturnedAmount());
-
-            double saleCash = s.getCashAmount();
-            double saleCard = s.getCardAmount();
-
-            // Fallback para registros antiguos sin desglosar
-            if (saleCash == 0 && saleCard == 0) {
-                if ("Tarjeta".equalsIgnoreCase(s.getPaymentMethod()))
-                    saleCard = s.getTotal();
-                else
-                    saleCash = s.getTotal();
-            }
-
-            cash += saleCash * netRatio;
-            card += saleCard * netRatio;
-        }
-
-        // Emojis y colores integrados en el valor
-        lblTotalSalesCount.setText("\ud83d\udcca " + count);
-        lblTotalAmount.setText("\ud83d\udcb0 " + String.format("%.2f \u20ac", total));
-        lblTotalCash.setText("\ud83d\udcb5 " + String.format("%.2f \u20ac", cash));
-        lblTotalCard.setText("\ud83d\udcb3 " + String.format("%.2f \u20ac", card));
+    private void updateSummaries(com.mycompany.ventacontrolfx.domain.model.HistoryStats stats) {
+        lblTotalSalesCount.setText("\ud83d\udcca " + stats.getCount());
+        lblTotalAmount.setText("\ud83d\udcb0 " + String.format("%.2f \u20ac", stats.getTotalRevenue()));
+        lblTotalCash.setText("\ud83d\udcb5 " + String.format("%.2f \u20ac", stats.getTotalCash()));
+        lblTotalCard.setText("\ud83d\udcb3 " + String.format("%.2f \u20ac", stats.getTotalCard()));
 
         if (lblCount != null)
-            lblCount.setText("\ud83d\udd0d " + count + " " + container.getBundle().getString("history.count_suffix"));
+            lblCount.setText(
+                    "\ud83d\udd0d " + stats.getCount() + " " + container.getBundle().getString("history.count_suffix"));
     }
 
     private void showDetails(Sale sale) {
-        // Cargar detalles si no est\u00e1n presentes
-        if (sale.getDetails() == null || sale.getDetails().isEmpty()) {
-            try {
-                List<SaleDetail> details = saleUseCase.getSaleDetails(sale.getSaleId()).getDetails();
-                sale.setDetails(details);
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-
         detailsPanel.setVisible(true);
         detailsPanel.setManaged(true);
         lblSaleId.setText(container.getBundle().getString("history.detail.ticket") + " #"
                 + String.format("%04d", sale.getSaleId()));
 
+        // ASYNC LOADING of details: Prevents lag when scrolling selection
+        container.getAsyncManager().runAsyncTask(() -> {
+            try {
+                // Return original sale if details are already there, otherwise fetch.
+                if (sale.getDetails() == null || sale.getDetails().isEmpty()) {
+                    Sale detailed = saleUseCase.getSaleDetails(sale.getSaleId());
+                    return detailed;
+                }
+                return sale;
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }, result -> {
+            Sale detailedSale = (Sale) result;
+            if (detailedSale != null && detailedSale.getDetails() != null) {
+                updateDetailsUI(detailedSale);
+            }
+        }, e -> {
+            e.printStackTrace();
+        });
+    }
+
+    private void updateDetailsUI(Sale sale) {
         boolean hasAnyReturned = sale.getDetails().stream().anyMatch(d -> d.getReturnedQuantity() > 0);
 
         if (sale.isReturn()) {
@@ -300,7 +313,6 @@ public class HistoryController implements Injectable, Searchable {
         }
 
         btnReturn.setDisable(sale.isReturn());
-        // La opacidad y el color ahora se gestionan v\u00eda CSS (.btn-warning:disabled)
 
         lblSaleFullDate.setText(sale.getSaleDateTime().format(fullFormatter) + "\n"
                 + container.getBundle().getString("receipt.attended_by") + ": " + sale.getUserName());
@@ -311,37 +323,41 @@ public class HistoryController implements Injectable, Searchable {
                 methodEmoji + (sale.getPaymentMethod().contains("Mixed") || sale.getPaymentMethod().contains("Mixto")
                         ? container.getBundle().getString("payment.method.mixed")
                         : sale.getPaymentMethod()));
+
         lblTotalAmountDetail.setText(String.format("%.2f \u20ac", sale.getTotal()));
-        // El color se gestiona mediante clases de utilidad
         lblTotalAmountDetail.getStyleClass().removeAll("text-total", "text-error");
         lblTotalAmountDetail.getStyleClass().add(sale.isReturn() ? "text-error" : "text-total");
 
         detailsItemsContainer.getChildren().clear();
         for (SaleDetail detail : sale.getDetails()) {
-            HBox row = new HBox(10);
-            row.setAlignment(Pos.CENTER_LEFT);
-            row.setStyle("-fx-padding: 8 0; -fx-border-color: #f8f9fa; -fx-border-width: 0 0 1 0;");
-
-            VBox nameBox = new VBox(2);
-            Label nameLabel = new Label(detail.getProductName());
-            nameLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 13px; -fx-text-fill: "
-                    + (detail.getReturnedQuantity() >= detail.getQuantity() ? "#e74c3c"
-                            : (detail.getReturnedQuantity() > 0 ? "#f39c12" : "#2c3e50"))
-                    + ";");
-
-            Label qtyLabel = new Label(
-                    "\ud83d\udce6 " + detail.getQuantity() + " un. x " + String.format("%.2f", detail.getUnitPrice()) + " \u20ac");
-            qtyLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: #95a5a6;");
-            nameBox.getChildren().addAll(nameLabel, qtyLabel);
-
-            Region spacer = new Region();
-            HBox.setHgrow(spacer, Priority.ALWAYS);
-            Label priceLabel = new Label("\ud83d\udcb0 " + String.format("%.2f \u20ac", detail.getLineTotal()));
-            priceLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #2c3e50;");
-
-            row.getChildren().addAll(nameBox, spacer, priceLabel);
-            detailsItemsContainer.getChildren().add(row);
+            detailsItemsContainer.getChildren().add(createDetailRow(detail));
         }
+    }
+
+    private HBox createDetailRow(SaleDetail detail) {
+        HBox row = new HBox(10);
+        row.setAlignment(Pos.CENTER_LEFT);
+        row.setStyle("-fx-padding: 8 0; -fx-border-color: #f8f9fa; -fx-border-width: 0 0 1 0;");
+
+        VBox nameBox = new VBox(2);
+        Label nameLabel = new Label(detail.getProductName());
+        String color = detail.getReturnedQuantity() >= detail.getQuantity() ? "#e74c3c"
+                : (detail.getReturnedQuantity() > 0 ? "#f39c12" : "#2c3e50");
+        nameLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 13px; -fx-text-fill: " + color + ";");
+
+        Label qtyLabel = new Label("\ud83d\udce6 " + detail.getQuantity() + " un. x "
+                + String.format("%.2f", detail.getUnitPrice()) + " \u20ac");
+        qtyLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: #95a5a6;");
+        nameBox.getChildren().addAll(nameLabel, qtyLabel);
+
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+
+        Label priceLabel = new Label("\ud83d\udcb0 " + String.format("%.2f \u20ac", detail.getLineTotal()));
+        priceLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #2c3e50;");
+
+        row.getChildren().addAll(nameBox, spacer, priceLabel);
+        return row;
     }
 
     @FXML
@@ -428,7 +444,8 @@ public class HistoryController implements Injectable, Searchable {
         if (selected == null)
             return;
 
-        // Garantizar que los detalles est\u00e9n cargados antes de abrir el di\u00e1logo
+        // Garantizar que los detalles est\u00e9n cargados antes de abrir el
+        // di\u00e1logo
         if (selected.getDetails() == null || selected.getDetails().isEmpty()) {
             try {
                 Sale fullSale = saleUseCase.getSaleDetails(selected.getSaleId());
@@ -448,7 +465,8 @@ public class HistoryController implements Injectable, Searchable {
             return;
         }
 
-        // Calcular el m\u00e1ximo devolvible (productos a\u00fan no devueltos) usando el precio
+        // Calcular el m\u00e1ximo devolvible (productos a\u00fan no devueltos) usando
+        // el precio
         // real pagado
         double maxRefundable = selected.getDetails().stream()
                 .mapToDouble(d -> (d.getQuantity() - d.getReturnedQuantity()) * (d.getLineTotal() / d.getQuantity()))
@@ -460,7 +478,8 @@ public class HistoryController implements Injectable, Searchable {
                         .getClosureUseCase();
                 double cashInDrawer = closureUseCase.getCurrentCashInDrawer();
 
-                // Calcular cu\u00e1nto del reembolso total es OBLIGATORIAMENTE en efectivo (basado
+                // Calcular cu\u00e1nto del reembolso total es OBLIGATORIAMENTE en efectivo
+                // (basado
                 // en el pago original)
                 double currentGrossTotal = selected.getTotal() + selected.getDiscountAmount();
                 double cashRatio = (currentGrossTotal > 0) ? selected.getCashAmount() / currentGrossTotal : 1.0;
@@ -471,7 +490,8 @@ public class HistoryController implements Injectable, Searchable {
                             ? "\n\n\ud83d\udca1 *Recuerda*: Este ticket es de una sesi\u00f3n antigua."
                             : "";
 
-                    boolean continuar = AlertUtil.showConfirmation("\u00e2\u0161\u00a0\u00ef\u00b8\u008f Efectivo limitado",
+                    boolean continuar = AlertUtil.showConfirmation(
+                            "\u00e2\u0161\u00a0\u00ef\u00b8\u008f Efectivo limitado",
                             "Efectivo insuficiente para la parte de met\u00e1lico",
                             String.format(
                                     "El efectivo en caja (%.2f \u20ac) es menor que la parte pagada en efectivo del ticket (%.2f \u20ac).\n\n"
