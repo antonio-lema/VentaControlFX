@@ -186,7 +186,8 @@ public class WorkSessionController implements Injectable {
 
         long activeSeconds = 0;
         if (activeSession != null && activeSession.getType() == type) {
-            activeSeconds = ChronoUnit.SECONDS.between(activeSession.getStartTime(), LocalDateTime.now());
+            activeSeconds = java.time.temporal.ChronoUnit.SECONDS.between(activeSession.getStartTime(),
+                    LocalDateTime.now());
         }
 
         return completedSeconds + activeSeconds;

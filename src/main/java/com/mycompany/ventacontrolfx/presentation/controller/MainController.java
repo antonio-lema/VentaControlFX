@@ -29,7 +29,8 @@ import javafx.scene.Scene;
 import javafx.application.Platform;
 import javafx.stage.Stage;
 
-public class MainController implements Injectable, com.mycompany.ventacontrolfx.shared.bus.GlobalEventBus.LocaleChangeListener {
+public class MainController
+        implements Injectable, com.mycompany.ventacontrolfx.shared.bus.GlobalEventBus.LocaleChangeListener {
 
     @FXML
     private StackPane headerContainer, sidebarContainer, cartContainer;
@@ -239,15 +240,19 @@ public class MainController implements Injectable, com.mycompany.ventacontrolfx.
             return;
         }
 
-        // Check if user is currently clocked in for a SHIFT
-        boolean isClockedIn = container.getWorkSessionUseCase().getAllActiveSessions().stream()
-                .anyMatch(s -> s.getUserId() == user.getUserId()
-                        && s.getType() == com.mycompany.ventacontrolfx.domain.model.WorkSession.SessionType.SHIFT);
-
-        if (isClockedIn) {
-            unlockCart();
-            return;
-        }
+        /*
+         * Desacoplar bloqueo de carrito del estado de turno según requerimiento
+         * boolean isClockedIn =
+         * container.getWorkSessionUseCase().getAllActiveSessions().stream()
+         * .anyMatch(s -> s.getUserId() == user.getUserId()
+         * && s.getType() ==
+         * com.mycompany.ventacontrolfx.domain.model.WorkSession.SessionType.SHIFT);
+         * 
+         * if (isClockedIn) {
+         * unlockCart();
+         * return;
+         * }
+         */
 
         int todayIdx = LocalDate.now().getDayOfWeek().getValue();
         BusinessDay today = cfg.getSchedule().stream()
@@ -360,7 +365,8 @@ public class MainController implements Injectable, com.mycompany.ventacontrolfx.
             target.getChildren().setAll(node);
         } catch (Exception e) {
             e.printStackTrace();
-            com.mycompany.ventacontrolfx.util.AlertUtil.showError("Error loading component", "FXML: " + fxml + "\nError: " + e.getMessage());
+            com.mycompany.ventacontrolfx.util.AlertUtil.showError("Error loading component",
+                    "FXML: " + fxml + "\nError: " + e.getMessage());
         }
     }
 
@@ -377,7 +383,8 @@ public class MainController implements Injectable, com.mycompany.ventacontrolfx.
             return (T) controller;
         } catch (Exception e) {
             e.printStackTrace();
-            com.mycompany.ventacontrolfx.util.AlertUtil.showError("Error loading component", "FXML: " + fxml + "\nError: " + e.getMessage());
+            com.mycompany.ventacontrolfx.util.AlertUtil.showError("Error loading component",
+                    "FXML: " + fxml + "\nError: " + e.getMessage());
             return null;
         }
     }

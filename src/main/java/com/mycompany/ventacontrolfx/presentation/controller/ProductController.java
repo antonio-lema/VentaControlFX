@@ -120,7 +120,7 @@ public class ProductController implements Injectable, com.mycompany.ventacontrol
                 setText(empty ? null : translateDynamic(item));
             }
         });
-        
+
         colName.setCellValueFactory(new PropertyValueFactory<>("name"));
         colName.setCellFactory(col -> new TableCell<Product, String>() {
             @Override
@@ -215,7 +215,8 @@ public class ProductController implements Injectable, com.mycompany.ventacontrol
                     asyncManager.runAsyncTask(() -> {
                         return resolveFile(imagePath);
                     }, (File file) -> {
-                        // Confirmar que la celda a\u00fan muestra el mismo path (protecci\u00f3n de reciclaje de
+                        // Confirmar que la celda a\u00fan muestra el mismo path (protecci\u00f3n de
+                        // reciclaje de
                         // celdas TableView)
                         if (imagePath.equals(getItem())) {
                             if (file != null) {
@@ -461,7 +462,7 @@ public class ProductController implements Injectable, com.mycompany.ventacontrol
                     container.getBundle().getString("error.no_permission"));
             return;
         }
-        if (AlertUtil.showConfirmation(container.getBundle().getString("alert.delete"),
+        if (AlertUtil.showConfirmation(container.getBundle().getString("btn.delete"),
                 container.getBundle().getString("product.confirm.delete") + " " + p.getName() + "?", "")) {
             try {
                 productUseCase.deleteProduct(p.getId());
@@ -474,7 +475,8 @@ public class ProductController implements Injectable, com.mycompany.ventacontrol
     }
 
     private String translateDynamic(String text) {
-        if (text == null || text.isBlank()) return text;
+        if (text == null || text.isBlank())
+            return text;
         if (container != null && container.getBundle() != null && container.getBundle().containsKey(text)) {
             return container.getBundle().getString(text);
         }

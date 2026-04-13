@@ -12,9 +12,12 @@ public class SkeletonProductBox extends StackPane {
 
     public SkeletonProductBox() {
         this.getStyleClass().add("skeleton-box");
-        this.setPrefWidth(180);
-        this.setMaxWidth(180);
-        this.setPrefHeight(280);
+        this.setPrefWidth(190);
+        this.setMaxWidth(190);
+        this.setMinWidth(190);
+        this.setPrefHeight(240);
+        this.setMaxHeight(240);
+        this.setMinHeight(240);
 
         VBox content = new VBox();
         content.setSpacing(0);
@@ -22,7 +25,9 @@ public class SkeletonProductBox extends StackPane {
 
         // 1. Image Placeholder Section
         StackPane imageContainer = new StackPane();
-        imageContainer.setPrefHeight(140);
+        imageContainer.setPrefHeight(130);
+        imageContainer.setMinHeight(130);
+        imageContainer.setMaxHeight(130);
         imageContainer.getStyleClass().add("skeleton-image-container");
 
         Region imageFiller = new Region();
@@ -37,8 +42,8 @@ public class SkeletonProductBox extends StackPane {
         imageContainer.getChildren().addAll(imageFiller, priceBadge);
 
         // 2. Info Section
-        VBox infoSkeleton = new VBox(12);
-        infoSkeleton.setPadding(new Insets(15));
+        VBox infoSkeleton = new VBox(8);
+        infoSkeleton.setPadding(new Insets(12));
 
         Region titleSkeleton = new Region();
         titleSkeleton.getStyleClass().addAll("skeleton-text", "skeleton-title");
@@ -55,21 +60,23 @@ public class SkeletonProductBox extends StackPane {
         // 3. Button Placeholder
         Region buttonSkeleton = new Region();
         buttonSkeleton.getStyleClass().add("skeleton-button");
-        buttonSkeleton.setMinHeight(38);
+        buttonSkeleton.setMinHeight(32);
+        buttonSkeleton.setMaxHeight(32);
 
         content.getChildren().addAll(imageContainer, infoSkeleton, buttonSkeleton);
 
         // --- EFECTO DE BRILLO (SHIMMER) ---
         // Optimización: Rectángulo más pequeño y cache para evitar lag
-        Rectangle shimmerLine = new Rectangle(50, 400);
+        Rectangle shimmerLine = new Rectangle(60, 300);
         shimmerLine.setFill(
                 new javafx.scene.paint.LinearGradient(0, 0, 1, 0, true, javafx.scene.paint.CycleMethod.NO_CYCLE,
                         new javafx.scene.paint.Stop(0, javafx.scene.paint.Color.TRANSPARENT),
-                        new javafx.scene.paint.Stop(0.5, javafx.scene.paint.Color.web("#ffffff", 0.7)),
+                        new javafx.scene.paint.Stop(0.5, javafx.scene.paint.Color.web("#ffffff", 0.5)),
                         new javafx.scene.paint.Stop(1, javafx.scene.paint.Color.TRANSPARENT)));
         shimmerLine.setRotate(15);
         shimmerLine.setMouseTransparent(true);
         shimmerLine.setCache(true);
+        shimmerLine.setManaged(false); // IMPORTANTE: Que no afecte al layout del StackPane
         shimmerLine.setCacheHint(javafx.scene.CacheHint.SPEED);
 
         this.getChildren().addAll(content, shimmerLine);

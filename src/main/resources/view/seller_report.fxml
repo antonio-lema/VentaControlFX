@@ -133,31 +133,48 @@
                 </VBox>
             </FlowPane>
 
-            <!-- ROW 2: Charts & Leaderboard -->
-            <HBox spacing="24">
-                <!-- GR&#x00c1F;ICAS (Evoluci&#x00f3;n y barras) -->
+            <!-- ROW 2: Performance Charts -->
+            <HBox spacing="24" prefHeight="400">
+                <!-- Evolution Chart -->
+                <VBox styleClass="widget-panel" HBox.hgrow="ALWAYS" spacing="16">
+                    <Label text="Evoluci\u00f3n Acumulada del Periodo" styleClass="widget-title"/>
+                    <LineChart fx:id="trendLineChart" legendVisible="false" VBox.vgrow="ALWAYS" animated="true" createSymbols="false">
+                        <xAxis><CategoryAxis label="Fecha"/></xAxis>
+                        <yAxis><NumberAxis label="Importe (\u20ac)"/></yAxis>
+                    </LineChart>
+                </VBox>
+
+                <!-- Hourly Activity BarChart -->
+                <VBox styleClass="widget-panel" prefWidth="450" spacing="16">
+                    <Label text="Ventas por Hora (Actividad)" styleClass="widget-title"/>
+                    <BarChart fx:id="hourlyBarChart" legendVisible="false" VBox.vgrow="ALWAYS">
+                        <xAxis><CategoryAxis label="Hora del d\u00eda"/></xAxis>
+                        <yAxis><NumberAxis label="Transacciones"/></yAxis>
+                    </BarChart>
+                </VBox>
+            </HBox>
+
+            <!-- ROW 3: Categories & Seller Board -->
+            <HBox spacing="24" prefHeight="400">
+                <!-- Category Distribution -->
+                <VBox styleClass="widget-panel" prefWidth="400" spacing="16">
+                    <Label text="Desglose por Categor\u00edas" styleClass="widget-title"/>
+                    <PieChart fx:id="pieCategories" legendVisible="true" VBox.vgrow="ALWAYS"/>
+                </VBox>
+
+                <!-- Seller Ranking -->
                 <VBox styleClass="widget-panel" HBox.hgrow="ALWAYS" spacing="16">
                     <HBox alignment="CENTER_LEFT">
-                        <Label text="Rendimiento Comercial" styleClass="widget-title"/>
-                        <Region HBox.hgrow="ALWAYS"/>
-                        <SegmentedButton visible="false" managed="false"/> <!-- Placeholder para tabs si se deseara -->
+                        <Label text="Ranking de Vendedores (Share %)" styleClass="widget-title"/>
+                        <Region HBox.hgrow="ALWAYS" />
+                        <Button text="Exportar CSV" onAction="#handleExportCSV" styleClass="btn-secondary">
+                             <graphic><FontAwesomeIconView glyphName="DOWNLOAD" fill="#64748b"/></graphic>
+                        </Button>
                     </HBox>
-                    <HBox spacing="10" VBox.vgrow="ALWAYS">
-                        <VBox HBox.hgrow="ALWAYS">
-                             <Label text="Ventas Totales por Agente" styleClass="chart-label"/>
-                             <BarChart fx:id="salesBarChart" legendVisible="false" VBox.vgrow="ALWAYS" animated="true">
-                                <xAxis><CategoryAxis label="Vendedor"/></xAxis>
-                                <yAxis><NumberAxis label="Ventas (&#x20ac;)"/></yAxis>
-                            </BarChart>
-                        </VBox>
-                        <VBox HBox.hgrow="ALWAYS">
-                            <Label text="Evoluci&#x00f3;n Acumulada del Periodo" styleClass="chart-label"/>
-                            <LineChart fx:id="trendLineChart" legendVisible="true" VBox.vgrow="ALWAYS" animated="true" createSymbols="false">
-                                <xAxis><CategoryAxis label="Fecha"/></xAxis>
-                                <yAxis><NumberAxis/></yAxis>
-                            </LineChart>
-                        </VBox>
-                    </HBox>
+                    <BarChart fx:id="salesBarChart" legendVisible="false" VBox.vgrow="ALWAYS">
+                        <xAxis><CategoryAxis label="Vendedor"/></xAxis>
+                        <yAxis><NumberAxis label="Ventas Netas (\u20ac)"/></yAxis>
+                    </BarChart>
                 </VBox>
             </HBox>
 

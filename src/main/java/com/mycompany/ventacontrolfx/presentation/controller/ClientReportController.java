@@ -212,20 +212,27 @@ public class ClientReportController implements Injectable {
 
     private void loadDataRange(String rangeFilter) {
         LocalDate end = LocalDate.now();
-        LocalDate start = end;
+        LocalDate start = null;
 
-        if (rangeFilter.equals(container.getBundle().getString("report.client.range.today"))) {
-            start = end;
-        } else if (rangeFilter.equals(container.getBundle().getString("report.client.range.7d"))) {
-            start = end.minusDays(7);
-        } else if (rangeFilter.equals(container.getBundle().getString("report.client.range.30d"))) {
-            start = end.minusDays(30);
-        } else if (rangeFilter.equals(container.getBundle().getString("report.client.range.month"))) {
-            start = end.withDayOfMonth(1);
-        } else if (rangeFilter.equals(container.getBundle().getString("report.client.range.year"))) {
-            start = end.withDayOfYear(1);
-        } else if (rangeFilter.equals(container.getBundle().getString("report.client.range.all"))) {
-            start = end.minusYears(20);
+        if (rangeFilter != null) {
+            String trimmed = rangeFilter.trim();
+            if (trimmed.equals(container.getBundle().getString("report.client.range.today"))) {
+                start = end;
+            } else if (trimmed.equals(container.getBundle().getString("report.client.range.7d"))) {
+                start = end.minusDays(7);
+            } else if (trimmed.equals(container.getBundle().getString("report.client.range.30d"))) {
+                start = end.minusDays(30);
+            } else if (trimmed.equals(container.getBundle().getString("report.client.range.month"))) {
+                start = end.withDayOfMonth(1);
+            } else if (trimmed.equals(container.getBundle().getString("report.client.range.year"))) {
+                start = end.withDayOfYear(1);
+            } else if (trimmed.equals(container.getBundle().getString("report.client.range.all"))) {
+                start = end.minusYears(20);
+            }
+        }
+
+        if (start == null) {
+            start = end.minusYears(20); // Fallback to avoid empty results on string mismatch
         }
 
         final LocalDate finalStart = start;
@@ -244,7 +251,9 @@ public class ClientReportController implements Injectable {
             }
         }, result -> {
             Object[] data = (Object[]) result;
+            @SuppressWarnings("unchecked")
             List<com.mycompany.ventacontrolfx.domain.model.ClientSaleSummary> summaries = (List<com.mycompany.ventacontrolfx.domain.model.ClientSaleSummary>) data[0];
+            @SuppressWarnings("unchecked")
             Map<Integer, Client> clientMap = (Map<Integer, Client>) data[1];
 
             allRows.clear();
@@ -591,6 +600,42 @@ public class ClientReportController implements Injectable {
             this.tier = tier;
             this.color = color;
             this.lastPurchase = lastPurchase;
+        }
+
+        public int getClientId() {
+            return clientId;
+        }
+
+        public String getClientName() {
+            return clientName;
+        }
+
+        public String getInfo() {
+            return info;
+        }
+
+        public double getTotal() {
+            return total;
+        }
+
+        public int getCount() {
+            return count;
+        }
+
+        public boolean isIsActive() {
+            return isActive;
+        }
+
+        public String getTier() {
+            return tier;
+        }
+
+        public String getColor() {
+            return color;
+        }
+
+        public java.time.LocalDateTime getLastPurchase() {
+            return lastPurchase;
         }
     }
 }

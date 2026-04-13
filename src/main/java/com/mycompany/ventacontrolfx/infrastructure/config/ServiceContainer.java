@@ -148,8 +148,8 @@ public class ServiceContainer {
         this.returnUseCase = new ReturnUseCase(saleRepository, productRepository, seriesRepository, configRepository,
                 refundCalculator, null); // Closure se inyecta luego
         this.saleUseCase = new com.mycompany.ventacontrolfx.application.usecase.SaleUseCase(saleRepository,
-                configRepository, authService, taxEngineService, clientRepository, promotionService, promotionEngine,
-                productRepository, seriesRepository, fiscalRepository, eventBus);
+                configRepository, authService, taxEngineService, clientRepository, promotionEngine,
+                productRepository, seriesRepository, eventBus);
         this.userUseCase = new com.mycompany.ventacontrolfx.application.usecase.UserUseCase(userRepository, emailSender,
                 authService);
         this.closureUseCase = new CashClosureUseCase(closureRepository, authService);

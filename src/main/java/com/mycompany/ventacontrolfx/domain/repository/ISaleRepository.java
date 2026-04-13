@@ -71,4 +71,9 @@ public interface ISaleRepository {
                         LocalDate end) throws SQLException;
 
         List<Sale> getByClient(int clientId) throws SQLException;
+
+        // Analytics
+        java.util.Map<String, Double> getCategoryDistribution(LocalDate start, LocalDate end) throws SQLException;
+
+        java.util.Map<Integer, Integer> getHourlyDistribution(LocalDate start, LocalDate end) throws SQLException;
 }

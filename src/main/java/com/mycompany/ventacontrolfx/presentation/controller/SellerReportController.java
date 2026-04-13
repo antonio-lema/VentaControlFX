@@ -11,16 +11,12 @@ import com.mycompany.ventacontrolfx.infrastructure.config.ServiceContainer;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.scene.chart.BarChart;
-import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.LineChart;
-import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.PieChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.HBox;
 import com.mycompany.ventacontrolfx.util.DateFilterUtils;
 
@@ -46,9 +42,9 @@ public class SellerReportController implements Injectable {
     private Label lblTrendTotal, lblTrendCount, lblTrendAvg, lblTrendMargin, lblBestPerformance;
 
     @FXML
-    private PieChart pieChartDistribution;
+    private PieChart pieChartDistribution, pieCategories;
     @FXML
-    private BarChart<String, Number> salesBarChart;
+    private BarChart<String, Number> salesBarChart, hourlyBarChart;
     @FXML
     private LineChart<String, Number> trendLineChart;
 
@@ -133,7 +129,8 @@ public class SellerReportController implements Injectable {
         colDate.setCellValueFactory(c -> new SimpleStringProperty(
                 c.getValue().getSaleDateTime() != null ? c.getValue().getSaleDateTime().format(FMT) : "\u2014"));
         colRecordType
-                .setCellValueFactory(c -> new SimpleStringProperty(c.getValue().isReturn() ? "Devoluci\u00f3n" : "Venta"));
+                .setCellValueFactory(
+                        c -> new SimpleStringProperty(c.getValue().isReturn() ? "Devoluci\u00f3n" : "Venta"));
         colMethod.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getPaymentMethod()));
         colClient.setCellValueFactory(c -> {
             Integer cid = c.getValue().getClientId();
@@ -146,7 +143,8 @@ public class SellerReportController implements Injectable {
                 return new SimpleStringProperty("Cliente #" + cid);
             }
         });
-        colAmount.setCellValueFactory(c -> new SimpleStringProperty(String.format("%.2f \u20ac", c.getValue().getTotal())));
+        colAmount.setCellValueFactory(
+                c -> new SimpleStringProperty(String.format("%.2f \u20ac", c.getValue().getTotal())));
     }
 
     @FXML
@@ -154,42 +152,75 @@ public class SellerReportController implements Injectable {
         loadData();
     }
 
+    @FXML
+    private void handleExportCSV() {
+        try {
+            java.io.File file = new java.io.File("reporte_ventas_" + LocalDate.now() + ".csv");
+            try (java.io.PrintWriter pw = new java.io.PrintWriter(file)) {
+                pw.println("Agente;Ventas Netas;Devoluciones;Tik. Medio;Participacion %");
+                for (SellerAnalytics sa : sellerTable.getItems()) {
+                    pw.println(String.format("%s;%.2f;%.2f;%.2f;%.1f%%",
+                            sa.getSellerName(), sa.getTotalSales(), sa.getReturnsTotal(),
+                            sa.getAverageTicket(), sa.getParticipationPercentage() * 100));
+                }
+            }
+            showInfo("Exportaci\u00f3n completada",
+                    "El archivo CSV ha sido generado en la carpeta del programa: " + file.getName());
+        } catch (Exception e) {
+            showError("Error al exportar", e.getMessage());
+        }
+    }
+
     private void loadData() {
         LocalDate from = dpFrom.getValue();
         LocalDate to = dpTo.getValue();
         String methodFilter = cbPaymentMethod.getValue();
 
-        try {
-            LocalDate searchFrom = (from == null) ? LocalDate.of(2000, 1, 1) : from;
-            LocalDate searchTo = (to == null) ? LocalDate.of(2100, 1, 1) : to;
+        container.getAsyncManager().runAsyncTask(() -> {
+            try {
+                LocalDate searchFrom = (from == null) ? LocalDate.of(2000, 1, 1) : from;
+                LocalDate searchTo = (to == null) ? LocalDate.of(2100, 1, 1) : to;
 
-            // 1. Cargar Ventas del periodo actual
-            List<Sale> currentSales = saleUseCase.getSalesByRange(searchFrom, searchTo).stream()
-                    .filter(s -> methodFilter.equals("Todos") || s.getPaymentMethod().equalsIgnoreCase(methodFilter))
-                    .collect(Collectors.toList());
+                List<Sale> currentSales = saleUseCase.getSalesByRange(searchFrom, searchTo).stream()
+                        .filter(s -> methodFilter.equals("Todos")
+                                || s.getPaymentMethod().equalsIgnoreCase(methodFilter))
+                        .collect(Collectors.toList());
 
-            // 1b. Cargar Devoluciones del periodo actual
-            List<Return> currentReturnsList = saleUseCase.getReturnsHistory(searchFrom, searchTo).stream()
-                    .filter(r -> methodFilter.equals("Todos") || r.getPaymentMethod().equalsIgnoreCase(methodFilter))
-                    .collect(Collectors.toList());
+                List<Return> currentReturnsList = saleUseCase.getReturnsHistory(searchFrom, searchTo).stream()
+                        .filter(r -> methodFilter.equals("Todos")
+                                || r.getPaymentMethod().equalsIgnoreCase(methodFilter))
+                        .collect(Collectors.toList());
 
-            // 2. Trend (Periodo anterior) - Solo si hay fechas seleccionadas
-            List<Sale> prevSales = new ArrayList<>();
-            List<Return> prevReturns = new ArrayList<>();
-            if (from != null && to != null) {
-                long days = java.time.temporal.ChronoUnit.DAYS.between(from, to) + 1;
-                LocalDate prevFrom = from.minusDays(days);
-                LocalDate prevTo = from.minusDays(1);
-                prevSales = saleUseCase.getSalesByRange(prevFrom, prevTo);
-                prevReturns = saleUseCase.getReturnsHistory(prevFrom, prevTo);
+                List<Sale> prevSales = new ArrayList<>();
+                List<Return> prevReturns = new ArrayList<>();
+                if (from != null && to != null) {
+                    long days = java.time.temporal.ChronoUnit.DAYS.between(from, to) + 1;
+                    LocalDate prevFrom = from.minusDays(days);
+                    LocalDate prevTo = from.minusDays(1);
+                    prevSales = saleUseCase.getSalesByRange(prevFrom, prevTo);
+                    prevReturns = saleUseCase.getReturnsHistory(prevFrom, prevTo);
+                }
+
+                Map<String, Double> catDist = saleUseCase.getCategoryDistribution(searchFrom, searchTo);
+                Map<Integer, Integer> hourDist = saleUseCase.getHourlyDistribution(searchFrom, searchTo);
+
+                Object[] result = { currentSales, currentReturnsList, prevSales, prevReturns, catDist, hourDist };
+                return result;
+            } catch (Exception e) {
+                throw new RuntimeException(e);
             }
-
-            processAnalytics(currentSales, currentReturnsList, prevSales, prevReturns);
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-            showError("Error de BD", "No se pudieron cargar los datos: " + e.getMessage());
-        }
+        }, (res) -> {
+            Object[] data = (Object[]) res;
+            try {
+                processAnalytics((List<Sale>) data[0], (List<Return>) data[1], (List<Sale>) data[2],
+                        (List<Return>) data[3]);
+                updateExtraCharts((Map<String, Double>) data[4], (Map<Integer, Integer>) data[5]);
+            } catch (SQLException e) {
+                showError("Error", e.getMessage());
+            }
+        }, e -> {
+            javafx.application.Platform.runLater(() -> showError("Error de Carga", e.getMessage()));
+        });
     }
 
     private void processAnalytics(List<Sale> currentSales, List<Return> currentReturnsList, List<Sale> prevSales,
@@ -212,7 +243,8 @@ public class SellerReportController implements Injectable {
         lblKpiMargin.setText(String.format("%.2f \u20ac", marginCurrent));
         lblKpiCount.setText(String.valueOf(currentSales.size()));
         lblKpiAvg.setText(
-                currentSales.isEmpty() ? "0.00 \u20ac" : String.format("%.2f \u20ac", totalCurrentNet / currentSales.size()));
+                currentSales.isEmpty() ? "0.00 \u20ac"
+                        : String.format("%.2f \u20ac", totalCurrentNet / currentSales.size()));
 
         // Devoluciones Label
         lblReturnsTotal.setText(String.format("-%.2f \u20ac", totalReturnsAmount));
@@ -349,6 +381,20 @@ public class SellerReportController implements Injectable {
         double totalPay = globalCash + globalCard;
         progressCash.setProgress(totalPay > 0 ? globalCash / totalPay : 0);
         progressCard.setProgress(totalPay > 0 ? globalCard / totalPay : 0);
+    }
+
+    private void updateExtraCharts(Map<String, Double> catDist, Map<Integer, Integer> hourDist) {
+        // Categorias Pie
+        ObservableList<PieChart.Data> catData = FXCollections.observableArrayList();
+        catDist.forEach((name, val) -> catData.add(new PieChart.Data(name, val)));
+        pieCategories.setData(catData);
+
+        // Horas Bar
+        XYChart.Series<String, Number> hourSeries = new XYChart.Series<>();
+        for (int h = 0; h < 24; h++) {
+            hourSeries.getData().add(new XYChart.Data<>(String.format("%02dh", h), hourDist.getOrDefault(h, 0)));
+        }
+        hourlyBarChart.getData().setAll(hourSeries);
     }
 
     private void updateTrendLabel(Label lbl, double current, double prev, boolean isCurrency) {

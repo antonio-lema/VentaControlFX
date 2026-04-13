@@ -104,6 +104,14 @@ public class PunctualityAuditController implements Injectable {
                     record.delay = "N/A";
                     record.status = "FALTA";
                     totalNoShows++;
+                    records.add(record);
+                } else if (shiftSession.getEndTime() == null) {
+                    // SI NO FINALIZA, NO SE TIENE EN CUENTA SEGÚN REQUERIMIENTO
+                    record.realStart = "En curso";
+                    record.delay = "N/A";
+                    record.status = "PENDIENTE";
+                    record.closingStatus = "Sin finalizar";
+                    records.add(record);
                 } else {
                     LocalTime realStart = shiftSession.getStartTime().toLocalTime();
                     record.realStart = realStart.format(timeFormatter);
@@ -118,21 +126,18 @@ public class PunctualityAuditController implements Injectable {
                         record.status = "OK";
                     }
 
-                    // Closing check
-                    if (shiftSession.getEndTime() != null) {
-                        LocalTime realEnd = shiftSession.getEndTime().toLocalTime();
-                        long endDiff = java.time.Duration.between(range.getClose(), realEnd).toMinutes();
-                        if (endDiff > 10)
-                            record.closingStatus = "Tarde (" + endDiff + "m)";
-                        else if (endDiff < -10)
-                            record.closingStatus = "Pronto (" + Math.abs(endDiff) + "m)";
-                        else
-                            record.closingStatus = "Correcto";
-                    } else {
-                        record.closingStatus = "Sesi\u00f3n activa";
-                    }
+                    // Closing check: ya sabemos que endTime != null aquí
+                    LocalTime realEnd = shiftSession.getEndTime().toLocalTime();
+                    long endDiff = java.time.Duration.between(range.getClose(), realEnd).toMinutes();
+                    if (endDiff > 10)
+                        record.closingStatus = "Tarde (" + endDiff + "m)";
+                    else if (endDiff < -10)
+                        record.closingStatus = "Pronto (" + Math.abs(endDiff) + "m)";
+                    else
+                        record.closingStatus = "Correcto";
+
+                    records.add(record);
                 }
-                records.add(record);
             }
         }
 
@@ -140,10 +145,19 @@ public class PunctualityAuditController implements Injectable {
         lblLateCount.setText(String.valueOf(totalLates));
         lblNoShowCount.setText(String.valueOf(totalNoShows));
 
-        if (records.isEmpty())
+        // Filtrar solo los registros que están finalizados o son faltas para el cálculo
+        // global
+        List<AuditRecord> countableRecords = records.stream()
+                .filter(r -> !r.status.equals("PENDIENTE"))
+                .collect(Collectors.toList());
+
+        if (countableRecords.isEmpty())
             lblGeneralPunctuality.setText("N/A");
         else {
-            double punctuality = ((double) (records.size() - totalLates - totalNoShows) / records.size()) * 100;
+            int countableLates = (int) countableRecords.stream().filter(r -> r.status.equals("RETRASO")).count();
+            int countableFaltas = (int) countableRecords.stream().filter(r -> r.status.equals("FALTA")).count();
+            double punctuality = ((double) (countableRecords.size() - countableLates - countableFaltas)
+                    / countableRecords.size()) * 100;
             lblGeneralPunctuality.setText(String.format("%.0f%%", punctuality));
         }
     }

@@ -194,12 +194,15 @@ public class HeaderController implements Injectable {
                     container.getBundle().getString("header.logout.confirm"),
                     container.getBundle().getString("header.logout.msg"))) {
 
-                // Finalizar turno autom\u00e1ticamente si hay uno activo
-                try {
-                    container.getWorkSessionUseCase().endSession(user.getUserId());
-                } catch (Exception e) {
-                    System.err.println("Error finalizando turno al cerrar sesi\u00f3n: " + e.getMessage());
-                }
+                /*
+                 * Finalizar turno automáticamente si hay uno activo
+                 * try {
+                 * container.getWorkSessionUseCase().endSession(user.getUserId());
+                 * } catch (Exception e) {
+                 * System.err.println("Error finalizando turno al cerrar sesión: " +
+                 * e.getMessage());
+                 * }
+                 */
 
                 performLogout();
             }

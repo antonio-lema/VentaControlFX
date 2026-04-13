@@ -248,9 +248,11 @@ public class ClientsController implements Injectable, com.mycompany.ventacontrol
                     container.getBundle().getString("error.no_permission"));
             return;
         }
-        if (AlertUtil.showConfirmation(container.getBundle().getString("alert.delete"),
-                container.getBundle().getString("client.confirm.delete") + " " + client.getName() + "?",
-                container.getBundle().getString("alert.confirm.undone"))) {
+
+        String title = container.getBundle().getString("alert.confirm");
+        String header = container.getBundle().getString("client.confirm.delete") + " " + client.getName() + "?";
+
+        if (AlertUtil.showConfirmation(title, header, "")) {
             try {
                 clientUseCase.deleteClient(client.getId());
                 loadClients();

@@ -379,12 +379,12 @@ public class JdbcSaleRepository implements ISaleRepository {
         List<Return> returns = new ArrayList<>();
         String sql = "SELECT r.*, u.username FROM returns r " +
                 "LEFT JOIN users u ON r.user_id = u.user_id " +
-                "WHERE DATE(r.return_datetime) BETWEEN ? AND ? " +
+                "WHERE r.return_datetime >= ? AND r.return_datetime <= ? " +
                 "ORDER BY r.return_datetime DESC";
         try (Connection conn = DBConnection.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setDate(1, Date.valueOf(start));
-            pstmt.setDate(2, Date.valueOf(end));
+            pstmt.setTimestamp(1, java.sql.Timestamp.valueOf(start.atStartOfDay()));
+            pstmt.setTimestamp(2, java.sql.Timestamp.valueOf(end.atTime(java.time.LocalTime.MAX)));
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
                     Return ret = new Return();
@@ -537,13 +537,18 @@ public class JdbcSaleRepository implements ISaleRepository {
         List<com.mycompany.ventacontrolfx.domain.model.ClientSaleSummary> list = new ArrayList<>();
         String sql = "SELECT client_id, COUNT(sale_id) as orders, SUM(total) as spent, MAX(sale_datetime) as last_date "
                 +
-                "FROM sales WHERE DATE(sale_datetime) BETWEEN ? AND ? AND is_return = FALSE AND client_id IS NOT NULL "
+                "FROM sales WHERE sale_datetime >= ? AND sale_datetime <= ? AND (is_return IS FALSE OR is_return IS NULL) AND client_id IS NOT NULL "
                 +
                 "GROUP BY client_id";
         try (Connection conn = DBConnection.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setDate(1, Date.valueOf(start));
-            pstmt.setDate(2, Date.valueOf(end));
+            pstmt.setTimestamp(1, java.sql.Timestamp.valueOf(start.atStartOfDay()));
+            pstmt.setTimestamp(2, java.sql.Timestamp.valueOf(end.atTime(java.time.LocalTime.MAX)));
+
+            // DIAGNOSTICO: Fila de prueba manual
+            list.add(new com.mycompany.ventacontrolfx.domain.model.ClientSaleSummary(1, 1, 100.0,
+                    java.time.LocalDateTime.now()));
+
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
                     Timestamp ts = rs.getTimestamp("last_date");
@@ -611,5 +616,45 @@ public class JdbcSaleRepository implements ISaleRepository {
         sale.setObservations(rs.getString("observations"));
 
         return sale;
+    }
+
+    @Override
+    public java.util.Map<String, Double> getCategoryDistribution(LocalDate start, LocalDate end) throws SQLException {
+        java.util.Map<String, Double> distribution = new java.util.HashMap<>();
+        String sql = "SELECT sd.category_name_snapshot, SUM(sd.line_total) as total " +
+                "FROM sale_details sd JOIN sales s ON sd.sale_id = s.sale_id " +
+                "WHERE s.sale_datetime >= ? AND s.sale_datetime <= ? " +
+                "GROUP BY sd.category_name_snapshot ORDER BY total DESC";
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setTimestamp(1, java.sql.Timestamp.valueOf(start.atStartOfDay()));
+            pstmt.setTimestamp(2, java.sql.Timestamp.valueOf(end.atTime(java.time.LocalTime.MAX)));
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    String cat = rs.getString("category_name_snapshot");
+                    distribution.put(cat != null ? cat : "Sin Categor\u00eda", rs.getDouble("total"));
+                }
+            }
+        }
+        return distribution;
+    }
+
+    @Override
+    public java.util.Map<Integer, Integer> getHourlyDistribution(LocalDate start, LocalDate end) throws SQLException {
+        java.util.Map<Integer, Integer> distribution = new java.util.HashMap<>();
+        String sql = "SELECT HOUR(sale_datetime) as hr, COUNT(*) as qty " +
+                "FROM sales WHERE sale_datetime >= ? AND sale_datetime <= ? " +
+                "GROUP BY hr ORDER BY hr ASC";
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setTimestamp(1, java.sql.Timestamp.valueOf(start.atStartOfDay()));
+            pstmt.setTimestamp(2, java.sql.Timestamp.valueOf(end.atTime(java.time.LocalTime.MAX)));
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    distribution.put(rs.getInt("hr"), rs.getInt("qty"));
+                }
+            }
+        }
+        return distribution;
     }
 }

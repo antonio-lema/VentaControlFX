@@ -8,8 +8,6 @@ import com.mycompany.ventacontrolfx.domain.repository.IClientRepository;
 import com.mycompany.ventacontrolfx.infrastructure.persistence.DBConnection;
 import com.mycompany.ventacontrolfx.util.AuthorizationService;
 import com.mycompany.ventacontrolfx.domain.repository.IDocumentSeriesRepository;
-import com.mycompany.ventacontrolfx.domain.repository.IFiscalDocumentRepository;
-import com.mycompany.ventacontrolfx.domain.service.FiscalIntegrityService;
 import com.mycompany.ventacontrolfx.domain.service.TaxEngineService;
 import com.mycompany.ventacontrolfx.application.service.PromotionService;
 import com.mycompany.ventacontrolfx.shared.bus.GlobalEventBus;
@@ -40,13 +38,10 @@ public class SaleUseCase {
     private final AuthorizationService authService;
     private final TaxEngineService taxEngineService;
     private final IClientRepository clientRepository;
-    private final PromotionService promotionService;
     private final com.mycompany.ventacontrolfx.application.service.PromotionEngine promotionEngine;
     private final IProductRepository productRepository;
     private final IDocumentSeriesRepository seriesRepository;
-    private final IFiscalDocumentRepository fiscalRepository;
     private final GlobalEventBus eventBus;
-    private final FiscalIntegrityService integrityService;
     private CashClosureUseCase cashClosureUseCase;
     private IFiscalPdfService pdfService;
 
@@ -59,24 +54,19 @@ public class SaleUseCase {
             AuthorizationService authService,
             TaxEngineService taxEngineService,
             IClientRepository clientRepository,
-            PromotionService promotionService,
             com.mycompany.ventacontrolfx.application.service.PromotionEngine promotionEngine,
             IProductRepository productRepository,
             IDocumentSeriesRepository seriesRepository,
-            IFiscalDocumentRepository fiscalRepository,
             GlobalEventBus eventBus) {
         this.saleRepository = saleRepository;
         this.configRepository = configRepository;
         this.authService = authService;
         this.taxEngineService = taxEngineService;
         this.clientRepository = clientRepository;
-        this.promotionService = promotionService;
         this.promotionEngine = promotionEngine;
         this.productRepository = productRepository;
         this.seriesRepository = seriesRepository;
-        this.fiscalRepository = fiscalRepository;
         this.eventBus = eventBus;
-        this.integrityService = new FiscalIntegrityService();
     }
 
     /**
@@ -535,5 +525,13 @@ public class SaleUseCase {
         } catch (Exception ex) {
             System.err.println("[SaleUseCase] Error archivando PDF de devoluci\u00f3n: " + ex.getMessage());
         }
+    }
+
+    public java.util.Map<String, Double> getCategoryDistribution(LocalDate start, LocalDate end) throws SQLException {
+        return saleRepository.getCategoryDistribution(start, end);
+    }
+
+    public java.util.Map<Integer, Integer> getHourlyDistribution(LocalDate start, LocalDate end) throws SQLException {
+        return saleRepository.getHourlyDistribution(start, end);
     }
 }
