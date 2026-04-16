@@ -33,6 +33,8 @@ public class PromotionFormController implements Injectable {
     @FXML
     private TextField txtName;
     @FXML
+    private TextField txtCode;
+    @FXML
     private ComboBox<PromotionType> cmbType;
     @FXML
     private TextField txtValue;
@@ -58,6 +60,12 @@ public class PromotionFormController implements Injectable {
     private TextField txtBuyQty;
     @FXML
     private TextField txtFreeQty;
+    @FXML
+    private TextField txtMaxUses;
+    @FXML
+    private TextField txtBoundClientId;
+    @FXML
+    private TextField txtMinOrderValue;
 
     private ContextMenu searchContextMenu;
     private Promotion promotion;
@@ -110,7 +118,7 @@ public class PromotionFormController implements Injectable {
             boolean isVolume = newVal == PromotionType.VOLUME_DISCOUNT;
             panelVolume.setVisible(isVolume);
             panelVolume.setManaged(isVolume);
-            
+
             if (panelValue != null) {
                 panelValue.setVisible(!isVolume);
                 panelValue.setManaged(!isVolume);
@@ -172,12 +180,16 @@ public class PromotionFormController implements Injectable {
         if (p != null) {
             lblTitle.setText("Editar Promoci\u00f3n");
             txtName.setText(p.getName());
+            txtCode.setText(p.getCode() != null ? p.getCode() : "");
             cmbType.setValue(p.getType());
             txtValue.setText(String.valueOf(p.getValue()));
             cmbScope.setValue(p.getScope());
             chkActive.setSelected(p.isActive());
             txtBuyQty.setText(String.valueOf(p.getBuyQty()));
             txtFreeQty.setText(String.valueOf(p.getFreeQty()));
+            txtMaxUses.setText(String.valueOf(p.getMaxUses()));
+            txtBoundClientId.setText(p.getCustomerId() != null ? String.valueOf(p.getCustomerId()) : "");
+            txtMinOrderValue.setText(String.format("%.2f", p.getMinOrderValue()).replace('.', ','));
             if (p.getStartDate() != null)
                 dpStartDate.setValue(p.getStartDate().toLocalDate());
             if (p.getEndDate() != null)
@@ -254,10 +266,15 @@ public class PromotionFormController implements Injectable {
             if (promotion == null)
                 promotion = new Promotion();
             promotion.setName(txtName.getText());
+            promotion.setCode(
+                    txtCode.getText() != null && !txtCode.getText().trim().isEmpty() ? txtCode.getText().trim() : null);
             promotion.setType(cmbType.getValue());
             double val = 0.0;
             if (cmbType.getValue() != PromotionType.VOLUME_DISCOUNT) {
-                try { val = Double.parseDouble(txtValue.getText()); } catch (Exception e) {}
+                try {
+                    val = Double.parseDouble(txtValue.getText().replace(',', '.'));
+                } catch (Exception e) {
+                }
             }
             promotion.setValue(val);
             promotion.setScope(cmbScope.getValue());
@@ -272,6 +289,26 @@ public class PromotionFormController implements Injectable {
 
             promotion.setBuyQty(buy);
             promotion.setFreeQty(free);
+
+            try {
+                promotion.setMaxUses(Integer.parseInt(txtMaxUses.getText()));
+            } catch (Exception e) {
+                promotion.setMaxUses(0);
+            }
+            try {
+                String bId = txtBoundClientId.getText().trim();
+                promotion.setCustomerId(bId.isEmpty() ? null : Integer.parseInt(bId));
+            } catch (Exception e) {
+                promotion.setCustomerId(null);
+            }
+
+            try {
+                String minVal = txtMinOrderValue.getText().trim().replace(',', '.');
+                promotion.setMinOrderValue(minVal.isEmpty() ? 0.0 : Double.parseDouble(minVal));
+            } catch (Exception e) {
+                promotion.setMinOrderValue(0.0);
+            }
+
             promotion.setActive(chkActive.isSelected());
             promotion.setStartDate(dpStartDate.getValue().atStartOfDay());
             promotion.setEndDate(dpEndDate.getValue().atStartOfDay());
@@ -287,6 +324,17 @@ public class PromotionFormController implements Injectable {
         close();
     }
 
+    @FXML
+    private void handleGenerateCode() {
+        String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        StringBuilder sb = new StringBuilder();
+        java.util.Random rnd = new java.util.Random();
+        for (int i = 0; i < 8; i++) {
+            sb.append(chars.charAt(rnd.nextInt(chars.length())));
+        }
+        txtCode.setText("CUP-" + sb.toString());
+    }
+
     private boolean validate() {
         if (txtName.getText().isEmpty())
             return false;
@@ -296,7 +344,7 @@ public class PromotionFormController implements Injectable {
             return false;
         if (cmbType.getValue() != PromotionType.VOLUME_DISCOUNT) {
             try {
-                Double.parseDouble(txtValue.getText());
+                Double.parseDouble(txtValue.getText().replace(',', '.'));
             } catch (Exception e) {
                 return false;
             }
@@ -320,14 +368,14 @@ public class PromotionFormController implements Injectable {
         searchContextMenu.hide(); // Ocultar para actualizar items
         searchContextMenu.getItems().clear();
         PromotionScope scope = cmbScope.getValue();
-        if (scope == PromotionScope.GLOBAL) return;
+        if (scope == PromotionScope.GLOBAL)
+            return;
 
         try {
             java.nio.file.Files.writeString(
-                java.nio.file.Path.of(System.getProperty("java.io.tmpdir"), "search_log.txt"),
-                "Query: " + query + " | Scope: " + scope + "\n",
-                java.nio.file.StandardOpenOption.CREATE, java.nio.file.StandardOpenOption.APPEND
-            );
+                    java.nio.file.Path.of(System.getProperty("java.io.tmpdir"), "search_log.txt"),
+                    "Query: " + query + " | Scope: " + scope + "\n",
+                    java.nio.file.StandardOpenOption.CREATE, java.nio.file.StandardOpenOption.APPEND);
 
             if (scope == PromotionScope.PRODUCT) {
                 List<Product> matches = productUseCase.getVisibleProducts(-1).stream()
@@ -374,7 +422,15 @@ public class PromotionFormController implements Injectable {
     private static class AffectedItem {
         int id;
         String label;
-        AffectedItem(int id, String l) { this.id = id; this.label = l; }
-        @Override public String toString() { return label; }
+
+        AffectedItem(int id, String l) {
+            this.id = id;
+            this.label = l;
+        }
+
+        @Override
+        public String toString() {
+            return label;
+        }
     }
 }

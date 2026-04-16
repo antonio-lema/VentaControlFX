@@ -42,15 +42,19 @@ public class AsyncManager {
         };
 
         task.setOnSucceeded(e -> {
-            if (onSuccess != null)
-                onSuccess.accept(task.getValue());
+            Platform.runLater(() -> {
+                if (onSuccess != null)
+                    onSuccess.accept(task.getValue());
+            });
         });
 
         task.setOnFailed(e -> {
-            if (onError != null)
-                onError.accept(task.getException());
-            else
-                task.getException().printStackTrace();
+            Platform.runLater(() -> {
+                if (onError != null)
+                    onError.accept(task.getException());
+                else
+                    task.getException().printStackTrace();
+            });
         });
 
         EXECUTOR.submit(task);

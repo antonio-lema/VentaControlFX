@@ -13,14 +13,38 @@ public class PromotionResult {
     private final Map<Integer, Double> itemDiscounts = new HashMap<>(); // productId -> discountAmount
     private final List<String> appliedPromos = new ArrayList<>();
     private final Map<Integer, String> itemPromoNames = new HashMap<>(); // productId -> promoName
+    private final List<String> appliedPromoCodes = new ArrayList<>(); // Track actual codes for usage counting
 
     public void addDiscount(int productId, double amount, String promoName) {
-        this.totalDiscount += amount;
-        this.itemDiscounts.put(productId, this.itemDiscounts.getOrDefault(productId, 0.0) + amount);
-        this.itemPromoNames.put(productId, promoName);
-        if (promoName != null && !this.appliedPromos.contains(promoName)) {
-            this.appliedPromos.add(promoName);
+        double currentAmount = this.itemDiscounts.getOrDefault(productId, 0.0);
+
+        // REGLA DE NEGOCIO: El mayor descuento GANA (No es acumulable)
+        if (amount > currentAmount) {
+            // Ajustar el total: quitar el viejo, poner el nuevo
+            this.totalDiscount = (this.totalDiscount - currentAmount) + amount;
+            this.itemDiscounts.put(productId, amount);
+            this.itemPromoNames.put(productId, promoName);
+
+            if (promoName != null && !this.appliedPromos.contains(promoName)) {
+                this.appliedPromos.add(promoName);
+            }
+            // If it looks like a code, track it
+            if (promoName != null && (promoName.startsWith("GIFT-") || promoName.startsWith("PROMO-"))) {
+                if (!this.appliedPromoCodes.contains(promoName))
+                    this.appliedPromoCodes.add(promoName);
+            }
         }
+    }
+
+    public void addDiscountWithCode(int productId, double amount, String promoName, String actualCode) {
+        addDiscount(productId, amount, promoName);
+        if (actualCode != null && !this.appliedPromoCodes.contains(actualCode)) {
+            this.appliedPromoCodes.add(actualCode);
+        }
+    }
+
+    public List<String> getAppliedPromoCodes() {
+        return appliedPromoCodes;
     }
 
     public double getTotalDiscount() {

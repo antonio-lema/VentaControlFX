@@ -283,11 +283,7 @@ public class WorkSessionController implements Injectable {
     }
 
     private void showAlert(String title, String content) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(content);
-        alert.showAndWait();
+        com.mycompany.ventacontrolfx.util.AlertUtil.showError(title, content);
     }
 
     public static class WorkSessionViewModel {

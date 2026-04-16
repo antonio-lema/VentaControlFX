@@ -21,9 +21,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class AlertUtil {
 
-    private static final String APP_PRIMARY = "#1e88e5";
-    private static final String APP_DANGER = "#e53935";
-    private static final String APP_WARNING = "#fb8c00";
     private static final String APP_SUCCESS = "#4caf50";
 
     public enum CustomAlertType {
@@ -133,26 +130,23 @@ public class AlertUtil {
         buttons.setPadding(new Insets(10, 0, 0, 0));
 
         Button btnCancel = new Button("CANCELAR");
-        btnCancel.getStyleClass().add("alert-button");
+        btnCancel.setCursor(javafx.scene.Cursor.HAND);
         btnCancel.setStyle(
-                "-fx-background-color: #f5f5f5; -fx-text-fill: #666666; -fx-font-weight: bold; -fx-padding: 10 25; -fx-cursor: hand;");
-        btnCancel.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent e) {
-                stage.close();
-            }
-        });
+                "-fx-background-color: rgba(0,0,0,0.05); -fx-text-fill: #666666; -fx-font-weight: bold; -fx-padding: 12 30; -fx-background-radius: 12; -fx-border-color: rgba(0,0,0,0.1); -fx-border-radius: 12;");
+        btnCancel.setOnAction(e -> stage.close());
 
         Button btnOk = new Button("ACEPTAR");
-        btnOk.getStyleClass().add("alert-button");
-        btnOk.setStyle("-fx-background-color: " + APP_PRIMARY
-                + "; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 25; -fx-cursor: hand;");
-        btnOk.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent e) {
-                response.set(true);
-                stage.close();
-            }
+        btnOk.setCursor(javafx.scene.Cursor.HAND);
+        String btnColor = (title.toLowerCase().contains("eliminar") || header.toLowerCase().contains("borrar")
+                || header.toLowerCase().contains("limpiar"))
+                        ? "linear-gradient(to bottom right, #ff5252, #d32f2f)"
+                        : "linear-gradient(to bottom right, #448aff, #1976d2)";
+
+        btnOk.setStyle("-fx-background-color: " + btnColor
+                + "; -fx-text-fill: white; -fx-font-weight: 800; -fx-padding: 12 35; -fx-background-radius: 12; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 10, 0, 0, 4);");
+        btnOk.setOnAction(e -> {
+            response.set(true);
+            stage.close();
         });
 
         buttons.getChildren().addAll(btnCancel, btnOk);
@@ -171,21 +165,16 @@ public class AlertUtil {
         VBox root = createBaseContainer(stage, type, header, content);
 
         Button btnOk = new Button("ENTENDIDO");
-        String btnColor = APP_PRIMARY;
+        btnOk.setCursor(javafx.scene.Cursor.HAND);
+        String btnColor = "linear-gradient(to bottom right, #448aff, #1976d2)";
         if (type == CustomAlertType.ERROR)
-            btnColor = APP_DANGER;
+            btnColor = "linear-gradient(to bottom right, #ff5252, #d32f2f)";
         if (type == CustomAlertType.WARNING)
-            btnColor = APP_WARNING;
+            btnColor = "linear-gradient(to bottom right, #ffa000, #f57c00)";
 
-        btnOk.getStyleClass().add("alert-button");
         btnOk.setStyle("-fx-background-color: " + btnColor
-                + "; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 35; -fx-cursor: hand;");
-        btnOk.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent e) {
-                stage.close();
-            }
-        });
+                + "; -fx-text-fill: white; -fx-font-weight: 800; -fx-padding: 12 45; -fx-background-radius: 12; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 10, 0, 0, 4);");
+        btnOk.setOnAction(e -> stage.close());
 
         root.getChildren().add(btnOk);
 
@@ -193,46 +182,49 @@ public class AlertUtil {
     }
 
     private static VBox createBaseContainer(Stage stage, CustomAlertType type, String header, String content) {
-        VBox root = new VBox(20);
-        root.getStyleClass().add("alert-root");
+        VBox root = new VBox(25);
         root.setAlignment(Pos.CENTER);
-        root.setPadding(new Insets(30));
+        root.setPadding(new Insets(40));
         root.setStyle(
-                "-fx-background-color: white; -fx-border-color: #eeeeee; -fx-border-width: 1; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 30, 0, 0, 10);");
+                "-fx-background-color: rgba(255, 255, 255, 0.95); -fx-background-radius: 24; -fx-border-color: rgba(255,255,255,0.3); -fx-border-radius: 24; -fx-border-width: 1.5; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 30, 0, 0, 15);");
 
         FontAwesomeIcon icon;
         String color;
         switch (type) {
             case ERROR:
                 icon = FontAwesomeIcon.TIMES_CIRCLE;
-                color = APP_DANGER;
+                color = "#ef4444";
                 break;
             case WARNING:
                 icon = FontAwesomeIcon.EXCLAMATION_TRIANGLE;
-                color = APP_WARNING;
+                color = "#f59e0b";
                 break;
             case CONFIRMATION:
                 icon = FontAwesomeIcon.QUESTION_CIRCLE;
-                color = APP_PRIMARY;
+                color = "#3b82f6";
                 break;
             default:
                 icon = FontAwesomeIcon.INFO_CIRCLE;
-                color = APP_PRIMARY;
+                color = "#3b82f6";
         }
 
         FontAwesomeIconView iconView = new FontAwesomeIconView(icon);
-        iconView.setSize("50px");
+        iconView.setSize("64px");
         iconView.setFill(Color.web(color));
+        iconView.setStyle("-fx-effect: dropshadow(three-pass-box, " + color + "66, 15, 0, 0, 5);");
 
         Label lblHeader = new Label(header);
-        lblHeader.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #333333;");
+        lblHeader.setStyle(
+                "-fx-font-size: 22px; -fx-font-weight: 800; -fx-text-fill: #1a202c; -fx-text-alignment: center;");
         lblHeader.setWrapText(true);
         lblHeader.setAlignment(Pos.CENTER);
+        lblHeader.setMaxWidth(400);
 
         Label lblContent = new Label(content);
-        lblContent.setStyle("-fx-font-size: 14px; -fx-text-fill: #777777; -fx-text-alignment: center;");
+        lblContent.setStyle(
+                "-fx-font-size: 15px; -fx-text-fill: #4a5568; -fx-text-alignment: center; -fx-line-spacing: 1.2;");
         lblContent.setWrapText(true);
-        lblContent.setMaxWidth(350);
+        lblContent.setMaxWidth(380);
         lblContent.setAlignment(Pos.CENTER);
 
         root.getChildren().addAll(iconView, lblHeader, lblContent);

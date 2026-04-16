@@ -69,4 +69,12 @@ public interface IProductRepository {
         Product findBySku(String sku) throws SQLException;
 
         java.util.List<Product> getBasicMetadata() throws SQLException;
+
+        java.util.List<Product> getPromotedPaginated(java.util.List<Integer> productIds,
+                        java.util.List<Integer> categoryIds,
+                        boolean hasGlobalPromo, int limit, int offset, int priceListId) throws SQLException;
+
+        int countPromoted(java.util.List<Integer> productIds, java.util.List<Integer> categoryIds,
+                        boolean hasGlobalPromo)
+                        throws SQLException;
 }

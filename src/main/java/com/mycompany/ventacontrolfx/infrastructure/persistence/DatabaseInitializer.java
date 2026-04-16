@@ -121,6 +121,7 @@ public class DatabaseInitializer {
                                         "is_return BOOLEAN DEFAULT FALSE, " +
                                         "return_reason TEXT, " +
                                         "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, " +
+                                        "promo_code VARCHAR(100) DEFAULT NULL, " +
                                         "FOREIGN KEY (client_id) REFERENCES clients(client_id))");
 
                         addColumnIfNotExists(conn, "sales", "closure_id", "INT DEFAULT NULL");
@@ -129,6 +130,10 @@ public class DatabaseInitializer {
                         addColumnIfNotExists(conn, "sales", "customer_name_snapshot", "VARCHAR(255) DEFAULT NULL");
                         addColumnIfNotExists(conn, "sales", "discount_amount", "DECIMAL(10,2) DEFAULT 0.00");
                         addColumnIfNotExists(conn, "sales", "discount_reason", "VARCHAR(255) DEFAULT NULL");
+                        addColumnIfNotExists(conn, "sales", "promo_code", "VARCHAR(100) DEFAULT NULL");
+                        addColumnIfNotExists(conn, "sales", "reward_promo_code", "VARCHAR(100) DEFAULT NULL");
+
+                        setSchemaVersion(conn, "1.13");
 
                         // 2. Sale Details Table
                         stmt.execute("CREATE TABLE IF NOT EXISTS sale_details (" +
@@ -143,6 +148,20 @@ public class DatabaseInitializer {
                         addColumnIfNotExists(conn, "sale_details", "returned_quantity", "INT DEFAULT 0");
                         addColumnIfNotExists(conn, "sale_details", "observations", "TEXT DEFAULT NULL");
                         addColumnIfNotExists(conn, "sales", "returned_amount", "DECIMAL(10,2) DEFAULT 0.00");
+
+                        // Sanity check migration for returns (Fixes "ghost" returns from NULL or
+                        // shifted data)
+                        if (!isMigrationDone(conn, "fix_returns_nulls_v2")) {
+                                stmt.execute("UPDATE sales SET is_return = 0 WHERE is_return IS NULL");
+                                stmt.execute("UPDATE sales SET returned_amount = 0 WHERE returned_amount IS NULL");
+                                stmt.execute("UPDATE sale_details SET returned_quantity = 0 WHERE returned_quantity IS NULL");
+
+                                // Si is_return=1 pero returned_amount=0 y no hay nada en la tabla returns,
+                                // probablemente es basura
+                                // PERO es arriesgado borrarlo sin preguntar. Hagamos al menos el COALESCE en
+                                // los SELECTs.
+                                markMigrationDone(conn, "fix_returns_nulls_v2");
+                        }
 
                         // --- Detalles de venta con desglose de IVA ---
                         addColumnIfNotExists(conn, "sale_details", "iva_rate", "DECIMAL(5,2) DEFAULT 21.0");
@@ -1054,13 +1073,25 @@ public class DatabaseInitializer {
                                         "start_date DATETIME, " +
                                         "end_date DATETIME, " +
                                         "active BOOLEAN DEFAULT TRUE, " +
-                                        "scope VARCHAR(50) NOT NULL)");
+                                        "scope VARCHAR(50) NOT NULL, " +
+                                        "code VARCHAR(50) UNIQUE DEFAULT NULL, " +
+                                        "max_uses INT DEFAULT 0, " +
+                                        "current_uses INT DEFAULT 0, " +
+                                        "uses_per_customer INT DEFAULT 1, " +
+                                        "customer_id INT DEFAULT NULL)");
 
                         stmt.execute("CREATE TABLE IF NOT EXISTS promotion_items (" +
                                         "promotion_id INT NOT NULL, " +
                                         "item_id INT NOT NULL, " +
                                         "PRIMARY KEY (promotion_id, item_id), " +
                                         "FOREIGN KEY (promotion_id) REFERENCES promotions(promotion_id) ON DELETE CASCADE)");
+
+                        addColumnIfNotExists(conn, "promotions", "code", "VARCHAR(50) UNIQUE DEFAULT NULL");
+                        addColumnIfNotExists(conn, "promotions", "max_uses", "INT DEFAULT 0");
+                        addColumnIfNotExists(conn, "promotions", "current_uses", "INT DEFAULT 0");
+                        addColumnIfNotExists(conn, "promotions", "uses_per_customer", "INT DEFAULT 1");
+                        addColumnIfNotExists(conn, "promotions", "customer_id", "INT DEFAULT NULL");
+                        addColumnIfNotExists(conn, "promotions", "min_order_value", "DECIMAL(10,2) DEFAULT 0.00");
 
                         // \u00e2\u201d\u20ac\u00e2\u201d\u20ac 10. Optimizaciones de Rendimiento
                         // Adicionales (V3)
@@ -1144,7 +1175,7 @@ public class DatabaseInitializer {
                         } catch (SQLException e) {
                                 System.err.println("[WARN] Could not seed generic product: " + e.getMessage());
                         }
-                        setSchemaVersion(conn, "1.8");
+                        setSchemaVersion(conn, "1.13");
                 }
         }
 
@@ -1226,7 +1257,7 @@ public class DatabaseInitializer {
                 try (Statement stmt = conn.createStatement();
                                 ResultSet rs = stmt.executeQuery(
                                                 "SELECT config_value FROM system_config WHERE config_key = 'db.schema_version'")) {
-                        if (rs.next() && "1.8".equals(rs.getString(1))) {
+                        if (rs.next() && "1.13".equals(rs.getString(1))) {
                                 return true;
                         }
                 } catch (Exception e) {

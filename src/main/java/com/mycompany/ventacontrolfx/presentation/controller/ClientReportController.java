@@ -28,7 +28,6 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 import com.mycompany.ventacontrolfx.presentation.util.RealTimeSearchBinder;
@@ -102,6 +101,34 @@ public class ClientReportController implements Injectable {
 
         paginationHelper = new PaginationHelper<>(clientTable, cmbRowLimit, lblClientCount,
                 container.getBundle().getString("sidebar.item.directory").toLowerCase());
+
+        // SYNC LOAD: Bypasses all async/threading to isolate root cause
+        try {
+            java.util.List<com.mycompany.ventacontrolfx.domain.model.ClientSaleSummary> summaries = saleUseCase
+                    .getClientSalesSummary(LocalDate.now().withDayOfYear(1), LocalDate.now());
+            java.util.List<com.mycompany.ventacontrolfx.domain.model.Client> clients = clientUseCase.getAllClients();
+            java.util.Map<Integer, com.mycompany.ventacontrolfx.domain.model.Client> clientMap = clients.stream()
+                    .collect(java.util.stream.Collectors.toMap(
+                            com.mycompany.ventacontrolfx.domain.model.Client::getId, c -> c, (a, b) -> a));
+            allRows.clear();
+            for (com.mycompany.ventacontrolfx.domain.model.ClientSaleSummary s : summaries) {
+                com.mycompany.ventacontrolfx.domain.model.Client c = clientMap.get(s.getClientId());
+                String name = c != null ? c.getName() : "Cliente #" + s.getClientId();
+                String info = (c != null && c.getTaxId() != null) ? "CIF: " + c.getTaxId() : "Particular";
+                boolean active = s.getLastPurchase() != null &&
+                        s.getLastPurchase().toLocalDate().isAfter(LocalDate.now().minusDays(30));
+                allRows.add(new ClientRow(s.getClientId(), name, info,
+                        s.getTotalSpent(), s.getTotalOrders(), active, "Test", "#1e88e5", s.getLastPurchase()));
+            }
+            paginationHelper.setData(allRows);
+            updateKpis(allRows);
+            System.out.println("[SYNC] Loaded " + allRows.size() + " clients.");
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            System.out.println("[SYNC ERROR] " + ex);
+        }
+
+        // Also fire normal async load for subsequent refreshes
         loadDataRange(container.getBundle().getString("report.client.range.year"));
     }
 
@@ -163,16 +190,7 @@ public class ClientReportController implements Injectable {
                 c.getValue().getSaleDateTime() != null ? c.getValue().getSaleDateTime().format(FMT_DATE) : "\u2014"));
 
         colItems.setCellValueFactory(c -> {
-            int items = 0;
-            try {
-                com.mycompany.ventacontrolfx.domain.model.Sale sale = saleUseCase
-                        .getSaleDetails(c.getValue().getSaleId());
-                if (sale != null && sale.getDetails() != null) {
-                    items = sale.getDetails().stream()
-                            .mapToInt(com.mycompany.ventacontrolfx.domain.model.SaleDetail::getQuantity).sum();
-                }
-            } catch (Exception e) {
-            }
+            int items = c.getValue().getTotalItems();
             return new SimpleStringProperty(
                     String.format(container.getBundle().getString("report.client.units"), items));
         });
@@ -242,8 +260,12 @@ public class ClientReportController implements Injectable {
             try {
                 List<com.mycompany.ventacontrolfx.domain.model.ClientSaleSummary> summaries = saleUseCase
                         .getClientSalesSummary(finalStart, finalEnd);
+
                 List<Client> clients = clientUseCase.getAllClients();
-                Map<Integer, Client> clientMap = clients.stream().collect(Collectors.toMap(Client::getId, c -> c));
+                // Safe mapping using merge function to avoid IllegalStateException on
+                // duplicates
+                Map<Integer, Client> clientMap = clients.stream()
+                        .collect(Collectors.toMap(Client::getId, c -> c, (existing, replacement) -> existing));
 
                 return new Object[] { summaries, clientMap };
             } catch (SQLException e) {
@@ -294,8 +316,10 @@ public class ClientReportController implements Injectable {
             }
             updateKpis(allRows);
         }, e -> {
+            e.printStackTrace();
+            String errorMsg = e.getMessage() != null ? e.getMessage() : e.toString();
             AlertUtil.showError(container.getBundle().getString("alert.error"),
-                    container.getBundle().getString("history.error.load") + ": " + e.getMessage());
+                    container.getBundle().getString("history.error.load") + "\n\nDetalle técnico: " + errorMsg);
         });
     }
 
@@ -387,17 +411,32 @@ public class ClientReportController implements Injectable {
         lblDetailInfo.setText(row.info + " | "
                 + String.format(container.getBundle().getString("report.client.last_purchase"), lastDateStr));
 
-        // LAZY LOADING: Load sales only for this client from DB
-        try {
-            List<Sale> clientSales = saleUseCase.getSalesByClient(row.clientId);
-            purchaseTable.setItems(FXCollections.observableArrayList(clientSales));
+        // ASYNC LOAD: Launch in background thread to avoid freezing UI
+        purchaseTable.setItems(FXCollections.observableArrayList()); // clear first
+        purchaseTable.setPlaceholder(new Label("Cargando ventas..."));
 
-            populateEvolutionChart(clientSales);
-            populateFavoriteMethod(clientSales);
-            populateTopProducts(clientSales);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        final int clientId = row.clientId;
+        new Thread(() -> {
+            try {
+                // Limit to 200 most recent sales to avoid loading tens of thousands of rows
+                List<Sale> clientSales = saleUseCase.getSalesByClient(clientId);
+                List<Sale> limited = clientSales.size() > 200
+                        ? clientSales.subList(0, 200)
+                        : clientSales;
+
+                javafx.application.Platform.runLater(() -> {
+                    purchaseTable.setItems(FXCollections.observableArrayList(limited));
+                    purchaseTable.setPlaceholder(new Label("No hay ventas registradas"));
+                    populateEvolutionChart(limited);
+                    populateFavoriteMethod(limited);
+                    populateTopProducts(limited);
+                });
+            } catch (SQLException e) {
+                e.printStackTrace();
+                javafx.application.Platform
+                        .runLater(() -> purchaseTable.setPlaceholder(new Label("Error al cargar ventas")));
+            }
+        }, "ClientDetail-Loader").start();
     }
 
     private void populateEvolutionChart(List<Sale> sales) {

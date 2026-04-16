@@ -492,3 +492,23 @@
     -fx-text-fill: #ef4444;
     -fx-border-color: #ef4444;
 }
+
+/* =========================================
+   ESTILOS DE FILA (DEVOLUCIONES)
+   ========================================= */
+.row-return {
+    -fx-background-color: rgba(239, 68, 68, 0.1) !important;
+}
+
+.row-return:selected {
+    -fx-background-color: rgba(239, 68, 68, 0.2) !important;
+}
+
+.row-partial-return {
+    -fx-background-color: rgba(245, 158, 11, 0.1) !important;
+    /* Ámbar/Amarillo claro */
+}
+
+.row-partial-return:selected {
+    -fx-background-color: rgba(245, 158, 11, 0.2) !important;
+}

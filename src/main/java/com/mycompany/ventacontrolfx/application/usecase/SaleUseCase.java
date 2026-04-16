@@ -9,7 +9,7 @@ import com.mycompany.ventacontrolfx.infrastructure.persistence.DBConnection;
 import com.mycompany.ventacontrolfx.util.AuthorizationService;
 import com.mycompany.ventacontrolfx.domain.repository.IDocumentSeriesRepository;
 import com.mycompany.ventacontrolfx.domain.service.TaxEngineService;
-import com.mycompany.ventacontrolfx.application.service.PromotionService;
+
 import com.mycompany.ventacontrolfx.shared.bus.GlobalEventBus;
 
 import com.mycompany.ventacontrolfx.application.ports.IFiscalPdfService;
@@ -45,6 +45,13 @@ public class SaleUseCase {
     private CashClosureUseCase cashClosureUseCase;
     private IFiscalPdfService pdfService;
 
+    public static class ProcessSaleResult {
+        public int saleId;
+        public String rewardPromoCode;
+        public double rewardAmount;
+        public LocalDateTime rewardExpiryDate;
+    }
+
     public void setPdfService(IFiscalPdfService pdfService) {
         this.pdfService = pdfService;
     }
@@ -78,25 +85,42 @@ public class SaleUseCase {
 
     public int processSale(List<CartItem> cartItems, double total, String paymentMethod, Integer clientId, int userId)
             throws SQLException {
-        return processSale(cartItems, total, paymentMethod, clientId, userId, 0.0, null, total, 0.0, null);
+        return processSale(cartItems, total, paymentMethod, clientId, userId, 0.0, null, total, 0.0, null, null).saleId;
     }
 
     public int processSale(List<CartItem> cartItems, double total, String paymentMethod, Integer clientId, int userId,
             double discountAmount, String discountReason) throws SQLException {
         return processSale(cartItems, total, paymentMethod, clientId, userId, discountAmount, discountReason,
-                total - discountAmount, 0.0, null);
+                total - discountAmount, 0.0, null, null).saleId;
     }
 
     public int processSale(List<CartItem> cartItems, double total, String paymentMethod, Integer clientId, int userId,
             double discountAmount, String discountReason, double cashAmount, double cardAmount, String observations)
             throws SQLException {
+        return processSale(cartItems, total, paymentMethod, clientId, userId, discountAmount, discountReason,
+                cashAmount, cardAmount, observations, null).saleId;
+    }
+
+    public ProcessSaleResult processSale(List<CartItem> cartItems, double total, String paymentMethod, Integer clientId,
+            int userId,
+            double discountAmount, String discountReason, double cashAmount, double cardAmount, String observations,
+            String promoCode)
+            throws SQLException {
         authService.checkPermission("VENTAS");
 
-        // \u00e2\u201d\u20ac\u00e2\u201d\u20ac REGLA DE NEGOCIO: Validar caja abierta
-        // \u00e2\u201d\u20ac\u00e2\u201d\u20ac
+        // ──── REGLA DE NEGOCIO: Validar caja abierta ────
         if (cashClosureUseCase != null && !cashClosureUseCase.hasActiveFund()) {
             throw new SQLException(
                     "OPERACION_BLOQUEADA: La caja no ha sido abierta. Debe establecer un fondo de caja antes de realizar ventas.");
+        }
+
+        // VALIDACIÓN DE INTEGRIDAD FINANCIERA (Anti-descuadre)
+        double totalToPay = total - discountAmount;
+        double deliveredMoney = cashAmount + cardAmount;
+        if (Math.abs(totalToPay - deliveredMoney) > 0.01) {
+            throw new SQLException(
+                    "ERROR_PAGO: El dinero entregado (" + String.format("%.2f", deliveredMoney)
+                            + ") no coincide con el total a pagar (" + String.format("%.2f", totalToPay) + ").");
         }
 
         SaleConfig config = configRepository.load();
@@ -114,8 +138,9 @@ public class SaleUseCase {
 
         // APLICAR MOTOR DE PROMOCIONES (PIPELINE) - Consistent with CartUseCase
         com.mycompany.ventacontrolfx.application.service.PromotionResult promoResult = promotionEngine
-                .process(cartItems);
-        double totalPromoDiscount = promoResult.getTotalDiscount();
+                .process(cartItems, promoCode, client);
+        // double totalPromoDiscount = promoResult.getTotalDiscount(); // Resolving
+        // lint: not needed here as we use itemDiscounts
 
         for (CartItem item : cartItems) {
             Product product = item.getProduct();
@@ -126,14 +151,14 @@ public class SaleUseCase {
             // Precio unitario original (con tarifa de cliente ya aplicada)
             double unitPrice = item.getUnitPrice();
 
-            // Calculamos el total de la l\u00ednea YA con descuento para que el TaxEngine
+            // Calculamos el total de la línea YA con descuento para que el TaxEngine
             // recalcule la base e IVA
             double grossLineTotal = (unitPrice * item.getQuantity()) - totalLineDiscount;
 
             // Simulamos un precio unitario efectivo para el motor de impuestos
             double effectiveUnitPrice = item.getQuantity() > 0 ? (grossLineTotal / item.getQuantity()) : 0.0;
 
-            // Usar el motor fiscal para calcular impuestos de esta l\u00ednea
+            // Usar el motor fiscal para calcular impuestos de esta línea
             TaxCalculationResult result = taxEngineService.calculateLine(product, client, effectiveUnitPrice,
                     item.getQuantity(), isInclusive);
             lineResults.add(result);
@@ -190,20 +215,39 @@ public class SaleUseCase {
         double globalDiscount = promoResult.getItemDiscounts().getOrDefault(-1, 0.0);
         grossSavingsTotal += globalDiscount;
 
-        double finalTotalTax = calculatedTotalIva;
-        double finalTotalNet = (total - discountAmount) - finalTotalTax;
+        // Total a pagar final
+        double finalTotalPayable = total - discountAmount;
+        // Total antes de descuentos manuales/globales pero después de promos de
+        // item
+        double preDiscountTotal = total;
+
+        // --- FIX FISCAL: Prorratear descuento global en bases e impuestos ---
+        double factor = (preDiscountTotal > 0) ? finalTotalPayable / preDiscountTotal : 1.0;
+
+        double finalTotalTax = calculatedTotalIva * factor;
+        double finalTotalNet = finalTotalPayable - finalTotalTax;
+
+        // 2. Generación de Cupón de Recompensa (Reward) - Cálculo anticipado (V1.13)
+        String finalRewardCode = null;
+        if (finalTotalPayable >= 5.0) {
+            finalRewardCode = generateRandomCode();
+            System.out.println("**************************************************");
+            System.out.println("[SALE_PROCESS] CODIGO GENERADO: " + finalRewardCode);
+            System.out.println("**************************************************");
+        }
 
         Sale sale = new Sale();
+        sale.setRewardPromoCode(finalRewardCode);
         sale.setSaleDateTime(LocalDateTime.now());
         sale.setUserId(userId);
         sale.setClientId(clientId);
-        sale.setTotal(total - discountAmount); // Descuento total = Auto (ya en total) + Manual
+        sale.setTotal(Math.round(finalTotalPayable * 100.0) / 100.0);
         sale.setPaymentMethod(paymentMethod);
-        sale.setIva(calculatedTotalIva);
-        sale.setTotalNet(finalTotalNet);
-        sale.setTotalTax(finalTotalTax);
+        sale.setIva(Math.round(finalTotalTax * 100.0) / 100.0);
+        sale.setTotalNet(Math.round(finalTotalNet * 100.0) / 100.0);
+        sale.setTotalTax(Math.round(finalTotalTax * 100.0) / 100.0);
         sale.setCustomerNameSnapshot(client != null ? client.getName() : "Consumidor Final");
-        sale.setDiscountAmount(grossSavingsTotal + discountAmount);
+        sale.setDiscountAmount(Math.round((grossSavingsTotal + discountAmount) * 100.0) / 100.0);
         sale.setDiscountReason(((discountReason != null ? discountReason : "") + " "
                 + String.join(", ", promoResult.getAppliedPromos())).trim());
         sale.setReturn(false);
@@ -211,13 +255,21 @@ public class SaleUseCase {
         sale.setCashAmount(cashAmount);
         sale.setCardAmount(cardAmount);
         sale.setObservations(observations);
+        sale.setPromoCode(promoCode);
 
         // 2. Generar el sumario fiscal (Tax Summary) de toda la venta
         List<SaleTaxSummary> taxSummaries = taxEngineService.summarizeTaxes(lineResults);
+
+        // Aplicar el factor de descuento a cada línea del sumario fiscal
+        if (factor != 1.0) {
+            for (SaleTaxSummary sum : taxSummaries) {
+                sum.setTaxBasis(Math.round(sum.getTaxBasis() * factor * 100.0) / 100.0);
+                sum.setTaxAmount(Math.round(sum.getTaxAmount() * factor * 100.0) / 100.0);
+            }
+        }
         sale.setTaxSummaries(taxSummaries);
 
-        // \u00e2\u201d\u20ac\u00e2\u201d\u20ac PROCESAMIENTO AT\u00d3MICO EN UNA SOLA
-        // TRANSACCI\u00d3N \u00e2\u201d\u20ac\u00e2\u201d\u20ac
+        // ──── PROCESAMIENTO ATÓMICO EN UNA SOLA TRANSACCIÓN ────
         try (Connection conn = DBConnection.getConnection()) {
             conn.setAutoCommit(false);
             try {
@@ -227,7 +279,7 @@ public class SaleUseCase {
                 // 2. Guardar Detalles
                 saleRepository.saveSaleDetails(details, saleId, conn);
 
-                // 3. Guardar Res\u00famenes de Impuestos
+                // 3. Guardar Resúmenes de Impuestos
                 saleRepository.saveSaleTaxSummaries(taxSummaries, saleId, conn);
 
                 // 4. Actualizar Stock
@@ -236,13 +288,54 @@ public class SaleUseCase {
                         int newStock = productRepository.updateStock(item.getProduct().getId(), -item.getQuantity(),
                                 conn);
 
-                        // Notificar si el stock ha bajado del m\u00ednimo (opcional: lanzar evento o
+                        // Notificar si el stock ha bajado del mínimo (opcional: lanzar evento o
                         // log)
                         if (newStock <= item.getProduct().getMinStock()) {
                             System.out.println("ALERTA STOCK: El producto " + item.getProduct().getName() +
-                                    " ha alcanzado el stock m\u00ednimo (" + newStock + ")");
+                                    " ha alcanzado el stock mínimo (" + newStock + ")");
                         }
                     }
+                }
+
+                // 5. Incrementar contadores de promociones
+                com.mycompany.ventacontrolfx.domain.repository.IPromotionRepository promoRepo = new com.mycompany.ventacontrolfx.infrastructure.persistence.JdbcPromotionRepository();
+                if (promoResult.getAppliedPromoCodes() != null) {
+                    for (String promoCodeOrName : promoResult.getAppliedPromoCodes()) {
+                        try {
+                            Promotion p = promoRepo.findByCode(promoCodeOrName).orElse(null);
+                            if (p == null) {
+                                // Fallback by name if it wasn't a code
+                                p = promoRepo.getAll().stream()
+                                        .filter(p1 -> p1.getName().equals(promoCodeOrName))
+                                        .findFirst().orElse(null);
+                            }
+                            if (p != null) {
+                                p.setCurrentUses(p.getCurrentUses() + 1);
+                                promoRepo.update(p);
+                            }
+                        } catch (Exception ex) {
+                            System.err.println("[SaleUseCase] Error incrementing promo usage: " + ex.getMessage());
+                        }
+                    }
+                }
+
+                // 6. Persistir Cupón de Recompensa si existe
+                if (sale.getRewardPromoCode() != null) {
+                    Promotion reward = new Promotion();
+                    reward.setName("Recompensa por compra > 100€");
+                    reward.setCode(sale.getRewardPromoCode());
+                    reward.setType(com.mycompany.ventacontrolfx.domain.model.PromotionType.FIXED_DISCOUNT);
+                    reward.setValue(10.0); // 10€ de descuento
+                    reward.setScope(com.mycompany.ventacontrolfx.domain.model.PromotionScope.GLOBAL);
+                    reward.setMaxUses(1);
+                    reward.setActive(true);
+                    reward.setMinOrderValue(100.0); // Restaurado el valor de producción (100€)
+                    reward.setStartDate(LocalDateTime.now());
+                    reward.setEndDate(LocalDateTime.now().plusMonths(3));
+                    // Eliminamos la vinculación al cliente para que sea más fácil de usar
+                    // if (clientId != null) reward.setCustomerId(clientId);
+
+                    promoRepo.save(reward);
                 }
 
                 conn.commit();
@@ -252,7 +345,12 @@ public class SaleUseCase {
                     eventBus.publishDataChange();
                 }
 
-                return saleId;
+                ProcessSaleResult result = new ProcessSaleResult();
+                result.saleId = saleId;
+                result.rewardPromoCode = sale.getRewardPromoCode();
+                result.rewardAmount = 10.0;
+                result.rewardExpiryDate = LocalDateTime.now().plusMonths(3);
+                return result;
             } catch (SQLException e) {
                 conn.rollback();
                 throw e;
@@ -285,6 +383,8 @@ public class SaleUseCase {
             conn.setAutoCommit(false);
             try {
                 double refundAmountForThisTransaction = 0;
+                double totalTaxRefunded = 0;
+                double totalNetRefunded = 0;
                 boolean allReturned = true;
                 List<ReturnDetail> newReturnDetails = new ArrayList<>();
 
@@ -303,14 +403,24 @@ public class SaleUseCase {
 
                             // USAR PRECIO FINAL (CON IVA) PARA LA DEVOLUCI\u00d3N
                             double unitRefundPrice = d.getGrossTotal() / d.getQuantity();
-                            double lineRefund = qtyToReturnNow * unitRefundPrice;
+                            double lineRefund = Math.round((qtyToReturnNow * unitRefundPrice) * 100.0) / 100.0;
                             refundAmountForThisTransaction += lineRefund;
+
+                            // CALCULO PROPORCIONAL DE IMPUESTOS
+                            double factor = (double) qtyToReturnNow / d.getQuantity();
+                            double lineTaxRefund = Math.round((d.getTaxAmount() * factor) * 100.0) / 100.0;
+                            double lineNetRefund = lineRefund - lineTaxRefund;
+
+                            totalTaxRefunded += lineTaxRefund;
+                            totalNetRefunded += lineNetRefund;
 
                             ReturnDetail rd = new ReturnDetail();
                             rd.setProductId(d.getProductId());
                             rd.setQuantity(qtyToReturnNow);
                             rd.setUnitPrice(unitRefundPrice);
                             rd.setSubtotal(lineRefund);
+                            rd.setTaxAmount(lineTaxRefund);
+                            rd.setNetAmount(lineNetRefund);
                             rd.setProductName(d.getProductName()); // Snapshot del nombre original
                             newReturnDetails.add(rd);
 
@@ -370,6 +480,8 @@ public class SaleUseCase {
                     newReturn.setPaymentMethod(sale.getPaymentMethod());
                     newReturn.setCashAmount(cashToRefund);
                     newReturn.setCardAmount(cardToRefund);
+                    newReturn.setTotalTax(totalTaxRefunded);
+                    newReturn.setTaxBasis(totalNetRefunded);
 
                     // \u00e2\u201d\u20ac\u00e2\u201d\u20ac GENERACI\u00d3N DE C\u00d3dIGO FISCAL
                     // \u00daNICO PARA LA DEVOLUCI\u00d3N \u00e2\u201d\u20ac\u00e2\u201d\u20ac
@@ -418,6 +530,13 @@ public class SaleUseCase {
                 if (e instanceof SQLException)
                     throw (SQLException) e;
                 throw new SQLException("Error durante la transacci\u00f3n de devoluci\u00f3n: " + e.getMessage(), e);
+            } finally {
+                try {
+                    if (conn != null && !conn.isClosed()) {
+                        conn.setAutoCommit(true);
+                    }
+                } catch (SQLException ignored) {
+                }
             }
         }
     }
@@ -449,6 +568,23 @@ public class SaleUseCase {
         return saleRepository.getByRange(from, to).stream()
                 .filter(s -> s.getClientId() != null && s.getClientId() == clientId && !s.isReturn())
                 .collect(java.util.stream.Collectors.toList());
+    }
+
+    public List<Return> getReturnsByClient(int clientId, LocalDate from, LocalDate to) throws SQLException {
+        return saleRepository.getReturnsByRange(from, to).stream()
+                .filter(r -> {
+                    try {
+                        Sale s = saleRepository.getById(r.getSaleId());
+                        return s != null && s.getClientId() != null && s.getClientId() == clientId;
+                    } catch (SQLException e) {
+                        return false;
+                    }
+                })
+                .collect(java.util.stream.Collectors.toList());
+    }
+
+    public List<Return> getReturnsBySaleId(int saleId) throws SQLException {
+        return saleRepository.getReturnsBySaleId(saleId);
     }
 
     public List<ReturnDetail> getReturnDetails(int returnId) throws SQLException {
@@ -493,7 +629,7 @@ public class SaleUseCase {
                     .issuedAt(r.getReturnDatetime())
                     .issuer(r.getIssuerName(), r.getIssuerTaxId(), r.getIssuerAddress(), null)
                     .receiver(r.getCustomerNameSnapshot(), null, null)
-                    .amounts(r.getTotalRefunded(), 0, r.getTotalRefunded())
+                    .amounts(r.getTotalRefunded(), r.getTotalTax(), r.getTaxBasis())
                     .status(FiscalDocument.Status.EMITIDO)
                     .build();
 
@@ -507,7 +643,8 @@ public class SaleUseCase {
                 lines.add(sd);
             }
 
-            String logoPath = configRepository.getValue("logoPath");
+            SaleConfig companyData = configRepository.load();
+            String logoPath = companyData != null ? companyData.getLogoPath() : null;
             PrintData data = new PrintData(doc, sale, lines, logoPath);
 
             String year = String.valueOf(doc.getIssuedAt().getYear());
@@ -533,5 +670,15 @@ public class SaleUseCase {
 
     public java.util.Map<Integer, Integer> getHourlyDistribution(LocalDate start, LocalDate end) throws SQLException {
         return saleRepository.getHourlyDistribution(start, end);
+    }
+
+    private String generateRandomCode() {
+        String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        StringBuilder sb = new StringBuilder("GIFT-");
+        java.util.Random rnd = new java.util.Random();
+        for (int i = 0; i < 8; i++) {
+            sb.append(chars.charAt(rnd.nextInt(chars.length())));
+        }
+        return sb.toString();
     }
 }

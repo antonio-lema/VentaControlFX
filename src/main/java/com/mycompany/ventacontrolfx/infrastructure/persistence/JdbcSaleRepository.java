@@ -24,7 +24,7 @@ public class JdbcSaleRepository implements ISaleRepository {
 
     @Override
     public int saveSale(Sale sale, Connection conn) throws SQLException {
-        String sql = "INSERT INTO sales (user_id, client_id, total, payment_method, iva, sale_datetime, is_return, doc_type, doc_series, doc_number, doc_status, control_hash, total_net, total_tax, customer_name_snapshot, discount_amount, discount_reason, cash_amount, card_amount, observations) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO sales (user_id, client_id, total, payment_method, iva, sale_datetime, is_return, doc_type, doc_series, doc_number, doc_status, control_hash, total_net, total_tax, customer_name_snapshot, discount_amount, discount_reason, cash_amount, card_amount, observations, promo_code, reward_promo_code) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             pstmt.setInt(1, sale.getUserId());
             if (sale.getClientId() != null && sale.getClientId() > 0) {
@@ -54,6 +54,8 @@ public class JdbcSaleRepository implements ISaleRepository {
             pstmt.setDouble(18, sale.getCashAmount());
             pstmt.setDouble(19, sale.getCardAmount());
             pstmt.setString(20, sale.getObservations());
+            pstmt.setString(21, sale.getPromoCode());
+            pstmt.setString(22, sale.getRewardPromoCode());
             pstmt.executeUpdate();
 
             try (ResultSet rs = pstmt.getGeneratedKeys()) {
@@ -240,10 +242,10 @@ public class JdbcSaleRepository implements ISaleRepository {
     public com.mycompany.ventacontrolfx.domain.model.HistoryStats getStatsByRange(LocalDate start, LocalDate end)
             throws SQLException {
         String sql = "SELECT COUNT(*) as total_count, " +
-                "SUM(total - returned_amount) as net_total, " +
-                "SUM(cash_amount * ((total - returned_amount) / CASE WHEN total = 0 THEN 1 ELSE total END)) as net_cash, "
+                "SUM(total - COALESCE(returned_amount, 0)) as net_total, " +
+                "SUM(cash_amount * ((total - COALESCE(returned_amount, 0)) / CASE WHEN total = 0 THEN 1 ELSE total END)) as net_cash, "
                 +
-                "SUM(card_amount * ((total - returned_amount) / CASE WHEN total = 0 THEN 1 ELSE total END)) as net_card "
+                "SUM(card_amount * ((total - COALESCE(returned_amount, 0)) / CASE WHEN total = 0 THEN 1 ELSE total END)) as net_card "
                 +
                 "FROM sales WHERE sale_datetime >= ? AND sale_datetime <= ?";
         try (Connection conn = DBConnection.getConnection();
@@ -272,7 +274,7 @@ public class JdbcSaleRepository implements ISaleRepository {
 
     @Override
     public int saveReturn(Return returnRecord, Connection conn) throws SQLException {
-        String sql = "INSERT INTO returns (sale_id, user_id, return_datetime, total_refunded, reason, payment_method, cash_amount, card_amount, doc_type, doc_series, doc_number, doc_status, control_hash, customer_name_snapshot, issuer_name, issuer_tax_id, issuer_address) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO returns (sale_id, user_id, return_datetime, total_refunded, reason, payment_method, cash_amount, card_amount, doc_type, doc_series, doc_number, doc_status, control_hash, customer_name_snapshot, issuer_name, issuer_tax_id, issuer_address, total_tax, tax_basis) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             pstmt.setInt(1, returnRecord.getSaleId());
             if (returnRecord.getUserId() > 0) {
@@ -299,6 +301,8 @@ public class JdbcSaleRepository implements ISaleRepository {
             pstmt.setString(15, returnRecord.getIssuerName());
             pstmt.setString(16, returnRecord.getIssuerTaxId());
             pstmt.setString(17, returnRecord.getIssuerAddress());
+            pstmt.setDouble(18, returnRecord.getTotalTax());
+            pstmt.setDouble(19, returnRecord.getTaxBasis());
 
             pstmt.executeUpdate();
             try (ResultSet rs = pstmt.getGeneratedKeys()) {
@@ -322,7 +326,7 @@ public class JdbcSaleRepository implements ISaleRepository {
 
     @Override
     public void saveReturnDetails(List<ReturnDetail> details, int returnId, Connection conn) throws SQLException {
-        String sql = "INSERT INTO return_details (return_id, product_id, quantity, unit_price, subtotal) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO return_details (return_id, product_id, quantity, unit_price, subtotal, tax_amount, net_amount) VALUES (?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             for (ReturnDetail detail : details) {
                 pstmt.setInt(1, returnId);
@@ -330,6 +334,8 @@ public class JdbcSaleRepository implements ISaleRepository {
                 pstmt.setInt(3, detail.getQuantity());
                 pstmt.setDouble(4, detail.getUnitPrice());
                 pstmt.setDouble(5, detail.getSubtotal());
+                pstmt.setDouble(6, detail.getTaxAmount());
+                pstmt.setDouble(7, detail.getNetAmount());
                 pstmt.addBatch();
             }
             pstmt.executeBatch();
@@ -370,7 +376,11 @@ public class JdbcSaleRepository implements ISaleRepository {
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, quantity);
             pstmt.setInt(2, detailId);
-            pstmt.executeUpdate();
+            int rows = pstmt.executeUpdate();
+            if (rows == 0) {
+                throw new SQLException(
+                        "No se pudo actualizar la cantidad devuelta: ID de detalle " + detailId + " no encontrado.");
+            }
         }
     }
 
@@ -399,21 +409,20 @@ public class JdbcSaleRepository implements ISaleRepository {
                     ret.setTotalRefunded(rs.getDouble("total_refunded"));
                     ret.setReason(rs.getString("reason"));
                     ret.setClosureId((Integer) rs.getObject("closure_id"));
-                    try {
-                        ret.setPaymentMethod(rs.getString("payment_method"));
-                        ret.setCashAmount(rs.getDouble("cash_amount"));
-                        ret.setCardAmount(rs.getDouble("card_amount"));
-                        ret.setDocType(rs.getString("doc_type"));
-                        ret.setDocSeries(rs.getString("doc_series"));
-                        ret.setDocNumber((Integer) rs.getObject("doc_number"));
-                        ret.setDocStatus(rs.getString("doc_status"));
-                        ret.setControlHash(rs.getString("control_hash"));
-                        ret.setCustomerNameSnapshot(rs.getString("customer_name_snapshot"));
-                        ret.setIssuerName(rs.getString("issuer_name"));
-                        ret.setIssuerTaxId(rs.getString("issuer_tax_id"));
-                        ret.setIssuerAddress(rs.getString("issuer_address"));
-                    } catch (SQLException ignored) {
-                    }
+                    ret.setPaymentMethod(rs.getString("payment_method"));
+                    ret.setCashAmount(rs.getDouble("cash_amount"));
+                    ret.setCardAmount(rs.getDouble("card_amount"));
+                    ret.setDocType(rs.getString("doc_type"));
+                    ret.setDocSeries(rs.getString("doc_series"));
+                    ret.setDocNumber((Integer) rs.getObject("doc_number"));
+                    ret.setDocStatus(rs.getString("doc_status"));
+                    ret.setControlHash(rs.getString("control_hash"));
+                    ret.setCustomerNameSnapshot(rs.getString("customer_name_snapshot"));
+                    ret.setIssuerName(rs.getString("issuer_name"));
+                    ret.setIssuerTaxId(rs.getString("issuer_tax_id"));
+                    ret.setIssuerAddress(rs.getString("issuer_address"));
+                    ret.setTotalTax(rs.getDouble("total_tax"));
+                    ret.setTaxBasis(rs.getDouble("tax_basis"));
                     returns.add(ret);
                 }
             }
@@ -457,6 +466,8 @@ public class JdbcSaleRepository implements ISaleRepository {
                     ret.setIssuerName(rs.getString("issuer_name"));
                     ret.setIssuerTaxId(rs.getString("issuer_tax_id"));
                     ret.setIssuerAddress(rs.getString("issuer_address"));
+                    ret.setTotalTax(rs.getDouble("total_tax"));
+                    ret.setTaxBasis(rs.getDouble("tax_basis"));
                     returns.add(ret);
                 }
             }
@@ -483,6 +494,8 @@ public class JdbcSaleRepository implements ISaleRepository {
                     detail.setQuantity(rs.getInt("quantity"));
                     detail.setUnitPrice(rs.getDouble("unit_price"));
                     detail.setSubtotal(rs.getDouble("subtotal"));
+                    detail.setTaxAmount(rs.getDouble("tax_amount"));
+                    detail.setNetAmount(rs.getDouble("net_amount"));
                     detail.setProductName(rs.getString("product_name"));
                     details.add(detail);
                 }
@@ -512,7 +525,7 @@ public class JdbcSaleRepository implements ISaleRepository {
         String sql = "SELECT sd.product_name_snapshot as name, SUM(sd.quantity) as total_qty, SUM(sd.line_total) as total_amount "
                 +
                 "FROM sale_details sd JOIN sales s ON sd.sale_id = s.sale_id " +
-                "WHERE s.client_id = ? AND s.is_return = FALSE " +
+                "WHERE s.client_id = ? AND (s.is_return = 0 OR s.is_return IS NULL) " +
                 "GROUP BY sd.product_name_snapshot " +
                 "ORDER BY total_qty DESC LIMIT ?";
         try (Connection conn = DBConnection.getConnection();
@@ -537,7 +550,7 @@ public class JdbcSaleRepository implements ISaleRepository {
         List<com.mycompany.ventacontrolfx.domain.model.ClientSaleSummary> list = new ArrayList<>();
         String sql = "SELECT client_id, COUNT(sale_id) as orders, SUM(total) as spent, MAX(sale_datetime) as last_date "
                 +
-                "FROM sales WHERE sale_datetime >= ? AND sale_datetime <= ? AND (is_return IS FALSE OR is_return IS NULL) AND client_id IS NOT NULL "
+                "FROM sales WHERE sale_datetime >= ? AND sale_datetime <= ? AND (is_return = 0 OR is_return IS NULL) AND client_id IS NOT NULL "
                 +
                 "GROUP BY client_id";
         try (Connection conn = DBConnection.getConnection();
@@ -545,17 +558,17 @@ public class JdbcSaleRepository implements ISaleRepository {
             pstmt.setTimestamp(1, java.sql.Timestamp.valueOf(start.atStartOfDay()));
             pstmt.setTimestamp(2, java.sql.Timestamp.valueOf(end.atTime(java.time.LocalTime.MAX)));
 
-            // DIAGNOSTICO: Fila de prueba manual
-            list.add(new com.mycompany.ventacontrolfx.domain.model.ClientSaleSummary(1, 1, 100.0,
-                    java.time.LocalDateTime.now()));
-
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
                     Timestamp ts = rs.getTimestamp("last_date");
+                    // Use getBigDecimal to safely handle MySQL's SUM() return type,
+                    // then convert to double. Avoids silent failures on large totals.
+                    java.math.BigDecimal spentBD = rs.getBigDecimal("spent");
+                    double spent = (spentBD != null) ? spentBD.doubleValue() : 0.0;
                     list.add(new com.mycompany.ventacontrolfx.domain.model.ClientSaleSummary(
                             rs.getInt("client_id"),
                             rs.getInt("orders"),
-                            rs.getDouble("spent"),
+                            spent,
                             ts != null ? ts.toLocalDateTime() : null));
                 }
             }
@@ -566,10 +579,14 @@ public class JdbcSaleRepository implements ISaleRepository {
     @Override
     public List<Sale> getByClient(int clientId) throws SQLException {
         List<Sale> sales = new ArrayList<>();
-        String sql = "SELECT s.*, u.username FROM sales s " +
+        // Performance Fix: Use a subquery to get total items count at DB level,
+        // avoiding N+1 in Java
+        String sql = "SELECT s.*, u.username, " +
+                "(SELECT IFNULL(SUM(quantity), 0) FROM sale_details sd WHERE sd.sale_id = s.sale_id) as item_count " +
+                "FROM sales s " +
                 "LEFT JOIN users u ON s.user_id = u.user_id " +
-                "WHERE s.client_id = ? " +
-                "ORDER BY s.sale_datetime DESC";
+                "WHERE s.client_id = ? AND (s.is_return = 0 OR s.is_return IS NULL) " +
+                "ORDER BY s.sale_datetime DESC LIMIT 200";
         try (Connection conn = DBConnection.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, clientId);
@@ -595,9 +612,10 @@ public class JdbcSaleRepository implements ISaleRepository {
         sale.setTotal(rs.getDouble("total"));
         sale.setPaymentMethod(rs.getString("payment_method"));
         sale.setIva(rs.getDouble("iva"));
+        // Forzamos el booleano para evitar interpretaciones erróneas de tipos numéricos
         sale.setReturn(rs.getBoolean("is_return"));
         sale.setReturnReason(rs.getString("return_reason"));
-        sale.setReturnedAmount(rs.getDouble("returned_amount"));
+        sale.setReturnedAmount(Math.max(0, rs.getDouble("returned_amount")));
         sale.setClosureId((Integer) rs.getObject("closure_id"));
         sale.setCashAmount(rs.getDouble("cash_amount"));
         sale.setCardAmount(rs.getDouble("card_amount"));
@@ -614,6 +632,20 @@ public class JdbcSaleRepository implements ISaleRepository {
         sale.setTotalTax(rs.getDouble("total_tax"));
         sale.setCustomerNameSnapshot(rs.getString("customer_name_snapshot"));
         sale.setObservations(rs.getString("observations"));
+        sale.setPromoCode(rs.getString("promo_code"));
+        sale.setRewardPromoCode(rs.getString("reward_promo_code"));
+
+        // Transient performance optimizer
+        try {
+            ResultSetMetaData meta = rs.getMetaData();
+            for (int i = 1; i <= meta.getColumnCount(); i++) {
+                if ("item_count".equalsIgnoreCase(meta.getColumnName(i))) {
+                    sale.setTotalItems(rs.getInt("item_count"));
+                    break;
+                }
+            }
+        } catch (SQLException ignored) {
+        }
 
         return sale;
     }

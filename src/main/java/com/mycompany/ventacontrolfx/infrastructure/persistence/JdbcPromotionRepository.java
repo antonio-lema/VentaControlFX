@@ -64,8 +64,25 @@ public class JdbcPromotionRepository implements IPromotionRepository {
     }
 
     @Override
+    public Optional<Promotion> findByCode(String code) throws SQLException {
+        String sql = "SELECT * FROM promotions WHERE code = ? AND active = 1 AND (start_date IS NULL OR start_date <= DATE_ADD(NOW(), INTERVAL 1 SECOND)) AND (end_date IS NULL OR end_date >= NOW())";
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, code);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    Promotion p = mapResultSetToPromotion(rs);
+                    p.setAffectedIds(getAffectedIds(p.getId()));
+                    return Optional.of(p);
+                }
+            }
+        }
+        return Optional.empty();
+    }
+
+    @Override
     public Promotion save(Promotion p) throws SQLException {
-        String sql = "INSERT INTO promotions (name, description, type, value, start_date, end_date, active, scope, buy_qty, free_qty) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO promotions (name, description, type, value, start_date, end_date, active, scope, buy_qty, free_qty, code, max_uses, current_uses, uses_per_customer, customer_id, min_order_value) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = DBConnection.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             pstmt.setString(1, p.getName());
@@ -78,6 +95,15 @@ public class JdbcPromotionRepository implements IPromotionRepository {
             pstmt.setString(8, p.getScope().name());
             pstmt.setInt(9, p.getBuyQty());
             pstmt.setInt(10, p.getFreeQty());
+            pstmt.setString(11, p.getCode());
+            pstmt.setInt(12, p.getMaxUses());
+            pstmt.setInt(13, p.getCurrentUses());
+            pstmt.setInt(14, p.getUsesPerCustomer());
+            if (p.getCustomerId() != null)
+                pstmt.setInt(15, p.getCustomerId());
+            else
+                pstmt.setNull(15, java.sql.Types.INTEGER);
+            pstmt.setDouble(16, p.getMinOrderValue());
             pstmt.executeUpdate();
 
             try (ResultSet rs = pstmt.getGeneratedKeys()) {
@@ -92,7 +118,7 @@ public class JdbcPromotionRepository implements IPromotionRepository {
 
     @Override
     public void update(Promotion p) throws SQLException {
-        String sql = "UPDATE promotions SET name = ?, description = ?, type = ?, value = ?, start_date = ?, end_date = ?, active = ?, scope = ?, buy_qty = ?, free_qty = ? WHERE promotion_id = ?";
+        String sql = "UPDATE promotions SET name = ?, description = ?, type = ?, value = ?, start_date = ?, end_date = ?, active = ?, scope = ?, buy_qty = ?, free_qty = ?, code = ?, max_uses = ?, current_uses = ?, uses_per_customer = ?, customer_id = ?, min_order_value = ? WHERE promotion_id = ?";
         try (Connection conn = DBConnection.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, p.getName());
@@ -105,7 +131,16 @@ public class JdbcPromotionRepository implements IPromotionRepository {
             pstmt.setString(8, p.getScope().name());
             pstmt.setInt(9, p.getBuyQty());
             pstmt.setInt(10, p.getFreeQty());
-            pstmt.setInt(11, p.getId());
+            pstmt.setString(11, p.getCode());
+            pstmt.setInt(12, p.getMaxUses());
+            pstmt.setInt(13, p.getCurrentUses());
+            pstmt.setInt(14, p.getUsesPerCustomer());
+            if (p.getCustomerId() != null)
+                pstmt.setInt(15, p.getCustomerId());
+            else
+                pstmt.setNull(15, java.sql.Types.INTEGER);
+            pstmt.setDouble(16, p.getMinOrderValue());
+            pstmt.setInt(17, p.getId());
             pstmt.executeUpdate();
 
             saveAffectedIds(p.getId(), p.getAffectedIds());
@@ -197,6 +232,13 @@ public class JdbcPromotionRepository implements IPromotionRepository {
         p.setScope(PromotionScope.valueOf(rs.getString("scope")));
         p.setBuyQty(rs.getInt("buy_qty"));
         p.setFreeQty(rs.getInt("free_qty"));
+        p.setCode(rs.getString("code"));
+        p.setMaxUses(rs.getInt("max_uses"));
+        p.setCurrentUses(rs.getInt("current_uses"));
+        p.setUsesPerCustomer(rs.getInt("uses_per_customer"));
+        int customerId = rs.getInt("customer_id");
+        p.setCustomerId(rs.wasNull() ? null : customerId);
+        p.setMinOrderValue(rs.getDouble("min_order_value"));
         return p;
     }
 }

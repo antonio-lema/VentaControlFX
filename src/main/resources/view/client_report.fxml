@@ -7,6 +7,7 @@
 <VBox xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mycompany.ventacontrolfx.presentation.controller.ClientReportController" styleClass="main-content-area" spacing="0">
     <stylesheets>
         <java.net.URL value="@../styles/components/crm-styles.css"/>
+        <java.net.URL value="@../styles/components/informes.css"/>
     </stylesheets>
     
     <!-- Header -->
@@ -27,67 +28,74 @@
                     <TextField fx:id="txtSearch" promptText="Buscar cliente, empresa o CIF..." style="-fx-background-color: transparent; -fx-prompt-text-fill: #94a3b8; -fx-text-fill: -fx-text-custom-main;" HBox.hgrow="ALWAYS"/>
                 </HBox>
                 
-                <ComboBox fx:id="cmbDateRange" style="-fx-background-color: -fx-bg-surface; -fx-border-color: #e2e8f0; -fx-border-radius: 6; -fx-padding: 2 10; -fx-font-weight: bold; -fx-text-fill: -fx-text-custom-main; -fx-min-width: 140;"/>
+                <ComboBox fx:id="cmbDateRange" styleClass="combo-limit" style="-fx-min-width: 140;"/>
             </HBox>
         </HBox>
     </VBox>
 
     <ScrollPane fitToWidth="true" style="-fx-background-color: transparent; -fx-background: transparent; -fx-border-color: transparent;" VBox.vgrow="ALWAYS">
-        <VBox spacing="24" style="-fx-padding: 24 30;">
+        <VBox spacing="24" style="-fx-padding: 30;">
         
-            <!-- KPI Cards -->
+            <!-- KPI Cards SaaS Style -->
             <HBox spacing="20" VBox.vgrow="NEVER">
-                <!-- Clientes Activos -->
-                <VBox HBox.hgrow="ALWAYS" style="-fx-background-color: -fx-bg-surface; -fx-background-radius: 12; -fx-padding: 20; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.04), 10, 0, 0, 4);" minWidth="200">
-                    <HBox alignment="CENTER_LEFT" spacing="10">
-                        <StackPane style="-fx-background-color: #e0e7ff; -fx-background-radius: 8; -fx-padding: 8; -fx-min-width: 32; -fx-min-height: 32;">
-                            <FontAwesomeIconView glyphName="USERS" fill="#4f46e5" size="16"/>
-                        </StackPane>
-                        <Label text="Clientes Activos" style="-fx-font-size: 13px; -fx-text-fill: #64748b; -fx-font-weight: bold;"/>
-                    </HBox>
-                    <HBox alignment="BOTTOM_LEFT" spacing="12" style="-fx-padding: 12 0 0 0;">
-                        <Label fx:id="lblKpiActive" text="0" style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: -fx-text-custom-main;"/>
-                        <Label fx:id="lblKpiActiveVar" text="-" style="-fx-background-color: #dcfce7; -fx-text-fill: #16a34a; -fx-padding: 2 6; -fx-background-radius: 10; -fx-font-size: 11px; -fx-font-weight: bold;"/>
-                    </HBox>
+                <!-- Clientes Activos: Blue -->
+                <VBox styleClass="kpi-card-saas, kpi-card-blue" HBox.hgrow="ALWAYS">
+                    <children>
+                        <HBox alignment="CENTER_LEFT" spacing="10">
+                            <StackPane styleClass="icon-bg-blue"><FontAwesomeIconView glyphName="USERS" fill="#1e88e5" size="16"/></StackPane>
+                            <Label text="CLIENTES ACTIVOS" styleClass="kpi-label-saas" />
+                        </HBox>
+                        <HBox alignment="BOTTOM_LEFT" spacing="10">
+                            <Label fx:id="lblKpiActive" text="0" styleClass="kpi-value-saas" />
+                            <Label fx:id="lblKpiActiveVar" text="-" styleClass="trend-text" style="-fx-background-color: #dcfce7; -fx-text-fill: #16a34a; -fx-padding: 2 6; -fx-background-radius: 10;" />
+                        </HBox>
+                        <Label text="Ventas últimos 30 días" styleClass="trend-text" />
+                    </children>
                 </VBox>
-                <!-- Facturaci&#x00f3;n Total -->
-                <VBox HBox.hgrow="ALWAYS" style="-fx-background-color: -fx-bg-surface; -fx-background-radius: 12; -fx-padding: 20; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.04), 10, 0, 0, 4);" minWidth="200">
-                    <HBox alignment="CENTER_LEFT" spacing="10">
-                        <StackPane style="-fx-background-color: #dcfce7; -fx-background-radius: 8; -fx-padding: 8; -fx-min-width: 32; -fx-min-height: 32;">
-                            <FontAwesomeIconView glyphName="MONEY" fill="#16a34a" size="16"/>
-                        </StackPane>
-                        <Label text="Facturaci&#x00f3;n Total" style="-fx-font-size: 13px; -fx-text-fill: #64748b; -fx-font-weight: bold;"/>
-                    </HBox>
-                    <HBox alignment="BOTTOM_LEFT" spacing="12" style="-fx-padding: 12 0 0 0;">
-                        <Label fx:id="lblKpiTotal" text="&#x20ac0;.00" style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: -fx-text-custom-main;"/>
-                        <Label fx:id="lblKpiTotalVar" text="-" style="-fx-background-color: #dcfce7; -fx-text-fill: #16a34a; -fx-padding: 2 6; -fx-background-radius: 10; -fx-font-size: 11px; -fx-font-weight: bold;"/>
-                    </HBox>
+
+                <!-- Facturaci&#x00f3;n Total: Green -->
+                <VBox styleClass="kpi-card-saas, kpi-card-green" HBox.hgrow="ALWAYS">
+                    <children>
+                        <HBox alignment="CENTER_LEFT" spacing="10">
+                            <StackPane styleClass="icon-bg-green"><FontAwesomeIconView glyphName="MONEY" fill="#10b981" size="16"/></StackPane>
+                            <Label text="FACTURACIÓN TOTAL" styleClass="kpi-label-saas" />
+                        </HBox>
+                        <HBox alignment="BOTTOM_LEFT" spacing="10">
+                            <Label fx:id="lblKpiTotal" text="&#x20ac;0.00" styleClass="kpi-value-saas" />
+                            <Label fx:id="lblKpiTotalVar" text="-" styleClass="trend-text" style="-fx-background-color: #dcfce7; -fx-text-fill: #16a34a; -fx-padding: 2 6; -fx-background-radius: 10;" />
+                        </HBox>
+                        <Label text="Volumen bruto por cliente" styleClass="trend-text" />
+                    </children>
                 </VBox>
-                <!-- Compra Media -->
-                <VBox HBox.hgrow="ALWAYS" style="-fx-background-color: -fx-bg-surface; -fx-background-radius: 12; -fx-padding: 20; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.04), 10, 0, 0, 4);" minWidth="200">
-                    <HBox alignment="CENTER_LEFT" spacing="10">
-                        <StackPane style="-fx-background-color: #fef3c7; -fx-background-radius: 8; -fx-padding: 8; -fx-min-width: 32; -fx-min-height: 32;">
-                            <FontAwesomeIconView glyphName="SHOPPING_BASKET" fill="#d97706" size="16"/>
-                        </StackPane>
-                        <Label text="Compra Media" style="-fx-font-size: 13px; -fx-text-fill: #64748b; -fx-font-weight: bold;"/>
-                    </HBox>
-                    <HBox alignment="BOTTOM_LEFT" spacing="12" style="-fx-padding: 12 0 0 0;">
-                        <Label fx:id="lblKpiAvgOrder" text="&#x20ac0;.00" style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: -fx-text-custom-main;"/>
-                        <Label fx:id="lblKpiAvgOrderVar" text="-" style="-fx-background-color: #fee2e2; -fx-text-fill: #dc2626; -fx-padding: 2 6; -fx-background-radius: 10; -fx-font-size: 11px; -fx-font-weight: bold;"/>
-                    </HBox>
+
+                <!-- Compra Media: Gold -->
+                <VBox styleClass="kpi-card-saas, kpi-card-gold" HBox.hgrow="ALWAYS">
+                    <children>
+                        <HBox alignment="CENTER_LEFT" spacing="10">
+                            <StackPane styleClass="icon-bg-gold"><FontAwesomeIconView glyphName="SHOPPING_BASKET" fill="#f59e0b" size="16"/></StackPane>
+                            <Label text="COMPRA MEDIA" styleClass="kpi-label-saas" />
+                        </HBox>
+                        <HBox alignment="BOTTOM_LEFT" spacing="10">
+                            <Label fx:id="lblKpiAvgOrder" text="&#x20ac;0.00" styleClass="kpi-value-saas" />
+                            <Label fx:id="lblKpiAvgOrderVar" text="-" styleClass="trend-text" style="-fx-background-color: #fee2e2; -fx-text-fill: #dc2626; -fx-padding: 2 6; -fx-background-radius: 10;" />
+                        </HBox>
+                        <Label text="Importe medio por ticket" styleClass="trend-text" />
+                    </children>
                 </VBox>
-                <!-- LTV Estimado -->
-                <VBox HBox.hgrow="ALWAYS" style="-fx-background-color: -fx-bg-surface; -fx-background-radius: 12; -fx-padding: 20; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.04), 10, 0, 0, 4);" minWidth="200">
-                    <HBox alignment="CENTER_LEFT" spacing="10">
-                        <StackPane style="-fx-background-color: #f3e8ff; -fx-background-radius: 8; -fx-padding: 8; -fx-min-width: 32; -fx-min-height: 32;">
-                            <FontAwesomeIconView glyphName="LINE_CHART" fill="#9333ea" size="16"/>
-                        </StackPane>
-                        <Label text="Valor del Cliente (LTV)" style="-fx-font-size: 13px; -fx-text-fill: #64748b; -fx-font-weight: bold;"/>
-                    </HBox>
-                    <HBox alignment="BOTTOM_LEFT" spacing="12" style="-fx-padding: 12 0 0 0;">
-                        <Label fx:id="lblKpiLtv" text="&#x20ac0;.00" style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: -fx-text-custom-main;"/>
-                        <Label fx:id="lblKpiLtvVar" text="-" style="-fx-background-color: #dcfce7; -fx-text-fill: #16a34a; -fx-padding: 2 6; -fx-background-radius: 10; -fx-font-size: 11px; -fx-font-weight: bold;"/>
-                    </HBox>
+
+                <!-- Valor del Cliente (LTV): Purple -->
+                <VBox styleClass="kpi-card-saas, kpi-card-purple" HBox.hgrow="ALWAYS">
+                    <children>
+                        <HBox alignment="CENTER_LEFT" spacing="10">
+                            <StackPane styleClass="icon-bg-purple"><FontAwesomeIconView glyphName="LINE_CHART" fill="#8b5cf6" size="16"/></StackPane>
+                            <Label text="VALOR CLIENTE (LTV)" styleClass="kpi-label-saas" />
+                        </HBox>
+                        <HBox alignment="BOTTOM_LEFT" spacing="10">
+                            <Label fx:id="lblKpiLtv" text="&#x20ac;0.00" styleClass="kpi-value-saas" />
+                            <Label fx:id="lblKpiLtvVar" text="-" styleClass="trend-text" style="-fx-background-color: #dcfce7; -fx-text-fill: #16a34a; -fx-padding: 2 6; -fx-background-radius: 10;" />
+                        </HBox>
+                        <Label text="Valor histórico medio" styleClass="trend-text" />
+                    </children>
                 </VBox>
             </HBox>
 

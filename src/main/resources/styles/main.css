@@ -68,3 +68,27 @@
 .menu-item:focused .label {
     -fx-text-fill: white !important;
 }
+
+/* --- POPUP & MODAL UNIFICATION --- */
+.modal-container,
+.alert-root {
+    -fx-background-color: -fx-bg-surface;
+    -fx-background-radius: -fx-radius-lg;
+    -fx-border-radius: -fx-radius-lg;
+    -fx-border-color: -fx-color-border-main;
+    -fx-border-width: 1;
+    -fx-effect: -fx-shadow-large;
+    -fx-padding: 30;
+}
+
+.alert-button {
+    -fx-background-radius: -fx-radius-md;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+    -fx-transition: all 0.2s;
+}
+
+.alert-button:hover {
+    -fx-opacity: 0.9;
+    -fx-translate-y: -1;
+}

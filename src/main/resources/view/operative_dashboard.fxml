@@ -119,7 +119,7 @@
                                     <HBox alignment="CENTER_LEFT" spacing="15">
                                         <Label text="%dashboard.section.staff" styleClass="card-title" />
                                         <Region HBox.hgrow="ALWAYS" />
-                                        <Button text="%dashboard.btn.history" styleClass="btn-link" />
+                                        <Button onAction="#handleShowAudit" text="%dashboard.btn.history" styleClass="btn-link" />
                                     </HBox>
                                     <TableView fx:id="tableActiveStaff" prefHeight="400" styleClass="modern-table">
                                         <columns>

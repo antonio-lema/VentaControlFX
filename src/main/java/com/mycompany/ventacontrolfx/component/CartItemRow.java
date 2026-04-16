@@ -31,7 +31,7 @@ public class CartItemRow extends HBox {
 
     private final java.util.ResourceBundle bundle;
 
-    public CartItemRow(CartItem cartItem, double globalTaxRate, boolean pricesIncludeTax, 
+    public CartItemRow(CartItem cartItem, double globalTaxRate, boolean pricesIncludeTax,
             java.util.ResourceBundle bundle,
             Runnable onIncrement, Runnable onDecrement, Runnable onDelete,
             Consumer<Integer> onSetQuantity, Runnable onEdit) {
@@ -197,8 +197,8 @@ public class CartItemRow extends HBox {
 
         Button deleteBtn = new Button();
         deleteBtn.getStyleClass().add("cart-delete-btn-reveal");
-        FontAwesomeIconView trashIcon = new FontAwesomeIconView(FontAwesomeIcon.TRASH);
-        trashIcon.setSize("14");
+        FontAwesomeIconView trashIcon = new FontAwesomeIconView(FontAwesomeIcon.TRASH_ALT);
+        trashIcon.setSize("16");
         trashIcon.getStyleClass().add("icon-white");
         deleteBtn.setGraphic(trashIcon);
         StackPane.setAlignment(deleteBtn, Pos.CENTER_RIGHT);
@@ -277,7 +277,8 @@ public class CartItemRow extends HBox {
     }
 
     private String translateDynamic(String text) {
-        if (text == null || text.isBlank()) return text;
+        if (text == null || text.isBlank())
+            return text;
         if (bundle != null && bundle.containsKey(text)) {
             return bundle.getString(text);
         }

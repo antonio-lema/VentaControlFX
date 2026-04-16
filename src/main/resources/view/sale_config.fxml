@@ -137,6 +137,16 @@
                                                HBox.hgrow="ALWAYS" styleClass="modern-input-field"/>
                                 </HBox>
                             </VBox>
+
+                            <!-- Nombre de la Terminal / Caja -->
+                            <VBox styleClass="config-field-group">
+                                <Label text="%config.field.terminal_name" styleClass="config-field-label"/>
+                                <HBox styleClass="config-input-container">
+                                    <FontAwesomeIconView glyphName="DESKTOP" size="14" styleClass="sidebar-icon"/>
+                                    <TextField fx:id="txtTerminalName" promptText="%config.field.terminal_name.prompt"
+                                               HBox.hgrow="ALWAYS" styleClass="modern-input-field"/>
+                                </HBox>
+                            </VBox>
                         </VBox>
                     </VBox>
 

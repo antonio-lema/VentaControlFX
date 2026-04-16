@@ -647,11 +647,29 @@ public class JdbcProductRepository implements IProductRepository {
 
     @Override
     public int updateStock(int productId, int quantityDelta, Connection conn) throws SQLException {
-        String updateSql = "UPDATE products SET stock_quantity = stock_quantity + ? WHERE product_id = ? AND manage_stock = TRUE";
+        // FIX: A\\u00f1adida validaci\\u00f3n at\\u00f3mica de stock suficiente en la
+        // query para evitar stock negativo.
+        String updateSql = "UPDATE products SET stock_quantity = stock_quantity + ? " +
+                "WHERE product_id = ? AND manage_stock = TRUE " +
+                "AND (stock_quantity + ? >= 0)";
         try (PreparedStatement pstmt = conn.prepareStatement(updateSql)) {
             pstmt.setInt(1, quantityDelta);
             pstmt.setInt(2, productId);
-            pstmt.executeUpdate();
+            pstmt.setInt(3, quantityDelta);
+            int updated = pstmt.executeUpdate();
+
+            if (updated == 0) {
+                // Verificar si es porque manage_stock es FALSE o por stock insuficiente
+                String checkSql = "SELECT manage_stock, stock_quantity FROM products WHERE product_id = ?";
+                try (PreparedStatement checkPstmt = conn.prepareStatement(checkSql)) {
+                    checkPstmt.setInt(1, productId);
+                    try (ResultSet rs = checkPstmt.executeQuery()) {
+                        if (rs.next() && rs.getBoolean("manage_stock") && quantityDelta < 0) {
+                            throw new SQLException("STOCK_INSUFICIENTE: Stock actual " + rs.getInt("stock_quantity"));
+                        }
+                    }
+                }
+            }
         }
 
         // Recuperar el nuevo stock para devolverlo (MySQL no soporta UPDATE ...
@@ -832,6 +850,101 @@ public class JdbcProductRepository implements IProductRepository {
             }
         }
         return products;
+    }
+
+    @Override
+    public List<Product> getPromotedPaginated(List<Integer> productIds, List<Integer> categoryIds,
+            boolean hasGlobalPromo, int limit, int offset, int priceListId) throws SQLException {
+        if (hasGlobalPromo) {
+            return searchPaginated("", limit, offset, priceListId, VisibilityFilter.VISIBLE);
+        }
+
+        if ((productIds == null || productIds.isEmpty()) && (categoryIds == null || categoryIds.isEmpty())) {
+            return new ArrayList<>();
+        }
+
+        StringBuilder whereClause = new StringBuilder(" WHERE p.visible = TRUE AND (");
+        boolean first = true;
+        if (productIds != null && !productIds.isEmpty()) {
+            whereClause.append("p.product_id IN (")
+                    .append(productIds.stream().map(String::valueOf).reduce((a, b) -> a + "," + b).get())
+                    .append(")");
+            first = false;
+        }
+        if (categoryIds != null && !categoryIds.isEmpty()) {
+            if (!first)
+                whereClause.append(" OR ");
+            whereClause.append("p.category_id IN (")
+                    .append(categoryIds.stream().map(String::valueOf).reduce((a, b) -> a + "," + b).get())
+                    .append(")");
+        }
+        whereClause.append(")");
+
+        String priceSubquery = (priceListId > 0)
+                ? "COALESCE((SELECT pp.price FROM product_prices pp WHERE pp.product_id = p.product_id AND pp.price_list_id = ? AND pp.start_date <= CURRENT_TIMESTAMP AND (pp.end_date IS NULL OR pp.end_date > CURRENT_TIMESTAMP) ORDER BY pp.start_date DESC LIMIT 1), (SELECT pp.price FROM product_prices pp JOIN price_lists pl ON pp.price_list_id = pl.price_list_id WHERE pp.product_id = p.product_id AND pl.is_default = 1 AND pp.start_date <= CURRENT_TIMESTAMP AND (pp.end_date IS NULL OR pp.end_date > CURRENT_TIMESTAMP) ORDER BY pp.start_date DESC LIMIT 1), 0.0)"
+                : "COALESCE((SELECT pp.price FROM product_prices pp JOIN price_lists pl ON pp.price_list_id = pl.price_list_id WHERE pp.product_id = p.product_id AND pl.is_default = 1 AND pp.start_date <= CURRENT_TIMESTAMP AND (pp.end_date IS NULL OR pp.end_date > CURRENT_TIMESTAMP) ORDER BY pp.start_date DESC LIMIT 1), 0.0)";
+
+        String sql = "SELECT p.*, c.name AS category_name, c.default_iva AS category_iva, " +
+                priceSubquery + " AS current_price " +
+                "FROM products p LEFT JOIN categories c ON p.category_id = c.category_id " +
+                whereClause.toString() +
+                " ORDER BY p.name ASC LIMIT ? OFFSET ?";
+
+        List<Product> products = new ArrayList<>();
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            int paramIndex = 1;
+            if (priceListId > 0)
+                pstmt.setInt(paramIndex++, priceListId);
+            pstmt.setInt(paramIndex++, limit);
+            pstmt.setInt(paramIndex++, offset);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    products.add(mapResultSetToProduct(rs));
+                }
+            }
+        }
+        return products;
+    }
+
+    @Override
+    public int countPromoted(List<Integer> productIds, List<Integer> categoryIds, boolean hasGlobalPromo)
+            throws SQLException {
+        if (hasGlobalPromo) {
+            return countSearch("", VisibilityFilter.VISIBLE);
+        }
+
+        if ((productIds == null || productIds.isEmpty()) && (categoryIds == null || categoryIds.isEmpty())) {
+            return 0;
+        }
+
+        StringBuilder whereClause = new StringBuilder(" WHERE p.visible = TRUE AND (");
+        boolean first = true;
+        if (productIds != null && !productIds.isEmpty()) {
+            whereClause.append("p.product_id IN (")
+                    .append(productIds.stream().map(String::valueOf).reduce((a, b) -> a + "," + b).get())
+                    .append(")");
+            first = false;
+        }
+        if (categoryIds != null && !categoryIds.isEmpty()) {
+            if (!first)
+                whereClause.append(" OR ");
+            whereClause.append("p.category_id IN (")
+                    .append(categoryIds.stream().map(String::valueOf).reduce((a, b) -> a + "," + b).get())
+                    .append(")");
+        }
+        whereClause.append(")");
+
+        String sql = "SELECT COUNT(*) FROM products p " + whereClause.toString();
+        try (Connection conn = DBConnection.getConnection();
+                Statement stmt = conn.createStatement();
+                ResultSet rs = stmt.executeQuery(sql)) {
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        }
+        return 0;
     }
 
     @Override

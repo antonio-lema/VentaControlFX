@@ -113,6 +113,15 @@
     -fx-fill: #d97706;
 }
 
+.kpi-red .kpi-icon-wrap {
+    -fx-background-color: #fee2e2;
+    -fx-text-fill: #ef4444;
+}
+
+.kpi-red FontAwesomeIconView {
+    -fx-fill: #ef4444;
+}
+
 /* Data Cards */
 .data-card {
     -fx-background-color: white;

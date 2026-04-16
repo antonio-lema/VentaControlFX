@@ -7,6 +7,8 @@ public class ReturnDetail {
     private int quantity;
     private double unitPrice;
     private double subtotal;
+    private double taxAmount;
+    private double netAmount;
     private String productName; // Helper for display if needed
 
     public ReturnDetail() {
@@ -75,5 +77,21 @@ public class ReturnDetail {
 
     public void setProductName(String productName) {
         this.productName = productName;
+    }
+
+    public double getTaxAmount() {
+        return taxAmount;
+    }
+
+    public void setTaxAmount(double taxAmount) {
+        this.taxAmount = taxAmount;
+    }
+
+    public double getNetAmount() {
+        return netAmount;
+    }
+
+    public void setNetAmount(double netAmount) {
+        this.netAmount = netAmount;
     }
 }

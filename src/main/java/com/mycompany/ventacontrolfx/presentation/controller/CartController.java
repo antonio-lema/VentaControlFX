@@ -15,16 +15,13 @@ import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextArea;
 import javafx.scene.Scene;
 import javafx.scene.paint.Color;
 import javafx.scene.layout.VBox;
 import javafx.scene.layout.HBox;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
 import javafx.stage.Modality;
 import javafx.stage.StageStyle;
 import javafx.animation.FadeTransition;
@@ -50,6 +47,8 @@ public class CartController implements Injectable {
     private VBox observationContainer;
     @FXML
     private Label lblGeneralObservation;
+    @FXML
+    private TextField txtPromoCode;
 
     private ServiceContainer container;
     private NavigationService navigationService;
@@ -122,6 +121,9 @@ public class CartController implements Injectable {
         observationContainer.visibleProperty().bind(cartUseCase.generalObservationProperty().isNotEmpty());
         observationContainer.managedProperty().bind(observationContainer.visibleProperty());
         lblGeneralObservation.textProperty().bind(cartUseCase.generalObservationProperty());
+
+        // Promo Code Binding
+        txtPromoCode.textProperty().bindBidirectional(cartUseCase.appliedPromoCodeProperty());
     }
 
     private void initListeners() {
@@ -134,7 +136,8 @@ public class CartController implements Injectable {
                         refreshPriceListLabel();
                         // Esperamos- [x] Investigar el estado de `CartController` para asegurar que la
                         // funcionalidad de borrado existe
-                        // - [x] Corregir l\u00f3gica de visibilidad en `CartController.java` (a\u00f1adidos logs)
+                        // - [x] Corregir l\u00f3gica de visibilidad en `CartController.java`
+                        // (a\u00f1adidos logs)
                         // - [x] A\u00f1adir `fx:id` en `cart_panel.fxml`
                         // - [x] Restaurar y simplificar estilos en `carrito.css`
                         // - [x] Forzar visibilidad y color en FXML para diagn\u00f3stico
@@ -201,6 +204,15 @@ public class CartController implements Injectable {
     @FXML
     private void showAddClientDialog() {
         navigationService.navigateTo("/view/clients.fxml");
+    }
+
+    @FXML
+    private void handleApplyPromo() {
+        // Triggered by the button, we just force a refresh
+        cartUseCase.updateTotals();
+        AlertUtil.showToast(container.getBundle().getString("cart.promo.applied_toast") != null
+                ? container.getBundle().getString("cart.promo.applied_toast")
+                : "C\u00f3digo procesado");
     }
 
     @FXML
@@ -502,7 +514,8 @@ public class CartController implements Injectable {
     @FXML
     private void handleShowSuspendedCarts() {
         try {
-            ModalService.showTransparentModal("/view/suspended_carts_dialog.fxml", container.getBundle().getString("cart.suspended.title"), container,
+            ModalService.showTransparentModal("/view/suspended_carts_dialog.fxml",
+                    container.getBundle().getString("cart.suspended.title"), container,
                     (SuspendedCartsDialogController controller) -> {
                         if (controller == null)
                             return;
@@ -556,14 +569,20 @@ public class CartController implements Injectable {
                             Integer clientId = client != null ? client.getId() : null;
                             String observations = cartUseCase.getGeneralObservation();
                             int userId = container.getUserSession().getCurrentUser().getUserId();
-                            System.out.println("[CartController] Processing sale: " + items.size() + " items.");
+                            String promoCode = cartUseCase.getAppliedPromoCode();
+                            System.out.println("[CartController] Processing sale: " + items.size() + " items. Promo: "
+                                    + promoCode);
 
                             container.getAsyncManager().runAsyncTask(() -> {
-                                // \u00e2\u201d\u20ac\u00e2\u201d\u20ac 1. PROCESAR VENTA EN HILO DE FONDO \u00e2\u201d\u20ac\u00e2\u201d\u20ac
-                                int saleId = container.getSaleUseCase().processSale(items, total, method, clientId,
-                                        userId, 0.0, null, cashAmount, cardAmount, observations);
+                                // \u00e2\u201d\u20ac\u00e2\u201d\u20ac 1. PROCESAR VENTA EN HILO DE FONDO
+                                // \u00e2\u201d\u20ac\u00e2\u201d\u20ac
+                                com.mycompany.ventacontrolfx.application.usecase.SaleUseCase.ProcessSaleResult result = container
+                                        .getSaleUseCase().processSale(items, total, method, clientId,
+                                                userId, 0.0, null, cashAmount, cardAmount, observations, promoCode);
+                                int saleId = result.saleId;
 
-                                // \u00e2\u201d\u20ac\u00e2\u201d\u20ac 2. EMISI\u00d3N FISCAL AUTOM\u00c1TICA EN HILO DE FONDO \u00e2\u201d\u20ac\u00e2\u201d\u20ac
+                                // \u00e2\u201d\u20ac\u00e2\u201d\u20ac 2. EMISI\u00d3N FISCAL AUTOM\u00c1TICA
+                                // EN HILO DE FONDO \u00e2\u201d\u20ac\u00e2\u201d\u20ac
                                 try {
                                     if (client != null && client.getTaxId() != null
                                             && !client.getTaxId().trim().isEmpty()) {
@@ -591,10 +610,15 @@ public class CartController implements Injectable {
                                 } catch (Exception fiscalEx) {
                                     System.err.println("Error en emisi\u00f3n fiscal: " + fiscalEx.getMessage());
                                 }
-                                return saleId;
+                                return result;
 
-                            }, (Integer saleId) -> {
-                                // \u00e2\u201d\u20ac\u00e2\u201d\u20ac 3. ACTUALIZAR UI EN HILO PRINCIPAL \u00e2\u201d\u20ac\u00e2\u201d\u20ac
+                            }, (com.mycompany.ventacontrolfx.application.usecase.SaleUseCase.ProcessSaleResult result) -> {
+                                int saleId = result.saleId;
+                                String rewardCode = result.rewardPromoCode;
+                                double rAmount = result.rewardAmount;
+                                java.time.LocalDateTime rExpiry = result.rewardExpiryDate;
+                                // \u00e2\u201d\u20ac\u00e2\u201d\u20ac 3. ACTUALIZAR UI EN HILO PRINCIPAL
+                                // \u00e2\u201d\u20ac\u00e2\u201d\u20ac
                                 cartUseCase.clear();
                                 container.getEventBus().publishDataChange();
 
@@ -606,7 +630,7 @@ public class CartController implements Injectable {
                                             if (client != null)
                                                 rc.setClientInfo(client);
                                             rc.setReceiptData(items, total, paid, change, method, saleId, null, null,
-                                                    observations);
+                                                    observations, rewardCode, rAmount, rExpiry);
                                         });
 
                             }, (Throwable e) -> {

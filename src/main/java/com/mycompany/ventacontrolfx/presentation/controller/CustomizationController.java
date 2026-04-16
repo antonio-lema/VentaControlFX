@@ -5,12 +5,14 @@ import com.mycompany.ventacontrolfx.infrastructure.config.ServiceContainer;
 import com.mycompany.ventacontrolfx.domain.repository.IAppSettingsRepository;
 import com.mycompany.ventacontrolfx.presentation.theme.ThemeManager;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.paint.Color;
+import javafx.animation.Timeline;
+import javafx.animation.KeyFrame;
+import javafx.util.Duration;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
@@ -321,39 +323,45 @@ public class CustomizationController implements Injectable {
 
     @FXML
     private void applyClassicBlue() {
-        // Sidebar = azul el\u00e9ctrico. Gradiente: #1e88e5 \u2192 azul oscuro \u2192 azul casi negro
+        // Sidebar = azul el\u00e9ctrico. Gradiente: #1e88e5 \u2192 azul oscuro \u2192
+        // azul casi negro
         applyPalette("#1e88e5", "#64748b", "#fafbfc", "#2c3e50", "#2c3e50", "#2c3e50", "#1e88e5");
     }
 
     @FXML
     private void applyEmeraldGreen() {
-        // Sidebar = verde esmeralda. Gradiente: #2e7d32 \u2192 verde oscuro \u2192 verde casi
+        // Sidebar = verde esmeralda. Gradiente: #2e7d32 \u2192 verde oscuro \u2192
+        // verde casi
         // negro
         applyPalette("#2e7d32", "#455a64", "#f1f8e9", "#1b5e20", "#1b5e20", "#10b981", "#2e7d32");
     }
 
     @FXML
     private void applyMidnightPurple() {
-        // Sidebar = p\u00farpura regio. Gradiente: #6a1b9a \u2192 violeta oscuro \u2192 negro violeta
+        // Sidebar = p\u00farpura regio. Gradiente: #6a1b9a \u2192 violeta oscuro \u2192
+        // negro violeta
         applyPalette("#6a1b9a", "#37474f", "#f3e5f5", "#4a148c", "#4a148c", "#4a148c", "#6a1b9a");
     }
 
     @FXML
     private void applySunsetAmber() {
-        // Sidebar = \u00e1mbar ardiente. Gradiente: #ef6c00 \u2192 naranja oscuro \u2192 marr\u00f3n casi
+        // Sidebar = \u00e1mbar ardiente. Gradiente: #ef6c00 \u2192 naranja oscuro
+        // \u2192 marr\u00f3n casi
         // negro
         applyPalette("#ef6c00", "#4e342e", "#fff8e1", "#3e2723", "#3e2723", "#e65100", "#ef6c00");
     }
 
     @FXML
     private void applySoftRose() {
-        // Sidebar = rosa oscuro. Gradiente: #d81b60 \u2192 rosa oscuro \u2192 granate casi negro
+        // Sidebar = rosa oscuro. Gradiente: #d81b60 \u2192 rosa oscuro \u2192 granate
+        // casi negro
         applyPalette("#d81b60", "#4a148c", "#fce4ec", "#880e4f", "#880e4f", "#880e4f", "#d81b60");
     }
 
     @FXML
     private void applyOceanTeal() {
-        // Sidebar = turquesa oc\u00e9ano. Gradiente: #0d9488 \u2192 teal oscuro \u2192 azul-verde casi
+        // Sidebar = turquesa oc\u00e9ano. Gradiente: #0d9488 \u2192 teal oscuro \u2192
+        // azul-verde casi
         // negro
         applyPalette("#0d9488", "#1e293b", "#f0fdfa", "#134e4a", "#134e4a", "#134e4a", "#0d9488");
     }
@@ -380,28 +388,29 @@ public class CustomizationController implements Injectable {
         stage.initStyle(javafx.stage.StageStyle.TRANSPARENT);
         stage.initModality(javafx.stage.Modality.NONE);
 
-        javafx.scene.layout.VBox root = new javafx.scene.layout.VBox(15);
-        root.setPadding(new javafx.geometry.Insets(22));
-        root.setPrefWidth(260);
-        root.setStyle("-fx-background-color:" + bg + ";" +
-                "-fx-border-color:" + primary + ";" +
-                "-fx-border-width:2.5;" +
-                "-fx-background-radius:16;" +
-                "-fx-border-radius:16;" +
-                "-fx-effect:dropshadow(three-pass-box,rgba(0,0,0,0.28),20,0,0,10);");
+        javafx.scene.layout.VBox root = new javafx.scene.layout.VBox(18);
+        root.setPadding(new javafx.geometry.Insets(30));
+        root.setPrefWidth(300);
+        root.setStyle("-fx-background-color: " + bg + ";" +
+                "-fx-background-radius: 24;" +
+                "-fx-border-color: " + primary + "44;" +
+                "-fx-border-width: 2;" +
+                "-fx-border-radius: 24;" +
+                "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 25, 0, 0, 10);");
         root.setAlignment(javafx.geometry.Pos.CENTER);
 
-        Label title = new Label("\u2728 Paleta Aplicada");
-        title.setStyle("-fx-text-fill:" + primary + ";-fx-font-weight:bold;-fx-font-size:17px;");
+        Label title = new Label("Paleta Aplicada");
+        title.setStyle("-fx-text-fill: " + primary + "; -fx-font-weight: 900; -fx-font-size: 20px;");
 
-        Label sub = new Label("As\u00ed lucir\u00e1n tus colores en la app.");
-        sub.setStyle("-fx-text-fill:" + text + ";-fx-font-size:12px;");
+        Label sub = new Label("La interfaz se ha actualizado con tus nuevos colores premium.");
+        sub.setStyle("-fx-text-fill: " + text + "; -fx-font-size: 13px; -fx-opacity: 0.8;");
         sub.setWrapText(true);
         sub.setTextAlignment(javafx.scene.text.TextAlignment.CENTER);
 
-        Button btn = new Button("\u00a1Perfecto!");
-        btn.setStyle("-fx-background-color:" + primary + ";-fx-text-fill:white;-fx-font-weight:bold;" +
-                "-fx-background-radius:20;-fx-padding:9 28;-fx-cursor:hand;");
+        Button btn = new Button("GENIAL");
+        btn.setCursor(javafx.scene.Cursor.HAND);
+        btn.setStyle("-fx-background-color: " + primary + "; -fx-text-fill: white; -fx-font-weight: bold; " +
+                "-fx-background-radius: 12; -fx-padding: 10 35; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 10, 0, 0, 4);");
         btn.setOnAction(e -> stage.close());
 
         root.getChildren().addAll(title, sub, btn);
@@ -411,18 +420,15 @@ public class CustomizationController implements Injectable {
         stage.setScene(scene);
 
         if (cpPrimary != null && cpPrimary.getScene() != null) {
-            stage.setX(cpPrimary.getScene().getWindow().getX() + 60);
-            stage.setY(cpPrimary.getScene().getWindow().getY() + 120);
+            stage.setX(cpPrimary.getScene().getWindow().getX() + 80);
+            stage.setY(cpPrimary.getScene().getWindow().getY() + 150);
         }
 
         stage.show();
-        new Thread(() -> {
-            try {
-                Thread.sleep(3500);
-            } catch (InterruptedException ignored) {
-            }
-            javafx.application.Platform.runLater(stage::close);
-        }).start();
+
+        // Auto-close with animation (optional, but keep simple for now)
+        Timeline fadeout = new Timeline(new KeyFrame(Duration.seconds(4), e -> stage.close()));
+        fadeout.play();
     }
 
     // \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u2500
@@ -434,18 +440,10 @@ public class CustomizationController implements Injectable {
     }
 
     private void showInfo(String title, String content) {
-        Alert a = new Alert(Alert.AlertType.INFORMATION);
-        a.setTitle(title);
-        a.setHeaderText(null);
-        a.setContentText(content);
-        a.showAndWait();
+        com.mycompany.ventacontrolfx.util.AlertUtil.showInfo(title, content);
     }
 
     private void showError(String title, String content) {
-        Alert a = new Alert(Alert.AlertType.ERROR);
-        a.setTitle(title);
-        a.setHeaderText(null);
-        a.setContentText(content);
-        a.showAndWait();
+        com.mycompany.ventacontrolfx.util.AlertUtil.showError(title, content);
     }
 }

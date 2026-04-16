@@ -10,6 +10,7 @@
     <stylesheets>
         <java.net.URL value="@/styles/components/historial.css" />
         <java.net.URL value="@/styles/components/filters.css" />
+        <java.net.URL value="@/styles/components/informes.css" />
     </stylesheets>
 
     <!-- Header Section -->
@@ -18,7 +19,7 @@
             <HBox spacing="16" alignment="CENTER_LEFT">
                 <children>
                     <StackPane styleClass="view-header-icon-wrap">
-                        <children><FontAwesomeIconView glyphName="REPLY" size="22" fill="white"/></children>
+                        <children><FontAwesomeIconView glyphName="HISTORY" size="22" fill="white"/></children>
                     </StackPane>
                     <VBox spacing="2">
                         <children>
@@ -38,7 +39,59 @@
     </VBox>
 
     <!-- Body Content Section with Standard Padding -->
-    <VBox spacing="20" VBox.vgrow="ALWAYS" style="-fx-padding: 30;">
+    <VBox spacing="25" VBox.vgrow="ALWAYS" style="-fx-padding: 30;">
+        <!-- KPI Row SaaS Style -->
+        <HBox spacing="20" alignment="CENTER">
+            <children>
+                <!-- Card Blue: Total Count -->
+                <VBox styleClass="kpi-card-saas, kpi-card-blue" HBox.hgrow="ALWAYS">
+                    <children>
+                        <HBox alignment="CENTER_LEFT" spacing="10">
+                            <StackPane styleClass="icon-bg-blue"><FontAwesomeIconView glyphName="FILE_TEXT_O" fill="#1e88e5" size="16"/></StackPane>
+                            <Label text="TOTAL DEVOLUCIONES" styleClass="kpi-label-saas" />
+                        </HBox>
+                        <Label fx:id="lblKpiCount" text="0" styleClass="kpi-value-saas" />
+                        <Label text="Operaciones en el periodo" styleClass="trend-text" />
+                    </children>
+                </VBox>
+
+                <!-- Card Red: Total Amount -->
+                <VBox styleClass="kpi-card-saas, kpi-card-red" HBox.hgrow="ALWAYS">
+                    <children>
+                        <HBox alignment="CENTER_LEFT" spacing="10">
+                            <StackPane styleClass="icon-bg-red"><FontAwesomeIconView glyphName="EXCLAMATION_TRIANGLE" fill="#ef4444" size="16"/></StackPane>
+                            <Label text="TOTAL REEMBOLSADO" styleClass="kpi-label-saas" />
+                        </HBox>
+                        <Label fx:id="lblKpiTotal" text="0.00 €" styleClass="kpi-value-saas" />
+                        <Label text="Suma de abonos detectados" styleClass="trend-text" />
+                    </children>
+                </VBox>
+
+                <!-- Card Gold: Average -->
+                <VBox styleClass="kpi-card-saas, kpi-card-gold" HBox.hgrow="ALWAYS">
+                    <children>
+                        <HBox alignment="CENTER_LEFT" spacing="10">
+                            <StackPane styleClass="icon-bg-gold"><FontAwesomeIconView glyphName="BAR_CHART" fill="#f59e0b" size="16"/></StackPane>
+                            <Label text="TICKET MEDIO" styleClass="kpi-label-saas" />
+                        </HBox>
+                        <Label fx:id="lblKpiAverage" text="0.00 €" styleClass="kpi-value-saas" />
+                        <Label text="Promedio por devolución" styleClass="trend-text" />
+                    </children>
+                </VBox>
+
+                <!-- Card Green: Last Activity -->
+                <VBox styleClass="kpi-card-saas, kpi-card-green" HBox.hgrow="ALWAYS">
+                    <children>
+                        <HBox alignment="CENTER_LEFT" spacing="10">
+                            <StackPane styleClass="icon-bg-green"><FontAwesomeIconView glyphName="CLOCK_O" fill="#10b981" size="16"/></StackPane>
+                            <Label text="ACTIVIDAD RECIENTE" styleClass="kpi-label-saas" />
+                        </HBox>
+                        <Label fx:id="lblKpiLast" text="--" styleClass="kpi-value-saas" />
+                        <Label text="Fecha de última gestión" styleClass="trend-text" />
+                    </children>
+                </VBox>
+            </children>
+        </HBox>
         <!-- Filters Section -->
         <HBox spacing="15" alignment="CENTER_LEFT" styleClass="filter-card">
         <padding><Insets top="15" right="20" bottom="15" left="20"/></padding>
@@ -151,7 +204,16 @@
                 </VBox>
 
                 <Region VBox.vgrow="ALWAYS" />
-                <Button onAction="#handleCloseDetails" text="%returns.detail.btn.close" maxWidth="Infinity" styleClass="btn-history-close" />
+                
+                <VBox spacing="10">
+                    <Button onAction="#handleReprint" text="%returns.detail.btn.reprint" maxWidth="Infinity" styleClass="btn-primary">
+                        <graphic><FontAwesomeIconView glyphName="PRINT" size="14"/></graphic>
+                    </Button>
+                    <Button onAction="#handleViewOriginalTicket" text="%returns.detail.btn.view_original" maxWidth="Infinity" styleClass="btn-secondary">
+                        <graphic><FontAwesomeIconView glyphName="TICKET" size="14"/></graphic>
+                    </Button>
+                    <Button onAction="#handleCloseDetails" text="%returns.detail.btn.close" maxWidth="Infinity" styleClass="btn-history-close" />
+                </VBox>
             </VBox>
         </VBox>
     </HBox>

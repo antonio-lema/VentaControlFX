@@ -114,7 +114,9 @@ public class HistoryController implements Injectable, Searchable {
                                                                  // podr\u00edamos
                     // usar cfg
                     if (s != null) {
-                        if (s.isReturn()) {
+                        boolean isFullReturn = s.isReturn()
+                                || (s.getReturnedAmount() >= (s.getTotal() - 0.01) && s.getTotal() > 0);
+                        if (isFullReturn) {
                             setStyle("-fx-font-weight: bold; -fx-text-fill: #ef4444; -fx-strikethrough: true;");
                         } else if (s.getReturnedAmount() > 0) {
                             setStyle("-fx-font-weight: bold; -fx-text-fill: #f59e0b;");
@@ -297,8 +299,10 @@ public class HistoryController implements Injectable, Searchable {
 
     private void updateDetailsUI(Sale sale) {
         boolean hasAnyReturned = sale.getDetails().stream().anyMatch(d -> d.getReturnedQuantity() > 0);
+        boolean allReturned = !sale.getDetails().isEmpty()
+                && sale.getDetails().stream().allMatch(d -> d.getReturnedQuantity() >= d.getQuantity());
 
-        if (sale.isReturn()) {
+        if (sale.isReturn() || allReturned) {
             lblReturnBadge.setText(container.getBundle().getString("history.status.returned"));
             lblReturnBadge.setVisible(true);
             lblReturnBadge.setStyle(
@@ -341,8 +345,7 @@ public class HistoryController implements Injectable, Searchable {
 
         VBox nameBox = new VBox(2);
         Label nameLabel = new Label(detail.getProductName());
-        String color = detail.getReturnedQuantity() >= detail.getQuantity() ? "#e74c3c"
-                : (detail.getReturnedQuantity() > 0 ? "#f39c12" : "#2c3e50");
+        String color = detail.getReturnedQuantity() > 0 ? "#f39c12" : "#2c3e50";
         nameLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 13px; -fx-text-fill: " + color + ";");
 
         Label qtyLabel = new Label("\ud83d\udce6 " + detail.getQuantity() + " un. x "
@@ -512,22 +515,9 @@ public class HistoryController implements Injectable, Searchable {
         ModalService.showModal("/view/return_dialog.fxml",
                 container.getBundle().getString("history.btn.register_return"), Modality.APPLICATION_MODAL,
                 StageStyle.TRANSPARENT, container, (ReturnDialogController controller) -> {
-                    controller.init(selected);
+                    controller.init(selected, container);
                     controller.setOnSuccess((reason, items) -> {
                         try {
-                            // Validaci\u00f3n final de efectivo justo antes de confirmar
-                            double refundTotal = selected.getDetails().stream()
-                                    .filter(d -> items.containsKey(d.getDetailId()))
-                                    .mapToDouble(d -> items.get(d.getDetailId()) * (d.getLineTotal() / d.getQuantity()))
-                                    .sum();
-
-                            try {
-                                container.getClosureUseCase().validateCashAvailableForReturn(refundTotal);
-                            } catch (SQLException cashEx) {
-                                AlertUtil.showError("\u274c Efectivo insuficiente", cashEx.getMessage());
-                                return;
-                            }
-
                             int userId = container.getUserSession().getCurrentUser().getUserId();
                             saleUseCase.registerPartialReturn(selected.getSaleId(), items, reason, userId);
                             AlertUtil.showInfo(container.getBundle().getString("alert.success"),

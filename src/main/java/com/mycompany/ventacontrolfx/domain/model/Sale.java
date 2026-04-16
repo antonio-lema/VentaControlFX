@@ -16,6 +16,9 @@ public class Sale {
     private double returnedAmount;
     private double cashAmount; // Split amount for Mixed payment
     private double cardAmount; // Split amount for Mixed payment
+    private String promoCode;
+    private String rewardPromoCode;
+    private int totalItems; // Transient count for UI performance optimization
 
     // Campos Fiscales (Documento)
     private String docType;
@@ -255,5 +258,29 @@ public class Sale {
 
     public void setObservations(String observations) {
         this.observations = observations;
+    }
+
+    public String getPromoCode() {
+        return promoCode;
+    }
+
+    public void setPromoCode(String promoCode) {
+        this.promoCode = promoCode;
+    }
+
+    public String getRewardPromoCode() {
+        return rewardPromoCode;
+    }
+
+    public void setRewardPromoCode(String rewardPromoCode) {
+        this.rewardPromoCode = rewardPromoCode;
+    }
+
+    public int getTotalItems() {
+        return totalItems;
+    }
+
+    public void setTotalItems(int totalItems) {
+        this.totalItems = totalItems;
     }
 }

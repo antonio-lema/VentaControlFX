@@ -20,7 +20,7 @@
         <HBox spacing="5" alignment="CENTER_RIGHT">
             <Button fx:id="btnRemoveClient" onAction="#handleRemoveSelectedClient" styleClass="btn-remove-client">
                 <graphic>
-                <FontAwesomeIconView glyphName="TRASH" size="14" fill="#ef4444" styleClass="icon-danger"/>
+                <FontAwesomeIconView glyphName="TRASH_ALT" size="14" fill="#ef4444" styleClass="icon-danger"/>
                 </graphic>
             </Button>
             <Button fx:id="showAddClientDialog" onAction="#showAddClientDialog" styleClass="btn-add-customer">
@@ -76,7 +76,7 @@
             <Button fx:id="btnClearCart" onAction="#clearCart" styleClass="btn-clear-cart">
                 <tooltip><Tooltip text="%cart.items.tooltip.clear"/></tooltip>
                 <graphic>
-                    <FontAwesomeIconView glyphName="TRASH" size="14" styleClass="icon-danger"/>
+                    <FontAwesomeIconView glyphName="TRASH_ALT" size="14" styleClass="icon-danger"/>
                 </graphic>
             </Button>
         </HBox>
@@ -103,6 +103,16 @@
         </HBox>
         <Label fx:id="lblGeneralObservation" wrapText="true" style="-fx-font-size: 12px; -fx-font-style: italic; -fx-text-fill: -fx-text-custom-muted;"/>
     </VBox>
+    <!-- Promo Code Section -->
+    <HBox spacing="10" alignment="CENTER_LEFT" styleClass="cart-promo-section" style="-fx-padding: 8 15; -fx-background-color: -fx-custom-color-bg-secondary; -fx-border-color: #eee; -fx-border-width: 1 0 1 0;">
+        <StackPane styleClass="icon-container-small" style="-fx-background-color: #f0fdf4;">
+            <FontAwesomeIconView glyphName="TICKET" size="14" fill="#166534"/>
+        </StackPane>
+        <TextField fx:id="txtPromoCode" promptText="%cart.promo.prompt" HBox.hgrow="ALWAYS" styleClass="input-field-modern" style="-fx-pref-height: 35; -fx-font-size: 13px;"/>
+        <Button onAction="#handleApplyPromo" styleClass="btn-icon-only">
+             <graphic><FontAwesomeIconView glyphName="ARROW_RIGHT" size="14" styleClass="icon-primary"/></graphic>
+        </Button>
+    </HBox>
     
     <VBox styleClass="checkout-summary">
         <HBox alignment="CENTER_LEFT">

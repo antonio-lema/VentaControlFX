@@ -74,9 +74,11 @@ public class PrintPreviewController implements Injectable {
     @FXML
     private Label lblTotalHeader;
     @FXML
-    private VBox paymentInfoContainer;
+    private VBox paymentInfoContainer, rewardSection;
     @FXML
     private HBox hboxVatTotal;
+    @FXML
+    private Label lblRewardMsg, lblRewardCode;
 
     // Labels de cabecera empresa (rellenados desde SaleConfig)
     @FXML
@@ -130,6 +132,31 @@ public class PrintPreviewController implements Injectable {
     public void setReceiptData(List<CartItem> items, double total, double paid, double change, String paymentMethod,
             int saleId,
             boolean isGift) {
+        setReceiptData(items, total, paid, change, paymentMethod, saleId, isGift, null, 0, null);
+    }
+
+    public void setReceiptData(List<CartItem> items, double total, double paid, double change, String paymentMethod,
+            int saleId,
+            boolean isGift, String rewardCode, double rAmount, java.time.LocalDateTime rExpiry) {
+        this.rewardPromoCode = rewardCode;
+        this.rewardAmount = rAmount;
+        this.rewardExpiryDate = rExpiry;
+
+        if (rewardSection != null) {
+            boolean hasReward = rewardCode != null && !rewardCode.isEmpty();
+            rewardSection.setVisible(hasReward);
+            rewardSection.setManaged(hasReward);
+            if (hasReward) {
+                if (lblRewardCode != null)
+                    lblRewardCode.setText(rewardCode);
+                if (lblRewardMsg != null && rExpiry != null) {
+                    java.time.format.DateTimeFormatter dtf = java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy");
+                    lblRewardMsg.setText(
+                            String.format("Cup\u00f3n de %.0f\u20ac para tu pr\u00f3xima compra\nV\u00e1lido hasta: %s",
+                                    rAmount, rExpiry.format(dtf)));
+                }
+            }
+        }
         this.isGiftMode = isGift;
         this.currentItems = items;
         this.currentTotal = total;
@@ -153,7 +180,8 @@ public class PrintPreviewController implements Injectable {
         // Fecha y hora
         LocalDateTime now = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMM, yyyy 'Hora:' HH:mm:ss");
-        lblDate.setText("Fecha: " + now.format(formatter) + " Caja: 01");
+        String terminal = (cfg != null && cfg.getTerminalName() != null) ? cfg.getTerminalName() : "Caja 01";
+        lblDate.setText("Fecha: " + now.format(formatter) + " " + terminal);
 
         // N\u00famero de ticket
         String prefix = isGiftMode ? "Ticket regalo N\u00ba: " : "Factura simplificada N\u00ba: ";
@@ -505,6 +533,7 @@ public class PrintPreviewController implements Injectable {
                     itemsContainer,
                     totalsRow,
                     paymentRow,
+                    rewardSection,
                     footerSpacer,
                     barcodeSection);
         }
@@ -514,7 +543,7 @@ public class PrintPreviewController implements Injectable {
     private void handleGiftTicket() {
         this.isGiftMode = !this.isGiftMode;
         setReceiptData(currentItems, currentTotal, currentPaid, currentChange, currentPaymentMethod, currentSaleId,
-                isGiftMode);
+                isGiftMode, rewardPromoCode, rewardAmount, rewardExpiryDate);
     }
 
     private List<CartItem> currentItems;
@@ -523,6 +552,9 @@ public class PrintPreviewController implements Injectable {
     private double currentChange;
     private String currentPaymentMethod;
     private int currentSaleId;
+    private String rewardPromoCode;
+    private double rewardAmount;
+    private java.time.LocalDateTime rewardExpiryDate;
 
     private void addItemRow(CartItem item, String sym) {
         HBox row = new HBox(10);
@@ -811,7 +843,8 @@ public class PrintPreviewController implements Injectable {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMM, yyyy 'Hora:' HH:mm:ss");
         lblDate.setText("Fecha Dev: " + returnRecord.getReturnDatetime().format(formatter));
 
-        // T\u00edtulo: Factura Rectificativa (Si tiene n\u00famero fiscal) o Ticket de Devoluci\u00f3n
+        // T\u00edtulo: Factura Rectificativa (Si tiene n\u00famero fiscal) o Ticket de
+        // Devoluci\u00f3n
         if (returnRecord.getDocNumber() != null) {
             lblTicketTitle.setText("Factura Rectificativa N\u00ba: " + returnRecord.getFullReference());
         } else {
@@ -854,8 +887,8 @@ public class PrintPreviewController implements Injectable {
 
         // Totales (Negativos representan abono)
         lblTotal.setText("-" + String.format(fmt, returnRecord.getTotalRefunded()));
-        lblSubtotal.setText("-" + String.format(fmt, returnRecord.getTotalRefunded())); // Simplificado
-        lblVat.setText("0.00 " + sym); // En abonos simples se suele poner el total bruto
+        lblSubtotal.setText("-" + String.format(fmt, returnRecord.getTaxBasis()));
+        lblVat.setText("-" + String.format(fmt, returnRecord.getTotalTax()));
 
         lblPaymentMethod.setText(returnRecord.getPaymentMethod());
         if (lblPaid != null)
@@ -879,7 +912,8 @@ public class PrintPreviewController implements Injectable {
     }
 
     private String translateDynamic(String text) {
-        if (text == null || text.isBlank()) return text;
+        if (text == null || text.isBlank())
+            return text;
         if (container != null && container.getBundle() != null && container.getBundle().containsKey(text)) {
             return container.getBundle().getString(text);
         }

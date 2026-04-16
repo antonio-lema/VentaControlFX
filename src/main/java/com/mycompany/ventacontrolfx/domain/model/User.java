@@ -76,6 +76,10 @@ public class User {
         this.passwordHash = passwordHash;
     }
 
+    public void setPassword(String password) {
+        this.passwordHash = password;
+    }
+
     public String getFullName() {
         return fullName;
     }

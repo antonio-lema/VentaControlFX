@@ -259,8 +259,7 @@ public class SidebarController implements Injectable {
         setVisible(btnStaffCalendar, true);
         setVisible(btnOperativeControl,
                 authService.hasPermission("CIERRES") || authService.hasPermission("admin.facturacion"));
-        setVisible(btnPunctualityAudit,
-                authService.hasPermission("CIERRES") || authService.hasPermission("rol.editar"));
+        setVisible(btnPunctualityAudit, authService.hasPermission("CIERRES"));
         setVisible(btnLock, true);
 
         // Ocultar secciones enteras si no hay hijos permitidos

@@ -15,6 +15,8 @@ public class Return {
     private String paymentMethod;
     private double cashAmount;
     private double cardAmount;
+    private double totalTax;
+    private double taxBasis;
     private List<ReturnDetail> details;
 
     // Fiscal Snapshots (Added for unique return invoice)
@@ -211,6 +213,22 @@ public class Return {
 
     public void setCardAmount(double cardAmount) {
         this.cardAmount = cardAmount;
+    }
+
+    public double getTotalTax() {
+        return totalTax;
+    }
+
+    public void setTotalTax(double totalTax) {
+        this.totalTax = totalTax;
+    }
+
+    public double getTaxBasis() {
+        return taxBasis;
+    }
+
+    public void setTaxBasis(double taxBasis) {
+        this.taxBasis = taxBasis;
     }
 
     public static class Builder {

@@ -48,6 +48,28 @@ public class DBConnection {
     }
 
     private static void releaseConnection(Connection conn) {
+        try {
+            if (conn != null && !conn.isClosed()) {
+                // Muy importante: resetear el estado de la conexión antes de volver al pool.
+                // Si se dejó en autoCommit = false, MySQL mantiene un snapshot (REPEATABLE
+                // READ)
+                // que causaría lectura de datos "fantasmas" o antiguos en el próximo uso.
+                if (!conn.getAutoCommit()) {
+                    conn.setAutoCommit(true);
+                }
+                conn.clearWarnings();
+            }
+        } catch (SQLException e) {
+            // Si hay error al resetear, mala señal: cerramos la conexión física y no la
+            // devolvemos al pool
+            try {
+                if (conn != null)
+                    conn.close();
+            } catch (SQLException ignored) {
+            }
+            return;
+        }
+
         if (pool.size() < MAX_POOL_SIZE) {
             pool.offer(conn);
         } else {

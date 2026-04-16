@@ -202,12 +202,17 @@ public class CashClosureUseCase {
      */
     public void validateCashAvailableForReturn(double returnAmount) throws SQLException {
         double available = repository.getCurrentCashInDrawer();
-        if (returnAmount > available) {
+
+        // Redondeamos para evitar fallos por precisión de punto flotante (0.000000001)
+        long returnCents = Math.round(returnAmount * 100.0);
+        long availableCents = Math.round(available * 100.0);
+
+        if (returnCents > availableCents) {
             throw new SQLException(String.format(
-                    "\u274c No hay suficiente efectivo en caja para esta devoluci\u00f3n.\n\n" +
-                            "\ud83c\udfe6 Efectivo actual: %.2f \u20ac\n" +
-                            "\ud83d\udcb8 Importe solicitado: %.2f \u20ac\n\n" +
-                            "\u00e2\u0161\u00a0\u00ef\u00b8\u008f Se requiere un fondo de caja mayor para cubrir este reembolso.",
+                    "❌ No hay suficiente efectivo en caja para esta devolución.\n\n" +
+                            "🏦 Efectivo actual: %.2f €\n" +
+                            "💵 Importe solicitado: %.2f €\n\n" +
+                            "⚠️ Se requiere un fondo de caja mayor para cubrir este reembolso.",
                     available, returnAmount));
         }
     }

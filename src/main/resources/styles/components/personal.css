@@ -1,0 +1,86 @@
+/* ─── Premium Personal & Audit Styling ─── */
+
+.stats-card {
+    background-color: -fx-bg-surface;
+    -fx-background-color: -fx-bg-surface;
+    -fx-background-radius: -fx-radius-lg;
+    padding: 20;
+    -fx-padding: 20;
+    -fx-effect: -fx-shadow-soft;
+    -fx-alignment: center;
+    -fx-spacing: 5;
+}
+
+.stats-card-warning {
+    background-color: #fffbeb;
+    -fx-background-color: #fffbeb;
+    -fx-background-radius: -fx-radius-lg;
+    padding: 20;
+    -fx-padding: 20;
+    -fx-effect: -fx-shadow-soft;
+    -fx-alignment: center;
+    -fx-spacing: 5;
+    border-color: #fde68a;
+    -fx-border-color: #fde68a;
+    border-width: 1;
+    -fx-border-width: 1;
+}
+
+.stats-card-danger {
+    background-color: #fef2f2;
+    -fx-background-color: #fef2f2;
+    -fx-background-radius: -fx-radius-lg;
+    padding: 20;
+    -fx-padding: 20;
+    -fx-effect: -fx-shadow-soft;
+    -fx-alignment: center;
+    -fx-spacing: 5;
+    border-color: #fecaca;
+    -fx-border-color: #fecaca;
+    border-width: 1;
+    -fx-border-width: 1;
+}
+
+.stats-label {
+    font-size: 13px;
+    -fx-font-size: 13px;
+    -fx-text-fill: -fx-text-custom-light;
+    font-weight: bold;
+    -fx-font-weight: bold;
+    -fx-text-alignment: center;
+}
+
+.stats-value {
+    font-size: 32px;
+    -fx-font-size: 32px;
+    font-weight: 900;
+    -fx-font-weight: 900;
+    -fx-text-fill: -fx-text-custom-main;
+    padding: 5 0 0 0;
+    -fx-padding: 5 0 0 0;
+}
+
+/* Dark theme Adjustments */
+.dark-theme .stats-card {
+    -fx-background-color: -fx-bg-surface;
+    -fx-border-color: -fx-color-border-main;
+    -fx-border-width: 1;
+}
+
+.dark-theme .stats-card-warning {
+    -fx-background-color: rgba(245, 158, 11, 0.1);
+    -fx-border-color: rgba(245, 158, 11, 0.3);
+}
+
+.dark-theme .stats-card-danger {
+    -fx-background-color: rgba(239, 68, 68, 0.1);
+    -fx-border-color: rgba(239, 68, 68, 0.3);
+}
+
+.dark-theme .stats-label {
+    -fx-text-fill: -fx-text-custom-light;
+}
+
+.dark-theme .stats-value {
+    -fx-text-fill: -fx-text-custom-main;
+}

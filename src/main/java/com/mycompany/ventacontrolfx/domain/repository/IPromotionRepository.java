@@ -22,4 +22,6 @@ public interface IPromotionRepository {
     void delete(int id) throws SQLException;
 
     void toggleActive(int id, boolean active) throws SQLException;
+
+    Optional<Promotion> findByCode(String code) throws SQLException;
 }

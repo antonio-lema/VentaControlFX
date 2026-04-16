@@ -445,18 +445,10 @@ public class SellerReportController implements Injectable {
     }
 
     private void showInfo(String title, String msg) {
-        Alert a = new Alert(Alert.AlertType.INFORMATION);
-        a.setTitle(title);
-        a.setHeaderText(null);
-        a.setContentText(msg);
-        a.showAndWait();
+        com.mycompany.ventacontrolfx.util.AlertUtil.showInfo(title, msg);
     }
 
     private void showError(String title, String msg) {
-        Alert a = new Alert(Alert.AlertType.ERROR);
-        a.setTitle(title);
-        a.setHeaderText(null);
-        a.setContentText(msg);
-        a.showAndWait();
+        com.mycompany.ventacontrolfx.util.AlertUtil.showError(title, msg);
     }
 }

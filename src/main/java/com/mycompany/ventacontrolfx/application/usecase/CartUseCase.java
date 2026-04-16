@@ -40,6 +40,7 @@ public class CartUseCase {
     private final IntegerProperty priceListId = new SimpleIntegerProperty(-1);
     private final IntegerProperty selectedCategoryId = new SimpleIntegerProperty(-2);
     private final StringProperty generalObservation = new SimpleStringProperty("");
+    private final StringProperty appliedPromoCode = new SimpleStringProperty("");
     private final BooleanProperty locked = new SimpleBooleanProperty(false);
 
     private final ICompanyConfigRepository configRepository;
@@ -116,11 +117,14 @@ public class CartUseCase {
                 }
             }
 
-            // 3. Aplicamos SOLO si la tarifa no cambi\u00f3 mientras consult\u00e1bamos la BD
-            // Esto evita el race condition cuando el usuario cambia la tarifa r\u00e1pidamente
+            // 3. Aplicamos SOLO si la tarifa no cambi\u00f3 mientras consult\u00e1bamos la
+            // BD
+            // Esto evita el race condition cuando el usuario cambia la tarifa
+            // r\u00e1pidamente
             javafx.application.Platform.runLater(() -> {
                 if (priceListId.get() != newListId) {
-                    // El usuario cambi\u00f3 la tarifa de nuevo: descartamos esta actualizaci\u00f3n obsoleta
+                    // El usuario cambi\u00f3 la tarifa de nuevo: descartamos esta
+                    // actualizaci\u00f3n obsoleta
                     System.out.println("[CartUseCase] Descartando precios obsoletos de tarifa " + newListId
                             + " (tarifa actual: " + priceListId.get() + ")");
                     return;
@@ -146,7 +150,7 @@ public class CartUseCase {
 
         // APLICAR MOTOR DE PROMOCIONES (PIPELINE)
         com.mycompany.ventacontrolfx.application.service.PromotionResult promoResult = promotionEngine
-                .process(new ArrayList<>(cartItems));
+                .process(new ArrayList<>(cartItems), appliedPromoCode.get(), client);
 
         double grossSavingsTotal = 0.0;
 
@@ -211,13 +215,24 @@ public class CartUseCase {
             if (globalDiscount > totalInclusive) {
                 globalDiscount = totalInclusive;
             }
+
+            // --- FIX FISCAL: Prorratear el descuento global entre base e IVA ---
+            // Si no hacemos esto, el IVA reportado es mayor al que realmente paga el
+            // cliente.
             totalInclusive -= globalDiscount;
+            // Para el total neto, restamos el descuento global proporcionalmente
+            // (simplificado: asumiendo que el descuento global incluye IVA)
+            totalBase -= (globalDiscount / 1.21); // Asumiendo IVA general para el descuento global
             grossSavingsTotal += globalDiscount;
         }
 
-        subtotal.set(Math.round(totalBase * 100.0) / 100.0);
-        tax.set(Math.round((totalInclusive - totalBase) * 100.0) / 100.0);
-        grandTotal.set(Math.round(totalInclusive * 100.0) / 100.0);
+        double finalTotal = Math.max(0, Math.round(totalInclusive * 100.0) / 100.0);
+        double roundedSubtotal = Math.round(totalBase * 100.0) / 100.0;
+
+        grandTotal.set(finalTotal);
+        subtotal.set(roundedSubtotal);
+        // El IVA es la diferencia exacta para evitar errores de 1 c\u00e9ntimo en UI
+        tax.set(Math.round((finalTotal - roundedSubtotal) * 100.0) / 100.0);
         totalSavings.set(Math.round(grossSavingsTotal * 100.0) / 100.0);
 
         itemCount.set(cartItems.stream().mapToInt(CartItem::getQuantity).sum());
@@ -273,6 +288,18 @@ public class CartUseCase {
 
     public void setGeneralObservation(String observation) {
         this.generalObservation.set(observation);
+    }
+
+    public StringProperty appliedPromoCodeProperty() {
+        return appliedPromoCode;
+    }
+
+    public String getAppliedPromoCode() {
+        return appliedPromoCode.get();
+    }
+
+    public void setAppliedPromoCode(String code) {
+        this.appliedPromoCode.set(code);
     }
 
     public int getPriceListId() {

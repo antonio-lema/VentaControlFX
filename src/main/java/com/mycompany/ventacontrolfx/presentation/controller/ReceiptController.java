@@ -33,7 +33,7 @@ public class ReceiptController implements Injectable {
     @FXML
     private VBox receiptContent, companyHeaderSection, ticketInfoSection, itemsContainer, totalsContainer,
             barcodeSection, paymentInfoContainer, clientInfoSection, vatBreakdownContainer, hboxSavings,
-            observationSection;
+            observationSection, rewardSection;
     @FXML
     private HBox itemsHeaderHBox, hboxVatTotal, barcodeContainer;
     @FXML
@@ -41,7 +41,8 @@ public class ReceiptController implements Injectable {
             lblPaymentMethod, lblTotalRight, lblChangeRight, lblGiftIndicator, lblPVPHeader, lblTotalHeader,
             lblClientName, lblClientTaxId, lblClientAddress, lblCompanyBrand, lblCompanyName, lblCompanyAddress,
             lblCompanyPhone, lblCompanyCif, lblFooterMessage, lblSuccessIcon, lblGiftIcon, lblCompanyIcon,
-            lblAttendedBy, lblWebsiteUrl, lblSavings, lblObservations, lblModalTitle, lblBarcodeValue;
+            lblAttendedBy, lblWebsiteUrl, lblSavings, lblObservations, lblModalTitle, lblBarcodeValue,
+            lblRewardMsg, lblRewardCode;
     @FXML
     private ImageView imgCompanyLogo, imgAppLogoRight;
     @FXML
@@ -56,6 +57,9 @@ public class ReceiptController implements Injectable {
     private int currentSaleId;
     private Client currentClient;
     private boolean isGiftMode = false;
+    private String rewardPromoCode;
+    private double rewardAmount;
+    private java.time.LocalDateTime rewardExpiryDate;
     private Runnable onNewSaleAction;
     private Runnable onBackAction;
 
@@ -73,6 +77,13 @@ public class ReceiptController implements Injectable {
 
     public void setReceiptData(List<CartItem> items, double total, double paid, double change, String paymentMethod,
             int saleId, Runnable onNewSale, Runnable onBack, String observations) {
+        setReceiptData(items, total, paid, change, paymentMethod, saleId, onNewSale, onBack, observations, null, 0,
+                null);
+    }
+
+    public void setReceiptData(List<CartItem> items, double total, double paid, double change, String paymentMethod,
+            int saleId, Runnable onNewSale, Runnable onBack, String observations, String rewardCode,
+            double rewardAmount, java.time.LocalDateTime expiryDate) {
         this.currentItems = items;
         this.currentTotal = total;
         this.currentPaid = paid;
@@ -81,6 +92,25 @@ public class ReceiptController implements Injectable {
         this.currentSaleId = saleId;
         this.onNewSaleAction = onNewSale;
         this.onBackAction = onBack;
+        this.rewardPromoCode = rewardCode;
+        this.rewardAmount = rewardAmount;
+        this.rewardExpiryDate = expiryDate;
+
+        if (rewardSection != null) {
+            boolean hasReward = rewardCode != null && !rewardCode.isEmpty();
+            rewardSection.setVisible(hasReward);
+            rewardSection.setManaged(hasReward);
+            if (hasReward) {
+                if (lblRewardCode != null)
+                    lblRewardCode.setText(rewardCode);
+                if (lblRewardMsg != null && expiryDate != null) {
+                    java.time.format.DateTimeFormatter dtf = java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy");
+                    lblRewardMsg.setText(
+                            String.format("Cup\u00f3n de %.0f\u20ac para tu pr\u00f3xima compra\nV\u00e1lido hasta: %s",
+                                    rewardAmount, expiryDate.format(dtf)));
+                }
+            }
+        }
 
         String sym = cfg.getCurrencySymbol();
         String fmt = "%." + cfg.getDecimalCount() + "f " + sym;
@@ -101,9 +131,9 @@ public class ReceiptController implements Injectable {
 
         applyCompanyHeader();
         itemsContainer.getChildren().clear();
-        
+
         System.out.println("[Receipt] Setting data for " + (items != null ? items.size() : "null") + " items");
-        
+
         if (items == null || items.isEmpty()) {
             Label placeholder = new Label(container.getBundle().getString("receipt.items.empty"));
             placeholder.setStyle("-fx-text-fill: grey; -fx-font-style: italic;");
@@ -340,7 +370,7 @@ public class ReceiptController implements Injectable {
                         ctrl.setClientInfo(currentClient);
                     ctrl.setReceiptData(currentItems, currentTotal, currentPaid, currentChange, currentPaymentMethod,
                             currentSaleId,
-                            isGiftMode);
+                            isGiftMode, rewardPromoCode, rewardAmount, rewardExpiryDate);
                 });
     }
 
@@ -431,8 +461,10 @@ public class ReceiptController implements Injectable {
         else
             receiptContent.setPrefWidth(300);
     }
+
     private String translateDynamic(String text) {
-        if (text == null || text.isBlank()) return text;
+        if (text == null || text.isBlank())
+            return text;
         if (container != null && container.getBundle() != null && container.getBundle().containsKey(text)) {
             return container.getBundle().getString(text);
         }

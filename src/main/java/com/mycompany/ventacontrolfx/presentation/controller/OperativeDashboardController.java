@@ -22,7 +22,6 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -149,7 +148,8 @@ public class OperativeDashboardController implements Injectable {
             boolean isCashOpen = cashClosureUseCase.hasActiveFund();
             double currentCash = cashClosureUseCase.getCurrentCashInDrawer();
             Platform.runLater(() -> {
-                lblCashStatus.setText(container.getBundle().getString("dashboard.cash." + (isCashOpen ? "open" : "closed")));
+                lblCashStatus
+                        .setText(container.getBundle().getString("dashboard.cash." + (isCashOpen ? "open" : "closed")));
                 lblCashStatus.setStyle(isCashOpen ? "-fx-text-fill: #16a34a;" : "-fx-text-fill: #ef4444;");
                 lblCashAmount.setText(String.format("%.2f \u20ac", currentCash));
             });
@@ -173,13 +173,20 @@ public class OperativeDashboardController implements Injectable {
     }
 
     @FXML
+    private void handleShowAudit() {
+        if (container != null && container.getNavigationService() != null) {
+            container.getNavigationService().navigateTo("/view/punctuality_audit.fxml");
+        }
+    }
+
+    @FXML
     private void handlePartialClosure() {
         try {
             cashClosureUseCase.performPartialClosure(container.getUserSession().getCurrentUser().getUserId());
             AlertUtil.showInfo(container.getBundle().getString("dashboard.partial.closure.title"),
                     container.getBundle().getString("dashboard.partial.closure.msg"));
         } catch (Exception e) {
-            AlertUtil.showError(container.getBundle().getString("alert.error"), 
+            AlertUtil.showError(container.getBundle().getString("alert.error"),
                     container.getBundle().getString("closure.error.generic") + ": " + e.getMessage());
         }
     }
@@ -190,10 +197,12 @@ public class OperativeDashboardController implements Injectable {
             vboxAlerts.getChildren().clear();
 
             if (schedule == null || schedule.isClosed() || schedule.getShifts().isEmpty()) {
-                lblBusinessStatus.setText(container.getBundle().getString("dashboard.status." + (schedule != null && schedule.isClosed() ? "closed" : "no_schedule")));
+                lblBusinessStatus.setText(container.getBundle().getString(
+                        "dashboard.status." + (schedule != null && schedule.isClosed() ? "closed" : "no_schedule")));
                 lblBusinessStatus.setStyle("-fx-background-color: #f1f5f9; -fx-text-fill: #475569;");
                 lblScheduleCompliance.setText("N/A");
-                vboxTodaySchedule.getChildren().add(new Label(container.getBundle().getString("dashboard.shifts.none")));
+                vboxTodaySchedule.getChildren()
+                        .add(new Label(container.getBundle().getString("dashboard.shifts.none")));
                 return;
             }
 
@@ -201,7 +210,8 @@ public class OperativeDashboardController implements Injectable {
             boolean isOpen = schedule.getShifts().stream()
                     .anyMatch(s -> now.isAfter(s.getOpen()) && now.isBefore(s.getClose()));
 
-            lblBusinessStatus.setText(container.getBundle().getString("dashboard.status." + (isOpen ? "open" : "out_of_hours")));
+            lblBusinessStatus
+                    .setText(container.getBundle().getString("dashboard.status." + (isOpen ? "open" : "out_of_hours")));
             lblBusinessStatus.setStyle(isOpen ? "-fx-background-color: #dcfce7; -fx-text-fill: #16a34a;"
                     : "-fx-background-color: #fef3c7; -fx-text-fill: #d97706;");
 
@@ -239,7 +249,9 @@ public class OperativeDashboardController implements Injectable {
                         new Label(r.getOpen() + " - " + r.getClose()));
                 timeRow.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
 
-                Label lblStaff = new Label(staffNames.isEmpty() ? container.getBundle().getString("dashboard.alert.no_staff_assigned") : staffNames);
+                Label lblStaff = new Label(
+                        staffNames.isEmpty() ? container.getBundle().getString("dashboard.alert.no_staff_assigned")
+                                : staffNames);
                 lblStaff.setStyle("-fx-font-size: 11px; -fx-text-fill: #64748b; -fx-font-style: italic;");
                 lblStaff.setWrapText(true);
 
@@ -252,8 +264,10 @@ public class OperativeDashboardController implements Injectable {
                     for (Integer id : r.getAssignedUserIds()) {
                         if (active.stream().noneMatch(s -> s.getUserId() == id)) {
                             String name = allUsers.stream().filter(u -> u.getUserId() == id).map(User::getFullName)
-                                    .findFirst().orElse(String.format(container.getBundle().getString("dashboard.staff.user"), id));
-                            addAlert(String.format(container.getBundle().getString("dashboard.alert.absence_detected"), name), "warning");
+                                    .findFirst()
+                                    .orElse(String.format(container.getBundle().getString("dashboard.staff.user"), id));
+                            addAlert(String.format(container.getBundle().getString("dashboard.alert.absence_detected"),
+                                    name), "warning");
                         }
                     }
                 }
@@ -261,7 +275,10 @@ public class OperativeDashboardController implements Injectable {
 
             // National Holiday Alert
             if (SpanishHolidays.isHoliday(LocalDate.now())) {
-                addAlert(String.format(container.getBundle().getString("dashboard.alert.holiday"), container.getBundle().getString(SpanishHolidays.getHolidayName(LocalDate.now()))), "info");
+                addAlert(
+                        String.format(container.getBundle().getString("dashboard.alert.holiday"),
+                                container.getBundle().getString(SpanishHolidays.getHolidayName(LocalDate.now()))),
+                        "info");
             }
 
             if (vboxAlerts.getChildren().isEmpty()) {
@@ -317,7 +334,8 @@ public class OperativeDashboardController implements Injectable {
         public ActiveStaffViewModel(WorkSession session, User user, BusinessDay.TimeRange scheduledRange,
                 List<WorkSession> userSessionsToday, java.util.ResourceBundle bundle) {
             String uname = session.getUserName();
-            this.name = (uname != null && !uname.isEmpty()) ? uname : String.format(bundle.getString("dashboard.staff.user"), session.getUserId());
+            this.name = (uname != null && !uname.isEmpty()) ? uname
+                    : String.format(bundle.getString("dashboard.staff.user"), session.getUserId());
             this.role = (user != null) ? user.getRole() : "N/D";
 
             // First start time of the day (SHIFTS only)
@@ -343,9 +361,21 @@ public class OperativeDashboardController implements Injectable {
             long m = (totalSeconds % 3600) / 60;
             this.duration = String.format("%dh %dm", h, m);
 
-            ProgressBar pb = new ProgressBar(Math.min(1.0, (double) h / 8.0));
+            // Calcular progreso basado en la duración real del turno
+            double shiftDurationHours = (scheduledRange != null && scheduledRange.getDurationHours() > 0)
+                    ? scheduledRange.getDurationHours()
+                    : 8.0;
+            ProgressBar pb = new ProgressBar(Math.min(1.0, (double) totalSeconds / 3600.0 / shiftDurationHours));
             pb.setPrefWidth(100);
-            pb.setStyle("-fx-accent: " + (h >= 8 ? "#ef4444" : "#3b82f6") + ";");
+
+            // Colorear según cercanía al final
+            if (pb.getProgress() > 0.9) {
+                pb.setStyle("-fx-accent: #10b981;"); // Verde al terminar
+            } else if (pb.getProgress() > 0.7) {
+                pb.setStyle("-fx-accent: #f59e0b;"); // Ámbar al final
+            } else {
+                pb.setStyle("-fx-accent: #3b82f6;"); // Azul por defecto
+            }
             this.progressNode = pb;
 
             Label lblStatus = new Label();

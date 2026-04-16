@@ -6,6 +6,7 @@ import com.mycompany.ventacontrolfx.infrastructure.config.Injectable;
 import com.mycompany.ventacontrolfx.infrastructure.config.ServiceContainer;
 import com.mycompany.ventacontrolfx.util.AlertUtil;
 import com.mycompany.ventacontrolfx.util.ModalService;
+import com.mycompany.ventacontrolfx.util.Searchable;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import javafx.application.Platform;
@@ -13,8 +14,8 @@ import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
-import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
@@ -23,7 +24,7 @@ import javafx.scene.layout.VBox;
 import java.sql.SQLException;
 import java.util.List;
 
-public class PriceListController implements Injectable {
+public class PriceListController implements Injectable, Searchable {
 
     @FXML
     private FlowPane priceListsContainer;
@@ -41,11 +42,20 @@ public class PriceListController implements Injectable {
         loadPriceLists();
     }
 
+    @Override
+    public void handleSearch(String text) {
+        loadPriceLists(text);
+    }
+
     private void loadPriceLists() {
+        loadPriceLists("");
+    }
+
+    private void loadPriceLists(String filter) {
         try {
             List<PriceList> lists = priceListUseCase.getAll();
             Platform.runLater(() -> {
-                updateUI(lists);
+                updateUI(lists, filter);
             });
         } catch (SQLException e) {
             Platform.runLater(() -> AlertUtil.showError(container.getBundle().getString("alert.error"),
@@ -53,21 +63,36 @@ public class PriceListController implements Injectable {
         }
     }
 
-    private void updateUI(List<PriceList> lists) {
+    private void updateUI(List<PriceList> lists, String filter) {
         priceListsContainer.getChildren().clear();
-        lblCount.setText(lists.size() + " " + container.getBundle().getString("price_lists.count_suffix"));
+
+        long count = lists.stream()
+                .filter(pl -> filter == null || filter.isEmpty()
+                        || pl.getName().toLowerCase().contains(filter.toLowerCase()))
+                .count();
+
+        lblCount.setText(count + " " + container.getBundle().getString("price_lists.count_suffix"));
 
         for (PriceList pl : lists) {
-            priceListsContainer.getChildren().add(createPriceListCard(pl));
+            if (filter != null && !filter.isEmpty() &&
+                    !pl.getName().toLowerCase().contains(filter.toLowerCase())) {
+                continue;
+            }
+            try {
+                priceListsContainer.getChildren().add(createPriceListCard(pl));
+            } catch (Exception e) {
+                System.err.println("Error creating card for product list " + pl.getName() + ": " + e.getMessage());
+            }
         }
     }
 
     private VBox createPriceListCard(PriceList pl) {
         VBox card = new VBox(15);
         card.setPadding(new Insets(20));
-        card.setPrefWidth(350);
         card.setStyle(
                 "-fx-background-color: -fx-bg-surface; -fx-background-radius: 12; -fx-effect: -fx-card-shadow; -fx-cursor: hand;");
+        card.setMinHeight(220); // Altura mínima uniforme
+        card.setPrefWidth(350);
 
         card.setOnMouseClicked(e -> {
             if (e.getClickCount() == 2) {
@@ -116,47 +141,89 @@ public class PriceListController implements Injectable {
         if (!pl.isDefault()) {
             try {
                 String pct = priceListUseCase.getAveragePercentageDifference(pl.getId());
-                Label lblPct = new Label(container.getBundle().getString("price_list.label.avg_diff") + ": " + pct);
+                // Evitar redundancia si el porcentaje ya incluye la palabra "media"
+                String cleanPct = pct.replace(" media", "").replace(" Media", "");
+                Label lblPct = new Label(
+                        container.getBundle().getString("price_list.label.avg_diff") + ": " + cleanPct);
+
                 if (pct.startsWith("+")) {
-                    lblPct.setStyle("-fx-text-fill: #22c55e; -fx-font-weight: bold; -fx-font-size: 13px;");
+                    lblPct.setStyle("-fx-text-fill: #10b981; -fx-font-weight: bold; -fx-font-size: 13px;");
                 } else if (pct.startsWith("-")) {
                     lblPct.setStyle("-fx-text-fill: #ef4444; -fx-font-weight: bold; -fx-font-size: 13px;");
                 } else {
-                    lblPct.setStyle("-fx-text-fill: #6b7280; -fx-font-weight: bold; -fx-font-size: 13px;");
+                    lblPct.setStyle(
+                            "-fx-text-fill: -fx-text-custom-muted; -fx-font-weight: bold; -fx-font-size: 13px;");
                 }
                 content.getChildren().add(lblPct);
             } catch (SQLException ignore) {
             }
         }
 
-        FlowPane actionBox = new FlowPane(8, 8);
+        HBox actionBox = new HBox(12);
         actionBox.setAlignment(Pos.CENTER_RIGHT);
+        actionBox.setPadding(new Insets(5, 0, 0, 0));
 
-        Button btnEdit = createIconButton(container.getBundle().getString("btn.edit"), FontAwesomeIcon.PENCIL,
-                "#eff6ff", "#1e40af");
-        btnEdit.setOnAction(e -> openPriceListForm(pl));
-
-        Button btnDelete = createIconButton(container.getBundle().getString("btn.delete"), FontAwesomeIcon.TRASH,
-                "#fef2f2", "#b91c1c");
-        btnDelete.setDisable(pl.isDefault() || pl.getId() == 1);
-        btnDelete.setOnAction(e -> deletePriceList(pl));
-
-        Button btnMakeDefault = createIconButton(container.getBundle().getString("price_list.btn.set_default"),
-                FontAwesomeIcon.STAR, "#f3f4f6", "#374151");
-        btnMakeDefault.setDisable(pl.isDefault());
-        btnMakeDefault.setOnAction(e -> makeDefault(pl));
-
-        Button btnClone = createIconButton(container.getBundle().getString("btn.clone"), FontAwesomeIcon.COPY,
-                "#fdf2f8", "#9d174d");
-        btnClone.setOnAction(e -> handleClone(pl));
-
-        Button btnViewTable = createIconButton(container.getBundle().getString("price_list.btn.view_prices"),
-                FontAwesomeIcon.EYE, "#ecfdf5", "#065f46");
+        // Ver Precios (Ojo)
+        Button btnViewTable = new Button();
+        btnViewTable.getStyleClass().add("btn-table-icon");
+        FontAwesomeIconView viewIcon = new FontAwesomeIconView(FontAwesomeIcon.EYE);
+        viewIcon.setSize("18");
+        viewIcon.setFill(javafx.scene.paint.Color.valueOf("#2196F3")); // Azul Primario
+        btnViewTable.setGraphic(viewIcon);
         btnViewTable.setOnAction(e -> openPriceTableView(pl));
+        Tooltip.install(btnViewTable, new Tooltip(container.getBundle().getString("price_list.btn.view_prices")));
+
+        // Clonar (Copy)
+        Button btnClone = new Button();
+        btnClone.getStyleClass().add("btn-table-icon");
+        FontAwesomeIconView cloneIcon = new FontAwesomeIconView(FontAwesomeIcon.COPY);
+        cloneIcon.setSize("18");
+        cloneIcon.setFill(javafx.scene.paint.Color.valueOf("#10b981")); // Verde esmeralda
+        btnClone.setGraphic(cloneIcon);
+        btnClone.setOnAction(e -> handleClone(pl));
+        Tooltip.install(btnClone, new Tooltip(container.getBundle().getString("price_list.dialog.clone")));
+
+        // Establecer como Predeterminada (Estrella)
+        Button btnMakeDefault = new Button();
+        btnMakeDefault.getStyleClass().add("btn-table-icon");
+        FontAwesomeIconView starIcon = new FontAwesomeIconView(FontAwesomeIcon.STAR);
+        starIcon.setSize("18");
+        starIcon.setFill(javafx.scene.paint.Color.valueOf("#f59e0b")); // Ámbar/Amarillo
+        btnMakeDefault.setGraphic(starIcon);
+        btnMakeDefault.setVisible(!pl.isDefault());
+        btnMakeDefault.setManaged(!pl.isDefault());
+        btnMakeDefault.setOnAction(e -> makeDefault(pl));
+        Tooltip.install(btnMakeDefault, new Tooltip(container.getBundle().getString("price_list.status.default")));
+
+        // Editar (Lápiz)
+        Button btnEdit = new Button();
+        btnEdit.getStyleClass().add("btn-table-icon");
+        FontAwesomeIconView editIcon = new FontAwesomeIconView(FontAwesomeIcon.PENCIL);
+        editIcon.setSize("18");
+        editIcon.setFill(javafx.scene.paint.Color.valueOf("#6366f1")); // Índigo/Púrpura
+        btnEdit.setGraphic(editIcon);
+        btnEdit.setOnAction(e -> openPriceListForm(pl));
+        Tooltip.install(btnEdit, new Tooltip(container.getBundle().getString("price_list.dialog.edit")));
+
+        // Eliminar (Papelera)
+        Button btnDelete = new Button();
+        btnDelete.getStyleClass().add("btn-table-icon-danger");
+        FontAwesomeIconView trashIcon = new FontAwesomeIconView(FontAwesomeIcon.TRASH);
+        trashIcon.setSize("18");
+        trashIcon.setFill(javafx.scene.paint.Color.valueOf("#ef4444")); // Rojo
+        btnDelete.setGraphic(trashIcon);
+        btnDelete.setDisable(pl.isDefault() || pl.getId() == 1);
+        btnDelete.setVisible(pl.getId() != 1); // No mostrar borrar en la principal
+        btnDelete.setManaged(pl.getId() != 1);
+        btnDelete.setOnAction(e -> deletePriceList(pl));
+        Tooltip.install(btnDelete, new Tooltip(container.getBundle().getString("btn.delete")));
 
         actionBox.getChildren().addAll(btnViewTable, btnClone, btnMakeDefault, btnEdit, btnDelete);
 
-        card.getChildren().addAll(header, content, actionBox);
+        Region spacer = new Region();
+        VBox.setVgrow(spacer, javafx.scene.layout.Priority.ALWAYS);
+
+        card.getChildren().addAll(header, content, spacer, actionBox);
         return card;
     }
 
@@ -236,21 +303,5 @@ public class PriceListController implements Injectable {
             AlertUtil.showError(container.getBundle().getString("alert.error"),
                     container.getBundle().getString("price_list.error.update") + ": " + ex.getMessage());
         }
-    }
-
-    private Button createIconButton(String text, FontAwesomeIcon iconEnum, String bgColor, String textColor) {
-        Button btn = new Button(text);
-        btn.setStyle("-fx-background-color: " + bgColor + "; -fx-text-fill: " + textColor
-                + "; -fx-background-radius: 6; -fx-padding: 6 12; -fx-cursor: hand; -fx-font-weight: bold; -fx-font-size: 12px;");
-
-        FontAwesomeIconView icon = new FontAwesomeIconView(iconEnum);
-        icon.setGlyphSize(14);
-        icon.setFill(javafx.scene.paint.Color.valueOf(textColor));
-
-        btn.setGraphic(icon);
-        btn.setContentDisplay(ContentDisplay.LEFT);
-        btn.setGraphicTextGap(8);
-
-        return btn;
     }
 }

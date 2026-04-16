@@ -34,6 +34,16 @@ public class PunctualityAuditController implements Injectable {
     @Override
     public void inject(ServiceContainer container) {
         this.container = container;
+
+        // Bloqueo de seguridad: solo permitimos el acceso si tiene permiso de
+        // arqueos/cierres
+        if (!container.getAuthService().hasPermission("CIERRES")) {
+            tableAudit.setPlaceholder(new Label("Acceso Denegado: Se requiere permiso de [CIERRES]"));
+            datePicker.setDisable(true);
+            lblGeneralPunctuality.setText("ERROR");
+            return;
+        }
+
         setupTable();
         datePicker.setValue(LocalDate.now());
         refresh();

@@ -22,19 +22,58 @@ public class PromotionEngine {
     }
 
     public PromotionResult process(List<CartItem> items) {
+        return process(items, null, null);
+    }
+
+    public PromotionResult process(List<CartItem> items, String appliedCode,
+            com.mycompany.ventacontrolfx.domain.model.Client client) {
         PromotionResult result = new PromotionResult();
         try {
             List<Promotion> activePromos = promotionRepository.getActive();
 
-            // 1. Simular promociones por PRODUCTO/CATEGOR\u00cda (Nivel de \u00edtem: % o fijo)
+            // Filtrar promociones: Las autom\u00e1ticas (sin c\u00f3digo) se aplican
+            // siempre.
+            // Las con c\u00f3digo solo si coinciden.
+            List<Promotion> promosToApply = activePromos.stream()
+                    .filter(p -> {
+                        // 1. Verificar c\u00f3digo
+                        boolean codeMatches = p.getCode() == null || p.getCode().isEmpty()
+                                || p.getCode().equalsIgnoreCase(appliedCode);
+                        if (!codeMatches)
+                            return false;
+
+                        // 2. Verificar l\u00edmite de usos globales
+                        if (p.getMaxUses() > 0 && p.getCurrentUses() >= p.getMaxUses())
+                            return false;
+
+                        // 3. Verificar vinculaci\u00f3n a cliente espec\u00edfico
+                        if (p.getCustomerId() != null) {
+                            if (client == null || !p.getCustomerId().equals(client.getId()))
+                                return false;
+                        }
+
+                        // 4. Verificar compra mínima (Min Order Value)
+                        if (p.getMinOrderValue() > 0) {
+                            double currentCartTotal = items.stream()
+                                    .mapToDouble(it -> it.getUnitPrice() * it.getQuantity()).sum();
+                            if (currentCartTotal < (p.getMinOrderValue() - 0.01)) { // Margen para redondeo
+                                return false;
+                            }
+                        }
+
+                        return true;
+                    })
+                    .collect(Collectors.toList());
+
+            // 1. Simular promociones por PRODUCTO/CATEGOR\u00cda
             PromotionResult itemResult = new PromotionResult();
             for (CartItem item : items) {
-                applyItemLevelPromos(item, activePromos, itemResult);
+                applyItemLevelPromos(item, promosToApply, itemResult);
             }
 
-            // 2. Simular promociones de VOLUMEN (2x1, 3x2, etc.)
+            // 2. Simular promociones de VOLUMEN
             PromotionResult volumeResult = new PromotionResult();
-            applyVolumePromos(items, activePromos, volumeResult);
+            applyVolumePromos(items, promosToApply, volumeResult);
 
             // 3. Fusionar: El mayor descuento por producto GANA (No acumulable)
             java.util.Set<Integer> allProductIds = new java.util.HashSet<>();
@@ -53,7 +92,7 @@ public class PromotionEngine {
             }
 
             // 4. Aplicar promociones GLOBALES
-            applyGlobalPromos(items, activePromos, result);
+            applyGlobalPromos(items, promosToApply, result);
 
         } catch (SQLException e) {
             System.err.println("[PromotionEngine] Error fetching promotions: " + e.getMessage());
@@ -94,46 +133,38 @@ public class PromotionEngine {
                             && p.getAffectedIds().contains(it.getProduct().getId()))
                             || (p.getScope() == PromotionScope.CATEGORY
                                     && p.getAffectedIds().contains(it.getProduct().getCategoryId())))
+                    .sorted(java.util.Comparator.comparingDouble(CartItem::getUnitPrice))
                     .collect(Collectors.toList());
 
             if (affectedItems.isEmpty())
                 continue;
 
-            // 1. Desglosar todas las unidades individuales para manejar precios distintos
-            // (Mix and Match)
-            List<UnitPriceRecord> allUnits = new java.util.ArrayList<>();
-            for (CartItem it : affectedItems) {
-                for (int i = 0; i < it.getQuantity(); i++) {
-                    allUnits.add(new UnitPriceRecord(it.getProduct().getId(), it.getUnitPrice()));
-                }
-            }
-
-            int totalQty = allUnits.size();
+            int totalQty = affectedItems.stream().mapToInt(CartItem::getQuantity).sum();
             int buyQty = p.getBuyQty();
             int freeQty = p.getFreeQty();
+            int packSize = buyQty + freeQty;
 
-            if (buyQty > 0 && totalQty >= (buyQty + freeQty)) {
-                // Cantidad de aplicaciones del pack (ej: en 3x2, pack de 3)
-                int applications = totalQty / (buyQty + freeQty);
-                int totalFreeUnits = applications * freeQty;
+            if (packSize > 0 && totalQty >= packSize) {
+                int applications = totalQty / packSize;
+                int remainingFreeUnits = applications * freeQty;
 
-                // 2. Ordenar por precio ascendente (REGLA: el m\u00e1s barato es gratis)
-                allUnits.sort(java.util.Comparator.comparingDouble(u -> u.price));
+                // Aplicar descuento a las unidades más baratas primero (recorriendo la lista ya
+                // ordenada)
+                for (CartItem it : affectedItems) {
+                    if (remainingFreeUnits <= 0)
+                        break;
 
-                // 3. Aplicar el descuento unitario a las N unidades m\u00e1s baratas
-                for (int i = 0; i < totalFreeUnits; i++) {
-                    UnitPriceRecord freeUnit = allUnits.get(i);
-                    res.addDiscount(freeUnit.productId, freeUnit.price,
-                            p.getName() + " (Unidad gratis)");
+                    int take = Math.min(it.getQuantity(), remainingFreeUnits);
+                    double lineDiscount = take * it.getUnitPrice();
+
+                    // Nota: addDiscount ahora es no-acumulativo, pero aquí estamos en el nivel de
+                    // volumen
+                    // Queremos guardar el descuento total de la promo de volumen para este producto
+                    res.addDiscount(it.getProduct().getId(), lineDiscount, p.getName() + " (Unidad gratis)");
+                    remainingFreeUnits -= take;
                 }
             }
         }
-    }
-
-    /**
-     * Helper para desglosar unidades en promociones de volumen.
-     */
-    private static record UnitPriceRecord(int productId, double price) {
     }
 
     private void applyGlobalPromos(List<CartItem> items, List<Promotion> promos, PromotionResult res) {
@@ -143,8 +174,12 @@ public class PromotionEngine {
             if (p.getScope() == PromotionScope.GLOBAL) {
                 double discount = calculateDiscount(currentSubtotal, p);
                 if (discount > 0) {
-                    res.addDiscount(-1, discount, p.getName());
-                    currentSubtotal -= discount; // Aplicaci\u00f3n cascada
+                    String displayName = p.getName();
+                    if (p.getCode() != null && p.getCode().startsWith("GIFT-")) {
+                        displayName = String.format("REGALO FIDELIDAD (-%.2f\u20ac)", p.getValue());
+                    }
+                    res.addDiscountWithCode(-1, discount, displayName, p.getCode());
+                    currentSubtotal -= discount; // Aplicación cascada
                 }
             }
         }

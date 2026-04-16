@@ -59,7 +59,8 @@ public class OpenPdfFiscalService implements IFiscalPdfService {
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
         boolean isInvoice = data.document.getDocType() == FiscalDocument.Type.FACTURA;
 
-        // \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac LOGOTIPO (Opcional) \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac
+        // \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac LOGOTIPO (Opcional)
+        // \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac
         if (data.logoPath != null && !data.logoPath.trim().isEmpty()) {
             try {
                 Image logo = Image.getInstance(data.logoPath);
@@ -72,7 +73,8 @@ public class OpenPdfFiscalService implements IFiscalPdfService {
             }
         }
 
-        // \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac CABECERA DE DOCUMENTO \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac
+        // \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac CABECERA DE DOCUMENTO
+        // \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac
         PdfPTable typeTable = new PdfPTable(1);
         typeTable.setWidthPercentage(100);
 
@@ -94,7 +96,8 @@ public class OpenPdfFiscalService implements IFiscalPdfService {
         document.add(typeTable);
         document.add(new Paragraph("\n"));
 
-        // \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac INFO EMISOR Y RECEPTOR (DOS COLUMNAS) \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac
+        // \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac INFO EMISOR Y RECEPTOR
+        // (DOS COLUMNAS) \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac
         PdfPTable infoTable = new PdfPTable(2);
         infoTable.setWidthPercentage(100);
         infoTable.setWidths(new float[] { 1f, 1f });
@@ -122,7 +125,8 @@ public class OpenPdfFiscalService implements IFiscalPdfService {
         document.add(infoTable);
         document.add(new Paragraph("\n"));
 
-        // \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac DATOS DEL RECEPTOR (S\u00f3lo si existe) \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac
+        // \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac DATOS DEL RECEPTOR
+        // (S\u00f3lo si existe) \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac
         if (data.document.getReceiverName() != null && !data.document.getReceiverName().trim().isEmpty()) {
             PdfPTable clientBox = new PdfPTable(1);
             clientBox.setWidthPercentage(100);
@@ -146,7 +150,8 @@ public class OpenPdfFiscalService implements IFiscalPdfService {
         document.add(new LineSeparator());
         document.add(new Paragraph("\n"));
 
-        // \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac L\u00cdNEAS DE DETALLE \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac
+        // \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac L\u00cdNEAS DE DETALLE
+        // \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac
         PdfPTable table = new PdfPTable(5);
         table.setWidthPercentage(100);
         table.setWidths(new float[] { 4f, 1f, 1.5f, 1f, 1.5f });
@@ -167,7 +172,8 @@ public class OpenPdfFiscalService implements IFiscalPdfService {
         }
         document.add(table);
 
-        // \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac RESUMEN DE IMPORTES \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac
+        // \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac RESUMEN DE IMPORTES
+        // \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac
         PdfPTable summaryTable = new PdfPTable(2);
         summaryTable.setWidthPercentage(100);
         summaryTable.setSpacingBefore(20);
@@ -186,14 +192,17 @@ public class OpenPdfFiscalService implements IFiscalPdfService {
         nestedTotals.setWidthPercentage(100);
         addTotalLine(nestedTotals, "Base Imponible:", String.format("%.2f \u20ac", data.document.getBaseAmount()));
 
-        // \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac DESGLOSE DE IVA DESDE EL SNAPSHOT FISCAL (V2.0) \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac
+        // \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac DESGLOSE DE IVA DESDE
+        // EL SNAPSHOT FISCAL (V2.0)
+        // \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac
         if (data.sale.getTaxSummaries() != null && !data.sale.getTaxSummaries().isEmpty()) {
             for (com.mycompany.ventacontrolfx.domain.model.SaleTaxSummary summary : data.sale.getTaxSummaries()) {
                 addTotalLine(nestedTotals, String.format("%s (%.1f%%):", summary.getTaxName(), summary.getTaxRate()),
                         String.format("%.2f \u20ac", summary.getTaxAmount()));
             }
         } else {
-            // Fallback para ventas hist\u00f3ricas sin snapshot V2.0 (C\u00e1lculo simplificado)
+            // Fallback para ventas hist\u00f3ricas sin snapshot V2.0 (C\u00e1lculo
+            // simplificado)
             java.util.Map<Double, Double[]> breakdown = new java.util.TreeMap<>();
             for (SaleDetail line : data.lines) {
                 double rate = line.getIvaRate();
@@ -226,9 +235,50 @@ public class OpenPdfFiscalService implements IFiscalPdfService {
         summaryTable.addCell(totalsCol);
         document.add(summaryTable);
 
-        // \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac PIE DE P\u00c1GINA FIXAL \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac
+        // \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac CUP\u00d3N DE REGALO /
+        // RECOMPENSA (V1.13) \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac
+        System.out.println("[DEBUG] PDF Generation - Reward code: "
+                + (data.sale != null ? data.sale.getRewardPromoCode() : "SALE_IS_NULL"));
+        if (data.sale != null && data.sale.getRewardPromoCode() != null && !data.sale.getRewardPromoCode().isEmpty()) {
+            document.add(new Paragraph("\n"));
+            PdfPTable rewardBox = new PdfPTable(1);
+            rewardBox.setWidthPercentage(100);
+            PdfPCell rCell = new PdfPCell();
+            rCell.setPadding(10);
+            rCell.setBorderWidth(1.5f);
+            rCell.setBorderColor(new Color(40, 167, 69)); // Verde éxito
+            rCell.setBackgroundColor(new Color(232, 245, 233));
+
+            Paragraph pTitle = new Paragraph("\u2728 \u00a1REGALO POR TU COMPRA! \u2728", FONT_BOLD);
+            pTitle.setAlignment(Element.ALIGN_CENTER);
+            rCell.addElement(pTitle);
+
+            String expiry = "";
+            if (data.sale.getSaleDateTime() != null) {
+                java.time.format.DateTimeFormatter dtfReward = java.time.format.DateTimeFormatter
+                        .ofPattern("dd/MM/yyyy");
+                expiry = data.sale.getSaleDateTime().plusMonths(3).format(dtfReward);
+            }
+
+            Paragraph pMsg = new Paragraph(
+                    "Disfruta de 10,00 \u20ac de descuento en tu pr\u00f3xima compra.\nV\u00e1lido hasta: " + expiry,
+                    FONT_BODY);
+            pMsg.setAlignment(Element.ALIGN_CENTER);
+            rCell.addElement(pMsg);
+
+            Paragraph pCode = new Paragraph("C\u00d3DIGO: " + data.sale.getRewardPromoCode(), FONT_TOTAL);
+            pCode.setAlignment(Element.ALIGN_CENTER);
+            rCell.addElement(pCode);
+
+            rewardBox.addCell(rCell);
+            document.add(rewardBox);
+        }
+
+        // \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac PIE DE P\u00c1GINA
+        // FISCAL \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac
         document.add(new Paragraph("\n\n"));
-        Paragraph pHash = new Paragraph("C\u00f3digo \u00danico de Integridad (SHA-256): " + data.document.getControlHash(),
+        Paragraph pHash = new Paragraph(
+                "C\u00f3digo \u00danico de Integridad (SHA-256): " + data.document.getControlHash(),
                 FONT_HASH);
         pHash.setAlignment(Element.ALIGN_CENTER);
         document.add(pHash);

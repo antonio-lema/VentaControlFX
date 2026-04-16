@@ -28,7 +28,6 @@ public class BackupService {
             String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
             String fileName = "backup_" + dbName + "_" + timestamp + ".sql";
 
-            // Create backups directory if not exists
             Path backupDir = Paths.get(System.getProperty("user.home"), "VentaControl", "backups");
             if (!Files.exists(backupDir)) {
                 Files.createDirectories(backupDir);
@@ -36,30 +35,38 @@ public class BackupService {
 
             File outputFile = backupDir.resolve(fileName).toFile();
 
-            // Build mysqldump command
             String mysqldumpPath = findMysqldump();
+            if (mysqldumpPath == null) {
+                return new BackupResult(false,
+                        "No se encontró el ejecutable 'mysqldump'. Por favor, verifique su instalación de MySQL.",
+                        null);
+            }
+
             java.util.List<String> cmd = new java.util.ArrayList<>();
             cmd.add(mysqldumpPath);
             cmd.add("-h" + host);
             cmd.add("-P" + port);
             cmd.add("-u" + user);
-
-            if (password != null && !password.isEmpty()) {
-                cmd.add("-p" + password);
-            }
-
+            // Evitamos -p para no disparar el Warning en el archivo SQL
             cmd.add(dbName);
 
             ProcessBuilder pb = new ProcessBuilder(cmd);
+            // Usamos variable de entorno para la contraseña (Evita Warning de inseguridad
+            // en stderr/stdout)
+            if (password != null && !password.isEmpty()) {
+                pb.environment().put("MYSQL_PWD", password);
+            }
+
             pb.redirectOutput(outputFile);
-            pb.redirectErrorStream(true);
+            pb.redirectErrorStream(false); // IMPORTANTE: Errores fuera del archivo SQL
+
             Process process = pb.start();
 
-            StringBuilder output = new StringBuilder();
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+            StringBuilder errorOutput = new StringBuilder();
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getErrorStream()))) {
                 String line;
                 while ((line = reader.readLine()) != null) {
-                    output.append(line).append("\n");
+                    errorOutput.append(line).append("\n");
                 }
             }
 
@@ -68,7 +75,10 @@ public class BackupService {
             if (exitCode == 0) {
                 return new BackupResult(true, "Backup creado exitosamente", outputFile.getAbsolutePath());
             } else {
-                return new BackupResult(false, "Error ejecutando mysqldump: " + output.toString(), null);
+                // Si falló, borramos el archivo parcial para no dejar basura corrupta
+                if (outputFile.exists())
+                    outputFile.delete();
+                return new BackupResult(false, "Error en mysqldump: " + errorOutput.toString(), null);
             }
 
         } catch (Exception e) {
@@ -111,19 +121,22 @@ public class BackupService {
             }
 
             String mysqlPath = findMysql();
+            if (mysqlPath == null) {
+                return new BackupResult(false, "No se encontró el ejecutable 'mysql'. verifique su instalación.", null);
+            }
+
             java.util.List<String> cmd = new java.util.ArrayList<>();
             cmd.add(mysqlPath);
             cmd.add("-h" + host);
             cmd.add("-P" + port);
             cmd.add("-u" + user);
-
-            if (password != null && !password.isEmpty()) {
-                cmd.add("-p" + password);
-            }
-
             cmd.add(dbName);
 
             ProcessBuilder pb = new ProcessBuilder(cmd);
+            if (password != null && !password.isEmpty()) {
+                pb.environment().put("MYSQL_PWD", password);
+            }
+
             pb.redirectInput(inputFile);
             pb.redirectErrorStream(true);
             Process process = pb.start();
@@ -141,7 +154,7 @@ public class BackupService {
             if (exitCode == 0) {
                 return new BackupResult(true, "Base de datos restaurada exitosamente", filePath);
             } else {
-                return new BackupResult(false, "Error ejecutando mysql: " + output.toString(), null);
+                return new BackupResult(false, "Error restaurando: " + output.toString(), null);
             }
 
         } catch (Exception e) {
@@ -153,6 +166,7 @@ public class BackupService {
         String[] commonPaths = {
                 "mysqldump",
                 "C:\\xampp\\mysql\\bin\\mysqldump.exe",
+                "C:\\mysql\\bin\\mysqldump.exe",
                 "C:\\Program Files\\MySQL\\MySQL Server 8.0\\bin\\mysqldump.exe",
                 "C:\\Program Files\\MySQL\\MySQL Server 5.7\\bin\\mysqldump.exe",
                 "C:\\Program Files\\MySQL\\MySQL Server 5.6\\bin\\mysqldump.exe"
@@ -165,6 +179,7 @@ public class BackupService {
         String[] commonPaths = {
                 "mysql",
                 "C:\\xampp\\mysql\\bin\\mysql.exe",
+                "C:\\mysql\\bin\\mysql.exe",
                 "C:\\Program Files\\MySQL\\MySQL Server 8.0\\bin\\mysql.exe",
                 "C:\\Program Files\\MySQL\\MySQL Server 5.7\\bin\\mysql.exe",
                 "C:\\Program Files\\MySQL\\MySQL Server 5.6\\bin\\mysql.exe"
@@ -175,19 +190,19 @@ public class BackupService {
 
     private String resolvePath(String[] paths, String versionFlag) {
         for (String path : paths) {
-            if (path.equals("mysql") || path.equals("mysqldump")) {
-                try {
-                    new ProcessBuilder(path, versionFlag).start().waitFor();
+            try {
+                // Si es solo "mysql", probamos en el PATH
+                Process p = new ProcessBuilder(path, versionFlag).start();
+                if (p.waitFor() == 0)
                     return path;
-                } catch (Exception e) {
-                    continue;
+            } catch (Exception e) {
+                // Si no, probamos acceso directo al archivo si es ruta absoluta
+                File f = new File(path);
+                if (f.exists() && f.canExecute()) {
+                    return path;
                 }
             }
-            File f = new File(path);
-            if (f.exists()) {
-                return path;
-            }
         }
-        return paths[0]; // Fallback
+        return null; // Cambiado para informar del fallo
     }
 }

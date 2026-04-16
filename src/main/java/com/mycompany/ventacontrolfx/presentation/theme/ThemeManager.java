@@ -12,7 +12,8 @@ import javafx.scene.paint.Color;
 
 /**
  * Gestor din\u00e1mico de la est\u00e9tica de la aplicaci\u00f3n.
- * Permite cambiar colores y tama\u00f1os en caliente inyectando CSS din\u00e1mico.
+ * Permite cambiar colores y tama\u00f1os en caliente inyectando CSS
+ * din\u00e1mico.
  */
 public class ThemeManager {
 
@@ -39,6 +40,7 @@ public class ThemeManager {
             "/styles/components/devoluciones.css",
             "/styles/components/informes.css",
             "/styles/components/vender.css",
+            "/styles/components/personal.css",
             "/styles/components/alertas.css",
             "/styles/skeleton.css"
     };
@@ -48,7 +50,8 @@ public class ThemeManager {
     }
 
     /**
-     * Aplica el sistema modular de estilos base y el tema din\u00e1mico a una escena.
+     * Aplica el sistema modular de estilos base y el tema din\u00e1mico a una
+     * escena.
      */
     public void applyFullTheme(Scene scene) {
         // 1. Aplicar estilos base (archivos CSS)
@@ -88,7 +91,8 @@ public class ThemeManager {
         String encodedCss = Base64.getEncoder().encodeToString(css.getBytes(StandardCharsets.UTF_8));
         String newUrl = "data:text/css;base64," + encodedCss;
 
-        // Limpiar cualquier stylesheet din\u00e1mico previo de ESTA escena espec\u00edfica
+        // Limpiar cualquier stylesheet din\u00e1mico previo de ESTA escena
+        // espec\u00edfica
         scene.getStylesheets().removeIf(url -> url.startsWith("data:text/css;base64,"));
 
         // A\u00f1adir el nuevo
@@ -126,7 +130,8 @@ public class ThemeManager {
     private String generateCss(Map<String, String> settings) {
         StringBuilder sb = new StringBuilder();
         String bg = settings.get("ui.bg_main");
-        // Calcular si es oscuro autom\u00e1ticamente seg\u00fan el color de fondo para evitar
+        // Calcular si es oscuro autom\u00e1ticamente seg\u00fan el color de fondo para
+        // evitar
         // mezclas
         boolean isDark = bg != null && !isLightColor(bg);
 
@@ -203,8 +208,10 @@ public class ThemeManager {
         }
 
         // El color elegido por el usuario ES el color SUPERIOR del gradiente.
-        // Gradiente: vibrante (top) \u2192 35% m\u00e1s oscuro (mid) \u2192 65% m\u00e1s oscuro (bot)
-        // As\u00ed, con sidebar = #1e88e5 (azul) se ver\u00e1: azul \u2192 azul medio \u2192 azul casi
+        // Gradiente: vibrante (top) \u2192 35% m\u00e1s oscuro (mid) \u2192 65%
+        // m\u00e1s oscuro (bot)
+        // As\u00ed, con sidebar = #1e88e5 (azul) se ver\u00e1: azul \u2192 azul medio
+        // \u2192 azul casi
         // negro
         final String sidebarTop = settings.getOrDefault("ui.sidebar_bg", "#0f172a");
         final String sidebarMid = darken(sidebarTop, 0.35);
@@ -411,7 +418,8 @@ public class ThemeManager {
             }
         }
 
-        // \u00e2\u201d\u20ac\u00e2\u201d\u20ac BLOQUE .sidebar con gradiente directo \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac
+        // \u00e2\u201d\u20ac\u00e2\u201d\u20ac BLOQUE .sidebar con gradiente directo
+        // \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac
         // JavaFX NO puede resolver variables CSS que contienen linear-gradient.
         // Por eso escribimos el valor del gradiente directamente en la regla CSS.
         // El color elegido (sidebarTop) es el vibrante de arriba;
@@ -423,7 +431,9 @@ public class ThemeManager {
                 .append(sidebarBot).append(" 100%);\n");
         sb.append("}\n");
 
-        // \u00e2\u201d\u20ac\u00e2\u201d\u20ac BLOQUE .search-bar con tinte del color primario \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac
+        // \u00e2\u201d\u20ac\u00e2\u201d\u20ac BLOQUE .search-bar con tinte del color
+        // primario
+        // \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac
         // La barra de b\u00fasqueda usa un tinte muy sutil del color primario.
         // En reposo: 5% de tinte. Al hacer foco: borde del color primario.
         if (primary != null) {
@@ -498,7 +508,8 @@ public class ThemeManager {
      * 
      * @param base  Color base (hex)
      * @param blend Color a mezclar (hex)
-     * @param ratio Proporci\u00f3n del color blend (0.0 = solo base, 1.0 = solo blend)
+     * @param ratio Proporci\u00f3n del color blend (0.0 = solo base, 1.0 = solo
+     *              blend)
      */
     private String blendColors(String base, String blend, double ratio) {
         try {

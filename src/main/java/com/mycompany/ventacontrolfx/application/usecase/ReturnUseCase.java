@@ -67,26 +67,30 @@ public class ReturnUseCase {
 
                 // 1. Validar y Calcular l\u00edneas de devoluci\u00f3n
                 for (SaleDetail d : saleDetails) {
-                    if (quantitiesToReturn.containsKey(d.getProductId())) {
-                        int qtyToReturnNow = quantitiesToReturn.get(d.getProductId());
-                        if (qtyToReturnNow > 0) {
-                            BigDecimal unitPrice = BigDecimal.valueOf(d.getUnitPrice());
-                            BigDecimal lineRefund = unitPrice.multiply(BigDecimal.valueOf(qtyToReturnNow));
-                            totalRefund = totalRefund.add(lineRefund);
+                    int qtyToReturnNow = quantitiesToReturn.getOrDefault(d.getProductId(), 0);
+                    int totalReturnedOnDetail = d.getReturnedQuantity() + qtyToReturnNow;
 
-                            ReturnDetail rd = new ReturnDetail();
-                            rd.setProductId(d.getProductId());
-                            rd.setProductName(d.getProductName());
-                            rd.setQuantity(qtyToReturnNow);
-                            rd.setUnitPrice(d.getUnitPrice());
-                            rd.setSubtotal(lineRefund.doubleValue());
-                            newReturnDetails.add(rd);
+                    if (qtyToReturnNow > 0) {
+                        BigDecimal unitPrice = BigDecimal.valueOf(d.getUnitPrice());
+                        BigDecimal lineRefund = unitPrice.multiply(BigDecimal.valueOf(qtyToReturnNow));
+                        totalRefund = totalRefund.add(lineRefund);
 
-                            // Actualizar Stock
-                            productRepository.updateStock(d.getProductId(), qtyToReturnNow, conn);
-                        }
+                        ReturnDetail rd = new ReturnDetail();
+                        rd.setProductId(d.getProductId());
+                        rd.setProductName(d.getProductName());
+                        rd.setQuantity(qtyToReturnNow);
+                        rd.setUnitPrice(d.getUnitPrice());
+                        rd.setSubtotal(lineRefund.doubleValue());
+                        newReturnDetails.add(rd);
+
+                        // Actualizar Stock de producto
+                        productRepository.updateStock(d.getProductId(), qtyToReturnNow, conn);
+
+                        // FIX: Actualizar cantidad devuelta en el detalle de la venta original
+                        saleRepository.updateDetailReturnedQuantity(d.getDetailId(), totalReturnedOnDetail, conn);
                     }
-                    if (d.getReturnedQuantity() < d.getQuantity()) {
+
+                    if (totalReturnedOnDetail < d.getQuantity()) {
                         allReturned = false;
                     }
                 }

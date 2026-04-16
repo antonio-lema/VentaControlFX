@@ -85,5 +85,15 @@ public class BusinessDay {
         public void setAssignedUserIds(List<Integer> ids) {
             this.assignedUserIds = ids != null ? ids : new ArrayList<>();
         }
+
+        public double getDurationHours() {
+            if (open == null || close == null)
+                return 0.0;
+            long seconds = java.time.temporal.ChronoUnit.SECONDS.between(open, close);
+            if (seconds < 0) { // Manejar turnos que cruzan la medianoche (ej: 22h a 06h)
+                seconds += 24 * 3600;
+            }
+            return (double) seconds / 3600.0;
+        }
     }
 }

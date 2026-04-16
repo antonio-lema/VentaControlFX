@@ -13,6 +13,11 @@ public class Promotion {
     private String description;
     private PromotionType type;
     private double value;
+    private String code;
+    private int maxUses;
+    private int currentUses;
+    private int usesPerCustomer = 1;
+    private Integer customerId;
     private LocalDateTime startDate;
     private LocalDateTime endDate;
     private boolean active;
@@ -21,16 +26,20 @@ public class Promotion {
     // IDs de productos o categor\u00edas afectados seg\u00fan el scope
     private List<Integer> affectedIds = new ArrayList<>();
 
-    // L\u00f3gica de Volumen (2x1, 3x2, etc.)
+    // Lógica de Volumen (2x1, 3x2, etc.)
     private int buyQty;
     private int freeQty;
+
+    // Compra mínima para aplicar
+    private double minOrderValue;
 
     public Promotion() {
     }
 
-    public Promotion(Integer id, String name, PromotionType type, double value, PromotionScope scope) {
+    public Promotion(Integer id, String name, String code, PromotionType type, double value, PromotionScope scope) {
         this.id = id;
         this.name = name;
+        this.code = code;
         this.type = type;
         this.value = value;
         this.scope = scope;
@@ -52,6 +61,46 @@ public class Promotion {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
+    }
+
+    public int getMaxUses() {
+        return maxUses;
+    }
+
+    public void setMaxUses(int maxUses) {
+        this.maxUses = maxUses;
+    }
+
+    public int getCurrentUses() {
+        return currentUses;
+    }
+
+    public void setCurrentUses(int currentUses) {
+        this.currentUses = currentUses;
+    }
+
+    public int getUsesPerCustomer() {
+        return usesPerCustomer;
+    }
+
+    public void setUsesPerCustomer(int usesPerCustomer) {
+        this.usesPerCustomer = usesPerCustomer;
+    }
+
+    public Integer getCustomerId() {
+        return customerId;
+    }
+
+    public void setCustomerId(Integer customerId) {
+        this.customerId = customerId;
     }
 
     public String getDescription() {
@@ -132,6 +181,14 @@ public class Promotion {
 
     public void setFreeQty(int freeQty) {
         this.freeQty = freeQty;
+    }
+
+    public double getMinOrderValue() {
+        return minOrderValue;
+    }
+
+    public void setMinOrderValue(double minOrderValue) {
+        this.minOrderValue = minOrderValue;
     }
 
     /**

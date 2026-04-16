@@ -64,13 +64,16 @@ public class CartUseCaseTest {
         com.mycompany.ventacontrolfx.domain.service.PriceResolutionService priceResolutionService = Mockito
                 .mock(com.mycompany.ventacontrolfx.domain.service.PriceResolutionService.class);
         IPriceRepository priceRepository = Mockito.mock(IPriceRepository.class);
+        com.mycompany.ventacontrolfx.domain.repository.IProductRepository productRepository = Mockito
+                .mock(com.mycompany.ventacontrolfx.domain.repository.IProductRepository.class);
 
         cartUseCase = new CartUseCase(configRepository,
                 priceResolutionService,
                 taxEngineService,
                 promotionService,
                 promotionEngine,
-                priceRepository);
+                priceRepository,
+                productRepository);
     }
 
     @Test

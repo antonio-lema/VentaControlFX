@@ -153,11 +153,22 @@ public class SellViewController implements Injectable, CategoryMenuRenderer.Cate
                 products = container.getProductRepository().getFavoritesPaginated(PAGE_SIZE, currentOffset,
                         selectedPriceListId);
             } else if (type == FilterType.PROMOTIONS) {
-                // Promotions are complex to paginate on server,
-                // but since they were limited to 1000 in refresh,
-                // scrolling might not be needed or would need a similar sublist logic.
-                // For now, return empty to avoid errors
-                products = new java.util.ArrayList<>();
+                // Optimized paging for promotions
+                List<Integer> productIds = activePromotions.stream()
+                        .filter(p -> p.getScope() == com.mycompany.ventacontrolfx.domain.model.PromotionScope.PRODUCT)
+                        .flatMap(p -> p.getAffectedIds().stream())
+                        .collect(java.util.stream.Collectors.toList());
+
+                List<Integer> categoryIds = activePromotions.stream()
+                        .filter(p -> p.getScope() == com.mycompany.ventacontrolfx.domain.model.PromotionScope.CATEGORY)
+                        .flatMap(p -> p.getAffectedIds().stream())
+                        .collect(java.util.stream.Collectors.toList());
+
+                boolean hasGlobal = activePromotions.stream()
+                        .anyMatch(p -> p.getScope() == com.mycompany.ventacontrolfx.domain.model.PromotionScope.GLOBAL);
+
+                products = container.getProductRepository().getPromotedPaginated(productIds, categoryIds, hasGlobal,
+                        PAGE_SIZE, currentOffset, selectedPriceListId);
             } else {
                 products = container.getProductRepository().searchPaginated("", PAGE_SIZE, currentOffset,
                         selectedPriceListId, VisibilityFilter.VISIBLE);
@@ -381,34 +392,23 @@ public class SellViewController implements Injectable, CategoryMenuRenderer.Cate
                 products = container.getProductRepository().getFavoritesPaginated(PAGE_SIZE, currentOffset,
                         selectedPriceListId);
             } else if (type == FilterType.PROMOTIONS) {
-                // Optimized: instead of fetching 5000, we fetch a smaller buffer or
-                // ideally this should be a JOIN in the repository.
-                // For now, let's limit to 1000 to reduce memory pressure.
-                List<Product> productsToFilter = container.getProductRepository().searchPaginated("", 1000, 0,
-                        selectedPriceListId, VisibilityFilter.VISIBLE);
+                // Optimized: Filtering on database level instead of memory
+                List<Integer> productIds = activePromotions.stream()
+                        .filter(p -> p.getScope() == com.mycompany.ventacontrolfx.domain.model.PromotionScope.PRODUCT)
+                        .flatMap(p -> p.getAffectedIds().stream())
+                        .collect(java.util.stream.Collectors.toList());
 
-                List<Product> filtered = productsToFilter.stream()
-                        .filter(p -> {
-                            boolean hasProductPromo = activePromotions.stream().anyMatch(
-                                    promo -> promo
-                                            .getScope() == com.mycompany.ventacontrolfx.domain.model.PromotionScope.PRODUCT
-                                            && promo.getAffectedIds().contains(p.getId()));
+                List<Integer> categoryIds = activePromotions.stream()
+                        .filter(p -> p.getScope() == com.mycompany.ventacontrolfx.domain.model.PromotionScope.CATEGORY)
+                        .flatMap(p -> p.getAffectedIds().stream())
+                        .collect(java.util.stream.Collectors.toList());
 
-                            boolean hasCategoryPromo = activePromotions.stream().anyMatch(
-                                    promo -> promo
-                                            .getScope() == com.mycompany.ventacontrolfx.domain.model.PromotionScope.CATEGORY
-                                            && promo.getAffectedIds().contains(p.getCategoryId()));
+                boolean hasGlobal = activePromotions.stream()
+                        .anyMatch(p -> p.getScope() == com.mycompany.ventacontrolfx.domain.model.PromotionScope.GLOBAL);
 
-                            boolean hasGlobal = activePromotions.stream().anyMatch(
-                                    promo -> promo
-                                            .getScope() == com.mycompany.ventacontrolfx.domain.model.PromotionScope.GLOBAL);
-
-                            return hasGlobal || hasProductPromo || hasCategoryPromo;
-                        }).collect(java.util.stream.Collectors.toList());
-
-                count = filtered.size();
-                int end = Math.min(currentOffset + PAGE_SIZE, count);
-                products = (currentOffset < count) ? filtered.subList(currentOffset, end) : new java.util.ArrayList<>();
+                count = container.getProductRepository().countPromoted(productIds, categoryIds, hasGlobal);
+                products = container.getProductRepository().getPromotedPaginated(productIds, categoryIds, hasGlobal,
+                        PAGE_SIZE, currentOffset, selectedPriceListId);
             } else if (type == FilterType.SEARCH && criteria != null) {
                 String query = (String) criteria;
                 count = container.getProductRepository().countSearch(query, VisibilityFilter.VISIBLE);
@@ -487,6 +487,11 @@ public class SellViewController implements Injectable, CategoryMenuRenderer.Cate
             return null;
         for (com.mycompany.ventacontrolfx.domain.model.Promotion promo : activePromotions) {
             if (promo.getScope() == com.mycompany.ventacontrolfx.domain.model.PromotionScope.GLOBAL) {
+                // Si la promo global requiere código (ej. GIFT-), NO la mostramos en cada
+                // producto
+                if (promo.getCode() != null && !promo.getCode().trim().isEmpty()) {
+                    continue;
+                }
                 return formatPromo(promo);
             }
             if (promo.getScope() == com.mycompany.ventacontrolfx.domain.model.PromotionScope.PRODUCT

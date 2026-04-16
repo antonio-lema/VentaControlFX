@@ -3,6 +3,7 @@ package com.mycompany.ventacontrolfx.infrastructure.navigation;
 import com.mycompany.ventacontrolfx.infrastructure.config.Injectable;
 import com.mycompany.ventacontrolfx.infrastructure.config.ServiceContainer;
 import com.mycompany.ventacontrolfx.util.Searchable;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.control.ScrollPane;
@@ -10,7 +11,6 @@ import javafx.scene.layout.VBox;
 import com.mycompany.ventacontrolfx.util.AuthorizationService;
 import com.mycompany.ventacontrolfx.util.AlertUtil;
 import com.mycompany.ventacontrolfx.domain.repository.IAuditRepository;
-import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -118,59 +118,61 @@ public class NavigationService {
             return;
         }
 
-        // Permitido: Registrar acceso exitoso (Audit Trail)
-        try {
-            audit.logAccess(userId, "NAVIGATE", fxmlPath, "Acceso a m\u00f3dulo");
-        } catch (SQLException ignored) {
-        }
-
         if (loadingOverlay != null)
             loadingOverlay.setVisible(true);
-        searchHandlers.clear(); // Clear search handlers for the new view
+        searchHandlers.clear();
 
-        // Notificar visibilidad del carrito y b\u00fasqueda ANTES de cargar la vista
+        // Notificar visibilidad del carrito y búsqueda ANTES de cargar
         boolean isSellView = SELL_VIEW.equals(fxmlPath);
-
         if (cartVisibilityListener != null) {
             cartVisibilityListener.onCartVisibilityChanged(isSellView);
         }
 
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath), container.getBundle());
-            Node viewNode = loader.load();
-            activeView = loader.getController();
-
-            // Automatic Injection
-            if (activeView instanceof Injectable) {
-                ((Injectable) activeView).inject(container);
+        // --- OPTIMIZACIÓN: Auditoría asíncrona para no bloquear el hilo UI ---
+        new Thread(() -> {
+            try {
+                audit.logAccess(userId, "NAVIGATE", fxmlPath, "Acceso a m\u00f3dulo");
+            } catch (Exception ignored) {
             }
+        }, "AsyncAudit").start();
 
-            // Initialization if provided
-            if (initializer != null) {
-                @SuppressWarnings("unchecked")
-                T controller = (T) activeView;
-                initializer.accept(controller);
-            }
+        // --- OPTIMIZACIÓN: Carga diferida ---
+        // Usamos runLater para dar tiempo a que el 'loadingOverlay' se dibuje
+        // y que el botón muestre su efecto de clic antes del bloqueo por FXML.
+        Platform.runLater(() -> {
+            try {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath), container.getBundle());
+                Node viewNode = loader.load();
+                activeView = loader.getController();
 
-            // Automatic Search Registration and Visibility
-            boolean isSearchable = activeView instanceof Searchable;
-            if (isSearchable) {
-                registerSearchHandler((Searchable) activeView);
-            }
-            if (searchBarVisibilityListener != null) {
-                searchBarVisibilityListener.onSearchBarVisibilityChanged(isSellView);
-            }
+                mainContent.setContent(viewNode);
 
-            mainContent.setContent(viewNode);
-        } catch (Exception e) {
-            e.printStackTrace();
-            AlertUtil.showError(container.getBundle().getString("alert.error"),
-                    container.getBundle().getString("error.navigation") + ": " + fxmlPath + "\nError: "
-                            + e.getMessage());
-        } finally {
-            if (loadingOverlay != null)
-                loadingOverlay.setVisible(false);
-        }
+                // Inyección y otros procesos secundarios
+                if (activeView instanceof Injectable) {
+                    ((Injectable) activeView).inject(container);
+                }
+
+                if (initializer != null) {
+                    @SuppressWarnings("unchecked")
+                    T controller = (T) activeView;
+                    initializer.accept(controller);
+                }
+
+                if (activeView instanceof Searchable) {
+                    registerSearchHandler((Searchable) activeView);
+                }
+                if (searchBarVisibilityListener != null) {
+                    searchBarVisibilityListener.onSearchBarVisibilityChanged(isSellView);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                AlertUtil.showError(container.getBundle().getString("alert.error"),
+                        container.getBundle().getString("error.navigation") + ": " + fxmlPath);
+            } finally {
+                if (loadingOverlay != null)
+                    loadingOverlay.setVisible(false);
+            }
+        });
     }
 
     /**

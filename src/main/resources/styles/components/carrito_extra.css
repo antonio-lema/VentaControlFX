@@ -1,26 +1,42 @@
-
-.btn-add-observation, .btn-add-manual-item {
-    -fx-background-color: transparent;
-    -fx-background-radius: 8;
-    -fx-padding: 6;
+.btn-add-observation,
+.btn-add-manual-item,
+.btn-icon-only-tiny,
+.btn-suspend-cart,
+.btn-resume-cart,
+.btn-clear-cart {
+    -fx-background-color: rgba(255, 255, 255, 0.4);
+    -fx-background-radius: 10;
+    -fx-padding: 7;
     -fx-cursor: hand;
-    -fx-border-color: #e0e0e0;
+    -fx-border-color: rgba(0, 0, 0, 0.08);
     -fx-border-width: 1;
-    -fx-border-radius: 8;
+    -fx-border-radius: 10;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.02), 4, 0, 0, 1);
 }
 
-.btn-add-observation:hover, .btn-add-manual-item:hover {
-    -fx-background-color: #f5f5f5;
+.btn-add-observation:hover,
+.btn-add-manual-item:hover,
+.btn-icon-only-tiny:hover,
+.btn-suspend-cart:hover,
+.btn-resume-cart:hover,
+.btn-clear-cart:hover {
+    -fx-background-color: -fx-custom-color-primary;
     -fx-border-color: -fx-custom-color-primary;
+    -fx-scale-x: 1.08;
+    -fx-scale-y: 1.08;
 }
 
-.btn-icon-only-tiny {
-    -fx-background-color: transparent;
-    -fx-background-radius: 4;
-    -fx-padding: 2;
-    -fx-cursor: hand;
+/* Ensure ALL icons inside these buttons turn white on hover */
+.btn-add-observation:hover .glyph-icon,
+.btn-add-manual-item:hover .glyph-icon,
+.btn-icon-only-tiny:hover .glyph-icon,
+.btn-suspend-cart:hover .glyph-icon,
+.btn-resume-cart:hover .glyph-icon,
+.btn-clear-cart:hover .glyph-icon {
+    -fx-fill: white !important;
 }
 
-.btn-icon-only-tiny:hover {
-    -fx-background-color: rgba(239, 68, 68, 0.1);
+.btn-clear-cart:hover {
+    -fx-background-color: #ef4444;
+    -fx-border-color: #ef4444;
 }

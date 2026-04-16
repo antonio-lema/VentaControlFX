@@ -28,6 +28,13 @@
     -fx-background-insets: 0;
 }
 
+.cart-section-title {
+    -fx-font-size: 13px;
+    -fx-font-weight: 800;
+    -fx-text-fill: -fx-text-custom-cards;
+    -fx-letter-spacing: 0.5px;
+}
+
 .cart-pricelist-header {
     -fx-padding: 10px 20px;
     -fx-background-color: -fx-bg-subtle;
@@ -559,13 +566,14 @@
    GENERAL SALE OBSERVATION BOX
    ========================================= */
 .cart-observation-box {
-    -fx-background-color: #f0f7ff; /* Soft blue background */
+    -fx-background-color: #f0f7ff;
+    /* Soft blue background */
     -fx-background-radius: -fx-radius-md;
     -fx-border-color: #bbdefb;
     -fx-border-width: 1;
     -fx-border-radius: -fx-radius-md;
     -fx-padding: 10 12;
-    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 5, 0, 0, 1);
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.05), 5, 0, 0, 1);
 }
 
 .cart-observation-label {
@@ -583,7 +591,7 @@
 }
 
 .btn-icon-only-small:hover {
-    -fx-background-color: rgba(0,0,0,0.05);
+    -fx-background-color: rgba(0, 0, 0, 0.05);
 }
 
 .icon-blue {

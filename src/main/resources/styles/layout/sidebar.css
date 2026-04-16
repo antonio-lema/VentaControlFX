@@ -99,8 +99,7 @@
 
 /* Iconos de los botones */
 .sidebar-icon {
-    -fx-fill: rgba(255, 255, 255, 0.85);
-    /* Mucho más visible que antes */
+    -fx-fill: white !important;
 }
 
 .sidebar-button:hover .sidebar-icon {
