@@ -103,7 +103,7 @@ public class ManageRolesController implements Injectable {
         actions.setPadding(new Insets(10, 0, 0, 0));
 
         Button btnEdit = new Button();
-        btnEdit.getStyleClass().add("user-action-btn");
+        btnEdit.getStyleClass().add("btn-action-edit");
         FontAwesomeIconView editIcon = new FontAwesomeIconView(FontAwesomeIcon.PENCIL);
         editIcon.setSize("18");
         btnEdit.setGraphic(editIcon);
@@ -116,7 +116,7 @@ public class ManageRolesController implements Injectable {
         }
 
         Button btnDelete = new Button();
-        btnDelete.getStyleClass().addAll("user-action-btn", "btn-trash-small");
+        btnDelete.getStyleClass().add("btn-action-delete");
         FontAwesomeIconView deleteIcon = new FontAwesomeIconView(FontAwesomeIcon.TRASH);
         deleteIcon.setSize("18");
         btnDelete.setGraphic(deleteIcon);

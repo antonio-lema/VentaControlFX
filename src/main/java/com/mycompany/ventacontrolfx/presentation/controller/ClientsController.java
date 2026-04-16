@@ -140,10 +140,13 @@ public class ClientsController implements Injectable, com.mycompany.ventacontrol
         HBox.setHgrow(spacer, javafx.scene.layout.Priority.ALWAYS);
 
         HBox actionButtons = new HBox(8);
+
+        // Botón Editar Circular
         Button btnEdit = new Button();
-        btnEdit.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.PENCIL));
-        btnEdit.setStyle(
-                "-fx-background-color: #eff6ff; -fx-text-fill: #1e40af; -fx-padding: 5;");
+        btnEdit.getStyleClass().add("btn-action-edit");
+        FontAwesomeIconView editIcon = new FontAwesomeIconView(FontAwesomeIcon.PENCIL);
+        editIcon.setSize("16");
+        btnEdit.setGraphic(editIcon);
         btnEdit.setOnAction(e -> {
             e.consume();
             if (container.getUserSession().hasPermission("cliente.editar")) {
@@ -154,11 +157,12 @@ public class ClientsController implements Injectable, com.mycompany.ventacontrol
             }
         });
 
+        // Botón Eliminar Circular (Premium)
         Button btnDelete = new Button();
-        FontAwesomeIconView trashIcon = new FontAwesomeIconView(FontAwesomeIcon.TRASH);
-        trashIcon.setSize("14");
+        btnDelete.getStyleClass().add("btn-action-delete");
+        FontAwesomeIconView trashIcon = new FontAwesomeIconView(FontAwesomeIcon.TRASH_ALT);
+        trashIcon.setSize("16");
         btnDelete.setGraphic(trashIcon);
-        btnDelete.getStyleClass().add("btn-trash-small");
         btnDelete.setOnAction(e -> {
             e.consume();
             handleDelete(client);

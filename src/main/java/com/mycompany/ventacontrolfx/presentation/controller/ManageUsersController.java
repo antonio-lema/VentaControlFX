@@ -56,7 +56,7 @@ public class ManageUsersController implements Injectable {
             renderUserCards(userList);
         } catch (SQLException e) {
             e.printStackTrace();
-            AlertUtil.showError(container.getBundle().getString("alert.error"), 
+            AlertUtil.showError(container.getBundle().getString("alert.error"),
                     String.format(container.getBundle().getString("user.manage.error.load"), e.getMessage()));
         }
     }
@@ -110,15 +110,14 @@ public class ManageUsersController implements Injectable {
         actions.setPadding(new Insets(10, 0, 0, 0));
 
         Button btnEdit = new Button();
-        btnEdit.getStyleClass().add("user-action-btn");
+        btnEdit.getStyleClass().add("btn-action-edit");
         FontAwesomeIconView editIcon = new FontAwesomeIconView(FontAwesomeIcon.PENCIL);
         editIcon.setSize("18");
-        editIcon.getStyleClass().add("sidebar-icon"); // Reutilizar clase si aplica o dejar a CSS
         btnEdit.setGraphic(editIcon);
         btnEdit.setOnAction(e -> handleEditSingleUser(user));
 
         Button btnDelete = new Button();
-        btnDelete.getStyleClass().addAll("user-action-btn", "btn-trash-small");
+        btnDelete.getStyleClass().add("btn-action-delete");
         FontAwesomeIconView deleteIcon = new FontAwesomeIconView(FontAwesomeIcon.TRASH);
         deleteIcon.setSize("18");
         btnDelete.setGraphic(deleteIcon);
@@ -151,19 +150,23 @@ public class ManageUsersController implements Injectable {
     @FXML
     private void handleNewUser() {
         if (!container.getUserSession().hasPermission("usuario.crear")) {
-            AlertUtil.showError(container.getBundle().getString("access.denied"), container.getBundle().getString("sidebar.permission_denied_msg"));
+            AlertUtil.showError(container.getBundle().getString("access.denied"),
+                    container.getBundle().getString("sidebar.permission_denied_msg"));
             return;
         }
-        ModalService.showTransparentModal("/view/register_user.fxml", container.getBundle().getString("user.manage.btn.new"), container, null);
+        ModalService.showTransparentModal("/view/register_user.fxml",
+                container.getBundle().getString("user.manage.btn.new"), container, null);
         loadUsers();
     }
 
     private void handleEditSingleUser(User user) {
         if (!container.getUserSession().hasPermission("usuario.crear")) {
-            AlertUtil.showError(container.getBundle().getString("access.denied"), container.getBundle().getString("sidebar.permission_denied_msg"));
+            AlertUtil.showError(container.getBundle().getString("access.denied"),
+                    container.getBundle().getString("sidebar.permission_denied_msg"));
             return;
         }
-        ModalService.showTransparentModal("/view/register_user.fxml", container.getBundle().getString("user.manage.btn.edit"), container,
+        ModalService.showTransparentModal("/view/register_user.fxml",
+                container.getBundle().getString("user.manage.btn.edit"), container,
                 (RegisterUserController controller) -> {
                     controller.setUser(user);
                 });
@@ -172,21 +175,23 @@ public class ManageUsersController implements Injectable {
 
     private void handleDeleteSingleUser(User user) {
         if (!container.getUserSession().hasPermission("usuario.crear")) {
-            AlertUtil.showError(container.getBundle().getString("access.denied"), container.getBundle().getString("sidebar.permission_denied_msg"));
+            AlertUtil.showError(container.getBundle().getString("access.denied"),
+                    container.getBundle().getString("sidebar.permission_denied_msg"));
             return;
         }
-        if (AlertUtil.showConfirmation(container.getBundle().getString("user.manage.confirm.delete.title"), 
+        if (AlertUtil.showConfirmation(container.getBundle().getString("user.manage.confirm.delete.title"),
                 String.format(container.getBundle().getString("user.manage.confirm.delete.msg"), user.getUsername()),
                 container.getBundle().getString("user.manage.confirm.delete.header"))) {
             try {
                 if (userUseCase.deleteUser(user.getUserId())) {
                     loadUsers();
                 } else {
-                    AlertUtil.showError(container.getBundle().getString("alert.error"), container.getBundle().getString("user.manage.error.delete"));
+                    AlertUtil.showError(container.getBundle().getString("alert.error"),
+                            container.getBundle().getString("user.manage.error.delete"));
                 }
             } catch (SQLException e) {
                 e.printStackTrace();
-                AlertUtil.showError(container.getBundle().getString("alert.error"), 
+                AlertUtil.showError(container.getBundle().getString("alert.error"),
                         String.format(container.getBundle().getString("user.manage.error.delete_db"), e.getMessage()));
             }
         }

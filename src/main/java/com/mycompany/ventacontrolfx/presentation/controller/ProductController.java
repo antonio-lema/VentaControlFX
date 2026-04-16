@@ -309,13 +309,18 @@ public class ProductController implements Injectable, com.mycompany.ventacontrol
             private final HBox pane = new HBox(8, btnEdit, btnDelete);
             {
                 pane.setAlignment(Pos.CENTER);
-                btnEdit.setGraphic(createIcon(FontAwesomeIcon.PENCIL, "#1e88e5"));
-                btnEdit.getStyleClass().add("btn-icon");
 
-                FontAwesomeIconView trashIcon = new FontAwesomeIconView(FontAwesomeIcon.TRASH);
+                // Botón Editar Circular
+                btnEdit.getStyleClass().add("btn-action-edit");
+                FontAwesomeIconView editIcon = new FontAwesomeIconView(FontAwesomeIcon.PENCIL);
+                editIcon.setSize("16");
+                btnEdit.setGraphic(editIcon);
+
+                // Botón Eliminar Circular (Premium)
+                btnDelete.getStyleClass().add("btn-action-delete");
+                FontAwesomeIconView trashIcon = new FontAwesomeIconView(FontAwesomeIcon.TRASH_ALT);
                 trashIcon.setSize("16");
                 btnDelete.setGraphic(trashIcon);
-                btnDelete.getStyleClass().add("btn-trash-small");
 
                 btnEdit.setOnAction(e -> {
                     if (container.getUserSession().hasPermission("producto.editar")) {
@@ -341,8 +346,8 @@ public class ProductController implements Injectable, com.mycompany.ventacontrol
                 if (empty || getTableRow() == null || getTableRow().getItem() == null) {
                     setGraphic(null);
                 } else {
-                    btnEdit.setText(null);
-                    btnEdit.setGraphic(createIcon(FontAwesomeIcon.PENCIL, "#1e88e5"));
+                    btnEdit.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.PENCIL, "16"));
+                    btnDelete.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.TRASH, "16"));
                     setGraphic(pane);
                 }
             }

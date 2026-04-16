@@ -101,6 +101,94 @@
 }
 
 /* ───────────────────────────────────────────────────
+   BOTONES DE ACCIÓN (ESTÉTICA PREMIUM MINIMALISTA)
+   ─────────────────────────────────────────────────── */
+.btn-table-icon,
+.btn-action-primary-circular,
+.btn-action-edit,
+.user-action-btn {
+    -fx-background-color: rgba(30, 136, 229, 0.08);
+    /* Fondo primario muy suave */
+    -fx-padding: 8;
+    -fx-background-radius: 50%;
+    -fx-min-width: 36px;
+    -fx-max-width: 36px;
+    -fx-min-height: 36px;
+    -fx-max-height: 36px;
+    -fx-alignment: center;
+    -fx-cursor: hand;
+    -fx-transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-table-icon .glyph-icon,
+.btn-table-icon .font-icon,
+.btn-action-primary-circular .glyph-icon,
+.btn-action-edit .glyph-icon,
+.user-action-btn .glyph-icon {
+    -fx-fill: -fx-custom-color-primary;
+}
+
+.btn-table-icon:hover,
+.btn-action-primary-circular:hover,
+.btn-action-edit:hover,
+.user-action-btn:hover {
+    -fx-background-color: -fx-custom-color-primary;
+    -fx-scale-x: 1.1;
+    -fx-scale-y: 1.1;
+    -fx-effect: dropshadow(three-pass-box, -fx-shadow-color-primary, 8, 0, 0, 2);
+}
+
+.btn-table-icon:hover .glyph-icon,
+.btn-table-icon:hover .font-icon,
+.btn-action-primary-circular:hover .glyph-icon,
+.btn-action-edit:hover .glyph-icon,
+.user-action-btn:hover .glyph-icon {
+    -fx-fill: white !important;
+}
+
+/* Variante de peligro (Borrar) */
+.btn-table-icon-danger,
+.btn-action-danger-circular,
+.btn-action-delete,
+.btn-trash-small {
+    -fx-background-color: rgba(239, 68, 68, 0.08);
+    /* Fondo rojo muy suave */
+    -fx-padding: 8;
+    -fx-background-radius: 50%;
+    -fx-min-width: 36px;
+    -fx-max-width: 36px;
+    -fx-min-height: 36px;
+    -fx-max-height: 36px;
+    -fx-alignment: center;
+    -fx-cursor: hand;
+    -fx-transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-table-icon-danger .glyph-icon,
+.btn-action-danger-circular .glyph-icon,
+.btn-action-delete .glyph-icon,
+.btn-trash-small .glyph-icon {
+    -fx-fill: #ef4444;
+}
+
+.btn-table-icon-danger:hover,
+.btn-action-danger-circular:hover,
+.btn-action-delete:hover,
+.btn-trash-small:hover {
+    -fx-background-color: #ef4444;
+    -fx-scale-x: 1.1;
+    -fx-scale-y: 1.1;
+    -fx-effect: dropshadow(three-pass-box, rgba(239, 68, 68, 0.3), 8, 0, 0, 2);
+}
+
+.btn-table-icon-danger:hover .glyph-icon,
+.btn-action-danger-circular:hover .glyph-icon,
+.btn-action-delete:hover .glyph-icon,
+.btn-trash-small:hover .glyph-icon {
+    -fx-fill: white !important;
+}
+
+/* ───────────────────────────────────────────────────
    CHIPS DE CATEGORÍA
    ─────────────────────────────────────────────────── */
 .category-btn {
@@ -195,11 +283,15 @@
     -fx-effect: dropshadow(three-pass-box, -fx-custom-color-warning-bg, 10, 0, 0, 3);
 }
 
-/* Iconos */
+/* ───────────────────────────────────────────────────
+   BOTONES DE ICONO (SUTILES)
+   ─────────────────────────────────────────────────── */
 .btn-icon {
     -fx-background-color: transparent;
     -fx-padding: 8;
-    -fx-background-radius: -fx-radius-md;
+    -fx-background-radius: 8px;
+    -fx-cursor: hand;
+    -fx-transition: all 0.2s;
 }
 
 .btn-icon:hover {

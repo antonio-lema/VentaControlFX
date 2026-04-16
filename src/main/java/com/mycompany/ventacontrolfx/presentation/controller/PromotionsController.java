@@ -4,20 +4,15 @@ import com.mycompany.ventacontrolfx.application.usecase.PromotionUseCase;
 import com.mycompany.ventacontrolfx.domain.model.Promotion;
 import com.mycompany.ventacontrolfx.infrastructure.config.ServiceContainer;
 import com.mycompany.ventacontrolfx.infrastructure.config.Injectable;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
-import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
+import javafx.scene.paint.Color;
 
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
-import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -62,6 +57,20 @@ public class PromotionsController implements Injectable {
         colType.setCellValueFactory(cellData -> new javafx.beans.property.SimpleStringProperty(
                 cellData.getValue().getType().getDisplayName()));
         colValue.setCellValueFactory(new PropertyValueFactory<>("value"));
+        colValue.setCellFactory(column -> new TableCell<Promotion, Double>() {
+            @Override
+            protected void updateItem(Double item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                } else {
+                    java.text.NumberFormat nf = java.text.NumberFormat.getInstance(container.getCurrentLocale());
+                    nf.setMinimumFractionDigits(2);
+                    nf.setMaximumFractionDigits(2);
+                    setText(nf.format(item));
+                }
+            }
+        });
         colScope.setCellValueFactory(cellData -> new javafx.beans.property.SimpleStringProperty(
                 cellData.getValue().getScope().getDisplayName()));
 
@@ -80,8 +89,8 @@ public class PromotionsController implements Injectable {
                 } else {
                     Promotion p = getTableRow().getItem();
                     boolean active = p.isActive();
-                    Label statusLabel = new Label(active 
-                            ? container.getBundle().getString("promotion.status.active") 
+                    Label statusLabel = new Label(active
+                            ? container.getBundle().getString("promotion.status.active")
                             : container.getBundle().getString("promotion.status.inactive"));
                     statusLabel.getStyleClass().add(active ? "badge-success" : "badge-danger");
                     setGraphic(statusLabel);
@@ -97,24 +106,40 @@ public class PromotionsController implements Injectable {
         colActions.setCellFactory(column -> new TableCell<>() {
             private final Button btnEdit = new Button();
             private final Button btnDelete = new Button();
-            private final HBox container = new HBox(8, btnEdit, btnDelete);
+            private final HBox rootContainer = new HBox(10, btnEdit, btnDelete);
 
             {
-                btnEdit.getStyleClass().addAll("btn-icon", "btn-edit-small");
-                btnEdit.setGraphic(new FontAwesomeIconView(de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon.EDIT));
+                rootContainer.setAlignment(javafx.geometry.Pos.CENTER);
+
+                // Botón Editar Circular
+                btnEdit.getStyleClass().add("btn-action-edit");
+                FontAwesomeIconView editIcon = new FontAwesomeIconView(
+                        de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon.PENCIL);
+                editIcon.setSize("16");
+                btnEdit.setGraphic(editIcon);
                 btnEdit.setOnAction(e -> handleEdit(getTableRow().getItem()));
 
-                btnDelete.getStyleClass().addAll("btn-icon", "btn-delete-small");
-                btnDelete.setGraphic(new FontAwesomeIconView(de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon.TRASH));
+                // Botón Eliminar Circular (Premium)
+                btnDelete.getStyleClass().add("btn-action-delete");
+                FontAwesomeIconView trashIcon = new FontAwesomeIconView(
+                        de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon.TRASH_ALT);
+                trashIcon.setSize("16");
+                btnDelete.setGraphic(trashIcon);
                 btnDelete.setOnAction(e -> handleDelete(getTableRow().getItem()));
-
-                container.setAlignment(javafx.geometry.Pos.CENTER);
             }
 
             @Override
             protected void updateItem(Void item, boolean empty) {
                 super.updateItem(item, empty);
-                setGraphic(empty ? null : container);
+                if (empty || getTableRow() == null || getTableRow().getItem() == null) {
+                    setGraphic(null);
+                } else {
+                    btnEdit.setGraphic(
+                            new FontAwesomeIconView(de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon.PENCIL, "16"));
+                    btnDelete.setGraphic(
+                            new FontAwesomeIconView(de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon.TRASH, "16"));
+                    setGraphic(rootContainer);
+                }
             }
         });
     }
@@ -161,31 +186,28 @@ public class PromotionsController implements Injectable {
     }
 
     private void handleDelete(Promotion promotion) {
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle(container.getBundle().getString("promotion.confirm.delete.title"));
-        alert.setHeaderText(container.getBundle().getString("promotion.confirm.delete.header"));
-        alert.setContentText(promotion.getName());
+        String title = container.getBundle().getString("promotion.confirm.delete.title");
+        String header = container.getBundle().getString("promotion.confirm.delete.header");
+        String content = promotion.getName();
 
-        alert.showAndWait().ifPresent(response -> {
-            if (response == ButtonType.OK) {
-                try {
-                    promotionUseCase.deletePromotion(promotion.getId());
-                    loadData();
-                } catch (SQLException e) {
-                    showError(container.getBundle().getString("promotion.error.delete"), e.getMessage());
-                }
+        if (com.mycompany.ventacontrolfx.util.AlertUtil.showConfirmation(title, header, content)) {
+            try {
+                promotionUseCase.deletePromotion(promotion.getId());
+                loadData();
+            } catch (SQLException e) {
+                showError(container.getBundle().getString("promotion.error.delete"), e.getMessage());
             }
-        });
+        }
     }
 
     private void showPromotionForm(Promotion promotion) {
         try {
             PromotionFormController controller = com.mycompany.ventacontrolfx.util.ModalService.showTransparentModal(
-                "/view/promotion_form.fxml", 
-                promotion == null ? container.getBundle().getString("promotion.btn.new") : container.getBundle().getString("promotion.btn.edit"), 
-                container, 
-                c -> c.setPromotion(promotion)
-            );
+                    "/view/promotion_form.fxml",
+                    promotion == null ? container.getBundle().getString("promotion.btn.new")
+                            : container.getBundle().getString("promotion.btn.edit"),
+                    container,
+                    c -> c.setPromotion(promotion));
 
             if (controller != null && controller.isSaved()) {
                 Promotion p = controller.getPromotion();

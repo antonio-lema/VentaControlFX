@@ -105,7 +105,6 @@ public class CategoryController implements Injectable, com.mycompany.ventacontro
                 else {
                     toggle.setState(item);
                     setGraphic(toggle);
-                    setAlignment(Pos.CENTER);
                 }
             }
         });
@@ -118,12 +117,18 @@ public class CategoryController implements Injectable, com.mycompany.ventacontro
             private final HBox pane = new HBox(8, btnEdit, btnDelete);
             {
                 pane.setAlignment(Pos.CENTER);
-                btnEdit.setGraphic(createIcon(FontAwesomeIcon.PENCIL, "#1e88e5"));
-                FontAwesomeIconView trashIcon = new FontAwesomeIconView(FontAwesomeIcon.TRASH);
+
+                // Botón Editar Circular
+                btnEdit.getStyleClass().add("btn-action-edit");
+                FontAwesomeIconView editIcon = new FontAwesomeIconView(FontAwesomeIcon.PENCIL);
+                editIcon.setSize("16");
+                btnEdit.setGraphic(editIcon);
+
+                // Botón Eliminar Circular (Premium)
+                btnDelete.getStyleClass().add("btn-action-delete");
+                FontAwesomeIconView trashIcon = new FontAwesomeIconView(FontAwesomeIcon.TRASH_ALT);
                 trashIcon.setSize("16");
                 btnDelete.setGraphic(trashIcon);
-                btnDelete.getStyleClass().add("btn-trash-small");
-                btnEdit.setStyle("-fx-background-color: transparent; -fx-cursor: hand;");
 
                 btnEdit.setOnAction(e -> handleEditCategory(getTableRow().getItem()));
                 btnDelete.setOnAction(e -> handleDeleteCategory(getTableRow().getItem()));
@@ -132,7 +137,13 @@ public class CategoryController implements Injectable, com.mycompany.ventacontro
             @Override
             protected void updateItem(Void item, boolean empty) {
                 super.updateItem(item, empty);
-                setGraphic(empty ? null : pane);
+                if (empty || getTableRow() == null || getTableRow().getItem() == null) {
+                    setGraphic(null);
+                } else {
+                    btnEdit.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.PENCIL, "16"));
+                    btnDelete.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.TRASH, "16"));
+                    setGraphic(pane);
+                }
             }
         });
     }
