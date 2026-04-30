@@ -17,7 +17,10 @@ import javafx.stage.Stage;
 import javafx.animation.TranslateTransition;
 import javafx.util.Duration;
 
+import com.mycompany.ventacontrolfx.domain.exception.UserNotFoundException;
+import com.mycompany.ventacontrolfx.domain.exception.InvalidPasswordException;
 import java.sql.SQLException;
+import java.util.ResourceBundle;
 
 public class LoginController implements Injectable {
 
@@ -71,45 +74,47 @@ public class LoginController implements Injectable {
             return;
         }
 
-        try {
-            // Delegamos toda la l\u00f3gica al Caso de Uso (Clean Architecture)
-            User user = loginUseCase.execute(username, password);
+        btnLogin.setDisable(true);
+        
+        ResourceBundle bundle = container.getBundle();
+        String verifyingMsg = bundle.containsKey("login.status.verifying") ? 
+                             bundle.getString("login.status.verifying") : "Verificando...";
+        lblMessage.setText(verifyingMsg);
 
-            // Si llegamos aqu\u00ed, el login fue exitoso
-            container.getUserSession().setCurrentUser(user);
-
-            /*
-             * Iniciar turno automáticamente al entrar
-             * try {
-             * container.getWorkSessionUseCase().startShift(user.getUserId());
-             * } catch (Exception e) {
-             * // Si ya tenía un turno abierto (ej: cierre inesperado), no hacemos nada
-             * System.out.
-             * println("El usuario ya tiene un turno activo o hubo un error al iniciar: " +
-             * e.getMessage());
-             * }
-             */
-
-            lblMessage.setText(container.getBundle().getString("login.success"));
-            SceneNavigator.loadScene(
-                    (Stage) btnLogin.getScene().getWindow(),
-                    "/view/main.fxml",
-                    "TPV",
-                    1200, 800,
-                    true,
-                    container);
-
-        } catch (com.mycompany.ventacontrolfx.domain.exception.UserNotFoundException ex) {
-            showErrorMessage(container.getBundle().getString("login.error.user_not_found"));
-        } catch (com.mycompany.ventacontrolfx.domain.exception.InvalidPasswordException ex) {
-            showErrorMessage(container.getBundle().getString("login.error.wrong_password"));
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-            showErrorMessage(container.getBundle().getString("login.error.database"));
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            showErrorMessage(container.getBundle().getString("login.error.unexpected") + ": " + ex.getMessage());
-        }
+        container.getAsyncManager().runAsyncTask(() -> {
+            try {
+                // El proceso de BCrypt y carga de permisos puede tardar >500ms
+                return loginUseCase.execute(username, password);
+            } catch (Exception ex) {
+                return ex; // Retornamos la excepción para manejarla en el callback
+            }
+        }, result -> {
+            btnLogin.setDisable(false);
+            
+            if (result instanceof User) {
+                User user = (User) result;
+                container.getUserSession().setCurrentUser(user);
+                lblMessage.setText(container.getBundle().getString("login.success"));
+                
+                SceneNavigator.loadScene(
+                        (Stage) btnLogin.getScene().getWindow(),
+                        "/view/main.fxml",
+                        "TPV",
+                        1200, 800,
+                        true,
+                        container);
+            } else if (result instanceof UserNotFoundException) {
+                showErrorMessage(container.getBundle().getString("login.error.user_not_found"));
+            } else if (result instanceof InvalidPasswordException) {
+                showErrorMessage(container.getBundle().getString("login.error.wrong_password"));
+            } else if (result instanceof SQLException) {
+                ((SQLException) result).printStackTrace();
+                showErrorMessage(container.getBundle().getString("login.error.database"));
+            } else if (result instanceof Exception) {
+                ((Exception) result).printStackTrace();
+                showErrorMessage(container.getBundle().getString("login.error.unexpected") + ": " + ((Exception) result).getMessage());
+            }
+        }, null);
     }
 
     private void showErrorMessage(String message) {

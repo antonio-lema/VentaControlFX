@@ -381,7 +381,6 @@ public class HistoryController implements Injectable, Searchable {
         detailsItemsContainer.getChildren().clear();
 
         // 1. Añadir Status AEAT / VeriFactu
-        String fStatus = sale.getFiscalStatus();
         if (fStatus != null && !fStatus.isEmpty()) {
             String textStatus = "PENDING".equals(fStatus) ? "⏳ Pendiente envío AEAT" : 
                                ("ACCEPTED".equals(fStatus) ? "✅ VeriFactu OK (" + (sale.getAeatSubmissionId() != null ? sale.getAeatSubmissionId() : "S/D") + ")" : 
