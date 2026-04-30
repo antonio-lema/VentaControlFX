@@ -73,8 +73,7 @@ public class OpenPdfFiscalService implements IFiscalPdfService {
             }
         }
 
-        // \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac CABECERA DE DOCUMENTO
-        // \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac
+        // ── CABECERA DE DOCUMENTO ──
         PdfPTable typeTable = new PdfPTable(1);
         typeTable.setWidthPercentage(100);
 
@@ -274,14 +273,58 @@ public class OpenPdfFiscalService implements IFiscalPdfService {
             document.add(rewardBox);
         }
 
-        // \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac PIE DE P\u00c1GINA
-        // FISCAL \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac
+        // ── PIE DE PÁGINA FISCAL (VERIFACTU) ──
         document.add(new Paragraph("\n\n"));
-        Paragraph pHash = new Paragraph(
-                "C\u00f3digo \u00danico de Integridad (SHA-256): " + data.document.getControlHash(),
-                FONT_HASH);
-        pHash.setAlignment(Element.ALIGN_CENTER);
-        document.add(pHash);
+        
+        PdfPTable fiscalTable = new PdfPTable(1);
+        fiscalTable.setWidthPercentage(100);
+        
+        // Texto obligatorio
+        PdfPCell legalCell = new PdfPCell(new Phrase("Factura verificable en la sede electrónica de la AEAT", FONT_BODY));
+        legalCell.setBorder(com.lowagie.text.Rectangle.NO_BORDER);
+        legalCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+        fiscalTable.addCell(legalCell);
+
+        // Generar QR (URL de PRE-PRODUCCIÓN para pruebas de VeriFactu)
+        String aeatUrl = "https://prewww1.aeat.es/wlpl/TIKE-CONT/ValidarQR?nif=" 
+                         + (data.document.getIssuerTaxId() != null ? data.document.getIssuerTaxId().toUpperCase() : "")
+                         + "&numserie=" + data.document.getFullReference()
+                         + "&fecha=" + data.document.getIssuedAt().format(java.time.format.DateTimeFormatter.ofPattern("dd-MM-yyyy"))
+                         + "&importe=" + String.format(java.util.Locale.US, "%.2f", data.document.getTotalAmount());
+        
+        byte[] qrBytes = null;
+        try {
+            qrBytes = com.mycompany.ventacontrolfx.util.QrGenerator.generateQrCode(aeatUrl, 120, 120);
+        } catch (Exception e) {
+            System.err.println("Error generador QR: " + e.getMessage());
+        }
+
+        if (qrBytes != null) {
+            try {
+                Image qrImage = Image.getInstance(qrBytes);
+                qrImage.setAlignment(Element.ALIGN_CENTER);
+                qrImage.scaleToFit(100, 100); // Forzar tamaño compatible
+                PdfPCell qrCell = new PdfPCell(qrImage, true); // fit = true
+                qrCell.setBorder(com.lowagie.text.Rectangle.NO_BORDER);
+                qrCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+                fiscalTable.addCell(qrCell);
+            } catch (Exception e) {
+                System.err.println("Error al incrustar QR en PDF: " + e.getMessage());
+            }
+        } else {
+            // FALLBACK: Si no hay QR, ponemos la URL en texto pequeño para depuración
+            PdfPCell debugCell = new PdfPCell(new Phrase("QR Error - URL: " + aeatUrl, FONT_HASH));
+            debugCell.setBorder(com.lowagie.text.Rectangle.NO_BORDER);
+            debugCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+            fiscalTable.addCell(debugCell);
+        }
+
+        PdfPCell hashCell = new PdfPCell(new Phrase("Hash: " + data.document.getControlHash(), FONT_HASH));
+        hashCell.setBorder(com.lowagie.text.Rectangle.NO_BORDER);
+        hashCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+        fiscalTable.addCell(hashCell);
+
+        document.add(fiscalTable);
     }
 
     private void addMetaLine(PdfPTable table, String label, String value) {

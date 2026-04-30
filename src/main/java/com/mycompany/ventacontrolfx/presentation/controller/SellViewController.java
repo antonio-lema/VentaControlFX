@@ -518,6 +518,16 @@ public class SellViewController implements Injectable, CategoryMenuRenderer.Cate
         return p.getName();
     }
 
+    @FXML
+    private void handleTestIncident() {
+        if (container != null) {
+            container.getEventBus().publishVerifactuIncident(
+                java.util.Collections.singletonList(1), 
+                java.util.Collections.emptyList()
+            );
+        }
+    }
+
     private String translateDynamic(String text) {
         if (text == null || text.isBlank())
             return text;

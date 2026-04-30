@@ -29,6 +29,7 @@ public class QueryFiscalDocumentUseCase {
     private final IFiscalDocumentRepository fiscalRepository;
     private final ISaleRepository saleRepository;
     private final FiscalIntegrityService integrityService;
+    private final com.mycompany.ventacontrolfx.domain.repository.ICompanyConfigRepository configRepository;
 
     public QueryFiscalDocumentUseCase(
             IFiscalDocumentRepository fiscalRepository,
@@ -36,6 +37,7 @@ public class QueryFiscalDocumentUseCase {
         this.fiscalRepository = fiscalRepository;
         this.saleRepository = saleRepository;
         this.integrityService = new FiscalIntegrityService();
+        this.configRepository = new com.mycompany.ventacontrolfx.infrastructure.persistence.JdbcCompanyConfigRepository();
     }
 
     // \u00e2\u201d\u20ac\u00e2\u201d\u20ac B\u00daSQUEDAS \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac
@@ -84,6 +86,18 @@ public class QueryFiscalDocumentUseCase {
             throw new IllegalStateException("No hay documento fiscal para la venta #" + saleId);
         }
         FiscalDocument doc = docOpt.get();
+        
+        // FISCAL FIX: Si el snapshot de emisor es null (porque la capa de persistencia 
+        // a\u00fan no llen\u00f3 doc_issuer_snapshots al facturar), inyectamos los defaults
+        if (doc.getIssuerTaxId() == null || doc.getIssuerTaxId().isBlank()) {
+            com.mycompany.ventacontrolfx.domain.model.SaleConfig companyData = configRepository.load();
+            if (companyData != null) {
+                doc.setIssuerTaxId(companyData.getCif());
+                doc.setIssuerName(companyData.getCompanyName());
+                doc.setIssuerAddress(companyData.getAddress());
+            }
+        }
+
         Sale sale = saleRepository.getById(saleId);
         List<SaleDetail> lines = saleRepository.getDetailsBySaleId(saleId);
 

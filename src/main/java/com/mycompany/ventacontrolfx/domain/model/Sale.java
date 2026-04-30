@@ -26,9 +26,18 @@ public class Sale {
     private Integer docNumber;
     private String docStatus;
     private String controlHash;
+    private String prevHash;
+    private String signature;
+    private String fiscalStatus;
+    private String fiscalMsg;
+    private String aeatSubmissionId;
+    private String genTimestamp;
+    private boolean isCorrection;
+    private String correctionType;
 
     // Global Snapshots (Inmutabilidad)
     private String customerNameSnapshot;
+    private String customerNifSnapshot;
     private double totalNet;
     private double totalTax;
     private double discountAmount;
@@ -57,6 +66,14 @@ public class Sale {
 
     public void setCustomerNameSnapshot(String customerNameSnapshot) {
         this.customerNameSnapshot = customerNameSnapshot;
+    }
+
+    public String getCustomerNifSnapshot() {
+        return customerNifSnapshot;
+    }
+
+    public void setCustomerNifSnapshot(String customerNifSnapshot) {
+        this.customerNifSnapshot = customerNifSnapshot;
     }
 
     public double getTotalNet() {
@@ -260,6 +277,46 @@ public class Sale {
         this.observations = observations;
     }
 
+    public String getPrevHash() {
+        return prevHash;
+    }
+
+    public void setPrevHash(String prevHash) {
+        this.prevHash = prevHash;
+    }
+
+    public String getSignature() {
+        return signature;
+    }
+
+    public void setSignature(String signature) {
+        this.signature = signature;
+    }
+
+    public String getFiscalStatus() {
+        return fiscalStatus;
+    }
+
+    public void setFiscalStatus(String fiscalStatus) {
+        this.fiscalStatus = fiscalStatus;
+    }
+
+    public String getFiscalMsg() {
+        return fiscalMsg;
+    }
+
+    public void setFiscalMsg(String fiscalMsg) {
+        this.fiscalMsg = fiscalMsg;
+    }
+
+    public String getAeatSubmissionId() {
+        return aeatSubmissionId;
+    }
+
+    public void setAeatSubmissionId(String aeatSubmissionId) {
+        this.aeatSubmissionId = aeatSubmissionId;
+    }
+
     public String getPromoCode() {
         return promoCode;
     }
@@ -282,5 +339,29 @@ public class Sale {
 
     public void setTotalItems(int totalItems) {
         this.totalItems = totalItems;
+    }
+
+    public String getGenTimestamp() {
+        return genTimestamp;
+    }
+
+    public void setGenTimestamp(String genTimestamp) {
+        this.genTimestamp = genTimestamp;
+    }
+
+    public boolean isCorrection() {
+        return isCorrection;
+    }
+
+    public void setCorrection(boolean isCorrection) {
+        this.isCorrection = isCorrection;
+    }
+
+    public String getCorrectionType() {
+        return correctionType;
+    }
+
+    public void setCorrectionType(String correctionType) {
+        this.correctionType = correctionType;
     }
 }

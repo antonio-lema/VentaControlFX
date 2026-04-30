@@ -185,6 +185,7 @@ public class PrintPreviewController implements Injectable {
 
         // N\u00famero de ticket
         String prefix = isGiftMode ? "Ticket regalo N\u00ba: " : "Factura simplificada N\u00ba: ";
+        if (currentTotal < 0) prefix = "FACTURA RECTIFICATIVA N\u00ba: ";
         lblTicketTitle.setText(prefix + String.format("%03d", saleId));
 
         // Art\u00edculos
@@ -299,6 +300,63 @@ public class PrintPreviewController implements Injectable {
 
         // Aplicar formato de papel
         applyPaperFormat();
+
+        // Recuperear datos fiscales reales (hash, serie) si es posible
+        try {
+            com.mycompany.ventacontrolfx.application.usecase.QueryFiscalDocumentUseCase queryUseCase = container.getQueryFiscalDocumentUseCase();
+            com.mycompany.ventacontrolfx.application.usecase.QueryFiscalDocumentUseCase.PrintData data = queryUseCase.getDataForReprint(currentSaleId);
+            
+            VBox fiscalBox = new VBox(8);
+            fiscalBox.setAlignment(javafx.geometry.Pos.CENTER);
+            fiscalBox.setStyle("-fx-padding: 15 0 10 0;");
+            
+            Label lblLegalText = new Label("Factura verificable en la sede electr\u00f3nica de la AEAT");
+            lblLegalText.setStyle("-fx-font-size: 10px; -fx-text-fill: #555; -fx-alignment: center; -fx-font-weight: bold;");
+            lblLegalText.setWrapText(true);
+            lblLegalText.setTextAlignment(javafx.scene.text.TextAlignment.CENTER);
+            lblLegalText.setMaxWidth(250);
+            
+            // L\u00f3gica robusta para URL
+            String nif = (data != null && data.document != null && data.document.getIssuerTaxId() != null) ? data.document.getIssuerTaxId() : cfg.getCif();
+            String fullRef = (data != null && data.document != null) ? data.document.getFullReference() : "2026-A-" + currentSaleId;
+            java.time.LocalDateTime issuedAt = (data != null && data.document != null) ? data.document.getIssuedAt() : java.time.LocalDateTime.now();
+            double amount = (data != null && data.document != null) ? data.document.getTotalAmount() : currentTotal;
+
+            // QR URL Base Verifactu (Usando PRE-PRODUCCI\u00d3N para coherencia)
+            String aeatUrl = "https://prewww1.aeat.es/wlpl/TIKE-CONT/ValidarQR?nif=" 
+                             + (nif != null ? nif.toUpperCase() : "")
+                             + "&numserie=" + fullRef
+                             + "&fecha=" + issuedAt.format(java.time.format.DateTimeFormatter.ofPattern("dd-MM-yyyy"))
+                             + "&importe=" + String.format(java.util.Locale.US, "%.2f", amount);
+            
+            byte[] qrBytes = com.mycompany.ventacontrolfx.util.QrGenerator.generateQrCode(aeatUrl, 250, 250);
+            if (qrBytes != null) {
+                javafx.scene.image.Image qrImage = new javafx.scene.image.Image(new java.io.ByteArrayInputStream(qrBytes));
+                javafx.scene.image.ImageView imgView = new javafx.scene.image.ImageView(qrImage);
+                imgView.setFitWidth(180);
+                imgView.setFitHeight(180);
+                fiscalBox.getChildren().addAll(lblLegalText, imgView);
+            }
+            
+            if (data != null && data.document != null && data.document.getControlHash() != null) {
+                String h = data.document.getControlHash();
+                String formattedHash = h;
+                if (h.length() > 32) {
+                    formattedHash = h.substring(0, 32) + "\n" + h.substring(32);
+                }
+                
+                Label lblHash = new Label("Hash:\n" + formattedHash);
+                lblHash.setStyle("-fx-font-size: 8px; -fx-text-fill: #777; -fx-alignment: center; -fx-font-family: monospace;");
+                lblHash.setWrapText(true);
+                lblHash.setTextAlignment(javafx.scene.text.TextAlignment.CENTER);
+                lblHash.setMaxWidth(300);
+                fiscalBox.getChildren().add(lblHash);
+            }
+            
+            paperSheet.getChildren().add(fiscalBox);
+        } catch (Exception ex) {
+            System.err.println("No se pudo cargar la vista fiscal para Print Preview: " + ex.getMessage());
+        }
     }
 
     public void setClosureData(CashClosure closure) {
@@ -843,10 +901,9 @@ public class PrintPreviewController implements Injectable {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMM, yyyy 'Hora:' HH:mm:ss");
         lblDate.setText("Fecha Dev: " + returnRecord.getReturnDatetime().format(formatter));
 
-        // T\u00edtulo: Factura Rectificativa (Si tiene n\u00famero fiscal) o Ticket de
-        // Devoluci\u00f3n
+        // T\u00edtulo oficial
         if (returnRecord.getDocNumber() != null) {
-            lblTicketTitle.setText("Factura Rectificativa N\u00ba: " + returnRecord.getFullReference());
+            lblTicketTitle.setText("FACTURA RECTIFICATIVA N\u00ba: " + returnRecord.getFullReference());
         } else {
             lblTicketTitle.setText("Ticket de Devoluci\u00f3n N\u00ba: REF-" + returnRecord.getReturnId());
         }
@@ -909,6 +966,45 @@ public class PrintPreviewController implements Injectable {
         }
 
         applyPaperFormat();
+
+        // ── A\u00d1ADIR C\u00d3DIGO QR FISCAL A LA VISTA EN PANTALLA (Para Devoluciones) ──
+        try {
+            // Re-usamos la l\u00f3gica robusta de generaci\u00f3n
+            String nif = (cfg != null) ? cfg.getCif() : "";
+            String fullRef = returnRecord.getFullReference();
+            LocalDateTime issuedAt = returnRecord.getReturnDatetime();
+            double amount = -returnRecord.getTotalRefunded();
+
+            VBox fiscalBox = new VBox(8);
+            fiscalBox.setAlignment(javafx.geometry.Pos.CENTER);
+            fiscalBox.setStyle("-fx-padding: 15 0 10 0;");
+            
+            Label lblLegalText = new Label("Factura verificable en la sede electr\u00f3nica de la AEAT");
+            lblLegalText.setStyle("-fx-font-size: 10px; -fx-text-fill: #555; -fx-alignment: center; -fx-font-weight: bold;");
+            lblLegalText.setWrapText(true);
+            lblLegalText.setTextAlignment(javafx.scene.text.TextAlignment.CENTER);
+            lblLegalText.setMaxWidth(250);
+            
+            // Generar QR (URL de PRE-PRODUCCI\u00d3N para pruebas de VeriFactu)
+            String aeatUrl = "https://prewww1.aeat.es/wlpl/TIKE-CONT/ValidarQR?nif=" 
+                             + (nif != null ? nif.toUpperCase() : "")
+                             + "&numserie=" + fullRef
+                             + "&fecha=" + issuedAt.format(java.time.format.DateTimeFormatter.ofPattern("dd-MM-yyyy"))
+                             + "&importe=" + String.format(java.util.Locale.US, "%.2f", amount);
+            
+            byte[] qrBytes = com.mycompany.ventacontrolfx.util.QrGenerator.generateQrCode(aeatUrl, 250, 250);
+            if (qrBytes != null) {
+                javafx.scene.image.Image qrImage = new javafx.scene.image.Image(new java.io.ByteArrayInputStream(qrBytes));
+                javafx.scene.image.ImageView imgView = new javafx.scene.image.ImageView(qrImage);
+                imgView.setFitWidth(180);
+                imgView.setFitHeight(180);
+                fiscalBox.getChildren().addAll(lblLegalText, imgView);
+            }
+            
+            paperSheet.getChildren().add(fiscalBox);
+        } catch (Exception ex) {
+            System.err.println("No se pudo cargar la vista fiscal para Devoluci\u00f3n en Print Preview: " + ex.getMessage());
+        }
     }
 
     private String translateDynamic(String text) {

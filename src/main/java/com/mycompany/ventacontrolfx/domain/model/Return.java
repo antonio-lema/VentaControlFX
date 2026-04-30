@@ -25,7 +25,16 @@ public class Return {
     private Integer docNumber;
     private String docStatus;
     private String controlHash;
+    private String prevHash;
+    private String signature;
+    private String fiscalStatus;
+    private String fiscalMsg;
+    private String aeatSubmissionId;
+    private String genTimestamp;
+    private boolean isCorrection;
+    private String correctionType;
     private String customerNameSnapshot;
+    private String customerNifSnapshot;
     private String issuerName;
     private String issuerTaxId;
     private String issuerAddress;
@@ -78,6 +87,14 @@ public class Return {
         this.customerNameSnapshot = customerNameSnapshot;
     }
 
+    public String getCustomerNifSnapshot() {
+        return customerNifSnapshot;
+    }
+
+    public void setCustomerNifSnapshot(String customerNifSnapshot) {
+        this.customerNifSnapshot = customerNifSnapshot;
+    }
+
     public String getIssuerName() {
         return issuerName;
     }
@@ -100,6 +117,70 @@ public class Return {
 
     public void setIssuerAddress(String issuerAddress) {
         this.issuerAddress = issuerAddress;
+    }
+
+    public String getPrevHash() {
+        return prevHash;
+    }
+
+    public void setPrevHash(String prevHash) {
+        this.prevHash = prevHash;
+    }
+
+    public String getSignature() {
+        return signature;
+    }
+
+    public void setSignature(String signature) {
+        this.signature = signature;
+    }
+
+    public String getFiscalStatus() {
+        return fiscalStatus;
+    }
+
+    public void setFiscalStatus(String fiscalStatus) {
+        this.fiscalStatus = fiscalStatus;
+    }
+
+    public String getFiscalMsg() {
+        return fiscalMsg;
+    }
+
+    public void setFiscalMsg(String fiscalMsg) {
+        this.fiscalMsg = fiscalMsg;
+    }
+
+    public String getAeatSubmissionId() {
+        return aeatSubmissionId;
+    }
+
+    public void setAeatSubmissionId(String aeatSubmissionId) {
+        this.aeatSubmissionId = aeatSubmissionId;
+    }
+
+    public String getGenTimestamp() {
+        return genTimestamp;
+    }
+
+    public void setGenTimestamp(String genTimestamp) {
+        this.genTimestamp = genTimestamp;
+    }
+
+    public boolean isCorrection() {
+        return isCorrection;
+    }
+
+    public void setCorrection(boolean isCorrection) {
+        this.isCorrection = isCorrection;
+    }
+
+    public String getCorrectionType() {
+        return correctionType;
+    }
+
+    public void setCorrectionType(String correctionType) {
+        this.correctionType = correctionType;
     }
 
     public String getFullReference() {
@@ -244,9 +325,12 @@ public class Return {
         private Integer docNumber;
         private String docStatus;
         private String customerNameSnapshot;
+        private String customerNifSnapshot;
         private String issuerName;
         private String issuerTaxId;
         private String issuerAddress;
+        private boolean isCorrection;
+        private String correctionType;
 
         public Builder(int saleId) {
             this.saleId = saleId;
@@ -302,8 +386,13 @@ public class Return {
             return this;
         }
 
-        public Builder customerNameSnapshot(String name) {
-            this.customerNameSnapshot = name;
+        public Builder customerNameSnapshot(String customerNameSnapshot) {
+            this.customerNameSnapshot = customerNameSnapshot;
+            return this;
+        }
+
+        public Builder customerNifSnapshot(String customerNifSnapshot) {
+            this.customerNifSnapshot = customerNifSnapshot;
             return this;
         }
 
@@ -322,6 +411,16 @@ public class Return {
             return this;
         }
 
+        public Builder isCorrection(boolean val) {
+            this.isCorrection = val;
+            return this;
+        }
+
+        public Builder correctionType(String val) {
+            this.correctionType = val;
+            return this;
+        }
+
         public Return build() {
             Return r = new Return();
             r.saleId = this.saleId;
@@ -335,10 +434,13 @@ public class Return {
             r.docSeries = this.docSeries;
             r.docNumber = this.docNumber;
             r.docStatus = this.docStatus;
-            r.customerNameSnapshot = this.customerNameSnapshot;
+            r.setCustomerNameSnapshot(this.customerNameSnapshot);
+            r.setCustomerNifSnapshot(this.customerNifSnapshot);
             r.issuerName = this.issuerName;
             r.issuerTaxId = this.issuerTaxId;
             r.issuerAddress = this.issuerAddress;
+            r.isCorrection = this.isCorrection;
+            r.correctionType = this.correctionType;
             return r;
         }
     }

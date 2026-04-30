@@ -133,7 +133,19 @@ public class DatabaseInitializer {
                         addColumnIfNotExists(conn, "sales", "promo_code", "VARCHAR(100) DEFAULT NULL");
                         addColumnIfNotExists(conn, "sales", "reward_promo_code", "VARCHAR(100) DEFAULT NULL");
 
-                        setSchemaVersion(conn, "1.13");
+                        // --- VERIFACTU FISCAL COLUMNS ---
+                        addColumnIfNotExists(conn, "sales", "doc_type", "VARCHAR(20) DEFAULT 'SIMPLIFICADA'");
+                        addColumnIfNotExists(conn, "sales", "doc_series", "VARCHAR(10) DEFAULT 'A'");
+                        addColumnIfNotExists(conn, "sales", "doc_number", "INT DEFAULT NULL");
+                        addColumnIfNotExists(conn, "sales", "doc_status", "VARCHAR(20) DEFAULT 'EMITIDO'");
+                        addColumnIfNotExists(conn, "sales", "control_hash", "VARCHAR(64) DEFAULT NULL");
+                        addColumnIfNotExists(conn, "sales", "prev_hash", "VARCHAR(64) DEFAULT NULL");
+                        addColumnIfNotExists(conn, "sales", "signature", "TEXT DEFAULT NULL");
+                        addColumnIfNotExists(conn, "sales", "fiscal_status", "VARCHAR(20) DEFAULT 'PENDING'");
+                        addColumnIfNotExists(conn, "sales", "fiscal_msg", "TEXT DEFAULT NULL");
+                        addColumnIfNotExists(conn, "sales", "aeat_submission_id", "VARCHAR(100) DEFAULT NULL");
+
+                        setSchemaVersion(conn, "1.14");
 
                         // 2. Sale Details Table
                         stmt.execute("CREATE TABLE IF NOT EXISTS sale_details (" +
@@ -236,7 +248,28 @@ public class DatabaseInitializer {
                         addColumnIfNotExists(conn, "returns", "closure_id", "INT DEFAULT NULL");
                         addColumnIfNotExists(conn, "returns", "payment_method", "VARCHAR(50)");
 
-                        // 5. Return Details Table
+                        // --- VERIFACTU FISCAL COLUMNS FOR RETURNS ---
+                        addColumnIfNotExists(conn, "returns", "prev_hash", "VARCHAR(64) DEFAULT NULL");
+                        addColumnIfNotExists(conn, "returns", "signature", "TEXT DEFAULT NULL");
+                        addColumnIfNotExists(conn, "returns", "fiscal_status", "VARCHAR(20) DEFAULT 'PENDING'");
+                        addColumnIfNotExists(conn, "returns", "fiscal_msg", "TEXT DEFAULT NULL");
+                        addColumnIfNotExists(conn, "returns", "aeat_submission_id", "VARCHAR(100) DEFAULT NULL");
+
+                        // 5. doc_series Table (VeriFactu / Facturación)
+                        stmt.execute("CREATE TABLE IF NOT EXISTS doc_series (" +
+                                        "series_id INT AUTO_INCREMENT PRIMARY KEY, " +
+                                        "series_code VARCHAR(10) UNIQUE NOT NULL, " +
+                                        "prefix VARCHAR(10), " +
+                                        "last_number INT DEFAULT 0, " +
+                                        "year INT, " +
+                                        "description VARCHAR(100))");
+
+                        // Seed data for Document Series
+                        stmt.execute("INSERT IGNORE INTO doc_series (series_code, prefix, last_number, year, description) VALUES ('A', 'TCK-', 0, 2026, 'Factura Simplificada (Ticket)')");
+                        stmt.execute("INSERT IGNORE INTO doc_series (series_code, prefix, last_number, year, description) VALUES ('F', 'FAC-', 0, 2026, 'Factura Ordinaria')");
+                        stmt.execute("INSERT IGNORE INTO doc_series (series_code, prefix, last_number, year, description) VALUES ('R', 'REC-', 0, 2026, 'Factura Rectificativa')");
+
+                        // 6. Return Details Table
                         stmt.execute("CREATE TABLE IF NOT EXISTS return_details (" +
                                         "return_detail_id INT AUTO_INCREMENT PRIMARY KEY, " +
                                         "return_id INT, " +
@@ -1253,18 +1286,17 @@ public class DatabaseInitializer {
                 }
         }
 
-        private static boolean isAlreadyInitialized(Connection conn) {
-                try (Statement stmt = conn.createStatement();
-                                ResultSet rs = stmt.executeQuery(
-                                                "SELECT config_value FROM system_config WHERE config_key = 'db.schema_version'")) {
-                        if (rs.next() && "1.13".equals(rs.getString(1))) {
-                                return true;
-                        }
-                } catch (Exception e) {
-                        // Table probably doesn't exist yet
-                }
-                return false;
+    private static boolean isAlreadyInitialized(Connection conn) {
+        try (Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery("SELECT config_value FROM system_config WHERE config_key = 'db.schema_version'")) {
+            if (rs.next() && "1.14".equals(rs.getString(1))) {
+                return true;
+            }
+        } catch (Exception e) {
+            // Table probably doesn't exist yet
         }
+        return false;
+    }
 
         private static boolean isMigrationDone(Connection conn, String migrationId) {
                 try (Statement stmt = conn.createStatement();

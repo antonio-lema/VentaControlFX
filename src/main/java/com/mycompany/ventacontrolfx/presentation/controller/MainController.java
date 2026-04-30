@@ -30,7 +30,8 @@ import javafx.application.Platform;
 import javafx.stage.Stage;
 
 public class MainController
-        implements Injectable, com.mycompany.ventacontrolfx.shared.bus.GlobalEventBus.LocaleChangeListener {
+        implements Injectable, com.mycompany.ventacontrolfx.shared.bus.GlobalEventBus.LocaleChangeListener,
+        com.mycompany.ventacontrolfx.shared.bus.GlobalEventBus.VerifactuIncidentListener {
 
     @FXML
     private StackPane headerContainer, sidebarContainer, cartContainer;
@@ -57,8 +58,38 @@ public class MainController
 
         loadStaticComponents();
         container.getEventBus().subscribeLocale(this);
+        container.getEventBus().subscribeVerifactu(this);
         showInitialView();
         startShiftMonitor();
+    }
+
+    @Override
+    public void onVerifactuIncidentDetected(java.util.List<Integer> affectedSaleIds, java.util.List<Integer> affectedReturnIds) {
+        Platform.runLater(() -> {
+            try {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/verifactu_incident_dialog.fxml"), container.getBundle());
+                Parent root = loader.load();
+                VerifactuIncidentDialogController controller = loader.getController();
+
+                Stage stage = new Stage();
+                stage.initModality(javafx.stage.Modality.APPLICATION_MODAL);
+                stage.setTitle("Incidencia Técnica VeriFactu");
+
+                Scene scene = new Scene(root);
+                container.getThemeManager().applyFullTheme(scene);
+                stage.setScene(scene);
+
+                controller.setOnSave(reason -> {
+                    new com.mycompany.ventacontrolfx.infrastructure.aeat.JdbcVerifactuRepository()
+                        .saveIncidentReason(affectedSaleIds, affectedReturnIds, reason);
+                    com.mycompany.ventacontrolfx.util.AlertUtil.showInfo("Éxito", "Justificación registrada correctamente.");
+                });
+
+                stage.show();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
     }
 
     private LocalDateTime snoozeUntil = null;

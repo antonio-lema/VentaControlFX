@@ -44,4 +44,14 @@ public class StatusBarController implements Injectable, GlobalEventBus.DataChang
         if (label != null)
             label.setText(text);
     }
+
+    @FXML
+    private void handleTestIncident() {
+        if (container != null) {
+            container.getEventBus().publishVerifactuIncident(
+                java.util.Collections.singletonList(1), 
+                java.util.Collections.emptyList()
+            );
+        }
+    }
 }

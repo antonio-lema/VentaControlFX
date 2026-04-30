@@ -24,7 +24,7 @@ public class JdbcSaleRepository implements ISaleRepository {
 
     @Override
     public int saveSale(Sale sale, Connection conn) throws SQLException {
-        String sql = "INSERT INTO sales (user_id, client_id, total, payment_method, iva, sale_datetime, is_return, doc_type, doc_series, doc_number, doc_status, control_hash, total_net, total_tax, customer_name_snapshot, discount_amount, discount_reason, cash_amount, card_amount, observations, promo_code, reward_promo_code) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO sales (user_id, client_id, total, payment_method, iva, sale_datetime, is_return, doc_type, doc_series, doc_number, doc_status, control_hash, total_net, total_tax, customer_name_snapshot, customer_nif_snapshot, discount_amount, discount_reason, cash_amount, card_amount, observations, promo_code, reward_promo_code, prev_hash, signature, fiscal_status, fiscal_msg, aeat_submission_id, gen_timestamp, is_correction, correction_type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             pstmt.setInt(1, sale.getUserId());
             if (sale.getClientId() != null && sale.getClientId() > 0) {
@@ -49,13 +49,24 @@ public class JdbcSaleRepository implements ISaleRepository {
             pstmt.setDouble(13, sale.getTotalNet());
             pstmt.setDouble(14, sale.getTotalTax());
             pstmt.setString(15, sale.getCustomerNameSnapshot());
-            pstmt.setDouble(16, sale.getDiscountAmount());
-            pstmt.setString(17, sale.getDiscountReason());
-            pstmt.setDouble(18, sale.getCashAmount());
-            pstmt.setDouble(19, sale.getCardAmount());
-            pstmt.setString(20, sale.getObservations());
-            pstmt.setString(21, sale.getPromoCode());
-            pstmt.setString(22, sale.getRewardPromoCode());
+            pstmt.setString(16, sale.getCustomerNifSnapshot());
+            pstmt.setDouble(17, sale.getDiscountAmount());
+            pstmt.setString(18, sale.getDiscountReason());
+            pstmt.setDouble(19, sale.getCashAmount());
+            pstmt.setDouble(20, sale.getCardAmount());
+            pstmt.setString(21, sale.getObservations());
+            pstmt.setString(22, sale.getPromoCode());
+            pstmt.setString(23, sale.getRewardPromoCode());
+
+            // VeriFactu Fields
+            pstmt.setString(24, sale.getPrevHash());
+            pstmt.setString(25, sale.getSignature());
+            pstmt.setString(26, sale.getFiscalStatus() != null ? sale.getFiscalStatus() : "PENDING");
+            pstmt.setString(27, sale.getFiscalMsg());
+            pstmt.setString(28, sale.getAeatSubmissionId());
+            pstmt.setString(29, sale.getGenTimestamp());
+            pstmt.setBoolean(30, sale.isCorrection());
+            pstmt.setString(31, sale.getCorrectionType());
             pstmt.executeUpdate();
 
             try (ResultSet rs = pstmt.getGeneratedKeys()) {
@@ -269,12 +280,12 @@ public class JdbcSaleRepository implements ISaleRepository {
     public int saveReturn(Return returnRecord) throws SQLException {
         try (Connection conn = DBConnection.getConnection()) {
             return saveReturn(returnRecord, conn);
-        }
+}
     }
 
     @Override
     public int saveReturn(Return returnRecord, Connection conn) throws SQLException {
-        String sql = "INSERT INTO returns (sale_id, user_id, return_datetime, total_refunded, reason, payment_method, cash_amount, card_amount, doc_type, doc_series, doc_number, doc_status, control_hash, customer_name_snapshot, issuer_name, issuer_tax_id, issuer_address, total_tax, tax_basis) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO returns (sale_id, user_id, return_datetime, total_refunded, reason, payment_method, cash_amount, card_amount, doc_type, doc_series, doc_number, doc_status, control_hash, customer_name_snapshot, customer_nif_snapshot, issuer_name, issuer_tax_id, issuer_address, total_tax, tax_basis, prev_hash, signature, fiscal_status, fiscal_msg, aeat_submission_id, gen_timestamp, is_correction, correction_type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             pstmt.setInt(1, returnRecord.getSaleId());
             if (returnRecord.getUserId() > 0) {
@@ -298,11 +309,22 @@ public class JdbcSaleRepository implements ISaleRepository {
             pstmt.setString(12, returnRecord.getDocStatus() != null ? returnRecord.getDocStatus() : "EMITIDO");
             pstmt.setString(13, returnRecord.getControlHash());
             pstmt.setString(14, returnRecord.getCustomerNameSnapshot());
-            pstmt.setString(15, returnRecord.getIssuerName());
-            pstmt.setString(16, returnRecord.getIssuerTaxId());
-            pstmt.setString(17, returnRecord.getIssuerAddress());
-            pstmt.setDouble(18, returnRecord.getTotalTax());
-            pstmt.setDouble(19, returnRecord.getTaxBasis());
+            pstmt.setString(15, returnRecord.getCustomerNifSnapshot());
+            pstmt.setString(16, returnRecord.getIssuerName());
+            pstmt.setString(17, returnRecord.getIssuerTaxId());
+            pstmt.setString(18, returnRecord.getIssuerAddress());
+            pstmt.setDouble(19, returnRecord.getTotalTax());
+            pstmt.setDouble(20, returnRecord.getTaxBasis());
+
+            // VeriFactu Fields
+            pstmt.setString(21, returnRecord.getPrevHash());
+            pstmt.setString(22, returnRecord.getSignature());
+            pstmt.setString(23, returnRecord.getFiscalStatus() != null ? returnRecord.getFiscalStatus() : "PENDING");
+            pstmt.setString(24, returnRecord.getFiscalMsg());
+            pstmt.setString(25, returnRecord.getAeatSubmissionId());
+            pstmt.setString(26, returnRecord.getGenTimestamp());
+            pstmt.setBoolean(27, returnRecord.isCorrection());
+            pstmt.setString(28, returnRecord.getCorrectionType());
 
             pstmt.executeUpdate();
             try (ResultSet rs = pstmt.getGeneratedKeys()) {
@@ -418,11 +440,14 @@ public class JdbcSaleRepository implements ISaleRepository {
                     ret.setDocStatus(rs.getString("doc_status"));
                     ret.setControlHash(rs.getString("control_hash"));
                     ret.setCustomerNameSnapshot(rs.getString("customer_name_snapshot"));
+                    ret.setCustomerNifSnapshot(rs.getString("customer_nif_snapshot"));
                     ret.setIssuerName(rs.getString("issuer_name"));
                     ret.setIssuerTaxId(rs.getString("issuer_tax_id"));
                     ret.setIssuerAddress(rs.getString("issuer_address"));
                     ret.setTotalTax(rs.getDouble("total_tax"));
                     ret.setTaxBasis(rs.getDouble("tax_basis"));
+                    ret.setCorrection(rs.getBoolean("is_correction"));
+                    ret.setCorrectionType(rs.getString("correction_type"));
                     returns.add(ret);
                 }
             }
@@ -463,11 +488,14 @@ public class JdbcSaleRepository implements ISaleRepository {
                     ret.setDocStatus(rs.getString("doc_status"));
                     ret.setControlHash(rs.getString("control_hash"));
                     ret.setCustomerNameSnapshot(rs.getString("customer_name_snapshot"));
+                    ret.setCustomerNifSnapshot(rs.getString("customer_nif_snapshot"));
                     ret.setIssuerName(rs.getString("issuer_name"));
                     ret.setIssuerTaxId(rs.getString("issuer_tax_id"));
                     ret.setIssuerAddress(rs.getString("issuer_address"));
                     ret.setTotalTax(rs.getDouble("total_tax"));
                     ret.setTaxBasis(rs.getDouble("tax_basis"));
+                    ret.setCorrection(rs.getBoolean("is_correction"));
+                    ret.setCorrectionType(rs.getString("correction_type"));
                     returns.add(ret);
                 }
             }
@@ -626,11 +654,18 @@ public class JdbcSaleRepository implements ISaleRepository {
         sale.setDocNumber((Integer) rs.getObject("doc_number"));
         sale.setDocStatus(rs.getString("doc_status"));
         sale.setControlHash(rs.getString("control_hash"));
+        sale.setFiscalStatus(rs.getString("fiscal_status"));
+        sale.setFiscalMsg(rs.getString("fiscal_msg"));
+        sale.setAeatSubmissionId(rs.getString("aeat_submission_id"));
+        sale.setGenTimestamp(rs.getString("gen_timestamp"));
+        sale.setCorrection(rs.getBoolean("is_correction"));
+        sale.setCorrectionType(rs.getString("correction_type"));
 
         // Snapshots de inmutabilidad
         sale.setTotalNet(rs.getDouble("total_net"));
         sale.setTotalTax(rs.getDouble("total_tax"));
         sale.setCustomerNameSnapshot(rs.getString("customer_name_snapshot"));
+        sale.setCustomerNifSnapshot(rs.getString("customer_nif_snapshot"));
         sale.setObservations(rs.getString("observations"));
         sale.setPromoCode(rs.getString("promo_code"));
         sale.setRewardPromoCode(rs.getString("reward_promo_code"));
@@ -673,20 +708,65 @@ public class JdbcSaleRepository implements ISaleRepository {
 
     @Override
     public java.util.Map<Integer, Integer> getHourlyDistribution(LocalDate start, LocalDate end) throws SQLException {
-        java.util.Map<Integer, Integer> distribution = new java.util.HashMap<>();
-        String sql = "SELECT HOUR(sale_datetime) as hr, COUNT(*) as qty " +
-                "FROM sales WHERE sale_datetime >= ? AND sale_datetime <= ? " +
-                "GROUP BY hr ORDER BY hr ASC";
+        String sql = "SELECT HOUR(sale_datetime) as hour, COUNT(*) as count FROM sales WHERE sale_datetime BETWEEN ? AND ? GROUP BY hour ORDER BY hour";
+        java.util.Map<Integer, Integer> map = new java.util.HashMap<>();
         try (Connection conn = DBConnection.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setTimestamp(1, java.sql.Timestamp.valueOf(start.atStartOfDay()));
-            pstmt.setTimestamp(2, java.sql.Timestamp.valueOf(end.atTime(java.time.LocalTime.MAX)));
+            pstmt.setTimestamp(2, java.sql.Timestamp.valueOf(end.atTime(23, 59, 59)));
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
-                    distribution.put(rs.getInt("hr"), rs.getInt("qty"));
+                    map.put(rs.getInt("hour"), rs.getInt("count"));
                 }
             }
         }
-        return distribution;
+        return map;
+    }
+
+    @Override
+    public String getLastControlHash(String docSeries) throws SQLException {
+        // Obtenemos el control_hash de la última venta o devolución emitida en esa
+        // serie
+        String sql = "SELECT control_hash FROM ( " +
+                "  SELECT control_hash, sale_datetime as dt FROM sales WHERE doc_series = ? " +
+                "  UNION ALL " +
+                "  SELECT control_hash, return_datetime as dt FROM returns WHERE doc_series = ? " +
+                ") AS combined ORDER BY dt DESC LIMIT 1";
+
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, docSeries);
+            pstmt.setString(2, docSeries);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getString("control_hash");
+                }
+            }
+        }
+        return null;
+    }
+    @Override
+    public void updateCorrectionData(int saleId, String newName, String newNif, boolean isCorrection, String correctionType, Connection conn) throws SQLException {
+        String sql = "UPDATE sales SET customer_name_snapshot = ?, customer_nif_snapshot = ?, " +
+                "is_correction = ?, correction_type = ?, fiscal_status = 'PENDING', fiscal_msg = NULL WHERE sale_id = ?";
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, newName);
+            pstmt.setString(2, newNif);
+            pstmt.setBoolean(3, isCorrection);
+            pstmt.setString(4, correctionType);
+            pstmt.setInt(5, saleId);
+            pstmt.executeUpdate();
+        }
+    }
+
+    @Override
+    public void updateFiscalStatus(int saleId, String status, String message, Connection conn) throws SQLException {
+        String sql = "UPDATE sales SET fiscal_status = ?, fiscal_msg = ? WHERE sale_id = ?";
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, status);
+            pstmt.setString(2, message);
+            pstmt.setInt(3, saleId);
+            pstmt.executeUpdate();
+        }
     }
 }

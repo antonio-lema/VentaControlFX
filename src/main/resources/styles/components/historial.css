@@ -453,6 +453,25 @@
     -fx-cursor: default;
 }
 
+.btn-history-correction {
+    -fx-background-color: linear-gradient(to bottom right, #6366f1, #4f46e5); /* Indigo modern */
+    -fx-text-fill: white;
+    -fx-font-weight: 800;
+    -fx-font-size: 13px;
+    -fx-padding: 12 24;
+    -fx-background-radius: -fx-radius-md;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(three-pass-box, rgba(79, 70, 229, 0.25), 10, 0, 0, 4);
+    -fx-graphic-text-gap: 10px;
+}
+
+.btn-history-correction:hover {
+    -fx-background-color: #4338ca;
+    -fx-effect: dropshadow(three-pass-box, rgba(79, 70, 229, 0.25), 15, 0, 0, 5);
+    -fx-scale-x: 1.02;
+    -fx-scale-y: 1.02;
+}
+
 .btn-history-close {
     -fx-background-color: -fx-bg-main;
     -fx-text-fill: -fx-text-custom-light;

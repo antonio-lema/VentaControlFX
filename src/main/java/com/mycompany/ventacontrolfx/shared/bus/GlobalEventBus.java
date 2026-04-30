@@ -21,8 +21,13 @@ public class GlobalEventBus {
         void onLocaleChanged();
     }
 
+    public interface VerifactuIncidentListener {
+        void onVerifactuIncidentDetected(java.util.List<Integer> affectedSaleIds, java.util.List<Integer> affectedReturnIds);
+    }
+
     private final List<WeakReference<DataChangeListener>> dataListeners = new ArrayList<>();
     private final List<WeakReference<LocaleChangeListener>> localeListeners = new ArrayList<>();
+    private final List<WeakReference<VerifactuIncidentListener>> verifactuListeners = new ArrayList<>();
 
     public void subscribe(DataChangeListener listener) {
         dataListeners.add(new WeakReference<>(listener));
@@ -52,6 +57,22 @@ public class GlobalEventBus {
                 iterator.remove();
             } else {
                 listener.onLocaleChanged();
+            }
+        }
+    }
+
+    public void subscribeVerifactu(VerifactuIncidentListener listener) {
+        verifactuListeners.add(new WeakReference<>(listener));
+    }
+
+    public void publishVerifactuIncident(java.util.List<Integer> saleIds, java.util.List<Integer> returnIds) {
+        Iterator<WeakReference<VerifactuIncidentListener>> iterator = verifactuListeners.iterator();
+        while (iterator.hasNext()) {
+            VerifactuIncidentListener listener = iterator.next().get();
+            if (listener == null) {
+                iterator.remove();
+            } else {
+                listener.onVerifactuIncidentDetected(saleIds, returnIds);
             }
         }
     }

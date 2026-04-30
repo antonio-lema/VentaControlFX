@@ -25,7 +25,7 @@ public class ProductBox extends VBox {
         this.getStyleClass().add("product-box");
         this.setPrefWidth(200);
         this.setCache(true);
-        this.setCacheHint(javafx.scene.CacheHint.SPEED);
+        this.setCacheHint(javafx.scene.CacheHint.QUALITY);
 
         // \u00e2\u201d\u20ac\u00e2\u201d\u20ac IMAGE SECTION (StackPane allows overlay
         // of price badge) \u00e2\u201d\u20ac\u00e2\u201d\u20ac

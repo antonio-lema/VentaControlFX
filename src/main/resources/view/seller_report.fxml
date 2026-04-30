@@ -147,8 +147,10 @@
                 <!-- Hourly Activity BarChart -->
                 <VBox styleClass="widget-panel" prefWidth="450" spacing="16">
                     <Label text="Ventas por Hora (Actividad)" styleClass="widget-title"/>
-                    <BarChart fx:id="hourlyBarChart" legendVisible="false" VBox.vgrow="ALWAYS">
-                        <xAxis><CategoryAxis label="Hora del d\u00eda"/></xAxis>
+                    <BarChart fx:id="hourlyBarChart" legendVisible="false" VBox.vgrow="ALWAYS" animated="false">
+                        <xAxis>
+                            <CategoryAxis label="Hora del día" tickLabelRotation="-45"/>
+                        </xAxis>
                         <yAxis><NumberAxis label="Transacciones"/></yAxis>
                     </BarChart>
                 </VBox>

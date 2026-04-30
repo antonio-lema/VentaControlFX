@@ -111,6 +111,13 @@
     -fx-text-custom-cards: -fx-text-custom-main;
     -fx-text-custom-cards-muted: -fx-text-custom-muted;
     -fx-text-custom-price: -fx-custom-color-primary;
+
+    /* --- CARD SPECIFIC TOKENS --- */
+    -fx-card-border-width: 1px;
+    -fx-card-hover-lift: -5px;
+    -fx-card-hover-scale: 1.01;
+    -fx-card-shadow: dropshadow(three-pass-box, rgba(0,0,0,0.06), 10, 0, 0, 2);
+    -fx-card-shadow-hover: dropshadow(three-pass-box, rgba(0,0,0,0.12), 20, 0, 0, 8);
 }
 
 .dark-theme {

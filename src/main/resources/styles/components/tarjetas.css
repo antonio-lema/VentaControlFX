@@ -23,6 +23,9 @@
     -fx-effect: -fx-card-shadow-hover;
     -fx-scale-x: -fx-card-hover-scale;
     -fx-scale-y: -fx-card-hover-scale;
+    /* Evitar que se vea pixelado en transformaciones */
+    -fx-cache: true;
+    -fx-cache-hint: quality;
 }
 
 /* ─── Zona de imagen (parte superior) ─────────────────── */

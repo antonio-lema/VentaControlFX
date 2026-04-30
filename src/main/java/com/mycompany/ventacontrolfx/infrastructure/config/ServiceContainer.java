@@ -17,6 +17,10 @@ import com.mycompany.ventacontrolfx.application.service.RefundCalculatorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import com.mycompany.ventacontrolfx.infrastructure.aeat.VerifactuOutboxManager;
+import com.mycompany.ventacontrolfx.infrastructure.aeat.AeatHttpClient;
+import com.mycompany.ventacontrolfx.infrastructure.aeat.VerifactuXmlBuilder;
+import java.util.concurrent.TimeUnit;
 // CartService removed, replaced by CartUseCase
 import java.util.Locale;
 import java.util.ResourceBundle;
@@ -54,6 +58,7 @@ public class ServiceContainer {
     private final IWorkSessionRepository workSessionRepository;
 
     // Use Cases (Application Layer)
+    private VerifactuOutboxManager verifactuOutboxManager;
     private final ProductUseCase productUseCase;
     private final CategoryUseCase categoryUseCase;
     private final ClientUseCase clientUseCase;
@@ -97,6 +102,7 @@ public class ServiceContainer {
     private Locale currentLocale = new Locale("es");
 
     public ServiceContainer() {
+        System.out.println("[ServiceContainer] Iniciando configuración de servicios...");
         // 1. Shared Infrastructure
         this.eventBus = new GlobalEventBus();
         this.asyncManager = new AsyncManager();
@@ -190,6 +196,25 @@ public class ServiceContainer {
             new BackupService().createDefaultBackup();
         }, 1, 24, TimeUnit.HOURS); // Cada 24h, empezando en 1h
 
+        try {
+            System.out.println("[VeriFactu] Iniciando módulo...");
+            AeatHttpClient aeatClient = new AeatHttpClient("https://prewww1.aeat.es/wlpl/TIKE-CONT/ws/SistemaFacturacion/VerifactuSOAP", "/certs/99999910G_prueba.pfx", "1234");
+            System.out.println("[VeriFactu] Cliente HTTP creado.");
+            VerifactuXmlBuilder xmlBuilder = new VerifactuXmlBuilder("99999910G", "(VERI*FACTU) CERTIFICADO FISICA PRUEBAS");
+            this.verifactuOutboxManager = new VerifactuOutboxManager(aeatClient, xmlBuilder, this.eventBus);
+            this.verifactuOutboxManager.start();
+            
+            // Cargar credenciales reales en un hilo separado para NO BLOQUEAR el arranque
+            new Thread(() -> {
+                System.out.println("[VeriFactu] Cargando credenciales reales en segundo plano...");
+                refreshVerifactuCredentials();
+                System.out.println("[VeriFactu] Credenciales reales cargadas.");
+            }).start();
+        } catch (Exception e) {
+            System.err.println("[VeriFactu] Error crítico en el arranque: " + e.getMessage());
+            e.printStackTrace();
+        }
+
         // 4. Domain Services
         // taxEngineService is now initialized above
 
@@ -217,6 +242,7 @@ public class ServiceContainer {
         // this.aiSkillDispatcher = new AiSkillDispatcher(this);
         // this.aiToolGenerator = new AiToolDefinitionGenerator();
         // this.aiIntentRouter = new AiIntentRouter(this);
+        System.out.println("[ServiceContainer] Configuración completada con éxito.");
     }
 
     // --- Getters ---
@@ -420,5 +446,20 @@ public class ServiceContainer {
 
     public Locale getCurrentLocale() {
         return currentLocale;
+    }
+
+    public void refreshVerifactuCredentials() {
+        if (verifactuOutboxManager == null) return;
+        try {
+            String nif = configRepository.load().getCif();
+            String name = configRepository.load().getCompanyName();
+            if (nif != null && !nif.isEmpty()) {
+                verifactuOutboxManager.updateCredentials(nif.toUpperCase(), name);
+            }
+        } catch (Exception ignored) {}
+    }
+
+    public VerifactuOutboxManager getVerifactuOutboxManager() {
+        return verifactuOutboxManager;
     }
 }

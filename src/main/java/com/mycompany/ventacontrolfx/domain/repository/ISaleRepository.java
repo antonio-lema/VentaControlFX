@@ -76,4 +76,10 @@ public interface ISaleRepository {
         java.util.Map<String, Double> getCategoryDistribution(LocalDate start, LocalDate end) throws SQLException;
 
         java.util.Map<Integer, Integer> getHourlyDistribution(LocalDate start, LocalDate end) throws SQLException;
+
+        String getLastControlHash(String docSeries) throws SQLException;
+
+        void updateCorrectionData(int saleId, String newName, String newNif, boolean isCorrection, String correctionType, Connection conn) throws SQLException;
+        
+        void updateFiscalStatus(int saleId, String status, String message, Connection conn) throws SQLException;
 }

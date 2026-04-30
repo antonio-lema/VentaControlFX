@@ -389,11 +389,20 @@ public class SellerReportController implements Injectable {
         catDist.forEach((name, val) -> catData.add(new PieChart.Data(name, val)));
         pieCategories.setData(catData);
 
-        // Horas Bar
+        // Horas Bar - Configuración robusta de categorías para evitar apilamiento
+        javafx.scene.chart.CategoryAxis xAxis = (javafx.scene.chart.CategoryAxis) hourlyBarChart.getXAxis();
+        if (xAxis.getCategories().isEmpty()) {
+            List<String> hoursList = new ArrayList<>();
+            for (int h = 0; h < 24; h++)
+                hoursList.add(String.format("%02dh", h));
+            xAxis.setCategories(FXCollections.observableArrayList(hoursList));
+        }
+
         XYChart.Series<String, Number> hourSeries = new XYChart.Series<>();
         for (int h = 0; h < 24; h++) {
             hourSeries.getData().add(new XYChart.Data<>(String.format("%02dh", h), hourDist.getOrDefault(h, 0)));
         }
+
         hourlyBarChart.getData().setAll(hourSeries);
     }
 
