@@ -23,7 +23,7 @@ public class VerifactuOutboxManager {
     private final ScheduledExecutorService scheduler;
 
     private int reqMinRegistros = 1;      
-    private int reqSegundosEspera = 0;     
+    private int reqSegundosEspera = 60;     
     private LocalDateTime ultimoEnvio = LocalDateTime.now().minusDays(1);
     
     private int consecutiveFailures = 0;
@@ -45,40 +45,48 @@ public class VerifactuOutboxManager {
     public void start() {
         // Lanzamos la primera ejecución INMEDIATAMENTE (1s) para no esperar
         scheduler.schedule(this::procesarCola, 1, TimeUnit.SECONDS);
-        LOGGER.info("[VeriFactu] Outbox Manager arrancado (Modo Telemetría)");
+        LOGGER.fine("[VeriFactu] Outbox Manager arrancado (Modo Telemetría)");
     }
 
     public void updateCredentials(String nif, String razonSocial) {
-        LOGGER.info("[VeriFactu] Credenciales configuradas: " + nif + " / " + razonSocial);
+        LOGGER.fine("[VeriFactu] Credenciales configuradas: " + nif + " / " + razonSocial);
         this.xmlBuilder.setCredentials(nif, razonSocial);
     }
 
     private void procesarCola() {
-        int delaySiguienteVuelta = 60; 
+        int delaySiguienteVuelta = reqSegundosEspera; 
         
         try {
-            System.out.println(">>> [VeriFactu] INICIANDO CICLO DE SINCRONIZACIÓN...");
+            // System.out.println(">>> [VeriFactu] INICIANDO CICLO DE SINCRONIZACIÓN...");
             
             String nifActual = xmlBuilder.getNifObligado();
             String razonActual = xmlBuilder.getRazonSocialObligado();
             
-            System.out.println("[VeriFactu] Usando NIF: " + nifActual);
+            // System.out.println("[VeriFactu] Usando NIF: " + nifActual);
             
             if (nifActual == null || nifActual.isEmpty()) {
-                System.out.println("[VeriFactu] ADVERTENCIA: No hay NIF configurado aún. Saltando esta vuelta...");
+                // LOGGER.fine("[VeriFactu] ADVERTENCIA: No hay NIF configurado aún. Saltando esta vuelta...");
                 return;
             }
 
             List<VerifactuPayload> pendientes = outboxRepository.getPendingRecordsOrderByIdAsc(nifActual, razonActual);
             
             if (pendientes == null || pendientes.isEmpty()) {
-                System.out.println("[VeriFactu] No hay nada pendiente en la base de datos. Zzz...");
+                // System.out.println("[VeriFactu] No hay nada pendiente en la base de datos. Zzz...");
             } else {
                 List<VerifactuPayload> batch = pendientes.size() > 1000 ? pendientes.subList(0, 1000) : pendientes;
                 String soapRequest = xmlBuilder.buildAltaSoapMessage(batch);
 
                 try {
+                    if (eventBus != null) {
+                        javafx.application.Platform.runLater(eventBus::publishVerifactuSyncStarted);
+                    }
+                    
                     String soapResponse = httpClient.sendSoapMessage(soapRequest);
+                    
+                    if (eventBus != null) {
+                        javafx.application.Platform.runLater(() -> eventBus.publishVerifactuSyncFinished("OK"));
+                    }
                     
                     if (isInternetDownDetected) {
                         notifyIncident(batch);
@@ -90,10 +98,13 @@ public class VerifactuOutboxManager {
                     procesarEstadosResponse(batch, soapResponse);
                     this.ultimoEnvio = LocalDateTime.now();
                     
-                    if (reqSegundosEspera > 0) {
-                        delaySiguienteVuelta = reqSegundosEspera;
-                    }
+                    // Hacienda ha podido actualizar reqSegundosEspera en actualizarPoliticasDeFlujo
+                    delaySiguienteVuelta = reqSegundosEspera;
                 } catch (Exception ex) {
+                    if (eventBus != null) {
+                        String errMsg = ex.getMessage();
+                        javafx.application.Platform.runLater(() -> eventBus.publishVerifactuSyncFinished("ERROR: " + errMsg));
+                    }
                     consecutiveFailures++;
                     LOGGER.log(Level.WARNING, "[VeriFactu] Error de comunicación: {0}", ex.getMessage());
                     if (consecutiveFailures >= 3 && !isInternetDownDetected) {
@@ -106,7 +117,7 @@ public class VerifactuOutboxManager {
             System.err.println("[VeriFactu] ERROR CRÍTICO EN EL MOTOR: " + t.getMessage());
             t.printStackTrace();
         } finally {
-            System.out.println("<<< [VeriFactu] FIN DEL CICLO. Próxima vuelta en " + delaySiguienteVuelta + " segundos.");
+            // System.out.println("<<< [VeriFactu] FIN DEL CICLO. Próxima vuelta en " + delaySiguienteVuelta + " segundos.");
             scheduler.schedule(this::procesarCola, delaySiguienteVuelta, TimeUnit.SECONDS);
         }
     }
@@ -130,11 +141,27 @@ public class VerifactuOutboxManager {
     private void actualizarPoliticasDeFlujo(String response) {
         if (response.contains("MinimoRegistrosEnvio")) {
             String n = extractTag(response, "MinimoRegistrosEnvio");
-            if (n != null) try { reqMinRegistros = Integer.parseInt(n); } catch (Exception ignored) {}
+            if (n != null) {
+                try { 
+                    int nuevoMin = Integer.parseInt(n);
+                    if (nuevoMin != reqMinRegistros) {
+                        System.out.println("[VeriFactu] AEAT solicita nuevo mínimo de registros: " + nuevoMin);
+                        reqMinRegistros = nuevoMin; 
+                    }
+                } catch (Exception ignored) {}
+            }
         }
         if (response.contains("TiempoEsperaEnvio")) {
             String t = extractTag(response, "TiempoEsperaEnvio");
-            if (t != null) try { reqSegundosEspera = Integer.parseInt(t); } catch (Exception ignored) {}
+            if (t != null) {
+                try { 
+                    int nuevoTiempo = Integer.parseInt(t);
+                    if (nuevoTiempo != reqSegundosEspera) {
+                        System.out.println("[VeriFactu] AEAT solicita cambiar intervalo de envío a: " + nuevoTiempo + " segundos (" + (nuevoTiempo / 60) + " min)");
+                        reqSegundosEspera = nuevoTiempo; 
+                    }
+                } catch (Exception ignored) {}
+            }
         }
     }
 
@@ -143,7 +170,7 @@ public class VerifactuOutboxManager {
         // Usamos una expresión regular para que funcione con <tik:RespuestaLinea>, <tikR:RespuestaLinea>, etc.
         String[] lineas = response.split("<[^>]*RespuestaLinea>");
         
-        System.out.println("[VeriFactu] Analizando " + (lineas.length - 1) + " líneas de respuesta de Hacienda...");
+        // System.out.println("[VeriFactu] Analizando " + (lineas.length - 1) + " líneas de respuesta de Hacienda...");
         
         if (lineas.length <= 1) {
             System.err.println("[VeriFactu] ADVERTENCIA: No se han encontrado líneas de respuesta formateadas. Respuesta RAW: " + response);
@@ -162,13 +189,13 @@ public class VerifactuOutboxManager {
                     if ("Correcto".equals(estado) || "Aceptación Completa".equals(estado)) {
                         String csv = extractTag(lineXml, "CSV");
                         outboxRepository.updateStatus(record.getIdRegistro(), "ACCEPTED", csv != null ? csv : "OK");
-                        System.out.println("[VeriFactu] Ticket " + fullNum + " -> ACEPTADO");
+                        // System.out.println("[VeriFactu] Ticket " + fullNum + " -> ACEPTADO");
                     } else {
                         String cod = extractTag(lineXml, "CodigoErrorRegistro");
                         String desc = extractTag(lineXml, "DescripcionErrorRegistro");
                         if ("3000".equals(cod)) {
                             outboxRepository.updateStatus(record.getIdRegistro(), "ACCEPTED", "Duplicado");
-                            System.out.println("[VeriFactu] Ticket " + fullNum + " -> ACEPTADO (Duplicado)");
+                            // System.out.println("[VeriFactu] Ticket " + fullNum + " -> ACEPTADO (Duplicado)");
                         } else {
                             outboxRepository.updateStatus(record.getIdRegistro(), "REJECTED", "[" + cod + "] " + desc);
                             System.err.println("[VeriFactu] Ticket " + fullNum + " -> RECHAZADO: [" + cod + "] " + desc);
