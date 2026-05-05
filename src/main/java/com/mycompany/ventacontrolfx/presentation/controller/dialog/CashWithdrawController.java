@@ -62,9 +62,9 @@ public class CashWithdrawController {
                         || userSession.hasPermission("USUARIOS");
                 if (canSeeTotals) {
                     lblWarning.setText(String.format(
-                            "\u00e2\u0161\u00a0\u00ef\u00b8\u008f Saldo insuficiente. Disponible: %.2f \u20ac", availableAmount));
+                            "\u20a0 Saldo insuficiente. Disponible: %.2f \u20ac", availableAmount));
                 } else {
-                    lblWarning.setText("\u00e2\u0161\u00a0\u00ef\u00b8\u008f Saldo insuficiente.");
+                    lblWarning.setText("\u20a0 Saldo insuficiente.");
                 }
                 lblWarning.setVisible(true);
                 lblWarning.setManaged(true);
