@@ -243,19 +243,19 @@ public class SidebarController implements Injectable {
         setVisible(btnThemeSettings,
                 authService.hasPermission("CONFIGURACION") || authService.hasPermission("config.estetica"));
         setVisible(btnBackup,
-                authService.hasPermission("CONFIGURACION") || authService.hasPermission("admin.facturacion"));
+                authService.hasPermission("admin.backup"));
         setVisible(btnReports,
                 authService.hasPermission("reporte.venta") || authService.hasPermission("reporte.vendedores"));
         setVisible(btnClientReport,
                 authService.hasPermission("reporte.cliente") || authService.hasPermission("HISTORIAL"));
         setVisible(btnBilling,
-                authService.hasPermission("admin.facturacion") || authService.hasPermission("HISTORIAL"));
-        setVisible(btnPriceLists, authService.hasPermission("admin.precios") || authService.hasPermission("PRODUCTOS"));
+                authService.hasPermission("fiscal.reenviar") || authService.hasPermission("fiscal.config"));
+        setVisible(btnPriceLists, authService.hasPermission("admin.precios_masivo") || authService.hasPermission("admin.precios_historial") || authService.hasPermission("PRODUCTOS"));
         setVisible(btnVat, authService.hasPermission("admin.iva"));
         setVisible(btnUsers, authService.hasPermission("usuario.crear"));
         setVisible(btnRoles, authService.hasPermission("rol.editar"));
-        setVisible(btnPromotions, authService.hasPermission("admin.precios") || authService.hasPermission("PRODUCTOS"));
-        setVisible(btnWorkSessions, true); // Accessible to all logged in users for now
+        setVisible(btnPromotions, authService.hasPermission("admin.promociones"));
+        setVisible(btnWorkSessions, true); 
         setVisible(btnStaffCalendar, true);
         setVisible(btnOperativeControl,
                 authService.hasPermission("CIERRES") || authService.hasPermission("admin.facturacion"));

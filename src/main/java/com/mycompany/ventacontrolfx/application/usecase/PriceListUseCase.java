@@ -2,6 +2,8 @@ package com.mycompany.ventacontrolfx.application.usecase;
 
 import com.mycompany.ventacontrolfx.domain.model.Price;
 import com.mycompany.ventacontrolfx.domain.model.PriceList;
+import com.mycompany.ventacontrolfx.domain.repository.IMassivePriceUpdateRepository;
+import com.mycompany.ventacontrolfx.domain.repository.IPriceHistoryRepository;
 import com.mycompany.ventacontrolfx.domain.repository.IPriceListRepository;
 import com.mycompany.ventacontrolfx.domain.repository.IPriceRepository;
 import java.sql.SQLException;
@@ -10,10 +12,17 @@ import java.util.List;
 public class PriceListUseCase {
     private final IPriceListRepository repository;
     private final IPriceRepository priceRepository;
+    private final IPriceHistoryRepository historyRepository;
+    private final IMassivePriceUpdateRepository massiveUpdateRepository;
 
-    public PriceListUseCase(IPriceListRepository repository, IPriceRepository priceRepository) {
+    public PriceListUseCase(IPriceListRepository repository, 
+                          IPriceRepository priceRepository,
+                          IPriceHistoryRepository historyRepository,
+                          IMassivePriceUpdateRepository massiveUpdateRepository) {
         this.repository = repository;
         this.priceRepository = priceRepository;
+        this.historyRepository = historyRepository;
+        this.massiveUpdateRepository = massiveUpdateRepository;
     }
 
     public List<PriceList> getAll() throws SQLException {
@@ -25,7 +34,7 @@ public class PriceListUseCase {
     }
 
     public String getAveragePercentageDifference(int priceListId) throws SQLException {
-        return priceRepository.getAveragePercentageDifference(priceListId);
+        return historyRepository.getAveragePercentageDifference(priceListId);
     }
 
     public PriceList getDefault() throws SQLException {
@@ -64,7 +73,7 @@ public class PriceListUseCase {
 
         // 3. Clonar los precios con el multiplicador
         double multiplier = 1.0 + (percentage / 100.0);
-        priceRepository.cloneAndAdjustPriceList(sourceId, targetId, multiplier,
+        massiveUpdateRepository.cloneAndAdjustPriceList(sourceId, targetId, multiplier,
                 "Clonaci\u00f3n con ajuste del " + percentage + "%", java.time.LocalDateTime.now());
 
         return new PriceList(targetId, newName, description, false, true, 0);

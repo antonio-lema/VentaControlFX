@@ -55,9 +55,11 @@ public class HistoryController implements Injectable, Searchable {
     @FXML
     private Button btnReturn, btnPrint, btnCorrection, btnResendAeat;
     @FXML
-    private TableColumn<Sale, String> colFiscalStatus;
-    @FXML
     private HBox quickFilterContainer;
+    @FXML
+    private VBox skeletonTableContainer;
+    @FXML
+    private TableColumn<Sale, String> colFiscalStatus;
 
     private SaleUseCase saleUseCase;
     private ServiceContainer container;
@@ -97,6 +99,12 @@ public class HistoryController implements Injectable, Searchable {
         boolean canCorrect = container.getUserSession().hasPermission("venta.subsanar");
         btnCorrection.setVisible(canCorrect);
         btnCorrection.setManaged(canCorrect);
+
+        boolean canResend = container.getUserSession().hasPermission("fiscal.reenviar");
+        if (btnResendAeat != null) {
+            btnResendAeat.setVisible(canResend);
+            btnResendAeat.setManaged(canResend);
+        }
     }
 
     private void setupTable() {
@@ -226,6 +234,10 @@ public class HistoryController implements Injectable, Searchable {
         final LocalDate finalStart = start;
         final LocalDate finalEnd = end;
 
+        // Show skeletons for KPI cards and table
+        showKpiSkeletons(true);
+        showTableSkeletons(true);
+
         // ASYNC LOADING: Prevents UI from freezing during DB queries
         container.getAsyncManager().runAsyncTask(() -> {
             try {
@@ -239,13 +251,51 @@ public class HistoryController implements Injectable, Searchable {
             }
         }, result -> {
             Object[] data = (Object[]) result;
+            showKpiSkeletons(false);
+            showTableSkeletons(false);
             updateSummaries((com.mycompany.ventacontrolfx.domain.model.HistoryStats) data[0]);
             paginationHelper.setData((List<Sale>) data[1]);
             handleCloseDetails();
         }, e -> {
+            showKpiSkeletons(false);
+            showTableSkeletons(false);
             AlertUtil.showError(container.getBundle().getString("alert.error"),
                     container.getBundle().getString("history.error.load") + ": " + e.getMessage());
         });
+    }
+
+    private void showTableSkeletons(boolean show) {
+        if (skeletonTableContainer == null) return;
+        
+        if (show) {
+            skeletonTableContainer.getChildren().clear();
+            for (int i = 0; i < 15; i++) {
+                skeletonTableContainer.getChildren().add(new com.mycompany.ventacontrolfx.component.SkeletonHistoryRow());
+            }
+            skeletonTableContainer.setVisible(true);
+            skeletonTableContainer.setManaged(true);
+        } else {
+            skeletonTableContainer.setVisible(false);
+            skeletonTableContainer.setManaged(false);
+        }
+    }
+
+    private void showKpiSkeletons(boolean show) {
+        if (show) {
+            lblTotalSalesCount.setGraphic(new com.mycompany.ventacontrolfx.component.SkeletonStatCard());
+            lblTotalSalesCount.setText("");
+            lblTotalAmount.setGraphic(new com.mycompany.ventacontrolfx.component.SkeletonStatCard());
+            lblTotalAmount.setText("");
+            lblTotalCash.setGraphic(new com.mycompany.ventacontrolfx.component.SkeletonStatCard());
+            lblTotalCash.setText("");
+            lblTotalCard.setGraphic(new com.mycompany.ventacontrolfx.component.SkeletonStatCard());
+            lblTotalCard.setText("");
+        } else {
+            lblTotalSalesCount.setGraphic(null);
+            lblTotalAmount.setGraphic(null);
+            lblTotalCash.setGraphic(null);
+            lblTotalCard.setGraphic(null);
+        }
     }
 
     @Override

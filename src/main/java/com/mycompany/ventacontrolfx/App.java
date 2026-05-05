@@ -30,7 +30,7 @@ public class App extends Application {
             try (java.sql.Connection conn = com.mycompany.ventacontrolfx.infrastructure.persistence.DBConnection
                     .getConnection()) {
                 com.mycompany.ventacontrolfx.infrastructure.persistence.DatabaseInitializer.initialize(conn);
-                System.out.println("Database initialization completed in background.");
+                // System.out.println("Database initialization completed in background.");
             } catch (Exception e) {
                 System.err.println("Error initializing database: " + e.getMessage());
             }

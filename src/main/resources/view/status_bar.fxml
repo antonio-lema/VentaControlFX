@@ -12,6 +12,14 @@
         <Insets top="5" right="20" bottom="5" left="20"/>
     </padding>
     <Label text="VentaControl Pro v1.0" styleClass="label-muted" style="-fx-font-size: 10px;"/>
+    
+    <HBox fx:id="badgeVerifactu" styleClass="status-badge" style="-fx-background-color: #34495e;">
+        <StackPane styleClass="status-icon-bg-blue">
+            <FontAwesomeIconView glyphName="CLOUD_UPLOAD" size="10" fill="#ffffff"/>
+        </StackPane>
+        <Label fx:id="lblVerifactuStatus" text="Sincronizando..." styleClass="status-badge-label" style="-fx-text-fill: white;"/>
+    </HBox>
+
     <Region HBox.hgrow="ALWAYS"/>
     
     <HBox fx:id="cardCountProducts" styleClass="status-badge">

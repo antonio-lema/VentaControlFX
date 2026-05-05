@@ -53,7 +53,7 @@ public class JdbcVerifactuRepository {
                 
                 java.sql.Timestamp fechaSql = rs.getTimestamp("fecha");
                 if (fechaSql == null) {
-                    System.err.println("[VeriFactu] Saltando " + opType + " con ID " + id + " porque no tiene fecha.");
+                    // System.err.println("[VeriFactu] Saltando " + opType + " con ID " + id + " porque no tiene fecha.");
                     continue;
                 }
                 LocalDateTime fechaTs = fechaSql.toLocalDateTime();
@@ -161,11 +161,11 @@ public class JdbcVerifactuRepository {
             }
 
             if (!pending.isEmpty()) {
-                System.out.println("[VeriFactu] " + pending.size() + " registros listos para enviar.");
+                // System.out.println("[VeriFactu] " + pending.size() + " registros listos para enviar.");
             }
         } catch (Exception e) {
-            System.err.println("[VeriFactu] ERROR al leer registros pendientes: " + e.getMessage());
-            e.printStackTrace();
+            // System.err.println("[VeriFactu] ERROR al leer registros pendientes: " + e.getMessage());
+            // e.printStackTrace();
         }
         return pending;
     }
@@ -194,7 +194,7 @@ public class JdbcVerifactuRepository {
                 }
             }
         } catch (Exception e) {
-            System.err.println("[VeriFactu] Error cargando IVA para " + traceId + ": " + e.getMessage());
+            // System.err.println("[VeriFactu] Error cargando IVA para " + traceId + ": " + e.getMessage());
         }
         return breakdown;
     }

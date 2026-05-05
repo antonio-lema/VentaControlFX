@@ -164,6 +164,13 @@
                     <mainClass>com.mycompany.ventacontrolfx.Launcher</mainClass>
                     <options>
                         <option>--enable-native-access=javafx.graphics</option>
+                        <option>--add-opens=java.base/jdk.internal.misc=ALL-UNNAMED</option>
+                        <option>--add-opens=java.base/sun.misc=ALL-UNNAMED</option>
+                        <option>--add-opens=javafx.graphics/com.sun.javafx.scene.layout=ALL-UNNAMED</option>
+                        <option>-Dprism.verbose=false</option>
+                        <option>-Djavafx.verbose=false</option>
+                        <option>-Djavafx.css.loglevel=OFF</option>
+                        <option>-Djdk.io.permissionsUseCanonicalPath=true</option>
                     </options>
                 </configuration>
             </plugin>

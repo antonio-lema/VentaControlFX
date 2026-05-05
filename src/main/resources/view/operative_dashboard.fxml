@@ -121,18 +121,23 @@
                                         <Region HBox.hgrow="ALWAYS" />
                                         <Button onAction="#handleShowAudit" text="%dashboard.btn.history" styleClass="btn-link" />
                                     </HBox>
-                                    <TableView fx:id="tableActiveStaff" prefHeight="400" styleClass="modern-table">
-                                        <columns>
-                                            <TableColumn fx:id="colStaffStatus" text="%dashboard.table.status" prefWidth="100" />
-                                            <TableColumn fx:id="colStaffName" text="%dashboard.table.staff" prefWidth="200" />
-                                            <TableColumn fx:id="colStaffRole" text="%dashboard.table.role" prefWidth="120" />
-                                            <TableColumn fx:id="colStaffShift" text="%dashboard.table.shift" prefWidth="130" />
-                                            <TableColumn fx:id="colStaffStart" text="%dashboard.table.session_start" prefWidth="100" />
-                                            <TableColumn fx:id="colStaffDuration" text="%dashboard.table.time" prefWidth="100" />
-                                            <TableColumn fx:id="colStaffProgress" text="%dashboard.table.progress" prefWidth="150" />
-                                        </columns>
-                                        <placeholder><Label text="%dashboard.table.empty"/></placeholder>
-                                    </TableView>
+                                    <StackPane VBox.vgrow="ALWAYS">
+                                        <children>
+                                            <TableView fx:id="tableActiveStaff" prefHeight="400" styleClass="modern-table">
+                                                <columns>
+                                                    <TableColumn fx:id="colStaffStatus" text="%dashboard.table.status" prefWidth="100" />
+                                                    <TableColumn fx:id="colStaffName" text="%dashboard.table.staff" prefWidth="200" />
+                                                    <TableColumn fx:id="colStaffRole" text="%dashboard.table.role" prefWidth="120" />
+                                                    <TableColumn fx:id="colStaffShift" text="%dashboard.table.shift" prefWidth="130" />
+                                                    <TableColumn fx:id="colStaffStart" text="%dashboard.table.session_start" prefWidth="100" />
+                                                    <TableColumn fx:id="colStaffDuration" text="%dashboard.table.time" prefWidth="100" />
+                                                    <TableColumn fx:id="colStaffProgress" text="%dashboard.table.progress" prefWidth="150" />
+                                                </columns>
+                                                <placeholder><Label text="%dashboard.table.empty"/></placeholder>
+                                            </TableView>
+                                            <VBox fx:id="skeletonStaffContainer" mouseTransparent="true" style="-fx-background-color: white;" visible="false" managed="false" />
+                                        </children>
+                                    </StackPane>
                                 </children>
                             </VBox>
 

@@ -172,7 +172,7 @@ public class CartController implements Injectable {
     }
 
     private void updateClientUI(Client client) {
-        System.out.println("[CartController] updateClientUI: client=" + (client != null ? client.getName() : "null"));
+        // System.out.println("[CartController] updateClientUI: client=" + (client != null ? client.getName() : "null"));
         if (client != null) {
             lblSelectedClient.setText(client.getName());
             lblSelectedClient.setStyle("-fx-text-fill: #1e88e5; -fx-font-weight: bold;");

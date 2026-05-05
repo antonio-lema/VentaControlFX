@@ -4,6 +4,7 @@ import com.mycompany.ventacontrolfx.domain.model.Client;
 import com.mycompany.ventacontrolfx.application.usecase.ClientUseCase;
 import com.mycompany.ventacontrolfx.infrastructure.config.Injectable;
 import com.mycompany.ventacontrolfx.infrastructure.config.ServiceContainer;
+import com.mycompany.ventacontrolfx.component.SkeletonClientBox;
 import com.mycompany.ventacontrolfx.util.AlertUtil;
 import com.mycompany.ventacontrolfx.util.ModalService;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
@@ -63,13 +64,29 @@ public class ClientsController implements Injectable, com.mycompany.ventacontrol
     }
 
     private void loadClients() {
-        try {
-            java.util.List<Client> clients = clientUseCase.getAllClients();
-            displayClients(clients);
-        } catch (SQLException e) {
-            AlertUtil.showError(container.getBundle().getString("alert.error"),
-                    container.getBundle().getString("client.error.load"));
+        if (clientsListContainer == null) return;
+        
+        // Mostrar esqueletos
+        clientsListContainer.getChildren().clear();
+        for (int i = 0; i < 8; i++) {
+            clientsListContainer.getChildren().add(new SkeletonClientBox());
         }
+        
+        container.getAsyncManager().runAsyncTask(() -> {
+            try {
+                return clientUseCase.getAllClients();
+            } catch (SQLException e) {
+                return null;
+            }
+        }, (clients) -> {
+            if (clients != null) {
+                displayClients((java.util.List<Client>) clients);
+            } else {
+                AlertUtil.showError(container.getBundle().getString("alert.error"),
+                        container.getBundle().getString("client.error.load"));
+                clientsListContainer.getChildren().clear();
+            }
+        }, null);
     }
 
     @Override
@@ -157,18 +174,36 @@ public class ClientsController implements Injectable, com.mycompany.ventacontrol
             }
         });
 
-        // Botón Eliminar Circular (Premium)
-        Button btnDelete = new Button();
-        btnDelete.getStyleClass().add("btn-action-delete");
-        FontAwesomeIconView trashIcon = new FontAwesomeIconView(FontAwesomeIcon.TRASH_ALT);
-        trashIcon.setSize("16");
-        btnDelete.setGraphic(trashIcon);
-        btnDelete.setOnAction(e -> {
-            e.consume();
-            handleDelete(client);
-        });
+        // Botón Eliminar / Desbloquear según permisos
+        Button btnAction = new Button();
+        boolean canDelete = container.getUserSession().hasPermission("cliente.eliminar");
+        
+        if (canDelete) {
+            btnAction.getStyleClass().add("btn-action-delete");
+            FontAwesomeIconView trashIcon = new FontAwesomeIconView(FontAwesomeIcon.TRASH_ALT);
+            trashIcon.setSize("16");
+            btnAction.setGraphic(trashIcon);
+            btnAction.setTooltip(new Tooltip(container.getBundle().getString("client.btn.delete")));
+            btnAction.setOnAction(e -> {
+                e.consume();
+                handleDelete(client);
+            });
+        } else {
+            btnAction.getStyleClass().add("btn-action-lock");
+            btnAction.setStyle("-fx-background-color: #f59e0b; -fx-text-fill: white; -fx-background-radius: 50;");
+            FontAwesomeIconView lockIcon = new FontAwesomeIconView(FontAwesomeIcon.LOCK);
+            lockIcon.setSize("16");
+            lockIcon.setFill(Color.WHITE);
+            btnAction.setGraphic(lockIcon);
+            btnAction.setTooltip(new Tooltip(container.getBundle().getString("client.btn.unlock")));
+            btnAction.setOnAction(e -> {
+                e.consume();
+                AlertUtil.showWarning(container.getBundle().getString("alert.locked"),
+                        container.getBundle().getString("client.msg.locked_action"));
+            });
+        }
 
-        actionButtons.getChildren().addAll(btnEdit, btnDelete);
+        actionButtons.getChildren().addAll(btnEdit, btnAction);
         footer.getChildren().addAll(cityLabel, spacer, actionButtons);
 
         card.getChildren().addAll(header, info, footer);

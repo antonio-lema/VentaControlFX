@@ -104,7 +104,7 @@
         <Label fx:id="lblGeneralObservation" wrapText="true" style="-fx-font-size: 12px; -fx-font-style: italic; -fx-text-fill: -fx-text-custom-muted;"/>
     </VBox>
     <!-- Promo Code Section -->
-    <HBox spacing="10" alignment="CENTER_LEFT" styleClass="cart-promo-section" style="-fx-padding: 8 15; -fx-background-color: -fx-custom-color-bg-secondary; -fx-border-color: #eee; -fx-border-width: 1 0 1 0;">
+    <HBox spacing="10" alignment="CENTER_LEFT" styleClass="cart-promo-section" style="-fx-padding: 8px 15px; -fx-background-color: -fx-custom-color-bg-secondary; -fx-border-color: #eeeeee; -fx-border-width: 1px 0px 1px 0px;">
         <StackPane styleClass="icon-container-small" style="-fx-background-color: #f0fdf4;">
             <FontAwesomeIconView glyphName="TICKET" size="14" fill="#166534"/>
         </StackPane>

@@ -233,9 +233,9 @@ public class SaleUseCase {
         String finalRewardCode = null;
         if (finalTotalPayable >= 5.0) {
             finalRewardCode = generateRandomCode();
-            System.out.println("**************************************************");
-            System.out.println("[SALE_PROCESS] CODIGO GENERADO: " + finalRewardCode);
-            System.out.println("**************************************************");
+            // System.out.println("**************************************************");
+            // System.out.println("[SALE_PROCESS] CODIGO GENERADO: " + finalRewardCode);
+            // System.out.println("**************************************************");
         }
 
         Sale sale = new Sale();

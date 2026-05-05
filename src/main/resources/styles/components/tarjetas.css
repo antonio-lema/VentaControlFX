@@ -8,10 +8,10 @@
 /* ─── Card contenedor ──────────────────────────────────── */
 .product-box {
     -fx-background-color: -fx-bg-surface;
-    -fx-background-radius: -fx-radius-lg;
+    -fx-background-radius: 16px;
     -fx-border-color: -fx-color-border-main;
-    -fx-border-width: -fx-card-border-width;
-    -fx-border-radius: -fx-radius-lg;
+    -fx-border-width: 1px;
+    -fx-border-radius: 16px;
     -fx-padding: 0px;
     -fx-cursor: hand;
     -fx-effect: -fx-card-shadow;
@@ -199,61 +199,61 @@
 /* ════════ SKELTON SCREEN (LOADING PLACEHOLDERS) ════════ */
 
 .skeleton-box {
-    -fx-background-color: white;
-    -fx-background-radius: 20px;
-    -fx-border-color: #f1f5f9;
+    -fx-background-color: -fx-bg-surface;
+    -fx-background-radius: 24px;
+    -fx-border-color: -fx-color-border-subtle;
     -fx-border-width: 1px;
-    -fx-border-radius: 20px;
+    -fx-border-radius: 24px;
     -fx-padding: 0px;
 }
 
 .skeleton-image-container {
-    -fx-background-color: #f8fafc;
-    -fx-background-radius: 20px 20px 0px 0px;
+    -fx-background-color: #e2e8f0;
+    -fx-background-radius: 24px 24px 0px 0px;
 }
 
 .skeleton-image-filler {
-    -fx-background-color: #f1f5f9;
+    -fx-background-color: #cbd5e1;
     -fx-background-radius: 12px;
 }
 
 .skeleton-price-badge {
-    -fx-background-color: #e2e8f0;
-    -fx-background-radius: 8px;
-    -fx-min-width: 50px;
-    -fx-pref-width: 50px;
-    -fx-min-height: 20px;
+    -fx-background-color: #94a3b8;
+    -fx-background-radius: 20px;
+    -fx-min-width: 54px;
+    -fx-pref-width: 54px;
+    -fx-min-height: 24px;
 }
 
 .skeleton-text {
-    -fx-background-color: #f1f5f9;
-    -fx-background-radius: 4px;
+    -fx-background-color: #cbd5e1;
+    -fx-background-radius: 6px;
 }
 
 .skeleton-title {
     -fx-min-height: 14px;
-    -fx-pref-width: 150px;
-    -fx-max-width: 150px;
+    -fx-pref-width: 185px;
+    -fx-max-width: 185px;
 }
 
 .skeleton-subtitle {
     -fx-min-height: 10px;
-    -fx-pref-width: 100px;
-    -fx-max-width: 100px;
-    -fx-background-color: #f8fafc;
+    -fx-pref-width: 155px;
+    -fx-max-width: 155px;
+    -fx-background-color: #e2e8f0;
 }
 
 .skeleton-stock {
     -fx-min-height: 10px;
-    -fx-pref-width: 60px;
-    -fx-max-width: 60px;
-    -fx-background-color: #f8fafc;
+    -fx-pref-width: 110px;
+    -fx-max-width: 110px;
+    -fx-background-color: #e2e8f0;
 }
 
 .skeleton-button {
-    -fx-background-color: #f1f5f9;
-    -fx-min-height: 44px;
-    -fx-background-radius: 0px 0px 20px 20px;
+    -fx-background-color: #e2e8f0;
+    -fx-min-height: 48px;
+    -fx-background-radius: 0px 0px 24px 24px;
 }
 
 /* Base Pulse Animation Class */

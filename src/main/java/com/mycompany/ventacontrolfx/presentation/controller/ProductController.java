@@ -316,23 +316,29 @@ public class ProductController implements Injectable, com.mycompany.ventacontrol
                 editIcon.setSize("16");
                 btnEdit.setGraphic(editIcon);
 
-                // Botón Eliminar Circular (Premium)
-                btnDelete.getStyleClass().add("btn-action-delete");
-                FontAwesomeIconView trashIcon = new FontAwesomeIconView(FontAwesomeIcon.TRASH_ALT);
-                trashIcon.setSize("16");
-                btnDelete.setGraphic(trashIcon);
+                boolean canDelete = container.getUserSession().hasPermission("producto.eliminar");
+                if (canDelete) {
+                    btnDelete.getStyleClass().add("btn-action-delete");
+                    FontAwesomeIconView trashIcon = new FontAwesomeIconView(FontAwesomeIcon.TRASH_ALT);
+                    trashIcon.setSize("16");
+                    btnDelete.setGraphic(trashIcon);
+                    btnDelete.setTooltip(new Tooltip(container.getBundle().getString("btn.delete")));
+                    btnDelete.setOnAction(e -> handleDeleteProduct(getTableRow().getItem()));
+                } else {
+                    btnDelete.getStyleClass().add("btn-action-lock");
+                    btnDelete.setStyle("-fx-background-color: #f59e0b; -fx-text-fill: white; -fx-background-radius: 4;");
+                    FontAwesomeIconView lockIcon = new FontAwesomeIconView(FontAwesomeIcon.LOCK);
+                    lockIcon.setSize("16");
+                    lockIcon.setFill(Color.WHITE);
+                    btnDelete.setGraphic(lockIcon);
+                    btnDelete.setTooltip(new Tooltip(container.getBundle().getString("btn.unlock")));
+                    btnDelete.setOnAction(e -> AlertUtil.showWarning(container.getBundle().getString("alert.locked"),
+                            container.getBundle().getString("product.msg.locked_action")));
+                }
 
                 btnEdit.setOnAction(e -> {
                     if (container.getUserSession().hasPermission("producto.editar")) {
                         openProductDialog(getTableRow().getItem());
-                    } else {
-                        AlertUtil.showError(container.getBundle().getString("alert.access_denied"),
-                                container.getBundle().getString("error.no_permission"));
-                    }
-                });
-                btnDelete.setOnAction(e -> {
-                    if (container.getUserSession().hasPermission("producto.eliminar")) {
-                        handleDeleteProduct(getTableRow().getItem());
                     } else {
                         AlertUtil.showError(container.getBundle().getString("alert.access_denied"),
                                 container.getBundle().getString("error.no_permission"));
@@ -346,8 +352,6 @@ public class ProductController implements Injectable, com.mycompany.ventacontrol
                 if (empty || getTableRow() == null || getTableRow().getItem() == null) {
                     setGraphic(null);
                 } else {
-                    btnEdit.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.PENCIL, "16"));
-                    btnDelete.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.TRASH, "16"));
                     setGraphic(pane);
                 }
             }

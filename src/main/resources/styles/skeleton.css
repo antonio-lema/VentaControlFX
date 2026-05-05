@@ -1,53 +1,53 @@
 /* Skeleton Premium Design */
 .skeleton-box {
     -fx-background-color: -fx-bg-surface;
-    -fx-background-radius: -fx-radius-lg;
+    -fx-background-radius: 16px;
     -fx-border-color: -fx-color-border-subtle;
-    -fx-border-width: 1;
-    -fx-border-radius: -fx-radius-lg;
+    -fx-border-width: 1px;
+    -fx-border-radius: 16px;
 }
 
 .skeleton-image-container {
-    -fx-background-color: -bg-subtle;
-    -fx-background-radius: -fx-radius-lg -fx-radius-lg 0 0;
+    -fx-background-color: #e2e8f0;
+    -fx-background-radius: 24px 24px 0px 0px;
 }
 
 .skeleton-image-filler {
-    -fx-background-color: #e0e0e0;
-    -fx-background-radius: -fx-radius-md;
+    -fx-background-color: #cbd5e1;
+    -fx-background-radius: 12px;
 }
 
 .skeleton-price-badge {
-    -fx-background-color: #d0d0d0;
-    -fx-background-radius: 20;
-    -fx-pref-width: 50;
-    -fx-pref-height: 22;
+    -fx-background-color: #94a3b8;
+    -fx-background-radius: 20px;
+    -fx-pref-width: 54px;
+    -fx-pref-height: 24px;
 }
 
 .skeleton-text {
-    -fx-background-color: #d0d0d0;
-    -fx-background-radius: 4;
+    -fx-background-color: #cbd5e1;
+    -fx-background-radius: 6px;
 }
 
 .skeleton-title {
-    -fx-pref-width: 120;
-    -fx-pref-height: 14;
+    -fx-pref-width: 120px;
+    -fx-pref-height: 14px;
 }
 
 .skeleton-subtitle {
-    -fx-pref-width: 80;
-    -fx-pref-height: 10;
+    -fx-pref-width: 80px;
+    -fx-pref-height: 10px;
 }
 
 .skeleton-stock {
-    -fx-pref-width: 60;
-    -fx-pref-height: 10;
+    -fx-pref-width: 60px;
+    -fx-pref-height: 10px;
 }
 
 .skeleton-button {
-    -fx-background-color: -bg-subtle;
-    -fx-background-radius: 0 0 -fx-radius-lg -fx-radius-lg;
-    -fx-pref-height: 36;
+    -fx-background-color: #e2e8f0;
+    -fx-background-radius: 0px 0px 24px 24px;
+    -fx-pref-height: 40px;
 }
 
 /* Pulse is handled in Java for compatibility */

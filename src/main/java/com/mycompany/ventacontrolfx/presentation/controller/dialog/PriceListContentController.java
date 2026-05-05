@@ -4,6 +4,7 @@ import com.mycompany.ventacontrolfx.domain.dto.PriceHistoryEventDTO;
 import com.mycompany.ventacontrolfx.domain.dto.PriceUpdateLogDTO;
 import com.mycompany.ventacontrolfx.domain.dto.ProductPriceDTO;
 import com.mycompany.ventacontrolfx.domain.model.PriceList;
+import com.mycompany.ventacontrolfx.domain.repository.IPriceHistoryRepository;
 import com.mycompany.ventacontrolfx.domain.repository.IPriceRepository;
 import com.mycompany.ventacontrolfx.infrastructure.config.Injectable;
 import com.mycompany.ventacontrolfx.infrastructure.config.ServiceContainer;
@@ -69,6 +70,7 @@ public class PriceListContentController implements Injectable {
     private ToggleButton tglFilterHoy, tglFilter7d, tglFilter1m, tglFilterTodo;
 
     private IPriceRepository priceRepository;
+    private IPriceHistoryRepository historyRepository;
     private AsyncManager asyncManager;
     private ServiceContainer container;
     private PriceList currentList;
@@ -81,6 +83,7 @@ public class PriceListContentController implements Injectable {
     public void inject(ServiceContainer container) {
         this.container = container;
         this.priceRepository = container.getPriceRepository();
+        this.historyRepository = container.getService(IPriceHistoryRepository.class); // Or getPriceHistoryRepository if it exists
         this.asyncManager = container.getAsyncManager();
     }
 
@@ -91,12 +94,17 @@ public class PriceListContentController implements Injectable {
         paginationHelper = new ServerPaginationHelper<>(tablePrices, null, lblCount, pagination, "productos",
                 this::fetchPricesPage);
 
-        // Load initial data for tabs
-        tabPane.getSelectionModel().selectedItemProperty().addListener((obs, oldTab, newTab) -> {
-            if (newTab != null && newTab.getText().contains("Historial")) {
-                loadHistory();
-            }
-        });
+        // Permission check for History Tab
+        if (!container.getUserSession().hasPermission("admin.precios_historial")) {
+            tabPane.getTabs().removeIf(tab -> tab.getText().contains("Historial"));
+        } else {
+            // Load initial data for tabs
+            tabPane.getSelectionModel().selectedItemProperty().addListener((obs, oldTab, newTab) -> {
+                if (newTab != null && newTab.getText().contains("Historial")) {
+                    loadHistory();
+                }
+            });
+        }
 
         DateFilterUtils.addQuickFilters(quickFilterContainer, (label) -> {
             switch (label) {
@@ -238,8 +246,8 @@ public class PriceListContentController implements Injectable {
 
     private void loadHistory() {
         asyncManager.runAsyncTask(() -> {
-            List<PriceUpdateLogDTO> bulkLogs = priceRepository.findBulkUpdateLog(currentList.getId());
-            List<ProductPriceDTO> priceHistory = priceRepository.findAllPriceHistory(currentList.getId());
+            List<PriceUpdateLogDTO> bulkLogs = historyRepository.findBulkUpdateLog(currentList.getId());
+            List<ProductPriceDTO> priceHistory = historyRepository.findAllPriceHistory(currentList.getId());
 
             List<PriceHistoryEventDTO> events = new ArrayList<>();
 

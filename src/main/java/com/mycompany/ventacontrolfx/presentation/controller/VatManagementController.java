@@ -1,7 +1,6 @@
 package com.mycompany.ventacontrolfx.presentation.controller;
 
 import com.mycompany.ventacontrolfx.application.usecase.PriceListUseCase;
-import com.mycompany.ventacontrolfx.application.usecase.MassivePriceUpdateUseCase;
 import com.mycompany.ventacontrolfx.domain.model.VisibilityFilter;
 import com.mycompany.ventacontrolfx.application.usecase.TaxManagementUseCase;
 import com.mycompany.ventacontrolfx.domain.model.Category;
@@ -41,6 +40,7 @@ import java.util.stream.Collectors;
 
 import com.mycompany.ventacontrolfx.infrastructure.config.Injectable;
 import com.mycompany.ventacontrolfx.infrastructure.config.ServiceContainer;
+import com.mycompany.ventacontrolfx.application.service.PriceUpdateService;
 
 /**
  * Controlador de la pantalla de Gesti\u00f3n de IVA y Subida Masiva de Precios.
@@ -53,6 +53,10 @@ import com.mycompany.ventacontrolfx.infrastructure.config.ServiceContainer;
  * 5. Favoritos
  */
 public class VatManagementController implements Injectable {
+    @FXML
+    private TabPane mainTabPane;
+    @FXML
+    private Tab tabCurrentConfig, tabMassUpdate, tabCatalog, tabHistory;
 
     private ServiceContainer container;
 
@@ -235,7 +239,6 @@ public class VatManagementController implements Injectable {
 
     // \u00e2\u201d\u20ac\u00e2\u201d\u20ac Servicios
     // \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u2500
-    private MassivePriceUpdateUseCase priceUpdateUseCase;
     private ICategoryRepository categoryRepository;
     private ITaxRepository taxRepository;
     private IProductRepository productRepository;
@@ -243,6 +246,7 @@ public class VatManagementController implements Injectable {
     private IPriceUpdateLogRepository priceLogRepository;
     private TaxManagementUseCase taxManagementUseCase;
     private AsyncManager asyncManager;
+    private PriceUpdateService priceUpdateService;
 
     private ObservableList<com.mycompany.ventacontrolfx.domain.model.Product> selectedProducts = FXCollections
             .observableArrayList();
@@ -353,14 +357,26 @@ public class VatManagementController implements Injectable {
 
     private void postInject() {
         if (container != null) {
+            // Permission check for Tabs
+            if (!container.getUserSession().hasPermission("admin.precios_masivo")) {
+                mainTabPane.getTabs().remove(tabMassUpdate);
+            }
+            if (!container.getUserSession().hasPermission("admin.iva")) {
+                mainTabPane.getTabs().remove(tabCatalog);
+                mainTabPane.getTabs().remove(tabCurrentConfig);
+            }
+            if (!container.getUserSession().hasPermission("admin.precios_historial") && !container.getUserSession().hasPermission("admin.iva")) {
+                 mainTabPane.getTabs().remove(tabHistory);
+            }
+
             this.priceListUseCase = container.getPriceListUseCase();
-            this.priceUpdateUseCase = container.getMassivePriceUpdateUseCase();
             this.categoryRepository = container.getCategoryUseCase().getRepository();
             this.taxRepository = container.getTaxRepository();
             this.priceLogRepository = container.getPriceLogRepository();
             this.taxManagementUseCase = container.getTaxManagementUseCase();
             this.productRepository = container.getProductRepository();
             this.asyncManager = container.getAsyncManager();
+            this.priceUpdateService = container.getPriceUpdateService();
 
             setupTaxGroupComboBoxes();
             fetchInitialDataAsync(() -> {
@@ -1042,24 +1058,33 @@ public class VatManagementController implements Injectable {
                 default -> null;
             };
 
+            PriceUpdateService.Request req = new PriceUpdateService.Request();
+            req.priceListId = priceListId;
+            req.value = value;
+            req.reason = reason;
+            req.startDate = startDate;
+            req.operation = switch (opType) {
+                case OP_PERCENTAGE -> PriceUpdateService.Operation.PERCENTAGE;
+                case OP_FIXED -> PriceUpdateService.Operation.FIXED;
+                case OP_ROUNDING -> PriceUpdateService.Operation.ROUNDING;
+                default -> throw new BusinessException("Tipo de operación no reconocido.");
+            };
+            req.grouping = switch (grouping) {
+                case GROUP_ALL -> PriceUpdateService.Grouping.ALL;
+                case GROUP_CATEGORY -> PriceUpdateService.Grouping.CATEGORY;
+                case GROUP_PRODUCTS -> PriceUpdateService.Grouping.PRODUCTS;
+                case GROUP_CLONE -> PriceUpdateService.Grouping.CLONE;
+                case GROUP_TOP -> PriceUpdateService.Grouping.TOP;
+                case GROUP_BOTTOM -> PriceUpdateService.Grouping.BOTTOM;
+                case GROUP_SLOW -> PriceUpdateService.Grouping.SLOW;
+                case GROUP_RANGE -> PriceUpdateService.Grouping.RANGE;
+                case GROUP_FAVORITES -> PriceUpdateService.Grouping.FAVORITES;
+                default -> throw new BusinessException("Agrupación no reconocida.");
+            };
+            req.extra = extra;
+
             asyncManager.runAsyncTask(() -> {
-                if (GROUP_CLONE.equals(finalGrouping)) {
-                    PriceList source = (PriceList) extra;
-                    if (source == null)
-                        throw new BusinessException("No se seleccion\u00f3 tarifa de origen.");
-                    priceUpdateUseCase.cloneAndAdjustPrices(source.getId(), priceListId, finalValue, finalReason,
-                            startDate);
-                    return -1;
-                } else if (OP_PERCENTAGE.equals(finalOpType)) {
-                    return applyByGroupingPercentage(priceListId, finalGrouping, finalValue, finalReason, startDate,
-                            extra);
-                } else if (OP_FIXED.equals(finalOpType)) {
-                    return applyByGroupingFixed(priceListId, finalGrouping, finalValue, finalReason, startDate, extra);
-                } else if (OP_ROUNDING.equals(finalOpType)) {
-                    return applyByGroupingRounding(priceListId, finalGrouping, finalValue, finalReason, startDate,
-                            extra);
-                }
-                throw new BusinessException("Tipo de operaci\u00f3n no reconocido.");
+                return priceUpdateService.execute(req);
             }, (res) -> {
                 int count = (int) res;
                 AlertUtil.showInfo(container.getBundle().getString("alert.success"),
@@ -1070,7 +1095,7 @@ public class VatManagementController implements Injectable {
                 clearPriceFields();
                 refreshPriceLog();
             }, (err) -> {
-                showError("Error al aplicar actualizaci\u00f3n: " + err.getMessage());
+                showError("Error al aplicar actualización: " + err.getMessage());
             });
 
         } catch (NumberFormatException e) {
@@ -1080,138 +1105,6 @@ public class VatManagementController implements Injectable {
         }
     }
 
-    /** Aplica un porcentaje seg\u00fan la agrupaci\u00f3n seleccionada. */
-    private int applyByGroupingPercentage(int priceListId, String grouping, double pct, String reason,
-            java.time.LocalDateTime startDate, Object extra)
-            throws Exception {
-        return switch (grouping) {
-            case GROUP_ALL -> priceUpdateUseCase.applyPercentageIncreaseToAll(priceListId, pct, reason, startDate);
-            case GROUP_CATEGORY -> {
-                Integer catId = (Integer) extra;
-                yield catId != null
-                        ? priceUpdateUseCase.applyPercentageIncreaseToCategory(priceListId, catId, pct,
-                                reason, startDate)
-                        : priceUpdateUseCase.applyPercentageIncreaseToAll(priceListId, pct, reason, startDate);
-            }
-            case GROUP_PRODUCTS -> {
-                @SuppressWarnings("unchecked")
-                List<Integer> ids = (List<Integer>) extra;
-                if (ids == null || ids.isEmpty())
-                    throw new BusinessException("No se han seleccionado productos.");
-                yield priceUpdateUseCase.applyPercentageIncreaseToProducts(priceListId, ids, pct, reason, startDate);
-            }
-            case GROUP_TOP -> {
-                int[] params = (int[]) extra;
-                yield priceUpdateUseCase.applyToTopSellers(priceListId, params[0], params[1], pct, reason, true,
-                        startDate);
-            }
-            case GROUP_BOTTOM -> {
-                int[] params = (int[]) extra;
-                yield priceUpdateUseCase.applyToBottomSellers(priceListId, params[0], params[1], pct, reason,
-                        true, startDate);
-            }
-            case GROUP_SLOW -> {
-                int slowDays = (int) extra;
-                yield priceUpdateUseCase.applyToSlowMovers(priceListId, slowDays, pct, reason, true, startDate);
-            }
-            case GROUP_RANGE -> {
-                double[] range = (double[]) extra;
-                yield priceUpdateUseCase.applyToPriceRange(priceListId, range[0], range[1], pct, reason, true,
-                        startDate);
-            }
-            case GROUP_FAVORITES -> priceUpdateUseCase.applyToFavorites(priceListId, pct, reason, true, startDate);
-            default -> throw new IllegalStateException("Agrupaci\u00f3n no reconocida: " + grouping);
-        };
-    }
-
-    /** Aplica importe fijo seg\u00fan la agrupaci\u00f3n seleccionada. */
-    private int applyByGroupingFixed(int priceListId, String grouping, double amount, String reason,
-            java.time.LocalDateTime startDate, Object extra) throws Exception {
-        return switch (grouping) {
-            case GROUP_ALL ->
-                priceUpdateUseCase.applyFixedAmountIncreaseToAll(priceListId, amount, reason, startDate);
-            case GROUP_CATEGORY -> {
-                Integer catId = (Integer) extra;
-                yield catId != null
-                        ? priceUpdateUseCase.applyFixedAmountIncreaseToCategory(priceListId, catId, amount,
-                                reason, startDate)
-                        : priceUpdateUseCase.applyFixedAmountIncreaseToAll(priceListId, amount, reason, startDate);
-            }
-            case GROUP_PRODUCTS -> {
-                @SuppressWarnings("unchecked")
-                List<Integer> ids = (List<Integer>) extra;
-                if (ids == null || ids.isEmpty())
-                    throw new BusinessException("No se han seleccionado productos.");
-                yield priceUpdateUseCase.applyFixedAmountIncreaseToProducts(priceListId, ids, amount, reason,
-                        startDate);
-            }
-            case GROUP_TOP -> {
-                int[] params = (int[]) extra;
-                yield priceUpdateUseCase.applyToTopSellers(priceListId, params[0], params[1], amount, reason, false,
-                        startDate);
-            }
-            case GROUP_BOTTOM -> {
-                int[] params = (int[]) extra;
-                yield priceUpdateUseCase.applyToBottomSellers(priceListId, params[0], params[1], amount,
-                        reason, false, startDate);
-            }
-            case GROUP_SLOW -> {
-                int slowDays = (int) extra;
-                yield priceUpdateUseCase.applyToSlowMovers(priceListId, slowDays, amount, reason, false, startDate);
-            }
-            case GROUP_RANGE -> {
-                double[] range = (double[]) extra;
-                yield priceUpdateUseCase.applyToPriceRange(priceListId, range[0], range[1], amount, reason, false,
-                        startDate);
-            }
-            case GROUP_FAVORITES -> priceUpdateUseCase.applyToFavorites(priceListId, amount, reason, false, startDate);
-            default -> throw new IllegalStateException("Agrupaci\u00f3n no reconocida: " + grouping);
-        };
-    }
-
-    /** Aplica redondeo seg\u00fan la agrupaci\u00f3n seleccionada. */
-    private int applyByGroupingRounding(int priceListId, String grouping, double target, String reason,
-            java.time.LocalDateTime startDate, Object extra)
-            throws Exception {
-        return switch (grouping) {
-            case GROUP_ALL -> priceUpdateUseCase.applyRoundingToAll(priceListId, target, reason, startDate);
-            case GROUP_CATEGORY -> {
-                Integer catId = (Integer) extra;
-                yield catId != null
-                        ? priceUpdateUseCase.applyRoundingToCategory(priceListId, catId, target, reason, startDate)
-                        : priceUpdateUseCase.applyRoundingToAll(priceListId, target, reason, startDate);
-            }
-            case GROUP_PRODUCTS -> {
-                @SuppressWarnings("unchecked")
-                List<Integer> ids = (List<Integer>) extra;
-                if (ids == null || ids.isEmpty())
-                    throw new BusinessException("No se han seleccionado productos.");
-                yield priceUpdateUseCase.applyRoundingToProducts(priceListId, ids, target, reason, startDate);
-            }
-            case GROUP_TOP -> {
-                int[] params = (int[]) extra;
-                yield priceUpdateUseCase.applyRoundingToTopSellers(priceListId, params[0], params[1], target, reason,
-                        startDate);
-            }
-            case GROUP_BOTTOM -> {
-                int[] params = (int[]) extra;
-                yield priceUpdateUseCase.applyRoundingToBottomSellers(priceListId, params[0], params[1], target,
-                        reason, startDate);
-            }
-            case GROUP_SLOW -> {
-                int slowDays = (int) extra;
-                yield priceUpdateUseCase.applyRoundingToSlowMovers(priceListId, slowDays, target, reason, startDate);
-            }
-            case GROUP_RANGE -> {
-                double[] range = (double[]) extra;
-                yield priceUpdateUseCase.applyRoundingToPriceRange(priceListId, range[0], range[1], target, reason,
-                        startDate);
-            }
-            case GROUP_FAVORITES -> priceUpdateUseCase.applyRoundingToFavorites(priceListId, target, reason, startDate);
-            default -> throw new UnsupportedOperationException(
-                    container.getBundle().getString("vat.price.update.error.apply") + ": " + grouping);
-        };
-    }
 
     /** Devuelve el categoryId seleccionado o null si se eligi\u00f3 "Todas". */
     private Integer getCategoryIdFromPanel() {

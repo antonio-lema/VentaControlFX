@@ -70,12 +70,31 @@ public class CashClosureController implements Injectable {
                 btnRegisterCashEntry.setManaged(canEnterCash);
             }
 
+            // Verificaci\u00f3n de permisos para Retirada
+            boolean canWithdrawCash = userSession.hasPermission("caja.retirada");
+            if (btnWithdrawCash != null) {
+                btnWithdrawCash.setVisible(canWithdrawCash);
+                btnWithdrawCash.setManaged(canWithdrawCash);
+            }
+
+            // Verificaci\u00f3n de permisos para Apertura y Cierre
+            boolean canOpenFund = userSession.hasPermission("caja.abrir");
+            if (btnOpenFund != null) {
+                btnOpenFund.setVisible(canOpenFund);
+                btnOpenFund.setManaged(canOpenFund);
+            }
+
+            boolean canCloseCash = userSession.hasPermission("caja.cerrar");
+            if (btnPerformClosure != null) {
+                btnPerformClosure.setVisible(canCloseCash);
+                btnPerformClosure.setManaged(canCloseCash);
+            }
+
             // Verificaci\u00f3n de permisos para ver totales financieros
             boolean canSeeTotals = userSession.hasPermission("caja.ver_totales")
                     || userSession.hasPermission("USUARIOS");
             if (cardCash != null) {
-                boolean canOperateCash = userSession.hasPermission("caja.abrir")
-                        || userSession.hasPermission("caja.cerrar");
+                boolean canOperateCash = canOpenFund || canCloseCash;
                 cardCash.setVisible(canSeeTotals || canOperateCash);
                 cardCash.setManaged(canSeeTotals || canOperateCash);
 
@@ -214,12 +233,14 @@ public class CashClosureController implements Injectable {
 
                 btnOpenFund.setDisable(true);
                 btnOpenFund.setText("\u2705 " + container.getBundle().getString("closure.status.open"));
-                btnWithdrawCash.setDisable(false);
+                
+                // Habilitar solo si tiene permiso Y hay sesi\u00f3n
+                btnWithdrawCash.setDisable(!userSession.hasPermission("caja.retirada"));
                 if (btnRegisterCashEntry != null)
-                    btnRegisterCashEntry.setDisable(false);
+                    btnRegisterCashEntry.setDisable(!userSession.hasPermission("caja.ingresar"));
 
-                // Asegurar que el bot\u00f3n de cierre est\u00e9 habilitado si hay sesi\u00f3n activa
-                btnPerformClosure.setDisable(false);
+                // Asegurar que el bot\u00f3n de cierre est\u00e9 habilitado si hay sesi\u00f3n activa Y tiene permiso
+                btnPerformClosure.setDisable(!userSession.hasPermission("caja.cerrar"));
                 btnPerformClosure.setText(container.getBundle().getString("closure.btn.perform"));
                 lblStatus.setText(container.getBundle().getString("closure.status.in_progress") + " \u23f3");
                 lblStatus.getStyleClass().removeAll("closure-status-done");
@@ -229,7 +250,7 @@ public class CashClosureController implements Injectable {
                 lblActiveFund.setStyle("-fx-text-fill: -color-warning; -fx-font-weight: bold;");
                 lblCashInDrawer.setText("\ud83c\udfe6 " + container.getBundle().getString("closure.no_session"));
                 lblCashInDrawer.setStyle("-fx-text-fill: -text-muted; -fx-font-size: 22px;");
-                btnOpenFund.setDisable(false);
+                btnOpenFund.setDisable(!userSession.hasPermission("caja.abrir"));
                 btnOpenFund.setText("\ud83d\udcbc " + container.getBundle().getString("closure.btn.open_fund"));
                 btnWithdrawCash.setDisable(true);
                 if (btnRegisterCashEntry != null)

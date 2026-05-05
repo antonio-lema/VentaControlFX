@@ -7,7 +7,7 @@
     -fx-background-radius: -fx-layout-radius;
     -fx-border-radius: -fx-layout-radius;
     -fx-border-color: -fx-color-border-main;
-    -fx-border-width: -fx-card-border-width;
+    -fx-border-width: 1px;
     -fx-effect: -fx-card-shadow;
 }
 
@@ -52,7 +52,7 @@
 .btn-change-pricelist {
     -fx-background-color: -fx-bg-surface;
     -fx-background-radius: -fx-radius-md;
-    -fx-padding: 6;
+    -fx-padding: 6px;
     -fx-cursor: hand;
     -fx-border-color: -fx-color-border-subtle;
     -fx-border-width: 1;
@@ -568,11 +568,11 @@
 .cart-observation-box {
     -fx-background-color: #f0f7ff;
     /* Soft blue background */
-    -fx-background-radius: -fx-radius-md;
+    -fx-background-radius: 8px;
     -fx-border-color: #bbdefb;
-    -fx-border-width: 1;
-    -fx-border-radius: -fx-radius-md;
-    -fx-padding: 10 12;
+    -fx-border-width: 1px;
+    -fx-border-radius: 8px;
+    -fx-padding: 10px 12px;
     -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.05), 5, 0, 0, 1);
 }
 

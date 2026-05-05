@@ -1,6 +1,7 @@
 package com.mycompany.ventacontrolfx.application.usecase;
 
 import com.mycompany.ventacontrolfx.domain.exception.BusinessException;
+import com.mycompany.ventacontrolfx.domain.repository.IMassivePriceUpdateRepository;
 import com.mycompany.ventacontrolfx.domain.repository.IPriceRepository;
 import com.mycompany.ventacontrolfx.domain.repository.IProductRepository;
 import com.mycompany.ventacontrolfx.domain.repository.IPriceUpdateLogRepository;
@@ -20,11 +21,11 @@ import java.sql.SQLException;
  */
 public class MassivePriceUpdateUseCase {
 
-    private final IPriceRepository priceRepository;
+    private final IMassivePriceUpdateRepository priceRepository;
     private final IProductRepository productRepository;
     private final IPriceUpdateLogRepository priceLogRepository;
 
-    public MassivePriceUpdateUseCase(IPriceRepository priceRepository,
+    public MassivePriceUpdateUseCase(IMassivePriceUpdateRepository priceRepository,
             IProductRepository productRepository,
             IPriceUpdateLogRepository priceLogRepository) {
         this.priceRepository = priceRepository;

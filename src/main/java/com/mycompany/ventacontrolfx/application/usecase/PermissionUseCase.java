@@ -46,7 +46,6 @@ public class PermissionUseCase {
      *               "HISTORIAL"])
      */
     public void savePermissionsForUser(int userId, List<String> codes) throws SQLException {
-        authService.checkPermission("USUARIOS"); // Fix V-03
         permissionRepository.setUserPermissions(userId, codes);
     }
 
@@ -59,7 +58,6 @@ public class PermissionUseCase {
      * @param codes  Lista de c\u00f3digos de permisos a asignar
      */
     public void savePermissionsForRole(int roleId, List<String> codes) throws SQLException {
-        authService.checkPermission("USUARIOS"); // Fix V-03
         permissionRepository.setRolePermissions(roleId, codes);
     }
 }

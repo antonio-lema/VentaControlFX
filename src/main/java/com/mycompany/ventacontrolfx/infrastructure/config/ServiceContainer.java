@@ -11,6 +11,7 @@ import com.mycompany.ventacontrolfx.shared.async.AsyncManager;
 import com.mycompany.ventacontrolfx.util.UserSession;
 import com.mycompany.ventacontrolfx.util.AuthorizationService;
 import com.mycompany.ventacontrolfx.infrastructure.navigation.NavigationService;
+import com.mycompany.ventacontrolfx.application.service.PriceUpdateService;
 import com.mycompany.ventacontrolfx.application.service.PromotionEngine;
 import com.mycompany.ventacontrolfx.application.service.PromotionService;
 import com.mycompany.ventacontrolfx.application.service.RefundCalculatorService;
@@ -20,8 +21,6 @@ import java.util.concurrent.TimeUnit;
 import com.mycompany.ventacontrolfx.infrastructure.aeat.VerifactuOutboxManager;
 import com.mycompany.ventacontrolfx.infrastructure.aeat.AeatHttpClient;
 import com.mycompany.ventacontrolfx.infrastructure.aeat.VerifactuXmlBuilder;
-import java.util.concurrent.TimeUnit;
-// CartService removed, replaced by CartUseCase
 import java.util.Locale;
 import java.util.ResourceBundle;
 
@@ -44,6 +43,8 @@ public class ServiceContainer {
     private final ISuspendedCartRepository suspendedCartRepository;
     private final IRoleRepository roleRepository;
     private final IPriceRepository priceRepository;
+    private final IMassivePriceUpdateRepository massivePriceUpdateRepository;
+    private final IPriceHistoryRepository priceHistoryRepository;
     private final IAuditRepository auditRepository;
     private final IAppSettingsRepository appSettingsRepository;
     private final IFiscalDocumentRepository fiscalRepository;
@@ -86,6 +87,7 @@ public class ServiceContainer {
     private final WorkSessionUseCase workSessionUseCase;
     private final ReturnUseCase returnUseCase;
     private final RefundCalculatorService refundCalculator;
+    private final PriceUpdateService priceUpdateService;
 
     // Shared Components
     private final GlobalEventBus eventBus;
@@ -102,12 +104,22 @@ public class ServiceContainer {
     private Locale currentLocale = new Locale("es");
 
     public ServiceContainer() {
-        System.out.println("[ServiceContainer] Iniciando configuración de servicios...");
+        // Silenciar loggers ruidosos
+        java.util.logging.Logger.getLogger("javafx.scene.CssStyleHelper").setLevel(java.util.logging.Level.OFF);
+        java.util.logging.Logger.getLogger("javafx.css").setLevel(java.util.logging.Level.OFF);
+        try {
+            java.util.logging.LogManager.getLogManager()
+                    .getLogger("com.mycompany.ventacontrolfx.infrastructure.aeat.VerifactuOutboxManager")
+                    .setLevel(java.util.logging.Level.WARNING);
+        } catch (Exception ignored) {
+        }
+
         // 1. Shared Infrastructure
         this.eventBus = new GlobalEventBus();
         this.asyncManager = new AsyncManager();
         this.userSession = new UserSession();
         this.authService = new AuthorizationService(userSession);
+        
         // 2. Adapters (Infrastructure Layer)
         this.productRepository = new JdbcProductRepository();
         this.categoryRepository = new JdbcCategoryRepository();
@@ -120,7 +132,12 @@ public class ServiceContainer {
         this.permissionRepository = new JdbcPermissionRepository();
         this.suspendedCartRepository = new JdbcSuspendedCartRepository();
         this.roleRepository = new JdbcRoleRepository(permissionRepository);
+        
+        // Price specialized repositories
         this.priceRepository = new JdbcPriceRepository();
+        this.massivePriceUpdateRepository = new JdbcMassivePriceUpdateRepository();
+        this.priceHistoryRepository = new JdbcPriceHistoryRepository();
+        
         this.auditRepository = new JdbcAuditRepository();
         this.appSettingsRepository = new JdbcAppSettingsRepository();
         this.fiscalRepository = new JdbcFiscalDocumentRepository();
@@ -151,15 +168,21 @@ public class ServiceContainer {
         this.categoryUseCase = new CategoryUseCase(categoryRepository, productRepository, authService);
         this.clientUseCase = new ClientUseCase(clientRepository, authService);
         this.refundCalculator = new RefundCalculatorService();
+        
+        // Use updated repositories in use cases
+        this.massivePriceUpdateUseCase = new MassivePriceUpdateUseCase(massivePriceUpdateRepository, productRepository,
+                priceLogRepository);
+        this.priceUpdateService = new PriceUpdateService(massivePriceUpdateUseCase);
+
         this.returnUseCase = new ReturnUseCase(saleRepository, productRepository, seriesRepository, configRepository,
-                refundCalculator, null); // Closure se inyecta luego
+                refundCalculator, null);
         this.saleUseCase = new com.mycompany.ventacontrolfx.application.usecase.SaleUseCase(saleRepository,
                 configRepository, authService, taxEngineService, clientRepository, promotionEngine,
                 productRepository, seriesRepository, eventBus);
         this.userUseCase = new com.mycompany.ventacontrolfx.application.usecase.UserUseCase(userRepository, emailSender,
                 authService);
         this.closureUseCase = new CashClosureUseCase(closureRepository, authService);
-        this.closureUseCase.setBackupService(new BackupService()); // Inject BackupService for auto-backups
+        this.closureUseCase.setBackupService(new BackupService());
         this.configUseCase = new ConfigUseCase(configRepository);
         this.dashboardUseCase = new DashboardUseCase(productRepository, categoryRepository, saleRepository,
                 closureRepository, clientRepository, userRepository);
@@ -170,12 +193,13 @@ public class ServiceContainer {
         this.userPermissionUseCase = new UserPermissionUseCase(userRepository, auditRepository, userSession);
         this.emitFiscalDocumentUseCase = new EmitFiscalDocumentUseCase(saleRepository, fiscalRepository,
                 seriesRepository, configRepository);
-        this.emitFiscalDocumentUseCase.setPdfService(pdfService); // Inyectamos el servicio de PDF
+        this.emitFiscalDocumentUseCase.setPdfService(pdfService);
         this.queryFiscalDocumentUseCase = new QueryFiscalDocumentUseCase(fiscalRepository, saleRepository);
         this.loginUseCase = new LoginUseCase(userRepository, auditRepository, roleUseCase, permissionUseCase);
-        this.priceListUseCase = new PriceListUseCase(priceListRepository, priceRepository);
-        this.massivePriceUpdateUseCase = new MassivePriceUpdateUseCase(priceRepository, productRepository,
-                priceLogRepository);
+        
+        // Update PriceListUseCase with specialized repositories
+        this.priceListUseCase = new PriceListUseCase(priceListRepository, priceRepository, priceHistoryRepository, massivePriceUpdateRepository);
+        
         this.getSaleTicketUseCase = new GetSaleTicketUseCase(saleRepository);
         this.restoreSuspendedCartUseCase = new RestoreSuspendedCartUseCase(
                 suspendedCartRepository, productRepository, clientRepository, cartUseCase);
@@ -192,57 +216,29 @@ public class ServiceContainer {
             return t;
         });
         scheduler.scheduleAtFixedRate(() -> {
-            System.out.println("[AutoBackup] Ejecutando backup diario programado...");
             new BackupService().createDefaultBackup();
-        }, 1, 24, TimeUnit.HOURS); // Cada 24h, empezando en 1h
+        }, 1, 24, TimeUnit.HOURS);
 
         try {
-            System.out.println("[VeriFactu] Iniciando módulo...");
-            AeatHttpClient aeatClient = new AeatHttpClient("https://prewww1.aeat.es/wlpl/TIKE-CONT/ws/SistemaFacturacion/VerifactuSOAP", "/certs/99999910G_prueba.pfx", "1234");
-            System.out.println("[VeriFactu] Cliente HTTP creado.");
-            VerifactuXmlBuilder xmlBuilder = new VerifactuXmlBuilder("99999910G", "(VERI*FACTU) CERTIFICADO FISICA PRUEBAS");
+            AeatHttpClient aeatClient = new AeatHttpClient(
+                    "https://prewww1.aeat.es/wlpl/TIKE-CONT/ws/SistemaFacturacion/VerifactuSOAP",
+                    "/certs/99999910G_prueba.pfx", "1234");
+            VerifactuXmlBuilder xmlBuilder = new VerifactuXmlBuilder("99999910G",
+                    "(VERI*FACTU) CERTIFICADO FISICA PRUEBAS");
             this.verifactuOutboxManager = new VerifactuOutboxManager(aeatClient, xmlBuilder, this.eventBus);
             this.verifactuOutboxManager.start();
-            
-            // Cargar credenciales reales en un hilo separado para NO BLOQUEAR el arranque
+
             new Thread(() -> {
-                System.out.println("[VeriFactu] Cargando credenciales reales en segundo plano...");
                 refreshVerifactuCredentials();
-                System.out.println("[VeriFactu] Credenciales reales cargadas.");
             }).start();
         } catch (Exception e) {
-            System.err.println("[VeriFactu] Error crítico en el arranque: " + e.getMessage());
+            System.err.println("[VeriFactu] Error cr\u00edtico en el arranque: " + e.getMessage());
             e.printStackTrace();
         }
 
-        // 4. Domain Services
-        // taxEngineService is now initialized above
-
-        // Cross-wiring: SaleUseCase necesita CashClosureUseCase para registrar
-        // devoluciones en caja
         this.saleUseCase.setCashClosureUseCase(this.closureUseCase);
-        this.saleUseCase.setPdfService(this.pdfService); // Inyectamos el servicio de PDF para archivado de devoluciones
-
+        this.saleUseCase.setPdfService(this.pdfService);
         this.returnUseCase.setPdfService(this.pdfService);
-        // El ReturnUseCase necesita el closure inyectado ahora que ya est\u00e1 creado
-        // Nota: Si ReturnUseCase no tiene setter, habr\u00e1 que crearlo o usar
-        // reflexi\u00f3n si
-        // es singleton
-        // Para simplificar, lo inyectamos aqu\u00ed (asumiendo que tiene acceso o
-        // setter)
-        // en esta versi\u00f3n lo inyectaremos via setter o crearemos el objeto
-        // despu\u00e9s.
-
-        // Vamos a modificar SaleUseCase para que use el nuevo ReturnUseCase si es
-        // necesario,
-        // pero por ahora los mantendremos independientes para evitar romper
-        // controladores.
-
-        // AI Engine Initialization (Disabled)
-        // this.aiSkillDispatcher = new AiSkillDispatcher(this);
-        // this.aiToolGenerator = new AiToolDefinitionGenerator();
-        // this.aiIntentRouter = new AiIntentRouter(this);
-        System.out.println("[ServiceContainer] Configuración completada con éxito.");
     }
 
     // --- Getters ---
@@ -268,6 +264,14 @@ public class ServiceContainer {
 
     public ReturnUseCase getReturnUseCase() {
         return returnUseCase;
+    }
+
+    public RefundCalculatorService getRefundCalculator() {
+        return refundCalculator;
+    }
+
+    public PriceUpdateService getPriceUpdateService() {
+        return priceUpdateService;
     }
 
     public GetSaleTicketUseCase getGetSaleTicketUseCase() {
@@ -322,7 +326,6 @@ public class ServiceContainer {
         this.navigationService = navigationService;
     }
 
-    // Factory methods for non-singleton usecases
     public ProductFilterUseCase createProductFilterUseCase() {
         return new ProductFilterUseCase();
     }
@@ -345,6 +348,14 @@ public class ServiceContainer {
 
     public IPriceRepository getPriceRepository() {
         return priceRepository;
+    }
+    
+    public IMassivePriceUpdateRepository getMassivePriceUpdateRepository() {
+        return massivePriceUpdateRepository;
+    }
+    
+    public IPriceHistoryRepository getPriceHistoryRepository() {
+        return priceHistoryRepository;
     }
 
     public PriceUseCase getPriceUseCase() {
@@ -449,17 +460,28 @@ public class ServiceContainer {
     }
 
     public void refreshVerifactuCredentials() {
-        if (verifactuOutboxManager == null) return;
+        if (verifactuOutboxManager == null)
+            return;
         try {
             String nif = configRepository.load().getCif();
             String name = configRepository.load().getCompanyName();
             if (nif != null && !nif.isEmpty()) {
                 verifactuOutboxManager.updateCredentials(nif.toUpperCase(), name);
             }
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
     }
 
     public VerifactuOutboxManager getVerifactuOutboxManager() {
         return verifactuOutboxManager;
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T> T getService(Class<T> clazz) {
+        if (clazz.equals(IPriceRepository.class)) return (T) priceRepository;
+        if (clazz.equals(IMassivePriceUpdateRepository.class)) return (T) massivePriceUpdateRepository;
+        if (clazz.equals(IPriceHistoryRepository.class)) return (T) priceHistoryRepository;
+        // Add more mappings if needed, or stick to explicit getters
+        return null;
     }
 }

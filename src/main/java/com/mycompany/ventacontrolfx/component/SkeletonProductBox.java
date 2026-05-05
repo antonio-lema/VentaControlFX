@@ -12,12 +12,12 @@ public class SkeletonProductBox extends StackPane {
 
     public SkeletonProductBox() {
         this.getStyleClass().add("skeleton-box");
-        this.setPrefWidth(190);
-        this.setMaxWidth(190);
-        this.setMinWidth(190);
-        this.setPrefHeight(240);
-        this.setMaxHeight(240);
-        this.setMinHeight(240);
+        this.setPrefWidth(200);
+        this.setMaxWidth(200);
+        this.setMinWidth(200);
+        this.setPrefHeight(260); // Adjusted for content
+        this.setMaxHeight(260);
+        this.setMinHeight(260);
 
         VBox content = new VBox();
         content.setSpacing(0);
@@ -25,14 +25,16 @@ public class SkeletonProductBox extends StackPane {
 
         // 1. Image Placeholder Section
         StackPane imageContainer = new StackPane();
-        imageContainer.setPrefHeight(130);
-        imageContainer.setMinHeight(130);
-        imageContainer.setMaxHeight(130);
+        imageContainer.setPrefHeight(150);
+        imageContainer.setMinHeight(150);
+        imageContainer.setMaxHeight(150);
         imageContainer.getStyleClass().add("skeleton-image-container");
 
         Region imageFiller = new Region();
         imageFiller.getStyleClass().add("skeleton-image-filler");
-        StackPane.setMargin(imageFiller, new Insets(10));
+        imageFiller.setPrefSize(185, 110);
+        imageFiller.setMaxSize(185, 110);
+        StackPane.setAlignment(imageFiller, Pos.CENTER);
 
         Region priceBadge = new Region();
         priceBadge.getStyleClass().add("skeleton-price-badge");
@@ -60,8 +62,9 @@ public class SkeletonProductBox extends StackPane {
         // 3. Button Placeholder
         Region buttonSkeleton = new Region();
         buttonSkeleton.getStyleClass().add("skeleton-button");
-        buttonSkeleton.setMinHeight(32);
-        buttonSkeleton.setMaxHeight(32);
+        buttonSkeleton.setMinHeight(48);
+        buttonSkeleton.setMaxHeight(48);
+        buttonSkeleton.setMaxWidth(Double.MAX_VALUE);
 
         content.getChildren().addAll(imageContainer, infoSkeleton, buttonSkeleton);
 
@@ -85,8 +88,8 @@ public class SkeletonProductBox extends StackPane {
         Rectangle clip = new Rectangle();
         clip.widthProperty().bind(this.widthProperty());
         clip.heightProperty().bind(this.heightProperty());
-        clip.setArcWidth(16);
-        clip.setArcHeight(16);
+        clip.setArcWidth(28);
+        clip.setArcHeight(28);
         this.setClip(clip);
 
         // Iniciar animaciones con un pequeño delay seguro

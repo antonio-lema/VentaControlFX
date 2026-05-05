@@ -236,8 +236,8 @@ public class OpenPdfFiscalService implements IFiscalPdfService {
 
         // \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac CUP\u00d3N DE REGALO /
         // RECOMPENSA (V1.13) \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac
-        System.out.println("[DEBUG] PDF Generation - Reward code: "
-                + (data.sale != null ? data.sale.getRewardPromoCode() : "SALE_IS_NULL"));
+        // System.out.println("[DEBUG] PDF Generation - Reward code: "
+        //        + (data.sale != null ? data.sale.getRewardPromoCode() : "SALE_IS_NULL"));
         if (data.sale != null && data.sale.getRewardPromoCode() != null && !data.sale.getRewardPromoCode().isEmpty()) {
             document.add(new Paragraph("\n"));
             PdfPTable rewardBox = new PdfPTable(1);

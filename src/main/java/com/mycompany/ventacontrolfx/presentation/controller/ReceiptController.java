@@ -133,7 +133,7 @@ public class ReceiptController implements Injectable {
         applyCompanyHeader();
         itemsContainer.getChildren().clear();
 
-        System.out.println("[Receipt] Setting data for " + (items != null ? items.size() : "null") + " items");
+        // System.out.println("[Receipt] Setting data for " + (items != null ? items.size() : "null") + " items");
 
         if (items == null || items.isEmpty()) {
             Label placeholder = new Label(container.getBundle().getString("receipt.items.empty"));

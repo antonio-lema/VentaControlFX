@@ -232,6 +232,12 @@ public class SellViewController implements Injectable, CategoryMenuRenderer.Cate
         if (categoriesMegaFlowPane == null)
             return;
 
+        // Show skeletons for categories
+        categoriesMegaFlowPane.getChildren().clear();
+        for (int i = 0; i < 6; i++) {
+            categoriesMegaFlowPane.getChildren().add(new com.mycompany.ventacontrolfx.component.SkeletonCategoryBox());
+        }
+
         container.getAsyncManager().runAsyncTask(() -> {
             List<Category> cats = categoryUseCase.getAll();
             Category all = new Category();

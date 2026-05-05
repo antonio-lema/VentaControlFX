@@ -48,9 +48,9 @@
             <VBox styleClass="view-body-padding" VBox.vgrow="ALWAYS">
                <children>
 
-            <TabPane tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS" styleClass="modern-tab-pane">
+            <TabPane fx:id="mainTabPane" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS" styleClass="modern-tab-pane">
               <tabs>
-                <Tab text="%vat.tab.current">
+                <Tab fx:id="tabCurrentConfig" text="%vat.tab.current">
                     <graphic>
                         <FontAwesomeIconView glyphName="COG" size="14" />
                     </graphic>
@@ -183,7 +183,7 @@
                 <!-- PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP -->
                 <!--  PESTA&#x00d1A;: SUBIDA MASIVA DE PRECIOS &#x2014; UI DIN&#x00c1;MICA              -->
                 <!-- PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP -->
-                <Tab text="%vat.tab.mass_update">
+                <Tab fx:id="tabMassUpdate" text="%vat.tab.mass_update">
                     <graphic>
                         <FontAwesomeIconView glyphName="LINE_CHART" size="14" />
                     </graphic>
@@ -541,7 +541,7 @@
                 <!-- PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP -->
                 <!--  PESTA&#x00d1A;: CAT&#x00c1;LOGO DE IMPUESTOS (MANTENIMIENTO)                -->
                 <!-- PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP -->
-                <Tab text="%vat.tab.catalog">
+                <Tab fx:id="tabCatalog" text="%vat.tab.catalog">
                     <graphic>
                         <FontAwesomeIconView glyphName="LIST_ALT" size="14" />
                     </graphic>
@@ -640,7 +640,7 @@
                 <!-- PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP -->
                 <!--  PESTA&#x00d1A;: HISTORIAL DE REVISIONES                             -->
                 <!-- PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP -->
-                <Tab text="%vat.tab.history">
+                <Tab fx:id="tabHistory" text="%vat.tab.history">
                     <graphic>
                         <FontAwesomeIconView glyphName="HISTORY" size="14" />
                     </graphic>

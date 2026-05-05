@@ -4,6 +4,7 @@ import com.mycompany.ventacontrolfx.domain.model.User;
 import com.mycompany.ventacontrolfx.application.usecase.UserUseCase;
 import com.mycompany.ventacontrolfx.infrastructure.config.Injectable;
 import com.mycompany.ventacontrolfx.infrastructure.config.ServiceContainer;
+import com.mycompany.ventacontrolfx.component.SkeletonUserBox;
 import com.mycompany.ventacontrolfx.util.AlertUtil;
 import com.mycompany.ventacontrolfx.util.ModalService;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
@@ -50,15 +51,30 @@ public class ManageUsersController implements Injectable {
     }
 
     private void loadUsers() {
-        try {
-            List<User> users = userUseCase.listUsers();
-            userList.setAll(users);
-            renderUserCards(userList);
-        } catch (SQLException e) {
-            e.printStackTrace();
-            AlertUtil.showError(container.getBundle().getString("alert.error"),
-                    String.format(container.getBundle().getString("user.manage.error.load"), e.getMessage()));
+        if (userCardsPane == null) return;
+        
+        // Mostrar esqueletos
+        userCardsPane.getChildren().clear();
+        for (int i = 0; i < 4; i++) {
+            userCardsPane.getChildren().add(new SkeletonUserBox());
         }
+        
+        container.getAsyncManager().runAsyncTask(() -> {
+            try {
+                return userUseCase.listUsers();
+            } catch (SQLException e) {
+                return null;
+            }
+        }, (users) -> {
+            if (users != null) {
+                userList.setAll((java.util.List<User>) users);
+                renderUserCards(userList);
+            } else {
+                AlertUtil.showError(container.getBundle().getString("alert.error"),
+                        container.getBundle().getString("user.manage.error.load"));
+                userCardsPane.getChildren().clear();
+            }
+        }, null);
     }
 
     private void renderUserCards(List<User> users) {
@@ -110,22 +126,53 @@ public class ManageUsersController implements Injectable {
         actions.setPadding(new Insets(10, 0, 0, 0));
 
         Button btnEdit = new Button();
-        btnEdit.getStyleClass().add("btn-action-edit");
-        FontAwesomeIconView editIcon = new FontAwesomeIconView(FontAwesomeIcon.PENCIL);
-        editIcon.setSize("18");
-        btnEdit.setGraphic(editIcon);
-        btnEdit.setOnAction(e -> handleEditSingleUser(user));
+        boolean canEdit = container.getUserSession().hasPermission("usuario.editar") 
+                || container.getUserSession().hasPermission("USUARIOS");
+        
+        if (canEdit) {
+            btnEdit.getStyleClass().add("btn-action-edit");
+            FontAwesomeIconView editIcon = new FontAwesomeIconView(FontAwesomeIcon.PENCIL);
+            editIcon.setSize("18");
+            btnEdit.setGraphic(editIcon);
+            btnEdit.setOnAction(e -> handleEditSingleUser(user));
+        } else {
+            btnEdit.getStyleClass().add("btn-action-lock");
+            btnEdit.setStyle("-fx-background-color: #f59e0b; -fx-text-fill: white; -fx-background-radius: 50;");
+            FontAwesomeIconView lockIcon = new FontAwesomeIconView(FontAwesomeIcon.LOCK);
+            lockIcon.setSize("18");
+            lockIcon.setFill(Color.WHITE);
+            btnEdit.setGraphic(lockIcon);
+            btnEdit.setTooltip(new Tooltip(container.getBundle().getString("user.manage.btn.unlock")));
+            btnEdit.setOnAction(e -> AlertUtil.showWarning(container.getBundle().getString("alert.locked"),
+                    container.getBundle().getString("user.msg.locked_edit")));
+        }
 
         Button btnDelete = new Button();
-        btnDelete.getStyleClass().add("btn-action-delete");
-        FontAwesomeIconView deleteIcon = new FontAwesomeIconView(FontAwesomeIcon.TRASH);
-        deleteIcon.setSize("18");
-        btnDelete.setGraphic(deleteIcon);
-        btnDelete.setOnAction(e -> handleDeleteSingleUser(user));
+        boolean canDelete = container.getUserSession().hasPermission("usuario.eliminar")
+                || container.getUserSession().hasPermission("USUARIOS");
+
+        if (canDelete) {
+            btnDelete.getStyleClass().add("btn-action-delete");
+            FontAwesomeIconView deleteIcon = new FontAwesomeIconView(FontAwesomeIcon.TRASH);
+            deleteIcon.setSize("18");
+            btnDelete.setGraphic(deleteIcon);
+            btnDelete.setOnAction(e -> handleDeleteSingleUser(user));
+        } else {
+            btnDelete.getStyleClass().add("btn-action-lock");
+            btnDelete.setStyle("-fx-background-color: #f59e0b; -fx-text-fill: white; -fx-background-radius: 50;");
+            FontAwesomeIconView lockIcon = new FontAwesomeIconView(FontAwesomeIcon.LOCK);
+            lockIcon.setSize("18");
+            lockIcon.setFill(Color.WHITE);
+            btnDelete.setGraphic(lockIcon);
+            btnDelete.setTooltip(new Tooltip(container.getBundle().getString("user.manage.btn.unlock")));
+            btnDelete.setOnAction(e -> AlertUtil.showWarning(container.getBundle().getString("alert.locked"),
+                    container.getBundle().getString("user.msg.locked_delete")));
+        }
 
         // El usuario administrador principal (normalmente ID 1) no puede ser eliminado
         if (user.getUserId() == 1 || "admin".equalsIgnoreCase(user.getUsername())) {
             btnDelete.setDisable(true);
+            btnDelete.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.SHIELD, "18"));
             btnDelete.setTooltip(new Tooltip(container.getBundle().getString("user.manage.no_delete_admin")));
         }
 
@@ -160,7 +207,8 @@ public class ManageUsersController implements Injectable {
     }
 
     private void handleEditSingleUser(User user) {
-        if (!container.getUserSession().hasPermission("usuario.crear")) {
+        if (!container.getUserSession().hasPermission("usuario.editar") && 
+            !container.getUserSession().hasPermission("USUARIOS")) {
             AlertUtil.showError(container.getBundle().getString("access.denied"),
                     container.getBundle().getString("sidebar.permission_denied_msg"));
             return;
@@ -174,7 +222,8 @@ public class ManageUsersController implements Injectable {
     }
 
     private void handleDeleteSingleUser(User user) {
-        if (!container.getUserSession().hasPermission("usuario.crear")) {
+        if (!container.getUserSession().hasPermission("usuario.eliminar") && 
+            !container.getUserSession().hasPermission("USUARIOS")) {
             AlertUtil.showError(container.getBundle().getString("access.denied"),
                     container.getBundle().getString("sidebar.permission_denied_msg"));
             return;

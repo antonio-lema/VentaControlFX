@@ -4,6 +4,7 @@ import com.mycompany.ventacontrolfx.domain.model.Role;
 import com.mycompany.ventacontrolfx.application.usecase.RoleUseCase;
 import com.mycompany.ventacontrolfx.infrastructure.config.Injectable;
 import com.mycompany.ventacontrolfx.infrastructure.config.ServiceContainer;
+import com.mycompany.ventacontrolfx.component.SkeletonRoleBox;
 import com.mycompany.ventacontrolfx.util.AlertUtil;
 import com.mycompany.ventacontrolfx.util.ModalService;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
@@ -18,6 +19,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import com.mycompany.ventacontrolfx.presentation.util.RealTimeSearchBinder;
 
 import java.sql.SQLException;
@@ -49,14 +51,29 @@ public class ManageRolesController implements Injectable {
     }
 
     private void loadRoles() {
-        try {
-            List<Role> roles = roleUseCase.getAllRoles();
-            roleList.setAll(roles);
-            renderRoleCards(roleList);
-        } catch (SQLException e) {
-            e.printStackTrace();
-            AlertUtil.showError("Error", "No se pudieron cargar los roles: " + e.getMessage());
+        if (roleCardsPane == null) return;
+        
+        // Mostrar esqueletos
+        roleCardsPane.getChildren().clear();
+        for (int i = 0; i < 3; i++) {
+            roleCardsPane.getChildren().add(new SkeletonRoleBox());
         }
+        
+        container.getAsyncManager().runAsyncTask(() -> {
+            try {
+                return roleUseCase.getAllRoles();
+            } catch (SQLException e) {
+                return null;
+            }
+        }, (roles) -> {
+            if (roles != null) {
+                roleList.setAll((java.util.List<Role>) roles);
+                renderRoleCards(roleList);
+            } else {
+                AlertUtil.showError("Error", "No se pudieron cargar los roles");
+                roleCardsPane.getChildren().clear();
+            }
+        }, null);
     }
 
     private void renderRoleCards(List<Role> roles) {
@@ -103,28 +120,56 @@ public class ManageRolesController implements Injectable {
         actions.setPadding(new Insets(10, 0, 0, 0));
 
         Button btnEdit = new Button();
-        btnEdit.getStyleClass().add("btn-action-edit");
-        FontAwesomeIconView editIcon = new FontAwesomeIconView(FontAwesomeIcon.PENCIL);
-        editIcon.setSize("18");
-        btnEdit.setGraphic(editIcon);
-        btnEdit.setOnAction(e -> handleEditSingleRole(role));
+        boolean canManageRoles = container.getUserSession().hasPermission("rol.editar");
+        
+        if (canManageRoles) {
+            btnEdit.getStyleClass().add("btn-action-edit");
+            FontAwesomeIconView editIcon = new FontAwesomeIconView(FontAwesomeIcon.PENCIL);
+            editIcon.setSize("18");
+            btnEdit.setGraphic(editIcon);
+            btnEdit.setOnAction(e -> handleEditSingleRole(role));
+        } else {
+            btnEdit.getStyleClass().add("btn-action-lock");
+            btnEdit.setStyle("-fx-background-color: #f59e0b; -fx-text-fill: white; -fx-background-radius: 50;");
+            FontAwesomeIconView lockIcon = new FontAwesomeIconView(FontAwesomeIcon.LOCK);
+            lockIcon.setSize("18");
+            lockIcon.setFill(Color.WHITE);
+            btnEdit.setGraphic(lockIcon);
+            btnEdit.setTooltip(new Tooltip(container.getBundle().getString("user.manage.btn.unlock")));
+            btnEdit.setOnAction(e -> AlertUtil.showWarning(container.getBundle().getString("alert.locked"),
+                    container.getBundle().getString("role.msg.locked_edit")));
+        }
 
         // Disable editing for "admin" role to ensure immutability
         if ("admin".equalsIgnoreCase(role.getName())) {
             btnEdit.setDisable(true);
+            btnEdit.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.SHIELD, "18"));
             btnEdit.setTooltip(new Tooltip("El rol de administrador principal no puede ser modificado."));
         }
 
         Button btnDelete = new Button();
-        btnDelete.getStyleClass().add("btn-action-delete");
-        FontAwesomeIconView deleteIcon = new FontAwesomeIconView(FontAwesomeIcon.TRASH);
-        deleteIcon.setSize("18");
-        btnDelete.setGraphic(deleteIcon);
-        btnDelete.setOnAction(e -> handleDeleteSingleRole(role));
+        if (canManageRoles) {
+            btnDelete.getStyleClass().add("btn-action-delete");
+            FontAwesomeIconView deleteIcon = new FontAwesomeIconView(FontAwesomeIcon.TRASH);
+            deleteIcon.setSize("18");
+            btnDelete.setGraphic(deleteIcon);
+            btnDelete.setOnAction(e -> handleDeleteSingleRole(role));
+        } else {
+            btnDelete.getStyleClass().add("btn-action-lock");
+            btnDelete.setStyle("-fx-background-color: #f59e0b; -fx-text-fill: white; -fx-background-radius: 50;");
+            FontAwesomeIconView lockIcon = new FontAwesomeIconView(FontAwesomeIcon.LOCK);
+            lockIcon.setSize("18");
+            lockIcon.setFill(Color.WHITE);
+            btnDelete.setGraphic(lockIcon);
+            btnDelete.setTooltip(new Tooltip(container.getBundle().getString("user.manage.btn.unlock")));
+            btnDelete.setOnAction(e -> AlertUtil.showWarning(container.getBundle().getString("alert.locked"),
+                    container.getBundle().getString("role.msg.locked_delete")));
+        }
 
         // Disable deletion for system roles or "admin"
         if ("admin".equalsIgnoreCase(role.getName()) || "cajero".equalsIgnoreCase(role.getName())) {
             btnDelete.setDisable(true);
+            btnDelete.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.SHIELD, "18"));
         }
 
         actions.getChildren().addAll(btnEdit, btnDelete);

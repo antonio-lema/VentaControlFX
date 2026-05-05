@@ -51,6 +51,8 @@ public class OperativeDashboardController implements Injectable {
     @FXML
     private VBox vboxAlerts;
     @FXML
+    private VBox skeletonStaffContainer;
+    @FXML
     private TableView<ActiveStaffViewModel> tableActiveStaff;
 
     @FXML
@@ -108,18 +110,47 @@ public class OperativeDashboardController implements Injectable {
 
     @FXML
     public void refreshData() {
-        try {
-            // 1. Business Schedule & Compliance
-            SaleConfig cfg = configUseCase.getConfig();
-            int todayIdx = LocalDate.now().getDayOfWeek().getValue();
-            final BusinessDay todaySchedule = (cfg != null) ? cfg.getSchedule().stream()
-                    .filter(d -> d.getDayOfWeek() == todayIdx)
-                    .findFirst()
-                    .orElse(null) : null;
+        showKpiSkeletons(true);
+        showListSkeletons(true);
+        container.getAsyncManager().runAsyncTask(() -> {
+            try {
+                // 1. Business Schedule & Compliance
+                SaleConfig cfg = configUseCase.getConfig();
+                int todayIdx = LocalDate.now().getDayOfWeek().getValue();
+                final BusinessDay todaySchedule = (cfg != null) ? cfg.getSchedule().stream()
+                        .filter(d -> d.getDayOfWeek() == todayIdx)
+                        .findFirst()
+                        .orElse(null) : null;
 
-            // 2. Staff Status
-            List<WorkSession> allSessionsToday = workSessionUseCase.getHistoryByDate(LocalDate.now());
-            List<WorkSession> activeSessions = workSessionUseCase.getAllActiveSessions();
+                // 2. Staff Status
+                List<WorkSession> allSessionsToday = workSessionUseCase.getHistoryByDate(LocalDate.now());
+                List<WorkSession> activeSessions = workSessionUseCase.getAllActiveSessions();
+
+                // 3. Cash Status
+                boolean isCashOpen = cashClosureUseCase.hasActiveFund();
+                double currentCash = cashClosureUseCase.getCurrentCashInDrawer();
+
+                // 4. Business Opening Time
+                List<WorkSession> todaySessions = workSessionUseCase.getHistoryByDate(LocalDate.now());
+
+                return new Object[] { cfg, todaySchedule, allSessionsToday, activeSessions, isCashOpen, currentCash,
+                        todaySessions };
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }, result -> {
+            Object[] data = (Object[]) result;
+            SaleConfig cfg = (SaleConfig) data[0];
+            BusinessDay todaySchedule = (BusinessDay) data[1];
+            List<WorkSession> allSessionsToday = (List<WorkSession>) data[2];
+            List<WorkSession> activeSessions = (List<WorkSession>) data[3];
+            boolean isCashOpen = (Boolean) data[4];
+            double currentCash = (Double) data[5];
+            List<WorkSession> todaySessions = (List<WorkSession>) data[6];
+
+            showKpiSkeletons(false);
+            showListSkeletons(false);
+
             Platform.runLater(() -> {
                 lblActiveStaffCount.setText(String.valueOf(activeSessions.size()));
                 activeStaffList.setAll(activeSessions.stream()
@@ -142,33 +173,72 @@ public class OperativeDashboardController implements Injectable {
                             return new ActiveStaffViewModel(s, u, range, userSessionsToday, container.getBundle());
                         })
                         .collect(Collectors.toList()));
-            });
 
-            // 3. Cash Status
-            boolean isCashOpen = cashClosureUseCase.hasActiveFund();
-            double currentCash = cashClosureUseCase.getCurrentCashInDrawer();
-            Platform.runLater(() -> {
                 lblCashStatus
                         .setText(container.getBundle().getString("dashboard.cash." + (isCashOpen ? "open" : "closed")));
                 lblCashStatus.setStyle(isCashOpen ? "-fx-text-fill: #16a34a;" : "-fx-text-fill: #ef4444;");
                 lblCashAmount.setText(String.format("%.2f \u20ac", currentCash));
+
+                LocalDateTime firstStart = null;
+                if (!todaySessions.isEmpty()) {
+                    firstStart = todaySessions.get(todaySessions.size() - 1).getStartTime();
+                    final String fStart = firstStart.format(DateTimeFormatter.ofPattern("HH:mm"));
+                    lblDailyOpenTime.setText(fStart);
+                } else {
+                    lblDailyOpenTime.setText("--:--");
+                }
+
+                updateScheduleUI(todaySchedule, firstStart);
             });
 
-            // 4. Business Opening Time
-            List<WorkSession> todaySessions = workSessionUseCase.getHistoryByDate(LocalDate.now());
-            LocalDateTime firstStart = null;
-            if (!todaySessions.isEmpty()) {
-                firstStart = todaySessions.get(todaySessions.size() - 1).getStartTime();
-                final String fStart = firstStart.format(DateTimeFormatter.ofPattern("HH:mm"));
-                Platform.runLater(() -> lblDailyOpenTime.setText(fStart));
-            } else {
-                Platform.runLater(() -> lblDailyOpenTime.setText("--:--"));
-            }
-
-            updateScheduleUI(todaySchedule, firstStart);
-
-        } catch (Exception e) {
+        }, e -> {
+            showKpiSkeletons(false);
+            showListSkeletons(false);
             e.printStackTrace();
+        });
+    }
+
+    private void showListSkeletons(boolean show) {
+        if (show) {
+            // Staff Table Skeletons
+            if (skeletonStaffContainer != null) {
+                skeletonStaffContainer.getChildren().clear();
+                for (int i = 0; i < 10; i++) {
+                    skeletonStaffContainer.getChildren().add(new com.mycompany.ventacontrolfx.component.SkeletonStaffRow());
+                }
+                skeletonStaffContainer.setVisible(true);
+                skeletonStaffContainer.setManaged(true);
+            }
+            // Schedule Skeletons
+            if (vboxTodaySchedule != null) {
+                vboxTodaySchedule.getChildren().clear();
+                for (int i = 0; i < 5; i++) {
+                    vboxTodaySchedule.getChildren().add(new com.mycompany.ventacontrolfx.component.SkeletonScheduleItem());
+                }
+            }
+        } else {
+            if (skeletonStaffContainer != null) {
+                skeletonStaffContainer.setVisible(false);
+                skeletonStaffContainer.setManaged(false);
+            }
+        }
+    }
+
+    private void showKpiSkeletons(boolean show) {
+        if (show) {
+            lblActiveStaffCount.setGraphic(new com.mycompany.ventacontrolfx.component.SkeletonStatCard());
+            lblActiveStaffCount.setText("");
+            lblCashAmount.setGraphic(new com.mycompany.ventacontrolfx.component.SkeletonStatCard());
+            lblCashAmount.setText("");
+            lblDailyOpenTime.setGraphic(new com.mycompany.ventacontrolfx.component.SkeletonStatCard());
+            lblDailyOpenTime.setText("");
+            lblScheduleCompliance.setGraphic(new com.mycompany.ventacontrolfx.component.SkeletonStatCard());
+            lblScheduleCompliance.setText("");
+        } else {
+            lblActiveStaffCount.setGraphic(null);
+            lblCashAmount.setGraphic(null);
+            lblDailyOpenTime.setGraphic(null);
+            lblScheduleCompliance.setGraphic(null);
         }
     }
 
@@ -181,6 +251,11 @@ public class OperativeDashboardController implements Injectable {
 
     @FXML
     private void handlePartialClosure() {
+        if (!container.getUserSession().hasPermission("caja.cerrar")) {
+            AlertUtil.showError(container.getBundle().getString("alert.error"),
+                    container.getBundle().getString("auth.error.no_permission"));
+            return;
+        }
         try {
             cashClosureUseCase.performPartialClosure(container.getUserSession().getCurrentUser().getUserId());
             AlertUtil.showInfo(container.getBundle().getString("dashboard.partial.closure.title"),

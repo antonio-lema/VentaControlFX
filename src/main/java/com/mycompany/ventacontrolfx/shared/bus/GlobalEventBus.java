@@ -25,9 +25,15 @@ public class GlobalEventBus {
         void onVerifactuIncidentDetected(java.util.List<Integer> affectedSaleIds, java.util.List<Integer> affectedReturnIds);
     }
 
+    public interface VerifactuSyncListener {
+        void onSyncStarted();
+        void onSyncFinished(String result);
+    }
+
     private final List<WeakReference<DataChangeListener>> dataListeners = new ArrayList<>();
     private final List<WeakReference<LocaleChangeListener>> localeListeners = new ArrayList<>();
     private final List<WeakReference<VerifactuIncidentListener>> verifactuListeners = new ArrayList<>();
+    private final List<WeakReference<VerifactuSyncListener>> syncListeners = new ArrayList<>();
 
     public void subscribe(DataChangeListener listener) {
         dataListeners.add(new WeakReference<>(listener));
@@ -73,6 +79,34 @@ public class GlobalEventBus {
                 iterator.remove();
             } else {
                 listener.onVerifactuIncidentDetected(saleIds, returnIds);
+            }
+        }
+    }
+
+    public void subscribeVerifactuSync(VerifactuSyncListener listener) {
+        syncListeners.add(new WeakReference<>(listener));
+    }
+
+    public void publishVerifactuSyncStarted() {
+        Iterator<WeakReference<VerifactuSyncListener>> iterator = syncListeners.iterator();
+        while (iterator.hasNext()) {
+            VerifactuSyncListener listener = iterator.next().get();
+            if (listener == null) {
+                iterator.remove();
+            } else {
+                listener.onSyncStarted();
+            }
+        }
+    }
+
+    public void publishVerifactuSyncFinished(String result) {
+        Iterator<WeakReference<VerifactuSyncListener>> iterator = syncListeners.iterator();
+        while (iterator.hasNext()) {
+            VerifactuSyncListener listener = iterator.next().get();
+            if (listener == null) {
+                iterator.remove();
+            } else {
+                listener.onSyncFinished(result);
             }
         }
     }
