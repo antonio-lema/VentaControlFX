@@ -85,11 +85,6 @@ public class ReturnListController implements Injectable {
         this.getSaleTicketUseCase = container.getGetSaleTicketUseCase();
 
         // Inicializar filtros
-        if (datePickerStart != null)
-            datePickerStart.setValue(LocalDate.now());
-        if (datePickerEnd != null)
-            datePickerEnd.setValue(LocalDate.now());
-
         if (cmbPaymentMethod != null) {
             cmbPaymentMethod.setItems(FXCollections.observableArrayList(
                     container.getBundle().getString("returns.filter.all"),

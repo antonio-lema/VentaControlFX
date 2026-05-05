@@ -43,6 +43,8 @@ public class ModalService {
                 container.getThemeManager().applyFullTheme(scene);
             }
             stage.setScene(scene);
+            stage.sizeToScene();
+            stage.centerOnScreen();
 
             stage.showAndWait();
             return controller;

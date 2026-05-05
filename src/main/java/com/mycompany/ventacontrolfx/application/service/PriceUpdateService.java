@@ -102,7 +102,7 @@ public class PriceUpdateService {
         return switch (req.grouping) {
             case ALL -> useCase.applyRoundingToAll(req.priceListId, req.value, req.reason, req.startDate);
             case CATEGORY -> useCase.applyRoundingToCategory(req.priceListId, (Integer) req.extra, req.value, req.reason, req.startDate);
-            case PRODUCTS -> useCase.applyRoundingToProducts(req.priceListId, (List<Integer>) req.extra, req.value, req.reason, req.startDate);
+            case PRODUCTS -> useCase.applyBulkRoundingToProducts(req.priceListId, (List<Integer>) req.extra, req.value, req.reason, req.startDate);
             case TOP -> {
                 int[] params = (int[]) req.extra;
                 yield useCase.applyRoundingToTopSellers(req.priceListId, params[0], params[1], req.value, req.reason, req.startDate);

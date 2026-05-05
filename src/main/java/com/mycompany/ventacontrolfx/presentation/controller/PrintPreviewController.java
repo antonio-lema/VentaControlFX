@@ -199,8 +199,10 @@ public class PrintPreviewController implements Injectable {
         // Visibilidad
         totalsContainer.setVisible(!isGiftMode);
         totalsContainer.setManaged(!isGiftMode);
-        barcodeSection.setVisible(false);
-        barcodeSection.setManaged(false);
+        if (barcodeSection != null) {
+            barcodeSection.setVisible(false);
+            barcodeSection.setManaged(false);
+        }
         lblGiftIndicator.setVisible(isGiftMode);
         lblGiftIndicator.setManaged(isGiftMode);
         lblPVPHeader.setVisible(!isGiftMode);
@@ -301,61 +303,72 @@ public class PrintPreviewController implements Injectable {
         // Aplicar formato de papel
         applyPaperFormat();
 
-        // Recuperear datos fiscales reales (hash, serie) si es posible
+        // ── DISEÑO PREMIUM VERI*FACTU ──
         try {
             com.mycompany.ventacontrolfx.application.usecase.QueryFiscalDocumentUseCase queryUseCase = container.getQueryFiscalDocumentUseCase();
             com.mycompany.ventacontrolfx.application.usecase.QueryFiscalDocumentUseCase.PrintData data = queryUseCase.getDataForReprint(currentSaleId);
             
-            VBox fiscalBox = new VBox(8);
-            fiscalBox.setAlignment(javafx.geometry.Pos.CENTER);
-            fiscalBox.setStyle("-fx-padding: 15 0 10 0;");
-            
-            Label lblLegalText = new Label("Factura verificable en la sede electr\u00f3nica de la AEAT");
-            lblLegalText.setStyle("-fx-font-size: 10px; -fx-text-fill: #555; -fx-alignment: center; -fx-font-weight: bold;");
-            lblLegalText.setWrapText(true);
-            lblLegalText.setTextAlignment(javafx.scene.text.TextAlignment.CENTER);
-            lblLegalText.setMaxWidth(250);
-            
-            // L\u00f3gica robusta para URL
-            String nif = (data != null && data.document != null && data.document.getIssuerTaxId() != null) ? data.document.getIssuerTaxId() : cfg.getCif();
-            String fullRef = (data != null && data.document != null) ? data.document.getFullReference() : "2026-A-" + currentSaleId;
-            java.time.LocalDateTime issuedAt = (data != null && data.document != null) ? data.document.getIssuedAt() : java.time.LocalDateTime.now();
-            double amount = (data != null && data.document != null) ? data.document.getTotalAmount() : currentTotal;
-
-            // QR URL Base Verifactu (Usando PRE-PRODUCCI\u00d3N para coherencia)
-            String aeatUrl = "https://prewww1.aeat.es/wlpl/TIKE-CONT/ValidarQR?nif=" 
-                             + (nif != null ? nif.toUpperCase() : "")
-                             + "&numserie=" + fullRef
-                             + "&fecha=" + issuedAt.format(java.time.format.DateTimeFormatter.ofPattern("dd-MM-yyyy"))
-                             + "&importe=" + String.format(java.util.Locale.US, "%.2f", amount);
-            
-            byte[] qrBytes = com.mycompany.ventacontrolfx.util.QrGenerator.generateQrCode(aeatUrl, 250, 250);
-            if (qrBytes != null) {
-                javafx.scene.image.Image qrImage = new javafx.scene.image.Image(new java.io.ByteArrayInputStream(qrBytes));
-                javafx.scene.image.ImageView imgView = new javafx.scene.image.ImageView(qrImage);
-                imgView.setFitWidth(180);
-                imgView.setFitHeight(180);
-                fiscalBox.getChildren().addAll(lblLegalText, imgView);
-            }
-            
             if (data != null && data.document != null && data.document.getControlHash() != null) {
-                String h = data.document.getControlHash();
-                String formattedHash = h;
-                if (h.length() > 32) {
-                    formattedHash = h.substring(0, 32) + "\n" + h.substring(32);
+                VBox fiscalBox = new VBox(5);
+                fiscalBox.setAlignment(javafx.geometry.Pos.CENTER);
+                fiscalBox.setStyle("-fx-padding: 25 0 10 0; -fx-background-color: white;");
+                
+                // Línea divisoria decorativa
+                javafx.scene.shape.Line separator = new javafx.scene.shape.Line(0, 0, 180, 0);
+                separator.setStroke(Color.web("#DDDDDD"));
+                separator.getStrokeDashArray().addAll(2.0, 2.0);
+                
+                Label lblVerifactuBrand = new Label("SISTEMA VERI*FACTU");
+                lblVerifactuBrand.setStyle("-fx-font-family: 'Segoe UI', system-ui; -fx-font-weight: bold; -fx-font-size: 12px; -fx-text-fill: #333333; -fx-padding: 5 0 0 0;");
+                
+                Label lblLegalText = new Label("Factura verificable en la sede electr\u00f3nica de la AEAT");
+                lblLegalText.setStyle("-fx-font-size: 9px; -fx-text-fill: #666666; -fx-alignment: center; -fx-font-weight: normal;");
+                lblLegalText.setWrapText(true);
+                lblLegalText.setTextAlignment(javafx.scene.text.TextAlignment.CENTER);
+                lblLegalText.setMaxWidth(220);
+                
+                // URL de AEAT Verifactu
+                String nif = (data.document.getIssuerTaxId() != null) ? data.document.getIssuerTaxId() : cfg.getCif();
+                String fullRef = data.document.getFullReference();
+                LocalDateTime issuedAt = data.document.getIssuedAt();
+                double amount = data.document.getTotalAmount();
+
+                String aeatUrl = "https://prewww1.aeat.es/wlpl/TIKE-CONT/ValidarQR?nif=" 
+                                 + (nif != null ? nif.toUpperCase() : "")
+                                 + "&numserie=" + fullRef
+                                 + "&fecha=" + issuedAt.format(java.time.format.DateTimeFormatter.ofPattern("dd-MM-yyyy"))
+                                 + "&importe=" + String.format(java.util.Locale.US, "%.2f", Math.abs(amount));
+                
+                byte[] qrBytes = com.mycompany.ventacontrolfx.util.QrGenerator.generateQrCode(aeatUrl, 300, 300);
+                if (qrBytes != null) {
+                    javafx.scene.image.Image qrImage = new javafx.scene.image.Image(new java.io.ByteArrayInputStream(qrBytes));
+                    javafx.scene.image.ImageView imgView = new javafx.scene.image.ImageView(qrImage);
+                    imgView.setFitWidth(140);
+                    imgView.setFitHeight(140);
+                    
+                    // Marco para el QR
+                    VBox qrFrame = new VBox(imgView);
+                    qrFrame.setAlignment(javafx.geometry.Pos.CENTER);
+                    qrFrame.setStyle("-fx-padding: 8; -fx-border-color: #EEEEEE; -fx-border-width: 1; -fx-background-color: white;");
+                    
+                    fiscalBox.getChildren().addAll(separator, lblVerifactuBrand, lblLegalText, qrFrame);
                 }
                 
-                Label lblHash = new Label("Hash:\n" + formattedHash);
-                lblHash.setStyle("-fx-font-size: 8px; -fx-text-fill: #777; -fx-alignment: center; -fx-font-family: monospace;");
+                // Hash formateado
+                String h = data.document.getControlHash();
+                String formattedHash = h.length() > 32 ? h.substring(0, 32) + "\n" + h.substring(32) : h;
+                
+                Label lblHash = new Label("Huella: " + formattedHash);
+                lblHash.setStyle("-fx-font-size: 7px; -fx-text-fill: #999999; -fx-alignment: center; -fx-font-family: monospace;");
                 lblHash.setWrapText(true);
                 lblHash.setTextAlignment(javafx.scene.text.TextAlignment.CENTER);
-                lblHash.setMaxWidth(300);
+                lblHash.setMaxWidth(280);
+                
                 fiscalBox.getChildren().add(lblHash);
+                paperSheet.getChildren().add(fiscalBox);
             }
-            
-            paperSheet.getChildren().add(fiscalBox);
         } catch (Exception ex) {
-            System.err.println("No se pudo cargar la vista fiscal para Print Preview: " + ex.getMessage());
+            System.err.println("Error redise\u00f1ando ticket Verifactu: " + ex.getMessage());
         }
     }
 

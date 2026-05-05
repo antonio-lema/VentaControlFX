@@ -60,7 +60,7 @@ public class JdbcUserRepository implements IUserRepository {
 
     @Override
     public boolean create(User user) throws SQLException {
-        String sql = "INSERT INTO users (username, password_hash, full_name, role, email, company_id) VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO users (username, password_hash, full_name, role, email, company_id, has_custom_permissions) VALUES (?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = DBConnection.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
@@ -70,6 +70,7 @@ public class JdbcUserRepository implements IUserRepository {
             pstmt.setString(4, user.getRole());
             pstmt.setString(5, user.getEmail());
             pstmt.setInt(6, user.getCompanyId());
+            pstmt.setBoolean(7, user.isHasCustomPermissions());
 
             return pstmt.executeUpdate() > 0;
         }
@@ -77,7 +78,7 @@ public class JdbcUserRepository implements IUserRepository {
 
     @Override
     public boolean update(User user) throws SQLException {
-        String sql = "UPDATE users SET full_name = ?, role = ?, email = ?, company_id = ? WHERE user_id = ?";
+        String sql = "UPDATE users SET full_name = ?, role = ?, email = ?, company_id = ?, has_custom_permissions = ? WHERE user_id = ?";
         try (Connection conn = DBConnection.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
@@ -85,7 +86,8 @@ public class JdbcUserRepository implements IUserRepository {
             pstmt.setString(2, user.getRole());
             pstmt.setString(3, user.getEmail());
             pstmt.setInt(4, user.getCompanyId());
-            pstmt.setInt(5, user.getUserId());
+            pstmt.setBoolean(5, user.isHasCustomPermissions());
+            pstmt.setInt(6, user.getUserId());
 
             return pstmt.executeUpdate() > 0;
         }
@@ -152,6 +154,11 @@ public class JdbcUserRepository implements IUserRepository {
         user.setFullName(rs.getString("full_name"));
         user.setRole(rs.getString("role"));
         user.setEmail(rs.getString("email"));
+        try {
+            user.setHasCustomPermissions(rs.getBoolean("has_custom_permissions"));
+        } catch (SQLException e) {
+            // Ignorar si no existe todav\u00eda
+        }
 
         try {
             user.setCompanyId(rs.getInt("company_id"));

@@ -14,9 +14,10 @@ public class PriceHistoryEventDTO {
     private final String reason;
     private final String details; // e.g., "Afecado a 20 productos" or "Anterior: 10.00 \u20ac"
     private final String targetName;
+    private final Integer logId;
 
     public PriceHistoryEventDTO(EventType type, LocalDateTime timestamp, String title, String description,
-            String reason, String details, String targetName) {
+            String reason, String details, String targetName, Integer logId) {
         this.type = type;
         this.timestamp = timestamp;
         this.title = title;
@@ -24,6 +25,7 @@ public class PriceHistoryEventDTO {
         this.reason = reason;
         this.details = details;
         this.targetName = targetName;
+        this.logId = logId;
     }
 
     public EventType getType() {
@@ -52,5 +54,9 @@ public class PriceHistoryEventDTO {
 
     public String getTargetName() {
         return targetName;
+    }
+
+    public Integer getLogId() {
+        return logId;
     }
 }

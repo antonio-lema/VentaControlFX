@@ -120,9 +120,11 @@ public class ManageRolesController implements Injectable {
         actions.setPadding(new Insets(10, 0, 0, 0));
 
         Button btnEdit = new Button();
+        boolean isSuperAdminRole = "SUPERADMIN".equalsIgnoreCase(role.getName());
+        boolean currentIsSuperAdmin = container.getAuthService().isSuperAdmin();
         boolean canManageRoles = container.getUserSession().hasPermission("rol.editar");
         
-        if (canManageRoles) {
+        if (canManageRoles && (!isSuperAdminRole || currentIsSuperAdmin)) {
             btnEdit.getStyleClass().add("btn-action-edit");
             FontAwesomeIconView editIcon = new FontAwesomeIconView(FontAwesomeIcon.PENCIL);
             editIcon.setSize("18");
@@ -130,7 +132,7 @@ public class ManageRolesController implements Injectable {
             btnEdit.setOnAction(e -> handleEditSingleRole(role));
         } else {
             btnEdit.getStyleClass().add("btn-action-lock");
-            btnEdit.setStyle("-fx-background-color: #f59e0b; -fx-text-fill: white; -fx-background-radius: 50;");
+            btnEdit.setStyle("-fx-background-color: #64748b; -fx-text-fill: white; -fx-background-radius: 50;");
             FontAwesomeIconView lockIcon = new FontAwesomeIconView(FontAwesomeIcon.LOCK);
             lockIcon.setSize("18");
             lockIcon.setFill(Color.WHITE);
@@ -140,15 +142,17 @@ public class ManageRolesController implements Injectable {
                     container.getBundle().getString("role.msg.locked_edit")));
         }
 
-        // Disable editing for "admin" role to ensure immutability
-        if ("admin".equalsIgnoreCase(role.getName())) {
-            btnEdit.setDisable(true);
-            btnEdit.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.SHIELD, "18"));
-            btnEdit.setTooltip(new Tooltip("El rol de administrador principal no puede ser modificado."));
+        // Disable editing for "admin" and "SUPERADMIN" role to ensure immutability from non-superadmins
+        if ("admin".equalsIgnoreCase(role.getName()) || isSuperAdminRole) {
+            if (!currentIsSuperAdmin) {
+                btnEdit.setDisable(true);
+                btnEdit.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.SHIELD, "18"));
+                btnEdit.setTooltip(new Tooltip("Este rol es del sistema y no puede ser modificado por administradores."));
+            }
         }
 
         Button btnDelete = new Button();
-        if (canManageRoles) {
+        if (canManageRoles && (!isSuperAdminRole || currentIsSuperAdmin)) {
             btnDelete.getStyleClass().add("btn-action-delete");
             FontAwesomeIconView deleteIcon = new FontAwesomeIconView(FontAwesomeIcon.TRASH);
             deleteIcon.setSize("18");
@@ -156,7 +160,7 @@ public class ManageRolesController implements Injectable {
             btnDelete.setOnAction(e -> handleDeleteSingleRole(role));
         } else {
             btnDelete.getStyleClass().add("btn-action-lock");
-            btnDelete.setStyle("-fx-background-color: #f59e0b; -fx-text-fill: white; -fx-background-radius: 50;");
+            btnDelete.setStyle("-fx-background-color: #64748b; -fx-text-fill: white; -fx-background-radius: 50;");
             FontAwesomeIconView lockIcon = new FontAwesomeIconView(FontAwesomeIcon.LOCK);
             lockIcon.setSize("18");
             lockIcon.setFill(Color.WHITE);
@@ -166,11 +170,13 @@ public class ManageRolesController implements Injectable {
                     container.getBundle().getString("role.msg.locked_delete")));
         }
 
-        // Disable deletion for system roles or "admin"
-        if ("admin".equalsIgnoreCase(role.getName()) || "cajero".equalsIgnoreCase(role.getName())) {
+        // Disable deletion for system roles or "admin" or "SUPERADMIN"
+        if ("admin".equalsIgnoreCase(role.getName()) || "cajero".equalsIgnoreCase(role.getName()) || isSuperAdminRole) {
             btnDelete.setDisable(true);
             btnDelete.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.SHIELD, "18"));
+            btnDelete.setTooltip(new Tooltip("Rol protegido del sistema. No se puede eliminar."));
         }
+
 
         actions.getChildren().addAll(btnEdit, btnDelete);
         card.getChildren().addAll(avatar, info, actions);

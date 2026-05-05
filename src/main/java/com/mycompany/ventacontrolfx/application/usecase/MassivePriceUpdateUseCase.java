@@ -2,22 +2,19 @@ package com.mycompany.ventacontrolfx.application.usecase;
 
 import com.mycompany.ventacontrolfx.domain.exception.BusinessException;
 import com.mycompany.ventacontrolfx.domain.repository.IMassivePriceUpdateRepository;
-import com.mycompany.ventacontrolfx.domain.repository.IPriceRepository;
 import com.mycompany.ventacontrolfx.domain.repository.IProductRepository;
 import com.mycompany.ventacontrolfx.domain.repository.IPriceUpdateLogRepository;
 import com.mycompany.ventacontrolfx.domain.model.PriceUpdateLog;
 
 import java.sql.SQLException;
+import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * Caso de uso: Actualizaci\u00f3n masiva de precios.
  *
- * Responsabilidad: Orquestar la l\u00f3gica de negocio (validaci\u00f3n, c\u00e1lculo del
- * multiplicador) y delegar la persistencia al repositorio via interfaz.
- *
- * IMPORTANTE (Clean Architecture): Esta clase NO debe contener SQL, Connection,
- * PreparedStatement ni ninguna referencia a infraestructura. Solo habla con
- * interfaces de dominio.
+ * Responsabilidad: Orquestar la l\u00f3gica de negocio y delegar la persistencia.
+ * Implementa un flujo at\u00f3mico de logId para asegurar la trazabilidad.
  */
 public class MassivePriceUpdateUseCase {
 
@@ -33,399 +30,225 @@ public class MassivePriceUpdateUseCase {
         this.priceLogRepository = priceLogRepository;
     }
 
-    /**
-     * Aplica una subida (o bajada) porcentual a TODOS los productos activos
-     * de una lista de precios.
-     *
-     * @param priceListId ID de la lista de precios a actualizar.
-     * @param percentage  Porcentaje a aplicar (ej: 5.0 = +5%, -3.0 = -3%).
-     * @param reason      Motivo del cambio (para trazabilidad en base de datos).
-     * @return N\u00famero de productos actualizados.
-     */
-    public int applyPercentageIncreaseToAll(int priceListId, double percentage, String reason,
-            java.time.LocalDateTime startDate)
-            throws SQLException {
-        startDate = (startDate != null) ? startDate.withNano(0) : java.time.LocalDateTime.now().withNano(0);
+    private int initLog(String type, String scope, double value, Integer categoryId, Integer priceListId, String reason, LocalDateTime appliedAt) throws SQLException {
+        PriceUpdateLog log = new PriceUpdateLog();
+        log.setUpdateType(type);
+        log.setScope(scope);
+        log.setValue(value);
+        log.setProductsUpdated(0);
+        log.setCategoryId(categoryId);
+        log.setReason(reason);
+        log.setPriceListId(priceListId);
+        log.setAppliedAt(appliedAt.withNano(0));
+        priceLogRepository.save(log);
+        return log.getLogId();
+    }
+
+    private void finalizeLog(int logId, int count) throws SQLException {
+        if (logId > 0) {
+            priceLogRepository.updateProductsUpdatedCount(logId, count);
+        }
+    }
+
+    public int applyPercentageIncreaseToAll(int priceListId, double percentage, String reason, LocalDateTime startDate) throws SQLException {
+        startDate = (startDate != null) ? startDate.withNano(0) : LocalDateTime.now().withNano(0);
         validatePercentage(percentage);
         double multiplier = 1.0 + (percentage / 100.0);
-        int updated = priceRepository.applyBulkMultiplier(priceListId, null, multiplier, reason, startDate);
-        saveLog("percentage", "Todos los Art\u00edculos", percentage, updated, null, reason, startDate);
+        int logId = initLog("percentage", "Todos los Art\u00edculos", percentage, null, priceListId, reason, startDate);
+        int updated = priceRepository.applyBulkMultiplier(priceListId, null, multiplier, reason, startDate, logId);
+        finalizeLog(logId, updated);
         return updated;
     }
 
-    /**
-     * Aplica una subida (o bajada) porcentual a todos los productos de una
-     * categor\u00eda espec\u00edfica.
-     *
-     * @param priceListId ID de la lista de precios.
-     * @param categoryId  ID de la categor\u00eda cuyos productos ser\u00e1n afectados.
-     * @param percentage  Porcentaje a aplicar.
-     * @param reason      Motivo del cambio.
-     * @return N\u00famero de productos actualizados.
-     */
-    public int applyPercentageIncreaseToCategory(int priceListId, int categoryId,
-            double percentage, String reason, java.time.LocalDateTime startDate) throws SQLException {
-        startDate = (startDate != null) ? startDate.withNano(0) : java.time.LocalDateTime.now().withNano(0);
+    public int applyPercentageIncreaseToCategory(int priceListId, int categoryId, double percentage, String reason, LocalDateTime startDate) throws SQLException {
+        startDate = (startDate != null) ? startDate.withNano(0) : LocalDateTime.now().withNano(0);
         validatePercentage(percentage);
         double multiplier = 1.0 + (percentage / 100.0);
-        int updated = priceRepository.applyBulkMultiplier(priceListId, categoryId, multiplier, reason, startDate);
-        saveLog("percentage", "Por Categor\u00eda", percentage, updated, categoryId, reason, startDate);
+        int logId = initLog("percentage", "Por Categor\u00eda", percentage, categoryId, priceListId, reason, startDate);
+        int updated = priceRepository.applyBulkMultiplier(priceListId, categoryId, multiplier, reason, startDate, logId);
+        finalizeLog(logId, updated);
         return updated;
     }
 
-    /**
-     * Aplica una subida (o bajada) por importe fijo a TODOS los productos.
-     */
-    public int applyFixedAmountIncreaseToAll(int priceListId, double amount, String reason,
-            java.time.LocalDateTime startDate)
-            throws SQLException {
-        startDate = (startDate != null) ? startDate.withNano(0) : java.time.LocalDateTime.now().withNano(0);
+    public int applyFixedAmountIncreaseToAll(int priceListId, double amount, String reason, LocalDateTime startDate) throws SQLException {
+        startDate = (startDate != null) ? startDate.withNano(0) : LocalDateTime.now().withNano(0);
         validateAmount(amount);
-        int updated = priceRepository.applyBulkFixedAmount(priceListId, null, amount, reason, startDate);
-        saveLog("fixed_amount", "Todos los Art\u00edculos", amount, updated, null, reason, startDate);
+        int logId = initLog("fixed_amount", "Todos los Art\u00edculos", amount, null, priceListId, reason, startDate);
+        int updated = priceRepository.applyBulkFixedAmount(priceListId, null, amount, reason, startDate, logId);
+        finalizeLog(logId, updated);
         return updated;
     }
 
-    /**
-     * Aplica una subida (o bajada) por importe fijo a una categor\u00eda.
-     */
-    public int applyFixedAmountIncreaseToCategory(int priceListId, int categoryId,
-            double amount, String reason, java.time.LocalDateTime startDate) throws SQLException {
-        startDate = (startDate != null) ? startDate.withNano(0) : java.time.LocalDateTime.now().withNano(0);
+    public int applyFixedAmountIncreaseToCategory(int priceListId, int categoryId, double amount, String reason, LocalDateTime startDate) throws SQLException {
+        startDate = (startDate != null) ? startDate.withNano(0) : LocalDateTime.now().withNano(0);
         validateAmount(amount);
-        int updated = priceRepository.applyBulkFixedAmount(priceListId, categoryId, amount, reason, startDate);
-        saveLog("fixed_amount", "Por Categor\u00eda", amount, updated, categoryId, reason, startDate);
+        int logId = initLog("fixed_amount", "Por Categor\u00eda", amount, categoryId, priceListId, reason, startDate);
+        int updated = priceRepository.applyBulkFixedAmount(priceListId, categoryId, amount, reason, startDate, logId);
+        finalizeLog(logId, updated);
         return updated;
     }
 
-    /**
-     * Redondea precios masivamente a un decimal objetivo (ej: .99).
-     */
-    public int applyRoundingToAll(int priceListId, double targetDecimal, String reason,
-            java.time.LocalDateTime startDate) throws SQLException {
-        startDate = (startDate != null) ? startDate.withNano(0) : java.time.LocalDateTime.now().withNano(0);
-        int updated = priceRepository.applyBulkRounding(priceListId, null, targetDecimal, reason, startDate);
-        saveLog("rounding", "Todos los Art\u00edculos", targetDecimal, updated, null, reason, startDate);
+    public int applyRoundingToAll(int priceListId, double targetDecimal, String reason, LocalDateTime startDate) throws SQLException {
+        startDate = (startDate != null) ? startDate.withNano(0) : LocalDateTime.now().withNano(0);
+        int logId = initLog("rounding", "Todos los Art\u00edculos", targetDecimal, null, priceListId, reason, startDate);
+        int updated = priceRepository.applyBulkRounding(priceListId, null, targetDecimal, reason, startDate, logId);
+        finalizeLog(logId, updated);
         return updated;
     }
 
-    /**
-     * Redondea precios de una categor\u00eda a un decimal objetivo (ej: .99).
-     */
-    public int applyRoundingToCategory(int priceListId, int categoryId, double targetDecimal, String reason,
-            java.time.LocalDateTime startDate)
-            throws SQLException {
-        startDate = (startDate != null) ? startDate.withNano(0) : java.time.LocalDateTime.now().withNano(0);
-        int updated = priceRepository.applyBulkRounding(priceListId, categoryId, targetDecimal, reason, startDate);
-        saveLog("rounding", "Por Categor\u00eda", targetDecimal, updated, categoryId, reason, startDate);
+    public int applyRoundingToCategory(int priceListId, int categoryId, double targetDecimal, String reason, LocalDateTime startDate) throws SQLException {
+        startDate = (startDate != null) ? startDate.withNano(0) : LocalDateTime.now().withNano(0);
+        int logId = initLog("rounding", "Por Categor\u00eda", targetDecimal, categoryId, priceListId, reason, startDate);
+        int updated = priceRepository.applyBulkRounding(priceListId, categoryId, targetDecimal, reason, startDate, logId);
+        finalizeLog(logId, updated);
         return updated;
     }
 
-    /**
-     * Aplica un ajuste (porcentual o fijo) a los N art\u00edculos m\u00e1s vendidos.
-     */
-    public int applyToTopSellers(int priceListId, int topN, int daysBack, double value, String reason,
-            boolean isPercentage, java.time.LocalDateTime startDate)
-            throws SQLException {
-        startDate = (startDate != null) ? startDate.withNano(0) : java.time.LocalDateTime.now().withNano(0);
-        if (isPercentage)
-            validatePercentage(value);
-        else
-            validateAmount(value);
-        if (topN <= 0)
-            throw new BusinessException("El n\u00famero de art\u00edculos Top debe ser mayor que 0.");
-        if (daysBack <= 0)
-            throw new BusinessException("Los d\u00edas de an\u00e1lisis deben ser mayores que 0.");
-
+    public int applyToTopSellers(int priceListId, int topN, int daysBack, double value, String reason, boolean isPercentage, LocalDateTime startDate) throws SQLException {
+        startDate = (startDate != null) ? startDate.withNano(0) : LocalDateTime.now().withNano(0);
+        if (isPercentage) validatePercentage(value); else validateAmount(value);
         double repoValue = isPercentage ? (1.0 + (value / 100.0)) : value;
-        int updated = priceRepository.applyBulkMultiplierToTopSellers(priceListId, topN, daysBack, repoValue, reason,
-                isPercentage, startDate);
-        saveLog(isPercentage ? "percentage" : "fixed_amount", "Top " + topN + " Vendidos", value, updated, null,
-                reason, startDate);
+        int logId = initLog(isPercentage ? "percentage" : "fixed_amount", "Top " + topN + " Vendidos", value, null, priceListId, reason, startDate);
+        int updated = priceRepository.applyBulkMultiplierToTopSellers(priceListId, topN, daysBack, repoValue, reason, isPercentage, startDate, logId);
+        finalizeLog(logId, updated);
         return updated;
     }
 
-    /**
-     * Aplica un ajuste (porcentual o fijo) a art\u00edculos sin ventas (slow-movers).
-     */
-    public int applyToSlowMovers(int priceListId, int daysWithoutSale, double value, String reason,
-            boolean isPercentage, java.time.LocalDateTime startDate)
-            throws SQLException {
-        startDate = (startDate != null) ? startDate.withNano(0) : java.time.LocalDateTime.now().withNano(0);
-        if (isPercentage)
-            validatePercentage(value);
-        else
-            validateAmount(value);
-        if (daysWithoutSale <= 0)
-            throw new BusinessException("Los d\u00edas sin venta deben ser mayores que 0.");
-
+    public int applyToSlowMovers(int priceListId, int daysWithoutSale, double value, String reason, boolean isPercentage, LocalDateTime startDate) throws SQLException {
+        startDate = (startDate != null) ? startDate.withNano(0) : LocalDateTime.now().withNano(0);
+        if (isPercentage) validatePercentage(value); else validateAmount(value);
         double repoValue = isPercentage ? (1.0 + (value / 100.0)) : value;
-        int updated = priceRepository.applyBulkMultiplierToSlowMovers(priceListId, daysWithoutSale, repoValue, reason,
-                isPercentage, startDate);
-        saveLog(isPercentage ? "percentage" : "fixed_amount", "Sin Ventas (" + daysWithoutSale + "d)", value, updated,
-                null, reason, startDate);
+        int logId = initLog(isPercentage ? "percentage" : "fixed_amount", "Sin Ventas (" + daysWithoutSale + "d)", value, null, priceListId, reason, startDate);
+        int updated = priceRepository.applyBulkMultiplierToSlowMovers(priceListId, daysWithoutSale, repoValue, reason, isPercentage, startDate, logId);
+        finalizeLog(logId, updated);
         return updated;
     }
 
-    /**
-     * Aplica un ajuste (porcentual o fijo) dentro de un rango de precio.
-     */
-    public int applyToPriceRange(int priceListId, double minPrice, double maxPrice, double value, String reason,
-            boolean isPercentage, java.time.LocalDateTime startDate)
-            throws SQLException {
-        startDate = (startDate != null) ? startDate.withNano(0) : java.time.LocalDateTime.now().withNano(0);
-        if (isPercentage)
-            validatePercentage(value);
-        else
-            validateAmount(value);
-        if (minPrice < 0)
-            throw new BusinessException("El precio m\u00ednimo no puede ser negativo.");
-        if (maxPrice <= minPrice)
-            throw new BusinessException("El precio m\u00e1ximo debe ser mayor que el m\u00ednimo.");
-
+    public int applyToPriceRange(int priceListId, double minPrice, double maxPrice, double value, String reason, boolean isPercentage, LocalDateTime startDate) throws SQLException {
+        startDate = (startDate != null) ? startDate.withNano(0) : LocalDateTime.now().withNano(0);
+        if (isPercentage) validatePercentage(value); else validateAmount(value);
         double repoValue = isPercentage ? (1.0 + (value / 100.0)) : value;
-        int updated = priceRepository.applyBulkMultiplierToPriceRange(priceListId, minPrice, maxPrice, repoValue,
-                reason, isPercentage, startDate);
-        saveLog(isPercentage ? "percentage" : "fixed_amount", "Rango [" + minPrice + "-" + maxPrice + "]", value,
-                updated, null, reason, startDate);
+        int logId = initLog(isPercentage ? "percentage" : "fixed_amount", "Rango [" + minPrice + "-" + maxPrice + "]", value, null, priceListId, reason, startDate);
+        int updated = priceRepository.applyBulkMultiplierToPriceRange(priceListId, minPrice, maxPrice, repoValue, reason, isPercentage, startDate, logId);
+        finalizeLog(logId, updated);
         return updated;
     }
 
-    /**
-     * Aplica un ajuste (porcentual o fijo) a favoritos.
-     */
-    public int applyToFavorites(int priceListId, double value, String reason, boolean isPercentage,
-            java.time.LocalDateTime startDate)
-            throws SQLException {
-        startDate = (startDate != null) ? startDate.withNano(0) : java.time.LocalDateTime.now().withNano(0);
-        if (isPercentage)
-            validatePercentage(value);
-        else
-            validateAmount(value);
-
+    public int applyToFavorites(int priceListId, double value, String reason, boolean isPercentage, LocalDateTime startDate) throws SQLException {
+        startDate = (startDate != null) ? startDate.withNano(0) : LocalDateTime.now().withNano(0);
+        if (isPercentage) validatePercentage(value); else validateAmount(value);
         double repoValue = isPercentage ? (1.0 + (value / 100.0)) : value;
-        int updated = priceRepository.applyBulkMultiplierToFavorites(priceListId, repoValue, reason, isPercentage,
-                startDate);
-        saveLog(isPercentage ? "percentage" : "fixed_amount", "Favoritos \u2605", value, updated, null, reason, startDate);
+        int logId = initLog(isPercentage ? "percentage" : "fixed_amount", "Favoritos \u2605", value, null, priceListId, reason, startDate);
+        int updated = priceRepository.applyBulkMultiplierToFavorites(priceListId, repoValue, reason, isPercentage, startDate, logId);
+        finalizeLog(logId, updated);
         return updated;
     }
 
-    /**
-     * Aplica un ajuste (porcentual o fijo) a los N art\u00edculos MENOS vendidos.
-     */
-    public int applyToBottomSellers(int priceListId, int bottomN, int daysBack, double value, String reason,
-            boolean isPercentage, java.time.LocalDateTime startDate)
-            throws SQLException {
-        startDate = (startDate != null) ? startDate.withNano(0) : java.time.LocalDateTime.now().withNano(0);
-        if (isPercentage)
-            validatePercentage(value);
-        else
-            validateAmount(value);
-        if (bottomN <= 0)
-            throw new BusinessException("El n\u00famero de art\u00edculos a actualizar debe ser mayor que 0.");
-        if (daysBack <= 0)
-            throw new BusinessException("Los d\u00edas de an\u00e1lisis deben ser mayores que 0.");
-
+    public int applyToBottomSellers(int priceListId, int bottomN, int daysBack, double value, String reason, boolean isPercentage, LocalDateTime startDate) throws SQLException {
+        startDate = (startDate != null) ? startDate.withNano(0) : LocalDateTime.now().withNano(0);
+        if (isPercentage) validatePercentage(value); else validateAmount(value);
         double repoValue = isPercentage ? (1.0 + (value / 100.0)) : value;
-        int updated = priceRepository.applyBulkMultiplierToBottomSellers(priceListId, bottomN, daysBack, repoValue,
-                reason, isPercentage, startDate);
-        saveLog(isPercentage ? "percentage" : "fixed_amount", "Bottom " + bottomN + " Vendidos", value, updated, null,
-                reason, startDate);
+        int logId = initLog(isPercentage ? "percentage" : "fixed_amount", "Bottom " + bottomN + " Vendidos", value, null, priceListId, reason, startDate);
+        int updated = priceRepository.applyBulkMultiplierToBottomSellers(priceListId, bottomN, daysBack, repoValue, reason, isPercentage, startDate, logId);
+        finalizeLog(logId, updated);
         return updated;
     }
 
-    /**
-     * Clona una lista de precios en otra aplicando un multiplicador masivo.
-     * \u00datil para crear tarifas de mayoristas a partir de la general.
-     */
-    public void cloneAndAdjustPrices(int sourceListId, int targetListId, double percentage, String reason,
-            java.time.LocalDateTime startDate)
-            throws SQLException {
-        startDate = (startDate != null) ? startDate.withNano(0) : java.time.LocalDateTime.now().withNano(0);
+    public void cloneAndAdjustPrices(int sourceListId, int targetListId, double percentage, String reason, LocalDateTime startDate) throws SQLException {
+        startDate = (startDate != null) ? startDate.withNano(0) : LocalDateTime.now().withNano(0);
         double multiplier = 1.0 + (percentage / 100.0);
-        priceRepository.cloneAndAdjustPriceList(sourceListId, targetListId, multiplier, reason, startDate);
-        saveLog("clonacion", "Desde Tarifa " + sourceListId, percentage, -1, null, reason, startDate);
+        int logId = initLog("clonacion", "Desde Tarifa " + sourceListId, percentage, null, targetListId, reason, startDate);
+        priceRepository.cloneAndAdjustPriceList(sourceListId, targetListId, multiplier, reason, startDate, logId);
+        // updated count isn't easily returned for clone, setting as -1 or estimate
+        finalizeLog(logId, -1);
     }
 
-    /**
-     * Aplica un nuevo tipo de IVA a todos los productos.
-     */
+    public int applyRoundingToTopSellers(int priceListId, int topN, int daysBack, double targetDecimal, String reason, LocalDateTime startDate) throws SQLException {
+        startDate = (startDate != null) ? startDate.withNano(0) : LocalDateTime.now().withNano(0);
+        int logId = initLog("rounding", "Top " + topN + " Vendidos", targetDecimal, null, priceListId, reason, startDate);
+        int updated = priceRepository.applyBulkRoundingToTopSellers(priceListId, topN, daysBack, targetDecimal, reason, startDate, logId);
+        finalizeLog(logId, updated);
+        return updated;
+    }
+
+    public int applyRoundingToBottomSellers(int priceListId, int bottomN, int daysBack, double targetDecimal, String reason, LocalDateTime startDate) throws SQLException {
+        startDate = (startDate != null) ? startDate.withNano(0) : LocalDateTime.now().withNano(0);
+        int logId = initLog("rounding", "Bottom " + bottomN + " Vendidos", targetDecimal, null, priceListId, reason, startDate);
+        int updated = priceRepository.applyBulkRoundingToBottomSellers(priceListId, bottomN, daysBack, targetDecimal, reason, startDate, logId);
+        finalizeLog(logId, updated);
+        return updated;
+    }
+
+    public int applyRoundingToSlowMovers(int priceListId, int daysWithoutSale, double targetDecimal, String reason, LocalDateTime startDate) throws SQLException {
+        startDate = (startDate != null) ? startDate.withNano(0) : LocalDateTime.now().withNano(0);
+        int logId = initLog("rounding", "Sin Ventas (" + daysWithoutSale + "d)", targetDecimal, null, priceListId, reason, startDate);
+        int updated = priceRepository.applyBulkRoundingToSlowMovers(priceListId, daysWithoutSale, targetDecimal, reason, startDate, logId);
+        finalizeLog(logId, updated);
+        return updated;
+    }
+
+    public int applyRoundingToPriceRange(int priceListId, double minPrice, double maxPrice, double targetDecimal, String reason, LocalDateTime startDate) throws SQLException {
+        startDate = (startDate != null) ? startDate.withNano(0) : LocalDateTime.now().withNano(0);
+        int logId = initLog("rounding", "Rango [" + minPrice + "-" + maxPrice + "]", targetDecimal, null, priceListId, reason, startDate);
+        int updated = priceRepository.applyBulkRoundingToPriceRange(priceListId, minPrice, maxPrice, targetDecimal, reason, startDate, logId);
+        finalizeLog(logId, updated);
+        return updated;
+    }
+
+    public int applyRoundingToFavorites(int priceListId, double targetDecimal, String reason, LocalDateTime startDate) throws SQLException {
+        startDate = (startDate != null) ? startDate.withNano(0) : LocalDateTime.now().withNano(0);
+        int logId = initLog("rounding", "Favoritos \u2605", targetDecimal, null, priceListId, reason, startDate);
+        int updated = priceRepository.applyBulkRoundingToFavorites(priceListId, targetDecimal, reason, startDate, logId);
+        finalizeLog(logId, updated);
+        return updated;
+    }
+
+    public int applyPercentageIncreaseToProducts(int priceListId, List<Integer> productIds, double percentage, String reason, LocalDateTime startDate) throws SQLException {
+        startDate = (startDate != null) ? startDate.withNano(0) : LocalDateTime.now().withNano(0);
+        validatePercentage(percentage);
+        double multiplier = 1.0 + (percentage / 100.0);
+        int logId = initLog("percentage", "Lista de Productos (" + (productIds != null ? productIds.size() : 0) + ")", percentage, null, priceListId, reason, startDate);
+        int updated = priceRepository.applyBulkMultiplierToProducts(priceListId, productIds, multiplier, reason, startDate, logId);
+        finalizeLog(logId, updated);
+        return updated;
+    }
+
+    public int applyFixedAmountIncreaseToProducts(int priceListId, List<Integer> productIds, double amount, String reason, LocalDateTime startDate) throws SQLException {
+        startDate = (startDate != null) ? startDate.withNano(0) : LocalDateTime.now().withNano(0);
+        validateAmount(amount);
+        int logId = initLog("fixed_amount", "Lista de Productos (" + (productIds != null ? productIds.size() : 0) + ")", amount, null, priceListId, reason, startDate);
+        int updated = priceRepository.applyBulkFixedAmountToProducts(priceListId, productIds, amount, reason, startDate, logId);
+        finalizeLog(logId, updated);
+        return updated;
+    }
+
+    public int applyBulkRoundingToProducts(int priceListId, List<Integer> productIds, double targetDecimal, String reason, LocalDateTime startDate) throws SQLException {
+        startDate = (startDate != null) ? startDate.withNano(0) : LocalDateTime.now().withNano(0);
+        int logId = initLog("rounding", "Lista de Productos (" + (productIds != null ? productIds.size() : 0) + ")", targetDecimal, null, priceListId, reason, startDate);
+        int updated = priceRepository.applyBulkRoundingToProducts(priceListId, productIds, targetDecimal, reason, startDate, logId);
+        finalizeLog(logId, updated);
+        return updated;
+    }
+
     public int applyTaxToAll(double taxRate, String reason) throws SQLException {
         productRepository.updateTaxRateToAll(taxRate);
-        int updated = productRepository.count(); // Aproximado o exacto seg\u00fan repo
-        saveLog("tax_change", "Todos los Art\u00edculos", taxRate, updated, null, reason, java.time.LocalDateTime.now());
+        int updated = productRepository.count();
+        // Tax changes are not currently linked to price logs via update_log_id, keeping legacy log for now
         return updated;
     }
 
-    /**
-     * Aplica un nuevo tipo de IVA a todos los productos de una categor\u00eda.
-     */
     public int applyTaxToCategory(int categoryId, double taxRate, String reason) throws SQLException {
         productRepository.updateTaxRateByCategory(categoryId, taxRate);
-        // Aqu\u00ed no tenemos un count exacto f\u00e1cil sin query extra, pero guardamos el log.
-        saveLog("tax_change_legacy", "Por Categor\u00eda", taxRate, -1, categoryId, reason, java.time.LocalDateTime.now());
-        return 1; // Indicativo
-    }
-
-    /**
-     * Aplica un grupo de impuestos V2 (TaxEngine) a todos los productos.
-     */
-    public int applyTaxGroupToAll(int taxGroupId, String reason) throws SQLException {
-        productRepository.updateTaxGroupToAll(taxGroupId);
-        int updated = productRepository.count();
-        saveLog("tax_group_change", "Todos los Art\u00edculos (V2)", taxGroupId, updated, null, reason,
-                java.time.LocalDateTime.now());
-        return updated;
-    }
-
-    /**
-     * Aplica un grupo de impuestos V2 (TaxEngine) a una categor\u00eda.
-     */
-    public int applyTaxGroupToCategory(int categoryId, int taxGroupId, String reason) throws SQLException {
-        productRepository.updateTaxGroupByCategory(categoryId, taxGroupId);
-        saveLog("tax_group_change", "Por Categor\u00eda (V2)", taxGroupId, -1, categoryId, reason,
-                java.time.LocalDateTime.now());
         return 1;
     }
 
-    /**
-     * Redondea precios de los art\u00edculos Top Sellers.
-     */
-    public int applyRoundingToTopSellers(int priceListId, int topN, int daysBack, double targetDecimal, String reason,
-            java.time.LocalDateTime startDate)
-            throws SQLException {
-        startDate = (startDate != null) ? startDate.withNano(0) : java.time.LocalDateTime.now().withNano(0);
-        int updated = priceRepository.applyBulkRoundingToTopSellers(priceListId, topN, daysBack, targetDecimal, reason,
-                startDate);
-        saveLog("rounding", "Top " + topN + " Vendidos", targetDecimal, updated, null, reason, startDate);
-        return updated;
-    }
-
-    /**
-     * Redondea precios de los art\u00edculos Bottom Sellers.
-     */
-    public int applyRoundingToBottomSellers(int priceListId, int bottomN, int daysBack, double targetDecimal,
-            String reason, java.time.LocalDateTime startDate)
-            throws SQLException {
-        startDate = (startDate != null) ? startDate.withNano(0) : java.time.LocalDateTime.now().withNano(0);
-        int updated = priceRepository.applyBulkRoundingToBottomSellers(priceListId, bottomN, daysBack, targetDecimal,
-                reason, startDate);
-        saveLog("rounding", "Bottom " + bottomN + " Vendidos", targetDecimal, updated, null, reason, startDate);
-        return updated;
-    }
-
-    /**
-     * Redondea precios de los art\u00edculos Sin Movimiento (Slow-movers).
-     */
-    public int applyRoundingToSlowMovers(int priceListId, int daysWithoutSale, double targetDecimal, String reason,
-            java.time.LocalDateTime startDate)
-            throws SQLException {
-        startDate = (startDate != null) ? startDate.withNano(0) : java.time.LocalDateTime.now().withNano(0);
-        int updated = priceRepository.applyBulkRoundingToSlowMovers(priceListId, daysWithoutSale, targetDecimal,
-                reason, startDate);
-        saveLog("rounding", "Sin Ventas (" + daysWithoutSale + "d)", targetDecimal, updated, null, reason, startDate);
-        return updated;
-    }
-
-    /**
-     * Redondea precios de art\u00edculos en un rango de precio.
-     */
-    public int applyRoundingToPriceRange(int priceListId, double minPrice, double maxPrice, double targetDecimal,
-            String reason, java.time.LocalDateTime startDate) throws SQLException {
-        startDate = (startDate != null) ? startDate.withNano(0) : java.time.LocalDateTime.now().withNano(0);
-        int updated = priceRepository.applyBulkRoundingToPriceRange(priceListId, minPrice, maxPrice, targetDecimal,
-                reason, startDate);
-        saveLog("rounding", "Rango [" + minPrice + "-" + maxPrice + "]", targetDecimal, updated, null, reason,
-                startDate);
-        return updated;
-    }
-
-    /**
-     * Redondea precios de art\u00edculos favoritos.
-     */
-    public int applyRoundingToFavorites(int priceListId, double targetDecimal, String reason,
-            java.time.LocalDateTime startDate) throws SQLException {
-        startDate = (startDate != null) ? startDate.withNano(0) : java.time.LocalDateTime.now().withNano(0);
-        int updated = priceRepository.applyBulkRoundingToFavorites(priceListId, targetDecimal, reason, startDate);
-        saveLog("rounding", "Favoritos \u2605", targetDecimal, updated, null, reason, startDate);
-        return updated;
-    }
-
     private void validateAmount(double amount) {
-        if (amount == 0) {
-            throw new BusinessException("El importe de cambio no puede ser cero.");
-        }
+        if (amount == 0) throw new BusinessException("El importe de cambio no puede ser cero.");
     }
 
-    /**
-     * Reglas de negocio sobre el porcentaje permitido.
-     * El dominio decide qu\u00e9 valores son aceptables, no la UI.
-     */
     private void validatePercentage(double percentage) {
-        if (percentage == 0) {
-            throw new BusinessException("El porcentaje de cambio no puede ser cero.");
-        }
-        if (percentage < -99) {
-            throw new BusinessException(
-                    "No se puede reducir el precio m\u00e1s de un 99%. Valor recibido: " + percentage + "%");
-        }
-        if (percentage > 200) {
-            throw new BusinessException(
-                    "Una subida del " + percentage + "% parece incorrecta. "
-                            + "Confirme manualmente si es un cambio intencionado superior al 200%.");
-        }
-    }
-
-    private void saveLog(String type, String scope, double value, int updated, Integer categoryId, String reason,
-            java.time.LocalDateTime appliedAt) {
-        try {
-            PriceUpdateLog log = new PriceUpdateLog();
-            log.setUpdateType(type);
-            log.setScope(scope);
-            log.setValue(value);
-            log.setProductsUpdated(updated);
-            log.setCategoryId(categoryId);
-            log.setReason(reason);
-            // Ensure we use the exact same timestamp rounded to seconds if needed,
-            // but for now just use the passed one without nanos to be safe
-            log.setAppliedAt(appliedAt != null ? appliedAt.withNano(0) : java.time.LocalDateTime.now().withNano(0));
-            priceLogRepository.save(log);
-        } catch (Exception ex) {
-            // Log simple, no interrumpir la operaci\u00f3n principal
-            System.err.println("Error guardando log de auditor\u00eda: " + ex.getMessage());
-        }
-    }
-
-    public int applyPercentageIncreaseToProducts(int priceListId, java.util.List<Integer> productIds, double percentage,
-            String reason, java.time.LocalDateTime startDate) throws SQLException {
-        startDate = (startDate != null) ? startDate.withNano(0) : java.time.LocalDateTime.now().withNano(0);
-        validatePercentage(percentage);
-        double multiplier = 1.0 + (percentage / 100.0);
-        int updated = priceRepository.applyBulkMultiplierToProducts(priceListId, productIds, multiplier, reason,
-                startDate);
-        saveLog("percentage", "Lista de Productos (" + (productIds != null ? productIds.size() : 0) + ")", percentage,
-                updated, null, reason, startDate);
-        return updated;
-    }
-
-    public int applyFixedAmountIncreaseToProducts(int priceListId, java.util.List<Integer> productIds, double amount,
-            String reason, java.time.LocalDateTime startDate) throws SQLException {
-        startDate = (startDate != null) ? startDate.withNano(0) : java.time.LocalDateTime.now().withNano(0);
-        validateAmount(amount);
-        int updated = priceRepository.applyBulkFixedAmountToProducts(priceListId, productIds, amount, reason,
-                startDate);
-        saveLog("fixed_amount", "Lista de Productos (" + (productIds != null ? productIds.size() : 0) + ")", amount,
-                updated, null, reason, startDate);
-        return updated;
-    }
-
-    public int applyRoundingToProducts(int priceListId, java.util.List<Integer> productIds, double targetDecimal,
-            String reason, java.time.LocalDateTime startDate) throws SQLException {
-        startDate = (startDate != null) ? startDate.withNano(0) : java.time.LocalDateTime.now().withNano(0);
-        int updated = priceRepository.applyBulkRoundingToProducts(priceListId, productIds, targetDecimal, reason,
-                startDate);
-        saveLog("rounding", "Lista de Productos (" + (productIds != null ? productIds.size() : 0) + ")", targetDecimal,
-                updated, null, reason, startDate);
-        return updated;
+        if (percentage == 0) throw new BusinessException("El porcentaje de cambio no puede ser cero.");
+        if (percentage < -99) throw new BusinessException("No se puede reducir el precio m\u00e1s de un 99%.");
+        if (percentage > 500) throw new BusinessException("Una subida del " + percentage + "% parece excesiva.");
     }
 }

@@ -288,81 +288,51 @@ public class CashClosureController implements Injectable {
 
     @FXML
     private void handleOpenFund() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/dialog/cash_opening_dialog.fxml"));
-            VBox pane = loader.load();
-            CashOpeningController controller = loader.getController();
-            controller.init(closureUseCase, userSession);
+        CashOpeningController controller = ModalService.showTransparentModal(
+                "/view/dialog/cash_opening_dialog.fxml",
+                container.getBundle().getString("closure.dialog.opening_title"),
+                container,
+                (CashOpeningController ctrl) -> {
+                    ctrl.init(closureUseCase, userSession);
+                });
 
-            Stage stage = new Stage();
-            stage.setTitle(container.getBundle().getString("closure.dialog.opening_title"));
-            stage.initModality(javafx.stage.Modality.APPLICATION_MODAL);
-            stage.initOwner(lblDate.getScene().getWindow());
-            stage.setScene(new javafx.scene.Scene(pane));
-            stage.showAndWait();
-
-            if (controller.isConfirmed()) {
-                refreshCashDrawer();
-                AlertUtil.showToast(container.getBundle().getString("closure.success.opened"));
-            }
-        } catch (java.io.IOException e) {
-            e.printStackTrace();
-            AlertUtil.showError(container.getBundle().getString("alert.error"),
-                    container.getBundle().getString("closure.error.dialog_opening"));
+        if (controller != null && controller.isConfirmed()) {
+            refreshCashDrawer();
+            AlertUtil.showToast(container.getBundle().getString("closure.success.opened"));
         }
     }
 
     @FXML
     private void handleWithdrawCash() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/dialog/cash_withdraw_dialog.fxml"));
-            javafx.scene.layout.VBox pane = loader.load();
-            CashWithdrawController controller = loader.getController();
-            controller.init(closureUseCase, userSession);
+        CashWithdrawController controller = ModalService.showTransparentModal(
+                "/view/dialog/cash_withdraw_dialog.fxml",
+                container.getBundle().getString("closure.dialog.withdraw_title"),
+                container,
+                (CashWithdrawController ctrl) -> {
+                    ctrl.init(closureUseCase, userSession);
+                });
 
-            javafx.stage.Stage stage = new javafx.stage.Stage();
-            stage.setTitle(container.getBundle().getString("closure.dialog.withdraw_title"));
-            stage.initModality(javafx.stage.Modality.APPLICATION_MODAL);
-            stage.initOwner(lblDate.getScene().getWindow());
-            stage.setScene(new javafx.scene.Scene(pane));
-            stage.showAndWait();
-
-            if (controller.isConfirmed()) {
-                refreshCashDrawer();
-                loadTodayData();
-                AlertUtil.showToast(container.getBundle().getString("closure.success.withdraw"));
-            }
-        } catch (java.io.IOException e) {
-            e.printStackTrace();
-            AlertUtil.showError(container.getBundle().getString("alert.error"),
-                    container.getBundle().getString("closure.error.dialog_withdraw"));
+        if (controller != null && controller.isConfirmed()) {
+            refreshCashDrawer();
+            loadTodayData();
+            AlertUtil.showToast(container.getBundle().getString("closure.success.withdraw"));
         }
     }
 
     @FXML
     private void handleRegisterCashEntry() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/dialog/cash_entry_dialog.fxml"));
-            javafx.scene.layout.VBox pane = loader.load();
-            CashEntryController controller = loader.getController();
-            controller.init(closureUseCase, userSession);
+        CashEntryController controller = ModalService.showTransparentModal(
+                "/view/dialog/cash_entry_dialog.fxml",
+                container.getBundle().getString("closure.dialog.entry_title"),
+                container,
+                (CashEntryController ctrl) -> {
+                    ctrl.init(closureUseCase, userSession);
+                });
 
-            javafx.stage.Stage stage = new javafx.stage.Stage();
-            stage.setTitle(container.getBundle().getString("closure.dialog.entry_title"));
-            stage.initModality(javafx.stage.Modality.APPLICATION_MODAL);
-            stage.initOwner(lblDate.getScene().getWindow());
-            stage.setScene(new javafx.scene.Scene(pane));
-            stage.showAndWait();
-
-            if (controller.isConfirmed()) {
-                refreshCashDrawer();
-                loadTodayData();
-                AlertUtil.showToast(container.getBundle().getString("closure.success.entry"));
-            }
-        } catch (java.io.IOException e) {
-            e.printStackTrace();
-            AlertUtil.showError(container.getBundle().getString("alert.error"),
-                    container.getBundle().getString("closure.error.dialog_entry"));
+        if (controller != null && controller.isConfirmed()) {
+            refreshCashDrawer();
+            loadTodayData();
+            AlertUtil.showToast(container.getBundle().getString("closure.success.entry"));
         }
     }
 

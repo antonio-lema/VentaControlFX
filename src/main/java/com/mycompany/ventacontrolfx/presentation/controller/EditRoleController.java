@@ -42,6 +42,7 @@ public class EditRoleController implements Injectable {
     private RoleUseCase roleUseCase;
     private PermissionUseCase permissionUseCase;
     private Role roleToEdit;
+    private ServiceContainer container;
 
     // UI state
     private List<CheckBox> permissionCheckboxes = new ArrayList<>();
@@ -50,6 +51,7 @@ public class EditRoleController implements Injectable {
 
     @Override
     public void inject(ServiceContainer container) {
+        this.container = container;
         this.roleUseCase = container.getRoleUseCase();
         this.permissionUseCase = container.getPermissionUseCase();
         loadCatalogPermissions();
@@ -142,9 +144,14 @@ public class EditRoleController implements Injectable {
             txtRoleName.setText(role.getName());
             txtDescription.setText(role.getDescription());
 
-            // Bloquear la edici\u00f3n del nombre si el rol es 'admin' o 'cajero' para evitar
-            // romper l\u00f3gica dura
-            if ("admin".equalsIgnoreCase(role.getName()) || "cajero".equalsIgnoreCase(role.getName())) {
+            boolean isSystemRole = "admin".equalsIgnoreCase(role.getName()) || 
+                                 "cajero".equalsIgnoreCase(role.getName()) ||
+                                 "SUPERADMIN".equalsIgnoreCase(role.getName());
+            
+            boolean currentIsSuperAdmin = container.getAuthService().isSuperAdmin();
+
+            // Bloquear la edici\u00f3n del nombre si el rol es de sistema
+            if (isSystemRole) {
                 txtRoleName.setDisable(true);
             }
 
@@ -158,36 +165,21 @@ public class EditRoleController implements Injectable {
                     cb.setSelected(true);
                 }
 
-                // Si es admin, desactivar todos los checkboxes para evitar cambios parciales
-                if ("admin".equalsIgnoreCase(role.getName())) {
+                // Si es un rol protegido y el usuario NO es SuperAdmin, bloquear cambios
+                if (isSystemRole && !currentIsSuperAdmin) {
                     cb.setDisable(true);
                 }
             }
 
-            // Actualizar estado inicial de los checkboxes "Seleccionar Todo"
-            for (javafx.scene.Node node : permissionsContainer.getChildren()) {
-                if (node instanceof VBox group) {
-                    javafx.scene.Node headerNode = group.getChildren().get(0);
-                    if (headerNode instanceof CheckBox chkAll) {
-                        javafx.scene.Node permsBoxNode = group.getChildren().get(2);
-                        if (permsBoxNode instanceof VBox permsBox) {
-                            boolean allSelected = permsBox.getChildren().stream()
-                                    .filter(n -> n instanceof CheckBox)
-                                    .map(n -> (CheckBox) n)
-                                    .allMatch(CheckBox::isSelected);
-                            if (allSelected && !permsBox.getChildren().isEmpty()) {
-                                chkAll.setSelected(true);
-                            }
-                        }
-                    }
-                }
-            }
-
-            if ("admin".equalsIgnoreCase(role.getName())) {
+            // Si es un rol protegido y el usuario NO es SuperAdmin, deshabilitar bot\u00f3n guardar
+            if (isSystemRole && !currentIsSuperAdmin) {
                 btnSave.setDisable(true);
+                lblError.setText("Este rol est\u00e1 protegido y s\u00f3lo un SuperAdmin puede modificarlo.");
+                lblError.setVisible(true);
             }
         }
     }
+
 
     @FXML
     private void handleSave() {

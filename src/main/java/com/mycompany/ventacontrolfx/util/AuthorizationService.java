@@ -40,16 +40,51 @@ public class AuthorizationService {
 
     /**
      * Comprueba si el rol del usuario es admin.
-     * Nota: el rol "admin" ya NO implica permisos autom\u00e1ticos en la l\u00f3gica normal,
-     * pero aqu\u00ed lo usamos como salvaguarda para la UI.
      */
     public boolean isAdmin() {
         User user = userSession.getCurrentUser();
         if (user == null)
             return false;
         String role = user.getRole();
-        return role != null && ("admin".equalsIgnoreCase(role) || "Administrador".equalsIgnoreCase(role));
+        return role != null && ("admin".equalsIgnoreCase(role) || 
+                               "Administrador".equalsIgnoreCase(role) || 
+                               "SUPERADMIN".equalsIgnoreCase(role));
     }
+
+    /**
+     * Comprueba si el rol del usuario es Super Admin.
+     */
+    public boolean isSuperAdmin() {
+        User user = userSession.getCurrentUser();
+        if (user == null)
+            return false;
+        String role = user.getRole();
+        return role != null && "SUPERADMIN".equalsIgnoreCase(role);
+    }
+
+    /**
+     * Determina si el usuario actual puede gestionar (editar/eliminar) a un usuario objetivo.
+     * 
+     * Reglas:
+     * 1. Un Admin NO puede gestionar a un SuperAdmin.
+     * 2. Un SuperAdmin puede gestionar a todos (excepto borrarse a s\u00ed mismo, l\u00f3gica en controlador).
+     * 3. Nadie puede cambiar el rango de un SuperAdmin.
+     */
+    public boolean canManageUser(User targetUser) {
+        User currentUser = userSession.getCurrentUser();
+        if (currentUser == null || targetUser == null) return false;
+
+        // Si el objetivo es SUPERADMIN
+        if ("SUPERADMIN".equalsIgnoreCase(targetUser.getRole())) {
+            // S\u00f3lo otro SUPERADMIN podr\u00eda (o nadie, seg\u00fan requerimiento)
+            // El usuario dice: "que el admin a el superadmin no le pueda hacer nada"
+            return isSuperAdmin(); 
+        }
+
+        // Si el usuario actual es ADMIN o SUPERADMIN, puede gestionar al resto
+        return isAdmin();
+    }
+
 
     // \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u2500
     // M\u00e9todos de acci\u00f3n protegida

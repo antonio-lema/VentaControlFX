@@ -17,8 +17,8 @@ public class JdbcPriceUpdateLogRepository implements IPriceUpdateLogRepository {
     @Override
     public void save(PriceUpdateLog log) throws SQLException {
         String sql = "INSERT INTO price_update_log " +
-                "(update_type, scope, category_id, value, products_updated, reason, applied_at) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?)";
+                "(update_type, scope, category_id, value, products_updated, reason, price_list_id, applied_at) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = DBConnection.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, log.getUpdateType());
@@ -30,7 +30,11 @@ public class JdbcPriceUpdateLogRepository implements IPriceUpdateLogRepository {
             ps.setDouble(4, log.getValue());
             ps.setInt(5, log.getProductsUpdated());
             ps.setString(6, log.getReason());
-            ps.setTimestamp(7, Timestamp.valueOf(log.getAppliedAt()));
+            if (log.getPriceListId() != null)
+                ps.setInt(7, log.getPriceListId());
+            else
+                ps.setNull(7, Types.INTEGER);
+            ps.setTimestamp(8, Timestamp.valueOf(log.getAppliedAt()));
             ps.executeUpdate();
             try (ResultSet rs = ps.getGeneratedKeys()) {
                 if (rs.next())
@@ -66,10 +70,24 @@ public class JdbcPriceUpdateLogRepository implements IPriceUpdateLogRepository {
                 Timestamp ts = rs.getTimestamp("applied_at");
                 if (ts != null)
                     log.setAppliedAt(ts.toLocalDateTime());
+                int plId = rs.getInt("price_list_id");
+                if (!rs.wasNull())
+                    log.setPriceListId(plId);
                 log.setCategoryName(rs.getString("category_name"));
                 result.add(log);
             }
         }
         return result;
+    }
+
+    @Override
+    public void updateProductsUpdatedCount(int logId, int count) throws SQLException {
+        String sql = "UPDATE price_update_log SET products_updated = ? WHERE log_id = ?";
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, count);
+            ps.setInt(2, logId);
+            ps.executeUpdate();
+        }
     }
 }

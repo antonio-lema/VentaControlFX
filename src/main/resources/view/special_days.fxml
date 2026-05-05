@@ -6,85 +6,111 @@
 <?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
 <?import java.net.URL?>
 
-<VBox spacing="20" prefWidth="600" prefHeight="550" styleClass="modal-container"
-      style="-fx-background-color: white;"
-      xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="com.mycompany.ventacontrolfx.presentation.controller.SpecialDaysController">
+<StackPane fx:id="rootStackPane" styleClass="register-popup-background" 
+           onMousePressed="#handleMousePressed" onMouseDragged="#handleMouseDragged"
+           xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="com.mycompany.ventacontrolfx.presentation.controller.SpecialDaysController">
     
-    <padding><Insets top="30" right="30" bottom="30" left="30"/></padding>
-    
-    <children>
-        <!-- Header Section -->
-        <HBox alignment="CENTER_LEFT" spacing="15">
-            <children>
-                <StackPane style="-fx-background-color: #6366f1; -fx-background-radius: 8; -fx-min-width: 45; -fx-min-height: 45;">
-                    <children>
-                        <FontAwesomeIconView glyphName="CALENDAR_CHECK_ALT" size="22" fill="white" />
-                    </children>
-                </StackPane>
-                <VBox spacing="2" HBox.hgrow="ALWAYS">
-                    <children>
-                        <Label text="Festivos y Excepciones" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #1e293b;" />
-                        <Label text="Configura d&#x00eda;s que anulan el horario semanal est&#x00e1;ndar." style="-fx-text-fill: #64748b;" />
-                    </children>
-                </VBox>
-            </children>
-        </HBox>
+    <VBox maxWidth="600" maxHeight="650" spacing="0" alignment="CENTER" styleClass="modern-register-card">
+        <padding>
+            <Insets top="30" right="40" bottom="30" left="40"/>
+        </padding>
+        
+        <children>
+            <!-- Header Section -->
+            <VBox styleClass="modern-register-header" alignment="CENTER_LEFT">
+                <children>
+                    <Label text="%special.days.title" styleClass="modern-register-title" />
+                    <Label text="%special.days.subtitle" 
+                           styleClass="modern-register-subtitle" style="-fx-text-fill: #64748b;" />
+                </children>
+            </VBox>
 
-        <Separator />
+            <Separator style="-fx-padding: 0 0 20 0;" />
 
-        <!-- Input Card -->
-        <VBox spacing="15" style="-fx-background-color: #f8fafc; -fx-padding: 20; -fx-background-radius: 12; -fx-border-color: #e2e8f0; -fx-border-radius: 12;">
-            <children>
-                <Label text="A&#x00d1A;DIR NUEVA EXCEPCI&#x00d3;N" style="-fx-font-weight: bold; -fx-font-size: 11px; -fx-text-fill: #94a3b8; -fx-letter-spacing: 1px;" />
-                <HBox spacing="15" alignment="BOTTOM_LEFT">
-                    <children>
-                        <VBox spacing="8" prefWidth="160">
-                            <children>
-                                <Label text="Fecha del evento" style="-fx-font-weight: bold; -fx-font-size: 12px;" />
-                                <DatePicker fx:id="pickerDate" promptText="Seleccionar..." prefHeight="35" style="-fx-background-radius: 6;" />
-                            </children>
-                        </VBox>
-                        <VBox spacing="8" HBox.hgrow="ALWAYS">
-                            <children>
-                                <Label text="Motivo / Descripci&#x00f3;n" style="-fx-font-weight: bold; -fx-font-size: 12px;" />
-                                <TextField fx:id="txtReason" promptText="Ej: Navidad, Reformas, Festivo Local..." prefHeight="35" style="-fx-background-radius: 6;" />
-                            </children>
-                        </VBox>
-                    </children>
-                </HBox>
-                <HBox spacing="20" alignment="CENTER_LEFT">
-                    <children>
-                        <CheckBox fx:id="chkClosed" text="Negocio Cerrado (Todo el d&#x00eda;)" selected="true" style="-fx-font-weight: bold;" />
-                        <Region HBox.hgrow="ALWAYS" />
-                        <Button text="A&#x00d1A;DIR A LA LISTA" onAction="#handleAdd" styleClass="btn-primary-saas" prefHeight="35" prefWidth="160">
-                            <graphic><FontAwesomeIconView glyphName="PLUS" fill="white" /></graphic>
-                        </Button>
-                    </children>
-                </HBox>
-            </children>
-        </VBox>
+            <!-- Input Section -->
+            <VBox spacing="15">
+                <children>
+                    <Label text="A&#x00d1;DIR NUEVA EXCEPCI&#x00d3;N" 
+                           style="-fx-font-weight: bold; -fx-font-size: 11px; -fx-text-fill: #94a3b8; -fx-letter-spacing: 1px;" />
+                    
+                    <HBox spacing="20">
+                        <children>
+                            <VBox styleClass="modern-input-group" HBox.hgrow="ALWAYS">
+                                <children>
+                                    <Label text="%special.days.field.date" styleClass="modern-label" style="-fx-font-size: 11px;" />
+                                    <HBox styleClass="modern-input-container" alignment="CENTER_LEFT">
+                                        <children>
+                                            <FontAwesomeIconView glyphName="CALENDAR" size="18" fill="#64748b" />
+                                            <DatePicker fx:id="pickerDate" promptText="Seleccionar..." 
+                                                        styleClass="modern-input-field" HBox.hgrow="ALWAYS" 
+                                                        style="-fx-background-color: transparent;" />
+                                        </children>
+                                    </HBox>
+                                </children>
+                            </VBox>
+                            
+                            <VBox styleClass="modern-input-group" HBox.hgrow="ALWAYS" prefWidth="250">
+                                <children>
+                                    <Label text="%special.days.field.reason" styleClass="modern-label" style="-fx-font-size: 11px;" />
+                                    <HBox styleClass="modern-input-container" alignment="CENTER_LEFT">
+                                        <children>
+                                            <FontAwesomeIconView glyphName="EDIT" size="18" fill="#64748b" />
+                                            <TextField fx:id="txtReason" promptText="%special.days.field.reason.prompt" 
+                                                       styleClass="modern-input-field" HBox.hgrow="ALWAYS" />
+                                        </children>
+                                    </HBox>
+                                </children>
+                            </VBox>
+                        </children>
+                    </HBox>
 
-        <!-- List Section -->
-        <VBox spacing="10" VBox.vgrow="ALWAYS">
-            <children>
-                <Label text="D&#x00cdA;S CONFIGURADOS" style="-fx-font-weight: bold; -fx-font-size: 11px; -fx-text-fill: #94a3b8; -fx-letter-spacing: 1px;" />
-                <ListView fx:id="listSpecials" VBox.vgrow="ALWAYS" style="-fx-background-radius: 12; -fx-border-radius: 12; -fx-border-color: #e2e8f0; -fx-background-insets: 0;" />
-            </children>
-        </VBox>
+                    <HBox spacing="20" alignment="CENTER_LEFT">
+                        <children>
+                            <CheckBox fx:id="chkClosed" text="%special.days.check.closed" 
+                                      selected="true" styleClass="modern-checkbox" style="-fx-font-weight: bold;" />
+                            <Region HBox.hgrow="ALWAYS" />
+                            <Button text="%special.days.btn.add" onAction="#handleAdd" 
+                                    styleClass="modern-btn-primary" prefHeight="40">
+                                <graphic>
+                                    <FontAwesomeIconView glyphName="PLUS" fill="white" />
+                                </graphic>
+                            </Button>
+                        </children>
+                    </HBox>
+                </children>
+            </VBox>
 
-        <HBox spacing="15" alignment="CENTER_RIGHT">
-            <children>
-                <Button text="ELIMINAR SELECCIONADO" onAction="#handleRemove" styleClass="btn-secondary-saas" prefHeight="40">
-                    <graphic><FontAwesomeIconView glyphName="TRASH_ALT" /></graphic>
-                </Button>
-                <Region HBox.hgrow="ALWAYS" />
-                <Button text="FINALIZAR Y VOLVER" onAction="#handleSave" styleClass="btn-primary-saas" prefHeight="40" prefWidth="180" style="-fx-background-color: #0f172a;" />
-            </children>
-        </HBox>
-    </children>
+            <Separator style="-fx-padding: 20 0;">
+                <VBox.margin>
+                    <Insets top="10" bottom="10" />
+                </VBox.margin>
+            </Separator>
 
-    <stylesheets>
-        <URL value="@../styles/components/informes.css" />
-    </stylesheets>
-</VBox>
+            <!-- List Section -->
+            <VBox spacing="10" VBox.vgrow="ALWAYS">
+                <children>
+                    <Label text="%special.days.list.title" 
+                           style="-fx-font-weight: bold; -fx-font-size: 11px; -fx-text-fill: #94a3b8; -fx-letter-spacing: 1px;" />
+                    <ListView fx:id="listSpecials" VBox.vgrow="ALWAYS" 
+                              style="-fx-background-radius: 12; -fx-border-radius: 12; -fx-border-color: #e2e8f0;" />
+                </children>
+            </VBox>
+
+            <!-- Footer Actions -->
+            <HBox spacing="15" alignment="CENTER_RIGHT" style="-fx-padding: 25 0 0 0;">
+                <children>
+                    <Button text="%special.days.btn.delete" onAction="#handleRemove" 
+                            styleClass="modern-btn-secondary" prefHeight="40">
+                        <graphic>
+                            <FontAwesomeIconView glyphName="TRASH_ALT" />
+                        </graphic>
+                    </Button>
+                    <Region HBox.hgrow="ALWAYS" />
+                    <Button text="%special.days.btn.finish" onAction="#handleSave" 
+                            styleClass="modern-btn-primary" prefHeight="40" prefWidth="200" />
+                </children>
+            </HBox>
+        </children>
+    </VBox>
+</StackPane>

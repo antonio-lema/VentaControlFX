@@ -9,16 +9,18 @@ public class PriceUpdateLogDTO {
     private final Double value;
     private final int productsUpdated;
     private final String reason;
+    private final Integer priceListId;
     private final LocalDateTime appliedAt;
 
     public PriceUpdateLogDTO(int logId, String updateType, String scope, Double value, int productsUpdated,
-            String reason, LocalDateTime appliedAt) {
+            String reason, Integer priceListId, LocalDateTime appliedAt) {
         this.logId = logId;
         this.updateType = updateType;
         this.scope = scope;
         this.value = value;
         this.productsUpdated = productsUpdated;
         this.reason = reason;
+        this.priceListId = priceListId;
         this.appliedAt = appliedAt;
     }
 
@@ -48,5 +50,9 @@ public class PriceUpdateLogDTO {
 
     public LocalDateTime getAppliedAt() {
         return appliedAt;
+    }
+
+    public Integer getPriceListId() {
+        return priceListId;
     }
 }

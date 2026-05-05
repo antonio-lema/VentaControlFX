@@ -139,6 +139,21 @@ public class SpecialDaysController implements Injectable {
         return specialDays;
     }
 
+    private double xOffset = 0, yOffset = 0;
+
+    @FXML
+    private void handleMousePressed(javafx.scene.input.MouseEvent event) {
+        xOffset = event.getSceneX();
+        yOffset = event.getSceneY();
+    }
+
+    @FXML
+    private void handleMouseDragged(javafx.scene.input.MouseEvent event) {
+        Stage stage = (Stage) pickerDate.getScene().getWindow();
+        stage.setX(event.getScreenX() - xOffset);
+        stage.setY(event.getScreenY() - yOffset);
+    }
+
     private void close() {
         ((Stage) pickerDate.getScene().getWindow()).close();
     }

@@ -15,38 +15,28 @@ public class SkeletonStatCard extends StackPane {
 
     public SkeletonStatCard() {
         this.getStyleClass().add("skeleton-box");
-        this.setPrefSize(200, 80);
-        this.setMinSize(180, 70);
-        this.setMaxSize(240, 90);
-        this.setStyle("-fx-background-radius: 16; -fx-background-color: -fx-bg-surface;");
+        // No fixed size or background, let it fit the parent label
+        this.setStyle("-fx-background-color: transparent;");
 
-        HBox content = new HBox(15);
+        VBox content = new VBox(0);
         content.setAlignment(Pos.CENTER_LEFT);
-        content.setPadding(new Insets(15));
+        content.setPadding(new Insets(5, 0, 5, 0));
 
-        // Icon placeholder (Circle)
-        Region icon = new Region();
-        icon.setPrefSize(40, 40);
-        icon.setMinSize(40, 40);
-        icon.getStyleClass().add("skeleton-text");
-        icon.setStyle("-fx-background-radius: 50;");
-
-        VBox textBox = new VBox(8);
-        textBox.setAlignment(Pos.CENTER_LEFT);
-
-        Region title = new Region();
-        title.setPrefSize(80, 10);
-        title.getStyleClass().add("skeleton-text");
-
+        // Value placeholder - Much thicker and wider to match the kpi-value-saas font size
         Region value = new Region();
-        value.setPrefSize(110, 16);
+        value.setMinWidth(160);
+        value.setPrefWidth(200);
+        value.setMaxWidth(240);
+        value.setMinHeight(34);
+        value.setPrefHeight(34);
+        value.setMaxHeight(34);
         value.getStyleClass().add("skeleton-text");
+        value.setStyle("-fx-background-radius: 8;");
 
-        textBox.getChildren().addAll(title, value);
-        content.getChildren().addAll(icon, textBox);
+        content.getChildren().add(value);
 
-        // Shimmer
-        Rectangle shimmerLine = new Rectangle(50, 150);
+        // Shimmer - Larger and slower for a premium feel
+        Rectangle shimmerLine = new Rectangle(80, 150);
         shimmerLine.setFill(
                 new javafx.scene.paint.LinearGradient(0, 0, 1, 0, true, javafx.scene.paint.CycleMethod.NO_CYCLE,
                         new javafx.scene.paint.Stop(0, javafx.scene.paint.Color.TRANSPARENT),

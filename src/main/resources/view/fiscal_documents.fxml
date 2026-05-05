@@ -94,24 +94,12 @@
 
             <VBox styleClass="stat-card" HBox.hgrow="ALWAYS">
                 <HBox alignment="CENTER_LEFT" spacing="15">
-                    <StackPane styleClass="icon-bg-red">
-                        <FontAwesomeIconView glyphName="BAN" size="24" fill="#ef4444"/>
-                    </StackPane>
-                    <VBox>
-                        <Label text="%fiscal.kpi.voided" styleClass="stat-label"/>
-                        <Label fx:id="lblTotalCancelled" text="0" styleClass="stat-value"/>
-                    </VBox>
-                </HBox>
-            </VBox>
-            
-            <VBox styleClass="stat-card" HBox.hgrow="ALWAYS">
-                <HBox alignment="CENTER_LEFT" spacing="15">
                     <StackPane styleClass="icon-bg-blue">
                         <FontAwesomeIconView glyphName="CALCULATOR" size="24" fill="#3b82f6"/>
                     </StackPane>
                     <VBox>
                         <Label text="%fiscal.kpi.total_facturado" styleClass="stat-label"/>
-                        <Label fx:id="lblTotalAmount" text="0.00 &#x20ac;" styleClass="stat-value"/>
+                        <Label fx:id="lblTotalAmount" text="0.00 €" styleClass="stat-value"/>
                     </VBox>
                 </HBox>
             </VBox>

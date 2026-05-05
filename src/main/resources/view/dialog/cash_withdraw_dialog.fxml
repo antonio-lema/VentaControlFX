@@ -5,7 +5,7 @@
 <?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
 <?import java.net.URL?>
 
-<VBox xmlns:fx="http://javafx.com/fxml/1" fx:id="root" spacing="20" styleClass="modern-register-card"
+<VBox xmlns:fx="http://javafx.com/fxml/1" fx:id="root" spacing="15" styleClass="modern-register-card"
       prefWidth="450" alignment="TOP_CENTER"
       fx:controller="com.mycompany.ventacontrolfx.presentation.controller.dialog.CashWithdrawController">
 
@@ -15,20 +15,20 @@
         <URL value="@/styles/components/formularios.css" />
     </stylesheets>
 
-    <VBox spacing="5" alignment="CENTER" style="-fx-padding: 30 0 10 0;">
-        <StackPane styleClass="estetica-card-icon-wrap, estetica-icon-red" maxWidth="50" maxHeight="50"
+    <VBox spacing="5" alignment="CENTER" style="-fx-padding: 20 0 5 0;">
+        <StackPane styleClass="estetica-card-icon-wrap, estetica-icon-red" maxWidth="45" maxHeight="45"
                    style="-fx-background-color: #fef2f2; -fx-background-radius: 50; -fx-border-radius: 50;">
-            <FontAwesomeIconView glyphName="MINUS_CIRCLE" size="24" fill="#ef4444"/>
+            <FontAwesomeIconView glyphName="MINUS_CIRCLE" size="22" fill="#ef4444"/>
         </StackPane>
-        <Label text="Retirar Efectivo" styleClass="modern-register-title" />
+        <Label text="Retirar Efectivo" styleClass="modern-register-title" style="-fx-font-size: 22px;" />
         <Label text="Registra una salida de dinero del libro de caja" styleClass="modern-register-subtitle" />
     </VBox>
 
-    <VBox spacing="15" style="-fx-padding: 0 40 30 40;">
+    <VBox spacing="12" style="-fx-padding: 0 35 25 35;">
 
         <!-- Saldo disponible -->
         <HBox fx:id="bannerAvailable" spacing="10" alignment="CENTER_LEFT"
-              style="-fx-background-color: #fef2f2; -fx-padding: 12; -fx-background-radius: 8; -fx-border-color: #fecaca; -fx-border-radius: 8;">
+              style="-fx-background-color: #fef2f2; -fx-padding: 10; -fx-background-radius: 8; -fx-border-color: #fecaca; -fx-border-radius: 8;">
             <FontAwesomeIconView glyphName="WARNING" size="14" fill="#dc2626" />
             <VBox>
                 <Label text="Efectivo disponible en caja:" styleClass="label-muted" />
@@ -37,19 +37,19 @@
         </HBox>
 
         <!-- Importe -->
-        <VBox spacing="8">
+        <VBox spacing="6">
             <Label text="Importe a Retirar (&#x20ac;):" styleClass="label" />
             <HBox spacing="10" alignment="CENTER_LEFT" styleClass="modern-input-container">
                 <FontAwesomeIconView glyphName="MONEY" size="20" fill="#ef4444" />
                 <TextField fx:id="txtAmount" promptText="0,00" HBox.hgrow="ALWAYS" styleClass="modern-input-field"
-                           style="-fx-font-size: 22px; -fx-font-weight: 900;" />
+                           style="-fx-font-size: 20px; -fx-font-weight: 900;" />
             </HBox>
             <!-- Aviso de saldo insuficiente -->
             <Label fx:id="lblWarning" text="" style="-fx-text-fill: #ef4444; -fx-font-size: 12px; -fx-padding: 0 0 0 5;" visible="false" managed="false" />
         </VBox>
 
         <!-- Motivo -->
-        <VBox spacing="8">
+        <VBox spacing="6">
             <Label text="Motivo de la Retirada:" styleClass="label" />
             <HBox spacing="10" alignment="CENTER_LEFT" styleClass="modern-input-container">
                 <FontAwesomeIconView glyphName="PENCIL" size="14" fill="#94a3b8" />
@@ -58,9 +58,9 @@
         </VBox>
 
         <!-- Botones de Acci&#x00f3;n -->
-        <HBox spacing="15" alignment="CENTER_RIGHT" style="-fx-padding: 10 0 0 0;">
-            <Button text="CANCELAR" onAction="#handleCancel" styleClass="btn-secondary" prefHeight="45" prefWidth="120" />
-            <Button fx:id="btnConfirm" text="CONFIRMAR RETIRADA" onAction="#handleConfirm" styleClass="btn-danger" prefHeight="45" HBox.hgrow="ALWAYS" maxWidth="Infinity">
+        <HBox spacing="15" alignment="CENTER_RIGHT" style="-fx-padding: 5 0 0 0;">
+            <Button text="CANCELAR" onAction="#handleCancel" styleClass="btn-secondary" prefHeight="40" prefWidth="110" />
+            <Button fx:id="btnConfirm" text="CONFIRMAR RETIRADA" onAction="#handleConfirm" styleClass="btn-danger" prefHeight="40" HBox.hgrow="ALWAYS" maxWidth="Infinity">
                 <graphic>
                     <FontAwesomeIconView glyphName="CHECK_CIRCLE" size="16" fill="white" />
                 </graphic>

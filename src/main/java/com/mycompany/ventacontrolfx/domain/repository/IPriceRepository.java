@@ -17,6 +17,7 @@ public interface IPriceRepository {
     PriceList getDefaultPriceList() throws SQLException;
     
     List<ProductPriceDTO> findPricesByList(int priceListId) throws SQLException;
-    List<ProductPriceDTO> findPricesByListPaginated(int priceListId, String search, java.time.LocalDateTime startDate, int limit, int offset) throws SQLException;
-    int countPricesByList(int priceListId, String search, java.time.LocalDateTime startDate) throws SQLException;
+    List<ProductPriceDTO> findPricesByListPaginated(int priceListId, String search, java.time.LocalDateTime startDate, Integer logId, int limit, int offset) throws SQLException;
+    int countPricesByList(int priceListId, String search, java.time.LocalDateTime startDate, Integer logId) throws SQLException;
+    void updateLogIdForPricesAtTimestamp(int priceListId, java.time.LocalDateTime timestamp, int logId) throws SQLException;
 }

@@ -31,6 +31,7 @@ public class BusinessHoursController implements Injectable {
     @FXML
     private TextField txtGracePeriod;
 
+    private ServiceContainer container;
     private ConfigUseCase configUseCase;
     private UserUseCase userUseCase;
     private SaleConfig currentConfig;
@@ -43,6 +44,7 @@ public class BusinessHoursController implements Injectable {
 
     @Override
     public void inject(ServiceContainer container) {
+        this.container = container;
         this.configUseCase = container.getConfigUseCase();
         this.userUseCase = container.getUserUseCase();
         try {
@@ -214,14 +216,26 @@ public class BusinessHoursController implements Injectable {
     private void handleManageSpecialDays() {
         try {
             javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(
-                    getClass().getResource("/view/special_days.fxml"));
-            VBox root = loader.load();
+                    getClass().getResource("/view/special_days.fxml"),
+                    container != null ? container.getBundle() : null);
+            javafx.scene.Parent root = loader.load();
             SpecialDaysController controller = loader.getController();
+
+            if (controller instanceof Injectable && container != null) {
+                ((Injectable) controller).inject(container);
+            }
 
             Stage stage = new Stage();
             stage.setTitle("Festivos y Excepciones");
             stage.initModality(javafx.stage.Modality.APPLICATION_MODAL);
-            stage.setScene(new javafx.scene.Scene(root));
+            stage.initStyle(javafx.stage.StageStyle.TRANSPARENT);
+
+            javafx.scene.Scene scene = new javafx.scene.Scene(root);
+            scene.setFill(javafx.scene.paint.Color.TRANSPARENT);
+            if (container != null) {
+                container.getThemeManager().applyFullTheme(scene);
+            }
+            stage.setScene(scene);
 
             controller.initData(currentConfig.getSpecialDays(), () -> {
                 currentConfig.setSpecialDays(controller.getResult());

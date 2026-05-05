@@ -74,9 +74,6 @@ public class ClosureHistoryController implements Injectable {
         this.closureUseCase = container.getClosureUseCase();
         this.userSession = container.getUserSession();
 
-        datePickerStart.setValue(LocalDate.now().minusDays(7));
-        datePickerEnd.setValue(LocalDate.now());
-
         setupTable();
         setupMovementsTable();
         setupFilters();

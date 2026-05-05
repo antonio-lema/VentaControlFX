@@ -84,10 +84,6 @@ public class SellerReportController implements Injectable {
         setupTables();
         setupFilters();
 
-        // Rango por defecto: mes actual
-        dpFrom.setValue(LocalDate.now().withDayOfMonth(1));
-        dpTo.setValue(LocalDate.now());
-
         DateFilterUtils.addQuickFilters(quickFilterContainer, dpFrom, dpTo, this::loadData);
 
         loadData();

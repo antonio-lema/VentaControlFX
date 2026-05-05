@@ -90,6 +90,7 @@ public class DateFilterUtils {
             ToggleButton btnTodo = createFilterChip(bundle.getString("filter.date.all"), rangeSetter, group, onFilter);
             buttons.add(btnTodo);
             btnTodo.setSelected(true);
+            rangeSetter.accept(bundle.getString("filter.date.all"));
         } else {
             buttons.add(createFilterChip("Hoy", rangeSetter, group, onFilter));
             buttons.add(createFilterChip("7D", rangeSetter, group, onFilter));
@@ -98,6 +99,7 @@ public class DateFilterUtils {
             ToggleButton btnTodo = createFilterChip("Todo", rangeSetter, group, onFilter);
             buttons.add(btnTodo);
             btnTodo.setSelected(true);
+            rangeSetter.accept("Todo");
         }
 
         container.getChildren().addAll(buttons);

@@ -17,4 +17,8 @@ public interface IPriceUpdateLogRepository {
      * Retrieves all price update log entries.
      */
     List<PriceUpdateLog> getAll() throws SQLException;
+    /**
+     * Updates the number of products affected by a specific log entry.
+     */
+    void updateProductsUpdatedCount(int logId, int count) throws SQLException;
 }

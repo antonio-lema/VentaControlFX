@@ -9,7 +9,7 @@ public class JdbcMassivePriceUpdateRepository implements IMassivePriceUpdateRepo
 
     @Override
     public int applyBulkMultiplier(int priceListId, Integer categoryId, double multiplier, String reason,
-            java.time.LocalDateTime startDate)
+            java.time.LocalDateTime startDate, Integer logId)
             throws SQLException {
 
         StringBuilder selectSql = new StringBuilder(
@@ -24,13 +24,13 @@ public class JdbcMassivePriceUpdateRepository implements IMassivePriceUpdateRepo
         try (Connection conn = DBConnection.getConnection()) {
             conn.setAutoCommit(false);
             try {
-                ensurePricesExist(priceListId, categoryId, conn);
+                ensurePricesExist(priceListId, categoryId, startDate, logId, conn);
                 try (PreparedStatement ps = conn.prepareStatement(selectSql.toString())) {
                     ps.setInt(1, priceListId);
                     if (categoryId != null && categoryId > 0)
                         ps.setInt(2, categoryId);
 
-                    int count = executeBulkUpdate(conn, ps, priceListId, multiplier, reason, startDate, true);
+                    int count = executeBulkUpdate(conn, ps, priceListId, multiplier, reason, startDate, true, logId);
                     conn.commit();
                     return count;
                 }
@@ -45,7 +45,7 @@ public class JdbcMassivePriceUpdateRepository implements IMassivePriceUpdateRepo
 
     @Override
     public int applyBulkFixedAmount(int priceListId, Integer categoryId, double amount, String reason,
-            java.time.LocalDateTime startDate)
+            java.time.LocalDateTime startDate, Integer logId)
             throws SQLException {
 
         StringBuilder selectSql = new StringBuilder(
@@ -60,13 +60,13 @@ public class JdbcMassivePriceUpdateRepository implements IMassivePriceUpdateRepo
         try (Connection conn = DBConnection.getConnection()) {
             conn.setAutoCommit(false);
             try {
-                ensurePricesExist(priceListId, categoryId, conn);
+                ensurePricesExist(priceListId, categoryId, startDate, logId, conn);
                 try (PreparedStatement ps = conn.prepareStatement(selectSql.toString())) {
                     ps.setInt(1, priceListId);
                     if (categoryId != null && categoryId > 0)
                         ps.setInt(2, categoryId);
 
-                    int count = executeBulkUpdate(conn, ps, priceListId, amount, reason, startDate, false);
+                    int count = executeBulkUpdate(conn, ps, priceListId, amount, reason, startDate, false, logId);
                     conn.commit();
                     return count;
                 }
@@ -81,7 +81,7 @@ public class JdbcMassivePriceUpdateRepository implements IMassivePriceUpdateRepo
 
     @Override
     public int applyBulkRounding(int priceListId, Integer categoryId, double roundingTarget, String reason,
-            java.time.LocalDateTime startDate)
+            java.time.LocalDateTime startDate, Integer logId)
             throws SQLException {
 
         try (Connection conn = DBConnection.getConnection()) {
@@ -99,13 +99,13 @@ public class JdbcMassivePriceUpdateRepository implements IMassivePriceUpdateRepo
 
             conn.setAutoCommit(false);
             try {
-                ensurePricesExist(priceListId, categoryId, conn);
+                ensurePricesExist(priceListId, categoryId, startDate, logId, conn);
                 int count;
                 try (PreparedStatement ps = conn.prepareStatement(selectSql.toString())) {
                     ps.setInt(1, priceListId);
                     if (categoryId != null && categoryId > 0)
                         ps.setInt(2, categoryId);
-                    count = executeBulkRounding(conn, ps, priceListId, roundingTarget, reason, startDate, globalTax);
+                    count = executeBulkRounding(conn, ps, priceListId, roundingTarget, reason, startDate, globalTax, logId);
                 }
                 conn.commit();
                 return count;
@@ -120,7 +120,7 @@ public class JdbcMassivePriceUpdateRepository implements IMassivePriceUpdateRepo
 
     @Override
     public int applyBulkMultiplierToTopSellers(int priceListId, int topN, int daysBack,
-            double value, String reason, boolean isPercentage, java.time.LocalDateTime startDate) throws SQLException {
+            double value, String reason, boolean isPercentage, java.time.LocalDateTime startDate, Integer logId) throws SQLException {
 
         String selectSql = "SELECT pp.product_id, pp.price " +
                 "FROM product_prices pp " +
@@ -141,13 +141,13 @@ public class JdbcMassivePriceUpdateRepository implements IMassivePriceUpdateRepo
         try (Connection conn = DBConnection.getConnection()) {
             conn.setAutoCommit(false);
             try {
-                ensurePricesExist(priceListId, null, conn);
+                ensurePricesExist(priceListId, null, startDate, logId, conn);
                 int count;
                 try (PreparedStatement ps = conn.prepareStatement(selectSql)) {
                     ps.setInt(1, daysBack);
                     ps.setInt(2, topN);
                     ps.setInt(3, priceListId);
-                    count = executeBulkUpdate(conn, ps, priceListId, value, reason, startDate, isPercentage);
+                    count = executeBulkUpdate(conn, ps, priceListId, value, reason, startDate, isPercentage, logId);
                     conn.commit();
                     return count;
                 }
@@ -162,7 +162,7 @@ public class JdbcMassivePriceUpdateRepository implements IMassivePriceUpdateRepo
 
     @Override
     public int applyBulkMultiplierToBottomSellers(int priceListId, int bottomN, int daysBack,
-            double value, String reason, boolean isPercentage, java.time.LocalDateTime startDate) throws SQLException {
+            double value, String reason, boolean isPercentage, java.time.LocalDateTime startDate, Integer logId) throws SQLException {
 
         String selectSql = "SELECT pp.product_id, pp.price " +
                 "FROM product_prices pp " +
@@ -186,13 +186,13 @@ public class JdbcMassivePriceUpdateRepository implements IMassivePriceUpdateRepo
         try (Connection conn = DBConnection.getConnection()) {
             conn.setAutoCommit(false);
             try {
-                ensurePricesExist(priceListId, null, conn);
+                ensurePricesExist(priceListId, null, startDate, logId, conn);
                 int count;
                 try (PreparedStatement ps = conn.prepareStatement(selectSql)) {
                     ps.setInt(1, daysBack);
                     ps.setInt(2, bottomN);
                     ps.setInt(3, priceListId);
-                    count = executeBulkUpdate(conn, ps, priceListId, value, reason, startDate, isPercentage);
+                    count = executeBulkUpdate(conn, ps, priceListId, value, reason, startDate, isPercentage, logId);
                     conn.commit();
                     return count;
                 }
@@ -207,7 +207,7 @@ public class JdbcMassivePriceUpdateRepository implements IMassivePriceUpdateRepo
 
     @Override
     public int applyBulkMultiplierToSlowMovers(int priceListId, int daysWithoutSale,
-            double value, String reason, boolean isPercentage, java.time.LocalDateTime startDate) throws SQLException {
+            double value, String reason, boolean isPercentage, java.time.LocalDateTime startDate, Integer logId) throws SQLException {
 
         String selectSql = "SELECT pp.product_id, pp.price " +
                 "FROM product_prices pp " +
@@ -225,12 +225,12 @@ public class JdbcMassivePriceUpdateRepository implements IMassivePriceUpdateRepo
         try (Connection conn = DBConnection.getConnection()) {
             conn.setAutoCommit(false);
             try {
-                ensurePricesExist(priceListId, null, conn);
+                ensurePricesExist(priceListId, null, startDate, logId, conn);
                 int count;
                 try (PreparedStatement ps = conn.prepareStatement(selectSql)) {
                     ps.setInt(1, priceListId);
                     ps.setInt(2, daysWithoutSale);
-                    count = executeBulkUpdate(conn, ps, priceListId, value, reason, startDate, isPercentage);
+                    count = executeBulkUpdate(conn, ps, priceListId, value, reason, startDate, isPercentage, logId);
                     conn.commit();
                     return count;
                 }
@@ -245,7 +245,7 @@ public class JdbcMassivePriceUpdateRepository implements IMassivePriceUpdateRepo
 
     @Override
     public int applyBulkMultiplierToPriceRange(int priceListId, double minPrice, double maxPrice,
-            double value, String reason, boolean isPercentage, java.time.LocalDateTime startDate) throws SQLException {
+            double value, String reason, boolean isPercentage, java.time.LocalDateTime startDate, Integer logId) throws SQLException {
 
         String selectSql = "SELECT pp.product_id, pp.price " +
                 "FROM product_prices pp " +
@@ -257,13 +257,13 @@ public class JdbcMassivePriceUpdateRepository implements IMassivePriceUpdateRepo
         try (Connection conn = DBConnection.getConnection()) {
             conn.setAutoCommit(false);
             try {
-                ensurePricesExist(priceListId, null, conn);
+                ensurePricesExist(priceListId, null, startDate, logId, conn);
                 int count;
                 try (PreparedStatement ps = conn.prepareStatement(selectSql)) {
                     ps.setInt(1, priceListId);
                     ps.setDouble(2, minPrice);
                     ps.setDouble(3, maxPrice);
-                    count = executeBulkUpdate(conn, ps, priceListId, value, reason, startDate, isPercentage);
+                    count = executeBulkUpdate(conn, ps, priceListId, value, reason, startDate, isPercentage, logId);
                     conn.commit();
                     return count;
                 }
@@ -278,7 +278,7 @@ public class JdbcMassivePriceUpdateRepository implements IMassivePriceUpdateRepo
 
     @Override
     public int applyBulkMultiplierToFavorites(int priceListId, double value, String reason, boolean isPercentage,
-            java.time.LocalDateTime startDate)
+            java.time.LocalDateTime startDate, Integer logId)
             throws SQLException {
 
         String selectSql = "SELECT pp.product_id, pp.price " +
@@ -291,11 +291,11 @@ public class JdbcMassivePriceUpdateRepository implements IMassivePriceUpdateRepo
         try (Connection conn = DBConnection.getConnection()) {
             conn.setAutoCommit(false);
             try {
-                ensurePricesExist(priceListId, null, conn);
+                ensurePricesExist(priceListId, null, startDate, logId, conn);
                 int count;
                 try (PreparedStatement ps = conn.prepareStatement(selectSql)) {
                     ps.setInt(1, priceListId);
-                    count = executeBulkUpdate(conn, ps, priceListId, value, reason, startDate, isPercentage);
+                    count = executeBulkUpdate(conn, ps, priceListId, value, reason, startDate, isPercentage, logId);
                     conn.commit();
                     return count;
                 }
@@ -310,7 +310,7 @@ public class JdbcMassivePriceUpdateRepository implements IMassivePriceUpdateRepo
 
     @Override
     public int applyBulkRoundingToTopSellers(int priceListId, int topN, int daysBack, double roundingTarget,
-            String reason, java.time.LocalDateTime startDate) throws SQLException {
+            String reason, java.time.LocalDateTime startDate, Integer logId) throws SQLException {
 
         String selectSql = "SELECT pp.product_id, pp.price, p.iva as p_iva, c.default_iva as c_iva " +
                 "FROM product_prices pp " +
@@ -332,14 +332,14 @@ public class JdbcMassivePriceUpdateRepository implements IMassivePriceUpdateRepo
         try (Connection conn = DBConnection.getConnection()) {
             conn.setAutoCommit(false);
             try {
-                ensurePricesExist(priceListId, null, conn);
+                ensurePricesExist(priceListId, null, startDate, logId, conn);
                 double globalTax = getGlobalTax(conn);
                 try (PreparedStatement ps = conn.prepareStatement(selectSql)) {
                     ps.setInt(1, daysBack);
                     ps.setInt(2, topN);
                     ps.setInt(3, priceListId);
                     int count = executeBulkRounding(conn, ps, priceListId, roundingTarget, reason, startDate,
-                            globalTax);
+                            globalTax, logId);
                     conn.commit();
                     return count;
                 }
@@ -354,7 +354,7 @@ public class JdbcMassivePriceUpdateRepository implements IMassivePriceUpdateRepo
 
     @Override
     public int applyBulkRoundingToBottomSellers(int priceListId, int bottomN, int daysBack, double roundingTarget,
-            String reason, java.time.LocalDateTime startDate) throws SQLException {
+            String reason, java.time.LocalDateTime startDate, Integer logId) throws SQLException {
 
         String selectSql = "SELECT pp.product_id, pp.price, p.iva as p_iva, c.default_iva as c_iva " +
                 "FROM product_prices pp " +
@@ -379,14 +379,14 @@ public class JdbcMassivePriceUpdateRepository implements IMassivePriceUpdateRepo
         try (Connection conn = DBConnection.getConnection()) {
             conn.setAutoCommit(false);
             try {
-                ensurePricesExist(priceListId, null, conn);
+                ensurePricesExist(priceListId, null, startDate, logId, conn);
                 double globalTax = getGlobalTax(conn);
                 try (PreparedStatement ps = conn.prepareStatement(selectSql)) {
                     ps.setInt(1, daysBack);
                     ps.setInt(2, bottomN);
                     ps.setInt(3, priceListId);
                     int count = executeBulkRounding(conn, ps, priceListId, roundingTarget, reason, startDate,
-                            globalTax);
+                            globalTax, logId);
                     conn.commit();
                     return count;
                 }
@@ -401,7 +401,7 @@ public class JdbcMassivePriceUpdateRepository implements IMassivePriceUpdateRepo
 
     @Override
     public int applyBulkRoundingToSlowMovers(int priceListId, int daysWithoutSale, double roundingTarget, String reason,
-            java.time.LocalDateTime startDate)
+            java.time.LocalDateTime startDate, Integer logId)
             throws SQLException {
 
         String selectSql = "SELECT pp.product_id, pp.price, p.iva as p_iva, c.default_iva as c_iva " +
@@ -421,13 +421,13 @@ public class JdbcMassivePriceUpdateRepository implements IMassivePriceUpdateRepo
         try (Connection conn = DBConnection.getConnection()) {
             conn.setAutoCommit(false);
             try {
-                ensurePricesExist(priceListId, null, conn);
+                ensurePricesExist(priceListId, null, startDate, logId, conn);
                 double globalTax = getGlobalTax(conn);
                 try (PreparedStatement ps = conn.prepareStatement(selectSql)) {
                     ps.setInt(1, priceListId);
                     ps.setInt(2, daysWithoutSale);
                     int count = executeBulkRounding(conn, ps, priceListId, roundingTarget, reason, startDate,
-                            globalTax);
+                            globalTax, logId);
                     conn.commit();
                     return count;
                 }
@@ -442,7 +442,7 @@ public class JdbcMassivePriceUpdateRepository implements IMassivePriceUpdateRepo
 
     @Override
     public int applyBulkRoundingToPriceRange(int priceListId, double minPrice, double maxPrice, double roundingTarget,
-            String reason, java.time.LocalDateTime startDate) throws SQLException {
+            String reason, java.time.LocalDateTime startDate, Integer logId) throws SQLException {
 
         String selectSql = "SELECT pp.product_id, pp.price, p.iva as p_iva, c.default_iva as c_iva " +
                 "FROM product_prices pp " +
@@ -455,14 +455,14 @@ public class JdbcMassivePriceUpdateRepository implements IMassivePriceUpdateRepo
         try (Connection conn = DBConnection.getConnection()) {
             conn.setAutoCommit(false);
             try {
-                ensurePricesExist(priceListId, null, conn);
+                ensurePricesExist(priceListId, null, startDate, logId, conn);
                 double globalTax = getGlobalTax(conn);
                 try (PreparedStatement ps = conn.prepareStatement(selectSql)) {
                     ps.setInt(1, priceListId);
                     ps.setDouble(2, minPrice);
                     ps.setDouble(3, maxPrice);
                     int count = executeBulkRounding(conn, ps, priceListId, roundingTarget, reason, startDate,
-                            globalTax);
+                            globalTax, logId);
                     conn.commit();
                     return count;
                 }
@@ -477,7 +477,7 @@ public class JdbcMassivePriceUpdateRepository implements IMassivePriceUpdateRepo
 
     @Override
     public int applyBulkRoundingToFavorites(int priceListId, double roundingTarget, String reason,
-            java.time.LocalDateTime startDate) throws SQLException {
+            java.time.LocalDateTime startDate, Integer logId) throws SQLException {
 
         String selectSql = "SELECT pp.product_id, pp.price, p.iva as p_iva, c.default_iva as c_iva " +
                 "FROM product_prices pp " +
@@ -490,12 +490,12 @@ public class JdbcMassivePriceUpdateRepository implements IMassivePriceUpdateRepo
         try (Connection conn = DBConnection.getConnection()) {
             conn.setAutoCommit(false);
             try {
-                ensurePricesExist(priceListId, null, conn);
+                ensurePricesExist(priceListId, null, startDate, logId, conn);
                 double globalTax = getGlobalTax(conn);
                 try (PreparedStatement ps = conn.prepareStatement(selectSql)) {
                     ps.setInt(1, priceListId);
                     int count = executeBulkRounding(conn, ps, priceListId, roundingTarget, reason, startDate,
-                            globalTax);
+                            globalTax, logId);
                     conn.commit();
                     return count;
                 }
@@ -510,7 +510,7 @@ public class JdbcMassivePriceUpdateRepository implements IMassivePriceUpdateRepo
 
     @Override
     public int applyBulkMultiplierToProducts(int priceListId, java.util.List<Integer> productIds, double multiplier,
-            String reason, java.time.LocalDateTime startDate) throws SQLException {
+            String reason, java.time.LocalDateTime startDate, Integer logId) throws SQLException {
         if (productIds == null || productIds.isEmpty())
             return 0;
         String ids = productIds.stream().map(String::valueOf).collect(java.util.stream.Collectors.joining(","));
@@ -523,10 +523,10 @@ public class JdbcMassivePriceUpdateRepository implements IMassivePriceUpdateRepo
         try (Connection conn = DBConnection.getConnection()) {
             conn.setAutoCommit(false);
             try {
-                ensurePricesExistForProducts(priceListId, productIds, conn);
+                ensurePricesExistForProducts(priceListId, productIds, startDate, logId, conn);
                 try (PreparedStatement ps = conn.prepareStatement(selectSql)) {
                     ps.setInt(1, priceListId);
-                    int count = executeBulkUpdate(conn, ps, priceListId, multiplier, reason, startDate, true);
+                    int count = executeBulkUpdate(conn, ps, priceListId, multiplier, reason, startDate, true, logId);
                     conn.commit();
                     return count;
                 }
@@ -541,7 +541,7 @@ public class JdbcMassivePriceUpdateRepository implements IMassivePriceUpdateRepo
 
     @Override
     public int applyBulkFixedAmountToProducts(int priceListId, java.util.List<Integer> productIds, double amount,
-            String reason, java.time.LocalDateTime startDate) throws SQLException {
+            String reason, java.time.LocalDateTime startDate, Integer logId) throws SQLException {
         if (productIds == null || productIds.isEmpty())
             return 0;
         String ids = productIds.stream().map(String::valueOf).collect(java.util.stream.Collectors.joining(","));
@@ -554,10 +554,10 @@ public class JdbcMassivePriceUpdateRepository implements IMassivePriceUpdateRepo
         try (Connection conn = DBConnection.getConnection()) {
             conn.setAutoCommit(false);
             try {
-                ensurePricesExistForProducts(priceListId, productIds, conn);
+                ensurePricesExistForProducts(priceListId, productIds, startDate, logId, conn);
                 try (PreparedStatement ps = conn.prepareStatement(selectSql)) {
                     ps.setInt(1, priceListId);
-                    int count = executeBulkUpdate(conn, ps, priceListId, amount, reason, startDate, false);
+                    int count = executeBulkUpdate(conn, ps, priceListId, amount, reason, startDate, false, logId);
                     conn.commit();
                     return count;
                 }
@@ -572,7 +572,7 @@ public class JdbcMassivePriceUpdateRepository implements IMassivePriceUpdateRepo
 
     @Override
     public int applyBulkRoundingToProducts(int priceListId, java.util.List<Integer> productIds, double targetDecimal,
-            String reason, java.time.LocalDateTime startDate) throws SQLException {
+            String reason, java.time.LocalDateTime startDate, Integer logId) throws SQLException {
         if (productIds == null || productIds.isEmpty())
             return 0;
         String ids = productIds.stream().map(String::valueOf).collect(java.util.stream.Collectors.joining(","));
@@ -588,10 +588,10 @@ public class JdbcMassivePriceUpdateRepository implements IMassivePriceUpdateRepo
             double globalTax = getGlobalTax(conn);
             conn.setAutoCommit(false);
             try {
-                ensurePricesExistForProducts(priceListId, productIds, conn);
+                ensurePricesExistForProducts(priceListId, productIds, startDate, logId, conn);
                 try (PreparedStatement ps = conn.prepareStatement(selectSql)) {
                     ps.setInt(1, priceListId);
-                    int count = executeBulkRounding(conn, ps, priceListId, targetDecimal, reason, startDate, globalTax);
+                    int count = executeBulkRounding(conn, ps, priceListId, targetDecimal, reason, startDate, globalTax, logId);
                     conn.commit();
                     return count;
                 }
@@ -607,19 +607,19 @@ public class JdbcMassivePriceUpdateRepository implements IMassivePriceUpdateRepo
     @Override
     public void clonePriceList(int sourceId, int targetId) throws SQLException {
         cloneAndAdjustPriceList(sourceId, targetId, 1.0, "Clonaci\u00f3n desde tarifa ID " + sourceId,
-                LocalDateTime.now());
+                LocalDateTime.now(), null);
     }
 
     @Override
     public void cloneAndAdjustPriceList(int sourceId, int targetId, double multiplier, String reason,
-            LocalDateTime startDate)
+            LocalDateTime startDate, Integer logId)
             throws SQLException {
-        String closeSql = "UPDATE product_prices SET end_date = CURRENT_TIMESTAMP " +
+        String closeSql = "UPDATE product_prices SET end_date = ? " +
                 "WHERE price_list_id = ? AND end_date IS NULL";
 
-        String insertSql = "INSERT INTO product_prices (product_id, price_list_id, price, start_date, end_date, reason) "
+        String insertSql = "INSERT INTO product_prices (product_id, price_list_id, price, start_date, end_date, reason, update_log_id) "
                 +
-                "SELECT product_id, ?, price * ?, ?, NULL, ? " +
+                "SELECT product_id, ?, price * ?, ?, NULL, ?, ? " +
                 "FROM product_prices " +
                 "WHERE price_list_id = ? AND start_date <= CURRENT_TIMESTAMP AND (end_date IS NULL OR end_date > CURRENT_TIMESTAMP)";
 
@@ -628,14 +628,16 @@ public class JdbcMassivePriceUpdateRepository implements IMassivePriceUpdateRepo
             try (PreparedStatement psClose = conn.prepareStatement(closeSql);
                     PreparedStatement psInsert = conn.prepareStatement(insertSql)) {
 
-                psClose.setInt(1, targetId);
+                psClose.setTimestamp(1, Timestamp.valueOf(startDate));
+                psClose.setInt(2, targetId);
                 psClose.executeUpdate();
 
                 psInsert.setInt(1, targetId);
                 psInsert.setDouble(2, multiplier);
                 psInsert.setTimestamp(3, Timestamp.valueOf(startDate));
                 psInsert.setString(4, reason);
-                psInsert.setInt(5, sourceId);
+                if (logId != null) psInsert.setInt(5, logId); else psInsert.setNull(5, Types.INTEGER);
+                psInsert.setInt(6, sourceId);
                 psInsert.executeUpdate();
 
                 conn.commit();
@@ -652,10 +654,10 @@ public class JdbcMassivePriceUpdateRepository implements IMassivePriceUpdateRepo
 
     private int executeBulkUpdate(Connection conn, PreparedStatement selectStmt,
             int priceListId, double value, String reason,
-            java.time.LocalDateTime startDate, boolean isPercentage) throws SQLException {
+            java.time.LocalDateTime startDate, boolean isPercentage, Integer logId) throws SQLException {
         int count = 0;
         String closeSql = "UPDATE product_prices SET end_date = ? WHERE product_id = ? AND price_list_id = ? AND end_date IS NULL";
-        String insertSql = "INSERT INTO product_prices (product_id, price_list_id, price, start_date, end_date, reason) VALUES (?, ?, ?, ?, NULL, ?)";
+        String insertSql = "INSERT INTO product_prices (product_id, price_list_id, price, start_date, end_date, reason, update_log_id) VALUES (?, ?, ?, ?, NULL, ?, ?)";
 
         try (ResultSet rs = selectStmt.executeQuery();
                 PreparedStatement closeStmt = conn.prepareStatement(closeSql);
@@ -686,6 +688,7 @@ public class JdbcMassivePriceUpdateRepository implements IMassivePriceUpdateRepo
                     insertStmt.setDouble(3, newPrice);
                     insertStmt.setTimestamp(4, Timestamp.valueOf(startDate));
                     insertStmt.setString(5, reason);
+                    if (logId != null) insertStmt.setInt(6, logId); else insertStmt.setNull(6, Types.INTEGER);
                     insertStmt.addBatch();
                     count++;
                 }
@@ -700,15 +703,15 @@ public class JdbcMassivePriceUpdateRepository implements IMassivePriceUpdateRepo
     }
 
     private int executeBulkRounding(Connection conn, PreparedStatement selectStmt, int priceListId,
-            double roundingTarget, String reason, java.time.LocalDateTime startDate, double globalTax)
+            double roundingTarget, String reason, java.time.LocalDateTime startDate, double globalTax, Integer logId)
             throws SQLException {
         boolean pricesIncludeTax = getPricesIncludeTax(conn);
         int updatedCount = 0;
         String closeSql = "UPDATE product_prices SET end_date = ? " +
                 "WHERE product_id = ? AND price_list_id = ? AND end_date IS NULL";
-        String insertSql = "INSERT INTO product_prices (product_id, price_list_id, price, start_date, end_date, reason) "
+        String insertSql = "INSERT INTO product_prices (product_id, price_list_id, price, start_date, end_date, reason, update_log_id) "
                 +
-                "VALUES (?, ?, ?, ?, NULL, ?)";
+                "VALUES (?, ?, ?, ?, NULL, ?, ?)";
 
         try (ResultSet rs = selectStmt.executeQuery();
                 PreparedStatement closeStmt = conn.prepareStatement(closeSql);
@@ -747,6 +750,7 @@ public class JdbcMassivePriceUpdateRepository implements IMassivePriceUpdateRepo
                     insertStmt.setDouble(3, newBasePrice);
                     insertStmt.setTimestamp(4, Timestamp.valueOf(startDate));
                     insertStmt.setString(5, reason);
+                    if (logId != null) insertStmt.setInt(6, logId); else insertStmt.setNull(6, Types.INTEGER);
                     insertStmt.addBatch();
                     updatedCount++;
                 }
@@ -760,7 +764,7 @@ public class JdbcMassivePriceUpdateRepository implements IMassivePriceUpdateRepo
         return updatedCount;
     }
 
-    private void ensurePricesExist(int targetPriceListId, Integer categoryId, Connection conn) throws SQLException {
+    private void ensurePricesExist(int targetPriceListId, Integer categoryId, java.time.LocalDateTime startDate, Integer logId, Connection conn) throws SQLException {
         int defaultPriceListId = -1;
         try (Statement stmt = conn.createStatement();
                 ResultSet rs = stmt
@@ -774,9 +778,9 @@ public class JdbcMassivePriceUpdateRepository implements IMassivePriceUpdateRepo
         }
 
         StringBuilder sql = new StringBuilder();
-        sql.append("INSERT INTO product_prices (product_id, price_list_id, price, start_date, reason) ");
+        sql.append("INSERT INTO product_prices (product_id, price_list_id, price, start_date, reason, update_log_id) ");
         sql.append(
-                "SELECT p.product_id, ?, COALESCE(pp_def.price, 0), NOW(), 'Copia impl\u00edcita de tarifa base por Subida Masiva' ");
+                "SELECT p.product_id, ?, COALESCE(pp_def.price, 0), ?, 'Copia impl\u00edcita de tarifa base por Subida Masiva', ? ");
         sql.append("FROM products p ");
         sql.append("LEFT JOIN product_prices pp_target ON p.product_id = pp_target.product_id ");
         sql.append("  AND pp_target.price_list_id = ? AND pp_target.end_date IS NULL ");
@@ -790,19 +794,22 @@ public class JdbcMassivePriceUpdateRepository implements IMassivePriceUpdateRepo
 
         try (PreparedStatement ps = conn.prepareStatement(sql.toString())) {
             ps.setInt(1, targetPriceListId);
-            ps.setInt(2, targetPriceListId);
-            ps.setInt(3, defaultPriceListId);
+            ps.setTimestamp(2, Timestamp.valueOf(startDate));
+            if (logId != null) ps.setInt(3, logId); else ps.setNull(3, Types.INTEGER);
+            ps.setInt(4, targetPriceListId);
+            ps.setInt(5, defaultPriceListId);
             if (categoryId != null && categoryId > 0) {
-                ps.setInt(4, categoryId);
+                ps.setInt(6, categoryId);
             }
             ps.executeUpdate();
         }
     }
 
-    private void ensurePricesExistForProducts(int priceListId, java.util.List<Integer> productIds, Connection conn)
+    private void ensurePricesExistForProducts(int priceListId, java.util.List<Integer> productIds,
+            java.time.LocalDateTime startDate, Integer logId, Connection conn)
             throws SQLException {
-        String sql = "INSERT IGNORE INTO product_prices (product_id, price_list_id, price, start_date, reason) " +
-                "SELECT p.product_id, ?, p.base_price, CURRENT_TIMESTAMP, 'Inicial masivo' " +
+        String sql = "INSERT IGNORE INTO product_prices (product_id, price_list_id, price, start_date, reason, update_log_id) " +
+                "SELECT p.product_id, ?, p.base_price, ?, 'Inicial masivo', ? " +
                 "FROM products p WHERE p.product_id IN (" +
                 productIds.stream().map(String::valueOf).collect(java.util.stream.Collectors.joining(",")) + ") " +
                 "AND NOT EXISTS (SELECT 1 FROM product_prices pp WHERE pp.product_id = p.product_id AND pp.price_list_id = ? "
@@ -810,7 +817,9 @@ public class JdbcMassivePriceUpdateRepository implements IMassivePriceUpdateRepo
                 "AND pp.start_date <= CURRENT_TIMESTAMP AND (pp.end_date IS NULL OR pp.end_date > CURRENT_TIMESTAMP))";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, priceListId);
-            ps.setInt(2, priceListId);
+            ps.setTimestamp(2, Timestamp.valueOf(startDate));
+            if (logId != null) ps.setInt(3, logId); else ps.setNull(3, Types.INTEGER);
+            ps.setInt(4, priceListId);
             ps.executeUpdate();
         }
     }
@@ -842,5 +851,21 @@ public class JdbcMassivePriceUpdateRepository implements IMassivePriceUpdateRepo
             return false;
         }
         return false;
+    }
+    @Override
+    public void updateLogIdForPricesAtTimestamp(int priceListId, java.time.LocalDateTime timestamp, int logId) throws SQLException {
+        String sql = "UPDATE product_prices SET update_log_id = ? " +
+                "WHERE price_list_id = ? " +
+                "AND start_date >= DATE_SUB(?, INTERVAL 5 SECOND) " +
+                "AND start_date <= DATE_ADD(?, INTERVAL 5 SECOND)";
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, logId);
+            ps.setInt(2, priceListId);
+            Timestamp ts = Timestamp.valueOf(timestamp);
+            ps.setTimestamp(3, ts);
+            ps.setTimestamp(4, ts);
+            ps.executeUpdate();
+        }
     }
 }

@@ -81,10 +81,15 @@ public class RegisterUserController implements Injectable {
     private void loadRoles() {
         try {
             List<Role> roles = roleUseCase.getAllRoles();
-            List<String> roleNames = roles.stream().map(Role::getName).toList();
+            boolean isSuperAdmin = container.getAuthService().isSuperAdmin();
+            
+            List<String> roleNames = roles.stream()
+                .filter(r -> isSuperAdmin || !"SUPERADMIN".equalsIgnoreCase(r.getName()))
+                .map(Role::getName)
+                .toList();
+                
             if (roleNames.isEmpty()) {
-                // Fallback si no hay roles en BD
-                roleNames = List.of("admin", "cajero");
+                roleNames = isSuperAdmin ? List.of("SUPERADMIN", "admin", "cajero") : List.of("admin", "cajero");
             }
             cmbRole.setItems(FXCollections.observableArrayList(roleNames));
         } catch (SQLException e) {
@@ -96,6 +101,13 @@ public class RegisterUserController implements Injectable {
     private void updatePermissionsByRole(String roleName) {
         if (roleName == null)
             return;
+        
+        // Protecci\u00f3n extra: si un Admin intenta hackear el combo y poner SUPERADMIN
+        if ("SUPERADMIN".equalsIgnoreCase(roleName) && !container.getAuthService().isSuperAdmin()) {
+            cmbRole.setValue("admin");
+            return;
+        }
+
         try {
             Role role = roleUseCase.getRoleByName(roleName);
             if (role == null)
@@ -105,22 +117,24 @@ public class RegisterUserController implements Injectable {
                     .map(Permission::getCode)
                     .toList();
 
+            boolean customizationEnabled = chkAllowExtraPerms.isSelected();
             for (CheckBox cb : permissionCheckboxes) {
                 String code = cb.getUserData().toString();
                 if (rolePermCodes.contains(code)) {
                     cb.setSelected(true);
-                    cb.setDisable(true);
-                    cb.setStyle("-fx-opacity: 0.8; -fx-text-fill: #888888; -fx-font-weight: bold;");
+                    cb.setDisable(!customizationEnabled);
+                    cb.setStyle(customizationEnabled ? "" : "-fx-opacity: 0.8; -fx-text-fill: #888888; -fx-font-weight: bold;");
                 } else {
-                    boolean customizationEnabled = chkAllowExtraPerms.isSelected();
                     cb.setDisable(!customizationEnabled);
                     cb.setStyle(customizationEnabled ? "" : "-fx-opacity: 0.5;");
                 }
             }
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
+
 
     /**
      * Carga el cat\u00e1logo de permisos desde la BD y genera checkboxes din\u00e1micamente.
@@ -247,15 +261,27 @@ public class RegisterUserController implements Injectable {
             txtUsername.setText(user.getUsername());
             txtUsername.setDisable(true);
             txtEmail.setText(user.getEmail());
-            String uiRole = "admin".equalsIgnoreCase(user.getRole()) ? "admin" : "cajero";
+            String uiRole = user.getRole();
             cmbRole.setValue(uiRole);
 
-            // Impedir cambiar el rol al administrador principal para asegurar que siempre
-            // haya uno
-            if (user.getUserId() == 1 || "admin".equalsIgnoreCase(user.getUsername())) {
+            // Impedir cambiar el rol al administrador principal o al SUPERADMIN
+            boolean isPrincipalAdmin = user.getUserId() == 1 || "admin".equalsIgnoreCase(user.getUsername());
+            boolean isTargetSuperAdmin = "SUPERADMIN".equalsIgnoreCase(user.getRole());
+            boolean currentIsSuperAdmin = container.getAuthService().isSuperAdmin();
+
+            if (isPrincipalAdmin || (isTargetSuperAdmin && !currentIsSuperAdmin)) {
                 cmbRole.setDisable(true);
                 cmbRole.setTooltip(new Tooltip(container.getBundle().getString("user.register.edit_principal.tooltip")));
+                
+                // Si un Admin intenta editar un SuperAdmin, deshabilitar todo el formulario o avisar
+                if (isTargetSuperAdmin && !currentIsSuperAdmin) {
+                    txtFullName.setDisable(true);
+                    txtEmail.setDisable(true);
+                    permissionsContainer.setDisable(true);
+                    chkAllowExtraPerms.setDisable(true);
+                }
             }
+
 
             if (lblTitle != null)
                 lblTitle.setText(container.getBundle().getString("user.register.edit.title"));
@@ -274,16 +300,20 @@ public class RegisterUserController implements Injectable {
                 userCodes.add(p.getCode());
             }
 
-            // Si el usuario tiene permisos que NO est\u00e1n en su rol, habilitamos el toggle de
-            // personalizaci\u00f3n
+            // Si el usuario tiene permisos personalizados habilitados en BD, o tiene permisos que NO est\u00e1n en su rol
             Role role = roleUseCase.getRoleByName(cmbRole.getValue());
+            boolean hasCustom = userToEdit != null && userToEdit.isHasCustomPermissions();
+            
             if (role != null) {
                 List<String> roleCodes = role.getPermissions().stream().map(Permission::getCode).toList();
                 boolean hasExtra = userCodes.stream().anyMatch(code -> !roleCodes.contains(code));
-                if (hasExtra) {
+                if (hasExtra || hasCustom) {
                     chkAllowExtraPerms.setSelected(true);
                 }
+            } else if (hasCustom) {
+                chkAllowExtraPerms.setSelected(true);
             }
+
 
             for (CheckBox cb : permissionCheckboxes) {
                 cb.setSelected(userCodes.contains(cb.getUserData().toString()));
@@ -374,6 +404,7 @@ public class RegisterUserController implements Injectable {
                 newUser.setEmail(email);
                 newUser.setRole(role);
                 newUser.setPasswordHash(pass1);
+                newUser.setHasCustomPermissions(chkAllowExtraPerms.isSelected());
 
                 User existing = userUseCase.getUserByUsername(username);
                 if (existing != null) {
@@ -406,9 +437,11 @@ public class RegisterUserController implements Injectable {
                 userToEdit.setFullName(fullName);
                 userToEdit.setEmail(email);
                 userToEdit.setRole(role);
+                userToEdit.setHasCustomPermissions(chkAllowExtraPerms.isSelected());
 
                 userUseCase.updateUser(userToEdit);
                 permissionUseCase.savePermissionsForUser(userToEdit.getUserId(), selectedPermissions);
+
 
                 if (!pass1.isEmpty()) {
                     userUseCase.resetPassword(userToEdit.getEmail(), pass1);

@@ -33,7 +33,7 @@
 
 .brand-name {
     -fx-text-fill: white !important;
-    -fx-font-size: 13px;
+    -fx-font-size: 18px;
     -fx-font-weight: bold;
     -fx-padding: 10 0 0 0;
 }
@@ -57,7 +57,7 @@
     -fx-cursor: hand;
     -fx-max-width: Infinity;
     -fx-text-fill: white !important;
-    -fx-font-size: 11px;
+    -fx-font-size: 13px;
     -fx-font-weight: 800;
     -fx-background-radius: 0;
     -fx-border-width: 1 0 1 0;
@@ -84,7 +84,7 @@
     -fx-alignment: CENTER;
     -fx-padding: 15 10;
     -fx-text-fill: rgba(255, 255, 255, 0.5) !important;
-    -fx-font-size: 11px;
+    -fx-font-size: 14px;
     -fx-font-weight: 600;
     -fx-cursor: hand;
     -fx-spacing: 5;

@@ -138,8 +138,17 @@
 }
 
 .filter-datepicker {
-    -fx-background-color: transparent;
-    -fx-border-width: 0;
+    -fx-background-color: -fx-bg-surface;
+    -fx-background-radius: 20px;
+    -fx-border-color: -fx-color-border-main;
+    -fx-border-radius: 20px;
+    -fx-border-width: 1.5px;
+    -fx-padding: 0 4;
+}
+
+.filter-datepicker:hover {
+    -fx-border-color: -fx-custom-color-primary;
+    -fx-background-color: -fx-custom-color-primary-bg;
 }
 
 .filter-search-field {
@@ -239,27 +248,30 @@
     -fx-background-color: #ef4444;
     -fx-text-fill: white;
     -fx-font-size: 10px;
-    -fx-font-weight: bold;
-    -fx-padding: 3 8;
-    -fx-background-radius: 4px;
+    -fx-font-weight: 800;
+    -fx-padding: 4 12;
+    -fx-background-radius: 20px; /* PILL */
+    -fx-effect: dropshadow(three-pass-box, rgba(239, 68, 68, 0.2), 5, 0, 0, 2);
 }
 
 .badge-success {
     -fx-background-color: #10b981;
     -fx-text-fill: white;
     -fx-font-size: 10px;
-    -fx-font-weight: bold;
-    -fx-padding: 3 8;
-    -fx-background-radius: 4px;
+    -fx-font-weight: 800;
+    -fx-padding: 4 12;
+    -fx-background-radius: 20px; /* PILL */
+    -fx-effect: dropshadow(three-pass-box, rgba(16, 185, 129, 0.2), 5, 0, 0, 2);
 }
 
 .badge-warning {
     -fx-background-color: #f59e0b;
     -fx-text-fill: white;
     -fx-font-size: 10px;
-    -fx-font-weight: bold;
-    -fx-padding: 3 8;
-    -fx-background-radius: 4px;
+    -fx-font-weight: 800;
+    -fx-padding: 4 12;
+    -fx-background-radius: 20px; /* PILL */
+    -fx-effect: dropshadow(three-pass-box, rgba(245, 158, 11, 0.2), 5, 0, 0, 2);
 }
 
 /* =========================================

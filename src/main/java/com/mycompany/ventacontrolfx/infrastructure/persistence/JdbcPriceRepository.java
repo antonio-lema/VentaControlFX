@@ -199,7 +199,7 @@ public class JdbcPriceRepository implements IPriceRepository {
     }
 
     @Override
-    public List<ProductPriceDTO> findPricesByListPaginated(int priceListId, String search, java.time.LocalDateTime startDate, int limit, int offset) throws SQLException {
+    public List<ProductPriceDTO> findPricesByListPaginated(int priceListId, String search, java.time.LocalDateTime startDate, Integer logId, int limit, int offset) throws SQLException {
         List<ProductPriceDTO> results = new ArrayList<>();
         String searchPattern = (search == null || search.trim().isEmpty()) ? null : "%" + search.trim().toLowerCase() + "%";
 
@@ -214,9 +214,12 @@ public class JdbcPriceRepository implements IPriceRepository {
         sql.append("LEFT JOIN product_prices pp ON p.product_id = pp.product_id AND pp.price_list_id = ? ");
         if (startDate == null) {
             sql.append("  AND pp.start_date <= CURRENT_TIMESTAMP AND (pp.end_date IS NULL OR pp.end_date > CURRENT_TIMESTAMP) ");
+        } else if (logId != null && logId > 0) {
+            // Hybrid lookup: Prioritize logId, fallback to timestamp if update_log_id is NULL (legacy)
+            sql.append("  AND (pp.update_log_id = ? OR (pp.update_log_id IS NULL AND pp.start_date >= DATE_SUB(?, INTERVAL 2 SECOND) AND pp.start_date <= DATE_ADD(?, INTERVAL 2 SECOND))) ");
         } else {
-            sql.append("  AND pp.start_date >= DATE_SUB(?, INTERVAL 1 SECOND) ");
-            sql.append("  AND pp.start_date <= DATE_ADD(?, INTERVAL 1 SECOND) ");
+            sql.append("  AND pp.start_date >= DATE_SUB(?, INTERVAL 5 SECOND) ");
+            sql.append("  AND pp.start_date <= DATE_ADD(?, INTERVAL 5 SECOND) ");
         }
         sql.append("LEFT JOIN product_prices pp_now ON p.product_id = pp_now.product_id AND pp_now.price_list_id = ? ");
         sql.append("  AND pp_now.start_date <= CURRENT_TIMESTAMP AND (pp_now.end_date IS NULL OR pp_now.end_date > CURRENT_TIMESTAMP) ");
@@ -239,9 +242,16 @@ public class JdbcPriceRepository implements IPriceRepository {
             int paramIdx = 1;
             ps.setInt(paramIdx++, priceListId);
             if (startDate != null) {
-                Timestamp ts = Timestamp.valueOf(startDate);
-                ps.setTimestamp(paramIdx++, ts);
-                ps.setTimestamp(paramIdx++, ts);
+                if (logId != null && logId > 0) {
+                    ps.setInt(paramIdx++, logId);
+                    Timestamp ts = Timestamp.valueOf(startDate);
+                    ps.setTimestamp(paramIdx++, ts);
+                    ps.setTimestamp(paramIdx++, ts);
+                } else {
+                    Timestamp ts = Timestamp.valueOf(startDate);
+                    ps.setTimestamp(paramIdx++, ts);
+                    ps.setTimestamp(paramIdx++, ts);
+                }
             }
             ps.setInt(paramIdx++, priceListId);
             if (searchPattern != null) {
@@ -270,7 +280,7 @@ public class JdbcPriceRepository implements IPriceRepository {
     }
 
     @Override
-    public int countPricesByList(int priceListId, String search, java.time.LocalDateTime startDate) throws SQLException {
+    public int countPricesByList(int priceListId, String search, java.time.LocalDateTime startDate, Integer logId) throws SQLException {
         String searchPattern = (search == null || search.trim().isEmpty()) ? null : "%" + search.trim().toLowerCase() + "%";
 
         StringBuilder sql = new StringBuilder();
@@ -278,8 +288,12 @@ public class JdbcPriceRepository implements IPriceRepository {
         sql.append("LEFT JOIN categories c ON p.category_id = c.category_id ");
         if (startDate != null) {
             sql.append("JOIN product_prices pp ON p.product_id = pp.product_id AND pp.price_list_id = ? ");
-            sql.append("AND pp.start_date >= DATE_SUB(?, INTERVAL 1 SECOND) ");
-            sql.append("AND pp.start_date <= DATE_ADD(?, INTERVAL 1 SECOND) ");
+            if (logId != null && logId > 0) {
+                sql.append("AND (pp.update_log_id = ? OR (pp.update_log_id IS NULL AND pp.start_date >= DATE_SUB(?, INTERVAL 2 SECOND) AND pp.start_date <= DATE_ADD(?, INTERVAL 2 SECOND))) ");
+            } else {
+                sql.append("AND pp.start_date >= DATE_SUB(?, INTERVAL 5 SECOND) ");
+                sql.append("AND pp.start_date <= DATE_ADD(?, INTERVAL 5 SECOND) ");
+            }
         }
         sql.append("WHERE p.visible = 1 ");
 
@@ -292,9 +306,16 @@ public class JdbcPriceRepository implements IPriceRepository {
             int paramIdx = 1;
             if (startDate != null) {
                 ps.setInt(paramIdx++, priceListId);
-                Timestamp ts = Timestamp.valueOf(startDate);
-                ps.setTimestamp(paramIdx++, ts);
-                ps.setTimestamp(paramIdx++, ts);
+                if (logId != null && logId > 0) {
+                    ps.setInt(paramIdx++, logId);
+                    Timestamp ts = Timestamp.valueOf(startDate);
+                    ps.setTimestamp(paramIdx++, ts);
+                    ps.setTimestamp(paramIdx++, ts);
+                } else {
+                    Timestamp ts = Timestamp.valueOf(startDate);
+                    ps.setTimestamp(paramIdx++, ts);
+                    ps.setTimestamp(paramIdx++, ts);
+                }
             }
             if (searchPattern != null) {
                 ps.setString(paramIdx++, searchPattern);
@@ -325,5 +346,22 @@ public class JdbcPriceRepository implements IPriceRepository {
         if (!rs.wasNull())
             p.setUpdateLogId(logId);
         return p;
+    }
+
+    @Override
+    public void updateLogIdForPricesAtTimestamp(int priceListId, java.time.LocalDateTime timestamp, int logId) throws SQLException {
+        String sql = "UPDATE product_prices SET update_log_id = ? " +
+                "WHERE price_list_id = ? " +
+                "AND start_date >= DATE_SUB(?, INTERVAL 5 SECOND) " +
+                "AND start_date <= DATE_ADD(?, INTERVAL 5 SECOND)";
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, logId);
+            ps.setInt(2, priceListId);
+            Timestamp ts = Timestamp.valueOf(timestamp);
+            ps.setTimestamp(3, ts);
+            ps.setTimestamp(4, ts);
+            ps.executeUpdate();
+        }
     }
 }

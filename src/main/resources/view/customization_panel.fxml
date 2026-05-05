@@ -158,7 +158,7 @@
                                         <Label text="%custom.color.primary" styleClass="color-row-label"/>
                                         <Label text="%custom.color.primary.desc" styleClass="color-row-hint"/>
                                     </VBox>
-                                    <ColorPicker fx:id="cpPrimary" maxWidth="140" prefHeight="36"/>
+                                    <ColorPicker fx:id="cpPrimary" prefWidth="130" prefHeight="38" styleClass="premium-picker"/>
                                 </HBox>
                                 <HBox styleClass="color-row" alignment="CENTER_LEFT" spacing="12">
                                     <StackPane style="-fx-background-color: rgba(100,116,139,0.1); -fx-background-radius: 8; -fx-padding: 7;">
@@ -168,7 +168,7 @@
                                         <Label text="%custom.color.secondary" styleClass="color-row-label"/>
                                         <Label text="%custom.color.secondary.desc" styleClass="color-row-hint"/>
                                     </VBox>
-                                    <ColorPicker fx:id="cpSecondary" maxWidth="140" prefHeight="36"/>
+                                    <ColorPicker fx:id="cpSecondary" prefWidth="130" prefHeight="38" styleClass="premium-picker"/>
                                 </HBox>
                                 <HBox styleClass="color-row" alignment="CENTER_LEFT" spacing="12">
                                     <StackPane style="-fx-background-color: rgba(15,23,42,0.08); -fx-background-radius: 8; -fx-padding: 7;">
@@ -178,7 +178,7 @@
                                         <Label text="%custom.color.bg" styleClass="color-row-label"/>
                                         <Label text="%custom.color.bg.desc" styleClass="color-row-hint"/>
                                     </VBox>
-                                    <ColorPicker fx:id="cpBackground" maxWidth="140" prefHeight="36"/>
+                                    <ColorPicker fx:id="cpBackground" prefWidth="130" prefHeight="38" styleClass="premium-picker"/>
                                 </HBox>
                                 <HBox styleClass="color-row" alignment="CENTER_LEFT" spacing="12">
                                     <StackPane style="-fx-background-color: rgba(30,30,30,0.08); -fx-background-radius: 8; -fx-padding: 7;">
@@ -188,7 +188,7 @@
                                         <Label text="%custom.color.text" styleClass="color-row-label"/>
                                         <Label text="%custom.color.text.desc" styleClass="color-row-hint"/>
                                     </VBox>
-                                    <ColorPicker fx:id="cpText" maxWidth="140" prefHeight="36"/>
+                                    <ColorPicker fx:id="cpText" prefWidth="130" prefHeight="38" styleClass="premium-picker"/>
                                 </HBox>
                                 <HBox styleClass="color-row" alignment="CENTER_LEFT" spacing="12">
                                     <StackPane style="-fx-background-color: rgba(139,92,246,0.1); -fx-background-radius: 8; -fx-padding: 7;">
@@ -198,7 +198,7 @@
                                         <Label text="%custom.color.cards_text" styleClass="color-row-label"/>
                                         <Label text="%custom.color.cards_text.desc" styleClass="color-row-hint"/>
                                     </VBox>
-                                    <ColorPicker fx:id="cpTextCards" maxWidth="140" prefHeight="36"/>
+                                    <ColorPicker fx:id="cpTextCards" prefWidth="130" prefHeight="38" styleClass="premium-picker"/>
                                 </HBox>
                                 <HBox styleClass="color-row" alignment="CENTER_LEFT" spacing="12">
                                     <StackPane style="-fx-background-color: rgba(16,185,129,0.1); -fx-background-radius: 8; -fx-padding: 7;">
@@ -208,7 +208,7 @@
                                         <Label text="%custom.color.price_text" styleClass="color-row-label"/>
                                         <Label text="%custom.color.price_text.desc" styleClass="color-row-hint"/>
                                     </VBox>
-                                    <ColorPicker fx:id="cpTextPrice" maxWidth="140" prefHeight="36"/>
+                                    <ColorPicker fx:id="cpTextPrice" prefWidth="130" prefHeight="38" styleClass="premium-picker"/>
                                 </HBox>
                                 <HBox styleClass="color-row" alignment="CENTER_LEFT" spacing="12">
                                     <StackPane style="-fx-background-color: rgba(15,23,42,0.12); -fx-background-radius: 8; -fx-padding: 7;">
@@ -218,7 +218,7 @@
                                         <Label text="%custom.color.sidebar" styleClass="color-row-label"/>
                                         <Label text="%custom.color.sidebar.desc" styleClass="color-row-hint"/>
                                     </VBox>
-                                    <ColorPicker fx:id="cpSidebar" maxWidth="140" prefHeight="36"/>
+                                    <ColorPicker fx:id="cpSidebar" prefWidth="130" prefHeight="38" styleClass="premium-picker"/>
                                 </HBox>
                                 <HBox styleClass="color-row" alignment="CENTER_LEFT" spacing="12">
                                     <StackPane style="-fx-background-color: rgba(15,23,42,0.12); -fx-background-radius: 8; -fx-padding: 7;">
@@ -228,7 +228,7 @@
                                         <Label text="%custom.color.sidebar_text" styleClass="color-row-label"/>
                                         <Label text="%custom.color.sidebar_text.desc" styleClass="color-row-hint"/>
                                     </VBox>
-                                    <ColorPicker fx:id="cpSidebarText" maxWidth="140" prefHeight="36"/>
+                                    <ColorPicker fx:id="cpSidebarText" prefWidth="130" prefHeight="38" styleClass="premium-picker"/>
                                 </HBox>
                             </VBox>
                         </VBox>

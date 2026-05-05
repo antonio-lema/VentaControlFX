@@ -32,7 +32,7 @@ import com.mycompany.ventacontrolfx.util.PaginationHelper;
 public class FiscalDocumentsController implements Injectable {
 
     @FXML
-    private Label lblTotalTickets, lblTotalInvoices, lblTotalReturns, lblTotalCancelled, lblTotalAmount;
+    private Label lblTotalTickets, lblTotalInvoices, lblTotalReturns, lblTotalAmount;
     @FXML
     private DatePicker dpFrom, dpTo;
     @FXML
@@ -191,11 +191,8 @@ public class FiscalDocumentsController implements Injectable {
 
         cbStatus.setItems(FXCollections.observableArrayList(
                 container.getBundle().getString("fiscal.doc.status.all"),
-                "EMITIDO", "ANULADO"));
+                "EMITIDO"));
         cbStatus.getSelectionModel().selectFirst();
-
-        dpFrom.setValue(LocalDate.now().minusDays(7));
-        dpTo.setValue(LocalDate.now());
 
         RealTimeSearchBinder.bind(txtSearch, query -> applyFilters());
     }
@@ -214,7 +211,6 @@ public class FiscalDocumentsController implements Injectable {
         long tickets = docs.stream().filter(d -> d.getDocType() == Type.TICKET).count();
         long invoices = docs.stream().filter(d -> d.getDocType() == Type.FACTURA).count();
         long returns = docs.stream().filter(d -> d.getDocType() == Type.RECTIFICATIVA).count();
-        long cancelled = docs.stream().filter(d -> d.getDocStatus() == Status.ANULADO).count();
 
         // El total facturado neto suele ser Ventas - Devoluciones, pero aqu\u00ed mostramos
         // el bruto emitido seg\u00fan requisito.
@@ -228,7 +224,6 @@ public class FiscalDocumentsController implements Injectable {
         lblTotalInvoices.setText(String.valueOf(invoices));
         if (lblTotalReturns != null)
             lblTotalReturns.setText(String.valueOf(returns));
-        lblTotalCancelled.setText(String.valueOf(cancelled));
         lblTotalAmount.setText(String.format("%.2f \u20ac", total));
     }
 

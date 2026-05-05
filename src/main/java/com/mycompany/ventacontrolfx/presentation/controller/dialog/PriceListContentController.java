@@ -77,6 +77,7 @@ public class PriceListContentController implements Injectable {
     private ServerPaginationHelper<ProductPriceDTO> paginationHelper;
     private String currentSearch = "";
     private LocalDateTime currentFilterDate;
+    private Integer currentFilterLogId;
     private Integer historyPeriodDays = null;
 
     @Override
@@ -211,6 +212,7 @@ public class PriceListContentController implements Injectable {
     private void applyHistoryFilter(PriceHistoryEventDTO event) {
         if (event.getType() == PriceHistoryEventDTO.EventType.BULK_UPDATE) {
             this.currentFilterDate = event.getTimestamp();
+            this.currentFilterLogId = event.getLogId();
             this.currentSearch = "";
             txtSearch.setText("");
             lblFilterInfo.setText("Filtro: Actualizaci\u00f3n Masiva ("
@@ -218,6 +220,7 @@ public class PriceListContentController implements Injectable {
             colDiff.setText("\u25b2 vs Hoy");
         } else {
             this.currentFilterDate = null;
+            this.currentFilterLogId = null;
             this.currentSearch = event.getTargetName();
             txtSearch.setText(event.getTargetName());
             lblFilterInfo.setText("Mostrando cambios en: " + event.getTargetName());
@@ -231,9 +234,9 @@ public class PriceListContentController implements Injectable {
 
     private void fetchPricesPage(int offset, int limit) {
         asyncManager.runAsyncTask(() -> {
-            int total = priceRepository.countPricesByList(currentList.getId(), currentSearch, currentFilterDate);
+            int total = priceRepository.countPricesByList(currentList.getId(), currentSearch, currentFilterDate, currentFilterLogId);
             List<ProductPriceDTO> items = priceRepository.findPricesByListPaginated(currentList.getId(), currentSearch,
-                    currentFilterDate, limit, offset);
+                    currentFilterDate, currentFilterLogId, limit, offset);
             return new Object[] { total, items };
         }, (res) -> {
             Object[] data = (Object[]) res;
@@ -260,7 +263,8 @@ public class PriceListContentController implements Injectable {
                         "Modificaci\u00f3n de " + log.getValue() + " aplicada a " + log.getScope(),
                         log.getReason(),
                         "Afect\u00f3 a " + log.getProductsUpdated() + " productos",
-                        null));
+                        null,
+                        log.getLogId()));
             }
 
             // Map individual history
@@ -273,7 +277,8 @@ public class PriceListContentController implements Injectable {
                             "Precio anterior: " + String.format("%.2f \u20ac", hist.getPrice()),
                             hist.getReason(),
                             "Sustituido por nueva vigencia",
-                            hist.getProductName()));
+                            hist.getProductName(),
+                            null));
                 }
             }
 
@@ -303,6 +308,7 @@ public class PriceListContentController implements Injectable {
     @FXML
     private void handleRefresh() {
         this.currentFilterDate = null;
+        this.currentFilterLogId = null;
         this.currentSearch = "";
         txtSearch.setText("");
         paneFilterInfo.setVisible(false);

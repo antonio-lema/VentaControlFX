@@ -6,6 +6,7 @@ import com.mycompany.ventacontrolfx.shared.async.AsyncManager;
 import com.mycompany.ventacontrolfx.infrastructure.config.Injectable;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
+import javafx.scene.layout.HBox;
 import java.util.Map;
 
 public class StatusBarController implements Injectable, GlobalEventBus.DataChangeListener, GlobalEventBus.VerifactuSyncListener {

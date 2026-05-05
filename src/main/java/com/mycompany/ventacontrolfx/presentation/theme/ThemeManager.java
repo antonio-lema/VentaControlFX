@@ -341,8 +341,7 @@ public class ThemeManager {
                 int fBase = fontSize != null ? (int) Double.parseDouble(fontSize) : 14;
                 int bRadius = borderRadius != null ? (int) Double.parseDouble(borderRadius) : 8;
 
-                sb.append(".button, .text-field, .combo-box {\n");
-                sb.append("  -fx-font-size: ").append(fBase).append("px;\n");
+                sb.append(".text-field, .combo-box {\n");
                 sb.append("  -fx-background-radius: ").append(bRadius).append("px;\n");
                 sb.append("  -fx-border-radius: ").append(bRadius).append("px;\n");
                 sb.append("}\n\n");

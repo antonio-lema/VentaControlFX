@@ -74,7 +74,7 @@ public class PriceListUseCase {
         // 3. Clonar los precios con el multiplicador
         double multiplier = 1.0 + (percentage / 100.0);
         massiveUpdateRepository.cloneAndAdjustPriceList(sourceId, targetId, multiplier,
-                "Clonaci\u00f3n con ajuste del " + percentage + "%", java.time.LocalDateTime.now());
+                "Clonaci\u00f3n con ajuste del " + percentage + "%", java.time.LocalDateTime.now(), null);
 
         return new PriceList(targetId, newName, description, false, true, 0);
     }

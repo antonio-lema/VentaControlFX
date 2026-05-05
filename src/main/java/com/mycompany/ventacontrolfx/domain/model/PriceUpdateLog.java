@@ -13,6 +13,7 @@ public class PriceUpdateLog {
     private double value;
     private int productsUpdated;
     private String reason;
+    private Integer priceListId;
     private LocalDateTime appliedAt;
 
     // Helpers para display
@@ -45,6 +46,9 @@ public class PriceUpdateLog {
 
     public LocalDateTime getAppliedAt() { return appliedAt; }
     public void setAppliedAt(LocalDateTime appliedAt) { this.appliedAt = appliedAt; }
+
+    public Integer getPriceListId() { return priceListId; }
+    public void setPriceListId(Integer priceListId) { this.priceListId = priceListId; }
 
     public String getCategoryName() { return categoryName; }
     public void setCategoryName(String categoryName) { this.categoryName = categoryName; }

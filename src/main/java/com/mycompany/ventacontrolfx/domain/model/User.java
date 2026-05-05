@@ -18,6 +18,7 @@ public class User {
     private String companyName;
     private Role roleObject;
     private Integer currentBranchId; // ID de la sucursal actual
+    private boolean hasCustomPermissions; // Si es true, ignora los permisos del rol
 
     // Mapeo de BranchID -> Lista de Permisos Contextuales
     private java.util.Map<Integer, List<Permission>> branchPermissions = new java.util.HashMap<>();
@@ -153,6 +154,14 @@ public class User {
         this.individualPermissions = permissions != null ? permissions : new ArrayList<>();
     }
 
+    public boolean isHasCustomPermissions() {
+        return hasCustomPermissions;
+    }
+
+    public void setHasCustomPermissions(boolean hasCustomPermissions) {
+        this.hasCustomPermissions = hasCustomPermissions;
+    }
+
     public Integer getCurrentBranchId() {
         return currentBranchId;
     }
@@ -180,8 +189,12 @@ public class User {
             return true;
 
         // 2. Comprobar permisos globales (Rol + Individuales)
-        if (rolePermissions.stream().anyMatch(p -> code.equalsIgnoreCase(p.getCode())))
-            return true;
+        // Si tiene permisos personalizados, ignoramos los del rol
+        if (!hasCustomPermissions) {
+            if (rolePermissions.stream().anyMatch(p -> code.equalsIgnoreCase(p.getCode())))
+                return true;
+        }
+        
         if (individualPermissions.stream().anyMatch(p -> code.equalsIgnoreCase(p.getCode())))
             return true;
 
@@ -193,4 +206,5 @@ public class User {
 
         return false;
     }
+
 }

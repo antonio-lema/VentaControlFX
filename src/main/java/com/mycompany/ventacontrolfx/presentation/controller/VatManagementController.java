@@ -394,7 +394,7 @@ public class VatManagementController implements Injectable {
             try {
                 data.defaultGroup = taxRepository.getDefaultTaxGroup();
                 data.taxGroups = taxRepository.getAllTaxGroups();
-                data.categories = categoryRepository.getAll();
+                data.categories = categoryRepository.getAllVisible();
                 data.priceLists = priceListUseCase.getAll();
             } catch (SQLException e) {
                 throw new RuntimeException(e);

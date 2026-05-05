@@ -64,11 +64,14 @@ public class JdbcPriceHistoryRepository implements IPriceHistoryRepository {
     @Override
     public List<PriceUpdateLogDTO> findBulkUpdateLog(int priceListId) throws SQLException {
         List<PriceUpdateLogDTO> logs = new ArrayList<>();
-        String sql = "SELECT * FROM price_update_log ORDER BY applied_at DESC LIMIT 100";
+        String sql = "SELECT * FROM price_update_log WHERE price_list_id = ? OR price_list_id IS NULL ORDER BY applied_at DESC LIMIT 100";
         try (Connection conn = DBConnection.getConnection();
-                Statement stmt = conn.createStatement();
-                ResultSet rs = stmt.executeQuery(sql)) {
-            while (rs.next()) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, priceListId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                int plId = rs.getInt("price_list_id");
+                Integer plIdObj = rs.wasNull() ? null : plId;
                 logs.add(new PriceUpdateLogDTO(
                         rs.getInt("log_id"),
                         rs.getString("update_type"),
@@ -76,7 +79,9 @@ public class JdbcPriceHistoryRepository implements IPriceHistoryRepository {
                         rs.getDouble("value"),
                         rs.getInt("products_updated"),
                         rs.getString("reason"),
+                        plIdObj,
                         rs.getTimestamp("applied_at").toLocalDateTime()));
+                }
             }
         }
         return logs;

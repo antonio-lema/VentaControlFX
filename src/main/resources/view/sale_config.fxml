@@ -33,7 +33,7 @@
                 </VBox>
                 <Region HBox.hgrow="ALWAYS"/>
                 <!-- Bot&#x00f3;n Guardar (cabecera) -->
-                <Button fx:id="btnSaveTop" text="%config.btn.save" onAction="#handleSave" styleClass="config-btn-save" defaultButton="true">
+                <Button fx:id="btnSaveTop" text="%config.btn.save" onAction="#handleSave" styleClass="btn-primary" defaultButton="true">
                     <graphic>
                         <HBox spacing="8" alignment="CENTER">
                             <FontAwesomeIconView glyphName="SAVE" size="14" fill="white"/>
@@ -45,9 +45,8 @@
         <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="detail-scroll, edge-to-edge" VBox.vgrow="ALWAYS">
             <VBox spacing="20" style="-fx-padding: 30;">
 
-                <!--  FILA 1: Empresa + Fiscal  -->
+                <!--  FILA 1: Empresa -->
                 <HBox spacing="20">
-
                     <!-- Tarjeta: Datos de la Empresa -->
                     <VBox styleClass="config-card" HBox.hgrow="ALWAYS">
                         <!-- Cabecera tarjeta -->
@@ -146,36 +145,6 @@
                                     <TextField fx:id="txtTerminalName" promptText="%config.field.terminal_name.prompt"
                                                HBox.hgrow="ALWAYS" styleClass="modern-input-field"/>
                                 </HBox>
-                            </VBox>
-                        </VBox>
-                    </VBox>
-
-                    <!-- Tarjeta: Configuraci&#x00f3;n Fiscal -->
-                    <VBox styleClass="config-card" HBox.hgrow="ALWAYS" maxWidth="350">
-                        <HBox styleClass="config-card-header" alignment="CENTER_LEFT" spacing="10">
-                            <StackPane styleClass="config-card-icon-wrap config-icon-orange">
-                                <FontAwesomeIconView glyphName="BALANCE_SCALE" size="16" fill="#fb8c00"/>
-                            </StackPane>
-                            <Label text="%config.section.fiscal" styleClass="config-card-title"/>
-                        </HBox>
-                        <Separator styleClass="config-card-separator"/>
-
-                        <VBox spacing="14" styleClass="config-card-body">
-                            <!-- Impuestos incluidos -->
-                            <VBox spacing="8">
-                                <CheckBox fx:id="chkPricesIncludeTax" text="%config.check.tax_included"
-                                          styleClass="config-checkbox"/>
-                                <Label text="%config.hint.tax_included" 
-                                       styleClass="config-field-hint" wrapText="true"/>
-                            </VBox>
-                            
-                            <Separator styleClass="config-card-separator" style="-fx-opacity: 0.3;"/>
-                            
-                            <VBox spacing="4">
-                                <Label text="%config.field.tax_ref" styleClass="config-field-label"/>
-                                <Label text="%config.field.tax_rate" styleClass="section-title" style="-fx-font-size: 15px;"/>
-                                <Label text="%config.hint.tax_manage" 
-                                       styleClass="config-field-hint" wrapText="true"/>
                             </VBox>
                         </VBox>
                     </VBox>
@@ -344,14 +313,14 @@
 
                 <!--  Botones de Acci&#x00f3;n finales  -->
                 <HBox spacing="15" alignment="CENTER_RIGHT">
-                    <Button text="%config.btn.reset" onAction="#handleReset" styleClass="config-btn-reset">
+                    <Button text="%config.btn.reset" onAction="#handleReset" styleClass="btn-secondary">
                         <graphic>
                             <HBox spacing="8" alignment="CENTER">
                                 <FontAwesomeIconView glyphName="UNDO" size="13" fill="#757575"/>
                             </HBox>
                         </graphic>
                     </Button>
-                    <Button text="%config.btn.save" onAction="#handleSave" styleClass="config-btn-save" defaultButton="true">
+                    <Button text="%config.btn.save" onAction="#handleSave" styleClass="btn-primary" defaultButton="true">
                         <graphic>
                             <HBox spacing="8" alignment="CENTER">
                                 <FontAwesomeIconView glyphName="CHECK" size="13" fill="white"/>

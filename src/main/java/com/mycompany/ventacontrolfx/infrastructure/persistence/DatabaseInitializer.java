@@ -35,6 +35,7 @@ public class DatabaseInitializer {
 			addColumnIfNotExists(conn, "users", "email", "VARCHAR(255)");
 			addColumnIfNotExists(conn, "users", "role", "VARCHAR(50)");
 			addColumnIfNotExists(conn, "users", "company_id", "INT DEFAULT NULL");
+			addColumnIfNotExists(conn, "users", "has_custom_permissions", "BOOLEAN DEFAULT FALSE");
 
 			// 1. Clients Table
 			stmt.execute("CREATE TABLE IF NOT EXISTS clients (" +
@@ -648,8 +649,10 @@ public class DatabaseInitializer {
 					"  value DECIMAL(10,4) NOT NULL," +
 					"  products_updated INT NOT NULL DEFAULT 0," +
 					"  reason VARCHAR(255)," +
+					"  price_list_id INT NULL," +
 					"  applied_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP" +
 					")");
+			addColumnIfNotExists(conn, "price_update_log", "price_list_id", "INT NULL");
 			// Aseguramos tama\u00f1o por si se cre\u00f3 antes con tama\u00f1o peque\u00f1o
 			// Solo modificamos si es necesario (asumimos que si no es 255 es mas
 			// peque\u00f1o en versiones antiguas)
@@ -1190,7 +1193,10 @@ public class DatabaseInitializer {
 
 			// V5: Seed system category and generic product for manual entries
 			try {
-				stmt.execute("INSERT IGNORE INTO categories (name, visible) VALUES ('SISTEMA', 0)");
+				// Prevenir duplicados de la categoría técnica
+				stmt.execute("INSERT INTO categories (name, visible) " +
+						"SELECT 'SISTEMA', 0 FROM DUAL " +
+						"WHERE NOT EXISTS (SELECT 1 FROM categories WHERE name = 'SISTEMA')");
 				int systemCatId = -1;
 				try (ResultSet rs = stmt
 						.executeQuery("SELECT category_id FROM categories WHERE name = 'SISTEMA' LIMIT 1")) {
@@ -1224,6 +1230,17 @@ public class DatabaseInitializer {
 				}
 			} catch (SQLException e) {
 				System.err.println("[WARN] Could not seed generic product: " + e.getMessage());
+			}
+
+			// V7: Limpieza de duplicados de sistema si existen
+			if (!isMigrationDone(conn, "cleanup_system_categories_v1")) {
+				try {
+					stmt.execute("DELETE FROM categories WHERE name = 'SISTEMA' AND category_id NOT IN (" +
+							"SELECT min_id FROM (SELECT MIN(category_id) as min_id FROM categories WHERE name = 'SISTEMA') as tmp)");
+					markMigrationDone(conn, "cleanup_system_categories_v1");
+				} catch (SQLException e) {
+					System.err.println("[WARN] Error limpiando categorías duplicadas: " + e.getMessage());
+				}
 			}
 			setSchemaVersion(conn, "1.13");
 		}

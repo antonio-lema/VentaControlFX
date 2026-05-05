@@ -126,10 +126,11 @@ public class ManageUsersController implements Injectable {
         actions.setPadding(new Insets(10, 0, 0, 0));
 
         Button btnEdit = new Button();
-        boolean canEdit = container.getUserSession().hasPermission("usuario.editar") 
-                || container.getUserSession().hasPermission("USUARIOS");
+        boolean canManage = container.getAuthService().canManageUser(user);
+        boolean isSelf = container.getUserSession().getCurrentUser() != null && 
+                         container.getUserSession().getCurrentUser().getUserId() == user.getUserId();
         
-        if (canEdit) {
+        if (canManage) {
             btnEdit.getStyleClass().add("btn-action-edit");
             FontAwesomeIconView editIcon = new FontAwesomeIconView(FontAwesomeIcon.PENCIL);
             editIcon.setSize("18");
@@ -137,19 +138,18 @@ public class ManageUsersController implements Injectable {
             btnEdit.setOnAction(e -> handleEditSingleUser(user));
         } else {
             btnEdit.getStyleClass().add("btn-action-lock");
-            btnEdit.setStyle("-fx-background-color: #f59e0b; -fx-text-fill: white; -fx-background-radius: 50;");
+            btnEdit.setStyle("-fx-background-color: #64748b; -fx-text-fill: white; -fx-background-radius: 50;");
             FontAwesomeIconView lockIcon = new FontAwesomeIconView(FontAwesomeIcon.LOCK);
             lockIcon.setSize("18");
             lockIcon.setFill(Color.WHITE);
             btnEdit.setGraphic(lockIcon);
-            btnEdit.setTooltip(new Tooltip(container.getBundle().getString("user.manage.btn.unlock")));
+            btnEdit.setTooltip(new Tooltip(container.getBundle().getString("user.msg.locked_edit")));
             btnEdit.setOnAction(e -> AlertUtil.showWarning(container.getBundle().getString("alert.locked"),
                     container.getBundle().getString("user.msg.locked_edit")));
         }
 
         Button btnDelete = new Button();
-        boolean canDelete = container.getUserSession().hasPermission("usuario.eliminar")
-                || container.getUserSession().hasPermission("USUARIOS");
+        boolean canDelete = canManage && !isSelf;
 
         if (canDelete) {
             btnDelete.getStyleClass().add("btn-action-delete");
@@ -159,22 +159,27 @@ public class ManageUsersController implements Injectable {
             btnDelete.setOnAction(e -> handleDeleteSingleUser(user));
         } else {
             btnDelete.getStyleClass().add("btn-action-lock");
-            btnDelete.setStyle("-fx-background-color: #f59e0b; -fx-text-fill: white; -fx-background-radius: 50;");
-            FontAwesomeIconView lockIcon = new FontAwesomeIconView(FontAwesomeIcon.LOCK);
+            btnDelete.setStyle("-fx-background-color: #64748b; -fx-text-fill: white; -fx-background-radius: 50;");
+            FontAwesomeIconView lockIcon = new FontAwesomeIconView(isSelf ? FontAwesomeIcon.USER : FontAwesomeIcon.LOCK);
             lockIcon.setSize("18");
             lockIcon.setFill(Color.WHITE);
             btnDelete.setGraphic(lockIcon);
-            btnDelete.setTooltip(new Tooltip(container.getBundle().getString("user.manage.btn.unlock")));
+            btnDelete.setTooltip(new Tooltip(isSelf ? "No puedes borrarte a ti mismo" : container.getBundle().getString("user.msg.locked_delete")));
             btnDelete.setOnAction(e -> AlertUtil.showWarning(container.getBundle().getString("alert.locked"),
-                    container.getBundle().getString("user.msg.locked_delete")));
+                    isSelf ? "No puedes eliminar tu propia cuenta." : container.getBundle().getString("user.msg.locked_delete")));
         }
 
-        // El usuario administrador principal (normalmente ID 1) no puede ser eliminado
-        if (user.getUserId() == 1 || "admin".equalsIgnoreCase(user.getUsername())) {
-            btnDelete.setDisable(true);
-            btnDelete.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.SHIELD, "18"));
-            btnDelete.setTooltip(new Tooltip(container.getBundle().getString("user.manage.no_delete_admin")));
+        // El usuario administrador principal o SUPERADMIN no puede ser eliminado jam\u00e1s por un Admin
+        if (user.getUserId() == 1 || "admin".equalsIgnoreCase(user.getUsername()) || "SUPERADMIN".equalsIgnoreCase(user.getRole())) {
+            // S\u00f3lo un SuperAdmin podr\u00eda borrar a otro (aunque normalmente no se recomienda)
+            // Seg\u00fan el requerimiento "ni el super admin... borrar su cuenta":
+            if (!container.getAuthService().isSuperAdmin() || "SUPERADMIN".equalsIgnoreCase(user.getRole())) {
+                btnDelete.setDisable(true);
+                btnDelete.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.SHIELD, "18"));
+                btnDelete.setTooltip(new Tooltip(container.getBundle().getString("user.manage.no_delete_admin")));
+            }
         }
+
 
         actions.getChildren().addAll(btnEdit, btnDelete);
         card.getChildren().addAll(avatar, info, badge, actions);

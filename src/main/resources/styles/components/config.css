@@ -188,21 +188,7 @@
 /* ========================================================================= */
 /* BUTTONS & ACTIONS                                                         */
 /* ========================================================================= */
-.config-btn-save {
-    -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #10b981 0%, #059669 100%);
-    -fx-text-fill: white;
-    -fx-font-weight: bold;
-    -fx-font-size: 14px;
-    -fx-padding: 10 24;
-    -fx-background-radius: 8px;
-    -fx-cursor: hand;
-    -fx-effect: dropshadow(three-pass-box, -fx-shadow-color-subtle, 8, 0, 0, 2);
-}
 
-.config-btn-save:hover {
-    -fx-background-color: #059669;
-    -fx-effect: dropshadow(three-pass-box, -fx-shadow-color-medium, 12, 0, 0, 4);
-}
 
 .btn-secondary {
     -fx-background-color: -fx-bg-main;
@@ -219,22 +205,7 @@
     -fx-background-color: -fx-color-border-subtle;
 }
 
-.config-btn-reset {
-    -fx-background-color: transparent;
-    -fx-text-fill: -fx-text-custom-light;
-    -fx-border-color: transparent;
-    -fx-cursor: hand;
-    -fx-font-size: 14px;
-    -fx-font-weight: bold;
-}
 
-.config-btn-reset:hover {
-    -fx-text-fill: #ef4444;
-}
-
-.config-btn-reset:hover .glyph-icon {
-    -fx-fill: #ef4444;
-}
 
 /* ========================================================================= */
 /* FEEDBACK BANNERS                                                          */
