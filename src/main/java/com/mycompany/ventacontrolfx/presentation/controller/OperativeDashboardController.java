@@ -21,6 +21,9 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -203,9 +206,20 @@ public class OperativeDashboardController implements Injectable {
             // Staff Table Skeletons
             if (skeletonStaffContainer != null) {
                 skeletonStaffContainer.getChildren().clear();
-                for (int i = 0; i < 10; i++) {
+                skeletonStaffContainer.setSpacing(0);
+                for (int i = 0; i < 6; i++) {
                     skeletonStaffContainer.getChildren().add(new com.mycompany.ventacontrolfx.component.SkeletonStaffRow());
+                    
+                    Region spacer = new Region();
+                    VBox.setVgrow(spacer, Priority.ALWAYS);
+                    skeletonStaffContainer.getChildren().add(spacer);
                 }
+                
+                // Bind to TableView size to ensure it fills the same area exactly
+                skeletonStaffContainer.prefHeightProperty().bind(tableActiveStaff.heightProperty());
+                skeletonStaffContainer.prefWidthProperty().bind(tableActiveStaff.widthProperty());
+                
+                skeletonStaffContainer.setStyle("-fx-background-color: white; -fx-padding: 38 20 20 20;");
                 skeletonStaffContainer.setVisible(true);
                 skeletonStaffContainer.setManaged(true);
             }

@@ -9,46 +9,61 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
 
 /**
- * Skeleton for History Table rows (Horizontal)
+ * Skeleton for History Table rows - Perfectly aligned with sales.fxml columns
  */
 public class SkeletonHistoryRow extends StackPane {
 
     public SkeletonHistoryRow() {
         this.getStyleClass().add("skeleton-box");
-        this.setPrefHeight(45);
-        this.setMinHeight(45);
-        this.setMaxHeight(45);
-        this.setStyle("-fx-background-color: -fx-bg-surface; -fx-border-color: -fx-color-border-subtle; -fx-border-width: 0 0 1 0;");
+        this.setPrefHeight(50);
+        this.setMinHeight(50);
+        this.setMaxHeight(50);
+        this.setStyle("-fx-background-color: transparent; -fx-border-width: 0;");
 
-        HBox content = new HBox(15);
+        HBox content = new HBox(0); // 0 spacing to align with TableView cells
         content.setAlignment(Pos.CENTER_LEFT);
-        content.setPadding(new Insets(0, 15, 0, 15));
 
-        // Column 1: ID Placeholder
-        Region idCol = new Region();
-        idCol.setPrefSize(40, 12);
-        idCol.getStyleClass().add("skeleton-text");
+        // Column 1: Ticket ID (100px)
+        Region col1 = createBar(80, 24);
+        StackPane cell1 = new StackPane(col1);
+        cell1.setMinWidth(100); cell1.setPrefWidth(100); cell1.setMaxWidth(100);
+        cell1.setAlignment(Pos.CENTER_LEFT);
 
-        // Column 2: Date Placeholder
-        Region dateCol = new Region();
-        dateCol.setPrefSize(140, 12);
-        dateCol.getStyleClass().add("skeleton-text");
+        // Column 2: Attended by (180px)
+        Region col2 = createBar(160, 24);
+        StackPane cell2 = new StackPane(col2);
+        cell2.setMinWidth(180); cell2.setPrefWidth(180); cell2.setMaxWidth(180);
+        cell2.setAlignment(Pos.CENTER_LEFT);
 
-        // Column 3: Payment Method Placeholder
-        Region methodCol = new Region();
-        methodCol.setPrefSize(100, 12);
-        methodCol.getStyleClass().add("skeleton-text");
+        // Column 3: Date (150px)
+        Region col3 = createBar(130, 24);
+        StackPane cell3 = new StackPane(col3);
+        cell3.setMinWidth(150); cell3.setPrefWidth(150); cell3.setMaxWidth(150);
+        cell3.setAlignment(Pos.CENTER_LEFT);
 
-        // Spacer
-        Region spacer = new Region();
-        HBox.setHgrow(spacer, Priority.ALWAYS);
+        // Column 4: Total (120px)
+        Region col4 = createBar(100, 24);
+        StackPane cell4 = new StackPane(col4);
+        cell4.setMinWidth(120); cell4.setPrefWidth(120); cell4.setMaxWidth(120);
+        cell4.setAlignment(Pos.CENTER_LEFT);
 
-        // Column 4: Total Placeholder (Right aligned)
-        Region totalCol = new Region();
-        totalCol.setPrefSize(80, 16);
-        totalCol.getStyleClass().add("skeleton-text");
+        // Column 5: Method (150px)
+        Region col5 = createBar(130, 24);
+        StackPane cell5 = new StackPane(col5);
+        cell5.setMinWidth(150); cell5.setPrefWidth(150); cell5.setMaxWidth(150);
+        cell5.setAlignment(Pos.CENTER_LEFT);
 
-        content.getChildren().addAll(idCol, dateCol, methodCol, spacer, totalCol);
+        // Column 6: Fiscal Status (120px)
+        Region col6 = createBar(100, 24);
+        StackPane cell6 = new StackPane(col6);
+        cell6.setMinWidth(120); cell6.setPrefWidth(120); cell6.setMaxWidth(120);
+        cell6.setAlignment(Pos.CENTER_LEFT);
+
+        // Add a filler region that grows (like constrained resize policy)
+        Region filler = new Region();
+        HBox.setHgrow(filler, Priority.ALWAYS);
+
+        content.getChildren().addAll(cell1, cell2, cell3, cell4, cell5, cell6, filler);
 
         // Shimmer
         Rectangle shimmerLine = new Rectangle(60, 100);
@@ -67,9 +82,17 @@ public class SkeletonHistoryRow extends StackPane {
             javafx.animation.TranslateTransition tt = new javafx.animation.TranslateTransition(
                     javafx.util.Duration.seconds(2.0), shimmerLine);
             tt.setFromX(-200);
-            tt.setToX(1000); // Longer for horizontal rows
+            tt.setToX(1200); 
             tt.setCycleCount(javafx.animation.Animation.INDEFINITE);
             tt.play();
         });
+    }
+
+    private Region createBar(double w, double h) {
+        Region r = new Region();
+        r.setMinWidth(w); r.setMaxWidth(w); r.setPrefWidth(w);
+        r.setMinHeight(h); r.setMaxHeight(h); r.setPrefHeight(h);
+        r.getStyleClass().add("skeleton-text");
+        return r;
     }
 }

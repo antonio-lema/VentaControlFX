@@ -15,47 +15,61 @@ public class SkeletonStaffRow extends StackPane {
 
     public SkeletonStaffRow() {
         this.getStyleClass().add("skeleton-box");
-        this.setPrefHeight(45);
-        this.setMinHeight(45);
-        this.setMaxHeight(45);
-        this.setStyle("-fx-background-color: -fx-bg-surface; -fx-border-color: -fx-color-border-subtle; -fx-border-width: 0 0 1 0;");
+        this.setPrefHeight(55);
+        this.setMinHeight(55);
+        this.setMaxHeight(55);
+        this.setStyle("-fx-background-color: transparent; -fx-border-width: 0;");
 
-        HBox content = new HBox(15);
+        HBox content = new HBox(0);
         content.setAlignment(Pos.CENTER_LEFT);
-        content.setPadding(new Insets(0, 15, 0, 15));
 
-        // Column 1: Status Icon (Circle)
-        Region statusCol = new Region();
-        statusCol.setPrefSize(12, 12);
-        statusCol.getStyleClass().add("skeleton-text");
-        statusCol.setStyle("-fx-background-radius: 50;");
+        // colStaffStatus: 100px
+        Region col1 = createBar(40, 24);
+        col1.setStyle("-fx-background-radius: 50;");
+        StackPane cell1 = new StackPane(col1);
+        cell1.setMinWidth(100); cell1.setPrefWidth(100); cell1.setMaxWidth(100);
 
-        // Column 2: Name Placeholder
-        Region nameCol = new Region();
-        nameCol.setPrefSize(150, 12);
-        nameCol.getStyleClass().add("skeleton-text");
+        // colStaffName: 200px
+        Region col2 = createBar(185, 24);
+        StackPane cell2 = new StackPane(col2);
+        cell2.setMinWidth(200); cell2.setPrefWidth(200); cell2.setMaxWidth(200);
+        cell2.setAlignment(Pos.CENTER_LEFT);
 
-        // Column 3: Role Placeholder
-        Region roleCol = new Region();
-        roleCol.setPrefSize(80, 10);
-        roleCol.getStyleClass().add("skeleton-text");
+        // colStaffRole: 120px
+        Region col3 = createBar(110, 24);
+        StackPane cell3 = new StackPane(col3);
+        cell3.setMinWidth(120); cell3.setPrefWidth(120); cell3.setMaxWidth(120);
+        cell3.setAlignment(Pos.CENTER_LEFT);
 
-        // Column 4: Time/Shift Placeholder
-        Region timeCol = new Region();
-        timeCol.setPrefSize(100, 10);
-        timeCol.getStyleClass().add("skeleton-text");
+        // colStaffShift: 130px
+        Region col4 = createBar(120, 24);
+        StackPane cell4 = new StackPane(col4);
+        cell4.setMinWidth(130); cell4.setPrefWidth(130); cell4.setMaxWidth(130);
+        cell4.setAlignment(Pos.CENTER_LEFT);
 
-        // Spacer
-        Region spacer = new Region();
-        HBox.setHgrow(spacer, Priority.ALWAYS);
+        // colStaffStart: 100px
+        Region col5 = createBar(90, 24);
+        StackPane cell5 = new StackPane(col5);
+        cell5.setMinWidth(100); cell5.setPrefWidth(100); cell5.setMaxWidth(100);
+        cell5.setAlignment(Pos.CENTER_LEFT);
 
-        // Column 5: Progress Bar Placeholder
-        Region progressCol = new Region();
-        progressCol.setPrefSize(120, 8);
-        progressCol.getStyleClass().add("skeleton-text");
-        progressCol.setStyle("-fx-background-radius: 4;");
+        // colStaffDuration: 100px
+        Region col6 = createBar(90, 24);
+        StackPane cell6 = new StackPane(col6);
+        cell6.setMinWidth(100); cell6.setPrefWidth(100); cell6.setMaxWidth(100);
+        cell6.setAlignment(Pos.CENTER_LEFT);
 
-        content.getChildren().addAll(statusCol, nameCol, roleCol, timeCol, spacer, progressCol);
+        // colStaffProgress: 150px
+        Region col7 = createBar(140, 14);
+        col7.setStyle("-fx-background-radius: 8;");
+        StackPane cell7 = new StackPane(col7);
+        cell7.setMinWidth(150); cell7.setPrefWidth(150); cell7.setMaxWidth(150);
+        cell7.setAlignment(Pos.CENTER_LEFT);
+
+        Region filler = new Region();
+        HBox.setHgrow(filler, Priority.ALWAYS);
+
+        content.getChildren().addAll(cell1, cell2, cell3, cell4, cell5, cell6, cell7, filler);
 
         // Shimmer
         Rectangle shimmerLine = new Rectangle(50, 100);
@@ -78,5 +92,13 @@ public class SkeletonStaffRow extends StackPane {
             tt.setCycleCount(javafx.animation.Animation.INDEFINITE);
             tt.play();
         });
+    }
+
+    private Region createBar(double w, double h) {
+        Region r = new Region();
+        r.setMinWidth(w); r.setMaxWidth(w); r.setPrefWidth(w);
+        r.setMinHeight(h); r.setMaxHeight(h); r.setPrefHeight(h);
+        r.getStyleClass().add("skeleton-text");
+        return r;
     }
 }

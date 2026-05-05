@@ -71,8 +71,6 @@ public class HistoryController implements Injectable, Searchable {
         this.container = container;
         this.saleUseCase = container.getSaleUseCase();
 
-        datePickerStart.setValue(LocalDate.now());
-        datePickerEnd.setValue(LocalDate.now());
         setupTable();
         paginationHelper = new PaginationHelper<>(salesTable, cmbRowLimit, lblCount,
                 container.getBundle().getString("sales.entity_plural"), container.getBundle());
@@ -114,7 +112,8 @@ public class HistoryController implements Injectable, Searchable {
             Sale sale = data.getValue();
             String formattedDate = sale.getSaleDateTime().format(fullFormatter);
             String status = sale.getFiscalStatus();
-            String aeatEmoji = "ACCEPTED".equals(status) ? "✅ " : ("REJECTED".equals(status) ? "❌ " : ("PENDING".equals(status) ? "⏳ " : ""));
+            String aeatEmoji = "ACCEPTED".equals(status) ? "✅ "
+                    : ("REJECTED".equals(status) ? "❌ " : ("PENDING".equals(status) ? "⏳ " : ""));
             return new SimpleStringProperty(aeatEmoji + formattedDate);
         });
         colTotal.setCellValueFactory(new PropertyValueFactory<>("total"));
@@ -130,17 +129,17 @@ public class HistoryController implements Injectable, Searchable {
                     setText(null);
                 } else {
                     Label lbl = new Label();
-                    lbl.setStyle("-fx-font-weight: bold; -fx-padding: 2 6; -fx-background-radius: 4; -fx-text-fill: white; -fx-font-size: 10px;");
-                    
+                    lbl.getStyleClass().add("badge-base");
+
                     if ("ACCEPTED".equals(item)) {
                         lbl.setText("ACEPTADO");
-                        lbl.setStyle(lbl.getStyle() + "-fx-background-color: #27ae60;");
+                        lbl.getStyleClass().add("badge-success");
                     } else if ("REJECTED".equals(item)) {
                         lbl.setText("ERROR");
-                        lbl.setStyle(lbl.getStyle() + "-fx-background-color: #c0392b;");
+                        lbl.getStyleClass().add("badge-danger");
                     } else {
                         lbl.setText("PENDIENTE");
-                        lbl.setStyle(lbl.getStyle() + "-fx-background-color: #f39c12;");
+                        lbl.getStyleClass().add("badge-warning");
                     }
                     setGraphic(lbl);
                 }
@@ -219,10 +218,8 @@ public class HistoryController implements Injectable, Searchable {
         LocalDate end = datePickerEnd.getValue();
 
         if (start == null || end == null) {
-            start = LocalDate.now().minusDays(30);
-            end = LocalDate.now();
-            datePickerStart.setValue(start);
-            datePickerEnd.setValue(end);
+            start = LocalDate.of(2000, 1, 1);
+            end = LocalDate.of(2100, 1, 1);
         }
 
         if (start.isAfter(end)) {
@@ -265,13 +262,27 @@ public class HistoryController implements Injectable, Searchable {
     }
 
     private void showTableSkeletons(boolean show) {
-        if (skeletonTableContainer == null) return;
-        
+        if (skeletonTableContainer == null)
+            return;
+
         if (show) {
             skeletonTableContainer.getChildren().clear();
-            for (int i = 0; i < 15; i++) {
+            skeletonTableContainer.setSpacing(0);
+            
+            // Dynamic spacers to fill the ENTIRE table height
+            for (int i = 0; i < 6; i++) {
                 skeletonTableContainer.getChildren().add(new com.mycompany.ventacontrolfx.component.SkeletonHistoryRow());
+                
+                Region spacer = new Region();
+                VBox.setVgrow(spacer, Priority.ALWAYS);
+                skeletonTableContainer.getChildren().add(spacer);
             }
+            
+            // Bind to TableView size to ensure it fills the same area exactly
+            skeletonTableContainer.prefHeightProperty().bind(salesTable.heightProperty());
+            skeletonTableContainer.prefWidthProperty().bind(salesTable.widthProperty());
+            
+            skeletonTableContainer.setStyle("-fx-background-color: white; -fx-padding: 38 20 20 20;");
             skeletonTableContainer.setVisible(true);
             skeletonTableContainer.setManaged(true);
         } else {
@@ -393,19 +404,17 @@ public class HistoryController implements Injectable, Searchable {
         if (sale.isReturn() || allReturned) {
             lblReturnBadge.setText(container.getBundle().getString("history.status.returned"));
             lblReturnBadge.setVisible(true);
-            lblReturnBadge.setStyle(
-                    "-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-size: 10px; -fx-font-weight: bold; -fx-padding: 2px 6px; -fx-background-radius: 4px;");
+            lblReturnBadge.getStyleClass().setAll("badge-danger");
         } else if (hasAnyReturned) {
             lblReturnBadge.setText(container.getBundle().getString("history.status.partial"));
             lblReturnBadge.setVisible(true);
-            lblReturnBadge.setStyle(
-                    "-fx-background-color: #f39c12; -fx-text-fill: white; -fx-font-size: 10px; -fx-font-weight: bold; -fx-padding: 2px 6px; -fx-background-radius: 4px;");
+            lblReturnBadge.getStyleClass().setAll("badge-warning");
         } else {
             lblReturnBadge.setVisible(false);
         }
 
         btnReturn.setDisable(sale.isReturn());
-        
+
         // Control de visibilidad del botón de re-envío AEAT
         String fStatus = sale.getFiscalStatus();
         boolean needsResend = "PENDING".equals(fStatus) || "REJECTED".equals(fStatus);
@@ -414,7 +423,8 @@ public class HistoryController implements Injectable, Searchable {
 
         lblSaleFullDate.setText(sale.getSaleDateTime().format(fullFormatter) + "\n"
                 + container.getBundle().getString("receipt.attended_by") + ": " + sale.getUserName() + "\n"
-                + "Cliente: " + (sale.getCustomerNameSnapshot() != null ? sale.getCustomerNameSnapshot() : "Consumidor Final") + "\n"
+                + "Cliente: "
+                + (sale.getCustomerNameSnapshot() != null ? sale.getCustomerNameSnapshot() : "Consumidor Final") + "\n"
                 + "NIF: " + (sale.getCustomerNifSnapshot() != null ? sale.getCustomerNifSnapshot() : "---"));
 
         String methodEmoji = container.getBundle().getString("payment.method.card")
@@ -432,12 +442,19 @@ public class HistoryController implements Injectable, Searchable {
 
         // 1. Añadir Status AEAT / VeriFactu
         if (fStatus != null && !fStatus.isEmpty()) {
-            String textStatus = "PENDING".equals(fStatus) ? "⏳ Pendiente envío AEAT" : 
-                               ("ACCEPTED".equals(fStatus) ? "✅ VeriFactu OK (" + (sale.getAeatSubmissionId() != null ? sale.getAeatSubmissionId() : "S/D") + ")" : 
-                               ("REJECTED".equals(fStatus) ? "❌ Error de validación: " + sale.getFiscalMsg() : fStatus));
-            String colorStatus = "PENDING".equals(fStatus) ? "#f39c12" : ("ACCEPTED".equals(fStatus) ? "#27ae60" : "#c0392b");
+            String textStatus = "PENDING".equals(fStatus) ? "⏳ Pendiente envío AEAT"
+                    : ("ACCEPTED".equals(fStatus)
+                            ? "✅ VeriFactu OK ("
+                                    + (sale.getAeatSubmissionId() != null ? sale.getAeatSubmissionId() : "S/D") + ")"
+                            : ("REJECTED".equals(fStatus) ? "❌ Error de validación: " + sale.getFiscalMsg() : fStatus));
             Label lblFiscalStatus = new Label(textStatus);
-            lblFiscalStatus.setStyle("-fx-text-fill: white; -fx-background-color: " + colorStatus + "; -fx-padding: 4 8; -fx-background-radius: 4; -fx-font-weight: bold; -fx-font-size: 11px;");
+            lblFiscalStatus.getStyleClass().add("badge-base");
+            if ("ACCEPTED".equals(fStatus))
+                lblFiscalStatus.getStyleClass().add("badge-success");
+            else if ("REJECTED".equals(fStatus))
+                lblFiscalStatus.getStyleClass().add("badge-danger");
+            else
+                lblFiscalStatus.getStyleClass().add("badge-warning");
             detailsItemsContainer.getChildren().add(lblFiscalStatus);
         }
 
@@ -530,18 +547,21 @@ public class HistoryController implements Injectable, Searchable {
                         }
 
                         // Cargar cliente si existe
-                        // Priorizar los snapshots del ticket (datos fiscales reales enviados/corregidos)
+                        // Priorizar los snapshots del ticket (datos fiscales reales
+                        // enviados/corregidos)
                         String fiscalName = selected.getCustomerNameSnapshot();
                         String fiscalNif = selected.getCustomerNifSnapshot();
-                        
+
                         if (fiscalNif != null && !fiscalNif.isEmpty()) {
                             com.mycompany.ventacontrolfx.domain.model.Client virtualClient = new com.mycompany.ventacontrolfx.domain.model.Client();
                             virtualClient.setName(fiscalName != null ? fiscalName : "Cliente");
                             virtualClient.setTaxId(fiscalNif);
-                            
-                            // Si existe el cliente real, intentamos traer la dirección (que no está en el snapshot)
+
+                            // Si existe el cliente real, intentamos traer la dirección (que no está en el
+                            // snapshot)
                             if (selected.getClientId() != null) {
-                                com.mycompany.ventacontrolfx.domain.model.Client realClient = container.getClientUseCase().getById(selected.getClientId());
+                                com.mycompany.ventacontrolfx.domain.model.Client realClient = container
+                                        .getClientUseCase().getById(selected.getClientId());
                                 if (realClient != null) {
                                     virtualClient.setAddress(realClient.getAddress());
                                     virtualClient.setPostalCode(realClient.getPostalCode());
@@ -551,7 +571,8 @@ public class HistoryController implements Injectable, Searchable {
                             }
                             ppc.setClientInfo(virtualClient);
                         } else if (selected.getClientId() != null) {
-                            com.mycompany.ventacontrolfx.domain.model.Client client = container.getClientUseCase().getById(selected.getClientId());
+                            com.mycompany.ventacontrolfx.domain.model.Client client = container.getClientUseCase()
+                                    .getById(selected.getClientId());
                             if (client != null) {
                                 ppc.setClientInfo(client);
                             }
@@ -658,14 +679,17 @@ public class HistoryController implements Injectable, Searchable {
                     });
                 });
     }
+
     @FXML
     private void handleCorrection() {
         Sale selected = salesTable.getSelectionModel().getSelectedItem();
-        if (selected == null) return;
+        if (selected == null)
+            return;
 
         // Solo permitir subsanar si ya fue aceptado o rechazado (si tiene hash)
         if (selected.getControlHash() == null) {
-            AlertUtil.showWarning("Operación no permitida", "Solo se pueden subsanar tickets que ya tengan un registro fiscal generado.");
+            AlertUtil.showWarning("Operación no permitida",
+                    "Solo se pueden subsanar tickets que ya tengan un registro fiscal generado.");
             return;
         }
 
@@ -676,7 +700,8 @@ public class HistoryController implements Injectable, Searchable {
                     controller.setOnSuccess((newName, newNif) -> {
                         try {
                             saleUseCase.registerCorrection(selected.getSaleId(), newName, newNif);
-                            AlertUtil.showInfo("Corrección registrada", "Los datos han sido corregidos. El ticket se reenviará a la AEAT automáticamente.");
+                            AlertUtil.showInfo("Corrección registrada",
+                                    "Los datos han sido corregidos. El ticket se reenviará a la AEAT automáticamente.");
                             loadSalesDirect();
                         } catch (SQLException e) {
                             e.printStackTrace();
@@ -689,7 +714,8 @@ public class HistoryController implements Injectable, Searchable {
     @FXML
     private void handleResendAeat() {
         Sale selected = salesTable.getSelectionModel().getSelectedItem();
-        if (selected == null) return;
+        if (selected == null)
+            return;
 
         btnResendAeat.setDisable(true);
         container.getAsyncManager().runAsyncTask(() -> {
@@ -704,7 +730,8 @@ public class HistoryController implements Injectable, Searchable {
                 AlertUtil.showInfo("Éxito", "El ticket ha sido procesado por AEAT correctamente.");
                 loadSalesDirect();
             } else if ("SOLICITADO".equals(result)) {
-                AlertUtil.showInfo("Envío en curso", "El ticket ha sido puesto en cola. Se enviará a la AEAT en unos segundos.");
+                AlertUtil.showInfo("Envío en curso",
+                        "El ticket ha sido puesto en cola. Se enviará a la AEAT en unos segundos.");
                 loadSalesDirect();
             } else {
                 AlertUtil.showError("Error AEAT", "No se pudo completar el envío: " + result);
