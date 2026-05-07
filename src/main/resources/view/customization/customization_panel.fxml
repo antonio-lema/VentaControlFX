@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
+<?import java.net.URL?>
+
+<VBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" 
+      fx:controller="com.mycompany.ventacontrolfx.presentation.controller.customization.CustomizationController"
+      spacing="0" styleClass="estetica-root">
+    
+    <stylesheets>
+        <URL value="@/styles/components/estetica.css" />
+    </stylesheets>
+
+    <children>
+        <!-- Header Premium -->
+        <VBox styleClass="estetica-header" spacing="4">
+            <children>
+                <HBox spacing="16" alignment="CENTER_LEFT">
+                    <children>
+                        <StackPane styleClass="estetica-header-icon-wrap">
+                            <children><FontAwesomeIconView glyphName="MAGIC" size="24" fill="white"/></children>
+                        </StackPane>
+                        <VBox spacing="0">
+                            <children>
+                                <Label text="Estética del Sistema" styleClass="estetica-title"/>
+                                <Label text="Personaliza la experiencia visual y los efectos de tu TPV" styleClass="estetica-subtitle"/>
+                            </children>
+                        </VBox>
+                        <Region HBox.hgrow="ALWAYS" />
+                    </children>
+                </HBox>
+            </children>
+        </VBox>
+
+        <!-- Tab Navigation (Modern Pills) -->
+        <HBox styleClass="estetica-tab-bar">
+            <children>
+                <Button fx:id="btnTabColors" text="COLORES" onAction="#showColors" styleClass="estetica-tab-btn, estetica-tab-btn-active" />
+                <Button fx:id="btnTabEffects" text="EFECTOS Y TIPOGRAFÍA" onAction="#showEffects" styleClass="estetica-tab-btn" />
+                <Button fx:id="btnTabInteraction" text="INTERACCIÓN" onAction="#showInteraction" styleClass="estetica-tab-btn" />
+            </children>
+        </HBox>
+
+        <!-- Content Area -->
+        <ScrollPane fitToWidth="true" styleClass="estetica-scroll" VBox.vgrow="ALWAYS">
+            <content>
+                <StackPane>
+                    <children>
+                        <!-- TAB: COLORES -->
+                        <VBox fx:id="paneColors" styleClass="estetica-content-area">
+                            <children>
+                                <VBox styleClass="estetica-card">
+                                    <children>
+                                        <HBox styleClass="estetica-card-header">
+                                            <StackPane styleClass="estetica-card-icon-wrap, estetica-icon-blue"><FontAwesomeIconView glyphName="PAINT_BRUSH" size="16" fill="#1e88e5"/></StackPane>
+                                            <VBox>
+                                                <Label text="Paleta de Colores" styleClass="estetica-card-title"/>
+                                                <Label text="Define los colores principales de la marca y la interfaz" styleClass="estetica-card-desc"/>
+                                            </VBox>
+                                        </HBox>
+                                        <VBox styleClass="estetica-card-body" spacing="15">
+                                            <children>
+                                                <HBox styleClass="color-row">
+                                                    <Label text="Color Primario" styleClass="color-row-label" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+                                                    <ColorPicker fx:id="cpPrimary" styleClass="modern-color-picker"/>
+                                                </HBox>
+                                                <HBox styleClass="color-row">
+                                                    <Label text="Color Secundario" styleClass="color-row-label" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+                                                    <ColorPicker fx:id="cpSecondary" styleClass="modern-color-picker"/>
+                                                </HBox>
+                                                <HBox styleClass="color-row">
+                                                    <Label text="Fondo Principal" styleClass="color-row-label" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+                                                    <ColorPicker fx:id="cpBackground" styleClass="modern-color-picker"/>
+                                                </HBox>
+                                                <HBox styleClass="color-row">
+                                                    <Label text="Texto General" styleClass="color-row-label" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+                                                    <ColorPicker fx:id="cpText" styleClass="modern-color-picker"/>
+                                                </HBox>
+                                                <Separator />
+                                                <HBox styleClass="color-row">
+                                                    <Label text="Fondo Sidebar" styleClass="color-row-label" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+                                                    <ColorPicker fx:id="cpSidebar" styleClass="modern-color-picker"/>
+                                                </HBox>
+                                                <HBox styleClass="color-row">
+                                                    <Label text="Texto Sidebar" styleClass="color-row-label" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+                                                    <ColorPicker fx:id="cpSidebarText" styleClass="modern-color-picker"/>
+                                                </HBox>
+                                                <Separator />
+                                                <HBox styleClass="color-row">
+                                                    <Label text="Texto en Tarjetas" styleClass="color-row-label" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+                                                    <ColorPicker fx:id="cpTextCards" styleClass="modern-color-picker"/>
+                                                </HBox>
+                                                <HBox styleClass="color-row">
+                                                    <Label text="Color de Precios" styleClass="color-row-label" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+                                                    <ColorPicker fx:id="cpTextPrice" styleClass="modern-color-picker"/>
+                                                </HBox>
+                                            </children>
+                                        </VBox>
+                                    </children>
+                                </VBox>
+
+                                <VBox styleClass="estetica-card">
+                                    <children>
+                                        <HBox styleClass="estetica-card-header">
+                                            <StackPane styleClass="estetica-card-icon-wrap, estetica-icon-amber"><FontAwesomeIconView glyphName="TH" size="16" fill="#f59e0b"/></StackPane>
+                                            <Label text="Temas Predefinidos" styleClass="estetica-card-title"/>
+                                        </HBox>
+                                        <FlowPane hgap="15" vgap="15" styleClass="estetica-card-body">
+                                            <children>
+                                                <Button onAction="#applyClassicBlue" styleClass="palette-chip">
+                                                    <graphic>
+                                                        <HBox spacing="10" alignment="CENTER_LEFT">
+                                                            <Region style="-fx-background-color: #1e88e5;" styleClass="palette-preview-dot"/>
+                                                            <Label text="Classic Blue" styleClass="palette-name"/>
+                                                        </HBox>
+                                                    </graphic>
+                                                </Button>
+                                                <Button onAction="#applyPremiumDark" styleClass="palette-chip">
+                                                    <graphic>
+                                                        <HBox spacing="10" alignment="CENTER_LEFT">
+                                                            <Region style="-fx-background-color: #0f172a;" styleClass="palette-preview-dot"/>
+                                                            <Label text="Midnight" styleClass="palette-name"/>
+                                                        </HBox>
+                                                    </graphic>
+                                                </Button>
+                                                <Button onAction="#applyEmeraldGreen" styleClass="palette-chip">
+                                                    <graphic>
+                                                        <HBox spacing="10" alignment="CENTER_LEFT">
+                                                            <Region style="-fx-background-color: #10b981;" styleClass="palette-preview-dot"/>
+                                                            <Label text="Emerald" styleClass="palette-name"/>
+                                                        </HBox>
+                                                    </graphic>
+                                                </Button>
+                                                <Button onAction="#applyMidnightPurple" styleClass="palette-chip">
+                                                    <graphic>
+                                                        <HBox spacing="10" alignment="CENTER_LEFT">
+                                                            <Region style="-fx-background-color: #7c3aed;" styleClass="palette-preview-dot"/>
+                                                            <Label text="Purple" styleClass="palette-name"/>
+                                                        </HBox>
+                                                    </graphic>
+                                                </Button>
+                                            </children>
+                                        </FlowPane>
+                                    </children>
+                                </VBox>
+                            </children>
+                        </VBox>
+
+                        <!-- TAB: EFECTOS -->
+                        <VBox fx:id="paneEffects" styleClass="estetica-content-area" visible="false" managed="false">
+                            <children>
+                                <VBox styleClass="estetica-card">
+                                    <children>
+                                        <HBox styleClass="estetica-card-header">
+                                            <StackPane styleClass="estetica-card-icon-wrap, estetica-icon-purple"><FontAwesomeIconView glyphName="FONT" size="16" fill="#7c3aed"/></StackPane>
+                                            <Label text="Escala y Tipografía" styleClass="estetica-card-title"/>
+                                        </HBox>
+                                        <VBox styleClass="estetica-card-body" spacing="22">
+                                            <children>
+                                                <HBox styleClass="estetica-slider-row">
+                                                    <VBox spacing="4" HBox.hgrow="ALWAYS">
+                                                        <Label text="Tamaño de Fuente Base" styleClass="estetica-slider-label"/>
+                                                        <Label text="Afecta a todos los textos del sistema" styleClass="estetica-slider-hint"/>
+                                                    </VBox>
+                                                    <Slider fx:id="sldFontSize" min="10" max="20" value="14" styleClass="estetica-slider"/>
+                                                    <Label fx:id="lblFontSizeVal" text="14px" styleClass="estetica-slider-value"/>
+                                                </HBox>
+                                                <HBox styleClass="estetica-slider-row">
+                                                    <VBox spacing="4" HBox.hgrow="ALWAYS">
+                                                        <Label text="Radio de Bordes" styleClass="estetica-slider-label"/>
+                                                        <Label text="Curvatura global de botones y tarjetas" styleClass="estetica-slider-hint"/>
+                                                    </VBox>
+                                                    <Slider fx:id="sldBorderRadius" min="0" max="30" value="8" styleClass="estetica-slider"/>
+                                                    <Label fx:id="lblBorderRadiusVal" text="8px" styleClass="estetica-slider-value"/>
+                                                </HBox>
+                                                <HBox styleClass="estetica-slider-row">
+                                                    <VBox spacing="4" HBox.hgrow="ALWAYS">
+                                                        <Label text="Escala de Elementos" styleClass="estetica-slider-label"/>
+                                                        <Label text="Zoom general de la interfaz" styleClass="estetica-slider-hint"/>
+                                                    </VBox>
+                                                    <Slider fx:id="sldCardScale" min="0.8" max="1.2" value="1.0" blockIncrement="0.05" majorTickUnit="0.05" snapToTicks="true" styleClass="estetica-slider"/>
+                                                    <Label fx:id="lblCardScaleVal" text="1.0x" styleClass="estetica-slider-value"/>
+                                                </HBox>
+                                            </children>
+                                        </VBox>
+                                    </children>
+                                </VBox>
+                            </children>
+                        </VBox>
+
+                        <!-- TAB: INTERACCIÓN -->
+                        <VBox fx:id="paneInteraction" styleClass="estetica-content-area" visible="false" managed="false">
+                            <children>
+                                <VBox styleClass="estetica-card">
+                                    <children>
+                                        <HBox styleClass="estetica-card-header">
+                                            <StackPane styleClass="estetica-card-icon-wrap, estetica-icon-rose"><FontAwesomeIconView glyphName="MOUSE_POINTER" size="16" fill="#f43f5e"/></StackPane>
+                                            <Label text="Efectos de Ratón (Hover)" styleClass="estetica-card-title"/>
+                                        </HBox>
+                                        <VBox styleClass="estetica-card-body" spacing="22">
+                                            <children>
+                                                <HBox styleClass="estetica-slider-row">
+                                                    <VBox spacing="4" HBox.hgrow="ALWAYS">
+                                                        <Label text="Elevación al pasar ratón" styleClass="estetica-slider-label"/>
+                                                        <Label text="Sensación de profundidad en tarjetas" styleClass="estetica-slider-hint"/>
+                                                    </VBox>
+                                                    <Slider fx:id="sldCardHoverLift" min="0" max="15" value="5" styleClass="estetica-slider"/>
+                                                    <Label fx:id="lblCardHoverLiftVal" text="5px" styleClass="estetica-slider-value"/>
+                                                </HBox>
+                                                <HBox styleClass="estetica-slider-row">
+                                                    <VBox spacing="4" HBox.hgrow="ALWAYS">
+                                                        <Label text="Intensidad de Sombras" styleClass="estetica-slider-label"/>
+                                                        <Label text="Efecto de relieve en los componentes" styleClass="estetica-slider-hint"/>
+                                                    </VBox>
+                                                    <Slider fx:id="sldCardShadow" min="0" max="40" value="15" styleClass="estetica-slider"/>
+                                                    <Label fx:id="lblCardShadowVal" text="15" styleClass="estetica-slider-value"/>
+                                                </HBox>
+                                            </children>
+                                        </VBox>
+                                    </children>
+                                </VBox>
+                            </children>
+                        </VBox>
+                    </children>
+                </StackPane>
+            </content>
+        </ScrollPane>
+
+        <!-- Action Bar Footer -->
+        <HBox styleClass="estetica-action-bar">
+            <children>
+                <Button text="RESTAURAR" onAction="#handleReset" styleClass="estetica-btn-reset">
+                    <graphic><FontAwesomeIconView glyphName="UNDO" size="14"/></graphic>
+                </Button>
+                <Button text="GUARDAR TEMA" onAction="#handleSave" styleClass="estetica-btn-save">
+                    <graphic><FontAwesomeIconView glyphName="SAVE" size="14" fill="white"/></graphic>
+                </Button>
+            </children>
+        </HBox>
+    </children>
+</VBox>

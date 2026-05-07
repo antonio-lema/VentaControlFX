@@ -6,48 +6,61 @@
     -fx-cursor: hand;
     -fx-background-radius: -fx-radius-md;
     -fx-font-family: -fx-font-family;
+    -fx-transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* ───────────────────────────────────────────────────
-   BOTONES PRIMARIOS (Contraste alto)
+   BOTONES PRIMARIOS (Premium Glossy)
    ─────────────────────────────────────────────────── */
 .btn-primary,
 .modern-btn-primary {
     -fx-background-color: -fx-grad-primary;
     -fx-text-fill: #ffffff !important;
-    -fx-font-weight: bold;
-    -fx-font-size: 14px;
+    -fx-font-weight: 800;
+    -fx-font-size: -fx-font-size-base;
     -fx-padding: 12 32;
-    -fx-background-radius: 12px;
-    -fx-effect: dropshadow(three-pass-box, -fx-shadow-color-primary, 15, 0, 0, 5);
+    -fx-background-radius: -fx-radius-md;
+    -fx-border-color: rgba(255, 255, 255, 0.2);
+    -fx-border-width: 1;
+    -fx-border-radius: -fx-radius-md;
+    -fx-effect: dropshadow(three-pass-box, -fx-shadow-color-primary, 15, 0, 0, 6);
 }
 
 .btn-primary:hover,
 .modern-btn-primary:hover {
     -fx-background-color: -fx-custom-color-primary-dark;
-    -fx-scale-x: 1.05;
-    -fx-scale-y: 1.05;
+    -fx-scale-x: 1.04;
+    -fx-scale-y: 1.04;
+    -fx-effect: dropshadow(three-pass-box, -fx-shadow-color-primary, 25, 0, 0, 10);
+    -fx-translate-y: -1px;
+}
+
+.btn-primary:pressed {
+    -fx-scale-x: 0.98;
+    -fx-scale-y: 0.98;
+    -fx-effect: dropshadow(three-pass-box, -fx-shadow-color-primary, 5, 0, 0, 2);
 }
 
 /* ───────────────────────────────────────────────────
-   BOTONES SECUNDARIOS (Outlined / Minimal)
+   BOTONES SECUNDARIOS (Glassmorphism / Minimal)
    ─────────────────────────────────────────────────── */
 .btn-secondary,
 .modern-btn-secondary {
-    -fx-background-color: -fx-bg-surface;
+    -fx-background-color: rgba(255, 255, 255, 0.05);
     -fx-text-fill: -fx-text-custom-medium;
-    -fx-padding: 12 24;
-    -fx-border-color: -fx-neutral-200;
-    -fx-border-width: 1;
-    -fx-border-radius: -fx-radius-lg;
-    -fx-background-radius: 12px;
+    -fx-padding: 11 24;
+    -fx-border-color: -fx-color-border-main;
+    -fx-border-width: 1.5;
+    -fx-border-radius: -fx-radius-md;
+    -fx-background-radius: -fx-radius-md;
 }
 
 .btn-secondary:hover {
     -fx-background-color: -fx-neutral-50;
-    -fx-text-fill: -fx-neutral-800;
+    -fx-border-color: -fx-custom-color-primary;
+    -fx-text-fill: -fx-custom-color-primary;
     -fx-scale-x: 1.02;
-    -fx-scale-y: 1.02;
+    -fx-translate-y: -1px;
 }
 
 /* ───────────────────────────────────────────────────
@@ -55,18 +68,21 @@
    ─────────────────────────────────────────────────── */
 .btn-success,
 .btn-pay {
-    -fx-background-color: -fx-custom-color-success;
+    -fx-background-color: -fx-grad-success;
     -fx-text-fill: #ffffff !important;
-    -fx-font-weight: bold;
+    -fx-font-weight: 800;
     -fx-padding: 14 30;
-    -fx-background-radius: 12px;
-    -fx-effect: dropshadow(three-pass-box, -fx-custom-color-success-bg, 15, 0, 0, 5);
+    -fx-background-radius: -fx-radius-lg;
+    -fx-border-color: rgba(255, 255, 255, 0.2);
+    -fx-border-width: 1;
+    -fx-border-radius: -fx-radius-lg;
+    -fx-effect: dropshadow(three-pass-box, rgba(16, 185, 129, 0.3), 15, 0, 0, 6);
 }
 
 .btn-success:hover {
-    -fx-background-color: -fx-custom-color-success-dark;
     -fx-scale-x: 1.03;
-    -fx-scale-y: 1.03;
+    -fx-translate-y: -1px;
+    -fx-effect: dropshadow(three-pass-box, rgba(16, 185, 129, 0.5), 25, 0, 0, 10);
 }
 
 /* ───────────────────────────────────────────────────
@@ -74,17 +90,18 @@
    ─────────────────────────────────────────────────── */
 .btn-danger,
 .cart-delete-btn {
-    -fx-background-color: -fx-custom-color-danger-bg;
-    -fx-text-fill: -fx-custom-color-danger;
-    -fx-border-color: -fx-custom-color-danger;
-    -fx-border-width: 1;
+    -fx-background-color: transparent;
+    -fx-text-fill: #ef4444;
+    -fx-border-color: #ef4444;
+    -fx-border-width: 1.5;
     -fx-border-radius: -fx-radius-md;
     -fx-padding: 8 16;
 }
 
 .btn-danger:hover {
-    -fx-background-color: -fx-custom-color-danger;
-    -fx-text-fill: white;
+    -fx-background-color: #ef4444;
+    -fx-text-fill: white !important;
+    -fx-effect: dropshadow(three-pass-box, rgba(239, 68, 68, 0.3), 12, 0, 0, 4);
 }
 
 .btn-trash-small {

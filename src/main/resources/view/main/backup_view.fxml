@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
+<?import java.net.URL?>
+
+<VBox xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.mycompany.ventacontrolfx.presentation.controller.dialog.BackupController"
+      styleClass="estetica-root" spacing="0">
+    
+    <stylesheets>
+        <URL value="@/styles/components/estetica.css" />
+    </stylesheets>
+    
+    <!-- Header Premium (Copiado del estilo de Estética para consistencia) -->
+    <VBox styleClass="estetica-header" spacing="4">
+        <children>
+            <HBox spacing="16" alignment="CENTER_LEFT">
+                <children>
+                    <StackPane styleClass="estetica-header-icon-wrap">
+                        <children><FontAwesomeIconView glyphName="DATABASE" size="24" fill="white"/></children>
+                    </StackPane>
+                    <VBox spacing="0">
+                        <children>
+                            <Label text="%backup.title" styleClass="estetica-title"/>
+                            <Label text="%backup.subtitle" styleClass="estetica-subtitle"/>
+                        </children>
+                    </VBox>
+                    <Region HBox.hgrow="ALWAYS" />
+                </children>
+            </HBox>
+        </children>
+    </VBox>
+
+    <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="estetica-scroll" VBox.vgrow="ALWAYS">
+        <VBox alignment="TOP_CENTER" spacing="25" style="-fx-padding: 40;">
+            
+            <!-- TARJETA: COPIA MANUAL -->
+            <VBox styleClass="estetica-card" maxWidth="850">
+                <HBox styleClass="estetica-card-header">
+                    <StackPane styleClass="estetica-card-icon-wrap, estetica-icon-blue">
+                        <FontAwesomeIconView glyphName="SAVE" size="16" fill="#1e88e5"/>
+                    </StackPane>
+                    <VBox>
+                        <Label text="%backup.section.manual" styleClass="estetica-card-title"/>
+                        <Label text="Crea un punto de restauración inmediato de tus datos" styleClass="estetica-card-desc"/>
+                    </VBox>
+                </HBox>
+
+                <VBox spacing="25" styleClass="estetica-card-body">
+                    <Label text="%backup.description" wrapText="true" styleClass="label-muted" style="-fx-font-size: 13px;"/>
+                    
+                    <HBox spacing="15" alignment="CENTER_LEFT">
+                        <Button text="%backup.btn.create" onAction="#handleCreateBackup" styleClass="btn-primary">
+                            <graphic>
+                                <FontAwesomeIconView glyphName="DOWNLOAD" size="16" fill="white"/>
+                            </graphic>
+                        </Button>
+                        <Button text="%backup.btn.open_folder" onAction="#handleOpenFolder" styleClass="btn-secondary">
+                            <graphic>
+                                <FontAwesomeIconView glyphName="FOLDER_OPEN" size="16" />
+                            </graphic>
+                        </Button>
+                    </HBox>
+                    
+                    <VBox fx:id="statusContainer" spacing="12" alignment="CENTER_LEFT" visible="false" managed="false">
+                        <ProgressBar fx:id="progressBar" progress="-1" maxWidth="Infinity" styleClass="modern-progress-bar" />
+                        <Label fx:id="lblStatus" text="Procesando..." styleClass="label-info" style="-fx-font-weight: bold;"/>
+                    </VBox>
+                </VBox>
+            </VBox>
+
+            <!-- TARJETA: INFORMACIÓN -->
+            <VBox styleClass="estetica-card" maxWidth="850">
+                <HBox styleClass="estetica-card-header">
+                    <StackPane styleClass="estetica-card-icon-wrap, estetica-icon-amber">
+                        <FontAwesomeIconView glyphName="INFO_CIRCLE" size="16" fill="#fb8c00"/>
+                    </StackPane>
+                    <VBox>
+                        <Label text="%backup.section.info" styleClass="estetica-card-title"/>
+                        <Label text="Detalles técnicos sobre el almacenamiento" styleClass="estetica-card-desc"/>
+                    </VBox>
+                </HBox>
+                <VBox spacing="12" styleClass="estetica-card-body">
+                    <HBox spacing="10" alignment="CENTER_LEFT">
+                        <Label text="%backup.info.location" style="-fx-font-weight: bold; -fx-text-fill: -fx-text-custom-medium;"/>
+                        <Label text="~/VentaControl/backups/" styleClass="code-label" style="-fx-background-color: -fx-bg-subtle; -fx-padding: 4 8; -fx-background-radius: 5;"/>
+                    </HBox>
+                    <Label text="%backup.info.requirement" wrapText="true" styleClass="label-muted" style="-fx-font-size: 12px;"/>
+                </VBox>
+            </VBox>
+
+            <!-- TARJETA: COPIAS DISPONIBLES -->
+            <VBox styleClass="estetica-card" maxWidth="850">
+                <HBox styleClass="estetica-card-header">
+                    <StackPane styleClass="estetica-card-icon-wrap, estetica-icon-rose">
+                        <FontAwesomeIconView glyphName="HISTORY" size="16" fill="#f43f5e"/>
+                    </StackPane>
+                    <VBox>
+                        <Label text="%backup.section.available" styleClass="estetica-card-title"/>
+                        <Label text="Selecciona una copia para volver a un estado anterior" styleClass="estetica-card-desc"/>
+                    </VBox>
+                </HBox>
+                <VBox spacing="20" styleClass="estetica-card-body">
+                    <Label text="%backup.description.restore" wrapText="true" styleClass="label-muted" style="-fx-font-size: 13px;"/>
+                    
+                    <ListView fx:id="lvBackups" prefHeight="250" styleClass="modern-list-view"/>
+                    
+                    <HBox alignment="CENTER_RIGHT">
+                        <Button text="%backup.btn.restore" onAction="#handleRestoreBackup" styleClass="btn-success">
+                            <graphic>
+                                <FontAwesomeIconView glyphName="UPLOAD" size="14" fill="white"/>
+                            </graphic>
+                        </Button>
+                    </HBox>
+                </VBox>
+            </VBox>
+
+        </VBox>
+    </ScrollPane>
+</VBox>
