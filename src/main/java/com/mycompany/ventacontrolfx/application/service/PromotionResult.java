@@ -63,3 +63,4 @@ public class PromotionResult {
         return appliedPromos;
     }
 }
+

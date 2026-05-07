@@ -1,7 +1,7 @@
 package com.mycompany.ventacontrolfx.application.usecase;
 
-import com.mycompany.ventacontrolfx.application.exception.InsufficientCashInDrawerException;
-import com.mycompany.ventacontrolfx.application.exception.RefundLimitExceededException;
+import com.mycompany.ventacontrolfx.domain.exception.InsufficientCashInDrawerException;
+import com.mycompany.ventacontrolfx.domain.exception.RefundLimitExceededException;
 import com.mycompany.ventacontrolfx.application.ports.IFiscalPdfService;
 import com.mycompany.ventacontrolfx.application.service.RefundCalculatorService;
 import com.mycompany.ventacontrolfx.application.usecase.QueryFiscalDocumentUseCase.PrintData;
@@ -212,3 +212,4 @@ public class ReturnUseCase {
         }
     }
 }
+

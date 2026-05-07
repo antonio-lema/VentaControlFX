@@ -18,3 +18,4 @@ public enum PromotionType {
         return displayName;
     }
 }
+

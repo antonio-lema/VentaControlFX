@@ -39,3 +39,4 @@ public class AppliedTax {
         return String.format("%s (%.2f%%): %.2f", taxName, taxRate, taxAmount);
     }
 }
+

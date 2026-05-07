@@ -221,3 +221,4 @@ public class EmitFiscalDocumentUseCase {
         return val != null ? val : "";
     }
 }
+

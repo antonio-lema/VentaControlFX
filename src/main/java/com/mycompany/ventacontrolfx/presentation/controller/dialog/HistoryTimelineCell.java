@@ -80,3 +80,4 @@ public class HistoryTimelineCell extends ListCell<PriceHistoryEventDTO> {
         }
     }
 }
+

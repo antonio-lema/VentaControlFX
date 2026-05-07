@@ -2,7 +2,7 @@ package com.mycompany.ventacontrolfx.application.usecase;
 
 import com.mycompany.ventacontrolfx.domain.model.Role;
 import com.mycompany.ventacontrolfx.domain.repository.IRoleRepository;
-import com.mycompany.ventacontrolfx.util.AuthorizationService;
+import com.mycompany.ventacontrolfx.infrastructure.security.AuthorizationService;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -59,3 +59,4 @@ public class RoleUseCase {
         return roleRepository.delete(roleId);
     }
 }
+

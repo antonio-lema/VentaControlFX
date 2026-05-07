@@ -2,14 +2,14 @@ package com.mycompany.ventacontrolfx.infrastructure.navigation;
 
 import com.mycompany.ventacontrolfx.infrastructure.config.Injectable;
 import com.mycompany.ventacontrolfx.infrastructure.config.ServiceContainer;
-import com.mycompany.ventacontrolfx.util.Searchable;
+import com.mycompany.ventacontrolfx.presentation.util.Searchable;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.VBox;
-import com.mycompany.ventacontrolfx.util.AuthorizationService;
-import com.mycompany.ventacontrolfx.util.AlertUtil;
+import com.mycompany.ventacontrolfx.infrastructure.security.AuthorizationService;
+import com.mycompany.ventacontrolfx.presentation.util.AlertUtil;
 import com.mycompany.ventacontrolfx.domain.repository.IAuditRepository;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -43,6 +43,7 @@ public class NavigationService {
     private final VBox loadingOverlay;
     private final ServiceContainer container;
 
+    private String currentFxmlPath;
     private Object activeView;
     private final List<Searchable> searchHandlers = new ArrayList<>();
 
@@ -53,26 +54,26 @@ public class NavigationService {
     // Control de Accesos
     private static final Map<String, String> ACCESS_RULES = new HashMap<>();
     static {
-        ACCESS_RULES.put("/view/products.fxml", "PRODUCTOS");
-        ACCESS_RULES.put("/view/categories.fxml", "PRODUCTOS");
-        ACCESS_RULES.put("/view/sales.fxml", "HISTORIAL");
-        ACCESS_RULES.put("/view/closure_history.fxml", "CIERRES");
-        ACCESS_RULES.put("/view/clients.fxml", "CLIENTES");
-        ACCESS_RULES.put("/view/manage_users.fxml", "usuario.crear");
-        ACCESS_RULES.put("/view/manage_roles.fxml", "rol.editar");
-        ACCESS_RULES.put("/view/sale_config.fxml", "CONFIGURACION");
-        ACCESS_RULES.put("/view/customization_panel.fxml", "CONFIGURACION");
-        ACCESS_RULES.put("/view/seller_report.fxml", "reporte.vendedores");
-        ACCESS_RULES.put("/view/client_report.fxml", "reporte.clientes");
-        ACCESS_RULES.put("/view/return_list.fxml", "venta.devolucion");
-        ACCESS_RULES.put("/view/vat_management.fxml", "admin.iva");
-        ACCESS_RULES.put("/view/price_lists.fxml", "PRODUCTOS");
-        ACCESS_RULES.put("/view/promotions.fxml", "PRODUCTOS");
-        ACCESS_RULES.put("/view/fiscal_documents.fxml", "HISTORIAL");
+        ACCESS_RULES.put("/view/product/products.fxml", "PRODUCTOS");
+        ACCESS_RULES.put("/view/product/categories.fxml", "PRODUCTOS");
+        ACCESS_RULES.put("/view/receipt/sales.fxml", "HISTORIAL");
+        ACCESS_RULES.put("/view/closure/closure_history.fxml", "CIERRES");
+        ACCESS_RULES.put("/view/dialog/clients.fxml", "CLIENTES");
+        ACCESS_RULES.put("/view/user/manage_users.fxml", "usuario.crear");
+        ACCESS_RULES.put("/view/user/manage_roles.fxml", "rol.editar");
+        ACCESS_RULES.put("/view/config/sale_config.fxml", "CONFIGURACION");
+        ACCESS_RULES.put("/view/customization/customization_panel.fxml", "CONFIGURACION");
+        ACCESS_RULES.put("/view/reports/seller_report.fxml", "reporte.venta|reporte.vendedores");
+        ACCESS_RULES.put("/view/reports/client_report.fxml", "reporte.cliente|HISTORIAL");
+        ACCESS_RULES.put("/view/receipt/return_list.fxml", "venta.devolucion");
+        ACCESS_RULES.put("/view/vat/vat_management.fxml", "admin.iva");
+        ACCESS_RULES.put("/view/dialog/price_lists.fxml", "admin.precios_masivo|PRODUCTOS");
+        ACCESS_RULES.put("/view/dialog/promotions.fxml", "admin.promociones|PRODUCTOS");
+        ACCESS_RULES.put("/view/receipt/fiscal_documents.fxml", "fiscal.reenviar|fiscal.config|HISTORIAL");
     }
 
     /** Vista que debe mostrar el carrito */
-    private static final String SELL_VIEW = "/view/sell_view.fxml";
+    private static final String SELL_VIEW = "/view/cart/sell_view.fxml";
 
     public NavigationService(ScrollPane mainContent, VBox loadingOverlay, ServiceContainer container) {
         this.mainContent = mainContent;
@@ -97,6 +98,7 @@ public class NavigationService {
     }
 
     public <T> void navigateTo(String fxmlPath, Consumer<T> initializer) {
+        this.currentFxmlPath = fxmlPath;
         // 1. Verificar Permisos (Control de Acceso)
         String requiredPermission = ACCESS_RULES.get(fxmlPath);
         AuthorizationService auth = container.getAuthService();
@@ -192,4 +194,15 @@ public class NavigationService {
             handler.handleSearch(text);
         }
     }
+
+    public void reloadCurrent() {
+        if (currentFxmlPath != null) {
+            navigateTo(currentFxmlPath);
+        }
+    }
 }
+
+
+
+
+

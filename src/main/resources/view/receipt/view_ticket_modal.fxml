@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import de.jensd.fx.glyphs.fontawesome.*?>
+<?import java.net.URL?>
+
+<VBox xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mycompany.ventacontrolfx.presentation.controller.receipt.TicketDetailController" 
+      spacing="0" prefWidth="500" prefHeight="700" styleClass="ticket-container">
+    
+    <stylesheets>
+        <URL value="@/styles/variables.css" />
+        <URL value="@/styles/components/botones.css" />
+        <URL value="@/styles/components/ticket.css" />
+    </stylesheets>
+
+    <!-- Modal Header Premium -->
+    <HBox alignment="CENTER_LEFT" spacing="20" styleClass="ticket-modal-header">
+        <StackPane styleClass="ticket-icon-bg">
+            <FontAwesomeIconView glyphName="TICKET" fill="white" size="20"/>
+        </StackPane>
+        <VBox spacing="2">
+            <Label fx:id="lblTicketId" text="Ticket #0000" styleClass="ticket-title-label"/>
+            <Label fx:id="lblDate" text="01/01/2026 00:00" styleClass="ticket-subtitle-label"/>
+        </VBox>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Button onAction="#handleClose" styleClass="button-ghost" text="✕" style="-fx-text-fill: white; -fx-font-size: 20px;"/>
+    </HBox>
+
+    <!-- Receipt Content (Premium Paper Look) -->
+    <ScrollPane fitToWidth="true" styleClass="ticket-scroll-pane" VBox.vgrow="ALWAYS" hbarPolicy="NEVER">
+        <content>
+            <VBox spacing="0" alignment="TOP_CENTER" styleClass="receipt-paper">
+                <padding><Insets top="40" right="50" bottom="40" left="50"/></padding>
+                
+                <!-- Business Info -->
+                <VBox alignment="CENTER" spacing="8">
+                    <Label text="VENTA CONTROL" styleClass="receipt-brand"/>
+                    <Label text="Software de Gestión TPV" styleClass="receipt-small" style="-fx-font-weight: bold;"/>
+                    <VBox alignment="CENTER" spacing="2">
+                        <Label text="Calle Principal 123, Madrid" styleClass="receipt-small"/>
+                        <Label text="NIF: B12345678" styleClass="receipt-small"/>
+                    </VBox>
+                </VBox>
+
+                <Separator styleClass="receipt-divider-dash">
+                    <padding><Insets top="30" bottom="25"/></padding>
+                </Separator>
+
+                <!-- Customer & Seller Info -->
+                <VBox spacing="15">
+                    <HBox alignment="CENTER_LEFT" spacing="10">
+                        <Label text="CLIENTE:" styleClass="receipt-label-bold" prefWidth="80"/>
+                        <Label fx:id="lblClient" text="Consumidor Final" styleClass="receipt-value" HBox.hgrow="ALWAYS"/>
+                    </HBox>
+                    <HBox alignment="CENTER_LEFT" spacing="10">
+                        <Label text="VENDEDOR:" styleClass="receipt-label-bold" prefWidth="80"/>
+                        <Label fx:id="lblUser" text="Admin" styleClass="receipt-value" HBox.hgrow="ALWAYS"/>
+                    </HBox>
+                </VBox>
+
+                <Separator styleClass="receipt-divider-dash">
+                    <padding><Insets top="25" bottom="25"/></padding>
+                </Separator>
+
+                <!-- Status Badge -->
+                <VBox alignment="CENTER" style="-fx-padding: 0 0 20 0;">
+                    <Label fx:id="lblReturnBadge" text="[ DEVOLUCIÓN REGISTRADA ]" visible="false" managed="false" 
+                           styleClass="receipt-return-badge"/>
+                </VBox>
+
+                <!-- Items Table Header -->
+                <HBox spacing="10" style="-fx-padding: 0 0 15 0; -fx-border-color: #e2e8f0; -fx-border-width: 0 0 1 0;">
+                    <Label text="DESCRIPCIÓN" styleClass="receipt-label-bold" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+                    <Label text="UDS" styleClass="receipt-label-bold" prefWidth="50" alignment="CENTER"/>
+                    <Label text="TOTAL" styleClass="receipt-label-bold" prefWidth="100" alignment="CENTER_RIGHT"/>
+                </HBox>
+                
+                <!-- Items list -->
+                <VBox fx:id="itemsContainer" spacing="15" VBox.vgrow="ALWAYS" style="-fx-padding: 15 0;">
+                    <!-- Dynamically populated -->
+                </VBox>
+
+                <Separator styleClass="receipt-divider-heavy">
+                    <padding><Insets top="20" bottom="20"/></padding>
+                </Separator>
+
+                <!-- Financial Summary -->
+                <VBox spacing="8" style="-fx-background-color: #f8fafc; -fx-padding: 20; -fx-background-radius: 12;">
+                    <HBox alignment="CENTER_RIGHT" spacing="20">
+                        <Label text="Subtotal:" styleClass="receipt-summary-label"/>
+                        <Label fx:id="lblSubtotal" text="0,00 €" styleClass="receipt-summary-value" prefWidth="120" alignment="CENTER_RIGHT"/>
+                    </HBox>
+                    <HBox alignment="CENTER_RIGHT" spacing="20">
+                        <Label text="Impuestos (IVA):" styleClass="receipt-summary-label"/>
+                        <Label fx:id="lblIva" text="0,00 €" styleClass="receipt-summary-value" prefWidth="120" alignment="CENTER_RIGHT"/>
+                    </HBox>
+                    <HBox alignment="CENTER_RIGHT" spacing="20" style="-fx-padding: 10 0 0 0;">
+                        <Label text="TOTAL TICKET" styleClass="receipt-total-label"/>
+                        <Label fx:id="lblTotal" text="0,00 €" styleClass="receipt-total-value" prefWidth="150" alignment="CENTER_RIGHT"/>
+                    </HBox>
+                </VBox>
+
+                <!-- Tax Breakdown -->
+                <VBox fx:id="taxDetailsContainer" spacing="6" style="-fx-padding: 20 0 0 0;">
+                    <!-- Dynamically populated -->
+                </VBox>
+
+                <Separator styleClass="receipt-divider-dash">
+                    <padding><Insets top="30" bottom="25"/></padding>
+                </Separator>
+
+                <!-- Footer info -->
+                <VBox alignment="CENTER" spacing="8">
+                    <HBox alignment="CENTER" spacing="10">
+                        <Label text="Forma de Pago:" styleClass="receipt-small"/>
+                        <Label fx:id="lblPayment" text="EFECTIVO" styleClass="receipt-value" style="-fx-font-size: 11px;"/>
+                    </HBox>
+                    <Label text="¡Gracias por su compra!" styleClass="receipt-thank-you">
+                        <padding><Insets top="15"/></padding>
+                    </Label>
+                </VBox>
+
+            </VBox>
+        </content>
+    </ScrollPane>
+
+    <!-- Modal Actions -->
+    <HBox spacing="20" alignment="CENTER_RIGHT" styleClass="ticket-modal-footer">
+        <Button fx:id="btnPrint" text="IMPRIMIR" onAction="#handlePrint" styleClass="btn-primary" prefHeight="45" prefWidth="140">
+            <graphic><FontAwesomeIconView glyphName="PRINT" fill="white" size="16" style="-fx-padding: 0 10 0 0;"/></graphic>
+        </Button>
+        <Button text="CERRAR" onAction="#handleClose" styleClass="btn-secondary" prefHeight="45" prefWidth="120"/>
+    </HBox>
+
+</VBox>

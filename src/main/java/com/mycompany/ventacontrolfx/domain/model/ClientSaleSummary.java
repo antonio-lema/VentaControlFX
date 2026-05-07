@@ -31,3 +31,4 @@ public class ClientSaleSummary {
         return lastPurchase;
     }
 }
+

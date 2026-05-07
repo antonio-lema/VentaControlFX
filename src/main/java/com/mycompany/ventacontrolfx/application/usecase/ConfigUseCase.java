@@ -24,3 +24,4 @@ public class ConfigUseCase {
         repository.reset();
     }
 }
+

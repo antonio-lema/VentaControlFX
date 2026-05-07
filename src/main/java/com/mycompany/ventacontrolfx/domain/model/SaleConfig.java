@@ -23,6 +23,13 @@ public class SaleConfig {
     private String emailFrom = "";
     private String emailPassword = "";
 
+    // --- Verifactu AEAT ---
+    private String verifactuNif = "";
+    private String verifactuCertName = "";
+    private String verifactuCertPath = "";
+    private String verifactuCertPass = "";
+    private String verifactuUrl = "";
+
     // \u00e2\u201d\u20ac\u00e2\u201d\u20ac Fiscal
     // \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac
     private double taxRate = 21.0;
@@ -168,6 +175,21 @@ public class SaleConfig {
     public void setEmailPassword(String emailPassword) {
         this.emailPassword = emailPassword;
     }
+
+    public String getVerifactuNif() { return verifactuNif; }
+    public void setVerifactuNif(String v) { this.verifactuNif = v; }
+
+    public String getVerifactuCertName() { return verifactuCertName; }
+    public void setVerifactuCertName(String v) { this.verifactuCertName = v; }
+
+    public String getVerifactuCertPath() { return verifactuCertPath; }
+    public void setVerifactuCertPath(String v) { this.verifactuCertPath = v; }
+
+    public String getVerifactuCertPass() { return verifactuCertPass; }
+    public void setVerifactuCertPass(String v) { this.verifactuCertPass = v; }
+
+    public String getVerifactuUrl() { return verifactuUrl; }
+    public void setVerifactuUrl(String v) { this.verifactuUrl = v; }
 
     public double getTaxRate() {
         return taxRate;
@@ -511,3 +533,4 @@ public class SaleConfig {
         return 1.0 + (taxRate / 100.0);
     }
 }
+

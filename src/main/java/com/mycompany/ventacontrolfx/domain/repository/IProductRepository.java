@@ -78,3 +78,4 @@ public interface IProductRepository {
                         boolean hasGlobalPromo)
                         throws SQLException;
 }
+

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
+
+<VBox spacing="15" styleClass="modal-container" prefWidth="850" stylesheets="@/styles/variables.css" 
+      xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" 
+      fx:controller="com.mycompany.ventacontrolfx.presentation.controller.dialog.ReturnDialogController">
+    <padding>
+        <Insets top="24" right="32" bottom="24" left="32"/>
+    </padding>
+
+    <HBox alignment="CENTER_LEFT" spacing="15">
+        <StackPane styleClass="icon-container-blue" maxWidth="45" maxHeight="45" style="-fx-background-color: rgba(239, 68, 68, 0.1);">
+            <FontAwesomeIconView glyphName="RETWEET" size="20" fill="#ef4444"/>
+        </StackPane>
+        <VBox spacing="2">
+            <Label text="Devolución de Productos" styleClass="modal-title"/>
+            <Label fx:id="lblTicketInfo" text="Seleccione los productos a devolver" styleClass="modal-subtitle"/>
+        </VBox>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Button onAction="#handleCancel" styleClass="button-ghost" text="&#x2715;" style="-fx-font-size: 16px;"/>
+    </HBox>
+
+    <Separator/>
+
+    <VBox spacing="15" VBox.vgrow="ALWAYS">
+        <!-- Table Header Row -->
+        <HBox spacing="10.0" style="-fx-background-color: #f8fafc; -fx-padding: 10; -fx-background-radius: 8;">
+            <Label prefWidth="40.0" text="Sel." styleClass="text-xs, font-bold, text-gray-500" />
+            <Label HBox.hgrow="ALWAYS" maxWidth="Infinity" text="PRODUCTO" styleClass="text-xs, font-bold, text-gray-500" />
+            <Region HBox.hgrow="ALWAYS" />
+            <Label prefWidth="70.0" text="VEND." styleClass="text-xs, font-bold, text-gray-500" alignment="CENTER" />
+            <Label prefWidth="70.0" text="DEV." styleClass="text-xs, font-bold, text-gray-500" alignment="CENTER" />
+            <Label prefWidth="90.0" text="CANT." styleClass="text-xs, font-bold, text-gray-500" alignment="CENTER" />
+        </HBox>
+
+        <ScrollPane fitToWidth="true" minHeight="200.0" maxHeight="350.0" styleClass="form-control" style="-fx-padding: 0;">
+            <VBox fx:id="itemsContainer" spacing="2.0" style="-fx-background-color: transparent; -fx-padding: 5;" />
+        </ScrollPane>
+
+        <!-- Reason TextArea -->
+        <VBox spacing="8.0">
+            <Label text="Motivo de la devolución" styleClass="text-sm, font-medium, text-gray-700" />
+            <TextArea fx:id="txtReason" prefHeight="70.0" promptText="Explica el motivo de la devolución..." styleClass="form-control" wrapText="true" />
+        </VBox>
+
+        <!-- Refund Summary -->
+        <VBox spacing="8.0" style="-fx-background-color: #f8fafc; -fx-padding: 15; -fx-background-radius: 12; -fx-border-color: #e2e8f0; -fx-border-width: 1;">
+            <HBox alignment="CENTER_LEFT" spacing="10">
+                <Label text="Total a devolver" styleClass="text-sm, font-medium, text-gray-800"/>
+                <Region HBox.hgrow="ALWAYS" />
+                <Label fx:id="lblTotalRefund" text="0,00 €" style="-fx-font-weight: 900; -fx-font-size: 18px; -fx-text-fill: #1e293b;"/>
+            </HBox>
+            <HBox fx:id="boxBrokenDownRefund" alignment="CENTER_LEFT" spacing="10" visible="false">
+                <VBox spacing="4">
+                    <HBox spacing="10" alignment="CENTER_LEFT">
+                        <Label text="• En Efectivo:" styleClass="text-xs, text-gray-500" minWidth="100"/>
+                        <Label fx:id="lblCashRefund" text="0,00 €" style="-fx-font-weight: bold; -fx-text-fill: #16a34a; -fx-font-size: 13px;"/>
+                    </HBox>
+                    <HBox spacing="10" alignment="CENTER_LEFT">
+                        <Label text="• En Tarjeta:" styleClass="text-xs, text-gray-500" minWidth="100"/>
+                        <Label fx:id="lblCardRefund" text="0,00 €" style="-fx-font-weight: bold; -fx-text-fill: #2563eb; -fx-font-size: 13px;"/>
+                    </HBox>
+                </VBox>
+            </HBox>
+        </VBox>
+    </VBox>
+
+    <Region VBox.vgrow="ALWAYS" minHeight="10"/>
+
+    <HBox spacing="10" alignment="CENTER_RIGHT">
+        <Button onAction="#handleCancel" styleClass="btn-secondary" text="Cancelar" cancelButton="true"/>
+        <Button onAction="#handleConfirm" styleClass="btn-primary" text="Confirmar Devolución" defaultButton="true">
+            <graphic>
+                <FontAwesomeIconView glyphName="CHECK" size="14" fill="WHITE" />
+            </graphic>
+        </Button>
+    </HBox>
+</VBox>
+

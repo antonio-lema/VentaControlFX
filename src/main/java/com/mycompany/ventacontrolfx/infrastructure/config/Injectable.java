@@ -7,3 +7,4 @@ package com.mycompany.ventacontrolfx.infrastructure.config;
 public interface Injectable {
     void inject(ServiceContainer container);
 }
+

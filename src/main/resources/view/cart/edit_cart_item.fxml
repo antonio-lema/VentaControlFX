@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.mycompany.ventacontrolfx.presentation.controller.dialog.EditCartItemController"
+      spacing="20" alignment="CENTER" prefWidth="400"
+      styleClass="modal-container">
+    
+    <padding>
+        <Insets top="30" right="30" bottom="30" left="30"/>
+    </padding>
+
+    <!-- Header -->
+    <VBox spacing="10" alignment="CENTER">
+        <FontAwesomeIconView glyphName="PENCIL_SQUARE_ALT" size="45" fill="#2196f3"/>
+        <Label text="Modificar Producto" styleClass="custom-modal-title"/>
+        <Label fx:id="lblProductName" text="Nombre del Producto" style="-fx-text-fill: #666; -fx-font-size: 16px; -fx-font-weight: bold;"/>
+    </VBox>
+
+    <VBox spacing="15">
+        <!-- Price Field -->
+        <VBox spacing="8">
+            <Label text="Precio Unitario (&#x20ac;):" style="-fx-font-weight: bold; -fx-text-fill: #555;"/>
+            <TextField fx:id="txtUnitPrice" styleClass="input-field-modern" prefHeight="45"/>
+        </VBox>
+
+        <!-- Discount Field -->
+        <VBox spacing="8">
+            <Label text="Descuento Manual:" style="-fx-font-weight: bold; -fx-text-fill: #555;"/>
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <TextField fx:id="txtDiscount" styleClass="input-field-modern" prefHeight="45" HBox.hgrow="ALWAYS" promptText="0.00"/>
+                <ToggleButton fx:id="toggleDiscountType" text="&#x20ac;" prefHeight="45" prefWidth="50" styleClass="toggle-button-modern-euro" selected="true"/>
+            </HBox>
+            <Label fx:id="lblDiscountHint" text="Descuento en valor absoluto" style="-fx-text-fill: #999; -fx-font-size: 11px;"/>
+        </VBox>
+
+        <!-- Observations Field -->
+        <VBox spacing="8">
+            <Label text="Observaci&#x00f3;n/Sugerencia:" style="-fx-font-weight: bold; -fx-text-fill: #555;"/>
+            <TextArea fx:id="txtObservations" prefHeight="80" wrapText="true" promptText="Ej: Sin cebolla, poco hecho..."/>
+        </VBox>
+    </VBox>
+
+    <!-- Footer Buttons -->
+    <HBox spacing="15" alignment="CENTER">
+        <Button text="CANCELAR" onAction="#handleCancel" styleClass="btn-secondary" prefHeight="45" prefWidth="130"/>
+        <Button text="GUARDAR CAMBIOS" onAction="#handleSave" styleClass="btn-primary" prefHeight="45" prefWidth="180"/>
+    </HBox>
+
+</VBox>

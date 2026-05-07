@@ -31,3 +31,4 @@ public interface IPermissionRepository {
      */
     void setRolePermissions(int roleId, List<String> codes) throws SQLException;
 }
+

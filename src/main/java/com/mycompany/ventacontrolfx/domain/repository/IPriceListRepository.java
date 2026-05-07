@@ -19,3 +19,4 @@ public interface IPriceListRepository {
 
     void setAsDefault(int id) throws SQLException;
 }
+

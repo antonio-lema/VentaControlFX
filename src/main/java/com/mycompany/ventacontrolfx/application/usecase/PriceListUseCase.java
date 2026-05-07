@@ -85,3 +85,4 @@ public class PriceListUseCase {
         priceRepository.updateCurrentAndSave(newPrice);
     }
 }
+

@@ -22,3 +22,4 @@ public interface IPriceUpdateLogRepository {
      */
     void updateProductsUpdatedCount(int logId, int count) throws SQLException;
 }
+

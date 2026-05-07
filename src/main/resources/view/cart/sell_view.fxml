@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.*?>
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml/1"
+            fx:id="sellViewRoot"
+            fx:controller="com.mycompany.ventacontrolfx.presentation.controller.cart.SellViewController"
+            styleClass="main-content-area">
+
+    <center>
+        <VBox spacing="0">
+            <!-- Replaced legacy header with professional view-header -->
+            <VBox styleClass="view-header, sell-view-header" spacing="0">
+                <children>
+                    <HBox spacing="16" alignment="CENTER_LEFT">
+                        <children>
+                            <StackPane styleClass="view-header-icon-wrap">
+                                <children>
+                                    <FontAwesomeIconView glyphName="SHOPPING_CART" size="24" fill="white"/>
+                                </children>
+                            </StackPane>
+                            <VBox spacing="2">
+                                <children>
+                                    <Label text="%sell.title" styleClass="view-title"/>
+                                    <Label fx:id="filterLabel" text="%sell.subtitle" styleClass="view-subtitle"/>
+                                </children>
+                            </VBox>
+                            
+                            <Region HBox.hgrow="ALWAYS" />
+                            
+                            <!-- Control Section in Header -->
+                            <HBox alignment="CENTER_LEFT" spacing="15.0" styleClass="filter-card">
+                                <children>
+                                    <VBox spacing="2">
+                                        <children>
+                                            <Label text="%sell.active_rate" styleClass="view-subtitle" style="-fx-font-size: 10px; -fx-font-weight: 800; -fx-text-fill: -fx-custom-color-primary;"/>
+                                            <HBox styleClass="modern-input-container, selector-glass" alignment="CENTER_LEFT" spacing="8">
+                                                <children>
+                                                    <FontAwesomeIconView glyphName="TAG" size="14" styleClass="icon-primary"/>
+                                                    <ComboBox fx:id="comboPriceList" prefWidth="160" styleClass="combo-invisible" />
+                                                </children>
+                                            </HBox>
+                                        </children>
+                                    </VBox>
+                                    <Separator orientation="VERTICAL" style="-fx-padding: 5 0;"/>
+                                    <VBox spacing="2">
+                                        <children>
+                                            <Label text="%sell.category_label" styleClass="view-subtitle" style="-fx-font-size: 10px; -fx-font-weight: 800; -fx-text-fill: -fx-custom-color-success;"/>
+                                            <Button fx:id="btnCategorySelector" onAction="#handleToggleCategoryMenu" styleClass="selector-glass, btn-category-trigger" prefWidth="180">
+                                                <graphic>
+                                                    <HBox spacing="8" alignment="CENTER_LEFT">
+                                                        <FontAwesomeIconView glyphName="FOLDER_OPEN" size="14" styleClass="icon-success"/>
+                                                        <Label fx:id="lblSelectedCategory" text="%sell.all_categories" styleClass="label-selector-text" />
+                                                        <Region HBox.hgrow="ALWAYS" />
+                                                        <FontAwesomeIconView glyphName="CHEVRON_DOWN" size="10" styleClass="icon-muted"/>
+                                                    </HBox>
+                                                </graphic>
+                                            </Button>
+                                        </children>
+                                    </VBox>
+                                </children>
+                            </HBox>
+                        </children>
+                    </HBox>
+                </children>
+            </VBox>
+            
+            <VBox VBox.vgrow="ALWAYS" spacing="10">
+                <children>
+                    <StackPane VBox.vgrow="ALWAYS">
+                        <ScrollPane fx:id="productsScrollPane" fitToHeight="true" fitToWidth="true" styleClass="products-scroll-pane">
+                            <TilePane fx:id="productsPane" hgap="20" vgap="20" styleClass="products-grid">
+                                <padding>
+                                    <Insets top="25" right="25" bottom="25" left="25"/>
+                                </padding>
+                            </TilePane>
+                        </ScrollPane>
+                        
+                        <!-- NEW: Category Mega Menu Overlay -->
+                        <VBox fx:id="categoryMenuContainer" visible="false" managed="false" styleClass="category-mega-menu">
+                            <children>
+                                <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="mega-menu-scroll">
+                                    <content>
+                                        <FlowPane fx:id="categoriesMegaFlowPane" hgap="15" vgap="15" styleClass="mega-menu-flow">
+                                            <padding>
+                                                <Insets top="25" right="25" bottom="25" left="25"/>
+                                            </padding>
+                                        </FlowPane>
+                                    </content>
+                                </ScrollPane>
+                                <Region VBox.vgrow="ALWAYS" onMouseClicked="#handleToggleCategoryMenu" style="-fx-background-color: rgba(0,0,0,0.1);"/>
+                            </children>
+                        </VBox>
+
+                        <VBox fx:id="loadingOverlay" visible="false" alignment="CENTER" styleClass="loading-overlay" mouseTransparent="false">
+                            <!-- Skeletons are shown in the productsPane below this transparent layer -->
+                        </VBox>
+                    </StackPane>
+
+                </children>
+            </VBox>
+        </VBox>
+    </center>
+</BorderPane>

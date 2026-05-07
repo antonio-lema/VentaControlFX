@@ -1,10 +1,10 @@
 .root {
     /* Tipografía Global */
     -fx-font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    -fx-font-size-base: 14px;
-    -fx-font-size-large: 18px;
-    -fx-font-size-small: 12px;
-    -fx-font-size-xl: 26px;
+    -fx-font-size-base: 14;
+    -fx-font-size-large: 18;
+    -fx-font-size-small: 12;
+    -fx-font-size-xl: 26;
 
     /* Espaciado y Bordes */
     -fx-radius-sm: 4px;

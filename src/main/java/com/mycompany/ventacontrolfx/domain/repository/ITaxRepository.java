@@ -54,3 +54,4 @@ public interface ITaxRepository {
 
         void saveTaxRevision(TaxRevision revision) throws SQLException;
 }
+

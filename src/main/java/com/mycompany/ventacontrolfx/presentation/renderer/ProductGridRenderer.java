@@ -1,6 +1,6 @@
 package com.mycompany.ventacontrolfx.presentation.renderer;
 
-import com.mycompany.ventacontrolfx.component.ProductBox;
+import com.mycompany.ventacontrolfx.presentation.component.ProductBox;
 import com.mycompany.ventacontrolfx.domain.model.Product;
 import javafx.application.Platform;
 import javafx.scene.layout.TilePane;
@@ -70,9 +70,13 @@ public class ProductGridRenderer {
     public void showSkeleton(int count) {
         java.util.List<javafx.scene.Node> skeletons = new java.util.ArrayList<>();
         for (int i = 0; i < count; i++) {
-            skeletons.add(new com.mycompany.ventacontrolfx.component.SkeletonProductBox());
+            skeletons.add(new com.mycompany.ventacontrolfx.presentation.component.SkeletonProductBox());
         }
         productsPane.getChildren().setAll(skeletons);
+    }
+
+    public int getVisibleCount() {
+        return productsPane.getChildren().size();
     }
 
     public void append(List<Product> products) {
@@ -115,3 +119,6 @@ public class ProductGridRenderer {
         return box;
     }
 }
+
+
+

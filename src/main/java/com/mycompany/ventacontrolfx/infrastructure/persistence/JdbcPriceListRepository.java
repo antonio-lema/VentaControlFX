@@ -211,3 +211,4 @@ public class JdbcPriceListRepository implements IPriceListRepository {
                 rs.getInt("priority"));
     }
 }
+

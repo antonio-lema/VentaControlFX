@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
+
+<VBox spacing="15" styleClass="modal-container" prefWidth="580" prefHeight="680" stylesheets="@/styles/variables.css" 
+      xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" 
+      fx:controller="com.mycompany.ventacontrolfx.presentation.controller.dialog.PromotionFormController">
+    <padding>
+        <Insets top="24" right="32" bottom="24" left="32"/>
+    </padding>
+
+    <HBox alignment="CENTER_LEFT" spacing="15">
+        <StackPane styleClass="icon-container-blue" maxWidth="45" maxHeight="45" style="-fx-background-color: rgba(99, 102, 241, 0.1);">
+            <FontAwesomeIconView glyphName="TAG" size="20" fill="#6366f1"/>
+        </StackPane>
+        <VBox spacing="2">
+            <Label fx:id="lblTitle" text="%promotion.btn.new" styleClass="modal-title"/>
+            <Label text="%promotion.form.subtitle" styleClass="modal-subtitle"/>
+        </VBox>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Button onAction="#handleCancel" styleClass="button-ghost" text="&#x2715;" style="-fx-font-size: 16px;"/>
+    </HBox>
+
+    <Separator/>
+
+    <ScrollPane fitToWidth="true" styleClass="edge-to-edge" style="-fx-background-color: transparent;" VBox.vgrow="ALWAYS">
+        <VBox spacing="20" style="-fx-padding: 5 2 5 2;">
+            <VBox spacing="8">
+                <Label text="%promotion.form.name" styleClass="text-sm, font-medium, text-gray-700"/>
+                <TextField fx:id="txtName" promptText="Ej: Rebajas de Verano" styleClass="form-control"/>
+            </VBox>
+            
+            <VBox spacing="8">
+                <Label text="%promotion.form.code" styleClass="text-sm, font-medium, text-gray-700"/>
+                <HBox spacing="10">
+                    <TextField fx:id="txtCode" promptText="Código (Ej: VERANO2024)" HBox.hgrow="ALWAYS" styleClass="form-control"/>
+                    <Button onAction="#handleGenerateCode" styleClass="btn-secondary" text="Generar">
+                        <graphic><FontAwesomeIconView glyphName="MAGIC" size="14"/></graphic>
+                    </Button>
+                </HBox>
+            </VBox>
+
+            <HBox spacing="15">
+                <VBox spacing="8" HBox.hgrow="ALWAYS">
+                    <Label text="Límite de Usos Totales (0 = Sin Límite)" styleClass="text-sm, font-medium, text-gray-700"/>
+                    <TextField fx:id="txtMaxUses" promptText="0" styleClass="form-control"/>
+                </VBox>
+                <VBox spacing="8" HBox.hgrow="ALWAYS">
+                    <Label text="ID Cliente Específico (Opcional)" styleClass="text-sm, font-medium, text-gray-700"/>
+                    <TextField fx:id="txtBoundClientId" promptText="Dejar vacío para todos" styleClass="form-control"/>
+                </VBox>
+            </HBox>
+
+            <VBox spacing="8">
+                <Label text="Compra Mínima Requerida (Subtotal > X)" styleClass="text-sm, font-medium, text-gray-700"/>
+                <TextField fx:id="txtMinOrderValue" promptText="0,00" styleClass="form-control"/>
+            </VBox>
+
+            <HBox spacing="15">
+                <VBox spacing="8" HBox.hgrow="ALWAYS">
+                    <Label text="%promotion.form.type" styleClass="text-sm, font-medium, text-gray-700"/>
+                    <ComboBox fx:id="cmbType" maxWidth="Infinity" styleClass="form-control"/>
+                </VBox>
+                <VBox fx:id="panelValue" spacing="8" HBox.hgrow="ALWAYS">
+                    <Label text="%promotion.form.value" styleClass="text-sm, font-medium, text-gray-700"/>
+                    <TextField fx:id="txtValue" promptText="0,00" styleClass="form-control"/>
+                </VBox>
+            </HBox>
+
+            <HBox spacing="15" alignment="CENTER_LEFT">
+                <VBox spacing="8" HBox.hgrow="ALWAYS">
+                    <Label text="%promotion.form.scope" styleClass="text-sm, font-medium, text-gray-700"/>
+                    <ComboBox fx:id="cmbScope" maxWidth="Infinity" styleClass="form-control"/>
+                </VBox>
+                <VBox spacing="8" HBox.hgrow="ALWAYS">
+                    <Label text="Estado" styleClass="text-sm, font-medium, text-gray-700"/>
+                    <CheckBox fx:id="chkActive" text="%promotion.form.active" selected="true" styleClass="text-sm, font-medium, text-gray-800"/>
+                </VBox>
+            </HBox>
+
+            <VBox fx:id="panelAffected" spacing="8">
+                <Label fx:id="lblAffected" text="%promotion.form.affected" styleClass="text-sm, font-medium, text-gray-700"/>
+                <HBox spacing="10">
+                    <TextField fx:id="txtAffectedSearch" promptText="Buscar ID o nombre..." HBox.hgrow="ALWAYS" styleClass="form-control"/>
+                    <Button onAction="#handleAddAffected" styleClass="btn-secondary" text="%promotion.form.btn.add" />
+                </HBox>
+                <ListView fx:id="listAffected" prefHeight="100" styleClass="form-control" style="-fx-padding: 0;"/>
+            </VBox>
+
+            <VBox fx:id="panelVolume" spacing="8">
+                <HBox spacing="15">
+                    <VBox spacing="8" HBox.hgrow="ALWAYS">
+                        <Label text="%promotion.form.buy_qty" styleClass="text-sm, font-medium, text-gray-700"/>
+                        <TextField fx:id="txtBuyQty" promptText="Ej: 2" styleClass="form-control"/>
+                    </VBox>
+                    <VBox spacing="8" HBox.hgrow="ALWAYS">
+                        <Label text="%promotion.form.free_qty" styleClass="text-sm, font-medium, text-gray-700"/>
+                        <TextField fx:id="txtFreeQty" promptText="Ej: 1" styleClass="form-control"/>
+                    </VBox>
+                </HBox>
+            </VBox>
+
+            <HBox spacing="15">
+                <VBox spacing="8" HBox.hgrow="ALWAYS">
+                    <Label text="%promotion.form.start_date" styleClass="text-sm, font-medium, text-gray-700"/>
+                    <DatePicker fx:id="dpStartDate" maxWidth="Infinity" styleClass="form-control"/>
+                </VBox>
+                <VBox spacing="8" HBox.hgrow="ALWAYS">
+                    <Label text="%promotion.form.end_date" styleClass="text-sm, font-medium, text-gray-700"/>
+                    <DatePicker fx:id="dpEndDate" maxWidth="Infinity" styleClass="form-control"/>
+                </VBox>
+            </HBox>
+        </VBox>
+    </ScrollPane>
+
+    <Region VBox.vgrow="ALWAYS" minHeight="10"/>
+
+    <HBox spacing="10" alignment="CENTER_RIGHT">
+        <Button onAction="#handleCancel" text="%btn.cancel" styleClass="btn-secondary" cancelButton="true" />
+        <Button onAction="#handleSave" text="%promotion.form.btn.save" styleClass="btn-primary" defaultButton="true">
+            <graphic><FontAwesomeIconView glyphName="SAVE" size="14" fill="white"/></graphic>
+        </Button>
+    </HBox>
+</VBox>

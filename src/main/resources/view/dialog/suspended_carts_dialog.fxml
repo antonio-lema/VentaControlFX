@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
+
+<VBox spacing="15" styleClass="modal-container" prefWidth="650" prefHeight="550" stylesheets="@/styles/variables.css" 
+      xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" 
+      fx:controller="com.mycompany.ventacontrolfx.presentation.controller.cart.SuspendedCartsDialogController">
+    <padding>
+        <Insets top="24" right="32" bottom="24" left="32"/>
+    </padding>
+
+    <HBox alignment="CENTER_LEFT" spacing="15">
+        <StackPane styleClass="icon-container-blue" maxWidth="45" maxHeight="45">
+            <FontAwesomeIconView glyphName="FOLDER_OPEN" size="20" fill="#1e88e5"/>
+        </StackPane>
+        <VBox spacing="2">
+            <Label text="Ventas Aplazadas" styleClass="modal-title"/>
+            <Label text="Recupere una venta pendiente para continuar" styleClass="modal-subtitle"/>
+        </VBox>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Button onAction="#handleClose" styleClass="button-ghost" text="&#x2715;" style="-fx-font-size: 16px;"/>
+    </HBox>
+
+    <Separator/>
+
+    <VBox spacing="15" VBox.vgrow="ALWAYS">
+        <TableView fx:id="tblCarts" VBox.vgrow="ALWAYS" styleClass="modern-table">
+            <columns>
+                <TableColumn fx:id="colAlias" text="Identificador" prefWidth="160"/>
+                <TableColumn fx:id="colDate" text="Fecha/Hora" prefWidth="160"/>
+                <TableColumn fx:id="colClient" text="Cliente" prefWidth="140"/>
+                <TableColumn fx:id="colTotal" text="Total" prefWidth="90"/>
+                <TableColumn fx:id="colActions" text="Acciones" prefWidth="80"/>
+            </columns>
+            <placeholder>
+                <Label text="No hay ventas aplazadas" styleClass="text-gray-400"/>
+            </placeholder>
+        </TableView>
+    </VBox>
+
+    <HBox spacing="10" alignment="CENTER_RIGHT">
+        <Button text="Cancelar" onAction="#handleClose" styleClass="btn-secondary"/>
+        <Button text="Recuperar Venta" onAction="#handleResume" styleClass="btn-primary">
+            <graphic>
+                <FontAwesomeIconView glyphName="ARROW_RIGHT" size="14" fill="white" />
+            </graphic>
+        </Button>
+    </HBox>
+</VBox>
+

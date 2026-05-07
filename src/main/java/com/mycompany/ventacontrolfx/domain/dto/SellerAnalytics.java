@@ -59,3 +59,4 @@ public class SellerAnalytics {
     public double getReturnsTotal() { return returnsTotal; }
     public void setReturnsTotal(double returnsTotal) { this.returnsTotal = returnsTotal; }
 }
+

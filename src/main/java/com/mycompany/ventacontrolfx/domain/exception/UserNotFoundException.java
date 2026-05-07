@@ -8,3 +8,4 @@ public class UserNotFoundException extends BusinessException {
         super("El usuario '" + username + "' no existe en el sistema.");
     }
 }
+

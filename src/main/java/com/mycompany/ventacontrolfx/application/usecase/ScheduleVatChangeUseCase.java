@@ -57,3 +57,4 @@ public class ScheduleVatChangeUseCase {
         return Optional.empty();
     }
 }
+

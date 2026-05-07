@@ -9,11 +9,11 @@ import java.util.List;
 
 public class ProductUseCase {
     private final IProductRepository repository;
-    private final com.mycompany.ventacontrolfx.util.AuthorizationService authService;
+    private final com.mycompany.ventacontrolfx.infrastructure.security.AuthorizationService authService;
     private final GlobalEventBus eventBus;
 
     public ProductUseCase(IProductRepository repository,
-            com.mycompany.ventacontrolfx.util.AuthorizationService authService,
+            com.mycompany.ventacontrolfx.infrastructure.security.AuthorizationService authService,
             GlobalEventBus eventBus) {
         this.repository = repository;
         this.authService = authService;
@@ -108,3 +108,5 @@ public class ProductUseCase {
         return repository.countSearch(query, visibility);
     }
 }
+
+

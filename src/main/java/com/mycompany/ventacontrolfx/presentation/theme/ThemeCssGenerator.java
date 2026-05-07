@@ -115,12 +115,12 @@ public class ThemeCssGenerator {
         if (fontSize != null) {
             try {
                 double base = Double.parseDouble(fontSize);
-                // Variables primero
-                sb.append("  -fx-font-size-base: ").append(base).append("px;\n");
-                sb.append("  -fx-font-size-large: ").append(base + 4.0).append("px;\n");
-                sb.append("  -fx-font-size-xl: ").append(base + 12.0).append("px;\n");
-                sb.append("  -fx-font-size-small: ").append(base - 2.0).append("px;\n");
-                // Propiedad global despus
+                // Variables de fuente como números puros (JavaFX prefiere esto para fuentes)
+                sb.append("  -fx-font-size-base: ").append(base).append(";\n");
+                sb.append("  -fx-font-size-large: ").append(base + 4.0).append(";\n");
+                sb.append("  -fx-font-size-xl: ").append(base + 12.0).append(";\n");
+                sb.append("  -fx-font-size-small: ").append(base - 2.0).append(";\n");
+                // Propiedad global con px para asegurar consistencia
                 sb.append("  -fx-font-size: ").append(base).append("px;\n");
             } catch (Exception ignored) {}
         }
@@ -128,6 +128,7 @@ public class ThemeCssGenerator {
         if (borderRadius != null) {
             try {
                 double br = Double.parseDouble(borderRadius);
+                // Los radios SIEMPRE con px para evitar ClassCastException
                 sb.append("  -fx-radius-sm: ").append(br * 0.5).append("px;\n");
                 sb.append("  -fx-radius-md: ").append(br).append("px;\n");
                 sb.append("  -fx-radius-lg: ").append(br * 1.5).append("px;\n");

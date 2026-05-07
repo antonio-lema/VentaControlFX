@@ -15,8 +15,8 @@ import java.util.Map;
 public class CustomizationController implements Injectable {
 
     @FXML private ColorPicker cpPrimary, cpSecondary, cpBackground, cpText, cpTextCards, cpTextPrice, cpSidebar, cpSidebarText;
-    @FXML private Slider sldFontSize, sldBorderRadius, sldCardScale, sldCardShadow, sldCardHoverLift, sldCardBorderWidth, sldCardHoverScale;
-    @FXML private Label lblFontSizeVal, lblBorderRadiusVal, lblCardScaleVal, lblCardShadowVal, lblCardHoverLiftVal, lblCardBorderWidthVal, lblCardHoverScaleVal;
+    @FXML private Slider sldFontSize, sldBorderRadius, sldCardScale, sldCardShadow, sldCardHoverLift;
+    @FXML private Label lblFontSizeVal, lblBorderRadiusVal, lblCardScaleVal, lblCardShadowVal, lblCardHoverLiftVal;
     
     @FXML private VBox paneColors, paneEffects, paneInteraction;
     @FXML private javafx.scene.control.Button btnTabColors, btnTabEffects, btnTabInteraction;
@@ -49,15 +49,13 @@ public class CustomizationController implements Injectable {
         uiManager.bindSliderLabel(sldCardScale, lblCardScaleVal, v -> String.format("%.2f\u00d7", v));
         uiManager.bindSliderLabel(sldCardShadow, lblCardShadowVal, v -> (int) v.doubleValue() + "");
         uiManager.bindSliderLabel(sldCardHoverLift, lblCardHoverLiftVal, v -> (int) v.doubleValue() + "px");
-        uiManager.bindSliderLabel(sldCardBorderWidth, lblCardBorderWidthVal, v -> String.format("%.1fpx", v));
-        uiManager.bindSliderLabel(sldCardHoverScale, lblCardHoverScaleVal, v -> String.format("%.2f\u00d7", v));
     }
 
     private void setupListeners() {
         ColorPicker[] pickers = {cpPrimary, cpSecondary, cpBackground, cpText, cpTextCards, cpTextPrice, cpSidebar, cpSidebarText};
         for (ColorPicker cp : pickers) if (cp != null) cp.valueProperty().addListener((obs, o, n) -> updatePreview());
         
-        Slider[] sliders = {sldFontSize, sldBorderRadius, sldCardScale, sldCardShadow, sldCardHoverLift, sldCardBorderWidth, sldCardHoverScale};
+        Slider[] sliders = {sldFontSize, sldBorderRadius, sldCardScale, sldCardShadow, sldCardHoverLift};
         for (Slider s : sliders) if (s != null) s.valueProperty().addListener((obs, o, n) -> updatePreview());
     }
 
@@ -77,9 +75,7 @@ public class CustomizationController implements Injectable {
             uiManager.trySetSlider(sldBorderRadius, s.getOrDefault("ui.border_radius", "8"));
             uiManager.trySetSlider(sldCardScale, s.getOrDefault("ui.card_scale", "1.0"));
             uiManager.trySetSlider(sldCardShadow, s.getOrDefault("ui.card_shadow", "15"));
-            uiManager.trySetSlider(sldCardHoverLift, s.getOrDefault("ui.card_hover_lift", "8"));
-            uiManager.trySetSlider(sldCardBorderWidth, s.getOrDefault("ui.card_border_width", "1.5"));
-            uiManager.trySetSlider(sldCardHoverScale, s.getOrDefault("ui.card_hover_scale", "1.02"));
+            uiManager.trySetSlider(sldCardHoverLift, s.getOrDefault("ui.card_hover_lift", "5"));
             isDarkMode = "DARK".equals(s.getOrDefault("ui.theme_mode", "LIGHT"));
         } catch (SQLException e) { e.printStackTrace(); }
     }
@@ -101,7 +97,7 @@ public class CustomizationController implements Injectable {
         // Asegurar que no enviamos nulos al themeManager
         return themeManager.buildSettingsMap(
             cpPrimary, cpSecondary, cpBackground, cpText, cpTextCards, cpTextPrice, cpSidebar, cpSidebarText, 
-            sldFontSize, sldBorderRadius, sldCardScale, sldCardShadow, sldCardHoverLift, sldCardBorderWidth, sldCardHoverScale, 
+            sldFontSize, sldBorderRadius, sldCardScale, sldCardShadow, sldCardHoverLift, 
             isDarkMode
         );
     }

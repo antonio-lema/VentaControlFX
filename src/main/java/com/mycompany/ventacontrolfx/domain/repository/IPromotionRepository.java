@@ -25,3 +25,4 @@ public interface IPromotionRepository {
 
     Optional<Promotion> findByCode(String code) throws SQLException;
 }
+

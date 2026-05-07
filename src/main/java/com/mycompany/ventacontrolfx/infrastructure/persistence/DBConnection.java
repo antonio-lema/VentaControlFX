@@ -81,7 +81,7 @@ public class DBConnection {
     }
 
     // A simple wrapper to intercept close() calls and return to pool
-    private static class PooledConnection extends com.mycompany.ventacontrolfx.util.ConnectionWrapper {
+    private static class PooledConnection extends com.mycompany.ventacontrolfx.infrastructure.persistence.ConnectionWrapper {
         public PooledConnection(Connection delegate) {
             super(delegate);
         }
@@ -92,3 +92,5 @@ public class DBConnection {
         }
     }
 }
+
+

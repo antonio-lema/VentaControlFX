@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
+<?import java.net.URL?>
+
+<VBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" 
+      fx:controller="com.mycompany.ventacontrolfx.presentation.controller.dialog.PunctualityAuditController"
+      spacing="0" styleClass="main-content-area">
+    
+    <stylesheets>
+        <URL value="@/styles/components/historial.css" />
+        <URL value="@/styles/components/filters.css" />
+        <URL value="@/styles/components/informes.css" />
+    </stylesheets>
+
+    <children>
+        <!-- Header Section (Returns Style) -->
+        <VBox styleClass="view-header" spacing="0">
+            <children>
+                <HBox spacing="16" alignment="CENTER_LEFT">
+                    <children>
+                        <StackPane styleClass="view-header-icon-wrap">
+                            <children><FontAwesomeIconView glyphName="CHECK_SQUARE" size="22" fill="white"/></children>
+                        </StackPane>
+                        <VBox spacing="2">
+                            <children>
+                                <Label text="%audit.punctuality.title" styleClass="view-title"/>
+                                <Label text="%audit.punctuality.subtitle" styleClass="view-subtitle"/>
+                            </children>
+                        </VBox>
+                        <Region HBox.hgrow="ALWAYS" />
+                        <Button onAction="#refresh" styleClass="btn-secondary" text="%returns.btn.refresh">
+                            <graphic><FontAwesomeIconView glyphName="REFRESH" size="14"/></graphic>
+                        </Button>
+                    </children>
+                </HBox>
+            </children>
+        </VBox>
+
+        <VBox spacing="30" VBox.vgrow="ALWAYS" style="-fx-padding: 30;">
+            <children>
+                
+                <!-- KPI Row SaaS Style -->
+                <HBox spacing="20" alignment="CENTER">
+                    <children>
+                        <!-- Punctuality Blue -->
+                        <VBox styleClass="kpi-card-saas, kpi-card-blue" HBox.hgrow="ALWAYS">
+                            <children>
+                                <HBox alignment="CENTER_LEFT" spacing="10">
+                                    <StackPane styleClass="icon-bg-blue"><FontAwesomeIconView glyphName="CHECK_CIRCLE" fill="#1e88e5" size="16"/></StackPane>
+                                    <Label text="%audit.punctuality.stats.general" styleClass="kpi-label-saas" />
+                                </HBox>
+                                <Label fx:id="lblGeneralPunctuality" text="--%" styleClass="kpi-value-saas" />
+                                <Label text="%audit.punctuality.stats.general.desc" styleClass="trend-text" />
+                            </children>
+                        </VBox>
+
+                        <!-- Late Red -->
+                        <VBox styleClass="kpi-card-saas, kpi-card-red" HBox.hgrow="ALWAYS">
+                            <children>
+                                <HBox alignment="CENTER_LEFT" spacing="10">
+                                    <StackPane styleClass="icon-bg-red"><FontAwesomeIconView glyphName="CLOCK_ALT" fill="#ef4444" size="16"/></StackPane>
+                                    <Label text="%audit.punctuality.stats.late" styleClass="kpi-label-saas" />
+                                </HBox>
+                                <Label fx:id="lblLateCount" text="0" styleClass="kpi-value-saas" />
+                                <Label text="%audit.punctuality.stats.late.desc" styleClass="trend-text" />
+                            </children>
+                        </VBox>
+
+                        <!-- No-Show Gold/Amber -->
+                        <VBox styleClass="kpi-card-saas, kpi-card-gold" HBox.hgrow="ALWAYS">
+                            <children>
+                                <HBox alignment="CENTER_LEFT" spacing="10">
+                                    <StackPane styleClass="icon-bg-gold"><FontAwesomeIconView glyphName="EXCLAMATION_TRIANGLE" fill="#f59e0b" size="16"/></StackPane>
+                                    <Label text="%audit.punctuality.stats.noshow" styleClass="kpi-label-saas" />
+                                </HBox>
+                                <Label fx:id="lblNoShowCount" text="0" styleClass="kpi-value-saas" />
+                                <Label text="%audit.punctuality.stats.noshow.desc" styleClass="trend-text" />
+                            </children>
+                        </VBox>
+                    </children>
+                </HBox>
+
+                <!-- Filter Card -->
+                <HBox spacing="15" alignment="CENTER_LEFT" styleClass="filter-card">
+                    <padding><Insets top="15" right="20" bottom="15" left="20"/></padding>
+                    <children>
+                        <VBox spacing="5">
+                            <Label text="%audit.punctuality.filter.date" styleClass="filter-label-cap"/>
+                            <DatePicker fx:id="datePicker" onAction="#handleDateChange" prefWidth="200" styleClass="modern-datepicker"/>
+                        </VBox>
+                        
+                        <Region HBox.hgrow="ALWAYS" />
+
+                        <Button onAction="#refresh" styleClass="btn-primary" text="%audit.punctuality.btn.filter">
+                             <graphic><FontAwesomeIconView glyphName="SEARCH" size="12" fill="white"/></graphic>
+                        </Button>
+                    </children>
+                </HBox>
+
+                <!-- Table Card -->
+                <VBox VBox.vgrow="ALWAYS" styleClass="table-card">
+                    <TableView fx:id="tableAudit" VBox.vgrow="ALWAYS" styleClass="modern-table-view">
+                        <columns>
+                            <TableColumn fx:id="colUser" prefWidth="180" text="%audit.punctuality.table.employee" />
+                            <TableColumn fx:id="colShift" prefWidth="180" text="%audit.punctuality.table.shift" />
+                            <TableColumn fx:id="colRealStart" prefWidth="130" text="%audit.punctuality.table.start" />
+                            <TableColumn fx:id="colDelay" prefWidth="110" text="%audit.punctuality.table.delay" />
+                            <TableColumn fx:id="colStatus" prefWidth="150" text="%audit.punctuality.table.status" />
+                            <TableColumn fx:id="colEndPunctuality" prefWidth="180" text="%audit.punctuality.table.end" />
+                        </columns>
+                        <columnResizePolicy>
+                            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                        </columnResizePolicy>
+                    </TableView>
+                </VBox>
+            </children>
+        </VBox>
+    </children>
+</VBox>

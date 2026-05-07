@@ -4,7 +4,7 @@ import com.mycompany.ventacontrolfx.domain.model.Product;
 import com.mycompany.ventacontrolfx.domain.model.Category;
 import com.mycompany.ventacontrolfx.domain.repository.IProductRepository;
 import com.mycompany.ventacontrolfx.domain.repository.ICategoryRepository;
-import com.mycompany.ventacontrolfx.util.AuthorizationService;
+import com.mycompany.ventacontrolfx.infrastructure.security.AuthorizationService;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -118,3 +118,4 @@ public class ProductImportUseCase {
         }
     }
 }
+

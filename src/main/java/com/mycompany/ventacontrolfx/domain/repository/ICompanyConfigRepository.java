@@ -11,3 +11,4 @@ public interface ICompanyConfigRepository {
 
     String getValue(String key);
 }
+

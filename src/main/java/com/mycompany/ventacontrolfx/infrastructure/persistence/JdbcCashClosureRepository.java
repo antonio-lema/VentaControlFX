@@ -125,11 +125,11 @@ public class JdbcCashClosureRepository implements ICashClosureRepository {
     public List<ProductSummary> getPendingProductSummary() throws SQLException {
         List<ProductSummary> summary = new ArrayList<>();
         String sql = "SELECT name, SUM(quantity) as total_qty, SUM(amount) as total_amount FROM (" +
-                "  SELECT COALESCE(p.name, 'Producto Eliminado') as name, sd.quantity, sd.line_total as amount " +
+                "  SELECT COALESCE(p.name, 'PRODUCT_DELETED') as name, sd.quantity, sd.line_total as amount " +
                 "  FROM sale_details sd JOIN sales s ON sd.sale_id = s.sale_id " +
                 "  LEFT JOIN products p ON sd.product_id = p.product_id WHERE s.closure_id IS NULL " +
                 "  UNION ALL " +
-                "  SELECT CONCAT('[DEV] ', COALESCE(p.name, 'Producto Eliminado')) as name, -rd.quantity, -rd.subtotal as amount "
+                "  SELECT CONCAT('[DEV] ', COALESCE(p.name, 'PRODUCT_DELETED')) as name, -rd.quantity, -rd.subtotal as amount "
                 +
                 "  FROM return_details rd JOIN returns r ON rd.return_id = r.return_id " +
                 "  LEFT JOIN products p ON rd.product_id = p.product_id WHERE r.closure_id IS NULL" +
@@ -165,11 +165,11 @@ public class JdbcCashClosureRepository implements ICashClosureRepository {
     public List<ProductSummary> getProductSummary(int closureId) throws SQLException {
         List<ProductSummary> summary = new ArrayList<>();
         String sql = "SELECT name, SUM(quantity) as total_qty, SUM(amount) as total_amount FROM (" +
-                "  SELECT COALESCE(p.name, 'Producto Eliminado') as name, sd.quantity, sd.line_total as amount " +
+                "  SELECT COALESCE(p.name, 'PRODUCT_DELETED') as name, sd.quantity, sd.line_total as amount " +
                 "  FROM sale_details sd JOIN sales s ON sd.sale_id = s.sale_id " +
                 "  LEFT JOIN products p ON sd.product_id = p.product_id WHERE s.closure_id = ? " +
                 "  UNION ALL " +
-                "  SELECT CONCAT('[DEV] ', COALESCE(p.name, 'Producto Eliminado')) as name, -rd.quantity, -rd.subtotal as amount "
+                "  SELECT CONCAT('[DEV] ', COALESCE(p.name, 'PRODUCT_DELETED')) as name, -rd.quantity, -rd.subtotal as amount "
                 +
                 "  FROM return_details rd JOIN returns r ON rd.return_id = r.return_id " +
                 "  LEFT JOIN products p ON rd.product_id = p.product_id WHERE r.closure_id = ?" +
@@ -210,7 +210,7 @@ public class JdbcCashClosureRepository implements ICashClosureRepository {
                 pstmt.setDouble(13, closure.getCashOut());
                 pstmt.setDouble(14, closure.getExpectedCash());
                 pstmt.setDouble(15, closure.getActualCash());
-                pstmt.setString(16, closure.getStatus() != null ? closure.getStatus() : "CUADRADO");
+                pstmt.setString(16, closure.getStatus() != null ? closure.getStatus() : "BALANCED");
                 if (closure.getReviewedBy() != null)
                     pstmt.setInt(17, closure.getReviewedBy());
                 else
@@ -223,7 +223,7 @@ public class JdbcCashClosureRepository implements ICashClosureRepository {
                         int closureId = generatedKeys.getInt(1);
                         closure.setClosureId(closureId);
                         // Register movement BEFORE marking session as closed to ensure traceability
-                        registerMovement(MovementType.CIERRE, closure.getTotalAll(), "Cierre de caja manual",
+                        registerMovement(MovementType.CIERRE, closure.getTotalAll(), "CLOSURE_MANUAL",
                                 closure.getUserId(), connection);
                         linkTransactionsToClosure(connection, closureId);
                         connection.commit(); // Commit transaction
@@ -372,8 +372,8 @@ public class JdbcCashClosureRepository implements ICashClosureRepository {
             pstmt.executeUpdate();
 
             String movementReason = (notes != null && !notes.trim().isEmpty())
-                    ? "Apertura: " + notes
-                    : "Apertura de caja";
+                    ? "OPENING: " + notes
+                    : "OPENING_AUTO";
             registerMovement(MovementType.APERTURA, initialAmount, movementReason, userId);
         }
     }
@@ -449,7 +449,7 @@ public class JdbcCashClosureRepository implements ICashClosureRepository {
 
     @Override
     public void markAsReviewed(int closureId, int reviewerId) throws SQLException {
-        String sql = "UPDATE cash_closures SET status = 'REVISADO', reviewed_by = ?, reviewed_at = CURRENT_TIMESTAMP WHERE closure_id = ?";
+        String sql = "UPDATE cash_closures SET status = 'REVIEWED', reviewed_by = ?, reviewed_at = CURRENT_TIMESTAMP WHERE closure_id = ?";
         try (Connection conn = DBConnection.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, reviewerId);
@@ -460,7 +460,7 @@ public class JdbcCashClosureRepository implements ICashClosureRepository {
 
     @Override
     public void markAsExcluded(int closureId, int reviewerId) throws SQLException {
-        String sql = "UPDATE cash_closures SET status = 'EXCLUIDO', reviewed_by = ?, reviewed_at = CURRENT_TIMESTAMP WHERE closure_id = ?";
+        String sql = "UPDATE cash_closures SET status = 'EXCLUDED', reviewed_by = ?, reviewed_at = CURRENT_TIMESTAMP WHERE closure_id = ?";
         try (Connection conn = DBConnection.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, reviewerId);
@@ -475,10 +475,10 @@ public class JdbcCashClosureRepository implements ICashClosureRepository {
         String sql = "UPDATE cash_closures SET " +
                 "actual_cash = ?, " +
                 "difference = ? - expected_cash, " +
-                "notes = CONCAT(IFNULL(notes, ''), '\n[Editado: ', ?, ' | Antiguo: ', ?, ' \u20ac]'), " +
+                "notes = CONCAT(IFNULL(notes, ''), '\n[EDITED: ', ?, ' | PREV: ', ?, ' \u20ac]'), " +
                 "reviewed_by = ?, " +
                 "reviewed_at = CURRENT_TIMESTAMP, " +
-                "status = CASE WHEN ABS(? - expected_cash) < 0.01 THEN 'CUADRADO' ELSE 'DESCUADRE' END " +
+                "status = CASE WHEN ABS(? - expected_cash) < 0.01 THEN 'BALANCED' ELSE 'DISCREPANCY' END " +
                 "WHERE closure_id = ?";
 
         try (Connection conn = DBConnection.getConnection();
@@ -494,3 +494,4 @@ public class JdbcCashClosureRepository implements ICashClosureRepository {
         }
     }
 }
+

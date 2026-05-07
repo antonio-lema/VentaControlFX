@@ -9,13 +9,13 @@ import com.mycompany.ventacontrolfx.domain.repository.IPriceRepository;
 import com.mycompany.ventacontrolfx.infrastructure.config.Injectable;
 import com.mycompany.ventacontrolfx.infrastructure.config.ServiceContainer;
 import com.mycompany.ventacontrolfx.shared.async.AsyncManager;
-import com.mycompany.ventacontrolfx.util.ServerPaginationHelper;
+import com.mycompany.ventacontrolfx.shared.util.ServerPaginationHelper;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
-import com.mycompany.ventacontrolfx.util.DateFilterUtils;
+import com.mycompany.ventacontrolfx.shared.util.DateFilterUtils;
 import javafx.beans.property.SimpleStringProperty;
 
 import java.time.LocalDateTime;
@@ -302,7 +302,7 @@ public class PriceListContentController implements Injectable {
 
     @FXML
     private void handleBack() {
-        container.getNavigationService().navigateTo("/view/price_lists.fxml");
+        container.getNavigationService().navigateTo("/view/dialog/price_lists.fxml");
     }
 
     @FXML
@@ -351,3 +351,6 @@ public class PriceListContentController implements Injectable {
         loadHistory();
     }
 }
+
+
+

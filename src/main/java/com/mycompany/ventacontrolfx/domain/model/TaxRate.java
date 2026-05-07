@@ -11,8 +11,21 @@ public class TaxRate {
     private LocalDateTime validFrom;
     private LocalDateTime validTo;
     private boolean active;
+    private TaxType taxType = TaxType.VAT;
+
+    public enum TaxType {
+        VAT, SURCHARGE, SPECIAL, OTHER
+    }
 
     public TaxRate() {
+    }
+
+    public TaxType getTaxType() {
+        return taxType;
+    }
+
+    public void setTaxType(TaxType taxType) {
+        this.taxType = taxType;
     }
 
     public int getTaxRateId() {
@@ -83,3 +96,4 @@ public class TaxRate {
         this.active = active;
     }
 }
+

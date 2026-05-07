@@ -31,3 +31,4 @@ public class SearchDebouncer {
         this.action = action;
     }
 }
+

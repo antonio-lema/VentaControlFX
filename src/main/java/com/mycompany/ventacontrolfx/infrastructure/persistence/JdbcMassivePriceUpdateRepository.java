@@ -869,3 +869,4 @@ public class JdbcMassivePriceUpdateRepository implements IMassivePriceUpdateRepo
         }
     }
 }
+

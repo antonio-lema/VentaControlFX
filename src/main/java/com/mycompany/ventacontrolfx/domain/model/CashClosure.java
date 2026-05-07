@@ -196,3 +196,4 @@ public class CashClosure {
         this.reviewedAt = reviewedAt;
     }
 }
+

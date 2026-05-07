@@ -136,3 +136,4 @@ public class JdbcPriceHistoryRepository implements IPriceHistoryRepository {
         return p;
     }
 }
+

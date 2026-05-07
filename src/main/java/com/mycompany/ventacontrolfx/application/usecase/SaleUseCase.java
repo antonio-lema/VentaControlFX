@@ -6,7 +6,7 @@ import com.mycompany.ventacontrolfx.domain.repository.ISaleRepository;
 import com.mycompany.ventacontrolfx.domain.repository.ICompanyConfigRepository;
 import com.mycompany.ventacontrolfx.domain.repository.IClientRepository;
 import com.mycompany.ventacontrolfx.infrastructure.persistence.DBConnection;
-import com.mycompany.ventacontrolfx.util.AuthorizationService;
+import com.mycompany.ventacontrolfx.infrastructure.security.AuthorizationService;
 import com.mycompany.ventacontrolfx.domain.repository.IDocumentSeriesRepository;
 import com.mycompany.ventacontrolfx.domain.service.TaxEngineService;
 
@@ -903,3 +903,4 @@ public class SaleUseCase {
         }
     }
 }
+

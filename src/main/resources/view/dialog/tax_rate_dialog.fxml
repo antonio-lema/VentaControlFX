@@ -2,78 +2,68 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
 <?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
-<?import java.net.URL?>
 
-<VBox xmlns:fx="http://javafx.com/fxml/1" fx:id="root" spacing="20" styleClass="modern-register-card" 
-      prefWidth="480" alignment="TOP_CENTER"
+<VBox spacing="15" styleClass="modal-container" prefWidth="480" stylesheets="@/styles/variables.css" 
+      xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" 
       fx:controller="com.mycompany.ventacontrolfx.presentation.controller.dialog.TaxRateDialogController">
-    
-    <stylesheets>
-        <URL value="@/styles/variables.css" />
-        <URL value="@/styles/components/botones.css" />
-        <URL value="@/styles/components/formularios.css" />
-    </stylesheets>
+    <padding>
+        <Insets top="24" right="32" bottom="24" left="32"/>
+    </padding>
 
-    <!-- Header -->
-    <VBox spacing="5" alignment="CENTER" style="-fx-padding: 30 0 10 0;">
-        <StackPane styleClass="estetica-card-icon-wrap, estetica-icon-green" maxWidth="50" maxHeight="50">
-            <FontAwesomeIconView glyphName="PERCENT" size="24" fill="#10b981"/>
+    <HBox alignment="CENTER_LEFT" spacing="15">
+        <StackPane styleClass="icon-container-blue" maxWidth="45" maxHeight="45" style="-fx-background-color: rgba(16, 185, 129, 0.1);">
+            <FontAwesomeIconView glyphName="PERCENT" size="20" fill="#10b981"/>
         </StackPane>
-        <Label text="Tasa Impositiva" styleClass="modern-register-title" />
-        <Label text="Configura el porcentaje para este tributo" styleClass="modern-register-subtitle" />
-    </VBox>
+        <VBox spacing="2">
+            <Label text="Tasa Impositiva" styleClass="modal-title"/>
+            <Label text="Configura el porcentaje para este tributo" styleClass="modal-subtitle"/>
+        </VBox>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Button onAction="#handleCancel" styleClass="button-ghost" text="&#x2715;" style="-fx-font-size: 16px;"/>
+    </HBox>
 
-    <!-- Body -->
-    <VBox spacing="18" style="-fx-padding: 0 40 30 40;">
-        
+    <Separator/>
+
+    <VBox spacing="20" VBox.vgrow="ALWAYS">
         <!-- Nombre -->
         <VBox spacing="8">
-            <Label text="Nombre:" styleClass="label" />
-            <HBox spacing="10" alignment="CENTER_LEFT" styleClass="modern-input-container">
-                <FontAwesomeIconView glyphName="TAG" size="16" fill="#64748b" />
-                <TextField fx:id="txtName" promptText="Ej: IVA 21%, RE 5.2%..." HBox.hgrow="ALWAYS" styleClass="modern-input-field" />
-            </HBox>
+            <Label text="Nombre" styleClass="text-sm, font-medium, text-gray-700" />
+            <TextField fx:id="txtName" promptText="Ej: IVA 21%, RE 5.2%..." styleClass="form-control" />
         </VBox>
 
         <!-- Valor -->
         <VBox spacing="8">
-            <Label text="Porcentaje (%):" styleClass="label" />
-            <HBox spacing="10" alignment="CENTER_LEFT" styleClass="modern-input-container">
-                <FontAwesomeIconView glyphName="CALCULATOR" size="16" fill="#64748b" />
-                <TextField fx:id="txtRate" promptText="Ej: 21.00" HBox.hgrow="ALWAYS" styleClass="modern-input-field" />
-            </HBox>
+            <Label text="Porcentaje (%)" styleClass="text-sm, font-medium, text-gray-700" />
+            <TextField fx:id="txtRate" promptText="Ej: 21.00" styleClass="form-control" />
         </VBox>
 
-        <!-- Pa&#x00ed;s -->
+        <!-- País -->
         <VBox spacing="8">
-            <Label text="Pa&#x00ed;s (ISO):" styleClass="label" />
-            <HBox spacing="10" alignment="CENTER_LEFT" styleClass="modern-input-container">
-                <FontAwesomeIconView glyphName="GLOBE" size="16" fill="#64748b" />
-                <TextField fx:id="txtCountry" promptText="Completa si aplica, Ej: ES" HBox.hgrow="ALWAYS" styleClass="modern-input-field" />
-            </HBox>
+            <Label text="País (ISO)" styleClass="text-sm, font-medium, text-gray-700" />
+            <TextField fx:id="txtCountry" promptText="Completa si aplica, Ej: ES" styleClass="form-control" />
         </VBox>
 
         <!-- Fecha Inicio -->
         <VBox spacing="8">
-            <Label text="Fecha de Inicio / Vigor:" styleClass="label" />
-            <HBox spacing="10" alignment="CENTER_LEFT" styleClass="modern-input-container">
-                <FontAwesomeIconView glyphName="CALENDAR" size="16" fill="#64748b" />
-                <DatePicker fx:id="dpStartDate" promptText="Seleccionar fecha" HBox.hgrow="ALWAYS" styleClass="modern-input-field" style="-fx-background-color: transparent;" />
-            </HBox>
+            <Label text="Fecha de Inicio / Vigor" styleClass="text-sm, font-medium, text-gray-700" />
+            <DatePicker fx:id="dpStartDate" promptText="Seleccionar fecha" maxWidth="Infinity" styleClass="form-control" />
         </VBox>
 
         <!-- Activo -->
-        <CheckBox fx:id="chkActive" text="Tasa activa para nuevos c&#x00e1;lculos" styleClass="permission-checkbox" />
-
-        <!-- Barra de acciones -->
-        <HBox spacing="15" alignment="CENTER_RIGHT" style="-fx-padding: 10 0 10 0;">
-            <Button text="CANCELAR" onAction="#handleCancel" styleClass="btn-secondary" prefHeight="45" prefWidth="120" />
-            <Button text="GUARDAR" onAction="#handleSave" styleClass="btn-primary" prefHeight="45" HBox.hgrow="ALWAYS" maxWidth="Infinity">
-                <graphic>
-                    <FontAwesomeIconView glyphName="CHECK_CIRCLE" size="18" fill="white" />
-                </graphic>
-            </Button>
-        </HBox>
+        <CheckBox fx:id="chkActive" text="Tasa activa para nuevos cálculos" styleClass="text-sm, font-medium, text-gray-800" />
     </VBox>
+
+    <Region VBox.vgrow="ALWAYS" minHeight="10"/>
+
+    <HBox spacing="10" alignment="CENTER_RIGHT">
+        <Button text="Cancelar" onAction="#handleCancel" styleClass="btn-secondary"/>
+        <Button text="Guardar Tasa" onAction="#handleSave" styleClass="btn-primary">
+            <graphic>
+                <FontAwesomeIconView glyphName="CHECK_CIRCLE" size="14" fill="white" />
+            </graphic>
+        </Button>
+    </HBox>
 </VBox>
+

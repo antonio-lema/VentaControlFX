@@ -4,7 +4,7 @@ import com.mycompany.ventacontrolfx.application.usecase.PriceListUseCase;
 import com.mycompany.ventacontrolfx.domain.model.PriceList;
 import com.mycompany.ventacontrolfx.infrastructure.config.Injectable;
 import com.mycompany.ventacontrolfx.infrastructure.config.ServiceContainer;
-import com.mycompany.ventacontrolfx.util.AlertUtil;
+import com.mycompany.ventacontrolfx.presentation.util.AlertUtil;
 import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
@@ -99,3 +99,4 @@ public class PriceListFormController implements Injectable {
         ((Stage) txtName.getScene().getWindow()).close();
     }
 }
+

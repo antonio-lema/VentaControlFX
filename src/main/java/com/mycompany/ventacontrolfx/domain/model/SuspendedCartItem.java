@@ -56,3 +56,4 @@ public class SuspendedCartItem {
         this.priceAtSuspension = priceAtSuspension;
     }
 }
+

@@ -83,3 +83,4 @@ public interface ISaleRepository {
         
         void updateFiscalStatus(int saleId, String status, String message, Connection conn) throws SQLException;
 }
+

@@ -29,3 +29,4 @@ public interface IDocumentSeriesRepository {
      */
     DocumentSeries findByCode(String seriesCode) throws SQLException;
 }
+

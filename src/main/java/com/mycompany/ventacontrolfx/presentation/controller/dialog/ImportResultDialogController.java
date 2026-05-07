@@ -52,3 +52,4 @@ public class ImportResultDialogController {
         return confirmed;
     }
 }
+

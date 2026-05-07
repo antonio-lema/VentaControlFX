@@ -7,3 +7,4 @@ public interface IAuditRepository {
 
     void logAccess(int userId, String action, String resource, String description) throws SQLException;
 }
+

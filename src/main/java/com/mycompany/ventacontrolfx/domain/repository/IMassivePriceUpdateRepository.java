@@ -29,3 +29,4 @@ public interface IMassivePriceUpdateRepository {
     void cloneAndAdjustPriceList(int sourceId, int targetId, double multiplier, String reason, LocalDateTime startDate, Integer logId) throws SQLException;
     void updateLogIdForPricesAtTimestamp(int priceListId, java.time.LocalDateTime timestamp, int logId) throws SQLException;
 }
+

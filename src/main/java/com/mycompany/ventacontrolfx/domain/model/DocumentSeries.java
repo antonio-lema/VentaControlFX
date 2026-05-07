@@ -76,3 +76,4 @@ public class DocumentSeries {
         return String.format("%s%05d", prefix, number);
     }
 }
+

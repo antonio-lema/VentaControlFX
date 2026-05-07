@@ -12,3 +12,4 @@ public interface IPriceHistoryRepository {
     List<PriceUpdateLogDTO> findBulkUpdateLog(int priceListId) throws SQLException;
     String getAveragePercentageDifference(int priceListId) throws SQLException;
 }
+

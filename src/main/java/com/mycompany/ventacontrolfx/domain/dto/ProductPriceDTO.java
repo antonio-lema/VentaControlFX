@@ -108,3 +108,4 @@ public class ProductPriceDTO {
         return String.format("%.1f%%", diff);
     }
 }
+

@@ -7,10 +7,10 @@ import java.util.List;
 
 public class ClientUseCase {
     private final IClientRepository repository;
-    private final com.mycompany.ventacontrolfx.util.AuthorizationService authService;
+    private final com.mycompany.ventacontrolfx.infrastructure.security.AuthorizationService authService;
 
     public ClientUseCase(IClientRepository repository,
-            com.mycompany.ventacontrolfx.util.AuthorizationService authService) {
+            com.mycompany.ventacontrolfx.infrastructure.security.AuthorizationService authService) {
         this.repository = repository;
         this.authService = authService;
     }
@@ -49,3 +49,5 @@ public class ClientUseCase {
         return repository.getById(id);
     }
 }
+
+

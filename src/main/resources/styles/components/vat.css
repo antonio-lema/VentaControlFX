@@ -1,0 +1,74 @@
+/* ── VAT Management Styles ────────────────────────────────────────── */
+
+.vat-banner {
+    -fx-background-color: #fef3c7;
+    -fx-border-color: #f59e0b;
+    -fx-border-width: 0 0 0 4;
+    -fx-padding: 12 16;
+}
+
+.vat-card {
+    -fx-background-color: -fx-bg-surface;
+    -fx-border-color: -fx-color-border-main;
+    -fx-border-radius: 12;
+    -fx-background-radius: 12;
+    -fx-padding: 20;
+    -fx-spacing: 15;
+    -fx-effect: dropshadow(three-pass-box, -fx-shadow-color-subtle, 8, 0, 0, 2);
+}
+
+.vat-tab-header {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -fx-text-custom-main;
+}
+
+.vat-mass-step {
+    -fx-background-color: #f8fafc;
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 10;
+    -fx-padding: 20;
+    -fx-spacing: 15;
+}
+
+.vat-mass-step-number {
+    -fx-background-color: -fx-custom-color-primary;
+    -fx-text-fill: white;
+    -fx-min-width: 24;
+    -fx-min-height: 24;
+    -fx-background-radius: 12;
+    -fx-alignment: center;
+    -fx-font-weight: bold;
+    -fx-font-size: 12px;
+}
+
+.vat-mass-step-title {
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -fx-text-custom-main;
+}
+
+.vat-status-badge {
+    -fx-padding: 2 8;
+    -fx-background-radius: 12;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+}
+
+.vat-status-active {
+    -fx-background-color: #dcfce7;
+    -fx-text-fill: #15803d;
+}
+
+.vat-status-inactive {
+    -fx-background-color: #f1f5f9;
+    -fx-text-fill: #64748b;
+}
+
+.vat-list-selected {
+    -fx-background-color: #eff6ff;
+    -fx-border-color: #3b82f6;
+    -fx-border-width: 1;
+    -fx-border-radius: 6;
+    -fx-padding: 10;
+}

@@ -2,29 +2,31 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
 <?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
-<?import java.net.URL?>
 
-<VBox xmlns:fx="http://javafx.com/fxml/1" fx:id="root" spacing="20" styleClass="modern-register-card" 
-      prefWidth="650" alignment="TOP_CENTER"
-      fx:controller="com.mycompany.ventacontrolfx.presentation.controller.dialog.CashClosingController">
-    
-    <stylesheets>
-        <URL value="@/styles/variables.css" />
-        <URL value="@/styles/components/botones.css" />
-        <URL value="@/styles/components/formularios.css" />
-    </stylesheets>
+<VBox spacing="15" styleClass="modal-container" prefWidth="680" stylesheets="@/styles/variables.css" 
+      xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" 
+      fx:controller="com.mycompany.ventacontrolfx.presentation.controller.closure.CashClosingController">
+    <padding>
+        <Insets top="24" right="32" bottom="24" left="32"/>
+    </padding>
 
-    <VBox spacing="5" alignment="CENTER" style="-fx-padding: 30 0 10 0;">
-        <StackPane styleClass="estetica-card-icon-wrap, estetica-icon-purple" maxWidth="50" maxHeight="50">
-            <FontAwesomeIconView glyphName="CALCULATOR" size="24" fill="#8b5cf6"/>
+    <HBox alignment="CENTER_LEFT" spacing="15">
+        <StackPane styleClass="icon-container-blue" maxWidth="45" maxHeight="45" style="-fx-background-color: rgba(139, 92, 246, 0.1);">
+            <FontAwesomeIconView glyphName="CALCULATOR" size="20" fill="#8b5cf6"/>
         </StackPane>
-        <Label text="Arqueo y Cierre de Caja" styleClass="modern-register-title" />
-        <Label text="Finaliza la jornada comparando el efectivo real" styleClass="modern-register-subtitle" />
-    </VBox>
+        <VBox spacing="2">
+            <Label text="Arqueo y Cierre de Caja" styleClass="modal-title"/>
+            <Label text="Finaliza la jornada comparando el efectivo real" styleClass="modal-subtitle"/>
+        </VBox>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Button onAction="#handleCancel" styleClass="button-ghost" text="&#x2715;" style="-fx-font-size: 16px;"/>
+    </HBox>
 
-    <VBox spacing="20" style="-fx-padding: 0 40 30 40;">
-        
+    <Separator/>
+
+    <VBox spacing="20" VBox.vgrow="ALWAYS">
         <!-- Grid de Comparativa -->
         <GridPane hgap="30" vgap="15">
             <columnConstraints>
@@ -35,69 +37,68 @@
             <!-- Detalle Izquierda -->
             <VBox spacing="10" GridPane.columnIndex="0" GridPane.rowIndex="0" GridPane.rowSpan="2" 
                   style="-fx-background-color: #f8fafc; -fx-padding: 20; -fx-background-radius: 12; -fx-border-color: #e2e8f0; -fx-border-width: 1; -fx-border-radius: 12;">
-                <Label text="DETALLE DEL ARQUEO" style="-fx-font-weight: 900; -fx-font-size: 12px; -fx-text-fill: -color-primary; -fx-padding: 0 0 5 0;" />
+                <Label text="DETALLE DEL ARQUEO" style="-fx-font-weight: 900; -fx-font-size: 11px; -fx-text-fill: -color-primary; -fx-padding: 0 0 5 0; -fx-letter-spacing: 0.5px;" />
                 
                 <HBox alignment="CENTER_LEFT" spacing="10">
-                    <Label text="Fondo Inicial:" styleClass="label-muted" minWidth="140" />
-                    <Label fx:id="lblInitFund" text="0,00 &#x20ac;" style="-fx-font-weight: bold;" HBox.hgrow="ALWAYS" maxWidth="Infinity" alignment="CENTER_RIGHT" />
+                    <Label text="Fondo Inicial" styleClass="text-sm, text-gray-500" minWidth="140" />
+                    <Label fx:id="lblInitFund" text="0,00 &#x20ac;" style="-fx-font-weight: bold; -fx-font-size: 13px;" HBox.hgrow="ALWAYS" maxWidth="Infinity" alignment="CENTER_RIGHT" />
                 </HBox>
                 <HBox alignment="CENTER_LEFT" spacing="10">
-                    <Label text="Ventas (+):" styleClass="label-muted" minWidth="140" />
-                    <Label fx:id="lblSales" text="0,00 &#x20ac;" style="-fx-text-fill: #16a34a; -fx-font-weight: bold;" HBox.hgrow="ALWAYS" maxWidth="Infinity" alignment="CENTER_RIGHT" />
+                    <Label text="Ventas (+)" styleClass="text-sm, text-gray-500" minWidth="140" />
+                    <Label fx:id="lblSales" text="0,00 &#x20ac;" style="-fx-text-fill: #16a34a; -fx-font-weight: bold; -fx-font-size: 13px;" HBox.hgrow="ALWAYS" maxWidth="Infinity" alignment="CENTER_RIGHT" />
                 </HBox>
                 <HBox alignment="CENTER_LEFT" spacing="10">
-                    <Label text="Otros Ingresos (+):" styleClass="label-muted" minWidth="140" />
-                    <Label fx:id="lblCashIn" text="0,00 &#x20ac;" HBox.hgrow="ALWAYS" maxWidth="Infinity" alignment="CENTER_RIGHT" />
+                    <Label text="Otros Ingresos (+)" styleClass="text-sm, text-gray-500" minWidth="140" />
+                    <Label fx:id="lblCashIn" text="0,00 &#x20ac;" style="-fx-font-weight: 500; -fx-font-size: 13px;" HBox.hgrow="ALWAYS" maxWidth="Infinity" alignment="CENTER_RIGHT" />
                 </HBox>
                 <HBox alignment="CENTER_LEFT" spacing="10">
-                    <Label text="Devoluciones (-):" styleClass="label-muted" minWidth="140" />
-                    <Label fx:id="lblReturns" text="0,00 &#x20ac;" style="-fx-text-fill: #ef4444; -fx-font-weight: bold;" HBox.hgrow="ALWAYS" maxWidth="Infinity" alignment="CENTER_RIGHT" />
+                    <Label text="Devoluciones (-)" styleClass="text-sm, text-gray-500" minWidth="140" />
+                    <Label fx:id="lblReturns" text="0,00 &#x20ac;" style="-fx-text-fill: #ef4444; -fx-font-weight: bold; -fx-font-size: 13px;" HBox.hgrow="ALWAYS" maxWidth="Infinity" alignment="CENTER_RIGHT" />
                 </HBox>
                 <HBox alignment="CENTER_LEFT" spacing="10">
-                    <Label text="Retiradas (-):" styleClass="label-muted" minWidth="140" />
-                    <Label fx:id="lblCashOut" text="0,00 &#x20ac;" HBox.hgrow="ALWAYS" maxWidth="Infinity" alignment="CENTER_RIGHT" />
+                    <Label text="Retiradas (-)" styleClass="text-sm, text-gray-500" minWidth="140" />
+                    <Label fx:id="lblCashOut" text="0,00 &#x20ac;" style="-fx-font-weight: 500; -fx-font-size: 13px;" HBox.hgrow="ALWAYS" maxWidth="Infinity" alignment="CENTER_RIGHT" />
                 </HBox>
                 
                 <Separator style="-fx-padding: 10 0;" />
                 
                 <VBox spacing="2">
-                    <Label text="Efectivo Esperado:" styleClass="label-muted" />
-                    <Label fx:id="lblExpected" text="0,00 &#x20ac;" style="-fx-font-size: 20px; -fx-font-weight: 900; -fx-text-fill: -color-primary;" />
+                    <Label text="Efectivo Esperado" styleClass="text-xs, text-gray-500" />
+                    <Label fx:id="lblExpected" text="0,00 &#x20ac;" style="-fx-font-size: 22px; -fx-font-weight: 900; -fx-text-fill: -color-primary;" />
                 </VBox>
             </VBox>
 
             <!-- Real (Input destacado) -->
             <VBox spacing="8" GridPane.columnIndex="1" GridPane.rowIndex="0">
-                <Label text="Efectivo Real Contado (&#x20ac;):" styleClass="label" />
-                <HBox spacing="10" alignment="CENTER_LEFT" styleClass="modern-input-container">
-                    <FontAwesomeIconView glyphName="MONEY" size="20" fill="#22c55e" />
-                    <TextField fx:id="txtActualAmount" promptText="0,00" HBox.hgrow="ALWAYS" styleClass="modern-input-field" style="-fx-font-size: 22px; -fx-font-weight: 900; -fx-text-fill: -fx-text-custom-main;" />
-                </HBox>
+                <Label text="Efectivo Real Contado (&#x20ac;)" styleClass="text-sm, font-medium, text-gray-700" />
+                <TextField fx:id="txtActualAmount" promptText="0,00" styleClass="form-control" style="-fx-font-size: 20px; -fx-font-weight: bold;" />
             </VBox>
 
             <!-- Diferencia -->
             <VBox spacing="5" GridPane.columnIndex="1" GridPane.rowIndex="1" 
-                  alignment="CENTER" style="-fx-background-color: #f8fafc; -fx-padding: 15; -fx-background-radius: 12;">
-                <Label text="Diferencia / Descuadre" styleClass="label-muted" />
-                <Label fx:id="lblDifference" text="0,00 &#x20ac;" style="-fx-font-size: 24px; -fx-font-weight: 900; -fx-text-fill: #10b981;" />
-                <Label fx:id="lblDiffReason" text="&#x2705; Caja cuadrada perfectamente" styleClass="trend-text" style="-fx-text-fill: #16a34a; -fx-font-weight: bold;" />
+                  alignment="CENTER" style="-fx-background-color: #f8fafc; -fx-padding: 15; -fx-background-radius: 12; -fx-border-color: #e2e8f0; -fx-border-width: 1;">
+                <Label text="Diferencia / Descuadre" styleClass="text-xs, text-gray-500" />
+                <Label fx:id="lblDifference" text="0,00 &#x20ac;" style="-fx-font-size: 26px; -fx-font-weight: 900; -fx-text-fill: #10b981;" />
+                <Label fx:id="lblDiffReason" text="&#x2705; Caja cuadrada perfectamente" style="-fx-text-fill: #16a34a; -fx-font-weight: bold; -fx-font-size: 11px;" />
             </VBox>
         </GridPane>
 
         <!-- Observaciones / Notas -->
         <VBox spacing="8">
-            <Label text="Observaciones / Justificaci&#x00f3;n:" styleClass="label" />
-            <TextArea fx:id="txtNotes" promptText="Motivo del descuadre, incidencias..." prefRowCount="3" wrapText="true" styleClass="text-field" />
+            <Label text="Observaciones / Justificación" styleClass="text-sm, font-medium, text-gray-700" />
+            <TextArea fx:id="txtNotes" promptText="Motivo del descuadre, incidencias..." prefHeight="80" wrapText="true" styleClass="form-control" />
         </VBox>
-
-        <!-- Botones de Acci&#x00f3;n -->
-        <HBox spacing="15" alignment="CENTER_RIGHT" style="-fx-padding: 10 0 0 0;">
-            <Button text="CANCELAR" onAction="#handleCancel" styleClass="btn-secondary" prefHeight="50" prefWidth="140" />
-            <Button text="CONFIRMAR CIERRE" onAction="#handleClose" styleClass="btn-primary" prefHeight="50" HBox.hgrow="ALWAYS" maxWidth="Infinity">
-                <graphic>
-                    <FontAwesomeIconView glyphName="CHECK_CIRCLE" size="18" fill="white" />
-                </graphic>
-            </Button>
-        </HBox>
     </VBox>
+
+    <Region VBox.vgrow="ALWAYS" minHeight="10"/>
+
+    <HBox spacing="10" alignment="CENTER_RIGHT">
+        <Button text="Cancelar" onAction="#handleCancel" styleClass="btn-secondary"/>
+        <Button text="Confirmar Cierre" onAction="#handleClose" styleClass="btn-primary">
+            <graphic>
+                <FontAwesomeIconView glyphName="CHECK_CIRCLE" size="14" fill="white" />
+            </graphic>
+        </Button>
+    </HBox>
 </VBox>
+

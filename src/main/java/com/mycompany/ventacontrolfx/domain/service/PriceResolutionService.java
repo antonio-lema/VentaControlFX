@@ -60,3 +60,4 @@ public class PriceResolutionService {
         return resolvePrice(productId, listId);
     }
 }
+

@@ -82,3 +82,4 @@ public class JdbcAppSettingsRepository implements IAppSettingsRepository {
         return settings;
     }
 }
+

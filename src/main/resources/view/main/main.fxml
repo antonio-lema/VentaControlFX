@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.*?>
+
+<!--
+    Layout:
+    [Sidebar (full-height) &#x2502; Header (abarca contenido + carrito)  ]
+    [                      &#x2502; Contenido principal   &#x2502; Carrito panel ]
+-->
+<BorderPane xmlns:fx="http://javafx.com/fxml/1"
+            fx:id="rootPane"
+            fx:controller="com.mycompany.ventacontrolfx.presentation.controller.main.MainController"
+            prefWidth="1200" prefHeight="800"
+            styleClass="main-background">
+
+    <!-- Sidebar: full height, totalmente independiente del header -->
+    <left>
+        <StackPane fx:id="sidebarContainer" />
+    </left>
+
+    <!-- Derecha: BorderPane con header arriba abarcando contenido + carrito -->
+    <center>
+        <BorderPane>
+
+            <!-- Header: ocupa todo el ancho derecho (contenido + carrito) -->
+            <top>
+                <StackPane fx:id="headerContainer" />
+            </top>
+
+            <!-- Contenido principal (centro) -->
+            <center>
+                <StackPane>
+                    <ScrollPane fx:id="mainContent" fitToHeight="true" fitToWidth="true" styleClass="main-content-scroll">
+                        <!-- Main view content will be injected here -->
+                    </ScrollPane>
+
+                    <!-- Loading Overlay -->
+                    <VBox fx:id="loadingOverlay" visible="false" alignment="CENTER" styleClass="loading-overlay">
+                        <ProgressIndicator />
+                        <Label text="Cargando..." styleClass="label-muted"/>
+                    </VBox>
+                </StackPane>
+            </center>
+
+            <!-- Carrito: dentro del BorderPane anidado, bajo el header -->
+            <right>
+                <StackPane fx:id="cartContainer" style="-fx-background-color: transparent;">
+                    <BorderPane.margin>
+                        <Insets top="25" right="25" bottom="25" left="25"/>
+                    </BorderPane.margin>
+                </StackPane>
+            </right>
+
+        </BorderPane>
+    </center>
+
+</BorderPane>

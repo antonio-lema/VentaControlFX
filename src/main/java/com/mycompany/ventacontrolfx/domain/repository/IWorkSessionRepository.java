@@ -17,3 +17,4 @@ public interface IWorkSessionRepository {
 
     List<WorkSession> getHistoryByDate(java.time.LocalDate date);
 }
+

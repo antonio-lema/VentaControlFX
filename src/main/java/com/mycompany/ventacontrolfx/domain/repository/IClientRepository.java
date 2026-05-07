@@ -19,3 +19,4 @@ public interface IClientRepository {
 
     Client getById(int id) throws SQLException;
 }
+

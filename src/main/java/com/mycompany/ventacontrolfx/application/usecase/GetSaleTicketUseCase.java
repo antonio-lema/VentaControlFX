@@ -33,3 +33,4 @@ public class GetSaleTicketUseCase {
         return sale;
     }
 }
+

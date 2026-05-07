@@ -107,3 +107,4 @@ public class CartItem {
         return Math.max(0, Math.round(rawTotal * 100.0) / 100.0);
     }
 }
+

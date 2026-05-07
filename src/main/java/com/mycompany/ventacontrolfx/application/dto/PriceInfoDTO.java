@@ -47,3 +47,4 @@ public class PriceInfoDTO {
         return String.format("%.2f \u20ac (%s)", value, priceListName);
     }
 }
+

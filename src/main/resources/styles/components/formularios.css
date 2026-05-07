@@ -9,8 +9,8 @@
 .modern-combo-box {
     -fx-background-color: -fx-bg-surface;
     -fx-border-color: -fx-color-border-subtle;
-    -fx-border-radius: 8px;
-    -fx-background-radius: 8px;
+    -fx-border-radius: -fx-radius-md;
+    -fx-background-radius: -fx-radius-md;
     -fx-text-fill: -fx-text-custom-main;
     -fx-padding: 12 15;
     -fx-font-size: 14px;

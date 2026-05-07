@@ -145,3 +145,4 @@ public class JdbcWorkSessionRepository implements IWorkSessionRepository {
         return session;
     }
 }
+

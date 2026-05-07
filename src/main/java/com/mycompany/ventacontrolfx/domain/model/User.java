@@ -183,9 +183,7 @@ public class User {
             return false;
 
         // 1. Administrador Global siempre tiene todo
-        if (this.role != null && (this.role.equalsIgnoreCase("Administrador") ||
-                this.role.equalsIgnoreCase("admin") ||
-                this.role.equalsIgnoreCase("SUPERADMIN")))
+        if (isAdmin())
             return true;
 
         // 2. Comprobar permisos globales (Rol + Individuales)
@@ -207,4 +205,11 @@ public class User {
         return false;
     }
 
+    public boolean isAdmin() {
+        return this.role != null && (this.role.equalsIgnoreCase("Administrador") ||
+                this.role.equalsIgnoreCase("admin") ||
+                this.role.equalsIgnoreCase("SUPERADMIN"));
+    }
+
 }
+

@@ -2,60 +2,62 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
 <?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
-<?import java.net.URL?>
 
-<VBox xmlns:fx="http://javafx.com/fxml/1" fx:id="root" spacing="15" styleClass="modern-register-card" 
-      prefWidth="450" alignment="TOP_CENTER"
-      fx:controller="com.mycompany.ventacontrolfx.presentation.controller.dialog.CashOpeningController">
-    
-    <stylesheets>
-        <URL value="@/styles/variables.css" />
-        <URL value="@/styles/components/botones.css" />
-        <URL value="@/styles/components/formularios.css" />
-    </stylesheets>
+<VBox spacing="15" styleClass="modal-container" prefWidth="450" stylesheets="@/styles/variables.css" 
+      xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" 
+      fx:controller="com.mycompany.ventacontrolfx.presentation.controller.closure.CashOpeningController">
+    <padding>
+        <Insets top="24" right="32" bottom="24" left="32"/>
+    </padding>
 
-    <VBox spacing="5" alignment="CENTER" style="-fx-padding: 20 0 5 0;">
-        <StackPane styleClass="estetica-card-icon-wrap, estetica-icon-blue" maxWidth="45" maxHeight="45">
-            <FontAwesomeIconView glyphName="KEY" size="22" fill="#3b82f6"/>
+    <HBox alignment="CENTER_LEFT" spacing="15">
+        <StackPane styleClass="icon-container-blue" maxWidth="45" maxHeight="45">
+            <FontAwesomeIconView glyphName="KEY" size="20" fill="#1e88e5"/>
         </StackPane>
-        <Label text="Apertura de Jornada" styleClass="modern-register-title" style="-fx-font-size: 22px;" />
-        <Label text="Introduce el fondo de caja para iniciar" styleClass="modern-register-subtitle" />
-    </VBox>
+        <VBox spacing="2">
+            <Label text="Apertura de Jornada" styleClass="modal-title"/>
+            <Label text="Introduce el fondo de caja para iniciar" styleClass="modal-subtitle"/>
+        </VBox>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Button onAction="#handleCancel" styleClass="button-ghost" text="&#x2715;" style="-fx-font-size: 16px;"/>
+    </HBox>
 
-    <VBox spacing="12" style="-fx-padding: 0 35 25 35;">
-        <!-- Informaci&#x00f3;n informativa -->
-        <HBox spacing="10" alignment="CENTER_LEFT" styleClass="info-banner" style="-fx-background-color: #f0f7ff; -fx-padding: 10; -fx-background-radius: 8;">
-            <FontAwesomeIconView glyphName="INFO_CIRCLE" size="14" fill="#3b82f6" />
-            <VBox>
-                <Label text="Saldo del &#x00fa;ltimo cierre:" styleClass="label-muted" />
-                <Label fx:id="lblLastClosure" text="0,00 &#x20ac;" style="-fx-font-weight: bold; -fx-text-fill: #1e40af;" />
+    <Separator/>
+
+    <VBox spacing="20" VBox.vgrow="ALWAYS">
+        <!-- Información informativa -->
+        <HBox spacing="12" alignment="CENTER_LEFT" style="-fx-background-color: #f0f7ff; -fx-padding: 12; -fx-background-radius: 12; -fx-border-color: #bee3f8; -fx-border-width: 1;">
+            <FontAwesomeIconView glyphName="INFO_CIRCLE" size="16" fill="#3182ce" />
+            <VBox spacing="2">
+                <Label text="Saldo del último cierre" styleClass="text-xs, text-gray-500" />
+                <Label fx:id="lblLastClosure" text="0,00 &#x20ac;" style="-fx-font-weight: 800; -fx-text-fill: #2c5282; -fx-font-size: 15px;" />
             </VBox>
         </HBox>
 
         <!-- Input Fondo Inicial -->
-        <VBox spacing="6">
-            <Label text="Fondo Inicial (&#x20ac;):" styleClass="label" />
-            <HBox spacing="10" alignment="CENTER_LEFT" styleClass="modern-input-container">
-                <FontAwesomeIconView glyphName="MONEY" size="16" fill="#94a3b8" />
-                <TextField fx:id="txtInitialAmount" promptText="0,00" HBox.hgrow="ALWAYS" styleClass="modern-input-field" style="-fx-font-size: 18px; -fx-font-weight: bold;" />
-            </HBox>
+        <VBox spacing="8">
+            <Label text="Fondo Inicial (&#x20ac;)" styleClass="text-sm, font-medium, text-gray-700" />
+            <TextField fx:id="txtInitialAmount" promptText="0,00" styleClass="form-control" style="-fx-font-size: 18px; -fx-font-weight: bold;" />
         </VBox>
 
         <!-- Observaciones -->
-        <VBox spacing="6">
-            <Label text="Notas de Apertura:" styleClass="label" />
-            <TextArea fx:id="txtNotes" promptText="Opcional. Ej: Monedas de 1&#x20ac; extra..." prefRowCount="2" wrapText="true" styleClass="text-field" />
+        <VBox spacing="8">
+            <Label text="Notas de Apertura" styleClass="text-sm, font-medium, text-gray-700" />
+            <TextArea fx:id="txtNotes" promptText="Opcional. Ej: Monedas de 1€ extra..." prefHeight="70" wrapText="true" styleClass="form-control" />
         </VBox>
-
-        <!-- Botones de Acci&#x00f3;n -->
-        <HBox spacing="15" alignment="CENTER_RIGHT" style="-fx-padding: 5 0 0 0;">
-            <Button text="CANCELAR" onAction="#handleCancel" styleClass="btn-secondary" prefHeight="40" prefWidth="110" />
-            <Button text="ABRIR CAJA" onAction="#handleOpen" styleClass="btn-success" prefHeight="40" HBox.hgrow="ALWAYS" maxWidth="Infinity">
-                <graphic>
-                    <FontAwesomeIconView glyphName="CHECK_CIRCLE" size="16" fill="white" />
-                </graphic>
-            </Button>
-        </HBox>
     </VBox>
+
+    <Region VBox.vgrow="ALWAYS" minHeight="10"/>
+
+    <HBox spacing="10" alignment="CENTER_RIGHT">
+        <Button text="Cancelar" onAction="#handleCancel" styleClass="btn-secondary"/>
+        <Button text="Abrir Caja" onAction="#handleOpen" styleClass="btn-primary">
+            <graphic>
+                <FontAwesomeIconView glyphName="CHECK_CIRCLE" size="14" fill="white" />
+            </graphic>
+        </Button>
+    </HBox>
 </VBox>
+

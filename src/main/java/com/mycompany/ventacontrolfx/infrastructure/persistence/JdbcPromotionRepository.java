@@ -242,3 +242,4 @@ public class JdbcPromotionRepository implements IPromotionRepository {
         return p;
     }
 }
+

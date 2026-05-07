@@ -53,6 +53,11 @@ public class JdbcCompanyConfigRepository implements ICompanyConfigRepository {
     private static final String K_SMTP_PORT = "smtp_port";
     private static final String K_EMAIL_FROM = "email_from";
     private static final String K_EMAIL_PASS = "email_password";
+    private static final String K_VERIFACTU_NIF = "verifactu.nif";
+    private static final String K_VERIFACTU_CERT_NAME = "verifactu.cert_name";
+    private static final String K_VERIFACTU_CERT_PATH = "verifactu.cert_path";
+    private static final String K_VERIFACTU_CERT_PASS = "verifactu.cert_pass";
+    private static final String K_VERIFACTU_URL = "verifactu.url";
 
     private static SaleConfig cachedConfig = null;
 
@@ -116,6 +121,11 @@ public class JdbcCompanyConfigRepository implements ICompanyConfigRepository {
         cfg.setSmtpPort(getFromCache(cache, K_SMTP_PORT, d.getSmtpPort()));
         cfg.setEmailFrom(getFromCache(cache, K_EMAIL_FROM, d.getEmailFrom()));
         cfg.setEmailPassword(getFromCache(cache, K_EMAIL_PASS, d.getEmailPassword()));
+        cfg.setVerifactuNif(getFromCache(cache, K_VERIFACTU_NIF, d.getVerifactuNif()));
+        cfg.setVerifactuCertName(getFromCache(cache, K_VERIFACTU_CERT_NAME, d.getVerifactuCertName()));
+        cfg.setVerifactuCertPath(getFromCache(cache, K_VERIFACTU_CERT_PATH, d.getVerifactuCertPath()));
+        cfg.setVerifactuCertPass(getFromCache(cache, K_VERIFACTU_CERT_PASS, d.getVerifactuCertPass()));
+        cfg.setVerifactuUrl(getFromCache(cache, K_VERIFACTU_URL, d.getVerifactuUrl()));
 
         // Cargar horario semanal din\u00e1mico
         List<BusinessDay> schedule = new ArrayList<>();
@@ -242,6 +252,11 @@ public class JdbcCompanyConfigRepository implements ICompanyConfigRepository {
         setValue(K_SMTP_PORT, orEmpty(cfg.getSmtpPort()));
         setValue(K_EMAIL_FROM, orEmpty(cfg.getEmailFrom()));
         setValue(K_EMAIL_PASS, orEmpty(cfg.getEmailPassword()));
+        setValue(K_VERIFACTU_NIF, orEmpty(cfg.getVerifactuNif()));
+        setValue(K_VERIFACTU_CERT_NAME, orEmpty(cfg.getVerifactuCertName()));
+        setValue(K_VERIFACTU_CERT_PATH, orEmpty(cfg.getVerifactuCertPath()));
+        setValue(K_VERIFACTU_CERT_PASS, orEmpty(cfg.getVerifactuCertPass()));
+        setValue(K_VERIFACTU_URL, orEmpty(cfg.getVerifactuUrl()));
 
         // Guardar horario semanal din\u00e1mico
         if (cfg.getSchedule() != null) {
@@ -338,3 +353,4 @@ public class JdbcCompanyConfigRepository implements ICompanyConfigRepository {
         return val != null ? val : "";
     }
 }
+

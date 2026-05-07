@@ -15,3 +15,4 @@ public interface IAppSettingsRepository {
 
     Map<String, String> getAllSettings() throws SQLException;
 }
+

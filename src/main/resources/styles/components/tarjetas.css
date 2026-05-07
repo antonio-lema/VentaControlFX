@@ -8,10 +8,10 @@
 /* ─── Card contenedor ──────────────────────────────────── */
 .product-box {
     -fx-background-color: -fx-bg-surface;
-    -fx-background-radius: 16px;
+    -fx-background-radius: -fx-radius-lg;
     -fx-border-color: -fx-color-border-main;
-    -fx-border-width: 1px;
-    -fx-border-radius: 16px;
+    -fx-border-width: -fx-card-border-width;
+    -fx-border-radius: -fx-radius-lg;
     -fx-padding: 0px;
     -fx-cursor: hand;
     -fx-effect: -fx-card-shadow;
@@ -80,13 +80,13 @@
 }
 
 .product-name {
-    -fx-font-size: 13.5px;
+    -fx-font-size: 14px;
     -fx-text-fill: -fx-text-custom-cards;
     -fx-font-weight: 700;
 }
 
 .product-description {
-    -fx-font-size: 11.5px;
+    -fx-font-size: 12px;
     -fx-text-fill: -fx-text-custom-cards-muted;
     -fx-font-weight: 400;
 }
@@ -162,7 +162,7 @@
 .user-name-label {
     -fx-text-fill: -fx-text-custom-main;
     -fx-font-weight: 800;
-    -fx-font-size: 22px;
+    -fx-font-size: 26px;
 }
 
 .user-username-label {

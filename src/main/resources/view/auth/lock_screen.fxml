@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.shape.Circle?>
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
+
+<StackPane styleClass="lock-screen-root"
+           xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="com.mycompany.ventacontrolfx.presentation.controller.auth.LockScreenController">
+    <VBox alignment="CENTER" spacing="20" styleClass="lock-screen-glass" maxWidth="380" maxHeight="-Infinity">
+        <padding>
+            <Insets bottom="40" left="40" right="40" top="40" />
+        </padding>
+
+        <!-- User Avatar -->
+        <StackPane>
+            <Circle radius="45" styleClass="user-avatar-circle"/>
+            <FontAwesomeIconView glyphName="USER" size="35" styleClass="sidebar-icon"/>
+            <!-- Lock Icon Badge -->
+            <StackPane alignment="CENTER" maxWidth="28" maxHeight="28"
+                       translateX="30" translateY="30" styleClass="lock-badge">
+                <FontAwesomeIconView glyphName="LOCK" size="14" styleClass="sidebar-icon"/>
+            </StackPane>
+        </StackPane>
+
+        <VBox alignment="CENTER" spacing="5">
+            <Label text="%lock.title" styleClass="lock-title"/>
+            <Label fx:id="lblUsername" text="%lock.default_user" styleClass="lock-username"/>
+        </VBox>
+
+        <VBox spacing="8" maxWidth="300" alignment="CENTER_LEFT" style="-fx-padding: 20 0 10 0;">
+            <Label text="%lock.input_label" styleClass="lock-input-label"/>
+            <PasswordField fx:id="passwordField" promptText="%lock.input_prompt"
+                           styleClass="lock-field" onAction="#handleUnlock"/>
+            <Label fx:id="lblError" styleClass="modern-error-label" visible="false" managed="false"/>
+        </VBox>
+
+        <Button text="%lock.btn_unlock" onAction="#handleUnlock"
+                styleClass="btn-unlock" maxWidth="300" prefHeight="45" defaultButton="true"/>
+
+        <Button text="%lock.btn_change_user" onAction="#handleChangeUser"
+                styleClass="btn-change-user" maxWidth="200"/>
+
+    </VBox>
+</StackPane>

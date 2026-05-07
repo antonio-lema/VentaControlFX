@@ -142,3 +142,4 @@ public class JdbcPermissionRepository implements IPermissionRepository {
                 rs.getString("description"));
     }
 }
+

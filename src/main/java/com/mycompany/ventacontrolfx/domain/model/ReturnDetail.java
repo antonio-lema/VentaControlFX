@@ -95,3 +95,4 @@ public class ReturnDetail {
         this.netAmount = netAmount;
     }
 }
+

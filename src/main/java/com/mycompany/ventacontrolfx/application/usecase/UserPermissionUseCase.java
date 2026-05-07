@@ -2,7 +2,7 @@ package com.mycompany.ventacontrolfx.application.usecase;
 
 import com.mycompany.ventacontrolfx.domain.repository.IUserRepository;
 import com.mycompany.ventacontrolfx.domain.repository.IAuditRepository;
-import com.mycompany.ventacontrolfx.util.UserSession;
+import com.mycompany.ventacontrolfx.domain.model.UserSession;
 import java.sql.SQLException;
 
 public class UserPermissionUseCase {
@@ -43,3 +43,4 @@ public class UserPermissionUseCase {
         return success;
     }
 }
+

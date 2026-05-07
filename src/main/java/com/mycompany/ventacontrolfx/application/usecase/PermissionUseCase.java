@@ -2,7 +2,7 @@ package com.mycompany.ventacontrolfx.application.usecase;
 
 import com.mycompany.ventacontrolfx.domain.model.Permission;
 import com.mycompany.ventacontrolfx.domain.repository.IPermissionRepository;
-import com.mycompany.ventacontrolfx.util.AuthorizationService;
+import com.mycompany.ventacontrolfx.infrastructure.security.AuthorizationService;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -61,3 +61,4 @@ public class PermissionUseCase {
         permissionRepository.setRolePermissions(roleId, codes);
     }
 }
+

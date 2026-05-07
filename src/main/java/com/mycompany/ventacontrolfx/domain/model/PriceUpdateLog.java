@@ -53,3 +53,4 @@ public class PriceUpdateLog {
     public String getCategoryName() { return categoryName; }
     public void setCategoryName(String categoryName) { this.categoryName = categoryName; }
 }
+

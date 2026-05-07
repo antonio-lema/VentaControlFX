@@ -167,8 +167,16 @@ public class TaxEngineService {
     /**
      * Obtiene todos los grupos de impuestos disponibles.
      */
-    public List<TaxGroup> getAllGroups() throws SQLException {
+    public List<TaxGroup> getAllTaxGroups() throws SQLException {
         return taxRepository.getAllTaxGroups();
+    }
+
+    public void saveTaxGroup(TaxGroup group) throws SQLException {
+        taxRepository.saveTaxGroup(group);
+    }
+
+    public void deleteTaxGroup(Integer groupId) throws SQLException {
+        taxRepository.deleteTaxGroup(groupId);
     }
 
     /**
@@ -209,3 +217,4 @@ public class TaxEngineService {
         return Math.round(value * 100.0) / 100.0;
     }
 }
+

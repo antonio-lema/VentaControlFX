@@ -12,11 +12,11 @@ import java.time.LocalDateTime;
 public class UserUseCase {
     private final IUserRepository userRepository;
     private final IEmailSender emailSender;
-    private final com.mycompany.ventacontrolfx.util.AuthorizationService authService;
+    private final com.mycompany.ventacontrolfx.infrastructure.security.AuthorizationService authService;
     private final SecureRandom secureRandom = new SecureRandom();
 
     public UserUseCase(IUserRepository userRepository, IEmailSender emailSender,
-            com.mycompany.ventacontrolfx.util.AuthorizationService authService) {
+            com.mycompany.ventacontrolfx.infrastructure.security.AuthorizationService authService) {
         this.userRepository = userRepository;
         this.emailSender = emailSender;
         this.authService = authService;
@@ -142,3 +142,5 @@ public class UserUseCase {
         emailSender.send(email, subject, body);
     }
 }
+
+

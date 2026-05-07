@@ -5,7 +5,7 @@ import com.mycompany.ventacontrolfx.domain.model.TaxRate;
 import com.mycompany.ventacontrolfx.domain.model.TaxRevision;
 import com.mycompany.ventacontrolfx.domain.repository.IProductRepository;
 import com.mycompany.ventacontrolfx.domain.repository.ITaxRepository;
-import com.mycompany.ventacontrolfx.util.AuthorizationService;
+import com.mycompany.ventacontrolfx.infrastructure.security.AuthorizationService;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -88,7 +88,7 @@ public class TaxManagementUseCase {
         taxRepository.deleteTaxGroup(taxGroupId);
     }
 
-    public void setDefaultTaxGroup(int taxGroupId) throws SQLException {
+    public void setDefaultTaxGroup(int taxGroupId, String reason) throws SQLException {
         authService.checkPermission("admin.iva");
         taxRepository.setDefaultTaxGroup(taxGroupId);
 
@@ -98,7 +98,7 @@ public class TaxManagementUseCase {
                 double totalRate = group.getRates().stream().mapToDouble(r -> r.getRate()).sum();
                 TaxRevision revision = new TaxRevision(null, null, TaxRevision.Scope.GLOBAL,
                         totalRate, group.getName(), java.time.LocalDateTime.now(),
-                        "Cambio de grupo impositivo global");
+                        reason != null ? reason : "Cambio de grupo impositivo global");
                 taxRepository.saveTaxRevision(revision);
             } catch (SQLException ignored) {
             }
@@ -147,3 +147,4 @@ public class TaxManagementUseCase {
         taxRepository.syncMirroredValues();
     }
 }
+

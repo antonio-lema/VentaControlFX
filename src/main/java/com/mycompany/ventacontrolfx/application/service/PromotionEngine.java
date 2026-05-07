@@ -195,3 +195,4 @@ public class PromotionEngine {
         return Math.max(0, result); // Nunca retornar descuentos negativos
     }
 }
+

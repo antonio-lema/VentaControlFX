@@ -2,7 +2,7 @@ package com.mycompany.ventacontrolfx.presentation.controller.dialog;
 
 import com.mycompany.ventacontrolfx.infrastructure.config.Injectable;
 import com.mycompany.ventacontrolfx.infrastructure.config.ServiceContainer;
-import com.mycompany.ventacontrolfx.util.AlertUtil;
+import com.mycompany.ventacontrolfx.presentation.util.AlertUtil;
 import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
@@ -74,3 +74,4 @@ public class PriceListCloneController implements Injectable {
         }
     }
 }
+

@@ -37,9 +37,9 @@ public class App extends Application {
         }).start();
 
         // 3. IMMEDIATELY show the Login screen
-        com.mycompany.ventacontrolfx.util.SceneNavigator.loadScene(
+        com.mycompany.ventacontrolfx.presentation.navigation.SceneNavigator.loadScene(
                 primaryStage,
-                "/view/login.fxml",
+                "/view/auth/login.fxml",
                 "Login",
                 900,
                 600,
@@ -51,3 +51,6 @@ public class App extends Application {
         launch(args);
     }
 }
+
+
+

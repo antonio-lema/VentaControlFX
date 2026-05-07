@@ -185,3 +185,4 @@ public class TaxRevision {
                 scope, rate, label, isCurrentlyActive());
     }
 }
+

@@ -95,3 +95,4 @@ public class WorkSession {
         this.userName = userName;
     }
 }
+

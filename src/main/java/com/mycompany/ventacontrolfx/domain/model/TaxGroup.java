@@ -6,10 +6,19 @@ import java.util.List;
 public class TaxGroup {
     private int taxGroupId;
     private String name;
+    private String description;
     private boolean isDefault;
     private List<TaxRate> taxRates = new ArrayList<>();
 
     public TaxGroup() {
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public int getTaxGroupId() {
@@ -60,3 +69,4 @@ public class TaxGroup {
         this.taxRates.add(rate);
     }
 }
+

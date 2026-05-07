@@ -49,13 +49,13 @@ public class LoginUseCase {
         // 1. Buscar usuario
         User user = userRepository.findByUsername(username);
         if (user == null) {
-            logFailedAttempt(username, "Usuario no encontrado");
+            logFailedAttempt(username, "USER_NOT_FOUND");
             throw new UserNotFoundException(username);
         }
 
         // 2. Validar contrase\u00f1a con BCrypt
         if (!BCrypt.checkpw(password, user.getPasswordHash())) {
-            logFailedAttempt(username, "Contrase\u00f1a incorrecta");
+            logFailedAttempt(username, "INVALID_PASSWORD");
             throw new InvalidPasswordException();
         }
 
@@ -63,7 +63,7 @@ public class LoginUseCase {
         loadExtendedProfile(user);
 
         // 4. Auditor\u00eda de \u00e9xito
-        auditRepository.logAccess(user.getUserId(), "LOGIN", "AUTH", "Inicio de sesi\u00f3n exitoso");
+        auditRepository.logAccess(user.getUserId(), "LOGIN", "AUTH", "LOGIN_SUCCESS");
 
         return user;
     }
@@ -111,8 +111,9 @@ public class LoginUseCase {
 
     private void logFailedAttempt(String username, String reason) {
         try {
-            auditRepository.logAccess(-1, "LOGIN_FAILED", "AUTH", "Intento fallido: " + reason + " (" + username + ")");
+            auditRepository.logAccess(-1, "LOGIN_FAILED", "AUTH", "FAILED_ATTEMPT: " + reason + " (" + username + ")");
         } catch (Exception ignored) {
         }
     }
 }
+

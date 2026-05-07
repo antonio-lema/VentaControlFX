@@ -41,3 +41,4 @@ public class PromotionUseCase {
         repository.toggleActive(id, active);
     }
 }
+

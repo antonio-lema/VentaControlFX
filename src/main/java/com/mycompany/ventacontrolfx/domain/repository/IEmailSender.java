@@ -6,3 +6,4 @@ public interface IEmailSender {
     void sendWithAttachment(String to, String subject, String body, byte[] attachment, String fileName)
             throws Exception;
 }
+

@@ -45,3 +45,4 @@ public interface IFiscalDocumentRepository {
     void updateStatus(int saleId, Status newStatus, Connection conn) throws SQLException;
 
 }
+

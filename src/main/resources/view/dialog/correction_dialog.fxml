@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
+
+<VBox spacing="15" styleClass="modal-container" prefWidth="480" stylesheets="@/styles/variables.css" 
+      xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" 
+      fx:controller="com.mycompany.ventacontrolfx.presentation.controller.dialog.CorrectionDialogController">
+    <padding>
+        <Insets top="24" right="32" bottom="24" left="32"/>
+    </padding>
+
+    <HBox alignment="CENTER_LEFT" spacing="15">
+        <StackPane styleClass="icon-container-blue" maxWidth="45" maxHeight="45" style="-fx-background-color: rgba(30, 136, 229, 0.1);">
+            <FontAwesomeIconView glyphName="WRENCH" size="20" fill="#1e88e5"/>
+        </StackPane>
+        <VBox spacing="2">
+            <Label text="Subsanar Datos Fiscales" styleClass="modal-title"/>
+            <Label text="Corrige los datos oficiales enviados a AEAT" styleClass="modal-subtitle"/>
+        </VBox>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Button onAction="#handleCancel" styleClass="button-ghost" text="&#x2715;" style="-fx-font-size: 16px;"/>
+    </HBox>
+
+    <Separator/>
+
+    <VBox spacing="20" VBox.vgrow="ALWAYS">
+        <Label text="IMPORTANTE: Esta acción enviará una corrección oficial a la AEAT sin alterar el importe del ticket." 
+               wrapText="true" style="-fx-text-fill: #e67e22; -fx-font-weight: bold; -fx-font-size: 12px;" />
+        
+        <VBox spacing="8">
+            <Label text="Nombre o Razón Social" styleClass="text-sm, font-medium, text-gray-700" />
+            <TextField fx:id="txtName" promptText="Nombre del cliente" styleClass="form-control" />
+        </VBox>
+
+        <VBox spacing="8">
+            <Label text="NIF / CIF" styleClass="text-sm, font-medium, text-gray-700" />
+            <TextField fx:id="txtNif" promptText="Documento de identidad" styleClass="form-control" />
+        </VBox>
+    </VBox>
+
+    <Region VBox.vgrow="ALWAYS" minHeight="10"/>
+
+    <HBox spacing="10" alignment="CENTER_RIGHT">
+        <Button text="Cancelar" onAction="#handleCancel" styleClass="btn-secondary" />
+        <Button text="Subsanar en AEAT" onAction="#handleSave" styleClass="btn-primary" />
+    </HBox>
+</VBox>

@@ -9,11 +9,11 @@ import java.util.List;
 public class CategoryUseCase {
     private final ICategoryRepository repository;
     private final IProductRepository productRepository;
-    private final com.mycompany.ventacontrolfx.util.AuthorizationService authService;
+    private final com.mycompany.ventacontrolfx.infrastructure.security.AuthorizationService authService;
 
     public CategoryUseCase(ICategoryRepository repository,
             IProductRepository productRepository,
-            com.mycompany.ventacontrolfx.util.AuthorizationService authService) {
+            com.mycompany.ventacontrolfx.infrastructure.security.AuthorizationService authService) {
         this.repository = repository;
         this.productRepository = productRepository;
         this.authService = authService;
@@ -64,3 +64,5 @@ public class CategoryUseCase {
         return repository.count();
     }
 }
+
+

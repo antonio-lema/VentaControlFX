@@ -1,0 +1,157 @@
+package com.mycompany.ventacontrolfx.presentation.controller.closure;
+
+import com.mycompany.ventacontrolfx.application.usecase.CashClosureUseCase;
+import com.mycompany.ventacontrolfx.domain.model.CashClosure;
+import com.mycompany.ventacontrolfx.presentation.util.AlertUtil;
+import com.mycompany.ventacontrolfx.domain.model.UserSession;
+import javafx.fxml.FXML;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
+import javafx.stage.Stage;
+
+import java.sql.SQLException;
+import java.time.LocalDate;
+
+public class CashClosingController {
+
+    @FXML
+    private Label lblInitFund, lblSales, lblCashIn, lblReturns, lblCashOut, lblExpected, lblDifference, lblDiffReason;
+    @FXML
+    private TextField txtActualAmount;
+    @FXML
+    private TextArea txtNotes;
+
+    private CashClosureUseCase closureUseCase;
+    private UserSession userSession;
+    private double expectedAmount = 0;
+    private boolean confirmed = false;
+
+    public void init(CashClosureUseCase useCase, UserSession session) {
+        this.closureUseCase = useCase;
+        this.userSession = session;
+
+        try {
+            this.expectedAmount = closureUseCase.getCurrentCashInDrawer();
+            double initialFund = closureUseCase.getActiveFundAmount();
+            java.util.Map<String, Double> totals = closureUseCase.getTodayTotals();
+
+            boolean canSeeTotals = userSession.hasPermission("caja.ver_totales")
+                    || userSession.hasPermission("USUARIOS");
+
+            if (canSeeTotals) {
+                lblInitFund.setText(String.format("%.2f \u20ac", initialFund));
+                // Ventas brutas (sin restar devoluciones a\u00fan en la etiqueta de ventas)
+                double returnsCash = totals.getOrDefault("returns_cash", 0.0);
+                lblSales.setText(String.format("%.2f \u20ac", totals.getOrDefault("cash", 0.0) + returnsCash));
+                lblCashIn.setText(String.format("%.2f \u20ac", totals.getOrDefault("manual_in", 0.0)));
+                lblReturns.setText(String.format("%.2f \u20ac", returnsCash));
+                lblCashOut.setText(String.format("%.2f \u20ac", totals.getOrDefault("manual_out", 0.0)));
+                lblExpected.setText(String.format("%.2f \u20ac", expectedAmount));
+            } else {
+                lblInitFund.setText("**** \u20ac");
+                lblSales.setText("**** \u20ac");
+                lblCashIn.setText("**** \u20ac");
+                lblReturns.setText("**** \u20ac");
+                lblCashOut.setText("**** \u20ac");
+                lblExpected.setText("**** \u20ac");
+            }
+            updateDifference();
+        } catch (SQLException e) {
+            lblExpected.setText("Error");
+        }
+
+        txtActualAmount.textProperty().addListener((obs, old, newVal) -> updateDifference());
+
+        // Foco inicial
+        javafx.application.Platform.runLater(txtActualAmount::requestFocus);
+    }
+
+    private void updateDifference() {
+        if (!userSession.hasPermission("caja.ver_totales") && !userSession.hasPermission("USUARIOS")) {
+            lblDifference.setText("**** \u20ac");
+            lblDifference.setStyle("-fx-font-size: 24px; -fx-font-weight: 900; -fx-text-fill: #94a3b8;");
+            lblDiffReason.setText("El descuadre se calcular\u00e1 al confirmar");
+            lblDiffReason.setStyle("-fx-text-fill: #64748b;");
+            return;
+        }
+
+        try {
+            String text = txtActualAmount.getText().replace(",", ".").trim();
+            double actual = text.isEmpty() ? 0 : Double.parseDouble(text);
+            double diff = actual - expectedAmount;
+
+            if (Math.abs(diff) < 0.001) {
+                lblDifference.setText(String.format("%.2f \u20ac", diff)); // Sin signo si es cero real
+                lblDifference.setStyle("-fx-font-size: 24px; -fx-font-weight: 900; -fx-text-fill: #10b981;");
+                lblDiffReason.setText("\u2705 Caja cuadrada perfectamente");
+                lblDiffReason.setStyle("-fx-text-fill: #16a34a; -fx-font-weight: bold;");
+            } else {
+                lblDifference.setText(String.format("%+.2f \u20ac", diff)); // Forzar signo + o -
+                lblDifference.setStyle("-fx-font-size: 24px; -fx-font-weight: 900; -fx-text-fill: #ef4444;");
+                lblDiffReason.setText(diff > 0 ? "\u00e2\u0161\u00a0\u00ef\u00b8\u008f Sobante de caja detectado" : "\u274c Faltante de caja detectado");
+                lblDiffReason.setStyle("-fx-text-fill: #dc2626; -fx-font-weight: bold;");
+            }
+        } catch (NumberFormatException e) {
+            lblDifference.setText("-- \u20ac");
+            lblDiffReason.setText("Importe no v\u00e1lido");
+        }
+    }
+
+    @FXML
+    private void handleClose() {
+        try {
+            String actualText = txtActualAmount.getText().replace(",", ".").trim();
+            if (actualText.isEmpty()) {
+                AlertUtil.showWarning("Campo Obligatorio", "Debe introducir el efectivo real contado.");
+                return;
+            }
+
+            double actual = Double.parseDouble(actualText);
+            double diff = actual - expectedAmount;
+            String notes = txtNotes.getText().trim();
+
+            if (Math.abs(diff) > 0.001 && notes.isEmpty()) {
+                AlertUtil.showWarning("Justificaci\u00f3n Necesaria",
+                        "Es obligatorio introducir una nota explicando el descuadre.");
+                txtNotes.requestFocus();
+                txtNotes.setStyle("-fx-border-color: #ef4444; -fx-border-width: 2;");
+                return;
+            }
+
+            CashClosure closure = new CashClosure();
+            closure.setClosureDate(LocalDate.now());
+            closure.setUserId(userSession.getCurrentUser() != null ? userSession.getCurrentUser().getUserId() : 1);
+            closure.setTotalCash(expectedAmount);
+            // Nota: totalCard y totalAll se enriquecen en el UseCase, pero mapeamos lo
+            // b\u00e1sico aqu\u00ed si fuera necesario
+            // Sin embargo, el UseCase performClosure ya recalcula los totales de ventas.
+            closure.setActualCash(actual);
+            closure.setNotes(notes);
+
+            closureUseCase.performClosure(closure);
+
+            confirmed = true;
+            close();
+
+        } catch (NumberFormatException e) {
+            AlertUtil.showError("Error de Formato", "El importe real no es v\u00e1lido.");
+        } catch (SQLException e) {
+            AlertUtil.showError("Error al Cerrar Caja", e.getMessage());
+        }
+    }
+
+    @FXML
+    private void handleCancel() {
+        close();
+    }
+
+    private void close() {
+        ((Stage) txtActualAmount.getScene().getWindow()).close();
+    }
+
+    public boolean isConfirmed() {
+        return confirmed;
+    }
+}
+

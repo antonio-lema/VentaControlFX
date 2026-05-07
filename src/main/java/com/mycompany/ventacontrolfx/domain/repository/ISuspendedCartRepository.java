@@ -15,3 +15,4 @@ public interface ISuspendedCartRepository {
 
     void delete(int id) throws SQLException;
 }
+

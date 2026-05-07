@@ -21,3 +21,4 @@ public interface ICategoryRepository {
 
     Category getById(int id) throws SQLException;
 }
+

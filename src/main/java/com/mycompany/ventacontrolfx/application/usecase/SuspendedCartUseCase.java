@@ -56,3 +56,4 @@ public class SuspendedCartUseCase {
         repository.delete(id);
     }
 }
+

@@ -9,3 +9,4 @@ public class InvalidPasswordException extends BusinessException {
         super("La contrase\u00f1a proporcionada es incorrecta.");
     }
 }
+

@@ -4,7 +4,7 @@ import com.mycompany.ventacontrolfx.application.usecase.TaxManagementUseCase;
 import com.mycompany.ventacontrolfx.domain.model.TaxRate;
 import com.mycompany.ventacontrolfx.infrastructure.config.Injectable;
 import com.mycompany.ventacontrolfx.infrastructure.config.ServiceContainer;
-import com.mycompany.ventacontrolfx.util.AlertUtil;
+import com.mycompany.ventacontrolfx.presentation.util.AlertUtil;
 import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.DatePicker;
@@ -105,3 +105,4 @@ public class TaxRateDialogController implements Injectable {
         return saveClicked;
     }
 }
+

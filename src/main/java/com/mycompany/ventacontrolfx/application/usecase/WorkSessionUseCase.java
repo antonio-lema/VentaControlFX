@@ -106,3 +106,4 @@ public class WorkSessionUseCase {
         return repository.getHistoryByDate(date);
     }
 }
+

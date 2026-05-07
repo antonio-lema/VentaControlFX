@@ -29,3 +29,4 @@ public class HistoryStats {
         return totalCard;
     }
 }
+

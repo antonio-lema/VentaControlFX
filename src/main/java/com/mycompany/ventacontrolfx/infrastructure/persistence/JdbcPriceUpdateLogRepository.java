@@ -91,3 +91,4 @@ public class JdbcPriceUpdateLogRepository implements IPriceUpdateLogRepository {
         }
     }
 }
+

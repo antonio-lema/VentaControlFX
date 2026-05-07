@@ -88,3 +88,4 @@ public class SaleTaxSummary {
         this.taxAmount = taxAmount;
     }
 }
+

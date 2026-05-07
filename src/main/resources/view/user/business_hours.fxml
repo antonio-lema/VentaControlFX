@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
+<?import java.net.URL?>
+
+<VBox spacing="0" prefWidth="850" prefHeight="650" styleClass="modal-container"
+      style="-fx-background-color: white; -fx-background-radius: 12;"
+      xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.mycompany.ventacontrolfx.presentation.controller.dialog.BusinessHoursController">
+    
+    <!-- Modern Header -->
+    <VBox spacing="5" style="-fx-background-color: #f8fafc; -fx-padding: 25; -fx-border-color: #e2e8f0; -fx-border-width: 0 0 1 0;">
+        <children>
+            <HBox alignment="CENTER_LEFT" spacing="15">
+                <children>
+                    <StackPane style="-fx-background-color: #3b82f6; -fx-background-radius: 8; -fx-min-width: 40; -fx-min-height: 40;">
+                        <children>
+                            <FontAwesomeIconView glyphName="CLOCK_ALT" size="20" fill="white" />
+                        </children>
+                    </StackPane>
+                    <VBox spacing="2">
+                        <children>
+                            <Label text="Configuraci&#x00f3;n de Horarios" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #1e293b;" />
+                            <Label text="Gestiona los turnos de apertura para el control de cumplimiento." style="-fx-text-fill: #64748b;" />
+                        </children>
+                    </VBox>
+                </children>
+            </HBox>
+        </children>
+    </VBox>
+
+    <ScrollPane fitToWidth="true" style="-fx-background-color: transparent; -fx-background-insets: 0; -fx-padding: 0;" VBox.vgrow="ALWAYS">
+        <content>
+            <VBox spacing="15" style="-fx-padding: 25; -fx-background-color: white;">
+                <children>
+                    <GridPane fx:id="gridSchedule" hgap="20" vgap="12">
+                        <columnConstraints>
+                            <ColumnConstraints minWidth="110" halignment="LEFT" />
+                            <ColumnConstraints hgrow="ALWAYS" />
+                            <ColumnConstraints minWidth="150" halignment="RIGHT" />
+                        </columnConstraints>
+                        
+                        <children>
+                            <!-- Headers labels added dynamically -->
+                        </children>
+                    </GridPane>
+                </children>
+            </VBox>
+        </content>
+    </ScrollPane>
+
+    <!-- Advanced Settings Footer -->
+    <VBox spacing="15" style="-fx-background-color: #f8fafc; -fx-padding: 20; -fx-border-color: #e2e8f0; -fx-border-width: 1 0 0 0;">
+        <children>
+            <HBox spacing="20" alignment="CENTER_LEFT">
+                <children>
+                    <HBox spacing="10" alignment="CENTER_LEFT">
+                        <children>
+                            <Label text="Margen de cortes&#x00eda;:" style="-fx-font-weight: bold; -fx-text-fill: #475569;" />
+                            <TextField fx:id="txtGracePeriod" prefWidth="50" style="-fx-background-radius: 4;" />
+                            <Label text="minutos" style="-fx-text-fill: #64748b;" />
+                            <Label>
+                                <graphic><FontAwesomeIconView glyphName="INFO_CIRCLE" fill="#94a3b8" /></graphic>
+                                <tooltip><Tooltip text="Tiempo permitido antes de marcar un retraso." /></tooltip>
+                            </Label>
+                        </children>
+                    </HBox>
+                    <Separator orientation="VERTICAL" />
+                    <Button text="Gestionar Festivos" onAction="#handleManageSpecialDays" styleClass="btn-secondary-saas">
+                        <graphic><FontAwesomeIconView glyphName="CALENDAR_ALT" /></graphic>
+                    </Button>
+                    <Region HBox.hgrow="ALWAYS" />
+                    <HBox spacing="10">
+                        <children>
+                            <Button text="CANCELAR" onAction="#handleCancel" styleClass="btn-secondary-saas" prefWidth="120" prefHeight="35" />
+                            <Button text="GUARDAR CONFIGURACI&#x00d3;N" onAction="#handleSave" styleClass="btn-primary-saas" prefWidth="220" prefHeight="35" />
+                        </children>
+                    </HBox>
+                </children>
+            </HBox>
+        </children>
+    </VBox>
+
+    <stylesheets>
+        <URL value="@/styles/components/informes.css" />
+    </stylesheets>
+</VBox>

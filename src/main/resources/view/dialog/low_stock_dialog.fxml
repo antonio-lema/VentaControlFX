@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
+
+<VBox spacing="0" styleClass="estetica-root" prefWidth="600" prefHeight="500" 
+      xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" 
+      fx:controller="com.mycompany.ventacontrolfx.presentation.controller.dialog.LowStockDialogController">
+    
+    <!-- Header Premium -->
+    <VBox styleClass="estetica-header" style="-fx-background-color: linear-gradient(to right, #e53935, #ff5252); -fx-padding: 20 30;">
+        <children>
+            <HBox alignment="CENTER_LEFT" spacing="20">
+                <children>
+                    <StackPane styleClass="estetica-header-icon-wrap" style="-fx-background-color: rgba(255,255,255,0.2);">
+                        <children><FontAwesomeIconView glyphName="EXCLAMATION_TRIANGLE" size="24" fill="white"/></children>
+                    </StackPane>
+                    <VBox spacing="2">
+                        <children>
+                            <Label text="Alertas de Stock" styleClass="estetica-title" style="-fx-text-fill: white;"/>
+                            <Label text="Productos que necesitan reposición urgente" styleClass="estetica-subtitle" style="-fx-text-fill: rgba(255,255,255,0.8);"/>
+                        </children>
+                    </VBox>
+                    <Region HBox.hgrow="ALWAYS" />
+                    <Button onAction="#handleClose" styleClass="button-ghost" text="✕" style="-fx-text-fill: white; -fx-font-size: 18px;"/>
+                </children>
+            </HBox>
+        </children>
+    </VBox>
+
+    <!-- Content Area -->
+    <VBox spacing="20" VBox.vgrow="ALWAYS" style="-fx-padding: 25; -fx-background-color: -fx-bg-main; -fx-background-radius: 0 0 20 20;">
+        <children>
+            <VBox VBox.vgrow="ALWAYS" styleClass="estetica-card" style="-fx-padding: 0;">
+                <children>
+                    <TableView fx:id="tableLowStock" VBox.vgrow="ALWAYS" styleClass="modern-table">
+                        <columns>
+                            <TableColumn fx:id="colName" text="PRODUCTO" prefWidth="300"/>
+                            <TableColumn fx:id="colCurrentStock" text="STOCK ACTUAL" prefWidth="120" style="-fx-alignment: CENTER;"/>
+                            <TableColumn fx:id="colMinStock" text="MÍNIMO" prefWidth="120" style="-fx-alignment: CENTER;"/>
+                        </columns>
+                        <placeholder>
+                            <Label text="No hay productos con stock bajo" styleClass="label-muted"/>
+                        </placeholder>
+                    </TableView>
+                </children>
+            </VBox>
+            
+            <HBox spacing="10" alignment="CENTER_RIGHT">
+                <children>
+                    <Button text="ENTENDIDO" onAction="#handleClose" styleClass="btn-primary" prefWidth="150" prefHeight="40"/>
+                </children>
+            </HBox>
+        </children>
+    </VBox>
+</VBox>

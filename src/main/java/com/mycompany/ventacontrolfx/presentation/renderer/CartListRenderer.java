@@ -1,9 +1,9 @@
 package com.mycompany.ventacontrolfx.presentation.renderer;
 
-import com.mycompany.ventacontrolfx.component.CartItemRow;
+import com.mycompany.ventacontrolfx.presentation.component.CartItemRow;
 import com.mycompany.ventacontrolfx.domain.model.CartItem;
 import com.mycompany.ventacontrolfx.application.usecase.CartUseCase;
-import com.mycompany.ventacontrolfx.presentation.controller.EditCartItemController;
+import com.mycompany.ventacontrolfx.presentation.controller.dialog.EditCartItemController;
 import javafx.collections.ListChangeListener;
 import javafx.scene.layout.VBox;
 
@@ -46,7 +46,7 @@ public class CartListRenderer {
                     try {
                         cartUseCase.incrementQuantity(item.getProduct());
                     } catch (IllegalArgumentException ex) {
-                        com.mycompany.ventacontrolfx.util.AlertUtil.showWarning(container.getBundle().getString("cart.error.insufficient_stock"), ex.getMessage());
+                        com.mycompany.ventacontrolfx.presentation.util.AlertUtil.showWarning(container.getBundle().getString("cart.error.insufficient_stock"), ex.getMessage());
                     }
                 },
                 () -> cartUseCase.decrementQuantity(item.getProduct()),
@@ -55,12 +55,12 @@ public class CartListRenderer {
                     try {
                         cartUseCase.updateQuantity(item.getProduct(), newQty);
                     } catch (IllegalArgumentException ex) {
-                        com.mycompany.ventacontrolfx.util.AlertUtil.showWarning(container.getBundle().getString("cart.error.insufficient_stock"), ex.getMessage());
+                        com.mycompany.ventacontrolfx.presentation.util.AlertUtil.showWarning(container.getBundle().getString("cart.error.insufficient_stock"), ex.getMessage());
                     }
                 },
                 () -> {
-                    com.mycompany.ventacontrolfx.util.ModalService.showTransparentModal(
-                            "/view/edit_cart_item.fxml",
+                    com.mycompany.ventacontrolfx.presentation.navigation.ModalService.showTransparentModal(
+                            "/view/cart/edit_cart_item.fxml",
                             container.getBundle().getString("cart.edit.title"),
                             container,
                             (EditCartItemController controller) -> {
@@ -91,3 +91,7 @@ public class CartListRenderer {
         });
     }
 }
+
+
+
+

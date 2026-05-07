@@ -36,3 +36,4 @@ public class ProductSummary {
         this.totalAmount = totalAmount;
     }
 }
+

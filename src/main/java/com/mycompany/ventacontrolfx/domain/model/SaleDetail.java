@@ -174,3 +174,4 @@ public class SaleDetail {
         this.observations = observations;
     }
 }
+

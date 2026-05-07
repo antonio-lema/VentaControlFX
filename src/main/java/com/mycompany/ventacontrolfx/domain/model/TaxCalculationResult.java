@@ -34,3 +34,4 @@ public class TaxCalculationResult {
         return appliedTaxes.stream().mapToDouble(AppliedTax::getTaxAmount).sum();
     }
 }
+

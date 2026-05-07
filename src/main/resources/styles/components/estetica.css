@@ -553,6 +553,60 @@
     -fx-background-color: -fx-custom-color-primary;
 }
 
+/* ==========================================================================
+   ALERTAS DE STOCK Y NOTIFICACIONES PREMIUM
+   ========================================================================== */
+
+/* Botón de Alerta en Header (Glassmorphism) */
+.header-alert-button {
+    -fx-background-color: rgba(229, 57, 53, 0.08);
+    -fx-border-color: rgba(229, 57, 53, 0.2);
+    -fx-border-width: 1px;
+    -fx-background-radius: 30;
+    -fx-border-radius: 30;
+    -fx-padding: 6 16;
+    -fx-spacing: 10;
+    -fx-cursor: hand;
+    -fx-transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.header-alert-button:hover {
+    -fx-background-color: rgba(229, 57, 53, 0.15);
+    -fx-border-color: rgba(229, 57, 53, 0.4);
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
+}
+
+/* Badge de Notificación */
+.header-alert-badge {
+    -fx-background-color: linear-gradient(to bottom right, #ff5252, #ff1744);
+    -fx-text-fill: white;
+    -fx-font-size: 10px;
+    -fx-font-weight: 900;
+    -fx-padding: 2 6;
+    -fx-background-radius: 10;
+    -fx-effect: dropshadow(three-pass-box, rgba(255, 23, 68, 0.4), 5, 0, 0, 0);
+}
+
+/* Diálogo de Stock Bajo (Modal Moderno) */
+.stock-dialog-root {
+    -fx-background-color: -fx-bg-main;
+    -fx-background-radius: 20;
+    -fx-border-radius: 20;
+    -fx-border-color: -fx-color-border-subtle;
+    -fx-border-width: 1px;
+}
+
+.stock-table-critical {
+    -fx-text-fill: #e53935;
+    -fx-font-weight: bold;
+}
+
+/* Animación de Pulso para Stock Crítico */
+.stock-pulse {
+    -fx-effect: dropshadow(three-pass-box, rgba(229, 57, 53, 0.6), 15, 0.5, 0, 0);
+}
+
 /* Force white text on hover for both the menu item and the checkbox inside it */
 .vat-custom-menu-item:hover .vat-explorer-checkbox,
 .vat-custom-menu-item:focused .vat-explorer-checkbox,

@@ -22,3 +22,4 @@ public interface IFiscalPdfService {
      */
     byte[] generateInvoicePdfBytes(PrintData data) throws IOException;
 }
+

@@ -12,11 +12,11 @@ import java.util.Map;
 
 public class CashClosureUseCase {
     private final ICashClosureRepository repository;
-    private final com.mycompany.ventacontrolfx.util.AuthorizationService authService;
+    private final com.mycompany.ventacontrolfx.infrastructure.security.AuthorizationService authService;
     private com.mycompany.ventacontrolfx.infrastructure.persistence.BackupService backupService;
 
     public CashClosureUseCase(ICashClosureRepository repository,
-            com.mycompany.ventacontrolfx.util.AuthorizationService authService) {
+            com.mycompany.ventacontrolfx.infrastructure.security.AuthorizationService authService) {
         this.repository = repository;
         this.authService = authService;
     }
@@ -261,3 +261,5 @@ public class CashClosureUseCase {
         repository.updateClosure(closureId, actualCash, reason, reviewerId, previousCash);
     }
 }
+
+

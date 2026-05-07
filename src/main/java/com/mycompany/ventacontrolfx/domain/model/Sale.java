@@ -365,3 +365,4 @@ public class Sale {
         this.correctionType = correctionType;
     }
 }
+

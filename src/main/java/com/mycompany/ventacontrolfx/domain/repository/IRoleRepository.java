@@ -17,3 +17,4 @@ public interface IRoleRepository {
 
     boolean delete(int roleId) throws SQLException;
 }
+

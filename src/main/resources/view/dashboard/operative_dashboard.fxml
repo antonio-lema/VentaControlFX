@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.*?>
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
+<?import java.net.URL?>
+
+<VBox spacing="0" styleClass="dashboard-container" xmlns="http://javafx.com/javafx/21" 
+      xmlns:fx="http://javafx.com/fxml/1" 
+      fx:controller="com.mycompany.ventacontrolfx.presentation.controller.dashboard.OperativeDashboardController">
+    
+    <!--  HEADER  -->
+    <HBox alignment="CENTER_LEFT" spacing="20" styleClass="dashboard-header">
+        <padding><Insets top="25" right="30" bottom="25" left="30"/></padding>
+        <children>
+            <StackPane styleClass="header-icon-container">
+                <children>
+                    <Circle radius="22" fill="#3b82f615" />
+                    <FontAwesomeIconView glyphName="DASHBOARD" size="24" fill="#3b82f6" />
+                </children>
+            </StackPane>
+            <VBox spacing="4" HBox.hgrow="ALWAYS">
+                <children>
+                    <Label text="%dashboard.header.title" styleClass="header-title" />
+                    <HBox alignment="CENTER_LEFT" spacing="12">
+                        <children>
+                            <Label text="%dashboard.header.subtitle" styleClass="header-subtitle" />
+                            <Separator orientation="VERTICAL" prefHeight="12" />
+                            <Label fx:id="lblServerTime" text="13:30:00" styleClass="header-clock" />
+                        </children>
+                    </HBox>
+                </children>
+            </VBox>
+            <HBox spacing="10" alignment="CENTER_RIGHT">
+                <children>
+                    <Button onAction="#refreshData" styleClass="btn-icon-refresh">
+                        <graphic><FontAwesomeIconView glyphName="REFRESH" size="16" /></graphic>
+                    </Button>
+                    <Label fx:id="lblBusinessStatus" text="%dashboard.status.loading" styleClass="status-badge" />
+                </children>
+            </HBox>
+        </children>
+    </HBox>
+
+    <ScrollPane fitToWidth="true" style="-fx-background-color: transparent;" VBox.vgrow="ALWAYS" styleClass="dashboard-scroll">
+        <content>
+            <VBox spacing="30" style="-fx-padding: 30;">
+                <children>
+                    
+                    <!--  KPI CARDS ROW  -->
+                    <HBox spacing="25" alignment="CENTER">
+                        <children>
+                            <!-- Card: Personal -->
+                            <VBox styleClass="kpi-card, kpi-blue" HBox.hgrow="ALWAYS">
+                                <children>
+                                    <HBox alignment="CENTER_LEFT" spacing="10">
+                                        <StackPane styleClass="kpi-icon-wrap"><FontAwesomeIconView glyphName="USERS" size="18" /></StackPane>
+                                        <Label text="%dashboard.kpi.active_staff" styleClass="kpi-label" />
+                                    </HBox>
+                                    <Label fx:id="lblActiveStaffCount" text="0" styleClass="kpi-value" />
+                                    <Label text="%dashboard.kpi.staff_desc" styleClass="kpi-hint" />
+                                </children>
+                            </VBox>
+                            
+                            <!-- Card: Caja Actual -->
+                            <VBox styleClass="kpi-card, kpi-green" HBox.hgrow="ALWAYS">
+                                <children>
+                                    <HBox alignment="CENTER_LEFT" spacing="10">
+                                        <StackPane styleClass="kpi-icon-wrap"><FontAwesomeIconView glyphName="MONEY" size="18" /></StackPane>
+                                        <Label text="%dashboard.kpi.cash_status" styleClass="kpi-label" />
+                                        <Region HBox.hgrow="ALWAYS" />
+                                        <Label fx:id="lblCashStatus" text="%dashboard.kpi.cash_open" style="-fx-font-weight: bold; -fx-font-size: 10px;" />
+                                    </HBox>
+                                    <Label fx:id="lblCashAmount" text="0.00 &#x20ac;" styleClass="kpi-value" />
+                                    <Label text="%dashboard.kpi.cash_desc" styleClass="kpi-hint" />
+                                </children>
+                            </VBox>
+
+                            <!-- Card: Apertura -->
+                            <VBox styleClass="kpi-card, kpi-indigo" HBox.hgrow="ALWAYS">
+                                <children>
+                                    <HBox alignment="CENTER_LEFT" spacing="10">
+                                        <StackPane styleClass="kpi-icon-wrap"><FontAwesomeIconView glyphName="CLOCK_ALT" size="18" /></StackPane>
+                                        <Label text="%dashboard.kpi.today_open" styleClass="kpi-label" />
+                                    </HBox>
+                                    <Label fx:id="lblDailyOpenTime" text="--:--" styleClass="kpi-value" />
+                                    <Label text="%dashboard.kpi.open_desc" styleClass="kpi-hint" />
+                                </children>
+                            </VBox>
+
+                            <!-- Card: Cumplimiento -->
+                            <VBox styleClass="kpi-card, kpi-amber" HBox.hgrow="ALWAYS">
+                                <children>
+                                    <HBox alignment="CENTER_LEFT" spacing="10">
+                                        <StackPane styleClass="kpi-icon-wrap"><FontAwesomeIconView glyphName="CHECK_SQUARE" size="18" /></StackPane>
+                                        <Label text="%dashboard.kpi.planning" styleClass="kpi-label" />
+                                    </HBox>
+                                    <Label fx:id="lblScheduleCompliance" text="100%" styleClass="kpi-value" />
+                                    <Label text="%dashboard.kpi.planning_desc" styleClass="kpi-hint" />
+                                </children>
+                            </VBox>
+                        </children>
+                    </HBox>
+
+                    <!--  CONTENT AREA (Grid)  -->
+                    <GridPane hgap="30" vgap="30">
+                        <columnConstraints>
+                            <ColumnConstraints hgrow="ALWAYS" minWidth="600" />
+                            <ColumnConstraints hgrow="NEVER" prefWidth="350" />
+                        </columnConstraints>
+                        
+                        <children>
+                            <!-- TABLA DE PERSONAL -->
+                            <VBox spacing="15" styleClass="data-card" GridPane.columnIndex="0">
+                                <padding><Insets top="25" right="25" bottom="25" left="25"/></padding>
+                                <children>
+                                    <HBox alignment="CENTER_LEFT" spacing="15">
+                                        <Label text="%dashboard.section.staff" styleClass="card-title" />
+                                        <Region HBox.hgrow="ALWAYS" />
+                                        <Button onAction="#handleShowAudit" text="%dashboard.btn.history" styleClass="btn-link" />
+                                    </HBox>
+                                    <StackPane VBox.vgrow="ALWAYS">
+                                        <children>
+                                            <TableView fx:id="tableActiveStaff" prefHeight="400" styleClass="modern-table">
+                                                <columns>
+                                                    <TableColumn fx:id="colStaffStatus" text="%dashboard.table.status" prefWidth="100" />
+                                                    <TableColumn fx:id="colStaffName" text="%dashboard.table.staff" prefWidth="200" />
+                                                    <TableColumn fx:id="colStaffRole" text="%dashboard.table.role" prefWidth="120" />
+                                                    <TableColumn fx:id="colStaffShift" text="%dashboard.table.shift" prefWidth="130" />
+                                                    <TableColumn fx:id="colStaffStart" text="%dashboard.table.session_start" prefWidth="100" />
+                                                    <TableColumn fx:id="colStaffDuration" text="%dashboard.table.time" prefWidth="100" />
+                                                    <TableColumn fx:id="colStaffProgress" text="%dashboard.table.progress" prefWidth="150" />
+                                                </columns>
+                                                <placeholder><Label text="%dashboard.table.empty"/></placeholder>
+                                            </TableView>
+                                            <VBox fx:id="skeletonStaffContainer" mouseTransparent="true" style="-fx-background-color: white;" visible="false" managed="false" />
+                                        </children>
+                                    </StackPane>
+                                </children>
+                            </VBox>
+
+                            <!-- PANEL LATERAL: HORARIOS -->
+                            <VBox spacing="20" GridPane.columnIndex="1">
+                                <children>
+                                    <!-- Tarjeta Horarios Hoy -->
+                                    <VBox spacing="15" styleClass="data-card">
+                                        <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
+                                        <children>
+                                            <HBox alignment="CENTER_LEFT" spacing="10">
+                                                <FontAwesomeIconView glyphName="CALENDAR" size="16" fill="#3b82f6" />
+                                                <Label text="%dashboard.section.today_schedule" styleClass="card-subtitle" />
+                                            </HBox>
+                                            <VBox fx:id="vboxTodaySchedule" spacing="10" styleClass="today-schedule-list">
+                                                <!-- Dynamic turns added here -->
+                                            </VBox>
+                                        </children>
+                                    </VBox>
+
+                                    <!-- Tarjeta Alertas/Eventos -->
+                                    <VBox spacing="15" styleClass="data-card" VBox.vgrow="ALWAYS">
+                                        <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
+                                        <children>
+                                            <HBox alignment="CENTER_LEFT" spacing="10">
+                                                <FontAwesomeIconView glyphName="BELL" size="16" fill="#ef4444" />
+                                                <Label text="%dashboard.section.alerts" styleClass="card-subtitle" />
+                                            </HBox>
+                                            <VBox fx:id="vboxAlerts" spacing="8">
+                                                <children>
+                                                    <!-- Alert placeholders -->
+                                                    <HBox spacing="8" styleClass="alert-row, alert-info">
+                                                        <FontAwesomeIconView glyphName="INFO_CIRCLE" />
+                                                        <Label text="%dashboard.alert.normal" />
+                                                    </HBox>
+                                                </children>
+                                            </VBox>
+                                        </children>
+                                    </VBox>
+                                </children>
+                            </VBox>
+                        </children>
+                    </GridPane>
+                </children>
+            </VBox>
+        </content>
+    </ScrollPane>
+
+    <stylesheets>
+        <URL value="@/styles/components/informes.css" />
+        <URL value="@/styles/components/operative_monitor.css" />
+    </stylesheets>
+</VBox>

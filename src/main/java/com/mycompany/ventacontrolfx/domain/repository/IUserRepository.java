@@ -56,3 +56,4 @@ public interface IUserRepository {
      */
     void incrementRecoveryAttempts(String email) throws SQLException;
 }
+

@@ -64,3 +64,4 @@ public class JdbcDocumentSeriesRepository implements IDocumentSeriesRepository {
         throw new SQLException("Serie no encontrada: " + seriesCode);
     }
 }
+

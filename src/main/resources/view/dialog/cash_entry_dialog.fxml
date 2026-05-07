@@ -2,72 +2,70 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
 <?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
-<?import java.net.URL?>
 
-<VBox xmlns:fx="http://javafx.com/fxml/1" fx:id="root" spacing="15" styleClass="modern-register-card"
-      prefWidth="450" alignment="TOP_CENTER"
-      fx:controller="com.mycompany.ventacontrolfx.presentation.controller.dialog.CashEntryController">
+<VBox spacing="15" styleClass="modal-container" prefWidth="450" stylesheets="@/styles/variables.css" 
+      xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" 
+      fx:controller="com.mycompany.ventacontrolfx.presentation.controller.closure.CashEntryController">
+    <padding>
+        <Insets top="24" right="32" bottom="24" left="32"/>
+    </padding>
 
-    <stylesheets>
-        <URL value="@/styles/variables.css" />
-        <URL value="@/styles/components/botones.css" />
-        <URL value="@/styles/components/formularios.css" />
-    </stylesheets>
-
-    <VBox spacing="5" alignment="CENTER" style="-fx-padding: 20 0 5 0;">
-        <StackPane styleClass="estetica-card-icon-wrap, estetica-icon-blue" maxWidth="45" maxHeight="45">
-            <FontAwesomeIconView glyphName="PLUS_CIRCLE" size="22" fill="#3b82f6"/>
+    <HBox alignment="CENTER_LEFT" spacing="15">
+        <StackPane styleClass="icon-container-blue" maxWidth="45" maxHeight="45">
+            <FontAwesomeIconView glyphName="PLUS_CIRCLE" size="20" fill="#1e88e5"/>
         </StackPane>
-        <Label text="Ingresar Efectivo" styleClass="modern-register-title" style="-fx-font-size: 22px;" />
-        <Label text="Registra una entrada manual en el libro de caja" styleClass="modern-register-subtitle" />
-    </VBox>
+        <VBox spacing="2">
+            <Label text="Ingresar Efectivo" styleClass="modal-title"/>
+            <Label text="Registra una entrada manual en caja" styleClass="modal-subtitle"/>
+        </VBox>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Button onAction="#handleCancel" styleClass="button-ghost" text="&#x2715;" style="-fx-font-size: 16px;"/>
+    </HBox>
 
-    <VBox spacing="12" style="-fx-padding: 0 35 25 35;">
+    <Separator/>
 
+    <VBox spacing="20" VBox.vgrow="ALWAYS">
         <!-- Saldo actual informativo -->
-        <HBox fx:id="bannerCurrentCash" spacing="10" alignment="CENTER_LEFT"
-              style="-fx-background-color: #f0fdf4; -fx-padding: 10; -fx-background-radius: 8; -fx-border-color: #bbf7d0; -fx-border-radius: 8;">
-            <FontAwesomeIconView glyphName="INFO_CIRCLE" size="14" fill="#16a34a" />
-            <VBox>
-                <Label text="Efectivo actual en caja:" styleClass="label-muted" />
-                <Label fx:id="lblCurrentCash" text="0,00 &#x20ac;" style="-fx-font-weight: bold; -fx-text-fill: #15803d;" />
+        <HBox fx:id="bannerCurrentCash" spacing="12" alignment="CENTER_LEFT"
+              style="-fx-background-color: #f0fdf4; -fx-padding: 12; -fx-background-radius: 12; -fx-border-color: #bbf7d0; -fx-border-width: 1;">
+            <FontAwesomeIconView glyphName="INFO_CIRCLE" size="16" fill="#16a34a" />
+            <VBox spacing="2">
+                <Label text="Efectivo actual en caja" styleClass="text-xs, text-gray-500" />
+                <Label fx:id="lblCurrentCash" text="0,00 &#x20ac;" style="-fx-font-weight: 800; -fx-text-fill: #15803d; -fx-font-size: 15px;" />
             </VBox>
         </HBox>
 
         <!-- Importe -->
-        <VBox spacing="6">
-            <Label text="Importe a Ingresar (&#x20ac;):" styleClass="label" />
-            <HBox spacing="10" alignment="CENTER_LEFT" styleClass="modern-input-container">
-                <FontAwesomeIconView glyphName="MONEY" size="20" fill="#22c55e" />
-                <TextField fx:id="txtAmount" promptText="0,00" HBox.hgrow="ALWAYS" styleClass="modern-input-field"
-                           style="-fx-font-size: 20px; -fx-font-weight: 900;" />
-            </HBox>
+        <VBox spacing="8">
+            <Label text="Importe a Ingresar (&#x20ac;)" styleClass="text-sm, font-medium, text-gray-700" />
+            <TextField fx:id="txtAmount" promptText="0,00" styleClass="form-control"
+                       style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #1e88e5;" />
         </VBox>
 
         <!-- Tipo de ingreso -->
-        <VBox spacing="6">
-            <Label text="Tipo de Ingreso:" styleClass="label" />
-            <ComboBox fx:id="comboType" maxWidth="Infinity" styleClass="modern-combo-box" />
+        <VBox spacing="8">
+            <Label text="Tipo de Ingreso" styleClass="text-sm, font-medium, text-gray-700" />
+            <ComboBox fx:id="comboType" maxWidth="Infinity" styleClass="form-control" />
         </VBox>
 
         <!-- Motivo -->
-        <VBox spacing="6">
-            <Label text="Motivo / Justificaci&#x00f3;n:" styleClass="label" />
-            <HBox spacing="10" alignment="CENTER_LEFT" styleClass="modern-input-container">
-                <FontAwesomeIconView glyphName="PENCIL" size="14" fill="#94a3b8" />
-                <TextField fx:id="txtReason" promptText="Escribe la justificaci&#x00f3;n..." HBox.hgrow="ALWAYS" styleClass="modern-input-field" />
-            </HBox>
+        <VBox spacing="8">
+            <Label text="Motivo / Justificación" styleClass="text-sm, font-medium, text-gray-700" />
+            <TextField fx:id="txtReason" promptText="Escribe la justificación..." styleClass="form-control" />
         </VBox>
-
-        <!-- Botones de Acci&#x00f3;n -->
-        <HBox spacing="15" alignment="CENTER_RIGHT" style="-fx-padding: 5 0 0 0;">
-            <Button text="CANCELAR" onAction="#handleCancel" styleClass="btn-secondary" prefHeight="40" prefWidth="110" />
-            <Button text="CONFIRMAR INGRESO" onAction="#handleConfirm" styleClass="btn-primary" prefHeight="40" HBox.hgrow="ALWAYS" maxWidth="Infinity">
-                <graphic>
-                    <FontAwesomeIconView glyphName="CHECK_CIRCLE" size="16" fill="white" />
-                </graphic>
-            </Button>
-        </HBox>
     </VBox>
+
+    <Region VBox.vgrow="ALWAYS" minHeight="10"/>
+
+    <HBox spacing="10" alignment="CENTER_RIGHT">
+        <Button text="Cancelar" onAction="#handleCancel" styleClass="btn-secondary"/>
+        <Button text="Confirmar Ingreso" onAction="#handleConfirm" styleClass="btn-primary">
+            <graphic>
+                <FontAwesomeIconView glyphName="CHECK_CIRCLE" size="14" fill="white" />
+            </graphic>
+        </Button>
+    </HBox>
 </VBox>
+

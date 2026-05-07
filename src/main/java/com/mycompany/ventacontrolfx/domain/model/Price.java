@@ -127,3 +127,4 @@ public class Price {
         this.updateLogId = updateLogId;
     }
 }
+

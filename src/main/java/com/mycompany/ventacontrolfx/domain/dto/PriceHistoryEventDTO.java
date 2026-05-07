@@ -60,3 +60,4 @@ public class PriceHistoryEventDTO {
         return logId;
     }
 }
+

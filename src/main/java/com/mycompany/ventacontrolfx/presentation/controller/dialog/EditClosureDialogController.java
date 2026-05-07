@@ -1,8 +1,8 @@
 package com.mycompany.ventacontrolfx.presentation.controller.dialog;
 
 import com.mycompany.ventacontrolfx.application.usecase.CashClosureUseCase;
-import com.mycompany.ventacontrolfx.util.AlertUtil;
-import com.mycompany.ventacontrolfx.util.UserSession;
+import com.mycompany.ventacontrolfx.presentation.util.AlertUtil;
+import com.mycompany.ventacontrolfx.domain.model.UserSession;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -82,3 +82,4 @@ public class EditClosureDialogController {
         return confirmed;
     }
 }
+

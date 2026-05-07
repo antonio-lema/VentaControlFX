@@ -17,7 +17,7 @@
     -fx-background-color: -fx-grad-primary;
     -fx-text-fill: #ffffff !important;
     -fx-font-weight: 800;
-    -fx-font-size: -fx-font-size-base;
+    -fx-font-size: 14px;
     -fx-padding: 12 32;
     -fx-background-radius: -fx-radius-md;
     -fx-border-color: rgba(255, 255, 255, 0.2);
@@ -209,6 +209,9 @@
    CHIPS DE CATEGORÍA
    ─────────────────────────────────────────────────── */
 .category-btn {
+    -fx-padding: 12 15;
+    -fx-font-size: 14px;
+    -fx-prompt-text-fill: -fx-text-custom-light;
     -fx-background-color: -fx-bg-surface;
     -fx-text-fill: -fx-text-custom-light;
     -fx-padding: 10 24;
@@ -216,7 +219,6 @@
     -fx-border-color: -fx-neutral-200;
     -fx-border-width: 1px;
     -fx-font-weight: 600;
-    -fx-font-size: 13px;
     -fx-cursor: hand;
     -fx-effect: none;
 }

@@ -252,3 +252,4 @@ public class MassivePriceUpdateUseCase {
         if (percentage > 500) throw new BusinessException("Una subida del " + percentage + "% parece excesiva.");
     }
 }
+

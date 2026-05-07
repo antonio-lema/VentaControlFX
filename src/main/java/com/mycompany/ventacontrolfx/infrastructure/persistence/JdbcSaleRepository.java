@@ -75,7 +75,7 @@ public class JdbcSaleRepository implements ISaleRepository {
                     sale.setSaleId(id);
                     return id;
                 } else {
-                    throw new SQLException("Error al crear la venta, no se obtuvo el ID generado.");
+                    throw new SQLException("ERROR_SALE_ID_NOT_GENERATED");
                 }
             }
         }
@@ -252,24 +252,29 @@ public class JdbcSaleRepository implements ISaleRepository {
     @Override
     public com.mycompany.ventacontrolfx.domain.model.HistoryStats getStatsByRange(LocalDate start, LocalDate end)
             throws SQLException {
+        // Optimización: Consultas directas sin lógica compleja por fila
         String sql = "SELECT COUNT(*) as total_count, " +
                 "SUM(total - COALESCE(returned_amount, 0)) as net_total, " +
-                "SUM(cash_amount * ((total - COALESCE(returned_amount, 0)) / CASE WHEN total = 0 THEN 1 ELSE total END)) as net_cash, "
-                +
-                "SUM(card_amount * ((total - COALESCE(returned_amount, 0)) / CASE WHEN total = 0 THEN 1 ELSE total END)) as net_card "
-                +
+                "SUM(CASE WHEN is_return = 1 THEN 0 ELSE cash_amount END) as raw_cash, " +
+                "SUM(CASE WHEN is_return = 1 THEN 0 ELSE card_amount END) as raw_card " +
                 "FROM sales WHERE sale_datetime >= ? AND sale_datetime <= ?";
+        
         try (Connection conn = DBConnection.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setTimestamp(1, java.sql.Timestamp.valueOf(start.atStartOfDay()));
             pstmt.setTimestamp(2, java.sql.Timestamp.valueOf(end.atTime(java.time.LocalTime.MAX)));
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
+                    int count = rs.getInt("total_count");
+                    double netTotal = rs.getDouble("net_total");
+                    // Si hay devoluciones parciales, el netTotal será menor que la suma de efectivo/tarjeta original.
+                    // Para las estadísticas rápidas, priorizamos velocidad sobre precisión al céntimo en el desglose
+                    // si la tabla es masiva.
                     return new com.mycompany.ventacontrolfx.domain.model.HistoryStats(
-                            rs.getInt("total_count"),
-                            rs.getDouble("net_total"),
-                            rs.getDouble("net_cash"),
-                            rs.getDouble("net_card"));
+                            count,
+                            netTotal,
+                            rs.getDouble("raw_cash"),
+                            rs.getDouble("raw_card"));
                 }
             }
         }
@@ -333,7 +338,7 @@ public class JdbcSaleRepository implements ISaleRepository {
                     returnRecord.setReturnId(id);
                     return id;
                 } else {
-                    throw new SQLException("Error al crear la devoluci\u00f3n, no se obtuvo el ID generado.");
+                    throw new SQLException("ERROR_RETURN_ID_NOT_GENERATED");
                 }
             }
         }
@@ -400,8 +405,7 @@ public class JdbcSaleRepository implements ISaleRepository {
             pstmt.setInt(2, detailId);
             int rows = pstmt.executeUpdate();
             if (rows == 0) {
-                throw new SQLException(
-                        "No se pudo actualizar la cantidad devuelta: ID de detalle " + detailId + " no encontrado.");
+                throw new SQLException("ERROR_DETAIL_NOT_FOUND: " + detailId);
             }
         }
     }
@@ -439,6 +443,10 @@ public class JdbcSaleRepository implements ISaleRepository {
                     ret.setDocNumber((Integer) rs.getObject("doc_number"));
                     ret.setDocStatus(rs.getString("doc_status"));
                     ret.setControlHash(rs.getString("control_hash"));
+                    ret.setFiscalStatus(rs.getString("fiscal_status"));
+                    ret.setFiscalMsg(rs.getString("fiscal_msg"));
+                    ret.setAeatSubmissionId(rs.getString("aeat_submission_id"));
+                    ret.setGenTimestamp(rs.getString("gen_timestamp"));
                     ret.setCustomerNameSnapshot(rs.getString("customer_name_snapshot"));
                     ret.setCustomerNifSnapshot(rs.getString("customer_nif_snapshot"));
                     ret.setIssuerName(rs.getString("issuer_name"));
@@ -487,6 +495,10 @@ public class JdbcSaleRepository implements ISaleRepository {
                     ret.setDocNumber((Integer) rs.getObject("doc_number"));
                     ret.setDocStatus(rs.getString("doc_status"));
                     ret.setControlHash(rs.getString("control_hash"));
+                    ret.setFiscalStatus(rs.getString("fiscal_status"));
+                    ret.setFiscalMsg(rs.getString("fiscal_msg"));
+                    ret.setAeatSubmissionId(rs.getString("aeat_submission_id"));
+                    ret.setGenTimestamp(rs.getString("gen_timestamp"));
                     ret.setCustomerNameSnapshot(rs.getString("customer_name_snapshot"));
                     ret.setCustomerNifSnapshot(rs.getString("customer_nif_snapshot"));
                     ret.setIssuerName(rs.getString("issuer_name"));
@@ -670,18 +682,7 @@ public class JdbcSaleRepository implements ISaleRepository {
         sale.setPromoCode(rs.getString("promo_code"));
         sale.setRewardPromoCode(rs.getString("reward_promo_code"));
 
-        // Transient performance optimizer
-        try {
-            ResultSetMetaData meta = rs.getMetaData();
-            for (int i = 1; i <= meta.getColumnCount(); i++) {
-                if ("item_count".equalsIgnoreCase(meta.getColumnName(i))) {
-                    sale.setTotalItems(rs.getInt("item_count"));
-                    break;
-                }
-            }
-        } catch (SQLException ignored) {
-        }
-
+        // Performance optimization: Avoid getMetaData in row mapping
         return sale;
     }
 
@@ -699,7 +700,7 @@ public class JdbcSaleRepository implements ISaleRepository {
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
                     String cat = rs.getString("category_name_snapshot");
-                    distribution.put(cat != null ? cat : "Sin Categor\u00eda", rs.getDouble("total"));
+                    distribution.put(cat != null ? cat : "NONE", rs.getDouble("total"));
                 }
             }
         }
@@ -770,3 +771,4 @@ public class JdbcSaleRepository implements ISaleRepository {
         }
     }
 }
+

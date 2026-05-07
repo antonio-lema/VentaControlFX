@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.chart.LineChart?>
+<?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
+<?import java.net.URL?>
+
+<VBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" 
+      fx:controller="com.mycompany.ventacontrolfx.presentation.controller.reports.ClientReportController"
+      spacing="0" styleClass="main-content-area">
+    
+    <stylesheets>
+        <URL value="@/styles/components/historial.css" />
+        <URL value="@/styles/components/filters.css" />
+        <URL value="@/styles/components/informes.css" />
+    </stylesheets>
+
+    <children>
+        <!-- Header Section (SaaS Style) -->
+        <VBox styleClass="view-header" spacing="0">
+            <children>
+                <HBox spacing="16" alignment="CENTER_LEFT">
+                    <children>
+                        <StackPane styleClass="view-header-icon-wrap">
+                            <children><FontAwesomeIconView glyphName="USERS" size="22" fill="white"/></children>
+                        </StackPane>
+                        <VBox spacing="2">
+                            <children>
+                                <Label text="Historial de Clientes" styleClass="view-title"/>
+                                <Label text="Análisis de comportamiento y retención (CRM)" styleClass="view-subtitle"/>
+                            </children>
+                        </VBox>
+                        <Region HBox.hgrow="ALWAYS" />
+                        <HBox spacing="10" alignment="CENTER_RIGHT">
+                            <HBox spacing="0" styleClass="search-box-header">
+                                <children>
+                                    <StackPane styleClass="search-icon-wrap">
+                                        <children><FontAwesomeIconView glyphName="SEARCH" size="14" fill="#64748b"/></children>
+                                    </StackPane>
+                                    <TextField fx:id="txtSearch" promptText="Buscar cliente, empresa o CIF..." prefWidth="300" styleClass="search-field-header"/>
+                                </children>
+                            </HBox>
+                            <ComboBox fx:id="cmbDateRange" prefWidth="150" styleClass="modern-combobox-header" />
+                            <Button onAction="#handleExport" styleClass="btn-secondary">
+                                <graphic><FontAwesomeIconView glyphName="DOWNLOAD" size="14"/></graphic>
+                            </Button>
+                        </HBox>
+                    </children>
+                </HBox>
+            </children>
+        </VBox>
+
+        <VBox spacing="30" VBox.vgrow="ALWAYS" style="-fx-padding: 30;">
+            <children>
+                
+                <!-- KPI Row SaaS Style -->
+                <HBox spacing="20" alignment="CENTER">
+                    <children>
+                        <!-- Active Clients -->
+                        <VBox styleClass="kpi-card-saas, kpi-card-blue" HBox.hgrow="ALWAYS">
+                            <children>
+                                <HBox alignment="CENTER_LEFT" spacing="10">
+                                    <StackPane styleClass="icon-bg-blue"><FontAwesomeIconView glyphName="USER_PLUS" fill="#1e88e5" size="16"/></StackPane>
+                                    <Label text="CLIENTES ACTIVOS" styleClass="kpi-label-saas" />
+                                </HBox>
+                                <Label fx:id="lblKpiActive" text="0" styleClass="kpi-value-saas" />
+                                <Label fx:id="lblKpiActiveVar" text="Ventas últimos 30 días" styleClass="trend-text" />
+                            </children>
+                        </VBox>
+
+                        <!-- Total Revenue -->
+                        <VBox styleClass="kpi-card-saas, kpi-card-green" HBox.hgrow="ALWAYS">
+                            <children>
+                                <HBox alignment="CENTER_LEFT" spacing="10">
+                                    <StackPane styleClass="icon-bg-green"><FontAwesomeIconView glyphName="EURO" fill="#10b981" size="16"/></StackPane>
+                                    <Label text="FACTURACIÓN TOTAL" styleClass="kpi-label-saas" />
+                                </HBox>
+                                <Label fx:id="lblKpiTotal" text="€0.00" styleClass="kpi-value-saas" />
+                                <Label fx:id="lblKpiTotalVar" text="Volumen bruto por cliente" styleClass="trend-text" />
+                            </children>
+                        </VBox>
+
+                        <!-- Average Ticket -->
+                        <VBox styleClass="kpi-card-saas, kpi-card-gold" HBox.hgrow="ALWAYS">
+                            <children>
+                                <HBox alignment="CENTER_LEFT" spacing="10">
+                                    <StackPane styleClass="icon-bg-gold"><FontAwesomeIconView glyphName="SHOPPING_BAG" fill="#f59e0b" size="16"/></StackPane>
+                                    <Label text="COMPRA MEDIA" styleClass="kpi-label-saas" />
+                                </HBox>
+                                <Label fx:id="lblKpiAvgOrder" text="€0.00" styleClass="kpi-value-saas" />
+                                <Label fx:id="lblKpiAvgOrderVar" text="Importe medio por ticket" styleClass="trend-text" />
+                            </children>
+                        </VBox>
+
+                        <!-- LTV -->
+                        <VBox styleClass="kpi-card-saas, kpi-card-purple" HBox.hgrow="ALWAYS">
+                            <children>
+                                <HBox alignment="CENTER_LEFT" spacing="10">
+                                    <StackPane styleClass="icon-bg-purple"><FontAwesomeIconView glyphName="LINE_CHART" fill="#8b5cf6" size="16"/></StackPane>
+                                    <Label text="VALOR CLIENTE (LTV)" styleClass="kpi-label-saas" />
+                                </HBox>
+                                <Label fx:id="lblKpiLtv" text="€0.00" styleClass="kpi-value-saas" />
+                                <Label fx:id="lblKpiLtvVar" text="Valor histórico medio" styleClass="trend-text" />
+                            </children>
+                        </VBox>
+                    </children>
+                </HBox>
+
+                <!-- Main Content Row -->
+                <HBox spacing="25" VBox.vgrow="ALWAYS">
+                    <children>
+                        <!-- Left: Client Directory Table -->
+                        <VBox spacing="0" HBox.hgrow="ALWAYS" styleClass="table-card">
+                            <children>
+                                <HBox alignment="CENTER_LEFT" spacing="15" style="-fx-padding: 15 20;">
+                                    <children>
+                                        <Label text="Directorio de Clientes" styleClass="widget-title" />
+                                        <Region HBox.hgrow="ALWAYS" />
+                                        <ComboBox fx:id="cmbRowLimit" prefWidth="90" styleClass="combo-limit" />
+                                    </children>
+                                </HBox>
+                                
+                                <TableView fx:id="clientTable" VBox.vgrow="ALWAYS" styleClass="modern-table-view">
+                                    <columns>
+                                        <TableColumn fx:id="colClientName" text="CLIENTE" prefWidth="250" />
+                                        <TableColumn fx:id="colClientStatus" text="ESTADO" prefWidth="100" styleClass="column-center" />
+                                        <TableColumn fx:id="colClientOrders" text="PEDIDOS" prefWidth="100" styleClass="column-center" />
+                                        <TableColumn fx:id="colClientTotal" text="TOTAL" prefWidth="120" styleClass="column-right" />
+                                    </columns>
+                                    <columnResizePolicy>
+                                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                                    </columnResizePolicy>
+                                </TableView>
+
+                                <HBox alignment="CENTER_LEFT" styleClass="table-footer">
+                                    <children>
+                                        <Region HBox.hgrow="ALWAYS" />
+                                        <Label fx:id="lblClientCount" text="0 registros" styleClass="trend-text" style="-fx-font-weight: bold;" />
+                                    </children>
+                                </HBox>
+                            </children>
+                        </VBox>
+
+                        <!-- Right: Detail and Insights -->
+                        <VBox fx:id="detailsPanel" prefWidth="480" spacing="20">
+                            <children>
+                                <!-- Empty State -->
+                                <StackPane fx:id="spDetailInitial" VBox.vgrow="ALWAYS" styleClass="detail-panel-empty">
+                                    <children>
+                                        <VBox alignment="CENTER" spacing="15">
+                                            <children>
+                                                <StackPane styleClass="icon-bg-muted" maxWidth="80" maxHeight="80">
+                                                    <children><FontAwesomeIconView glyphName="USER_CIRCLE" size="48" fill="#94a3b8"/></children>
+                                                </StackPane>
+                                                <Label text="Seleccione un perfil para ver su análisis" styleClass="label-muted" />
+                                            </children>
+                                        </VBox>
+                                    </children>
+                                </StackPane>
+
+                                <!-- Active Detail Content -->
+                                <VBox fx:id="pnlDetailContent" spacing="20" VBox.vgrow="ALWAYS" styleClass="detail-panel" visible="false" managed="false">
+                                    <children>
+                                        <HBox prefHeight="6.0" styleClass="detail-panel-accent" />
+                                        <VBox spacing="20" styleClass="detail-panel-body" VBox.vgrow="ALWAYS">
+                                            <children>
+                                                <!-- Header Detail -->
+                                                <HBox spacing="20" alignment="CENTER_LEFT">
+                                                    <children>
+                                                        <StackPane fx:id="spAvatar" styleClass="avatar-circle">
+                                                            <children><Label fx:id="lblDetailInitials" text="JD" styleClass="avatar-text"/></children>
+                                                        </StackPane>
+                                                        <VBox spacing="4" HBox.hgrow="ALWAYS">
+                                                            <children>
+                                                                <Label fx:id="lblDetailName" text="John Doe" styleClass="detail-sale-id" />
+                                                                <HBox spacing="8" alignment="CENTER_LEFT">
+                                                                    <children>
+                                                                        <Label fx:id="lblDetailTier" text="DIAMOND" styleClass="badge-primary" />
+                                                                        <Label fx:id="lblDetailInfo" text="CIF: 12345678X" styleClass="label-muted" />
+                                                                    </children>
+                                                                </HBox>
+                                                            </children>
+                                                        </VBox>
+                                                    </children>
+                                                </HBox>
+
+                                                <Separator />
+
+                                                <!-- Chart Evolution -->
+                                                <VBox spacing="10" VBox.vgrow="ALWAYS">
+                                                    <children>
+                                                        <Label text="EVOLUCIÓN DE COMPRAS" styleClass="filter-label-cap" />
+                                                        <LineChart fx:id="chartEvolution" legendVisible="false" prefHeight="180">
+                                                            <xAxis><CategoryAxis side="BOTTOM" /></xAxis>
+                                                            <yAxis><NumberAxis side="LEFT" /></yAxis>
+                                                        </LineChart>
+                                                    </children>
+                                                </VBox>
+
+                                                <!-- Purchase History Table -->
+                                                <VBox spacing="10" VBox.vgrow="ALWAYS">
+                                                    <children>
+                                                        <Label text="ÚLTIMAS TRANSACCIONES" styleClass="filter-label-cap" />
+                                                        <TableView fx:id="purchaseTable" prefHeight="250" styleClass="modern-table-view">
+                                                            <columns>
+                                                                <TableColumn fx:id="colDate" text="FECHA" prefWidth="100" />
+                                                                <TableColumn fx:id="colItems" text="ARTÍCULOS" prefWidth="80" styleClass="column-center" />
+                                                                <TableColumn fx:id="colAmount" text="TOTAL" prefWidth="90" styleClass="column-right" />
+                                                                <TableColumn fx:id="colMethod" text="PAGO" prefWidth="90" styleClass="column-center" />
+                                                            </columns>
+                                                            <columnResizePolicy>
+                                                                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                                                            </columnResizePolicy>
+                                                        </TableView>
+                                                    </children>
+                                                </VBox>
+                                            </children>
+                                        </VBox>
+                                    </children>
+                                </VBox>
+                            </children>
+                        </VBox>
+                    </children>
+                </HBox>
+            </children>
+        </VBox>
+    </children>
+</VBox>

@@ -1,0 +1,277 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
+<?import java.net.URL?>
+<?import javafx.scene.layout.StackPane?>
+
+<AnchorPane id="AnchorPane" prefHeight="750.0" prefWidth="1100.0" styleClass="main-content-area"
+            xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.mycompany.ventacontrolfx.presentation.controller.receipt.HistoryController">
+   <stylesheets>
+       <URL value="@/styles/components/historial.css" />
+       <URL value="@/styles/components/filters.css" />
+       <URL value="@/styles/components/informes.css" />
+   </stylesheets>
+   <children>
+      <VBox spacing="0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <children>
+            <!-- Header Section (Simplified like Returns) -->
+            <VBox styleClass="view-header" spacing="0">
+                <children>
+                    <HBox spacing="16" alignment="CENTER_LEFT">
+                        <children>
+                            <StackPane styleClass="view-header-icon-wrap">
+                                <children><FontAwesomeIconView glyphName="SHOPPING_CART" size="24" fill="white"/></children>
+                            </StackPane>
+                            <VBox spacing="2">
+                                <children>
+                                    <Label text="%history.title" styleClass="view-title"/>
+                                    <Label text="%history.subtitle" styleClass="view-subtitle"/>
+                                </children>
+                            </VBox>
+                            <Region HBox.hgrow="ALWAYS" />
+                            <Button onAction="#loadSales" styleClass="btn-secondary" text="%returns.btn.refresh">
+                                <graphic><FontAwesomeIconView glyphName="REFRESH" size="14" fill="white" /></graphic>
+                            </Button>
+                        </children>
+                    </HBox>
+                </children>
+            </VBox>
+            
+            <VBox spacing="30.0" VBox.vgrow="ALWAYS" style="-fx-padding: 30;">
+                <children>
+
+                    <!-- KPI Cards Row (Moved up to match Returns) -->
+                    <HBox spacing="20.0" alignment="CENTER">
+                        <children>
+                           <!-- Card Tickets: Blue -->
+                           <VBox styleClass="kpi-card-saas, kpi-card-blue" HBox.hgrow="ALWAYS">
+                              <children>
+                                 <HBox alignment="CENTER_LEFT" spacing="10.0">
+                                    <children>
+                                       <StackPane styleClass="icon-bg-blue">
+                                          <children><FontAwesomeIconView glyphName="SHOPPING_CART" size="16" fill="#1e88e5" /></children>
+                                       </StackPane>
+                                       <Label text="TICKETS" styleClass="kpi-label-saas" />
+                                    </children>
+                                 </HBox>
+                                 <Label fx:id="lblTotalSalesCount" text="0" styleClass="kpi-value-saas" />
+                                 <Label text="Ventas en el periodo" styleClass="trend-text" />
+                              </children>
+                           </VBox>
+
+                           <!-- Card Total: Red -->
+                           <VBox styleClass="kpi-card-saas, kpi-card-red" HBox.hgrow="ALWAYS">
+                              <children>
+                                 <HBox alignment="CENTER_LEFT" spacing="10.0">
+                                    <children>
+                                       <StackPane styleClass="icon-bg-red">
+                                          <children><FontAwesomeIconView glyphName="EURO" size="16" fill="#ef4444" /></children>
+                                       </StackPane>
+                                       <Label text="TOTAL RECAUDADO" styleClass="kpi-label-saas" />
+                                    </children>
+                                 </HBox>
+                                 <Label fx:id="lblTotalAmount" text="0,00 €" styleClass="kpi-value-saas" />
+                                 <Label text="Cifra de ventas bruta" styleClass="trend-text" />
+                              </children>
+                           </VBox>
+
+                           <!-- Card Cash: Gold -->
+                           <VBox styleClass="kpi-card-saas, kpi-card-gold" HBox.hgrow="ALWAYS">
+                              <children>
+                                 <HBox alignment="CENTER_LEFT" spacing="10.0">
+                                    <children>
+                                       <StackPane styleClass="icon-bg-gold">
+                                          <children><FontAwesomeIconView glyphName="MONEY" size="16" fill="#f59e0b" /></children>
+                                       </StackPane>
+                                       <Label text="EFECTIVO" styleClass="kpi-label-saas" />
+                                    </children>
+                                 </HBox>
+                                 <Label fx:id="lblTotalCash" text="0,00 €" styleClass="kpi-value-saas" />
+                                 <Label text="Pagos en metálico" styleClass="trend-text" />
+                              </children>
+                           </VBox>
+
+                           <!-- Card Card: Green -->
+                           <VBox styleClass="kpi-card-saas, kpi-card-green" HBox.hgrow="ALWAYS">
+                              <children>
+                                 <HBox alignment="CENTER_LEFT" spacing="10.0">
+                                    <children>
+                                       <StackPane styleClass="icon-bg-green">
+                                          <children><FontAwesomeIconView glyphName="CREDIT_CARD" size="16" fill="#10b981" /></children>
+                                       </StackPane>
+                                       <Label text="TARJETA" styleClass="kpi-label-saas" />
+                                    </children>
+                                 </HBox>
+                                 <Label fx:id="lblTotalCard" text="0,00 €" styleClass="kpi-value-saas" />
+                                 <Label text="Cobros por datáfono" styleClass="trend-text" />
+                              </children>
+                           </VBox>
+                        </children>
+                    </HBox>
+
+                    <!-- Combined Filter Card (Matching Returns Layout) -->
+                    <HBox alignment="CENTER_LEFT" spacing="15.0" styleClass="filter-card">
+                        <padding><Insets top="15" right="20" bottom="15" left="20"/></padding>
+                        <children>
+                            <VBox spacing="5">
+                                <children>
+                                    <Label text="%history.filter.from" styleClass="filter-label-cap" />
+                                    <DatePicker fx:id="datePickerStart" onAction="#loadSales" prefWidth="150.0" styleClass="modern-datepicker" />
+                                </children>
+                            </VBox>
+                            
+                            <VBox spacing="5">
+                                <children>
+                                    <Label text="%history.filter.to" styleClass="filter-label-cap" />
+                                    <DatePicker fx:id="datePickerEnd" onAction="#loadSales" prefWidth="150.0" styleClass="modern-datepicker" />
+                                </children>
+                            </VBox>
+
+                            <VBox spacing="5" HBox.hgrow="ALWAYS">
+                                <children>
+                                    <Label text="%history.filter.search_ticket" styleClass="filter-label-cap" />
+                                    <TextField fx:id="txtSearchId" promptText="%history.filter.ticket_prompt" onAction="#handleSearch" styleClass="modern-textfield" />
+                                </children>
+                            </VBox>
+
+                            <VBox spacing="5" alignment="BOTTOM_LEFT">
+                                <children>
+                                    <Button onAction="#handleClearFilters" styleClass="btn-modern-clear" text="%history.btn.clear">
+                                        <graphic><FontAwesomeIconView glyphName="ERASER" size="12" /></graphic>
+                                    </Button>
+                                </children>
+                            </VBox>
+
+                            <!-- Quick Filters Integrated inside the Card -->
+                            <HBox fx:id="quickFilterContainer" spacing="8.0" alignment="BOTTOM_LEFT" styleClass="date-filter-container" />
+                        </children>
+                    </HBox>
+
+                    <HBox spacing="20.0" VBox.vgrow="ALWAYS">
+                       <children>
+                          <!-- Sales Table Card -->
+                          <VBox spacing="0" styleClass="table-card" HBox.hgrow="ALWAYS">
+                             <children>
+                                <StackPane VBox.vgrow="ALWAYS">
+                                   <children>
+                                      <TableView fx:id="salesTable" styleClass="modern-table-view">
+                                        <columns>
+                                          <TableColumn fx:id="colId" prefWidth="100.0" text="%history.table.ticket" styleClass="column-center" />
+                                          <TableColumn fx:id="colUser" prefWidth="180.0" text="%history.table.attended_by" />
+                                          <TableColumn fx:id="colDate" prefWidth="150.0" text="%history.table.date" />
+                                          <TableColumn fx:id="colTotal" prefWidth="120.0" text="%history.table.total" styleClass="column-right" />
+                                          <TableColumn fx:id="colMethod" prefWidth="150.0" text="%history.table.method" styleClass="column-center" />
+                                          <TableColumn fx:id="colFiscalStatus" prefWidth="120.0" text="Estado AEAT" styleClass="column-center" />
+                                        </columns>
+                                         <columnResizePolicy>
+                                            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                                         </columnResizePolicy>
+                                      </TableView>
+                                      <VBox fx:id="skeletonTableContainer" mouseTransparent="true" style="-fx-background-color: white;" visible="false" managed="false" />
+                                   </children>
+                                </StackPane>
+                                
+                                <HBox alignment="CENTER_LEFT" prefHeight="40.0" spacing="15.0" styleClass="table-footer">
+                                   <children>
+                                      <Label text="%history.show_limit" styleClass="label-limit" />
+                                      <ComboBox fx:id="cmbRowLimit" prefWidth="90" styleClass="combo-limit" />
+                                      <Region HBox.hgrow="ALWAYS" />
+                                      <Label fx:id="lblCount" text="%history.found_count" styleClass="label-muted" style="-fx-font-weight: bold;" />
+                                   </children>
+                                </HBox>
+                             </children>
+                          </VBox>
+
+                          <!-- Receipt Side Panel -->
+                          <VBox fx:id="detailsPanel" prefWidth="380.0" visible="false" managed="false" styleClass="detail-panel">
+                             <children>
+                                <HBox prefHeight="6.0" styleClass="detail-panel-accent" />
+                                <VBox spacing="15.0" styleClass="detail-panel-body" VBox.vgrow="ALWAYS">
+                                   <children>
+                                      <VBox alignment="CENTER" spacing="5">
+                                         <children>
+                                            <Label text="%history.detail.title" styleClass="filter-label-cap" />
+                                            <HBox spacing="10" alignment="CENTER">
+                                                <children>
+                                                    <Label fx:id="lblSaleId" text="%history.detail.ticket_prefix" styleClass="detail-sale-id" />
+                                                    <Label fx:id="lblReturnBadge" text="%history.detail.returned" visible="false" styleClass="badge-danger" />
+                                                </children>
+                                             </HBox>
+                                            <Label fx:id="lblSaleFullDate" text="18/02/2026 15:30" styleClass="label-muted" />
+                                         </children>
+                                      </VBox>
+
+                                      <Separator />
+
+                                      <Label text="%history.detail.products" styleClass="filter-label-cap" />
+                                      <ScrollPane fitToWidth="true" styleClass="detail-scroll" prefHeight="300.0" VBox.vgrow="ALWAYS">
+                                         <content>
+                                            <VBox fx:id="detailsItemsContainer" spacing="12.0" styleClass="detail-items-container" />
+                                         </content>
+                                      </ScrollPane>
+
+                                      <Separator />
+
+                                      <VBox spacing="8.0">
+                                         <children>
+                                            <HBox alignment="CENTER_LEFT">
+                                               <children>
+                                                  <Label text="%history.detail.payment_method" styleClass="label-muted" />
+                                                  <Region HBox.hgrow="ALWAYS" />
+                                                  <Label fx:id="lblPaymentMethod" text="Efectivo" styleClass="detail-info-value" />
+                                               </children>
+                                            </HBox>
+                                            <HBox alignment="CENTER_LEFT" style="-fx-padding: 10 0 0 0;">
+                                               <children>
+                                                  <Label text="%history.detail.total" styleClass="detail-total-label" />
+                                                  <Region HBox.hgrow="ALWAYS" />
+                                                  <Label fx:id="lblTotalAmountDetail" text="0,00 &#x20ac;" styleClass="detail-total-value, text-total" />
+                                               </children>
+                                            </HBox>
+                                         </children>
+                                      </VBox>
+
+                                       <HBox spacing="10">
+                                          <children>
+                                              <Button fx:id="btnPrint" text="%history.detail.btn.print" onAction="#handlePrintTicket" HBox.hgrow="ALWAYS" maxWidth="Infinity" styleClass="btn-history-print">
+                                                 <graphic>
+                                                    <FontAwesomeIconView glyphName="PRINT" fill="white" size="16" />
+                                                 </graphic>
+                                              </Button>
+                                               <Button fx:id="btnCorrection" text="Subsanar" onAction="#handleCorrection" HBox.hgrow="ALWAYS" maxWidth="Infinity" styleClass="btn-history-correction">
+                                                  <graphic>
+                                                     <FontAwesomeIconView glyphName="WRENCH" fill="white" size="16" />
+                                                  </graphic>
+                                               </Button>
+                                              <Button fx:id="btnReturn" text="%history.detail.btn.return" onAction="#handleRegisterReturn" HBox.hgrow="ALWAYS" maxWidth="Infinity" styleClass="btn-history-return">
+                                                 <graphic>
+                                                    <FontAwesomeIconView glyphName="REPLY" fill="white" size="16" />
+                                                 </graphic>
+                                              </Button>
+                                          </children>
+                                       </HBox>
+                                       <Button fx:id="btnResendAeat" text="Re-enviar a AEAT" onAction="#handleResendAeat" maxWidth="Infinity" style="-fx-background-color: #f39c12; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10; -fx-background-radius: 8;">
+                                          <graphic>
+                                             <FontAwesomeIconView glyphName="CLOUD_UPLOAD" fill="white" size="16" />
+                                          </graphic>
+                                       </Button>
+
+                                       <Region VBox.vgrow="ALWAYS" />
+                                       <Button onAction="#handleCloseDetails" text="%history.detail.btn.close" maxWidth="Infinity" styleClass="btn-history-close" />
+                                   </children>
+                                </VBox>
+                             </children>
+                          </VBox>
+                       </children>
+                    </HBox>
+                </children>
+            </VBox>
+         </children>
+      </VBox>
+   </children>
+</AnchorPane>

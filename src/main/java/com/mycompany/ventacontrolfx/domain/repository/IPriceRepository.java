@@ -21,3 +21,4 @@ public interface IPriceRepository {
     int countPricesByList(int priceListId, String search, java.time.LocalDateTime startDate, Integer logId) throws SQLException;
     void updateLogIdForPricesAtTimestamp(int priceListId, java.time.LocalDateTime timestamp, int logId) throws SQLException;
 }
+

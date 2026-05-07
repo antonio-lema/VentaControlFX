@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
+
+<VBox spacing="15" styleClass="modal-container" prefWidth="550" stylesheets="@/styles/variables.css" 
+      xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" 
+      fx:controller="com.mycompany.ventacontrolfx.presentation.controller.dialog.ClientFormController">
+    <padding>
+        <Insets top="24" right="32" bottom="24" left="32"/>
+    </padding>
+
+    <HBox alignment="CENTER_LEFT" spacing="15">
+        <StackPane styleClass="icon-container-blue" maxWidth="45" maxHeight="45">
+            <FontAwesomeIconView glyphName="USER_PLUS" size="20" fill="#1e88e5"/>
+        </StackPane>
+        <VBox spacing="2">
+            <Label fx:id="lblTitle" text="%client.form.title" styleClass="modal-title"/>
+            <Label text="%client.form.subtitle" styleClass="modal-subtitle"/>
+        </VBox>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Button onAction="#handleCancel" styleClass="button-ghost" text="&#x2715;" style="-fx-font-size: 16px;"/>
+    </HBox>
+
+    <Separator/>
+
+    <ScrollPane fitToWidth="true" styleClass="edge-to-edge" style="-fx-background-color: transparent;" VBox.vgrow="ALWAYS">
+        <VBox spacing="18" style="-fx-padding: 5 2 5 2;">
+            <!-- Tipo de Cliente -->
+            <VBox spacing="6">
+                <Label text="%client.form.type" styleClass="text-sm, font-medium, text-gray-700"/>
+                <ComboBox fx:id="cmbType" promptText="%client.form.type.prompt" styleClass="form-control" maxWidth="Infinity"/>
+            </VBox>
+            
+            <!-- Name -->
+            <VBox spacing="6">
+                <Label text="%client.form.name" styleClass="text-sm, font-medium, text-gray-700"/>
+                <TextField fx:id="txtName" promptText="%client.form.name.prompt" styleClass="form-control"/>
+            </VBox>
+            
+            <HBox spacing="15">
+                <!-- ID Type -->
+                <VBox spacing="6" HBox.hgrow="ALWAYS">
+                    <Label text="%client.form.id_type" styleClass="text-sm, font-medium, text-gray-700"/>
+                    <ComboBox fx:id="cmbIdType" styleClass="form-control" maxWidth="Infinity"/>
+                </VBox>
+                <!-- Tax ID -->
+                <VBox spacing="6" HBox.hgrow="ALWAYS">
+                     <Label text="%client.form.tax_id" styleClass="text-sm, font-medium, text-gray-700"/>
+                     <TextField fx:id="txtTaxId" promptText="%client.form.tax_id.prompt" styleClass="form-control"/>
+                </VBox>
+            </HBox>
+
+            <!-- Phone, Email -->
+            <HBox spacing="15">
+                <VBox spacing="6" HBox.hgrow="ALWAYS">
+                     <Label text="%client.form.phone" styleClass="text-sm, font-medium, text-gray-700"/>
+                     <TextField fx:id="txtPhone" promptText="%client.form.phone.prompt" styleClass="form-control"/>
+                </VBox>
+                <VBox spacing="6" HBox.hgrow="ALWAYS">
+                    <Label text="%client.form.email" styleClass="text-sm, font-medium, text-gray-700"/>
+                    <TextField fx:id="txtEmail" promptText="%client.form.email.prompt" styleClass="form-control"/>
+                </VBox>
+            </HBox>
+
+            <!-- Address -->
+            <VBox spacing="6">
+                <Label text="%client.form.address" styleClass="text-sm, font-medium, text-gray-700"/>
+                <TextField fx:id="txtAddress" promptText="%client.form.address.prompt" styleClass="form-control"/>
+            </VBox>
+
+            <HBox spacing="15">
+                 <VBox spacing="6" maxWidth="120">
+                     <Label text="%client.form.cp" styleClass="text-sm, font-medium, text-gray-700"/>
+                     <TextField fx:id="txtPostalCode" promptText="%client.form.cp.prompt" styleClass="form-control"/>
+                </VBox>
+                <VBox spacing="6" HBox.hgrow="ALWAYS">
+                     <Label text="%client.form.city" styleClass="text-sm, font-medium, text-gray-700"/>
+                     <TextField fx:id="txtCity" promptText="%client.form.city.prompt" styleClass="form-control"/>
+                </VBox>
+            </HBox>
+            
+            <HBox spacing="15">
+                 <VBox spacing="6" HBox.hgrow="ALWAYS">
+                     <Label text="%client.form.province" styleClass="text-sm, font-medium, text-gray-700"/>
+                     <ComboBox fx:id="cmbProvince" promptText="%client.form.province.prompt" styleClass="form-control" maxWidth="Infinity"/>
+                </VBox>
+                <VBox spacing="6" HBox.hgrow="ALWAYS">
+                     <Label text="%client.form.country" styleClass="text-sm, font-medium, text-gray-700"/>
+                     <TextField fx:id="txtCountry" promptText="%client.form.country.prompt" styleClass="form-control"/>
+                </VBox>
+            </HBox>
+
+            <!-- Price List Selector -->
+            <VBox spacing="6">
+                <Label text="%client.form.pricelist" styleClass="text-sm, font-medium, text-gray-700"/>
+                <ComboBox fx:id="cmbPriceList" promptText="%client.form.pricelist.prompt" styleClass="form-control" maxWidth="Infinity"/>
+            </VBox>
+        </VBox>
+    </ScrollPane>
+
+    <Region VBox.vgrow="ALWAYS" minHeight="10"/>
+
+    <HBox spacing="10" alignment="CENTER_RIGHT">
+        <Button text="%btn.cancel" onAction="#handleCancel" styleClass="btn-secondary" cancelButton="true" />
+        <Button text="%btn.save" onAction="#handleSave" styleClass="btn-primary" defaultButton="true">
+            <graphic>
+                <FontAwesomeIconView glyphName="SAVE" size="14" fill="white" />
+            </graphic>
+        </Button>
+    </HBox>
+</VBox>
+
