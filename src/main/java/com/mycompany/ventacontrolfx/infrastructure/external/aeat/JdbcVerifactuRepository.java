@@ -27,6 +27,18 @@ public class JdbcVerifactuRepository {
                 "NULL AS orig_series, NULL AS orig_num, NULL AS orig_date, 0 AS orig_base, 0 AS orig_cuota " +
                 "FROM sales s WHERE s.fiscal_status = 'PENDING' AND s.doc_series IS NOT NULL AND s.doc_number IS NOT NULL " +
                 "UNION ALL " +
+                "SELECT 'ANULACION' AS op_type, s.sale_id AS id, s.doc_type, s.doc_series, s.doc_number, " +
+                "s.sale_datetime AS fecha, s.total AS importe, s.total_net AS base, s.total_tax AS cuota, s.control_hash, s.prev_hash, s.gen_timestamp, s.is_correction, " +
+                "s.customer_name_snapshot, s.customer_nif_snapshot, s.incident_reason, " +
+                "NULL AS orig_series, NULL AS orig_num, NULL AS orig_date, 0 AS orig_base, 0 AS orig_cuota " +
+                "FROM sales s WHERE s.fiscal_status = 'VOID_PENDING' AND s.doc_series IS NOT NULL AND s.doc_number IS NOT NULL " +
+                "UNION ALL " +
+                "SELECT 'ANULACION' AS op_type, r.return_id AS id, r.doc_type, r.doc_series, r.doc_number, " +
+                "r.return_datetime AS fecha, -r.total_refunded AS importe, -r.tax_basis AS base, -r.total_tax AS cuota, r.control_hash, r.prev_hash, r.gen_timestamp, r.is_correction, " +
+                "r.customer_name_snapshot, r.customer_nif_snapshot, r.incident_reason, " +
+                "NULL AS orig_series, NULL AS orig_num, NULL AS orig_date, 0 AS orig_base, 0 AS orig_cuota " +
+                "FROM returns r WHERE r.fiscal_status = 'VOID_PENDING' AND r.doc_series IS NOT NULL AND r.doc_number IS NOT NULL " +
+                "UNION ALL " +
                 "SELECT 'RECTIFICATIVA' AS op_type, r.return_id AS id, r.doc_type, r.doc_series, r.doc_number, " +
                 "r.return_datetime AS fecha, -r.total_refunded AS importe, -r.tax_basis AS base, -r.total_tax AS cuota, r.control_hash, r.prev_hash, r.gen_timestamp, r.is_correction, " +
                 "r.customer_name_snapshot, r.customer_nif_snapshot, r.incident_reason, " +
@@ -105,8 +117,9 @@ public class JdbcVerifactuRepository {
 
                 // Reconstruir genTimestamp determinístico para que el hash coincida
                 String genTimestamp = rs.getString("gen_timestamp");
-                if (genTimestamp == null || genTimestamp.isEmpty()) {
-                    genTimestamp = fechaTs.atZone(java.time.ZoneId.of("Europe/Madrid"))
+                // IMPORTANTE: Para ANULACIONES siempre usamos la hora actual para evitar error [2004] de AEAT
+                if (opType.equals("ANULACION") || genTimestamp == null || genTimestamp.isEmpty()) {
+                    genTimestamp = java.time.ZonedDateTime.now(java.time.ZoneId.of("Europe/Madrid"))
                             .format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssxxx"));
                 }
 
@@ -132,9 +145,8 @@ public class JdbcVerifactuRepository {
                 
                 payload.setIncidentReason(rs.getString("incident_reason"));
 
-                // Si es rectificativa, poblar datos originales.
-                // Si la venta original no tiene datos, OMITIR para no romper el batch con NumSerieFactura vacío.
-                if (payload.isRectificativa()) {
+                // Si es rectificativa (y NO una anulación), poblar datos originales.
+                if (payload.isRectificativa() && !isAnulacion) {
                     String oSer = rs.getString("orig_series");
                     int oNum = rs.getInt("orig_num");
                     java.sql.Timestamp oDateTs = rs.getTimestamp("orig_date");
@@ -211,28 +223,35 @@ public class JdbcVerifactuRepository {
         String opType = parts[0];
         int id = Integer.parseInt(parts[1]);
 
-        String table = opType.equals("ALTA") ? "sales" : "returns";
-        String idColumn = opType.equals("ALTA") ? "sale_id" : "return_id";
+        // Si es una anulación, la tabla siempre es sales
+        String table = (opType.equals("ALTA") || opType.equals("ANULACION")) ? "sales" : "returns";
+        String idColumn = (opType.equals("ALTA") || opType.equals("ANULACION")) ? "sale_id" : "return_id";
 
-        // CSV se puede guardar en fiscal_msg o en un campo dedicado
-        // (aeat_submission_id)
-        String sql = "UPDATE " + table + " SET fiscal_status = ?, fiscal_msg = ?, aeat_submission_id = ? WHERE "
-                + idColumn + " = ?";
+        // SQL base para actualización fiscal
+        String sql = "UPDATE " + table + " SET fiscal_status = ?, fiscal_msg = ?, aeat_submission_id = ? WHERE " + idColumn + " = ?";
 
         try (Connection conn = DBConnection.getConnection();
-                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, status);
             pstmt.setString(2, statusMsg != null && statusMsg.length() > 500 ? statusMsg.substring(0, 500) : statusMsg);
 
-            // Si el status es ACCEPTED y msg parece un CSV (16 caracteres) lo asignamos
-            if ("ACCEPTED".equals(status) && statusMsg != null && statusMsg.length() == 16) {
+            if ("ACCEPTED".equals(status) && statusMsg != null && statusMsg.length() >= 16) {
                 pstmt.setString(3, statusMsg);
             } else {
-                pstmt.setString(3, null); // O mantener el anterior si hubiera
+                pstmt.setString(3, null);
             }
 
             pstmt.setInt(4, id);
             pstmt.executeUpdate();
+
+            // Lógica Adicional: Si la ANULACIÓN fue aceptada, marcamos el documento como VOIDED
+            if (opType.equals("ANULACION") && "ACCEPTED".equals(status)) {
+                String voidSql = "UPDATE sales SET doc_status = 'VOIDED' WHERE sale_id = ?";
+                try (PreparedStatement psVoid = conn.prepareStatement(voidSql)) {
+                    psVoid.setInt(1, id);
+                    psVoid.executeUpdate();
+                }
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -338,11 +357,11 @@ public class JdbcVerifactuRepository {
 
     public List<FiscalOperationModel> getRecentFiscalOperations(int limit) {
         List<FiscalOperationModel> list = new ArrayList<>();
-        String sql = "SELECT 'ALTA' AS op_type, sale_id AS id, doc_series, doc_number, sale_datetime AS fecha, total, fiscal_status, fiscal_msg, xml_sent, xml_received " +
-                "FROM sales WHERE doc_number IS NOT NULL " +
+        String sql = "SELECT 'ALTA' AS op_type, sale_id AS id, doc_series, doc_number, sale_datetime AS fecha, total, fiscal_status, fiscal_msg, xml_sent, xml_received, doc_status " +
+                "FROM sales " +
                 "UNION ALL " +
-                "SELECT 'RECTIFICATIVA' AS op_type, return_id AS id, doc_series, doc_number, return_datetime AS fecha, -total_refunded AS total, fiscal_status, fiscal_msg, xml_sent, xml_received " +
-                "FROM returns WHERE doc_number IS NOT NULL " +
+                "SELECT 'RECTIFICATIVA' AS op_type, return_id AS id, doc_series, doc_number, return_datetime AS fecha, -total_refunded AS total, fiscal_status, fiscal_msg, xml_sent, xml_received, doc_status " +
+                "FROM returns " +
                 "ORDER BY fecha DESC LIMIT ?";
 
         try (Connection conn = DBConnection.getConnection();
@@ -350,17 +369,29 @@ public class JdbcVerifactuRepository {
             pstmt.setInt(1, limit);
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
-                    String doc = rs.getString("doc_series") + "-" + String.format("%05d", rs.getInt("doc_number"));
+                    String series = rs.getString("doc_series");
+                    int num = rs.getInt("doc_number");
+                    String doc;
+                    if (series != null && num > 0) {
+                        doc = series + "-" + String.format("%05d", num);
+                    } else {
+                        doc = "LEGACY-" + rs.getInt("id");
+                    }
+
+                    String status = rs.getString("fiscal_status");
+                    if (status == null) status = "NON_FISCAL";
+
                     list.add(new FiscalOperationModel(
                             rs.getInt("id"),
                             rs.getString("op_type"),
                             doc,
                             rs.getTimestamp("fecha").toString(),
                             rs.getDouble("total"),
-                            rs.getString("fiscal_status"),
+                            status,
                             rs.getString("fiscal_msg"),
                             rs.getString("xml_sent"),
-                            rs.getString("xml_received")
+                            rs.getString("xml_received"),
+                            rs.getString("doc_status")
                     ));
                 }
             }
@@ -377,6 +408,25 @@ public class JdbcVerifactuRepository {
             if (i < ids.size() - 1) sb.append(",");
         }
         return sb.toString();
+    }
+
+    public void requestVoid(String traceId) {
+        if (traceId == null || !traceId.contains("-")) return;
+        String[] parts = traceId.split("-");
+        String opType = parts[0];
+        int id = Integer.parseInt(parts[1]);
+        
+        String table = opType.equals("ALTA") || opType.equals("ANULACION") ? "sales" : "returns";
+        String idCol = opType.equals("ALTA") || opType.equals("ANULACION") ? "sale_id" : "return_id";
+
+        String sql = "UPDATE " + table + " SET fiscal_status = 'VOID_PENDING' WHERE " + idCol + " = ?";
+        try (java.sql.Connection conn = com.mycompany.ventacontrolfx.infrastructure.persistence.DBConnection.getConnection();
+             java.sql.PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            ps.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
 

@@ -32,6 +32,9 @@
                             </children>
                         </VBox>
                         <Region HBox.hgrow="ALWAYS" />
+                        <Button styleClass="btn-secondary" onAction="#handleVoid" text="Anular" style="-fx-background-color: #ef4444; -fx-text-fill: white;">
+                            <graphic><FontAwesomeIconView glyphName="TRASH" size="14" fill="white"/></graphic>
+                        </Button>
                         <Button styleClass="btn-primary" onAction="#handleRefresh" text="Sincronizar Datos">
                             <graphic><FontAwesomeIconView glyphName="REFRESH" size="14" fill="white"/></graphic>
                         </Button>

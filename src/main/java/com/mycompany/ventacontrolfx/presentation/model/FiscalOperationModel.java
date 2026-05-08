@@ -10,10 +10,11 @@ public class FiscalOperationModel {
     private final DoubleProperty total = new SimpleDoubleProperty();
     private final StringProperty status = new SimpleStringProperty();
     private final StringProperty error = new SimpleStringProperty();
+    private final StringProperty docStatus = new SimpleStringProperty();
     private final StringProperty xmlSent = new SimpleStringProperty();
     private final StringProperty xmlReceived = new SimpleStringProperty();
 
-    public FiscalOperationModel(int id, String type, String document, String date, double total, String status, String error, String xmlSent, String xmlReceived) {
+    public FiscalOperationModel(int id, String type, String document, String date, double total, String status, String error, String xmlSent, String xmlReceived, String docStatus) {
         this.id.set(id);
         this.type.set(type);
         this.document.set(document);
@@ -23,7 +24,11 @@ public class FiscalOperationModel {
         this.error.set(error);
         this.xmlSent.set(xmlSent);
         this.xmlReceived.set(xmlReceived);
+        this.docStatus.set(docStatus);
     }
+
+    public String getDocStatus() { return docStatus.get(); }
+    public StringProperty docStatusProperty() { return docStatus; }
 
     public int getId() { return id.get(); }
     public IntegerProperty idProperty() { return id; }

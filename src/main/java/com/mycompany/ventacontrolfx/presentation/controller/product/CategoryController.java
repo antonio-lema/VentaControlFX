@@ -182,11 +182,7 @@ public class CategoryController implements Injectable, com.mycompany.ventacontro
         }
     }
 
-    @Override
-    public void handleSearch(String query) {
-        this.currentSearchQuery = query == null ? "" : query.trim();
-        paginationHelper.refresh();
-    }
+
 
     @FXML
     private void handleAddCategory() {

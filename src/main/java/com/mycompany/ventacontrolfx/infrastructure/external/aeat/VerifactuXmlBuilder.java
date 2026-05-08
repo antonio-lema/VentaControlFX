@@ -49,8 +49,7 @@ public class VerifactuXmlBuilder {
      * (AnulacionRegFactuSistemaFacturacion) para listado de cancelaciones.
      */
     public String buildAnulacionSoapMessage(List<VerifactuPayload> payloads) {
-        // En VeriFactu se usa el mismo nodo raíz para Alta y Anulación
-        return buildEnvelope("RegFactuSistemaFacturacion", payloads);
+        return buildEnvelope("AnulacionRegFactuSistemaFacturacion", payloads);
     }
 
     private String buildEnvelope(String rootNode, List<VerifactuPayload> payloads) {
@@ -73,106 +72,91 @@ public class VerifactuXmlBuilder {
 
         // --- Iterar Registros ---
         for (VerifactuPayload payload : payloads) {
+            boolean isAnulacion = payload.isAnulacion();
             xml.append("      <sfLR:RegistroFactura>\n");
-            xml.append("        <sf:RegistroAlta>\n");
+            xml.append("        <sf:").append(isAnulacion ? "RegistroAnulacion" : "RegistroAlta").append(">\n");
             xml.append("          <sf:IDVersion>1.0</sf:IDVersion>\n");
 
             // IDFactura
             xml.append("          <sf:IDFactura>\n");
-            xml.append("            <sf:IDEmisorFactura>").append(escapeXml(payload.getNifEmisor()))
-                    .append("</sf:IDEmisorFactura>\n");
-            xml.append("            <sf:NumSerieFactura>").append(escapeXml(payload.getNumSerieFactura()))
-                    .append("</sf:NumSerieFactura>\n");
-            xml.append("            <sf:FechaExpedicionFactura>").append(escapeXml(payload.getFechaExpedicion()))
-                    .append("</sf:FechaExpedicionFactura>\n");
+            xml.append("            <sf:").append(isAnulacion ? "IDEmisorFacturaAnulada" : "IDEmisorFactura").append(">").append(escapeXml(payload.getNifEmisor()))
+                    .append("</sf:").append(isAnulacion ? "IDEmisorFacturaAnulada" : "IDEmisorFactura").append(">\n");
+            xml.append("            <sf:").append(isAnulacion ? "NumSerieFacturaAnulada" : "NumSerieFactura").append(">").append(escapeXml(payload.getNumSerieFactura()))
+                    .append("</sf:").append(isAnulacion ? "NumSerieFacturaAnulada" : "NumSerieFactura").append(">\n");
+            xml.append("            <sf:").append(isAnulacion ? "FechaExpedicionFacturaAnulada" : "FechaExpedicionFactura").append(">").append(escapeXml(payload.getFechaExpedicion()))
+                    .append("</sf:").append(isAnulacion ? "FechaExpedicionFacturaAnulada" : "FechaExpedicionFactura").append(">\n");
             xml.append("          </sf:IDFactura>\n");
 
-            xml.append("          <sf:NombreRazonEmisor>").append(escapeXml(razonSocialObligado))
-                    .append("</sf:NombreRazonEmisor>\n");
+            if (!isAnulacion) {
+                xml.append("          <sf:NombreRazonEmisor>").append(escapeXml(razonSocialObligado))
+                        .append("</sf:NombreRazonEmisor>\n");
 
-            xml.append("          <sf:TipoFactura>").append(escapeXml(payload.getTipoFactura()))
-                    .append("</sf:TipoFactura>\n");
+                xml.append("          <sf:TipoFactura>").append(escapeXml(payload.getTipoFactura()))
+                        .append("</sf:TipoFactura>\n");
 
-            // Tipo de Rectificativa (Si aplica) - DEBE IR ANTES DE DescripcionOperacion
-            if (payload.isRectificativa()) {
-                xml.append("          <sf:TipoRectificativa>I</sf:TipoRectificativa>\n"); // I = Por diferencias
-                xml.append("          <sf:FacturasRectificadas>\n");
-                xml.append("            <sf:IDFacturaRectificada>\n");
-                xml.append("              <sf:IDEmisorFactura>").append(escapeXml(payload.getNifEmisor()))
-                        .append("</sf:IDEmisorFactura>\n");
-                xml.append("              <sf:NumSerieFactura>").append(escapeXml(payload.getOriginalNumSerie()))
-                        .append("</sf:NumSerieFactura>\n");
-                xml.append("              <sf:FechaExpedicionFactura>").append(escapeXml(payload.getOriginalFechaExp()))
-                        .append("</sf:FechaExpedicionFactura>\n");
-                xml.append("            </sf:IDFacturaRectificada>\n");
-                xml.append("          </sf:FacturasRectificadas>\n");
-            }
+                // Tipo de Rectificativa (Si aplica)
+                if (payload.isRectificativa()) {
+                    xml.append("          <sf:TipoRectificativa>I</sf:TipoRectificativa>\n");
+                    xml.append("          <sf:FacturasRectificadas>\n");
+                    xml.append("            <sf:IDFacturaRectificada>\n");
+                    xml.append("              <sf:IDEmisorFactura>").append(escapeXml(payload.getNifEmisor()))
+                            .append("</sf:IDEmisorFactura>\n");
+                    xml.append("              <sf:NumSerieFactura>").append(escapeXml(payload.getOriginalNumSerie()))
+                            .append("</sf:NumSerieFactura>\n");
+                    xml.append("              <sf:FechaExpedicionFactura>").append(escapeXml(payload.getOriginalFechaExp()))
+                            .append("</sf:FechaExpedicionFactura>\n");
+                    xml.append("            </sf:IDFacturaRectificada>\n");
+                    xml.append("          </sf:FacturasRectificadas>\n");
+                }
 
-            xml.append("          <sf:DescripcionOperacion>Ventas de mostrador TPV</sf:DescripcionOperacion>\n");
+                xml.append("          <sf:DescripcionOperacion>Ventas de mostrador TPV</sf:DescripcionOperacion>\n");
+                xml.append("          <sf:FacturaSimplificadaArt7273>N</sf:FacturaSimplificadaArt7273>\n");
+                
+                boolean noCustomer = payload.getCustomerNif() == null || payload.getCustomerNif().isEmpty();
+                xml.append("          <sf:FacturaSinIdentifDestinatarioArt61d>").append(noCustomer ? "S" : "N").append("</sf:FacturaSinIdentifDestinatarioArt61d>\n");
 
-            // Factura emitida al amparo de los artículos 7.2 y 7.3 (Facturas completas en lugar de simplificadas)
-            // NO debe ser 'S' si la factura es F2 o R5. Por defecto lo ponemos a 'N'.
-            xml.append("          <sf:FacturaSimplificadaArt7273>N</sf:FacturaSimplificadaArt7273>\n");
-            
-            // Sin Identificación Destinatario?
-            boolean noCustomer = payload.getCustomerNif() == null || payload.getCustomerNif().isEmpty();
-            xml.append("          <sf:FacturaSinIdentifDestinatarioArt61d>").append(noCustomer ? "S" : "N").append("</sf:FacturaSinIdentifDestinatarioArt61d>\n");
+                if (!noCustomer) {
+                    xml.append("          <sf:Destinatarios>\n");
+                    xml.append("            <sf:IDDestinatario>\n");
+                    xml.append("              <sf:NombreRazon>").append(escapeXml(payload.getCustomerName())).append("</sf:NombreRazon>\n");
+                    xml.append("              <sf:NIF>").append(escapeXml(payload.getCustomerNif())).append("</sf:NIF>\n");
+                    xml.append("            </sf:IDDestinatario>\n");
+                    xml.append("          </sf:Destinatarios>\n");
+                }
 
-            // Destinatarios (Si hay cliente identificado)
-            if (!noCustomer) {
-                xml.append("          <sf:Destinatarios>\n");
-                xml.append("            <sf:IDDestinatario>\n");
-                xml.append("              <sf:NombreRazon>").append(escapeXml(payload.getCustomerName())).append("</sf:NombreRazon>\n");
-                xml.append("              <sf:NIF>").append(escapeXml(payload.getCustomerNif())).append("</sf:NIF>\n");
-                xml.append("            </sf:IDDestinatario>\n");
-                xml.append("          </sf:Destinatarios>\n");
-            }
-
-            // Desglose (Obligatorio)
-            xml.append("          <sf:Desglose>\n");
-            
-            java.util.Map<Double, Double[]> breakdown = payload.getVatBreakdown();
-            if (breakdown != null && !breakdown.isEmpty()) {
-                // Caso 1: Tenemos desglose detallado (Multi-IVA)
-                for (java.util.Map.Entry<Double, Double[]> entry : breakdown.entrySet()) {
-                    double rate = entry.getKey();
-                    double lineBase = entry.getValue()[0];
-                    double lineCuota = entry.getValue()[1];
-                    
+                xml.append("          <sf:Desglose>\n");
+                java.util.Map<Double, Double[]> breakdown = payload.getVatBreakdown();
+                if (breakdown != null && !breakdown.isEmpty()) {
+                    for (java.util.Map.Entry<Double, Double[]> entry : breakdown.entrySet()) {
+                        double rate = entry.getKey();
+                        double lineBase = entry.getValue()[0];
+                        double lineCuota = entry.getValue()[1];
+                        xml.append("            <sf:DetalleDesglose>\n");
+                        xml.append("              <sf:Impuesto>01</sf:Impuesto>\n");
+                        xml.append("              <sf:ClaveRegimen>01</sf:ClaveRegimen>\n");
+                        xml.append("              <sf:CalificacionOperacion>S1</sf:CalificacionOperacion>\n");
+                        xml.append("              <sf:TipoImpositivo>").append(String.format(java.util.Locale.US, "%.2f", rate)).append("</sf:TipoImpositivo>\n");
+                        xml.append("              <sf:BaseImponibleOimporteNoSujeto>").append(String.format(java.util.Locale.US, "%.2f", Math.abs(lineBase))).append("</sf:BaseImponibleOimporteNoSujeto>\n");
+                        xml.append("              <sf:CuotaRepercutida>").append(String.format(java.util.Locale.US, "%.2f", Math.abs(lineCuota))).append("</sf:CuotaRepercutida>\n");
+                        xml.append("            </sf:DetalleDesglose>\n");
+                    }
+                } else {
+                    double base = payload.getTotalNet();
+                    double cuota = payload.getTotalTax();
+                    double rate = (base != 0) ? (Math.abs(cuota) / Math.abs(base)) * 100 : 21.0;
                     xml.append("            <sf:DetalleDesglose>\n");
                     xml.append("              <sf:Impuesto>01</sf:Impuesto>\n");
                     xml.append("              <sf:ClaveRegimen>01</sf:ClaveRegimen>\n");
                     xml.append("              <sf:CalificacionOperacion>S1</sf:CalificacionOperacion>\n");
                     xml.append("              <sf:TipoImpositivo>").append(String.format(java.util.Locale.US, "%.2f", rate)).append("</sf:TipoImpositivo>\n");
-                    xml.append("              <sf:BaseImponibleOimporteNoSujeto>").append(String.format(java.util.Locale.US, "%.2f", Math.abs(lineBase))).append("</sf:BaseImponibleOimporteNoSujeto>\n");
-                    xml.append("              <sf:CuotaRepercutida>").append(String.format(java.util.Locale.US, "%.2f", Math.abs(lineCuota))).append("</sf:CuotaRepercutida>\n");
+                    xml.append("              <sf:BaseImponibleOimporteNoSujeto>").append(String.format(java.util.Locale.US, "%.2f", Math.abs(base))).append("</sf:BaseImponibleOimporteNoSujeto>\n");
+                    xml.append("              <sf:CuotaRepercutida>").append(String.format(java.util.Locale.US, "%.2f", Math.abs(cuota))).append("</sf:CuotaRepercutida>\n");
                     xml.append("            </sf:DetalleDesglose>\n");
                 }
-            } else {
-                // Caso 2: Fallback (Cálculo aproximado si no hay desglose)
-                double base = payload.getTotalNet();
-                double cuota = payload.getTotalTax();
-                if (base == 0.0 && cuota == 0.0) {
-                    double rawTotal = payload.getImporteTotal();
-                    base = rawTotal / 1.21;
-                    cuota = rawTotal - base;
-                }
-                double rate = (base != 0) ? (Math.abs(cuota) / Math.abs(base)) * 100 : 21.0;
-                
-                xml.append("            <sf:DetalleDesglose>\n");
-                xml.append("              <sf:Impuesto>01</sf:Impuesto>\n");
-                xml.append("              <sf:ClaveRegimen>01</sf:ClaveRegimen>\n");
-                xml.append("              <sf:CalificacionOperacion>S1</sf:CalificacionOperacion>\n");
-                xml.append("              <sf:TipoImpositivo>").append(String.format(java.util.Locale.US, "%.2f", rate)).append("</sf:TipoImpositivo>\n");
-                xml.append("              <sf:BaseImponibleOimporteNoSujeto>").append(String.format(java.util.Locale.US, "%.2f", Math.abs(base))).append("</sf:BaseImponibleOimporteNoSujeto>\n");
-                xml.append("              <sf:CuotaRepercutida>").append(String.format(java.util.Locale.US, "%.2f", Math.abs(cuota))).append("</sf:CuotaRepercutida>\n");
-                xml.append("            </sf:DetalleDesglose>\n");
+                xml.append("          </sf:Desglose>\n");
+                xml.append("          <sf:CuotaTotal>").append(String.format(java.util.Locale.US, "%.2f", Math.abs(payload.getTotalTax()))).append("</sf:CuotaTotal>\n");
+                xml.append("          <sf:ImporteTotal>").append(String.format(java.util.Locale.US, "%.2f", Math.abs(payload.getImporteTotal()))).append("</sf:ImporteTotal>\n");
             }
-            xml.append("          </sf:Desglose>\n");
-
-            // Importes (brutos: base + cuota)
-            xml.append("          <sf:CuotaTotal>").append(String.format(java.util.Locale.US, "%.2f", Math.abs(payload.getTotalTax()))).append("</sf:CuotaTotal>\n");
-            xml.append("          <sf:ImporteTotal>").append(String.format(java.util.Locale.US, "%.2f", Math.abs(payload.getImporteTotal()))).append("</sf:ImporteTotal>\n");
 
             // Encadenamiento
             if (payload.getPrevHash() != null && !payload.getPrevHash().isEmpty()) {
@@ -208,26 +192,24 @@ public class VerifactuXmlBuilder {
             xml.append("            <sf:IndicadorMultiplesOT>N</sf:IndicadorMultiplesOT>\n");
             xml.append("          </sf:SistemaInformatico>\n");
             
-            // FechaHoraHusoGenRegistro DEBE IR DESPUÉS DE SistemaInformatico
-            String ahoraIso;
-            if (payload.getGenTimestamp() != null && !payload.getGenTimestamp().isEmpty()) {
-                ahoraIso = payload.getGenTimestamp();
-            } else {
-                ahoraIso = java.time.ZonedDateTime.now(java.time.ZoneId.of("Europe/Madrid")).minusMinutes(1)
-                    .format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssxxx"));
-            }
+            String ahoraIso = payload.getGenTimestamp() != null && !payload.getGenTimestamp().isEmpty() 
+                ? payload.getGenTimestamp() 
+                : java.time.ZonedDateTime.now(java.time.ZoneId.of("Europe/Madrid")).minusMinutes(1).format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssxxx"));
+            
             xml.append("          <sf:FechaHoraHusoGenRegistro>").append(ahoraIso).append("</sf:FechaHoraHusoGenRegistro>\n");
 
             // Huella
             String cuotaStr = String.format(java.util.Locale.US, "%.2f", Math.abs(payload.getTotalTax()));
             String totalStr = String.format(java.util.Locale.US, "%.2f", Math.abs(payload.getImporteTotal()));
             StringBuilder sb = new StringBuilder();
-            sb.append("IDEmisorFactura=").append(payload.getNifEmisor());
-            sb.append("&NumSerieFactura=").append(payload.getNumSerieFactura());
-            sb.append("&FechaExpedicionFactura=").append(payload.getFechaExpedicion());
-            sb.append("&TipoFactura=").append(payload.getTipoFactura());
-            sb.append("&CuotaTotal=").append(cuotaStr);
-            sb.append("&ImporteTotal=").append(totalStr);
+            sb.append(isAnulacion ? "IDEmisorFacturaAnulada=" : "IDEmisorFactura=").append(payload.getNifEmisor());
+            sb.append(isAnulacion ? "&NumSerieFacturaAnulada=" : "&NumSerieFactura=").append(payload.getNumSerieFactura());
+            sb.append(isAnulacion ? "&FechaExpedicionFacturaAnulada=" : "&FechaExpedicionFactura=").append(payload.getFechaExpedicion());
+            if (!isAnulacion) {
+                sb.append("&TipoFactura=").append(payload.getTipoFactura());
+                sb.append("&CuotaTotal=").append(cuotaStr);
+                sb.append("&ImporteTotal=").append(totalStr);
+            }
             sb.append("&Huella=").append(payload.getPrevHash() != null ? payload.getPrevHash().toUpperCase() : "");
             sb.append("&FechaHoraHusoGenRegistro=").append(ahoraIso);
             String huellaCalculada = sha256(sb.toString()).toUpperCase();
@@ -235,9 +217,7 @@ public class VerifactuXmlBuilder {
             xml.append("          <sf:TipoHuella>01</sf:TipoHuella>\n");
             xml.append("          <sf:Huella>").append(huellaCalculada).append("</sf:Huella>\n");
 
-
-
-            xml.append("        </sf:RegistroAlta>\n");
+            xml.append("        </sf:").append(isAnulacion ? "RegistroAnulacion" : "RegistroAlta").append(">\n");
             xml.append("      </sfLR:RegistroFactura>\n");
         }
 
