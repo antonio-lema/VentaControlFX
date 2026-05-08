@@ -96,6 +96,9 @@
                 <Button fx:id="btnBilling" styleClass="sidebar-button" onAction="#handleShowBilling" contentDisplay="TOP" maxWidth="Infinity" text="%sidebar.item.billing">
                     <graphic><FontAwesomeIconView glyphName="FILE_TEXT_ALT" size="22" styleClass="sidebar-icon"/></graphic>
                 </Button>
+                <Button fx:id="btnVerifactu" styleClass="sidebar-button" onAction="#handleShowVerifactu" contentDisplay="TOP" maxWidth="Infinity" text="%sidebar.item.verifactu">
+                    <graphic><FontAwesomeIconView glyphName="SHIELD" size="22" styleClass="sidebar-icon"/></graphic>
+                </Button>
                 <Button fx:id="btnVat" styleClass="sidebar-button" onAction="#handleShowVat" contentDisplay="TOP" maxWidth="Infinity" text="%sidebar.item.vat">
                     <graphic><FontAwesomeIconView glyphName="PERCENT" size="22" styleClass="sidebar-icon"/></graphic>
                 </Button>

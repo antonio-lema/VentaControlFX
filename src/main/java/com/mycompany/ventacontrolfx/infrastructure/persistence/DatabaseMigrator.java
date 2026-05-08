@@ -57,6 +57,9 @@ public class DatabaseMigrator {
         addColumn(conn, columnCache, "sales", "control_hash", "VARCHAR(64) DEFAULT NULL");
         addColumn(conn, columnCache, "sales", "fiscal_status", "VARCHAR(20) DEFAULT 'PENDING'");
         addColumn(conn, columnCache, "sales", "aeat_submission_id", "VARCHAR(100) DEFAULT NULL");
+        addColumn(conn, columnCache, "sales", "incident_reason", "TEXT DEFAULT NULL");
+        addColumn(conn, columnCache, "sales", "xml_sent", "LONGTEXT DEFAULT NULL");
+        addColumn(conn, columnCache, "sales", "xml_received", "LONGTEXT DEFAULT NULL");
         addColumn(conn, columnCache, "sales", "observations", "TEXT");
 
         // --- SALE DETAILS ---
@@ -105,6 +108,9 @@ public class DatabaseMigrator {
         addColumn(conn, columnCache, "returns", "customer_nif_snapshot", "VARCHAR(50) DEFAULT NULL");
         addColumn(conn, columnCache, "returns", "fiscal_msg", "TEXT DEFAULT NULL");
         addColumn(conn, columnCache, "returns", "aeat_submission_id", "VARCHAR(100) DEFAULT NULL");
+        addColumn(conn, columnCache, "returns", "incident_reason", "TEXT DEFAULT NULL");
+        addColumn(conn, columnCache, "returns", "xml_sent", "LONGTEXT DEFAULT NULL");
+        addColumn(conn, columnCache, "returns", "xml_received", "LONGTEXT DEFAULT NULL");
 
         // --- PROMOTIONS ---
         addColumn(conn, columnCache, "promotions", "buy_qty", "INT DEFAULT 0");

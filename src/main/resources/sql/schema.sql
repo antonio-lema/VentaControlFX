@@ -95,7 +95,10 @@ CREATE TABLE IF NOT EXISTS sales (
     signature TEXT DEFAULT NULL,
     fiscal_status VARCHAR(20) DEFAULT 'PENDING',
     fiscal_msg TEXT DEFAULT NULL,
+    incident_reason TEXT DEFAULT NULL,
     aeat_submission_id VARCHAR(100) DEFAULT NULL,
+    xml_sent LONGTEXT DEFAULT NULL,
+    xml_received LONGTEXT DEFAULT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (client_id) REFERENCES clients(client_id)
 );
@@ -173,7 +176,10 @@ CREATE TABLE IF NOT EXISTS returns (
     signature TEXT DEFAULT NULL,
     fiscal_status VARCHAR(20) DEFAULT 'PENDING',
     fiscal_msg TEXT DEFAULT NULL,
+    incident_reason TEXT DEFAULT NULL,
     aeat_submission_id VARCHAR(100) DEFAULT NULL,
+    xml_sent LONGTEXT DEFAULT NULL,
+    xml_received LONGTEXT DEFAULT NULL,
     customer_name_snapshot VARCHAR(255) DEFAULT NULL,
     issuer_name VARCHAR(255) DEFAULT NULL,
     issuer_tax_id VARCHAR(50) DEFAULT NULL,

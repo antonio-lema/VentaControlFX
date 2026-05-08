@@ -17,5 +17,14 @@ public enum PromotionType {
     public String getKey() {
         return key;
     }
+
+    public String getDisplayName() {
+        switch (this) {
+            case PERCENTAGE: return "Porcentaje (%)";
+            case FIXED_DISCOUNT: return "Descuento Fijo (\u20ac)";
+            case VOLUME_DISCOUNT: return "Por Volumen";
+            default: return name();
+        }
+    }
 }
 

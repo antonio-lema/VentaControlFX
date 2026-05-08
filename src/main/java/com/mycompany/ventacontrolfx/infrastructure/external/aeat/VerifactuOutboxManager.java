@@ -76,6 +76,7 @@ public class VerifactuOutboxManager {
             } else {
                 List<VerifactuPayload> batch = pendientes.size() > 1000 ? pendientes.subList(0, 1000) : pendientes;
                 String soapRequest = xmlBuilder.buildAltaSoapMessage(batch);
+                outboxRepository.saveXmlSent(batch, soapRequest);
 
                 try {
                     if (eventBus != null) {
@@ -83,6 +84,7 @@ public class VerifactuOutboxManager {
                     }
                     
                     String soapResponse = httpClient.sendSoapMessage(soapRequest);
+                    outboxRepository.saveXmlReceived(batch, soapResponse);
                     
                     if (eventBus != null) {
                         javafx.application.Platform.runLater(() -> eventBus.publishVerifactuSyncFinished("OK"));

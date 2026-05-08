@@ -70,6 +70,13 @@ public class CategoryController implements Injectable, com.mycompany.ventacontro
         filterCategories(text);
     }
 
+    private void filterCategories(String text) {
+        this.currentSearchQuery = text != null ? text.trim() : "";
+        if (paginationHelper != null) {
+            paginationHelper.refresh();
+        }
+    }
+
     private void setupColumns() {
         colName.setCellValueFactory(new PropertyValueFactory<>("name"));
         colTaxGroup.setCellValueFactory(new PropertyValueFactory<>("taxGroupName"));

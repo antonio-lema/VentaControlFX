@@ -18,7 +18,7 @@ import java.util.Map;
 
 public class SidebarController implements Injectable {
 
-    @FXML private Button btnSell, btnProducts, btnCategories, btnHistory, btnReturns, btnClosures, btnBilling, btnClients, btnConfig, btnLock, btnThemeSettings, btnBackup, btnReports, btnClientReport, btnPriceLists, btnVat, btnUsers, btnRoles, btnPromotions, btnWorkSessions, btnOperativeControl, btnStaffCalendar, btnPunctualityAudit;
+    @FXML private Button btnSell, btnProducts, btnCategories, btnHistory, btnReturns, btnClosures, btnBilling, btnVerifactu, btnClients, btnConfig, btnLock, btnThemeSettings, btnBackup, btnReports, btnClientReport, btnPriceLists, btnVat, btnUsers, btnRoles, btnPromotions, btnWorkSessions, btnOperativeControl, btnStaffCalendar, btnPunctualityAudit;
     @FXML private VBox contentVentas, contentCatalogo, contentPersonal, contentClientes, contentGestion, contentSistema;
     @FXML private Button sectionVentas, sectionCatalogo, sectionPersonal, sectionClientes, sectionGestion, sectionSistema;
     @FXML private Label lblAppName;
@@ -47,7 +47,7 @@ public class SidebarController implements Injectable {
     private void init() {
         brandingManager.applyBranding(lblAppName, brandLogoImage);
         
-        List<Button> allButtons = Arrays.asList(btnSell, btnHistory, btnReturns, btnProducts, btnCategories, btnClients, btnReports, btnClientReport, btnClosures, btnBilling, btnConfig, btnThemeSettings, btnBackup, btnLock, btnPriceLists, btnVat, btnUsers, btnRoles, btnPromotions, btnWorkSessions, btnStaffCalendar, btnOperativeControl, btnPunctualityAudit);
+        List<Button> allButtons = Arrays.asList(btnSell, btnHistory, btnReturns, btnProducts, btnCategories, btnClients, btnReports, btnClientReport, btnClosures, btnBilling, btnVerifactu, btnConfig, btnThemeSettings, btnBackup, btnLock, btnPriceLists, btnVat, btnUsers, btnRoles, btnPromotions, btnWorkSessions, btnStaffCalendar, btnOperativeControl, btnPunctualityAudit);
         uiManager.applyEffects(allButtons);
         
         applyPermissions();
@@ -64,6 +64,7 @@ public class SidebarController implements Injectable {
         perms.put(btnConfig, "CONFIGURACION|config.general"); perms.put(btnThemeSettings, "CONFIGURACION|config.estetica");
         perms.put(btnBackup, "admin.backup"); perms.put(btnReports, "reporte.venta|reporte.vendedores");
         perms.put(btnClientReport, "reporte.cliente|HISTORIAL"); perms.put(btnBilling, "fiscal.reenviar|fiscal.config");
+        perms.put(btnVerifactu, "fiscal.config|admin.facturacion");
         perms.put(btnPriceLists, "admin.precios_masivo|PRODUCTOS"); perms.put(btnVat, "admin.iva");
         perms.put(btnUsers, "usuario.crear"); perms.put(btnRoles, "rol.editar");
         perms.put(btnPromotions, "admin.promociones"); perms.put(btnOperativeControl, "CIERRES|admin.facturacion");
@@ -78,7 +79,7 @@ public class SidebarController implements Injectable {
     }
 
     private void setActive(Button b) {
-        uiManager.setActiveButton(b, Arrays.asList(btnSell, btnHistory, btnReturns, btnProducts, btnCategories, btnClients, btnReports, btnClientReport, btnClosures, btnBilling, btnConfig, btnThemeSettings, btnBackup, btnLock, btnPriceLists, btnVat, btnUsers, btnRoles, btnPromotions, btnWorkSessions, btnStaffCalendar, btnOperativeControl, btnPunctualityAudit));
+        uiManager.setActiveButton(b, Arrays.asList(btnSell, btnHistory, btnReturns, btnProducts, btnCategories, btnClients, btnReports, btnClientReport, btnClosures, btnBilling, btnVerifactu, btnConfig, btnThemeSettings, btnBackup, btnLock, btnPriceLists, btnVat, btnUsers, btnRoles, btnPromotions, btnWorkSessions, btnStaffCalendar, btnOperativeControl, btnPunctualityAudit));
     }
 
     @FXML private void toggleVentas() { uiManager.toggleSection(contentVentas, sectionVentas); }
@@ -98,6 +99,7 @@ public class SidebarController implements Injectable {
     @FXML private void handleShowCategories() { setActive(btnCategories); nav.navigateTo("/view/product/categories.fxml"); }
     @FXML private void handleShowClosures() { setActive(btnClosures); nav.navigateTo("/view/closure/closure_history.fxml"); }
     @FXML private void handleShowBilling() { setActive(btnBilling); nav.navigateTo("/view/receipt/fiscal_documents.fxml"); }
+    @FXML private void handleShowVerifactu() { setActive(btnVerifactu); nav.navigateTo("/view/receipt/verifactu_dashboard.fxml"); }
     @FXML private void handleShowPriceLists() { setActive(btnPriceLists); nav.navigateTo("/view/dialog/price_lists.fxml"); }
     @FXML private void handleShowPromotions() { setActive(btnPromotions); nav.navigateTo("/view/dialog/promotions.fxml"); }
     @FXML private void handleShowVat() { setActive(btnVat); nav.navigateTo("/view/vat/vat_management.fxml"); }

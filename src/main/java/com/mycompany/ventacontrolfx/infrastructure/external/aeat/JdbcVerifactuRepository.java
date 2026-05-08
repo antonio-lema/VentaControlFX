@@ -7,6 +7,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import com.mycompany.ventacontrolfx.presentation.model.FiscalOperationModel;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -237,6 +238,50 @@ public class JdbcVerifactuRepository {
         }
     }
 
+    public void saveXmlSent(List<VerifactuPayload> batch, String xmlSent) {
+        if (batch == null || batch.isEmpty() || xmlSent == null) return;
+        
+        try (Connection conn = DBConnection.getConnection()) {
+            for (VerifactuPayload p : batch) {
+                String[] parts = p.getIdRegistro().split("-");
+                String table = parts[0].equals("ALTA") ? "sales" : "returns";
+                String idCol = parts[0].equals("ALTA") ? "sale_id" : "return_id";
+                int id = Integer.parseInt(parts[1]);
+                
+                String sql = "UPDATE " + table + " SET xml_sent = ? WHERE " + idCol + " = ?";
+                try (PreparedStatement ps = conn.prepareStatement(sql)) {
+                    ps.setString(1, xmlSent);
+                    ps.setInt(2, id);
+                    ps.executeUpdate();
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void saveXmlReceived(List<VerifactuPayload> batch, String xmlReceived) {
+        if (batch == null || batch.isEmpty() || xmlReceived == null) return;
+        
+        try (Connection conn = DBConnection.getConnection()) {
+            for (VerifactuPayload p : batch) {
+                String[] parts = p.getIdRegistro().split("-");
+                String table = parts[0].equals("ALTA") ? "sales" : "returns";
+                String idCol = parts[0].equals("ALTA") ? "sale_id" : "return_id";
+                int id = Integer.parseInt(parts[1]);
+                
+                String sql = "UPDATE " + table + " SET xml_received = ? WHERE " + idCol + " = ?";
+                try (PreparedStatement ps = conn.prepareStatement(sql)) {
+                    ps.setString(1, xmlReceived);
+                    ps.setInt(2, id);
+                    ps.executeUpdate();
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     private PrevDetails findPrevDetailsByHash(Connection conn, String hash) {
         String sql = "SELECT sale_datetime AS fecha, doc_series, doc_number FROM sales WHERE control_hash = ? " +
                 "UNION " +
@@ -289,6 +334,40 @@ public class JdbcVerifactuRepository {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public List<FiscalOperationModel> getRecentFiscalOperations(int limit) {
+        List<FiscalOperationModel> list = new ArrayList<>();
+        String sql = "SELECT 'ALTA' AS op_type, sale_id AS id, doc_series, doc_number, sale_datetime AS fecha, total, fiscal_status, fiscal_msg, xml_sent, xml_received " +
+                "FROM sales WHERE doc_number IS NOT NULL " +
+                "UNION ALL " +
+                "SELECT 'RECTIFICATIVA' AS op_type, return_id AS id, doc_series, doc_number, return_datetime AS fecha, -total_refunded AS total, fiscal_status, fiscal_msg, xml_sent, xml_received " +
+                "FROM returns WHERE doc_number IS NOT NULL " +
+                "ORDER BY fecha DESC LIMIT ?";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, limit);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    String doc = rs.getString("doc_series") + "-" + String.format("%05d", rs.getInt("doc_number"));
+                    list.add(new FiscalOperationModel(
+                            rs.getInt("id"),
+                            rs.getString("op_type"),
+                            doc,
+                            rs.getTimestamp("fecha").toString(),
+                            rs.getDouble("total"),
+                            rs.getString("fiscal_status"),
+                            rs.getString("fiscal_msg"),
+                            rs.getString("xml_sent"),
+                            rs.getString("xml_received")
+                    ));
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
     }
 
     private String buildInClause(java.util.List<Integer> ids) {

@@ -17,5 +17,14 @@ public enum PromotionScope {
     public String getKey() {
         return key;
     }
+
+    public String getDisplayName() {
+        switch (this) {
+            case GLOBAL: return "Global";
+            case CATEGORY: return "Categor\u00eda";
+            case PRODUCT: return "Producto";
+            default: return name();
+        }
+    }
 }
 
