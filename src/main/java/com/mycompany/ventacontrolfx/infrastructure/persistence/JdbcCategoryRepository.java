@@ -183,6 +183,50 @@ public class JdbcCategoryRepository implements ICategoryRepository {
     }
 
     @Override
+    public int count(String query) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM categories WHERE name LIKE ?";
+        try (Connection connection = DBConnection.getConnection();
+                PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setString(1, "%" + query + "%");
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) return rs.getInt(1);
+            }
+        }
+        return 0;
+    }
+
+    @Override
+    public List<Category> getPaginated(String query, int limit, int offset) throws SQLException {
+        List<Category> categories = new ArrayList<>();
+        String sql = "SELECT c.*, tg.name as tax_group_name FROM categories c " +
+                    "LEFT JOIN tax_groups tg ON c.tax_group_id = tg.tax_group_id " +
+                    "WHERE c.name LIKE ? LIMIT ? OFFSET ?";
+        try (Connection connection = DBConnection.getConnection();
+                PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setString(1, "%" + query + "%");
+            pstmt.setInt(2, limit);
+            pstmt.setInt(3, offset);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    Category category = new Category(
+                            rs.getInt("category_id"),
+                            rs.getString("name"),
+                            rs.getBoolean("visible"),
+                            rs.getBoolean("is_favorite"),
+                            rs.getDouble("default_iva"));
+                    int taxGroupId = rs.getInt("tax_group_id");
+                    if (!rs.wasNull()) {
+                        category.setTaxGroupId(taxGroupId);
+                        category.setTaxGroupName(rs.getString("tax_group_name"));
+                    }
+                    categories.add(category);
+                }
+            }
+        }
+        return categories;
+    }
+
+    @Override
     public Category getById(int id) throws SQLException {
         String sql = "SELECT c.*, tg.name as tax_group_name FROM categories c LEFT JOIN tax_groups tg ON c.tax_group_id = tg.tax_group_id WHERE c.category_id = ?";
         try (Connection connection = DBConnection.getConnection();
@@ -190,21 +234,12 @@ public class JdbcCategoryRepository implements ICategoryRepository {
             pstmt.setInt(1, id);
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
-                    boolean isFavorite = rs.getBoolean("is_favorite");
-                    double defaultIva = rs.getDouble("default_iva");
-
-                    Integer parentCategoryId = rs.getInt("parent_category_id");
-                    if (rs.wasNull())
-                        parentCategoryId = null;
-
                     Category category = new Category(
                             rs.getInt("category_id"),
                             rs.getString("name"),
                             rs.getBoolean("visible"),
-                            isFavorite,
-                            defaultIva);
-                    category.setParentCategoryId(parentCategoryId);
-
+                            rs.getBoolean("is_favorite"),
+                            rs.getDouble("default_iva"));
                     int taxGroupId = rs.getInt("tax_group_id");
                     if (!rs.wasNull()) {
                         category.setTaxGroupId(taxGroupId);

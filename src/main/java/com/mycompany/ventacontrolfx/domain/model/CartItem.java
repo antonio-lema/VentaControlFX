@@ -101,9 +101,7 @@ public class CartItem {
     }
 
     public double getTotal() {
-        // Total = (Precio * Cantidad) - Descuento Automático - Descuento Manual
-        double rawTotal = (unitPrice.get() * quantity.get()) - discountAmount.get() - manualDiscountAmount.get();
-        // Redondeo profesional a 2 decimales para evitar imprecisiones de coma flotante
+        double rawTotal = (unitPrice.get() * quantity.get()) - discountAmount.get();
         return Math.max(0, Math.round(rawTotal * 100.0) / 100.0);
     }
 }

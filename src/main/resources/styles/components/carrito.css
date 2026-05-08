@@ -605,3 +605,43 @@
 .btn-icon-only-small:hover .icon-gray {
     -fx-fill: #ef4444;
 }
+
+/* =========================================
+   MODERN PROMO SECTION
+   ========================================= */
+.cart-promo-section {
+    -fx-padding: 12 20;
+    -fx-background-color: -fx-bg-surface;
+    -fx-border-color: -fx-color-border-main;
+    -fx-border-width: 1 0 1 0;
+}
+
+.promo-input-container {
+    -fx-background-color: -fx-bg-main;
+    -fx-background-radius: -fx-radius-md;
+    -fx-border-color: -fx-color-border-main;
+    -fx-border-width: 1;
+    -fx-border-radius: -fx-radius-md;
+}
+
+.promo-textfield {
+    -fx-background-color: transparent;
+    -fx-border-width: 0;
+    -fx-padding: 8 12;
+    -fx-font-size: 13px;
+    -fx-text-fill: -fx-text-custom-main;
+}
+
+.btn-apply-promo {
+    -fx-background-color: -fx-custom-color-primary;
+    -fx-text-fill: white !important;
+    -fx-font-weight: 800;
+    -fx-font-size: 11px;
+    -fx-padding: 0 18;
+    -fx-background-radius: 0 -fx-radius-md -fx-radius-md 0;
+    -fx-cursor: hand;
+}
+
+.btn-apply-promo:hover {
+    -fx-background-color: -fx-custom-color-primary-dark;
+}

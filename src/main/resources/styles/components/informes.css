@@ -241,7 +241,7 @@
 
 .kpi-label-saas {
     -fx-font-size: 13px;
-    -fx-text-fill: -fx-text-custom-light;
+    -fx-text-fill: -fx-text-custom-medium;
     -fx-font-weight: bold;
 }
 
@@ -430,11 +430,13 @@
 }
 
 #tableMovements {
-    -fx-font-size: 11.5px;
+    -fx-font-size: 13px;
 }
 
 #tableMovements .column-header .label {
-    -fx-font-size: 11px;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -fx-text-custom-main;
 }
 
 .search-box-saas {

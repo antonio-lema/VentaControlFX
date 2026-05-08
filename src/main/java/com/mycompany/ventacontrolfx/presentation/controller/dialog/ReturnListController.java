@@ -34,6 +34,8 @@ public class ReturnListController implements Injectable {
     @FXML
     private ComboBox<String> cmbPaymentMethod;
     @FXML
+    private ComboBox<Integer> cmbRowLimit;
+    @FXML
     private TableView<Return> returnsTable;
     @FXML
     private TableColumn<Return, Integer> colSaleId, colClosure;
@@ -67,7 +69,7 @@ public class ReturnListController implements Injectable {
 
         // 1. Inicializar Managers
         this.tableManager = new ReturnTableManager(
-            container, returnsTable, colId, colSaleId, colClosure, colUser, colDate, colReason, colActions, colAmount, colFiscalStatus
+            container, returnsTable, colId, colSaleId, colClosure, colUser, colDate, colReason, colActions, colAmount, colFiscalStatus, cmbRowLimit, lblCount
         );
         this.tableManager.init(
             this::handleReprint, 
@@ -95,8 +97,6 @@ public class ReturnListController implements Injectable {
 
         // 3. Listeners
         if (txtSearch != null) RealTimeSearchBinder.bind(txtSearch, query -> applyFilters());
-        if (datePickerStart != null) datePickerStart.setValue(LocalDate.now());
-        if (datePickerEnd != null) datePickerEnd.setValue(LocalDate.now());
 
         if (datePickerStart != null) datePickerStart.valueProperty().addListener((obs, old, nv) -> loadReturns());
         if (datePickerEnd != null) datePickerEnd.valueProperty().addListener((obs, old, nv) -> loadReturns());
@@ -144,7 +144,7 @@ public class ReturnListController implements Injectable {
             return matchesText && matchesPayment;
         });
 
-        returnsTable.setItems(filteredData);
+        tableManager.setData(filteredData);
         updateSummary(filteredData);
     }
 
@@ -160,7 +160,7 @@ public class ReturnListController implements Injectable {
                 .map(r -> r.getReturnDatetime().format(kpiFormatter)).orElse("-");
         }
 
-        if (lblCount != null) lblCount.setText(String.format(container.getBundle().getString("returns.footer.records"), count));
+        if (lblCount != null) lblCount.setVisible(true);
         if (lblTotalRefunded != null) lblTotalRefunded.setText(String.format("%.2f \u20ac", total));
         if (lblKpiTotal != null) lblKpiTotal.setText(String.format("%.2f \u20ac", total));
         if (lblKpiCount != null) lblKpiCount.setText(String.valueOf(count));

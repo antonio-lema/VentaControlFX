@@ -181,106 +181,110 @@
                             </VBox>
                             
                             <!-- DETAIL AUDIT PANEL -->
-                            <VBox fx:id="detailsPanel" prefWidth="450.0" minWidth="420.0" visible="false" managed="false" styleClass="detail-panel">
+                            <VBox fx:id="detailsPanel" prefWidth="550.0" minWidth="520.0" visible="false" managed="false" styleClass="detail-panel">
                                 <children>
                                     <HBox prefHeight="6.0" styleClass="detail-panel-accent" />
-                                    <VBox spacing="20.0" styleClass="detail-panel-body" VBox.vgrow="ALWAYS">
-                                        <children>
-                                            <!-- CABECERA -->
-                                            <VBox alignment="CENTER" spacing="5">
+                                    <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" styleClass="detail-scroll">
+                                        <content>
+                                            <VBox spacing="20.0" styleClass="detail-panel-body">
                                                 <children>
-                                                    <Label text="%closure_history.detail.title_label" styleClass="filter-label-cap" />
-                                                    <HBox spacing="10" alignment="CENTER">
+                                                    <!-- CABECERA -->
+                                                    <VBox alignment="CENTER" spacing="5">
                                                         <children>
-                                                            <Label fx:id="lblClosureDetailId" text="%closure_history.detail.id_prefix" styleClass="detail-sale-id" />
+                                                            <Label text="%closure_history.detail.title_label" styleClass="filter-label-cap" />
+                                                            <HBox spacing="10" alignment="CENTER">
+                                                                <children>
+                                                                    <Label fx:id="lblClosureDetailId" text="%closure_history.detail.id_prefix" styleClass="detail-sale-id" />
+                                                                </children>
+                                                             </HBox>
                                                         </children>
-                                                     </HBox>
-                                                </children>
-                                            </VBox>
-                                            <Separator />
-                                            
-                                            <!-- DESGLOSE -->
-                                            <VBox spacing="10" styleClass="kpi-card-saas" style="-fx-background-color: #f8fafc; -fx-padding: 15; -fx-background-radius: 8; -fx-border-color: #e2e8f0; -fx-border-radius: 8;">
-                                                <children>
-                                                    <Label text="%closure_history.detail.summary" style="-fx-font-weight: bold; -fx-font-size: 13px; -fx-text-fill: -fx-text-custom-main;" />
-                                                    <GridPane vgap="10" hgap="15">
-                                                        <columnConstraints>
-                                                            <ColumnConstraints hgrow="ALWAYS" />
-                                                            <ColumnConstraints halignment="RIGHT" minWidth="100"/>
-                                                        </columnConstraints>
+                                                    </VBox>
+                                                    <Separator />
+                                                    
+                                                    <!-- DESGLOSE -->
+                                                    <VBox spacing="15" styleClass="audit-summary-card">
                                                         <children>
-                                                            <Label text="%closure_history.detail.initial_decl" GridPane.rowIndex="0" styleClass="label-muted"/>
-                                                            <Label fx:id="lblDetInitial" text="0.00 &#x20ac;" GridPane.rowIndex="0" GridPane.columnIndex="1" style="-fx-font-weight: bold;"/>
-                                                            
-                                                            <Label text="%closure_history.detail.cash_sales" GridPane.rowIndex="1" styleClass="label-muted"/>
-                                                            <Label fx:id="lblDetSales" text="0.00 &#x20ac;" GridPane.rowIndex="1" GridPane.columnIndex="1" style="-fx-text-fill: #16a34a;"/>
-                                                            
-                                                            <Label text="%closure_history.detail.manual_in" GridPane.rowIndex="2" styleClass="label-muted"/>
-                                                            <Label fx:id="lblDetIn" text="0.00 &#x20ac;" GridPane.rowIndex="2" GridPane.columnIndex="1" style="-fx-text-fill: #16a34a;"/>
-                                                            
-                                                            <Label text="%closure_history.detail.manual_out" GridPane.rowIndex="3" styleClass="label-muted"/>
-                                                            <Label fx:id="lblDetOut" text="0.00 &#x20ac;" GridPane.rowIndex="3" GridPane.columnIndex="1" style="-fx-text-fill: #dc2626;"/>
-                                                            
-                                                            <Label text="%closure_history.detail.total_expected" GridPane.rowIndex="4" style="-fx-font-weight: bold;"/>
-                                                            <Label fx:id="lblDetExpected" text="0.00 &#x20ac;" GridPane.rowIndex="4" GridPane.columnIndex="1" style="-fx-font-weight: bold;"/>
-                                                            
-                                                            <Separator GridPane.rowIndex="5" GridPane.columnSpan="2" style="-fx-padding: 5 0;"/>
-                                                            
-                                                            <Label text="%closure_history.detail.total_counted" GridPane.rowIndex="6" style="-fx-font-weight: bold;"/>
-                                                            <Label fx:id="lblDetActual" text="0.00 &#x20ac;" GridPane.rowIndex="6" GridPane.columnIndex="1" style="-fx-font-weight: bold; -fx-font-size: 16px; -fx-text-fill: -fx-text-custom-main;"/>
+                                                            <Label text="%closure_history.detail.summary" styleClass="audit-section-title" />
+                                                            <GridPane vgap="12" hgap="15">
+                                                                <columnConstraints>
+                                                                    <ColumnConstraints hgrow="ALWAYS" />
+                                                                    <ColumnConstraints halignment="RIGHT" minWidth="110"/>
+                                                                </columnConstraints>
+                                                                <children>
+                                                                    <Label text="%closure_history.detail.initial_decl" GridPane.rowIndex="0" styleClass="audit-label"/>
+                                                                    <Label fx:id="lblDetInitial" text="0.00 &#x20ac;" GridPane.rowIndex="0" GridPane.columnIndex="1" styleClass="audit-value-main"/>
+                                                                    
+                                                                    <Label text="%closure_history.detail.cash_sales" GridPane.rowIndex="1" styleClass="audit-label"/>
+                                                                    <Label fx:id="lblDetSales" text="0.00 &#x20ac;" GridPane.rowIndex="1" GridPane.columnIndex="1" styleClass="audit-value-success"/>
+                                                                    
+                                                                    <Label text="%closure_history.detail.manual_in" GridPane.rowIndex="2" styleClass="audit-label"/>
+                                                                    <Label fx:id="lblDetIn" text="0.00 &#x20ac;" GridPane.rowIndex="2" GridPane.columnIndex="1" styleClass="audit-value-success"/>
+                                                                    
+                                                                    <Label text="%closure_history.detail.manual_out" GridPane.rowIndex="3" styleClass="audit-label"/>
+                                                                    <Label fx:id="lblDetOut" text="0.00 &#x20ac;" GridPane.rowIndex="3" GridPane.columnIndex="1" styleClass="audit-value-danger"/>
+                                                                    
+                                                                    <Separator GridPane.rowIndex="4" GridPane.columnSpan="2" style="-fx-padding: 8 0;"/>
+
+                                                                    <Label text="%closure_history.detail.total_expected" GridPane.rowIndex="5" styleClass="audit-label-bold"/>
+                                                                    <Label fx:id="lblDetExpected" text="0.00 &#x20ac;" GridPane.rowIndex="5" GridPane.columnIndex="1" styleClass="audit-value-bold"/>
+                                                                    
+                                                                    <Label text="%closure_history.detail.total_counted" GridPane.rowIndex="6" styleClass="audit-label-highlight"/>
+                                                                    <Label fx:id="lblDetActual" text="0.00 &#x20ac;" GridPane.rowIndex="6" GridPane.columnIndex="1" styleClass="audit-value-highlight"/>
+                                                                </children>
+                                                            </GridPane>
                                                         </children>
-                                                    </GridPane>
-                                                </children>
-                                            </VBox>
-                                            
-                                            <!-- MOVIMIENTOS -->
-                                            <VBox spacing="10" VBox.vgrow="ALWAYS">
-                                                <children>
-                                                    <Label text="%closure_history.detail.movements" styleClass="filter-label-cap" />
-                                                    <TableView fx:id="tableMovements" VBox.vgrow="ALWAYS" styleClass="modern-table-view">
-                                                        <columns>
-                                                            <TableColumn fx:id="colMovCreated" text="%closure_history.detail.mov.time" prefWidth="70"/>
-                                                            <TableColumn fx:id="colMovType" text="%closure_history.detail.mov.type" prefWidth="80"/>
-                                                            <TableColumn fx:id="colMovUser" text="%closure_history.table.user" prefWidth="90"/>
-                                                            <TableColumn fx:id="colMovAmount" text="%closure_history.detail.mov.amount" prefWidth="90" styleClass="column-right"/>
-                                                            <TableColumn fx:id="colMovReason" text="%closure_history.detail.mov.reason" prefWidth="200"/>
-                                                        </columns>
-                                                        <columnResizePolicy>
-                                                            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
-                                                        </columnResizePolicy>
-                                                    </TableView>
-                                                </children>
-                                            </VBox>
-                                            
-                                            <!-- OBSERVACIONES -->
-                                            <VBox spacing="8">
-                                                <children>
-                                                    <Label text="%closure_history.detail.obs_label" styleClass="filter-label-cap" />
-                                                    <Label fx:id="lblDetNotes" text="..." wrapText="true" style="-fx-background-color: #fffbeb; -fx-padding: 12; -fx-background-radius: 8; -fx-border-color: #fef3c7; -fx-text-fill: #92400e; -fx-font-size: 13px;" maxWidth="Infinity"/>
-                                                </children>
-                                            </VBox>
-                                            
-                                            <!-- ACCIONES -->
-                                            <VBox spacing="10">
-                                                <children>
-                                                    <HBox spacing="10" alignment="CENTER">
+                                                    </VBox>
+                                                    
+                                                    <!-- MOVIMIENTOS -->
+                                                    <VBox spacing="10">
                                                         <children>
-                                                            <Button fx:id="btnMarkReviewed" onAction="#handleMarkReviewed" text="%closure_history.btn.mark_reviewed" styleClass="btn-primary" maxWidth="Infinity" HBox.hgrow="ALWAYS" prefHeight="45">
-                                                                <graphic><FontAwesomeIconView glyphName="CHECK_CIRCLE" size="14" fill="white"/></graphic>
-                                                            </Button>
-                                                            <Button fx:id="btnEditClosure" onAction="#handleEditClosure" text="%closure_history.btn.modify" styleClass="btn-secondary" maxWidth="Infinity" HBox.hgrow="ALWAYS" prefHeight="45">
-                                                                <graphic><FontAwesomeIconView glyphName="EDIT" size="14"/></graphic>
-                                                            </Button>
-                                                            <Button onAction="#handlePrintAudit" styleClass="btn-secondary" prefHeight="45" prefWidth="50">
-                                                                <graphic><FontAwesomeIconView glyphName="PRINT" size="18" /></graphic>
-                                                            </Button>
+                                                            <Label text="%closure_history.detail.movements" styleClass="filter-label-cap" />
+                                                            <TableView fx:id="tableMovements" VBox.vgrow="ALWAYS" styleClass="modern-table-view">
+                                                                <columns>
+                                                                    <TableColumn fx:id="colMovCreated" text="%closure_history.detail.mov.time" minWidth="75" prefWidth="75"/>
+                                                                    <TableColumn fx:id="colMovType" text="%closure_history.detail.mov.type" minWidth="75" prefWidth="75"/>
+                                                                    <TableColumn fx:id="colMovUser" text="%closure_history.table.user" minWidth="75" prefWidth="75"/>
+                                                                    <TableColumn fx:id="colMovAmount" text="%closure_history.detail.mov.amount" minWidth="85" prefWidth="85" styleClass="column-right"/>
+                                                                    <TableColumn fx:id="colMovReason" text="%closure_history.detail.mov.reason" minWidth="100" prefWidth="150"/>
+                                                                </columns>
+                                                                <columnResizePolicy>
+                                                                    <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                                                                </columnResizePolicy>
+                                                            </TableView>
                                                         </children>
-                                                    </HBox>
-                                                    <Button onAction="#handleCloseDetails" text="%closure_history.detail.btn.close" maxWidth="Infinity" styleClass="btn-history-close" />
+                                                    </VBox>
+                                                    
+                                                    <!-- OBSERVACIONES -->
+                                                    <VBox spacing="8">
+                                                        <children>
+                                                            <Label text="%closure_history.detail.obs_label" styleClass="audit-section-title-small" />
+                                                            <Label fx:id="lblDetNotes" text="..." wrapText="true" styleClass="audit-observation-box" maxWidth="Infinity"/>
+                                                        </children>
+                                                    </VBox>
+                                                    
+                                                    <!-- ACCIONES -->
+                                                    <VBox spacing="10">
+                                                        <children>
+                                                            <HBox spacing="10" alignment="CENTER">
+                                                                <children>
+                                                                    <Button fx:id="btnMarkReviewed" onAction="#handleMarkReviewed" text="%closure_history.btn.mark_reviewed" styleClass="btn-primary" maxWidth="Infinity" HBox.hgrow="ALWAYS" prefHeight="45">
+                                                                        <graphic><FontAwesomeIconView glyphName="CHECK_CIRCLE" size="14" fill="white"/></graphic>
+                                                                    </Button>
+                                                                    <Button fx:id="btnEditClosure" onAction="#handleEditClosure" text="%closure_history.btn.modify" styleClass="btn-secondary" maxWidth="Infinity" HBox.hgrow="ALWAYS" prefHeight="45">
+                                                                        <graphic><FontAwesomeIconView glyphName="EDIT" size="14"/></graphic>
+                                                                    </Button>
+                                                                    <Button onAction="#handlePrintAudit" styleClass="btn-secondary" prefHeight="45" prefWidth="50">
+                                                                        <graphic><FontAwesomeIconView glyphName="PRINT" size="18" /></graphic>
+                                                                    </Button>
+                                                                </children>
+                                                            </HBox>
+                                                            <Button onAction="#handleCloseDetails" text="%closure_history.detail.btn.close" maxWidth="Infinity" styleClass="btn-history-close" />
+                                                        </children>
+                                                    </VBox>
                                                 </children>
                                             </VBox>
-                                        </children>
-                                    </VBox>
+                                        </content>
+                                    </ScrollPane>
                                 </children>
                             </VBox>
                         </children>

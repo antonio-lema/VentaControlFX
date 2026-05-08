@@ -18,7 +18,7 @@ public class PromotionResult {
     public void addDiscount(int productId, double amount, String promoName) {
         double currentAmount = this.itemDiscounts.getOrDefault(productId, 0.0);
 
-        // REGLA DE NEGOCIO: El mayor descuento GANA (No es acumulable)
+        // REGLA DE NEGOCIO: El mayor descuento GANA (No es acumulable entre promos del mismo tipo)
         if (amount > currentAmount) {
             // Ajustar el total: quitar el viejo, poner el nuevo
             this.totalDiscount = (this.totalDiscount - currentAmount) + amount;
@@ -28,11 +28,18 @@ public class PromotionResult {
             if (promoName != null && !this.appliedPromos.contains(promoName)) {
                 this.appliedPromos.add(promoName);
             }
-            // If it looks like a code, track it
-            if (promoName != null && (promoName.startsWith("GIFT-") || promoName.startsWith("PROMO-"))) {
-                if (!this.appliedPromoCodes.contains(promoName))
-                    this.appliedPromoCodes.add(promoName);
-            }
+        }
+    }
+
+    /**
+     * Suma un descuento forzosamente (para acumulaci\u00f3n de cupones).
+     */
+    public void forceAddDiscount(int productId, double amount, String promoName) {
+        double previous = this.itemDiscounts.getOrDefault(productId, 0.0);
+        this.itemDiscounts.put(productId, amount);
+        this.totalDiscount = (this.totalDiscount - previous) + amount;
+        if (promoName != null && !this.appliedPromos.contains(promoName)) {
+            this.appliedPromos.add(promoName);
         }
     }
 

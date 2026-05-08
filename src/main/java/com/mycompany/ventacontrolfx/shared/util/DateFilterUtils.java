@@ -71,6 +71,16 @@ public class DateFilterUtils {
      */
     public static void addQuickFilters(HBox container, java.util.function.Consumer<String> rangeSetter,
             java.util.ResourceBundle bundle, Runnable onFilter) {
+        // Default to "Today" if bundle is present, to match common UX
+        String defaultLabel = (bundle != null) ? bundle.getString("filter.date.today") : "Hoy";
+        addQuickFilters(container, rangeSetter, bundle, onFilter, defaultLabel);
+    }
+
+    /**
+     * Flexible version that allows specifying the default active button.
+     */
+    public static void addQuickFilters(HBox container, java.util.function.Consumer<String> rangeSetter,
+            java.util.ResourceBundle bundle, Runnable onFilter, String defaultLabel) {
         if (container == null)
             return;
 
@@ -86,20 +96,23 @@ public class DateFilterUtils {
             buttons.add(createFilterChip(bundle.getString("filter.date.today"), rangeSetter, group, onFilter));
             buttons.add(createFilterChip(bundle.getString("filter.date.7d"), rangeSetter, group, onFilter));
             buttons.add(createFilterChip(bundle.getString("filter.date.this_month"), rangeSetter, group, onFilter));
-
-            ToggleButton btnTodo = createFilterChip(bundle.getString("filter.date.all"), rangeSetter, group, onFilter);
-            buttons.add(btnTodo);
-            btnTodo.setSelected(true);
-            rangeSetter.accept(bundle.getString("filter.date.all"));
+            buttons.add(createFilterChip(bundle.getString("filter.date.all"), rangeSetter, group, onFilter));
         } else {
-            ToggleButton btnHoy = createFilterChip("Hoy", rangeSetter, group, onFilter);
-            buttons.add(btnHoy);
+            buttons.add(createFilterChip("Hoy", rangeSetter, group, onFilter));
             buttons.add(createFilterChip("7D", rangeSetter, group, onFilter));
             buttons.add(createFilterChip("Este Mes", rangeSetter, group, onFilter));
-
             buttons.add(createFilterChip("Todo", rangeSetter, group, onFilter));
-            btnHoy.setSelected(true);
-            rangeSetter.accept("Hoy");
+        }
+
+        // Set default selected button
+        if (defaultLabel != null) {
+            for (ToggleButton btn : buttons) {
+                if (btn.getText().equals(defaultLabel)) {
+                    btn.setSelected(true);
+                    rangeSetter.accept(defaultLabel);
+                    break;
+                }
+            }
         }
 
         container.getChildren().addAll(buttons);

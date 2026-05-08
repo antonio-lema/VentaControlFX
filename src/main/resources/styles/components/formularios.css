@@ -12,18 +12,40 @@
     -fx-border-radius: -fx-radius-md;
     -fx-background-radius: -fx-radius-md;
     -fx-text-fill: -fx-text-custom-main;
-    -fx-padding: 12 15;
+    -fx-padding: 2 5; /* Reducido para evitar que el texto desaparezca */
     -fx-font-size: 14px;
     -fx-prompt-text-fill: -fx-text-custom-light;
 }
 
+/* Forzar color de texto en la celda interna del desplegable */
+.combo-box > .list-cell,
+.modern-combo-box > .list-cell {
+    -fx-text-fill: -fx-text-custom-main;
+    -fx-background-color: transparent;
+    -fx-padding: 8 10;
+}
+
 .text-field:focused,
 .modern-input-field:focused,
-.modern-combo-box:focused {
+.modern-combo-box:focused,
+.combo-box:focused {
     -fx-background-color: -fx-bg-surface;
     -fx-border-color: #1e88e5;
-    -fx-effect: dropshadow(three-pass-box, -fx-shadow-color-subtle, 8, 0, 0, 2);
+    -fx-effect: dropshadow(three-pass-box, rgba(30, 136, 229, 0.2), 8, 0, 0, 2);
     -fx-border-width: 1.5;
+}
+
+/* Estilo para el botón de la flecha */
+.combo-box > .arrow-button,
+.modern-combo-box > .arrow-button {
+    -fx-background-color: transparent;
+    -fx-padding: 0 10 0 0;
+}
+
+.combo-box > .arrow-button > .arrow,
+.modern-combo-box > .arrow-button > .arrow {
+    -fx-background-color: -fx-text-custom-light;
+    -fx-shape: "M 0 0 L 4 4 L 8 0 Z";
 }
 
 /* Títulos de sección */

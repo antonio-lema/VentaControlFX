@@ -36,11 +36,16 @@ public class CategoryController implements Injectable, com.mycompany.ventacontro
     @FXML
     private TextField searchField;
     @FXML
+    private ComboBox<Integer> cmbRowLimit;
+    @FXML
     private Label lblCount;
+    @FXML
+    private Pagination pagination;
 
     private CategoryUseCase categoryUseCase;
     private ServiceContainer container;
-    private ObservableList<Category> categoryList = FXCollections.observableArrayList();
+    private com.mycompany.ventacontrolfx.shared.util.ServerPaginationHelper<Category> paginationHelper;
+    private String currentSearchQuery = "";
 
     @Override
     public void inject(ServiceContainer container) {
@@ -48,9 +53,13 @@ public class CategoryController implements Injectable, com.mycompany.ventacontro
         this.categoryUseCase = container.getCategoryUseCase();
 
         setupColumns();
-        loadCategories();
+        
+        paginationHelper = new com.mycompany.ventacontrolfx.shared.util.ServerPaginationHelper<>(
+                categoriesTable, cmbRowLimit, lblCount, pagination,
+                container.getBundle().getString("categories.entity_plural"),
+                this::fetchCategoriesPage, container.getBundle());
 
-        searchField.textProperty().addListener((obs, old, nv) -> filterCategories(nv));
+        searchField.textProperty().addListener((obs, old, nv) -> handleSearch(nv));
     }
 
     @Override
@@ -155,24 +164,21 @@ public class CategoryController implements Injectable, com.mycompany.ventacontro
         return view;
     }
 
-    private void loadCategories() {
+    private void fetchCategoriesPage(int offset, int limit) {
         try {
-            List<Category> categories = categoryUseCase.getAll();
-            categoryList.setAll(categories);
-            filterCategories(searchField.getText());
+            int total = categoryUseCase.getCount(currentSearchQuery);
+            List<Category> items = categoryUseCase.getPaginated(currentSearchQuery, limit, offset);
+            paginationHelper.applyDataTarget(items, total);
         } catch (SQLException e) {
             AlertUtil.showError(container.getBundle().getString("alert.error"),
                     container.getBundle().getString("category.error.load"));
         }
     }
 
-    private void filterCategories(String query) {
-        String q = query == null ? "" : query.toLowerCase().trim();
-        ObservableList<Category> filtered = categoryList.filtered(
-                c -> q.isEmpty() || c.getName().toLowerCase().contains(q) || String.valueOf(c.getId()).contains(q));
-        categoriesTable.setItems(filtered);
-        if (lblCount != null)
-            lblCount.setText(filtered.size() + " " + container.getBundle().getString("categories.entity_plural"));
+    @Override
+    public void handleSearch(String query) {
+        this.currentSearchQuery = query == null ? "" : query.trim();
+        paginationHelper.refresh();
     }
 
     @FXML
@@ -202,7 +208,7 @@ public class CategoryController implements Injectable, com.mycompany.ventacontro
                 (AddCategoryController controller) -> {
                     controller.setCategory(category);
                 });
-        loadCategories();
+        paginationHelper.refresh();
     }
 
     private void handleDeleteCategory(Category category) {
@@ -215,7 +221,7 @@ public class CategoryController implements Injectable, com.mycompany.ventacontro
                 container.getBundle().getString("category.confirm.delete") + " '" + category.getName() + "'?", "")) {
             try {
                 categoryUseCase.deleteCategory(category.getId());
-                loadCategories();
+                paginationHelper.refresh();
             } catch (SQLException e) {
                 AlertUtil.showError(container.getBundle().getString("alert.error"),
                         container.getBundle().getString("category.error.delete"));

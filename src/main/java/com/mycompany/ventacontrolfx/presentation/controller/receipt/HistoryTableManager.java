@@ -86,7 +86,7 @@ public class HistoryTableManager {
                         lbl.setText(container.getBundle().getString("history.status.accepted"));
                         lbl.getStyleClass().add("badge-success");
                     } else if ("REJECTED".equals(item)) {
-                        lbl.setText(container.getBundle().getString("error"));
+                        lbl.setText(container.getBundle().getString("history.status.rejected"));
                         lbl.getStyleClass().add("badge-danger");
                     } else {
                         lbl.setText(container.getBundle().getString("history.status.pending"));
@@ -131,11 +131,20 @@ public class HistoryTableManager {
                 if (empty || item == null) {
                     setText(null);
                 } else {
-                    String emoji = item.contains("Mixed") || item.contains("Mixto") ? "\ud83d\udd04 "
-                            : (container.getBundle().getString("payment.method.card").equalsIgnoreCase(item)
-                                    ? "\ud83d\udcb3 "
-                                    : "\ud83d\udcb5 ");
-                    setText(emoji + item);
+                    String translated;
+                    String emoji;
+                    String lowerItem = item.toLowerCase();
+                    if (lowerItem.contains("mixed") || lowerItem.contains("mixto")) {
+                        translated = container.getBundle().getString("payment.method.mixed");
+                        emoji = "\ud83d\udd04 ";
+                    } else if (lowerItem.contains("card") || lowerItem.contains("tarjeta")) {
+                        translated = container.getBundle().getString("payment.method.card");
+                        emoji = "\ud83d\udcb3 ";
+                    } else {
+                        translated = container.getBundle().getString("payment.method.cash");
+                        emoji = "\ud83d\udcb5 ";
+                    }
+                    setText(emoji + translated);
                 }
             }
         });

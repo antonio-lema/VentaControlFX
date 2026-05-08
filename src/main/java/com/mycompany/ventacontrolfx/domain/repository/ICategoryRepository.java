@@ -18,7 +18,8 @@ public interface ICategoryRepository {
     void delete(int id) throws SQLException;
 
     int count() throws SQLException;
-
+    int count(String query) throws SQLException;
+    List<Category> getPaginated(String query, int limit, int offset) throws SQLException;
     Category getById(int id) throws SQLException;
 }
 

@@ -40,8 +40,6 @@ public class AppShellManager {
                 cartTarget.setManaged(shouldShow);
             }
         });
-        
-        showInitialView();
     }
 
     private void showInitialView() {

@@ -55,7 +55,7 @@ public class PromotionsController implements Injectable {
     private void setupTable() {
         colName.setCellValueFactory(new PropertyValueFactory<>("name"));
         colType.setCellValueFactory(cellData -> new javafx.beans.property.SimpleStringProperty(
-                cellData.getValue().getType().getDisplayName()));
+                container.getBundle().getString(cellData.getValue().getType().getKey())));
         colValue.setCellValueFactory(new PropertyValueFactory<>("value"));
         colValue.setCellFactory(column -> new TableCell<Promotion, Double>() {
             @Override
@@ -72,7 +72,7 @@ public class PromotionsController implements Injectable {
             }
         });
         colScope.setCellValueFactory(cellData -> new javafx.beans.property.SimpleStringProperty(
-                cellData.getValue().getScope().getDisplayName()));
+                container.getBundle().getString(cellData.getValue().getScope().getKey())));
 
         // Custom cell factories for formatting
         colDates.setCellValueFactory(cellData -> {

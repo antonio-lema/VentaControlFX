@@ -4,18 +4,18 @@ package com.mycompany.ventacontrolfx.domain.model;
  * Define el tipo de c\u00e1lculo de la promoci\u00f3n.
  */
 public enum PromotionType {
-    PERCENTAGE("Porcentaje (%)"),
-    FIXED_DISCOUNT("Descuento Fijo (\u20ac)"),
-    VOLUME_DISCOUNT("Volumen (2x1, 3x2, etc.)");
+    PERCENTAGE("promotion.type.percentage"),
+    FIXED_DISCOUNT("promotion.type.fixed_discount"),
+    VOLUME_DISCOUNT("promotion.type.volume_discount");
 
-    private final String displayName;
+    private final String key;
 
-    PromotionType(String displayName) {
-        this.displayName = displayName;
+    PromotionType(String key) {
+        this.key = key;
     }
 
-    public String getDisplayName() {
-        return displayName;
+    public String getKey() {
+        return key;
     }
 }
 

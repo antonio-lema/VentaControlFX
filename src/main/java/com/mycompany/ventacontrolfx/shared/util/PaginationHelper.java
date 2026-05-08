@@ -64,10 +64,24 @@ public class PaginationHelper<T> {
 
     private void updateCountLabel(int showing, int total) {
         if (lblCount != null) {
-            String format = (bundle != null && bundle.containsKey("pagination.showing_simple"))
-                    ? bundle.getString("pagination.showing_simple")
-                    : "\ud83d\udd0d Mostrando %d de %d %s";
-            lblCount.setText(String.format(format, showing, total, entityNamePlural));
+            String text;
+            if (showing < total) {
+                String format = (bundle != null && bundle.containsKey("pagination.showing_limit"))
+                        ? bundle.getString("pagination.showing_limit")
+                        : "\ud83d\udd0d Mostrando %d de %d %s";
+                text = String.format(format, showing, total, entityNamePlural);
+            } else {
+                String format = (bundle != null && bundle.containsKey("pagination.showing_simple"))
+                        ? bundle.getString("pagination.showing_simple")
+                        : "\ud83d\udd0d %d registros encontrados";
+                
+                if (format.contains("%d")) {
+                    text = String.format(format, total);
+                } else {
+                    text = format + " " + total;
+                }
+            }
+            lblCount.setText(text);
         }
     }
 }

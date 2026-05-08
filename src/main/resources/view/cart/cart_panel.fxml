@@ -33,8 +33,8 @@
     <HBox spacing="10" alignment="CENTER_LEFT" styleClass="cart-pricelist-header">
         <!-- Secci&#x00f3;n Tarifa -->
         <HBox spacing="8" alignment="CENTER_LEFT" HBox.hgrow="ALWAYS">
-            <StackPane styleClass="icon-container-small" style="-fx-background-color: -fx-custom-color-primary-bg;">
-                <FontAwesomeIconView glyphName="TAG" size="12" style="-fx-fill: -fx-custom-color-primary;"/>
+            <StackPane styleClass="icon-container-small">
+                <FontAwesomeIconView glyphName="TAG" size="12" styleClass="icon-primary"/>
             </StackPane>
             <VBox spacing="0">
                 <Label text="%cart.pricelist.label" style="-fx-font-size: 10px; -fx-text-fill: -fx-text-custom-muted;"/>
@@ -104,14 +104,16 @@
         <Label fx:id="lblGeneralObservation" wrapText="true" style="-fx-font-size: 12px; -fx-font-style: italic; -fx-text-fill: -fx-text-custom-muted;"/>
     </VBox>
     <!-- Promo Code Section -->
-    <HBox spacing="10" alignment="CENTER_LEFT" styleClass="cart-promo-section" style="-fx-padding: 8px 15px; -fx-background-color: -fx-custom-color-bg-secondary; -fx-border-color: #eeeeee; -fx-border-width: 1px 0px 1px 0px;">
-        <StackPane styleClass="icon-container-small" style="-fx-background-color: #f0fdf4;">
-            <FontAwesomeIconView glyphName="TICKET" size="14" fill="#166534"/>
-        </StackPane>
-        <TextField fx:id="txtPromoCode" promptText="%cart.promo.prompt" HBox.hgrow="ALWAYS" styleClass="input-field-modern" style="-fx-pref-height: 35; -fx-font-size: 13px;"/>
-        <Button onAction="#handleApplyPromo" styleClass="btn-icon-only">
-             <graphic><FontAwesomeIconView glyphName="ARROW_RIGHT" size="14" styleClass="icon-primary"/></graphic>
-        </Button>
+    <HBox alignment="CENTER_LEFT" styleClass="cart-promo-section">
+        <HBox alignment="CENTER_LEFT" styleClass="promo-input-container" HBox.hgrow="ALWAYS">
+            <children>
+                <StackPane style="-fx-padding: 0 0 0 12;">
+                    <FontAwesomeIconView glyphName="TICKET" size="14" style="-fx-fill: -fx-text-custom-muted;"/>
+                </StackPane>
+                <TextField fx:id="txtPromoCode" promptText="%cart.promo.prompt" HBox.hgrow="ALWAYS" styleClass="promo-textfield"/>
+                <Button onAction="#handleApplyPromo" text="%cart.promo.btn_apply" styleClass="btn-apply-promo" prefHeight="38"/>
+            </children>
+        </HBox>
     </HBox>
     
     <VBox styleClass="checkout-summary">

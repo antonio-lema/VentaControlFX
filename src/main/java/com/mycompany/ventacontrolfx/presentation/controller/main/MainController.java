@@ -52,6 +52,9 @@ public class MainController implements Injectable,
         container.getEventBus().subscribeVerifactu(this);
         
         shiftMonitor.start();
+
+        // 4. Navegación Inicial (Solo al arrancar)
+        navService.navigateTo("/view/cart/sell_view.fxml");
     }
 
     @Override
@@ -63,6 +66,7 @@ public class MainController implements Injectable,
     public void onLocaleChanged() {
         Platform.runLater(() -> {
             shellManager.build(headerContainer, sidebarContainer, cartContainer);
+            container.getNavigationService().reloadCurrent();
         });
     }
 }

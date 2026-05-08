@@ -182,6 +182,9 @@ public class CartItemRow extends HBox {
         // Cuando cambia el descuento (por promociones)
         cartItem.discountAmountProperty().addListener((obs, oldVal, newVal) -> refreshPrice.run());
 
+        // Cuando cambia el descuento manual (por el diálogo de edición)
+        cartItem.manualDiscountAmountProperty().addListener((obs, oldVal, newVal) -> refreshPrice.run());
+
         priceContainer.getChildren().addAll(priceLabel, discountLabel, finalPriceLabel);
 
         Button editBtn = new Button();

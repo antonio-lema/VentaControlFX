@@ -19,12 +19,12 @@
                     </StackPane>
                     <VBox spacing="2">
                         <children>
-                            <Label text="Promociones y Descuentos" styleClass="view-title"/>
-                            <Label text="Gestiona ofertas temporales, descuentos por volumen y promociones especiales." styleClass="view-subtitle"/>
+                            <Label text="%promotions.title" styleClass="view-title"/>
+                            <Label text="%promotions.subtitle" styleClass="view-subtitle"/>
                         </children>
                     </VBox>
                     <Region HBox.hgrow="ALWAYS" />
-                    <Button onAction="#handleNewPromotion" styleClass="btn-primary" text=" Nueva Promoci&#x00f3;n">
+                    <Button onAction="#handleNewPromotion" styleClass="btn-primary" text="%promotions.btn.new">
                         <graphic>
                             <FontAwesomeIconView glyphName="PLUS" size="14" fill="WHITE"/>
                         </graphic>
@@ -41,7 +41,7 @@
                 <children>
                     <HBox spacing="10" alignment="CENTER_LEFT" styleClass="search-bar" HBox.hgrow="ALWAYS" maxWidth="400">
                         <FontAwesomeIconView glyphName="SEARCH" size="16" styleClass="sidebar-icon"/>
-                        <TextField fx:id="searchField" promptText="Buscar promoci&#x00f3;n..." HBox.hgrow="ALWAYS" styleClass="search-field"/>
+                        <TextField fx:id="searchField" promptText="%promotions.filter.prompt" HBox.hgrow="ALWAYS" styleClass="search-field"/>
                     </HBox>
                     <Region HBox.hgrow="ALWAYS" />
                     <Button onAction="#handleRefresh" styleClass="btn-icon">
@@ -53,13 +53,13 @@
             <!-- Promotions Table -->
             <TableView fx:id="promotionsTable" VBox.vgrow="ALWAYS" styleClass="modern-table-view">
                 <columns>
-                    <TableColumn fx:id="colName" prefWidth="200.0" text="NOMBRE" />
-                    <TableColumn fx:id="colType" prefWidth="120.0" text="TIPO" />
-                    <TableColumn fx:id="colValue" prefWidth="100.0" text="VALOR" />
-                    <TableColumn fx:id="colScope" prefWidth="120.0" text="&#x00c1;MBITO" />
-                    <TableColumn fx:id="colDates" prefWidth="200.0" text="VIGENCIA" />
-                    <TableColumn fx:id="colStatus" prefWidth="100.0" text="ESTADO" />
-                    <TableColumn fx:id="colActions" prefWidth="120.0" text="ACCIONES" />
+                    <TableColumn fx:id="colName" prefWidth="200.0" text="%promotions.table.name" />
+                    <TableColumn fx:id="colType" prefWidth="120.0" text="%promotions.table.type" />
+                    <TableColumn fx:id="colValue" prefWidth="100.0" text="%promotions.table.value" />
+                    <TableColumn fx:id="colScope" prefWidth="120.0" text="%promotions.table.scope" />
+                    <TableColumn fx:id="colDates" prefWidth="200.0" text="%promotions.table.validity" />
+                    <TableColumn fx:id="colStatus" prefWidth="100.0" text="%promotions.table.status" />
+                    <TableColumn fx:id="colActions" prefWidth="120.0" text="%promotions.table.actions" />
                 </columns>
                 <columnResizePolicy>
                     <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />

@@ -49,10 +49,10 @@
                     <children>
                         <HBox alignment="CENTER_LEFT" spacing="10">
                             <StackPane styleClass="icon-bg-blue"><FontAwesomeIconView glyphName="FILE_TEXT_ALT" fill="#1e88e5" size="16"/></StackPane>
-                            <Label text="TOTAL DEVOLUCIONES" styleClass="kpi-label-saas" />
+                            <Label text="%returns.kpi.total_count" styleClass="kpi-label-saas" />
                         </HBox>
                         <Label fx:id="lblKpiCount" text="0" styleClass="kpi-value-saas" />
-                        <Label text="Operaciones en el periodo" styleClass="trend-text" />
+                        <Label text="%returns.kpi.desc.period" styleClass="trend-text" />
                     </children>
                 </VBox>
 
@@ -61,10 +61,10 @@
                     <children>
                         <HBox alignment="CENTER_LEFT" spacing="10">
                             <StackPane styleClass="icon-bg-red"><FontAwesomeIconView glyphName="EXCLAMATION_TRIANGLE" fill="#ef4444" size="16"/></StackPane>
-                            <Label text="TOTAL REEMBOLSADO" styleClass="kpi-label-saas" />
+                            <Label text="%returns.kpi.total_amount" styleClass="kpi-label-saas" />
                         </HBox>
                         <Label fx:id="lblKpiTotal" text="0.00 €" styleClass="kpi-value-saas" />
-                        <Label text="Suma de abonos detectados" styleClass="trend-text" />
+                        <Label text="%returns.kpi.desc.detected" styleClass="trend-text" />
                     </children>
                 </VBox>
 
@@ -73,10 +73,10 @@
                     <children>
                         <HBox alignment="CENTER_LEFT" spacing="10">
                             <StackPane styleClass="icon-bg-gold"><FontAwesomeIconView glyphName="BAR_CHART" fill="#f59e0b" size="16"/></StackPane>
-                            <Label text="TICKET MEDIO" styleClass="kpi-label-saas" />
+                            <Label text="%returns.kpi.average_ticket" styleClass="kpi-label-saas" />
                         </HBox>
                         <Label fx:id="lblKpiAverage" text="0.00 €" styleClass="kpi-value-saas" />
-                        <Label text="Promedio por devolución" styleClass="trend-text" />
+                        <Label text="%returns.kpi.desc.average" styleClass="trend-text" />
                     </children>
                 </VBox>
 
@@ -85,10 +85,10 @@
                     <children>
                         <HBox alignment="CENTER_LEFT" spacing="10">
                             <StackPane styleClass="icon-bg-green"><FontAwesomeIconView glyphName="CLOCK_ALT" fill="#10b981" size="16"/></StackPane>
-                            <Label text="ACTIVIDAD RECIENTE" styleClass="kpi-label-saas" />
+                            <Label text="%returns.kpi.recent_activity" styleClass="kpi-label-saas" />
                         </HBox>
                         <Label fx:id="lblKpiLast" text="--" styleClass="kpi-value-saas" />
-                        <Label text="Fecha de última gestión" styleClass="trend-text" />
+                        <Label text="%returns.kpi.desc.last_activity" styleClass="trend-text" />
                     </children>
                 </VBox>
             </children>
@@ -155,8 +155,10 @@
             <!-- Summary Footer -->
             <HBox alignment="CENTER_RIGHT" spacing="20" styleClass="table-footer">
                 <padding><Insets top="15" right="20" bottom="15" left="20"/></padding>
-                <HBox spacing="10" alignment="CENTER_LEFT" HBox.hgrow="ALWAYS">
-                    <Label fx:id="lblCount" text="0 registros" styleClass="label-muted"/>
+                <HBox spacing="15" alignment="CENTER_LEFT" HBox.hgrow="ALWAYS">
+                    <Label text="%history.show_limit" styleClass="label-limit" />
+                    <ComboBox fx:id="cmbRowLimit" prefWidth="90" styleClass="combo-limit" />
+                    <Label fx:id="lblCount" text="%records_found" styleClass="label-muted"/>
                 </HBox>
                 <Label text="%returns.footer.total_refunded" styleClass="footer-label"/>
                 <Label fx:id="lblTotalRefunded" text="0,00 &#x20ac;" styleClass="footer-value-danger"/>

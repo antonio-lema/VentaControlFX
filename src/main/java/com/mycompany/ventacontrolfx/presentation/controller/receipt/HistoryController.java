@@ -131,7 +131,7 @@ public class HistoryController implements Injectable, Searchable {
         lblTotalAmount.setText("\ud83d\udcb0 " + String.format("%.2f \u20ac", stats.getTotalRevenue()));
         lblTotalCash.setText("\ud83d\udcb5 " + String.format("%.2f \u20ac", stats.getTotalCash()));
         lblTotalCard.setText("\ud83d\udcb3 " + String.format("%.2f \u20ac", stats.getTotalCard()));
-        if (lblCount != null) lblCount.setText("\ud83d\udd0d " + stats.getCount() + " " + container.getBundle().getString("history.count_suffix"));
+        if (lblCount != null) lblCount.setVisible(true); // Solo asegurar que es visible
         
         tableManager.setData(sales);
         handleCloseDetails();

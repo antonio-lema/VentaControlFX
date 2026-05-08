@@ -142,4 +142,3 @@ public class PaymentController implements Injectable {
         stage.close();
     }
 }
-

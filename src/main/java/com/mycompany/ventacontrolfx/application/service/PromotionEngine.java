@@ -65,33 +65,52 @@ public class PromotionEngine {
                     })
                     .collect(Collectors.toList());
 
-            // 1. Simular promociones por PRODUCTO/CATEGOR\u00cda
-            PromotionResult itemResult = new PromotionResult();
+            // 1. Simular promociones por PRODUCTO/CATEGORIA (AUTOMATICAS)
+            List<Promotion> autoPromos = promosToApply.stream()
+                    .filter(p -> p.getCode() == null || p.getCode().isEmpty())
+                    .collect(Collectors.toList());
+            
+            PromotionResult autoItemResult = new PromotionResult();
             for (CartItem item : items) {
-                applyItemLevelPromos(item, promosToApply, itemResult);
+                applyItemLevelPromos(item, autoPromos, autoItemResult);
             }
+            PromotionResult autoVolumeResult = new PromotionResult();
+            applyVolumePromos(items, autoPromos, autoVolumeResult);
 
-            // 2. Simular promociones de VOLUMEN
-            PromotionResult volumeResult = new PromotionResult();
-            applyVolumePromos(items, promosToApply, volumeResult);
-
-            // 3. Fusionar: El mayor descuento por producto GANA (No acumulable)
             java.util.Set<Integer> allProductIds = new java.util.HashSet<>();
-            allProductIds.addAll(itemResult.getItemDiscounts().keySet());
-            allProductIds.addAll(volumeResult.getItemDiscounts().keySet());
+            allProductIds.addAll(autoItemResult.getItemDiscounts().keySet());
+            allProductIds.addAll(autoVolumeResult.getItemDiscounts().keySet());
 
             for (int prodId : allProductIds) {
-                double itemD = itemResult.getItemDiscounts().getOrDefault(prodId, 0.0);
-                double volD = volumeResult.getItemDiscounts().getOrDefault(prodId, 0.0);
-
+                double itemD = autoItemResult.getItemDiscounts().getOrDefault(prodId, 0.0);
+                double volD = autoVolumeResult.getItemDiscounts().getOrDefault(prodId, 0.0);
                 if (itemD >= volD && itemD > 0) {
-                    result.addDiscount(prodId, itemD, itemResult.getItemPromoNames().get(prodId));
+                    result.addDiscount(prodId, itemD, autoItemResult.getItemPromoNames().get(prodId));
                 } else if (volD > itemD) {
-                    result.addDiscount(prodId, volD, volumeResult.getItemPromoNames().get(prodId));
+                    result.addDiscount(prodId, volD, autoVolumeResult.getItemPromoNames().get(prodId));
                 }
             }
 
-            // 4. Aplicar promociones GLOBALES
+            // 2. APLICAR CÓDIGO EXPLÍCITO (ACUMULATIVO SOBRE LO ANTERIOR)
+            if (appliedCode != null && !appliedCode.isEmpty()) {
+                List<Promotion> codePromos = promosToApply.stream()
+                        .filter(p -> p.getCode() != null && p.getCode().equalsIgnoreCase(appliedCode))
+                        .collect(Collectors.toList());
+                
+                if (!codePromos.isEmpty()) {
+                    PromotionResult codeResult = new PromotionResult();
+                    for (CartItem item : items) {
+                        applyItemLevelPromos(item, codePromos, codeResult);
+                    }
+                    for (Integer prodId : codeResult.getItemDiscounts().keySet()) {
+                        double existing = result.getItemDiscounts().getOrDefault(prodId, 0.0);
+                        double extra = codeResult.getItemDiscounts().get(prodId);
+                        result.forceAddDiscount(prodId, existing + extra, codeResult.getItemPromoNames().get(prodId));
+                    }
+                }
+            }
+
+            // 3. Aplicar promociones GLOBALES
             applyGlobalPromos(items, promosToApply, result);
 
         } catch (SQLException e) {
@@ -168,7 +187,9 @@ public class PromotionEngine {
     }
 
     private void applyGlobalPromos(List<CartItem> items, List<Promotion> promos, PromotionResult res) {
-        double currentSubtotal = items.stream().mapToDouble(CartItem::getTotal).sum() - res.getTotalDiscount();
+        double currentSubtotal = items.stream()
+                .mapToDouble(it -> (it.getUnitPrice() * it.getQuantity()) - it.getManualDiscountAmount())
+                .sum() - res.getTotalDiscount();
 
         for (Promotion p : promos) {
             if (p.getScope() == PromotionScope.GLOBAL) {

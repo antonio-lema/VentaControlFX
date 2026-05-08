@@ -260,6 +260,7 @@ public class ServiceContainer {
 
     public void setLanguage(String langCode) {
         this.currentLocale = new Locale(langCode);
+        Locale.setDefault(currentLocale); // Establecer como defecto global para Java/JavaFX
         this.bundle = ResourceBundle.getBundle("i18n/messages", currentLocale);
         com.mycompany.ventacontrolfx.presentation.util.AlertUtil.setBundle(this.bundle);
         this.eventBus.publishLocaleChange();

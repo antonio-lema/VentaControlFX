@@ -20,7 +20,10 @@ public class ReturnTableManager {
     private final TableColumn<Return, Integer> colSaleId, colClosure;
     private final TableColumn<Return, Double> colAmount;
     private final TableColumn<Return, String> colFiscalStatus;
-
+    private final ComboBox<Integer> cmbRowLimit;
+    private final Label lblCount;
+    
+    private com.mycompany.ventacontrolfx.shared.util.PaginationHelper<Return> paginationHelper;
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
 
     public ReturnTableManager(
@@ -34,7 +37,9 @@ public class ReturnTableManager {
             TableColumn<Return, String> colReason,
             TableColumn<Return, String> colActions,
             TableColumn<Return, Double> colAmount,
-            TableColumn<Return, String> colFiscalStatus) {
+            TableColumn<Return, String> colFiscalStatus,
+            ComboBox<Integer> cmbRowLimit,
+            Label lblCount) {
         this.container = container;
         this.returnsTable = returnsTable;
         this.colId = colId;
@@ -46,10 +51,17 @@ public class ReturnTableManager {
         this.colActions = colActions;
         this.colAmount = colAmount;
         this.colFiscalStatus = colFiscalStatus;
+        this.cmbRowLimit = cmbRowLimit;
+        this.lblCount = lblCount;
     }
 
     public void init(Runnable onReprint, java.util.function.Consumer<Integer> onViewTicket, java.util.function.Consumer<Return> onDoubleClick) {
         setupTable(onReprint, onViewTicket, onDoubleClick);
+        this.paginationHelper = new com.mycompany.ventacontrolfx.shared.util.PaginationHelper<>(
+            returnsTable, cmbRowLimit, lblCount, 
+            container.getBundle().getString("returns.footer.records_plural"), 
+            container.getBundle()
+        );
     }
 
     private void setupTable(Runnable onReprint, java.util.function.Consumer<Integer> onViewTicket, java.util.function.Consumer<Return> onDoubleClick) {
@@ -196,7 +208,11 @@ public class ReturnTableManager {
     }
 
     public void setData(List<Return> data) {
-        returnsTable.setItems(javafx.collections.FXCollections.observableArrayList(data));
+        if (paginationHelper != null) {
+            paginationHelper.setData(data);
+        } else {
+            returnsTable.setItems(javafx.collections.FXCollections.observableArrayList(data));
+        }
     }
 
     public Return getSelection() {

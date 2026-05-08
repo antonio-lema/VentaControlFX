@@ -60,8 +60,12 @@ public class CategoryUseCase {
         repository.delete(id);
     }
 
-    public int getCount() throws SQLException {
-        return repository.count();
+    public int getCount(String query) throws SQLException {
+        return repository.count(query);
+    }
+
+    public List<Category> getPaginated(String query, int limit, int offset) throws SQLException {
+        return repository.getPaginated(query, limit, offset);
     }
 }
 

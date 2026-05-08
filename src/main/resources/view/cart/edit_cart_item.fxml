@@ -8,7 +8,7 @@
 <VBox xmlns="http://javafx.com/javafx"
       xmlns:fx="http://javafx.com/fxml"
       fx:controller="com.mycompany.ventacontrolfx.presentation.controller.dialog.EditCartItemController"
-      spacing="20" alignment="CENTER" prefWidth="400"
+      spacing="20" alignment="CENTER" prefWidth="450"
       styleClass="modal-container">
     
     <padding>
@@ -16,40 +16,58 @@
     </padding>
 
     <!-- Header -->
-    <VBox spacing="10" alignment="CENTER">
-        <FontAwesomeIconView glyphName="PENCIL_SQUARE_ALT" size="45" fill="#2196f3"/>
-        <Label text="Modificar Producto" styleClass="custom-modal-title"/>
-        <Label fx:id="lblProductName" text="Nombre del Producto" style="-fx-text-fill: #666; -fx-font-size: 16px; -fx-font-weight: bold;"/>
+    <VBox spacing="8" alignment="CENTER">
+        <FontAwesomeIconView glyphName="EDIT" size="40" style="-fx-fill: -fx-custom-color-primary;"/>
+        <Label text="%btn.edit" styleClass="custom-modal-title" style="-fx-font-size: 22px; -fx-font-weight: 800;"/>
+        <Label fx:id="lblProductName" text="Product Name" style="-fx-text-fill: -fx-text-custom-muted; -fx-font-size: 15px; -fx-font-weight: bold;"/>
     </VBox>
 
-    <VBox spacing="15">
+    <Separator/>
+
+    <VBox spacing="20">
         <!-- Price Field -->
         <VBox spacing="8">
-            <Label text="Precio Unitario (&#x20ac;):" style="-fx-font-weight: bold; -fx-text-fill: #555;"/>
+            <Label text="%product.price" style="-fx-font-weight: bold; -fx-text-fill: -fx-text-custom-main;"/>
             <TextField fx:id="txtUnitPrice" styleClass="input-field-modern" prefHeight="45"/>
         </VBox>
 
         <!-- Discount Field -->
         <VBox spacing="8">
-            <Label text="Descuento Manual:" style="-fx-font-weight: bold; -fx-text-fill: #555;"/>
-            <HBox spacing="10" alignment="CENTER_LEFT">
-                <TextField fx:id="txtDiscount" styleClass="input-field-modern" prefHeight="45" HBox.hgrow="ALWAYS" promptText="0.00"/>
-                <ToggleButton fx:id="toggleDiscountType" text="&#x20ac;" prefHeight="45" prefWidth="50" styleClass="toggle-button-modern-euro" selected="true"/>
+            <Label text="%product.discount" style="-fx-font-weight: bold; -fx-text-fill: -fx-text-custom-main;"/>
+            <HBox spacing="0" alignment="CENTER_LEFT" styleClass="promo-input-container">
+                <TextField fx:id="txtDiscount" styleClass="promo-textfield" prefHeight="45" HBox.hgrow="ALWAYS" promptText="0.00"/>
+                <ToggleButton fx:id="toggleDiscountType" text="&#x20ac;" prefHeight="45" prefWidth="60" styleClass="btn-apply-promo" selected="true"/>
             </HBox>
-            <Label fx:id="lblDiscountHint" text="Descuento en valor absoluto" style="-fx-text-fill: #999; -fx-font-size: 11px;"/>
+            <Label fx:id="lblDiscountHint" text="%product.discount_hint" style="-fx-text-fill: -fx-text-custom-muted; -fx-font-size: 11px;"/>
         </VBox>
 
         <!-- Observations Field -->
         <VBox spacing="8">
-            <Label text="Observaci&#x00f3;n/Sugerencia:" style="-fx-font-weight: bold; -fx-text-fill: #555;"/>
-            <TextArea fx:id="txtObservations" prefHeight="80" wrapText="true" promptText="Ej: Sin cebolla, poco hecho..."/>
+            <Label text="%sidebar.item.monitor" style="-fx-font-weight: bold; -fx-text-fill: -fx-text-custom-main;"/>
+            <TextArea fx:id="txtObservations" prefHeight="80" wrapText="true" promptText="..." styleClass="input-field-modern"/>
         </VBox>
     </VBox>
 
+    <Region VBox.vgrow="ALWAYS" prefHeight="10"/>
+
     <!-- Footer Buttons -->
-    <HBox spacing="15" alignment="CENTER">
-        <Button text="CANCELAR" onAction="#handleCancel" styleClass="btn-secondary" prefHeight="45" prefWidth="130"/>
-        <Button text="GUARDAR CAMBIOS" onAction="#handleSave" styleClass="btn-primary" prefHeight="45" prefWidth="180"/>
+    <HBox spacing="15" alignment="CENTER_RIGHT">
+        <Button onAction="#handleCancel" styleClass="btn-secondary" prefHeight="45" prefWidth="130">
+            <graphic>
+                <HBox spacing="8" alignment="CENTER">
+                    <FontAwesomeIconView glyphName="TIMES" size="14" style="-fx-fill: -fx-text-custom-muted;"/>
+                    <Label text="%btn.cancel" style="-fx-text-fill: -fx-text-custom-muted;"/>
+                </HBox>
+            </graphic>
+        </Button>
+        <Button onAction="#handleSave" styleClass="btn-primary" prefHeight="45" prefWidth="180">
+            <graphic>
+                <HBox spacing="8" alignment="CENTER">
+                    <FontAwesomeIconView glyphName="CHECK" size="14" style="-fx-fill: white;"/>
+                    <Label text="%btn.save" style="-fx-text-fill: white; -fx-font-weight: bold;"/>
+                </HBox>
+            </graphic>
+        </Button>
     </HBox>
 
 </VBox>
