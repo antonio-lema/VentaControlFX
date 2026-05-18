@@ -47,6 +47,8 @@ public class VerifactuDashboardController implements Injectable {
     private Button btnRetry;
     @FXML
     private Button btnSubsanar;
+    @FXML
+    private Button btnOpenAeat;
 
     @FXML
     private TableView<com.mycompany.ventacontrolfx.presentation.model.FiscalLogModel> historyTable;
@@ -208,12 +210,15 @@ public class VerifactuDashboardController implements Injectable {
         lblDetailStatus.setText(op.getStatus());
         lblDetailError.setText(op.getError() != null ? op.getError() : "-");
 
-        // Mostrar botones de reintento/subsanaci\u00f3n si est\u00e1 rechazado o hay
-        // error
+        // Mostrar botones de reintento/subsanación si está rechazado o hay error
         String status = op.getStatus();
         boolean canRetry = "REJECTED".equals(status) || "ERROR".equals(status) || "PENDING".equals(status);
         btnRetry.setVisible(canRetry);
         btnSubsanar.setVisible(canRetry && (op.getType().equals("ALTA") || op.getType().equals("RECTIFICATIVA")));
+        
+        // Mostrar botón de ver en AEAT si es una factura válida
+        boolean isAeatVerifiable = op.getDocument() != null && !op.getDocument().startsWith("LEGACY");
+        btnOpenAeat.setVisible(isAeatVerifiable);
 
         loadXmlIntoWebView(webXmlSent, op.getXmlSent());
         loadXmlIntoWebView(webXmlReceived, op.getXmlReceived());
@@ -270,6 +275,67 @@ public class VerifactuDashboardController implements Injectable {
             return xmlOutput.getWriter().toString();
         } catch (Exception e) {
             return xml.replace("><", ">\n<");
+        }
+    }
+
+    @FXML
+    private void handleOpenAeat() {
+        FiscalOperationModel selected = operationsTable.getSelectionModel().getSelectedItem();
+        if (selected == null) return;
+
+        try {
+            // Obtener el CIF de la empresa
+            String cif = "99999910G"; // Valor de pruebas por defecto
+            try {
+                if (container != null && container.getConfigRepository() != null) {
+                    cif = container.getConfigRepository().load().getCif();
+                }
+            } catch (Exception e) {
+                // Mantener fallback
+            }
+
+            // Formatear fecha a dd-MM-yyyy
+            String dateStr = selected.getDate(); // Formato: "yyyy-MM-dd HH:mm:ss.S"
+            String formattedDate = "18-05-2026";
+            String year = "2026";
+            try {
+                String justDate = dateStr.split(" ")[0]; // "yyyy-MM-dd"
+                String[] parts = justDate.split("-");
+                if (parts.length == 3) {
+                    year = parts[0];
+                    formattedDate = parts[2] + "-" + parts[1] + "-" + parts[0];
+                }
+            } catch (Exception e) {}
+
+            // Formatear referencia al estilo del validador AEAT (año-serie-numero)
+            String fullNumSerie = year + "-" + selected.getDocument();
+
+            // Importe absoluto
+            double total = Math.abs(selected.getTotal());
+            String formattedTotal = String.format(java.util.Locale.US, "%.2f", total);
+
+            // Construir URL oficial de AEAT VeriFactu
+            String aeatUrl = "https://prewww1.aeat.es/wlpl/TIKE-CONT/ValidarQR?nif=" 
+                    + (cif != null ? cif.toUpperCase() : "")
+                    + "&numserie=" + fullNumSerie
+                    + "&fecha=" + formattedDate
+                    + "&importe=" + formattedTotal;
+
+            System.out.println("====== [DASHBOARD AEAT REDIRECT] ======");
+            System.out.println("Abriendo validador AEAT para: " + fullNumSerie);
+            System.out.println("URL: " + aeatUrl);
+            System.out.println("=======================================");
+
+            // Abrir en el navegador predeterminado del sistema
+            if (java.awt.Desktop.isDesktopSupported()) {
+                java.awt.Desktop.getDesktop().browse(new java.net.URI(aeatUrl));
+            }
+        } catch (Exception e) {
+            System.err.println("Error al abrir el validador AEAT: " + e.getMessage());
+            com.mycompany.ventacontrolfx.presentation.util.AlertUtil.showError(
+                "Error de Navegación",
+                "No se pudo abrir el validador de la AEAT automáticamente: " + e.getMessage()
+            );
         }
     }
 

@@ -126,6 +126,9 @@
                     <Button fx:id="btnSubsanar" onAction="#handleSubsanar" text="Subsanar" visible="false" styleClass="btn-primary" style="-fx-background-color: #f59e0b;">
                         <graphic><FontAwesomeIconView glyphName="WRENCH" size="14" fill="white"/></graphic>
                     </Button>
+                    <Button fx:id="btnOpenAeat" onAction="#handleOpenAeat" text="Ver en AEAT" visible="false" styleClass="btn-secondary" style="-fx-background-color: #10b981; -fx-text-fill: white;">
+                        <graphic><FontAwesomeIconView glyphName="EXTERNAL_LINK" size="14" fill="white"/></graphic>
+                    </Button>
                 </HBox>
 
                 <VBox spacing="8" styleClass="stat-card" style="-fx-background-color: #fee2e2; -fx-border-color: #fecaca;" fx:id="errorBox">
