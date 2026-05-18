@@ -16,9 +16,10 @@ public class ProductGridRenderer {
     private final boolean pricesIncludeTax;
     private final java.util.function.Function<Product, String> promotionResolver;
     private final java.util.ResourceBundle bundle;
+    private final int globalDecimals;
 
     public ProductGridRenderer(TilePane productsPane, Label labelCountProducts, double globalTaxRate,
-            boolean pricesIncludeTax, java.util.function.Function<Product, String> promotionResolver,
+            boolean pricesIncludeTax, int globalDecimals, java.util.function.Function<Product, String> promotionResolver,
             java.util.ResourceBundle bundle,
             Consumer<Product> onAddToCart) {
         this.productsPane = productsPane;
@@ -27,6 +28,7 @@ public class ProductGridRenderer {
         this.pricesIncludeTax = pricesIncludeTax;
         this.promotionResolver = promotionResolver;
         this.bundle = bundle;
+        this.globalDecimals = globalDecimals;
         this.onAddToCart = onAddToCart;
     }
 
@@ -97,7 +99,7 @@ public class ProductGridRenderer {
 
     private javafx.scene.Node createProductNode(Product p, boolean animate) {
         String discountDesc = promotionResolver != null ? promotionResolver.apply(p) : null;
-        ProductBox box = new ProductBox(p, globalTaxRate, pricesIncludeTax, discountDesc, bundle, onAddToCart);
+        ProductBox box = new ProductBox(p, globalTaxRate, pricesIncludeTax, globalDecimals, discountDesc, bundle, onAddToCart);
 
         if (!animate)
             return box;

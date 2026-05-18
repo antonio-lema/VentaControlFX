@@ -2,6 +2,7 @@ package com.mycompany.ventacontrolfx.presentation.controller.dialog;
 
 import com.mycompany.ventacontrolfx.application.usecase.SaleUseCase;
 import com.mycompany.ventacontrolfx.application.usecase.UserUseCase;
+import com.mycompany.ventacontrolfx.application.usecase.ReturnUseCase;
 import com.mycompany.ventacontrolfx.domain.dto.SellerAnalytics;
 import com.mycompany.ventacontrolfx.domain.model.Return;
 import com.mycompany.ventacontrolfx.domain.model.Sale;
@@ -70,6 +71,7 @@ public class SellerReportController implements Injectable {
 
     private SaleUseCase saleUseCase;
     private UserUseCase userUseCase;
+    private ReturnUseCase returnUseCase;
     private ServiceContainer container;
 
     private static final DateTimeFormatter FMT = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
@@ -80,6 +82,7 @@ public class SellerReportController implements Injectable {
         this.container = container;
         this.saleUseCase = container.getSaleUseCase();
         this.userUseCase = container.getUserUseCase();
+        this.returnUseCase = container.getReturnUseCase();
 
         setupTables();
         setupFilters();
@@ -182,7 +185,7 @@ public class SellerReportController implements Injectable {
                                 || s.getPaymentMethod().equalsIgnoreCase(methodFilter))
                         .collect(Collectors.toList());
 
-                List<Return> currentReturnsList = saleUseCase.getReturnsHistory(searchFrom, searchTo).stream()
+                List<Return> currentReturnsList = returnUseCase.getReturnsHistory(searchFrom, searchTo).stream()
                         .filter(r -> methodFilter.equals("Todos")
                                 || r.getPaymentMethod().equalsIgnoreCase(methodFilter))
                         .collect(Collectors.toList());
@@ -194,7 +197,7 @@ public class SellerReportController implements Injectable {
                     LocalDate prevFrom = from.minusDays(days);
                     LocalDate prevTo = from.minusDays(1);
                     prevSales = saleUseCase.getSalesByRange(prevFrom, prevTo);
-                    prevReturns = saleUseCase.getReturnsHistory(prevFrom, prevTo);
+                    prevReturns = returnUseCase.getReturnsHistory(prevFrom, prevTo);
                 }
 
                 Map<String, Double> catDist = saleUseCase.getCategoryDistribution(searchFrom, searchTo);

@@ -9,7 +9,7 @@
 <VBox spacing="25" alignment="CENTER" prefWidth="480" 
       style="-fx-background-color: white; -fx-background-radius: 20; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 30, 0, 0, 10); -fx-border-color: #eeeeee; -fx-border-width: 1; -fx-border-radius: 20;"
       xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="com.mycompany.ventacontrolfx.presentation.controller.ClosureReminderController">
+      fx:controller="com.mycompany.ventacontrolfx.presentation.controller.dialog.ClosureReminderController">
     <padding>
         <Insets top="40" right="40" bottom="40" left="40"/>
     </padding>
@@ -38,7 +38,6 @@
                         style="-fx-background-color: #3b82f6; -fx-background-radius: 12; -fx-text-fill: white; -fx-font-size: 16; -fx-font-weight: bold; -fx-cursor: hand; -fx-effect: dropshadow(three-pass-box, rgba(59, 130, 246, 0.3), 10, 0, 0, 5);">
                     <graphic>
                         <FontAwesomeIconView glyphName="CHECK_CIRCLE" fill="white" size="20">
-                            <VBox.margin><Insets right="10"/></VBox.margin>
                         </FontAwesomeIconView>
                     </graphic>
                     <text>CERRAR CAJA AHORA</text>

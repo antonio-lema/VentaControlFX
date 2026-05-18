@@ -19,41 +19,14 @@
    <children>
       <VBox spacing="0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
-            <!-- Header Section -->
-            <VBox styleClass="view-header" spacing="0">
-                <children>
-                    <HBox spacing="16" alignment="CENTER_LEFT">
-                        <children>
-                            <StackPane styleClass="view-header-icon-wrap">
-                                <children><FontAwesomeIconView glyphName="TAG" size="22" fill="white"/></children>
-                            </StackPane>
-                            <VBox spacing="2">
-                                <children>
-                                    <Label text="%categories.title" styleClass="view-title"/>
-                                    <Label text="%categories.subtitle" styleClass="view-subtitle"/>
-                                </children>
-                            </VBox>
-                            <Region HBox.hgrow="ALWAYS" />
-                            <HBox spacing="10.0" alignment="CENTER_RIGHT">
-                                <children>
-                                    <Button fx:id="btnAdd" onAction="#handleAddCategory" styleClass="btn-primary" text="%categories.btn.new">
-                                        <graphic><FontAwesomeIconView glyphName="PLUS" size="14" fill="WHITE"/></graphic>
-                                    </Button>
-                                </children>
-                            </HBox>
-                        </children>
-                    </HBox>
-                </children>
-            </VBox>
-            
-            <VBox spacing="20.0" VBox.vgrow="ALWAYS" style="-fx-padding: 25;">
+            <VBox spacing="20.0" VBox.vgrow="ALWAYS" style="-fx-padding: 20 25 25 25;">
                 <children>
 
             <!-- Table Card -->
             <VBox spacing="0" styleClass="table-card" VBox.vgrow="ALWAYS">
                <children>
                   <!-- Filter Section -->
-                  <HBox alignment="CENTER_LEFT" styleClass="modern-filter-bar">
+                  <HBox alignment="CENTER_LEFT" styleClass="modern-filter-bar" spacing="15">
                      <children>
                         <Label text="%categories.filter.label" styleClass="label-muted" />
                         <HBox alignment="CENTER_LEFT" styleClass="search-bar" HBox.hgrow="ALWAYS" maxWidth="400">
@@ -63,6 +36,9 @@
                            </children>
                         </HBox>
                         <Region HBox.hgrow="ALWAYS" />
+                        <Button fx:id="btnAdd" onAction="#handleAddCategory" styleClass="btn-primary" text="%categories.btn.new">
+                            <graphic><FontAwesomeIconView glyphName="PLUS" size="14" fill="WHITE"/></graphic>
+                        </Button>
                         <HBox alignment="CENTER_LEFT" spacing="10" styleClass="row-limit-container">
                            <children>
                               <Label text="%history.show_limit" styleClass="label-limit" />

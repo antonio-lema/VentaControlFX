@@ -29,7 +29,9 @@ public class JdbcCategoryRepository implements ICategoryRepository {
                         rs.getString("name"),
                         rs.getBoolean("visible"),
                         isFavorite,
-                        defaultIva);
+                        defaultIva,
+                        rs.getObject("decimals") != null ? rs.getInt("decimals") : null);
+
                 category.setParentCategoryId(parentCategoryId);
 
                 int taxGroupId = rs.getInt("tax_group_id");
@@ -63,7 +65,9 @@ public class JdbcCategoryRepository implements ICategoryRepository {
                         rs.getString("name"),
                         rs.getBoolean("visible"),
                         isFavorite,
-                        defaultIva);
+                        defaultIva,
+                        rs.getObject("decimals") != null ? rs.getInt("decimals") : null);
+
                 category.setParentCategoryId(parentCategoryId);
 
                 int taxGroupId = rs.getInt("tax_group_id");
@@ -87,12 +91,20 @@ public class JdbcCategoryRepository implements ICategoryRepository {
             while (rs.next()) {
                 double defaultIva = rs.getDouble("default_iva");
 
+                Integer decimals = null;
+                try {
+                    Object decObj = rs.getObject("decimals");
+                    if (decObj != null) decimals = rs.getInt("decimals");
+                } catch (SQLException e) {}
+
                 Category category = new Category(
                         rs.getInt("category_id"),
                         rs.getString("name"),
                         rs.getBoolean("visible"),
                         rs.getBoolean("is_favorite"),
-                        defaultIva);
+                        defaultIva,
+                        decimals);
+
 
                 Integer parentCategoryId = rs.getInt("parent_category_id");
                 if (!rs.wasNull()) {
@@ -112,7 +124,8 @@ public class JdbcCategoryRepository implements ICategoryRepository {
 
     @Override
     public void save(Category category) throws SQLException {
-        String sql = "INSERT INTO categories (name, visible, is_favorite, default_iva, tax_rate, tax_group_id, parent_category_id) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO categories (name, visible, is_favorite, default_iva, tax_rate, tax_group_id, parent_category_id, decimals) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+
         try (Connection connection = DBConnection.getConnection();
                 PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setString(1, category.getName());
@@ -130,13 +143,20 @@ public class JdbcCategoryRepository implements ICategoryRepository {
             } else {
                 pstmt.setNull(7, Types.INTEGER);
             }
+            if (category.getDecimals() != null) {
+                pstmt.setInt(8, category.getDecimals());
+            } else {
+                pstmt.setNull(8, Types.INTEGER);
+            }
             pstmt.executeUpdate();
+
         }
     }
 
     @Override
     public void update(Category category) throws SQLException {
-        String sql = "UPDATE categories SET name = ?, visible = ?, is_favorite = ?, default_iva = ?, tax_rate = ?, tax_group_id = ?, parent_category_id = ? WHERE category_id = ?";
+        String sql = "UPDATE categories SET name = ?, visible = ?, is_favorite = ?, default_iva = ?, tax_rate = ?, tax_group_id = ?, parent_category_id = ?, decimals = ? WHERE category_id = ?";
+
         try (Connection connection = DBConnection.getConnection();
                 PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setString(1, category.getName());
@@ -154,8 +174,14 @@ public class JdbcCategoryRepository implements ICategoryRepository {
             } else {
                 pstmt.setNull(7, Types.INTEGER);
             }
-            pstmt.setInt(8, category.getId());
+            if (category.getDecimals() != null) {
+                pstmt.setInt(8, category.getDecimals());
+            } else {
+                pstmt.setNull(8, Types.INTEGER);
+            }
+            pstmt.setInt(9, category.getId());
             pstmt.executeUpdate();
+
         }
     }
 
@@ -213,7 +239,9 @@ public class JdbcCategoryRepository implements ICategoryRepository {
                             rs.getString("name"),
                             rs.getBoolean("visible"),
                             rs.getBoolean("is_favorite"),
-                            rs.getDouble("default_iva"));
+                            rs.getDouble("default_iva"),
+                            rs.getObject("decimals") != null ? rs.getInt("decimals") : null);
+
                     int taxGroupId = rs.getInt("tax_group_id");
                     if (!rs.wasNull()) {
                         category.setTaxGroupId(taxGroupId);
@@ -239,7 +267,9 @@ public class JdbcCategoryRepository implements ICategoryRepository {
                             rs.getString("name"),
                             rs.getBoolean("visible"),
                             rs.getBoolean("is_favorite"),
-                            rs.getDouble("default_iva"));
+                            rs.getDouble("default_iva"),
+                            rs.getObject("decimals") != null ? rs.getInt("decimals") : null);
+
                     int taxGroupId = rs.getInt("tax_group_id");
                     if (!rs.wasNull()) {
                         category.setTaxGroupId(taxGroupId);

@@ -23,6 +23,8 @@ public class AddProductController implements Injectable {
     @FXML private HBox hboxStockDetails;
     @FXML private ComboBox<Category> cmbCategory;
     @FXML private ComboBox<TaxGroup> cmbTaxGroup;
+    @FXML private ComboBox<Integer> cmbDecimals;
+
     @FXML private CheckBox chkFavorite, chkManageStock;
     @FXML private ImageView ivProductImage;
     @FXML private Label lblTitle;
@@ -49,7 +51,9 @@ public class AddProductController implements Injectable {
         try {
             priceManager.renderPriceLists(container.getPriceListUseCase().getAll());
             taxManager.loadData(container.getCategoryUseCase().getAll(), container.getTaxEngineService().getAllTaxGroups());
+            setupDecimalsComboBox();
         } catch (Exception e) { e.printStackTrace(); }
+
 
         hboxStockDetails.disableProperty().bind(chkManageStock.selectedProperty().not());
         txtStockQuantity.setText("0"); txtMinStock.setText("0");
@@ -68,8 +72,10 @@ public class AddProductController implements Injectable {
         taxManager.selectCategoryById(product.getCategoryId());
         taxManager.selectTaxGroupById(product.getTaxGroupId());
         imageManager.loadPreview(product.getImagePath());
+        cmbDecimals.setValue(product.getDecimals());
 
         Platform.runLater(() -> priceManager.loadProductPrices(product.getId(), product.getPrice()));
+
     }
 
     @FXML private void handleSelectImage() { imageManager.selectImage(); }
@@ -90,6 +96,8 @@ public class AddProductController implements Injectable {
             productToEdit.setMinStock(Integer.parseInt(txtMinStock.getText()));
             productToEdit.setIva(txtIva.getText().isEmpty() ? null : Double.parseDouble(txtIva.getText().replace(",", ".")));
             productToEdit.setTaxGroupId(cmbTaxGroup.getValue() != null ? cmbTaxGroup.getValue().getId() : null);
+            productToEdit.setDecimals(cmbDecimals.getValue());
+
 
             // Guardar Imagen
             String newPath = imageManager.saveImageLocally();
@@ -143,5 +151,22 @@ public class AddProductController implements Injectable {
         Stage stage = (Stage) txtName.getScene().getWindow();
         stage.setX(event.getScreenX() - xOffset); stage.setY(event.getScreenY() - yOffset);
     }
+
+    private void setupDecimalsComboBox() {
+        cmbDecimals.setItems(javafx.collections.FXCollections.observableArrayList(null, 0, 1, 2, 3, 4, 5));
+        cmbDecimals.setConverter(new javafx.util.StringConverter<Integer>() {
+            @Override
+            public String toString(Integer value) {
+                if (value == null) return container.getBundle().getString("product.form.decimals.none");
+                return String.valueOf(value);
+            }
+
+            @Override
+            public Integer fromString(String string) {
+                return null;
+            }
+        });
+    }
 }
+
 

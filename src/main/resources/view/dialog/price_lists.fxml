@@ -5,26 +5,17 @@
 <?import javafx.geometry.Insets?>
 
 <VBox spacing="0" styleClass="main-content-area" style="-fx-padding: 0;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mycompany.ventacontrolfx.presentation.controller.dialog.PriceListController">
-    <!-- Header Section -->
-    <VBox styleClass="view-header" spacing="0">
-        <HBox alignment="CENTER_LEFT" spacing="16">
-            <StackPane styleClass="view-header-icon-wrap">
-                <FontAwesomeIconView glyphName="MONEY" size="24" fill="white"/>
-            </StackPane>
-            <VBox spacing="2">
-                <Label text="Gesti&#x00f3;n de Tarifas" styleClass="view-title"/>
-                <Label text="Administra las listas de precios aplicables a ventas y clientes" styleClass="view-subtitle"/>
-            </VBox>
-            <Region HBox.hgrow="ALWAYS" />
-            <Button text="Nueva Tarifa" onAction="#openNewPriceListForm" styleClass="btn-primary">
-                <graphic>
-                    <FontAwesomeIconView glyphName="PLUS" size="14" fill="WHITE"/>
-                </graphic>
-            </Button>
-        </HBox>
-    </VBox>
-
     <VBox spacing="20" VBox.vgrow="ALWAYS" style="-fx-padding: 25 35;">
+        <HBox alignment="CENTER_LEFT" spacing="15" style="-fx-padding: 0 0 15 0; -fx-border-color: #e2e8f0; -fx-border-width: 0 0 1 0;">
+            <children>
+                <Label text="LISTAS DE PRECIOS" style="-fx-font-weight: 800; -fx-text-fill: #64748b; -fx-font-size: 11px; -fx-letter-spacing: 1px;" />
+                <Region HBox.hgrow="ALWAYS" />
+                <Button text="Nueva Tarifa" onAction="#openNewPriceListForm" styleClass="btn-primary">
+                    <graphic><FontAwesomeIconView glyphName="PLUS" size="14" fill="WHITE"/></graphic>
+                </Button>
+            </children>
+        </HBox>
+        
         <HBox alignment="CENTER_LEFT" spacing="10">
             <Label fx:id="lblCount" text="0 tarifas registradas" styleClass="metric-value-small, text-muted"/>
         </HBox>

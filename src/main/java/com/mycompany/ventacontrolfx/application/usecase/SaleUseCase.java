@@ -26,10 +26,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Caso de uso para la gesti\u00f3n de ventas, incluyendo el procesamiento de
- * nuevas
- * ventas,
- * historial, detalles y devoluciones.
+ * nuevas ventas, historial y detalles.
  */
 public class SaleUseCase {
 
@@ -249,6 +246,7 @@ public class SaleUseCase {
         sale.setTotalNet(Math.round(finalTotalNet * 100.0) / 100.0);
         sale.setTotalTax(Math.round(finalTotalTax * 100.0) / 100.0);
         sale.setCustomerNameSnapshot(client != null ? client.getName() : "Consumidor Final");
+        sale.setCustomerNifSnapshot(client != null ? client.getTaxId() : null);
         sale.setDiscountAmount(Math.round((grossSavingsTotal + discountAmount) * 100.0) / 100.0);
         sale.setDiscountReason(((discountReason != null ? discountReason : "") + " "
                 + String.join(", ", promoResult.getAppliedPromos())).trim());
@@ -434,209 +432,6 @@ public class SaleUseCase {
         return saleRepository.getById(saleId);
     }
 
-    /**
-     * Registra una devoluci\u00f3n parcial o total de una venta.
-     */
-    public void registerPartialReturn(int saleId, Map<Integer, Integer> returnItems, String reason, int userId)
-            throws SQLException {
-        authService.checkPermission("VENTAS");
-        Sale sale = saleRepository.getById(saleId);
-        if (sale == null)
-            return;
-
-        try (Connection conn = DBConnection.getConnection()) {
-            conn.setAutoCommit(false);
-            try {
-                double refundAmountForThisTransaction = 0;
-                double totalTaxRefunded = 0;
-                double totalNetRefunded = 0;
-                boolean allReturned = true;
-                List<ReturnDetail> newReturnDetails = new ArrayList<>();
-
-                for (SaleDetail d : sale.getDetails()) {
-                    if (returnItems.containsKey(d.getDetailId())) {
-                        int qtyToReturnNow = returnItems.get(d.getDetailId());
-                        int maxReturnable = d.getQuantity() - d.getReturnedQuantity();
-
-                        if (qtyToReturnNow > maxReturnable)
-                            qtyToReturnNow = maxReturnable;
-
-                        if (qtyToReturnNow > 0) {
-                            int newTotalReturn = d.getReturnedQuantity() + qtyToReturnNow;
-                            saleRepository.updateDetailReturnedQuantity(d.getDetailId(), newTotalReturn, conn);
-                            d.setReturnedQuantity(newTotalReturn);
-
-                            // USAR PRECIO FINAL (CON IVA) PARA LA DEVOLUCI\u00d3N
-                            double unitRefundPrice = d.getGrossTotal() / d.getQuantity();
-                            double lineRefund = Math.round((qtyToReturnNow * unitRefundPrice) * 100.0) / 100.0;
-                            refundAmountForThisTransaction += lineRefund;
-
-                            // CALCULO PROPORCIONAL DE IMPUESTOS
-                            double factor = (double) qtyToReturnNow / d.getQuantity();
-                            double lineTaxRefund = Math.round((d.getTaxAmount() * factor) * 100.0) / 100.0;
-                            double lineNetRefund = lineRefund - lineTaxRefund;
-
-                            totalTaxRefunded += lineTaxRefund;
-                            totalNetRefunded += lineNetRefund;
-
-                            ReturnDetail rd = new ReturnDetail();
-                            rd.setProductId(d.getProductId());
-                            rd.setQuantity(qtyToReturnNow);
-                            rd.setUnitPrice(unitRefundPrice);
-                            rd.setSubtotal(lineRefund);
-                            rd.setTaxAmount(lineTaxRefund);
-                            rd.setNetAmount(lineNetRefund);
-                            rd.setProductName(d.getProductName()); // Snapshot del nombre original
-                            newReturnDetails.add(rd);
-
-                            // INCREMENTAR STOCK AL DEVOLVER
-                            com.mycompany.ventacontrolfx.infrastructure.persistence.JdbcProductRepository productRepo = new com.mycompany.ventacontrolfx.infrastructure.persistence.JdbcProductRepository();
-                            productRepo.updateStock(d.getProductId(), qtyToReturnNow, conn);
-                        }
-                    }
-                    if (d.getReturnedQuantity() < d.getQuantity())
-                        allReturned = false;
-                }
-
-                if (refundAmountForThisTransaction > 0) {
-                    // Logic for Mixed Payment Returns: Refund Proportionally to what was paid
-                    double currentGrossTotal = sale.getTotal() + sale.getDiscountAmount();
-                    double cashRatio = (currentGrossTotal > 0) ? sale.getCashAmount() / currentGrossTotal : 1.0;
-
-                    double cashToRefund = Math.round((refundAmountForThisTransaction * cashRatio) * 100.0) / 100.0;
-                    double cardToRefund = Math.round((refundAmountForThisTransaction - cashToRefund) * 100.0) / 100.0;
-
-                    // Ensure we don't refund more than what was actually paid in each method
-                    List<Return> prevReturns = saleRepository.getReturnsBySaleId(saleId);
-                    double totalCashReturnedSoFar = prevReturns.stream().mapToDouble(Return::getCashAmount).sum();
-                    double totalCardReturnedSoFar = prevReturns.stream().mapToDouble(Return::getCardAmount).sum();
-
-                    double availableCash = Math.max(0, sale.getCashAmount() - totalCashReturnedSoFar);
-                    double availableCard = Math.max(0, sale.getCardAmount() - totalCardReturnedSoFar);
-
-                    if (cashToRefund > availableCash) {
-                        double excess = cashToRefund - availableCash;
-                        cashToRefund = availableCash;
-                        cardToRefund += excess;
-                    }
-                    if (cardToRefund > availableCard) {
-                        double excess = cardToRefund - availableCard;
-                        cardToRefund = availableCard;
-                        cashToRefund += excess;
-                    }
-
-                    // Cap final refund
-                    cashToRefund = Math.min(cashToRefund, availableCash);
-                    cardToRefund = Math.min(cardToRefund, availableCard);
-
-                    // Validaci\u00f3n de efectivo disponible para la devoluci\u00f3n (solo la parte
-                    // que
-                    // devolvemos en cash)
-                    if (cashToRefund > 0 && cashClosureUseCase != null) {
-                        cashClosureUseCase.validateCashAvailableForReturn(cashToRefund);
-                    }
-
-                    Return newReturn = new Return();
-                    newReturn.setSaleId(saleId);
-                    newReturn.setUserId(userId);
-                    newReturn.setTotalRefunded(refundAmountForThisTransaction);
-                    newReturn.setReason(reason);
-                    newReturn.setReturnDatetime(LocalDateTime.now());
-                    newReturn.setPaymentMethod(sale.getPaymentMethod());
-                    newReturn.setCashAmount(cashToRefund);
-                    newReturn.setCardAmount(cardToRefund);
-                    newReturn.setTotalTax(totalTaxRefunded);
-                    newReturn.setTaxBasis(totalNetRefunded);
-
-                    // \u00e2\u201d\u20ac\u00e2\u201d\u20ac GENERACI\u00d3N DE C\u00d3dIGO FISCAL
-                    // \u00daNICO PARA LA DEVOLUCI\u00d3N \u00e2\u201d\u20ac\u00e2\u201d\u20ac
-                    String seriesCode = "R";
-                    int nextDocNumber = seriesRepository.getAndIncrement(seriesCode, conn);
-
-                    // ———— GESTIÓN FISCAL (VeriFactu Chaining para Rectificativas) ————
-                    String prevHash = saleRepository.getLastControlHash(seriesCode);
-
-                    // AEAT Hashing deterministic
-                    String nifEmisor = configRepository.getValue("cif");
-                    if (nifEmisor == null || nifEmisor.isEmpty())
-                        nifEmisor = "99999910G";
-
-                    String fechaExp = newReturn.getReturnDatetime()
-                            .format(java.time.format.DateTimeFormatter.ofPattern("dd-MM-yyyy"));
-                    String ahoraIso = newReturn.getReturnDatetime()
-                            .atZone(java.time.ZoneId.of("Europe/Madrid"))
-                            .format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssxxx"));
-
-                    String fullNumSerie = newReturn.getReturnDatetime().getYear() + "-" + seriesCode + "-"
-                            + String.format("%05d", nextDocNumber);
-
-                    StringBuilder sbHuella = new StringBuilder();
-                    sbHuella.append("IDEmisorFactura=").append(nifEmisor);
-                    sbHuella.append("&NumSerieFactura=").append(fullNumSerie);
-                    sbHuella.append("&FechaExpedicionFactura=").append(fechaExp);
-                    sbHuella.append("&TipoFactura=").append("R1"); // R1 por defecto para abonos de mostrador
-                    sbHuella.append("&CuotaTotal=")
-                            .append(String.format(java.util.Locale.US, "%.2f", newReturn.getTotalTax()));
-                    sbHuella.append("&ImporteTotal=")
-                            .append(String.format(java.util.Locale.US, "%.2f", newReturn.getTotalRefunded()));
-                    sbHuella.append("&Huella=").append(prevHash != null ? prevHash.toUpperCase() : "");
-                    sbHuella.append("&FechaHoraHusoGenRegistro=").append(ahoraIso);
-
-                    String currentHash = sha256(sbHuella.toString()).toUpperCase();
-
-                    newReturn.setControlHash(currentHash);
-                    newReturn.setPrevHash(prevHash);
-                    newReturn.setFiscalStatus("PENDING");
-                    newReturn.setGenTimestamp(ahoraIso);
-                    newReturn.setDocSeries(seriesCode);
-                    newReturn.setDocNumber(nextDocNumber);
-                    newReturn.setDocType("RECTIFICATIVA");
-                    
-                    // Snapshot del emisor para la rectificativa
-                    SaleConfig companyData = configRepository.load();
-                    newReturn.setIssuerName(companyData.getCompanyName());
-                    newReturn.setIssuerTaxId(companyData.getCif());
-                    newReturn.setIssuerAddress(companyData.getAddress());
-                    newReturn.setCustomerNameSnapshot(sale.getCustomerNameSnapshot());
-
-                    int returnId = saleRepository.saveReturn(newReturn, conn);
-                    saleRepository.saveReturnDetails(newReturnDetails, returnId, conn);
-
-                    double newTotalReturned = sale.getReturnedAmount() + refundAmountForThisTransaction;
-                    saleRepository.updateSaleReturnStatus(saleId, allReturned,
-                            allReturned ? reason : reason + " (Parcial)", newTotalReturned, conn);
-
-                    // Registrar en caja SOLO la parte devuelta en efectivo
-                    if (cashToRefund > 0 && cashClosureUseCase != null) {
-                        String cashReason = String.format("[Devoluci\u00f3n Ticket #%d - Origen: %s] %s", saleId,
-                                sale.getPaymentMethod(), reason);
-                        cashClosureUseCase.registerCashReturn(cashToRefund, cashReason, userId, conn);
-                    }
-
-                    // Archivamos el PDF fiscal de la devoluci\u00f3n antes del commit (para
-                    // asegurar
-                    // integridad)
-                    archiveReturnInPdf(newReturn, newReturnDetails);
-
-                }
-
-                conn.commit();
-            } catch (Exception e) {
-                conn.rollback();
-                if (e instanceof SQLException)
-                    throw (SQLException) e;
-                throw new SQLException("Error durante la transacci\u00f3n de devoluci\u00f3n: " + e.getMessage(), e);
-            } finally {
-                try {
-                    if (conn != null && !conn.isClosed()) {
-                        conn.setAutoCommit(true);
-                    }
-                } catch (SQLException ignored) {
-                }
-            }
-        }
-    }
-
     public int getTotalSalesCount() throws SQLException {
         return saleRepository.count();
     }
@@ -660,36 +455,18 @@ public class SaleUseCase {
                 .collect(java.util.stream.Collectors.toList());
     }
 
+    public List<Sale> getSalesByUserAndRange(int userId, LocalDateTime start, LocalDateTime end) throws SQLException {
+        return saleRepository.getByUserAndRange(userId, start, end);
+    }
+
+    public List<Sale> getSalesByClosureId(int closureId) throws SQLException {
+        return saleRepository.getByClosureId(closureId);
+    }
+
     public List<Sale> getSalesByClient(int clientId, LocalDate from, LocalDate to) throws SQLException {
         return saleRepository.getByRange(from, to).stream()
                 .filter(s -> s.getClientId() != null && s.getClientId() == clientId && !s.isReturn())
                 .collect(java.util.stream.Collectors.toList());
-    }
-
-    public List<Return> getReturnsByClient(int clientId, LocalDate from, LocalDate to) throws SQLException {
-        return saleRepository.getReturnsByRange(from, to).stream()
-                .filter(r -> {
-                    try {
-                        Sale s = saleRepository.getById(r.getSaleId());
-                        return s != null && s.getClientId() != null && s.getClientId() == clientId;
-                    } catch (SQLException e) {
-                        return false;
-                    }
-                })
-                .collect(java.util.stream.Collectors.toList());
-    }
-
-    public List<Return> getReturnsBySaleId(int saleId) throws SQLException {
-        return saleRepository.getReturnsBySaleId(saleId);
-    }
-
-    public List<ReturnDetail> getReturnDetails(int returnId) throws SQLException {
-        return saleRepository.getReturnDetailsByReturnId(returnId);
-    }
-
-    public List<Return> getReturnsHistory(LocalDate start, LocalDate end) throws SQLException {
-        authService.checkPermission("HISTORIAL");
-        return saleRepository.getReturnsByRange(start, end);
     }
 
     public List<ProductSummary> getTopProductsByClient(int clientId, int limit) throws SQLException {
@@ -705,10 +482,6 @@ public class SaleUseCase {
         return saleRepository.getByClient(clientId);
     }
 
-    /**
-     * Genera y archiva el PDF de la devoluci\u00f3n (Factura Rectificativa).
-     * Sincronizado con el motor de ReturnUseCase para mantener coherencia.
-     */
     /**
      * Genera y archiva el PDF de la venta (Ticket o Factura).
      */
@@ -753,57 +526,6 @@ public class SaleUseCase {
             pdfService.generateInvoicePdf(data, fullPath);
         } catch (Exception ex) {
             System.err.println("[SaleUseCase] Error archivando PDF de venta: " + ex.getMessage());
-        }
-    }
-
-    private void archiveReturnInPdf(Return r, List<ReturnDetail> details) {
-        if (this.pdfService == null)
-            return;
-        try {
-            // Cargar la venta original para contexto
-            Sale sale = saleRepository.getById(r.getSaleId());
-
-            // Conversi\u00f3n para compatibilidad con IFiscalPdfService.PrintData
-            FiscalDocument doc = FiscalDocument.builder()
-                    .saleId(r.getSaleId())
-                    .type(FiscalDocument.Type.RECTIFICATIVA)
-                    .series(r.getDocSeries())
-                    .number(r.getDocNumber())
-                    .issuedAt(r.getReturnDatetime())
-                    .issuer(r.getIssuerName(), r.getIssuerTaxId(), r.getIssuerAddress(), null)
-                    .receiver(r.getCustomerNameSnapshot(), null, null)
-                    .amounts(r.getTaxBasis(), r.getTotalTax(), r.getTotalRefunded())
-                    .status(FiscalDocument.Status.EMITIDO)
-                    .build();
-
-            List<SaleDetail> lines = new ArrayList<>();
-            for (ReturnDetail rd : details) {
-                SaleDetail sd = new SaleDetail();
-                sd.setProductName(rd.getProductName());
-                sd.setQuantity(rd.getQuantity());
-                sd.setUnitPrice(rd.getUnitPrice());
-                sd.setLineTotal(rd.getSubtotal());
-                lines.add(sd);
-            }
-
-            SaleConfig companyData = configRepository.load();
-            String logoPath = companyData != null ? companyData.getLogoPath() : null;
-            PrintData data = new PrintData(doc, sale, lines, logoPath);
-
-            String year = String.valueOf(doc.getIssuedAt().getYear());
-            String month = String.format("%02d", doc.getIssuedAt().getMonthValue());
-            String dirPath = "archivos_fiscales/" + year + "/" + month + "/Devoluciones";
-
-            Path path = Paths.get(dirPath);
-            if (!Files.exists(path))
-                Files.createDirectories(path);
-
-            String fileName = doc.getFullReference().replace("/", "_") + ".pdf";
-            String fullPath = dirPath + "/" + fileName;
-
-            pdfService.generateInvoicePdf(data, fullPath);
-        } catch (Exception ex) {
-            System.err.println("[SaleUseCase] Error archivando PDF de devoluci\u00f3n: " + ex.getMessage());
         }
     }
 

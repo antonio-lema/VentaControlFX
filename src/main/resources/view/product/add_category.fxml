@@ -60,6 +60,20 @@
                     <TextField fx:id="txtIva" promptText="%category.form.iva.prompt" styleClass="modern-input-field" HBox.hgrow="ALWAYS" style="-fx-text-fill: #1e293b;"/>
                 </HBox>
             </VBox>
+            
+            <!-- Decimals -->
+            <VBox styleClass="modern-input-group">
+                <Label text="%category.form.decimals" styleClass="modern-label" style="-fx-text-fill: #64748b; -fx-font-size: 11px; -fx-font-weight: bold; -fx-padding: 0 0 5 0;"/>
+                <HBox styleClass="modern-input-container" alignment="CENTER_LEFT">
+                    <FontAwesomeIconView glyphName="LIST_OL" size="18" fill="#64748b">
+                        <HBox.margin>
+                            <Insets right="10"/>
+                        </HBox.margin>
+                    </FontAwesomeIconView> 
+                    <ComboBox fx:id="cmbDecimals" promptText="%category.form.decimals.prompt" styleClass="modern-input-field" HBox.hgrow="ALWAYS" maxWidth="Infinity" style="-fx-background-color: transparent; -fx-text-fill: #1e293b;"/>
+                </HBox>
+            </VBox>
+
         </VBox>
         
         <!-- Actions -->

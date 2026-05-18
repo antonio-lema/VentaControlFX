@@ -49,7 +49,7 @@ public class ReturnDialogController {
             // Cargar histórico de devoluciones para calcular el sobrante de
             // efectivo/tarjeta actual
             if (container != null) {
-                this.prevReturns = container.getSaleUseCase().getReturnsBySaleId(sale.getSaleId());
+                this.prevReturns = container.getReturnUseCase().getReturnsBySaleId(sale.getSaleId());
             }
         } catch (Exception e) {
             this.prevReturns = new java.util.ArrayList<>();

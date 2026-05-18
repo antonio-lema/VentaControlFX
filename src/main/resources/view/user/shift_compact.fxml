@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
+<?import java.net.URL?>
+
+<AnchorPane prefWidth="480.0" styleClass="modal-container"
+            xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.mycompany.ventacontrolfx.presentation.controller.dialog.WorkSessionController">
+    <stylesheets>
+        <URL value="@/styles/components/work_sessions.css" />
+    </stylesheets>
+    <children>
+        <VBox spacing="0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <children>
+                <!-- Header -->
+                <VBox styleClass="modal-header">
+                    <children>
+                        <HBox spacing="15" alignment="CENTER_LEFT">
+                            <children>
+                                <StackPane styleClass="modal-icon-container">
+                                    <children><FontAwesomeIconView glyphName="CLOCK_ALT" size="22" fill="white"/></children>
+                                </StackPane>
+                                <VBox spacing="2">
+                                    <children>
+                                        <Label text="Control de Jornada" styleClass="modal-title"/>
+                                        <Label text="Registra tus tiempos de trabajo y descansos" styleClass="modal-subtitle"/>
+                                    </children>
+                                </VBox>
+                                <Region HBox.hgrow="ALWAYS" />
+                                <Button onAction="#handleClose" styleClass="modal-close-button">
+                                    <graphic><FontAwesomeIconView glyphName="CLOSE" size="18" /></graphic>
+                                </Button>
+                            </children>
+                        </HBox>
+                    </children>
+                </VBox>
+                
+                <ScrollPane fitToWidth="true" styleClass="modal-content-scroll" VBox.vgrow="ALWAYS">
+                    <content>
+                        <VBox spacing="25.0" alignment="CENTER" style="-fx-padding: 30;">
+                            <children>
+                                <!-- Status & Timer Card -->
+                                <VBox alignment="CENTER" spacing="15" styleClass="config-card">
+                                    <padding><Insets top="25" right="20" bottom="25" left="20"/></padding>
+                                    <children>
+                                        <StackPane fx:id="statusIconContainer" styleClass="status-icon-container-compact, status-inactive">
+                                            <children><FontAwesomeIconView fx:id="statusIcon" glyphName="USER_TIMES" size="42" fill="white"/></children>
+                                        </StackPane>
+                                        <VBox alignment="CENTER" spacing="5">
+                                            <children>
+                                                <Label fx:id="lblCurrentStatus" text="FUERA DE TURNO" styleClass="status-title-compact"/>
+                                                <Label fx:id="lblSessionTimer" text="00:00:00" styleClass="timer-label-compact"/>
+                                            </children>
+                                        </VBox>
+                                        <Label fx:id="lblTotalWorked" text="Acumulado hoy: 0h 0m" styleClass="info-label" style="-fx-font-size: 13px;"/>
+                                    </children>
+                                </VBox>
+
+                                <!-- Main Actions -->
+                                <VBox spacing="12" alignment="CENTER" maxWidth="350">
+                                    <children>
+                                        <Button fx:id="btnStartShift" text="INICIAR TURNO" onAction="#handleStartShift" 
+                                                styleClass="action-button, btn-success" prefHeight="55" maxWidth="Infinity">
+                                            <graphic><FontAwesomeIconView glyphName="PLAY" fill="white" size="16"/></graphic>
+                                        </Button>
+                                        
+                                        <HBox spacing="12">
+                                            <children>
+                                                <Button fx:id="btnStartBreak" text="DESCANSO" onAction="#handleStartBreak" 
+                                                        styleClass="action-button, btn-warning" prefHeight="50" HBox.hgrow="ALWAYS" maxWidth="Infinity">
+                                                    <graphic><FontAwesomeIconView glyphName="PAUSE" fill="white" size="14"/></graphic>
+                                                </Button>
+                                                <Button fx:id="btnEndSession" text="FINALIZAR" onAction="#handleEndSession" 
+                                                        styleClass="action-button, btn-danger" prefHeight="50" HBox.hgrow="ALWAYS" maxWidth="Infinity">
+                                                    <graphic><FontAwesomeIconView glyphName="STOP" fill="white" size="14"/></graphic>
+                                                </Button>
+                                            </children>
+                                        </HBox>
+                                    </children>
+                                </VBox>
+                            </children>
+                        </VBox>
+                    </content>
+                </ScrollPane>
+
+                <!-- Footer -->
+                <HBox styleClass="modal-footer" alignment="CENTER_RIGHT">
+                    <children>
+                        <Button text="Cerrar" onAction="#handleClose" styleClass="modal-button-secondary" />
+                    </children>
+                </HBox>
+            </children>
+        </VBox>
+    </children>
+</AnchorPane>

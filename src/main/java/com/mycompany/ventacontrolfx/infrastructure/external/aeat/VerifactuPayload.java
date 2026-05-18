@@ -35,7 +35,7 @@ public class VerifactuPayload {
 
     private String customerName;
     private String customerNif;
-    
+
     // Desglose de IVA por tasa (Rate -> [Base, Cuota])
     private java.util.Map<Double, Double[]> vatBreakdown = new java.util.HashMap<>();
 
@@ -47,7 +47,7 @@ public class VerifactuPayload {
     private String incidentReason;
 
     public VerifactuPayload(String nifEmisor, String razonSocialEmisor, String tipoFactura, String numSerieFactura,
-            String fechaExpedicion, double importeTotal, double totalNet, double totalTax, 
+            String fechaExpedicion, double importeTotal, double totalNet, double totalTax,
             String hashControl, String prevHash,
             String prevNumSerie, String prevFechaExpedicion,
             boolean isAnulacion, boolean isCorrection, String idRegistro, String genTimestamp,
@@ -188,5 +188,3 @@ public class VerifactuPayload {
         this.vatBreakdown = vatBreakdown;
     }
 }
-
-

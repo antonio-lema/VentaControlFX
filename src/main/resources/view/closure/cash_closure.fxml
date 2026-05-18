@@ -62,7 +62,7 @@
                     <!-- Saldo actual prominente -->
                     <VBox alignment="CENTER" spacing="4" style="-fx-padding: 10 0 6 0;">
                         <Label fx:id="lblCashInDrawer" text="%closure.cash.no_session"
-                               style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: -text-muted;"/>
+                               style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: -fx-text-custom-muted;"/>
                         <Label fx:id="lblActiveFund" text="%closure.cash.no_fund"
                                style="-fx-font-size: 12px; -fx-text-fill: -color-warning; -fx-font-weight: bold;"/>
                     </VBox>

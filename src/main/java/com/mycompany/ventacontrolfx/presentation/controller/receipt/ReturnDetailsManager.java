@@ -1,6 +1,6 @@
 package com.mycompany.ventacontrolfx.presentation.controller.receipt;
 
-import com.mycompany.ventacontrolfx.application.usecase.SaleUseCase;
+import com.mycompany.ventacontrolfx.application.usecase.ReturnUseCase;
 import com.mycompany.ventacontrolfx.domain.model.Return;
 import com.mycompany.ventacontrolfx.domain.model.ReturnDetail;
 import com.mycompany.ventacontrolfx.infrastructure.config.ServiceContainer;
@@ -20,7 +20,7 @@ import java.util.List;
 public class ReturnDetailsManager {
 
     private final ServiceContainer container;
-    private final SaleUseCase saleUseCase;
+    private final ReturnUseCase returnUseCase;
     
     private final VBox detailsPanel, detailsItemsContainer;
     private final Label lblDetailReturnId, lblDetailSaleId, lblDetailDate, lblDetailReason, lblDetailUser, lblDetailTotal;
@@ -29,7 +29,7 @@ public class ReturnDetailsManager {
 
     public ReturnDetailsManager(
             ServiceContainer container,
-            SaleUseCase saleUseCase,
+            ReturnUseCase returnUseCase,
             VBox detailsPanel,
             VBox detailsItemsContainer,
             Label lblDetailReturnId,
@@ -39,7 +39,7 @@ public class ReturnDetailsManager {
             Label lblDetailUser,
             Label lblDetailTotal) {
         this.container = container;
-        this.saleUseCase = saleUseCase;
+        this.returnUseCase = returnUseCase;
         this.detailsPanel = detailsPanel;
         this.detailsItemsContainer = detailsItemsContainer;
         this.lblDetailReturnId = lblDetailReturnId;
@@ -54,7 +54,7 @@ public class ReturnDetailsManager {
         if (returnRecord == null) return;
 
         try {
-            List<ReturnDetail> details = saleUseCase.getReturnDetails(returnRecord.getReturnId());
+            List<ReturnDetail> details = returnUseCase.getReturnDetailsList(returnRecord.getReturnId());
             returnRecord.setDetails(details);
 
             lblDetailReturnId.setText(container.getBundle().getString("returns.detail.id_prefix") + returnRecord.getFullReference());

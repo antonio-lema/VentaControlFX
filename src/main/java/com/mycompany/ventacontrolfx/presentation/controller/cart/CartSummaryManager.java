@@ -22,23 +22,26 @@ public class CartSummaryManager {
     }
 
     public void bind(Label subtotal, Label tax, Label savings, Label itemsCount, Label totalButton, HBox savingsBox, TextField promoCode) {
+        int decimals = container.getConfigUseCase().getConfig().getDecimalCount();
+        String format = "%." + decimals + "f \u20ac";
+
         subtotal.textProperty().bind(Bindings.createStringBinding(
-                () -> String.format(container.getBundle().getString("cart.summary.subtotal_format"), cartUseCase.getSubtotal()),
+                () -> String.format(format, cartUseCase.getSubtotal()),
                 cartUseCase.subtotalProperty()));
 
         tax.textProperty().bind(Bindings.createStringBinding(
-                () -> String.format(container.getBundle().getString("cart.summary.tax_format"), cartUseCase.getTax()),
+                () -> String.format(format, cartUseCase.getTax()),
                 cartUseCase.taxProperty()));
 
         savings.textProperty().bind(Bindings.createStringBinding(
-                () -> String.format(container.getBundle().getString("cart.summary.savings_format"), cartUseCase.getTotalSavings()),
+                () -> String.format("-" + format, cartUseCase.getTotalSavings()),
                 cartUseCase.totalSavingsProperty()));
 
         savingsBox.visibleProperty().bind(cartUseCase.totalSavingsProperty().greaterThan(0));
         savingsBox.managedProperty().bind(savingsBox.visibleProperty());
 
         totalButton.textProperty().bind(Bindings.createStringBinding(
-                () -> String.format("%.2f \u20ac", cartUseCase.getGrandTotal()),
+                () -> String.format(format, cartUseCase.getGrandTotal()),
                 cartUseCase.grandTotalProperty()));
 
         itemsCount.textProperty().bind(Bindings.createStringBinding(

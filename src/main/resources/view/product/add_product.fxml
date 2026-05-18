@@ -78,6 +78,18 @@
                         </HBox>
                     </VBox>
 
+                    <!-- Decimals -->
+                    <VBox styleClass="modern-input-group">
+                        <Label text="%product.form.decimals" styleClass="modern-label" style="-fx-text-fill: #64748b; -fx-font-size: 11px; -fx-font-weight: bold; -fx-padding: 0 0 5 0;"/>
+                        <HBox styleClass="modern-input-container" alignment="CENTER_LEFT">
+                            <FontAwesomeIconView glyphName="LIST_OL" size="18" fill="#64748b">
+                                <HBox.margin><Insets right="10"/></HBox.margin>
+                            </FontAwesomeIconView> 
+                            <ComboBox fx:id="cmbDecimals" promptText="%product.form.decimals.prompt" styleClass="modern-input-field" HBox.hgrow="ALWAYS" maxWidth="Infinity" style="-fx-background-color: transparent; -fx-text-fill: #1e293b;"/>
+                        </HBox>
+                    </VBox>
+
+
                     <!-- Stock Management -->
                     <VBox spacing="10" style="-fx-background-color: #f1f5f9; -fx-padding: 15; -fx-background-radius: 8;">
                         <CheckBox fx:id="chkManageStock" text="%product.form.manage_stock" styleClass="modern-checkbox" style="-fx-font-weight: bold; -fx-text-fill: #1e293b;"/>

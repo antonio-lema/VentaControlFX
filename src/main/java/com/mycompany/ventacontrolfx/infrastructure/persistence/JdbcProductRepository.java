@@ -19,7 +19,7 @@ public class JdbcProductRepository implements IProductRepository {
         List<Product> products = new ArrayList<>();
         String priceSubquery = buildPriceSubquery(priceListId);
 
-        String sql = "SELECT p.*, c.name AS category_name, c.default_iva AS category_iva, " +
+        String sql = "SELECT p.*, c.name AS category_name, c.default_iva AS category_iva, c.decimals AS category_decimals, " +
                 priceSubquery + " AS current_price " +
                 "FROM products p LEFT JOIN categories c ON p.category_id = c.category_id";
 
@@ -47,7 +47,7 @@ public class JdbcProductRepository implements IProductRepository {
         List<Product> products = new ArrayList<>();
         String priceSubquery = buildPriceSubquery(priceListId);
 
-        String sql = "SELECT p.*, c.name AS category_name, c.default_iva AS category_iva, " +
+        String sql = "SELECT p.*, c.name AS category_name, c.default_iva AS category_iva, c.decimals AS category_decimals, " +
                 priceSubquery + " AS current_price " +
                 "FROM products p LEFT JOIN categories c ON p.category_id = c.category_id WHERE p.visible = TRUE";
 
@@ -167,7 +167,8 @@ public class JdbcProductRepository implements IProductRepository {
             conn = DBConnection.getConnection();
             conn.setAutoCommit(false); // Transacci\u00f3n para doble escritura
 
-            String sql = "INSERT INTO products (category_id, name, is_favorite, image_path, visible, iva, tax_rate, tax_group_id, sku, cost_price, is_active, stock_quantity, min_stock, manage_stock) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            String sql = "INSERT INTO products (category_id, name, is_favorite, image_path, visible, iva, tax_group_id, sku, cost_price, is_active, stock_quantity, min_stock, manage_stock, decimals) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
             try (PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
                 pstmt.setInt(1, product.getCategoryId());
                 pstmt.setString(2, product.getName());
@@ -178,49 +179,30 @@ public class JdbcProductRepository implements IProductRepository {
                 Double iva = product.getIva();
                 if (iva != null) {
                     pstmt.setDouble(6, iva);
-                    pstmt.setDouble(7, iva); // Compatibility
                 } else {
                     pstmt.setNull(6, Types.DOUBLE);
-                    pstmt.setNull(7, Types.DOUBLE);
                 }
                 if (product.getTaxGroupId() != null && product.getTaxGroupId() > 0) {
-                    pstmt.setInt(8, product.getTaxGroupId());
+                    pstmt.setInt(7, product.getTaxGroupId());
                 } else {
-                    pstmt.setNull(8, Types.INTEGER);
+                    pstmt.setNull(7, Types.INTEGER);
                 }
-                pstmt.setString(9, product.getSku());
-                pstmt.setDouble(10, product.getCostPrice());
-                pstmt.setBoolean(11, product.isActive());
-                pstmt.setInt(12, product.getStockQuantity());
-                pstmt.setInt(13, product.getMinStock());
-                pstmt.setBoolean(14, product.isManageStock());
+                pstmt.setString(8, product.getSku());
+                pstmt.setDouble(9, product.getCostPrice());
+                pstmt.setBoolean(10, product.isActive());
+                pstmt.setInt(11, product.getStockQuantity());
+                pstmt.setInt(12, product.getMinStock());
+                pstmt.setBoolean(13, product.isManageStock());
+                if (product.getDecimals() != null) {
+                    pstmt.setInt(14, product.getDecimals());
+                } else {
+                    pstmt.setNull(14, Types.INTEGER);
+                }
                 pstmt.executeUpdate();
 
                 try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
                     if (generatedKeys.next()) {
                         product.setId(generatedKeys.getInt(1));
-                    }
-                }
-
-                // Insertar en la estructura nueva product_prices de forma transparente
-                if (product.getId() > 0) {
-                    // Obtener ID lista default (fallback 1)
-                    int defaultPriceListId = 1;
-                    try (Statement stmtList = conn.createStatement();
-                            ResultSet rsList = stmtList.executeQuery(
-                                    "SELECT price_list_id FROM price_lists WHERE is_default = 1 LIMIT 1")) {
-                        if (rsList.next()) {
-                            defaultPriceListId = rsList.getInt(1);
-                        }
-                    } catch (Exception ignored) {
-                    }
-
-                    String priceSql = "INSERT INTO product_prices (product_id, price_list_id, price, start_date, reason) VALUES (?, ?, ?, NOW(), 'Creaci\u00f3n de producto')";
-                    try (PreparedStatement pstmtPrice = conn.prepareStatement(priceSql)) {
-                        pstmtPrice.setInt(1, product.getId());
-                        pstmtPrice.setInt(2, defaultPriceListId);
-                        pstmtPrice.setDouble(3, product.getPrice());
-                        pstmtPrice.executeUpdate();
                     }
                 }
             } // Close pstmt
@@ -257,7 +239,8 @@ public class JdbcProductRepository implements IProductRepository {
             conn.setAutoCommit(false);
 
             // 1. Insertar productos en lote
-            String sql = "INSERT INTO products (category_id, name, is_favorite, image_path, visible, iva, tax_rate, tax_group_id, sku, cost_price, is_active, stock_quantity, min_stock, manage_stock) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            String sql = "INSERT INTO products (category_id, name, is_favorite, image_path, visible, iva, tax_group_id, sku, cost_price, is_active, stock_quantity, min_stock, manage_stock, decimals) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
             try (PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
                 for (Product product : products) {
                     pstmt.setInt(1, product.getCategoryId());
@@ -269,23 +252,27 @@ public class JdbcProductRepository implements IProductRepository {
                     Double iva = product.getIva();
                     if (iva != null) {
                         pstmt.setDouble(6, iva);
-                        pstmt.setDouble(7, iva);
                     } else {
                         pstmt.setNull(6, Types.DOUBLE);
-                        pstmt.setNull(7, Types.DOUBLE);
                     }
                     if (product.getTaxGroupId() != null && product.getTaxGroupId() > 0) {
-                        pstmt.setInt(8, product.getTaxGroupId());
+                        pstmt.setInt(7, product.getTaxGroupId());
                     } else {
-                        pstmt.setNull(8, Types.INTEGER);
+                        pstmt.setNull(7, Types.INTEGER);
                     }
-                    pstmt.setString(9, product.getSku());
-                    pstmt.setDouble(10, product.getCostPrice());
-                    pstmt.setBoolean(11, product.isActive());
-                    pstmt.setInt(12, product.getStockQuantity());
-                    pstmt.setInt(13, product.getMinStock());
-                    pstmt.setBoolean(14, product.isManageStock());
+                    pstmt.setString(8, product.getSku());
+                    pstmt.setDouble(9, product.getCostPrice());
+                    pstmt.setBoolean(10, product.isActive());
+                    pstmt.setInt(11, product.getStockQuantity());
+                    pstmt.setInt(12, product.getMinStock());
+                    pstmt.setBoolean(13, product.isManageStock());
+                    if (product.getDecimals() != null) {
+                        pstmt.setInt(14, product.getDecimals());
+                    } else {
+                        pstmt.setNull(14, Types.INTEGER);
+                    }
                     pstmt.addBatch();
+
                 }
                 pstmt.executeBatch();
 
@@ -299,30 +286,7 @@ public class JdbcProductRepository implements IProductRepository {
                 }
             }
 
-            // 2. Obtener ID de lista de precios por defecto una sola vez
-            int defaultPriceListId = 1;
-            try (Statement stmtList = conn.createStatement();
-                    ResultSet rsList = stmtList.executeQuery(
-                            "SELECT price_list_id FROM price_lists WHERE is_default = 1 LIMIT 1")) {
-                if (rsList.next()) {
-                    defaultPriceListId = rsList.getInt(1);
-                }
-            } catch (Exception ignored) {
-            }
 
-            // 3. Insertar precios en lote
-            String priceSql = "INSERT INTO product_prices (product_id, price_list_id, price, start_date, reason) VALUES (?, ?, ?, NOW(), 'Importaci\u00f3n masiva')";
-            try (PreparedStatement pstmtPrice = conn.prepareStatement(priceSql)) {
-                for (Product product : products) {
-                    if (product.getId() > 0) {
-                        pstmtPrice.setInt(1, product.getId());
-                        pstmtPrice.setInt(2, defaultPriceListId);
-                        pstmtPrice.setDouble(3, product.getPrice());
-                        pstmtPrice.addBatch();
-                    }
-                }
-                pstmtPrice.executeBatch();
-            }
 
             conn.commit();
         } catch (SQLException e) {
@@ -344,7 +308,8 @@ public class JdbcProductRepository implements IProductRepository {
             conn = DBConnection.getConnection();
             conn.setAutoCommit(false); // Transacci\u00f3n para doble escritura
 
-            String sql = "UPDATE products SET category_id = ?, name = ?, is_favorite = ?, image_path = ?, visible = ?, iva = ?, tax_rate = ?, tax_group_id = ?, sku = ?, cost_price = ?, is_active = ?, stock_quantity = ?, min_stock = ?, manage_stock = ? WHERE product_id = ?";
+            String sql = "UPDATE products SET category_id = ?, name = ?, is_favorite = ?, image_path = ?, visible = ?, iva = ?, tax_group_id = ?, sku = ?, cost_price = ?, is_active = ?, stock_quantity = ?, min_stock = ?, manage_stock = ?, decimals = ? WHERE product_id = ?";
+
             try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
                 pstmt.setInt(1, product.getCategoryId());
                 pstmt.setString(2, product.getName());
@@ -355,73 +320,28 @@ public class JdbcProductRepository implements IProductRepository {
                 Double iva = product.getIva();
                 if (iva != null) {
                     pstmt.setDouble(6, iva);
-                    pstmt.setDouble(7, iva); // Compatibility
                 } else {
                     pstmt.setNull(6, Types.DOUBLE);
-                    pstmt.setNull(7, Types.DOUBLE);
                 }
                 if (product.getTaxGroupId() != null && product.getTaxGroupId() > 0) {
-                    pstmt.setInt(8, product.getTaxGroupId());
+                    pstmt.setInt(7, product.getTaxGroupId());
                 } else {
-                    pstmt.setNull(8, Types.INTEGER);
+                    pstmt.setNull(7, Types.INTEGER);
                 }
-                pstmt.setString(9, product.getSku());
-                pstmt.setDouble(10, product.getCostPrice());
-                pstmt.setBoolean(11, product.isActive());
-                pstmt.setInt(12, product.getStockQuantity());
-                pstmt.setInt(13, product.getMinStock());
-                pstmt.setBoolean(14, product.isManageStock());
+                pstmt.setString(8, product.getSku());
+                pstmt.setDouble(9, product.getCostPrice());
+                pstmt.setBoolean(10, product.isActive());
+                pstmt.setInt(11, product.getStockQuantity());
+                pstmt.setInt(12, product.getMinStock());
+                pstmt.setBoolean(13, product.isManageStock());
+                if (product.getDecimals() != null) {
+                    pstmt.setInt(14, product.getDecimals());
+                } else {
+                    pstmt.setNull(14, Types.INTEGER);
+                }
                 pstmt.setInt(15, product.getId());
                 pstmt.executeUpdate();
-            }
 
-            // --- L\u00c3\u0192\u00e2\u20ac\u0153GICA DE DOBLE ESCRITURA PARA
-            // product_prices ---
-            // 1. Obtener ID de la lista por defecto
-            int defaultPriceListId = 1;
-            try (Statement stmtList = conn.createStatement();
-                    ResultSet rsList = stmtList
-                            .executeQuery("SELECT price_list_id FROM price_lists WHERE is_default = 1 LIMIT 1")) {
-                if (rsList.next()) {
-                    defaultPriceListId = rsList.getInt(1);
-                }
-            } catch (Exception ignored) {
-            }
-
-            // 2. Comprobar si el precio actual es distinto (o simplemente cerrar el actual
-            // e insertar nuevo)
-            // Para evitar basura, vamos a comprobar qu\u00e9 precio activo hay
-            double activePrice = -1;
-            boolean hasActive = false;
-            String selectSql = "SELECT price FROM product_prices WHERE product_id = ? AND price_list_id = ? AND end_date IS NULL LIMIT 1";
-            try (PreparedStatement selectStmt = conn.prepareStatement(selectSql)) {
-                selectStmt.setInt(1, product.getId());
-                selectStmt.setInt(2, defaultPriceListId);
-                try (ResultSet rs = selectStmt.executeQuery()) {
-                    if (rs.next()) {
-                        hasActive = true;
-                        activePrice = rs.getDouble(1);
-                    }
-                }
-            }
-
-            // Si el precio cambi\u00f3, generamos el hist\u00f3rico
-            if (!hasActive || activePrice != product.getPrice()) {
-                if (hasActive) {
-                    String updateOld = "UPDATE product_prices SET end_date = NOW(), reason = 'AUDIT_PRICE_CHANGE' WHERE product_id = ? AND price_list_id = ? AND end_date IS NULL";
-                    try (PreparedStatement updStmt = conn.prepareStatement(updateOld)) {
-                        updStmt.setInt(1, product.getId());
-                        updStmt.setInt(2, defaultPriceListId);
-                        updStmt.executeUpdate();
-                    }
-                }
-                String insertNew = "INSERT INTO product_prices (product_id, price_list_id, price, start_date, end_date, reason) VALUES (?, ?, ?, NOW(), NULL, 'AUDIT_PRODUCT_UPDATE')";
-                try (PreparedStatement insStmt = conn.prepareStatement(insertNew)) {
-                    insStmt.setInt(1, product.getId());
-                    insStmt.setInt(2, defaultPriceListId);
-                    insStmt.setDouble(3, product.getPrice());
-                    insStmt.executeUpdate();
-                }
             }
 
             conn.commit();
@@ -539,23 +459,21 @@ public class JdbcProductRepository implements IProductRepository {
 
     @Override
     public void updateTaxRateByCategory(int categoryId, double taxRate) throws SQLException {
-        String sql = "UPDATE products SET iva = ?, tax_rate = ? WHERE category_id = ?";
+        String sql = "UPDATE products SET iva = ? WHERE category_id = ?";
         try (Connection conn = DBConnection.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setDouble(1, taxRate);
-            pstmt.setDouble(2, taxRate); // Compatibility
-            pstmt.setInt(3, categoryId);
+            pstmt.setInt(2, categoryId);
             pstmt.executeUpdate();
         }
     }
 
     @Override
     public void updateTaxRateToAll(double taxRate) throws SQLException {
-        String sql = "UPDATE products SET iva = ?, tax_rate = ?";
+        String sql = "UPDATE products SET iva = ?";
         try (Connection conn = DBConnection.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setDouble(1, taxRate);
-            pstmt.setDouble(2, taxRate); // Compatibility
             pstmt.executeUpdate();
         }
     }
@@ -680,75 +598,79 @@ public class JdbcProductRepository implements IProductRepository {
     }
 
     private Product mapResultSetToProduct(ResultSet rs) throws SQLException {
-        double ivaVal = rs.getDouble("iva");
-        Double iva = rs.wasNull() ? null : ivaVal;
-
-        if (iva == null) {
-            try {
-                double taxRateVal = rs.getDouble("tax_rate");
-                if (!rs.wasNull()) {
-                    iva = taxRateVal;
-                }
-            } catch (SQLException e) {
-                // tax_rate doesn't exist
-            }
+        ResultSetMetaData rsmd = rs.getMetaData();
+        
+        // 1. IVA Handling (Unified)
+        Double iva = null;
+        if (hasColumn(rsmd, "iva")) {
+            double val = rs.getDouble("iva");
+            if (!rs.wasNull()) iva = val;
         }
 
+        // 2. Category Snapshots
         Double categoryIva = null;
-        try {
-            double catIvaVal = rs.getDouble("category_iva");
-            if (!rs.wasNull()) {
-                categoryIva = catIvaVal;
-            }
-        } catch (SQLException e) {
-            // column missing in legacy queries or joins
+        if (hasColumn(rsmd, "category_iva")) {
+            double val = rs.getDouble("category_iva");
+            if (!rs.wasNull()) categoryIva = val;
         }
 
-        Double calculatedPrice = 0.0;
-        try {
-            double currPriceVal = rs.getDouble("current_price");
-            if (!rs.wasNull()) {
-                calculatedPrice = currPriceVal;
-            }
-        } catch (SQLException e) {
-            // column missing
+        Integer categoryDecimals = null;
+        if (hasColumn(rsmd, "category_decimals")) {
+            int val = rs.getInt("category_decimals");
+            if (!rs.wasNull()) categoryDecimals = val;
+        }
+
+        // 3. Price Handling
+        double calculatedPrice = 0.0;
+        if (hasColumn(rsmd, "current_price")) {
+            calculatedPrice = rs.getDouble("current_price");
+        }
+
+        // 4. Decimals Handling
+        Integer decimals = null;
+        if (hasColumn(rsmd, "decimals")) {
+            int val = rs.getInt("decimals");
+            if (!rs.wasNull()) decimals = val;
         }
 
         Product p = new Product(
                 rs.getInt("product_id"),
                 rs.getInt("category_id"),
                 rs.getString("name"),
-                calculatedPrice != null ? calculatedPrice.doubleValue() : 0.0,
+                calculatedPrice,
                 rs.getBoolean("is_favorite"),
                 rs.getBoolean("visible"),
                 rs.getString("image_path"),
-                rs.getString("category_name"),
+                hasColumn(rsmd, "category_name") ? rs.getString("category_name") : null,
                 iva,
                 categoryIva,
-                rs.getString("sku"),
-                rs.getDouble("cost_price"),
+                hasColumn(rsmd, "sku") ? rs.getString("sku") : null,
+                hasColumn(rsmd, "cost_price") ? rs.getDouble("cost_price") : 0.0,
                 rs.getBoolean("is_active"),
                 rs.getInt("stock_quantity"),
                 rs.getInt("min_stock"),
-                rs.getBoolean("manage_stock"));
-        p.setCurrentPrice(calculatedPrice != null ? calculatedPrice.doubleValue() : 0.0);
+                rs.getBoolean("manage_stock"),
+                decimals);
 
-        try {
-            int taxGroupId = rs.getInt("tax_group_id");
-            if (!rs.wasNull())
-                p.setTaxGroupId(taxGroupId);
-        } catch (SQLException e) {
-        }
-        try {
-            p.setSku(rs.getString("sku"));
-        } catch (SQLException e) {
-        }
-        try {
-            p.setCostPrice(rs.getDouble("cost_price"));
-        } catch (SQLException e) {
+        p.setCurrentPrice(calculatedPrice);
+        p.setCategoryDecimals(categoryDecimals);
+
+        if (hasColumn(rsmd, "tax_group_id")) {
+            int tgId = rs.getInt("tax_group_id");
+            if (!rs.wasNull()) p.setTaxGroupId(tgId);
         }
 
         return p;
+    }
+
+    private boolean hasColumn(ResultSetMetaData rsmd, String columnName) throws SQLException {
+        int columns = rsmd.getColumnCount();
+        for (int i = 1; i <= columns; i++) {
+            if (columnName.equalsIgnoreCase(rsmd.getColumnLabel(i))) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override

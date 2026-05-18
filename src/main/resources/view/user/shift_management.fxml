@@ -16,25 +16,6 @@
     <children>
         <VBox spacing="0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
             <children>
-                <!-- Header Section -->
-                <VBox styleClass="view-header" spacing="0">
-                    <children>
-                        <HBox spacing="16" alignment="CENTER_LEFT">
-                            <children>
-                                <StackPane styleClass="view-header-icon-wrap">
-                                    <children><FontAwesomeIconView glyphName="CLOCK_ALT" size="24" fill="white"/></children>
-                                </StackPane>
-                                <VBox spacing="2">
-                                    <children>
-                                        <Label text="Gesti&#x00f3;n de Turnos y Descansos" styleClass="view-title"/>
-                                        <Label text="Registra tus entradas, salidas y tiempos de descanso &#x23f1;&#xfe0f;" styleClass="view-subtitle"/>
-                                    </children>
-                                </VBox>
-                            </children>
-                        </HBox>
-                    </children>
-                </VBox>
-                
                 <VBox spacing="25.0" VBox.vgrow="ALWAYS" style="-fx-padding: 30;">
                     <children>
                         <!-- Current Status Card -->
@@ -60,16 +41,16 @@
                                                 <Insets top="10.0" bottom="10.0"/>
                                             </VBox.margin>
                                         </Separator>
-                                        <HBox spacing="15" alignment="CENTER">
+                                        <HBox spacing="10" alignment="CENTER">
                                             <children>
-                                                <Button fx:id="btnStartShift" text="INICIAR TURNO" onAction="#handleStartShift" styleClass="btn-action, btn-success" prefHeight="50" HBox.hgrow="ALWAYS" maxWidth="Infinity">
-                                                    <graphic><FontAwesomeIconView glyphName="PLAY" fill="white"/></graphic>
+                                                <Button fx:id="btnStartShift" text="INICIAR TURNO" onAction="#handleStartShift" styleClass="btn-action, btn-success" prefHeight="50" HBox.hgrow="ALWAYS" maxWidth="Infinity" style="-fx-font-size: 13;">
+                                                    <graphic><FontAwesomeIconView glyphName="PLAY" fill="white" size="14"/></graphic>
                                                 </Button>
-                                                <Button fx:id="btnStartBreak" text="INICIAR DESCANSO" onAction="#handleStartBreak" styleClass="btn-action, btn-warning" prefHeight="50" HBox.hgrow="ALWAYS" maxWidth="Infinity">
-                                                    <graphic><FontAwesomeIconView glyphName="PAUSE" fill="white"/></graphic>
+                                                <Button fx:id="btnStartBreak" text="DESCANSO" onAction="#handleStartBreak" styleClass="btn-action, btn-warning" prefHeight="50" HBox.hgrow="ALWAYS" maxWidth="Infinity" style="-fx-font-size: 13;">
+                                                    <graphic><FontAwesomeIconView glyphName="PAUSE" fill="white" size="14"/></graphic>
                                                 </Button>
-                                                <Button fx:id="btnEndSession" text="FINALIZAR" onAction="#handleEndSession" styleClass="btn-action, btn-danger" prefHeight="50" HBox.hgrow="ALWAYS" maxWidth="Infinity">
-                                                    <graphic><FontAwesomeIconView glyphName="STOP" fill="white"/></graphic>
+                                                <Button fx:id="btnEndSession" text="FINALIZAR" onAction="#handleEndSession" styleClass="btn-action, btn-danger" prefHeight="50" HBox.hgrow="ALWAYS" maxWidth="Infinity" style="-fx-font-size: 13;">
+                                                    <graphic><FontAwesomeIconView glyphName="STOP" fill="white" size="14"/></graphic>
                                                 </Button>
                                             </children>
                                         </HBox>
@@ -78,10 +59,16 @@
                                 
                                 <VBox styleClass="info-card" HBox.hgrow="ALWAYS">
                                     <children>
-                                        <Label text="RESUMEN DE HOY" styleClass="card-title-small"/>
-                                        <GridPane vgap="15" hgap="20" style="-fx-padding: 10 0 0 0;">
+                                        <HBox alignment="CENTER_LEFT" spacing="10">
+                                            <children>
+                                                <Label text="RESUMEN DE HOY" styleClass="card-title-small"/>
+                                                <Region HBox.hgrow="ALWAYS" />
+                                                <Label fx:id="lblCashStatus" text="CAJA CERRADA" styleClass="status-label-closed"/>
+                                            </children>
+                                        </HBox>
+                                        <GridPane vgap="12" hgap="20" style="-fx-padding: 15 0 0 0;">
                                             <columnConstraints>
-                                                <ColumnConstraints minWidth="120"/>
+                                                <ColumnConstraints minWidth="130"/>
                                                 <ColumnConstraints hgrow="ALWAYS"/>
                                             </columnConstraints>
                                             <children>
@@ -91,8 +78,11 @@
                                                 <Label text="Total Trabajado:" styleClass="label-muted" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
                                                 <Label fx:id="lblTotalWorked" text="0h 0m" styleClass="info-value" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
                                                 
-                                                <Label text="Total Descansos:" styleClass="label-muted" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
-                                                <Label fx:id="lblTotalBreak" text="0h 0m" styleClass="info-value" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+                                                <Label text="Efectivo en Caja:" styleClass="label-muted" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                                                <Label fx:id="lblCashInDrawer" text="0,00 €" styleClass="info-value, text-success" GridPane.rowIndex="2" GridPane.columnIndex="1" style="-fx-font-weight: bold;"/>
+                                                
+                                                <Label text="Ventas Hoy:" styleClass="label-muted" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+                                                <Label fx:id="lblTodaySales" text="0,00 €" styleClass="info-value" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
                                             </children>
                                         </GridPane>
                                     </children>
@@ -100,32 +90,99 @@
                             </children>
                         </HBox>
 
-                        <!-- History Table Card -->
-                        <VBox styleClass="table-card" VBox.vgrow="ALWAYS">
+                        <!-- Content Area: Split between History and Audit Details -->
+                        <HBox spacing="25" VBox.vgrow="ALWAYS">
                             <children>
-                                <HBox alignment="CENTER_LEFT" style="-fx-padding: 0 0 15 0;">
+                                <!-- History Table Card (Left) -->
+                                <VBox styleClass="table-card" HBox.hgrow="ALWAYS">
                                     <children>
-                                        <Label text="HISTORIAL DE ACTIVIDAD" styleClass="card-title-small"/>
-                                        <Region HBox.hgrow="ALWAYS" />
-                                        <Button text="Refrescar" onAction="#loadHistory" styleClass="btn-refresh">
-                                            <graphic><FontAwesomeIconView glyphName="REFRESH" /></graphic>
-                                        </Button>
+                                        <HBox alignment="CENTER_LEFT" style="-fx-padding: 0 0 15 0;">
+                                            <children>
+                                                <Label text="HISTORIAL DE ACTIVIDAD" styleClass="card-title-small"/>
+                                                <Region HBox.hgrow="ALWAYS" />
+                                                <Button text="Informe X" onAction="#handlePartialClosure" styleClass="btn-refresh, btn-info-muted">
+                                                    <graphic><FontAwesomeIconView glyphName="FILE_TEXT_ALT" /></graphic>
+                                                </Button>
+                                                <Button text="Refrescar" onAction="#loadHistory" styleClass="btn-refresh">
+                                                    <graphic><FontAwesomeIconView glyphName="REFRESH" /></graphic>
+                                                </Button>
+                                            </children>
+                                        </HBox>
+                                        <TableView fx:id="historyTable" styleClass="modern-table-view" VBox.vgrow="ALWAYS">
+                                            <columns>
+                                                <TableColumn fx:id="colType" prefWidth="120.0" text="TIPO" />
+                                                <TableColumn fx:id="colStart" prefWidth="150.0" text="INICIO" />
+                                                <TableColumn fx:id="colEnd" prefWidth="150.0" text="FIN" />
+                                                <TableColumn fx:id="colDuration" prefWidth="120.0" text="DURACI&#x00d3;N" />
+                                            </columns>
+                                            <columnResizePolicy>
+                                                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                                            </columnResizePolicy>
+                                        </TableView>
                                     </children>
-                                </HBox>
-                                <TableView fx:id="historyTable" styleClass="modern-table-view" VBox.vgrow="ALWAYS">
-                                    <columns>
-                                        <TableColumn fx:id="colType" prefWidth="150.0" text="TIPO" />
-                                        <TableColumn fx:id="colStart" prefWidth="200.0" text="INICIO" />
-                                        <TableColumn fx:id="colEnd" prefWidth="200.0" text="FIN" />
-                                        <TableColumn fx:id="colDuration" prefWidth="150.0" text="DURACI&#x00d3;N" />
-                                        <TableColumn fx:id="colStatus" prefWidth="120.0" text="ESTADO" />
-                                    </columns>
-                                    <columnResizePolicy>
-                                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
-                                    </columnResizePolicy>
-                                </TableView>
+                                </VBox>
+
+                                <!-- Audit Details Panel (Right) -->
+                                <VBox fx:id="panelAuditDetails" styleClass="table-card" prefWidth="480" visible="false" managed="false">
+                                    <children>
+                                        <HBox alignment="CENTER_LEFT" style="-fx-padding: 0 0 15 0;">
+                                            <children>
+                                                <Label text="DETALLE DE AUDITOR&#x00cd;A" styleClass="card-title-small"/>
+                                            </children>
+                                        </HBox>
+                                        
+                                        <ScrollPane fitToWidth="true" style="-fx-background-color: transparent;" VBox.vgrow="ALWAYS">
+                                            <content>
+                                                <VBox spacing="20">
+                                                    <children>
+                                                        <!-- Financial Summary (Like the PDF) -->
+                                                        <VBox spacing="10" styleClass="audit-summary-box">
+                                                            <children>
+                                                                <Label text="RESUMEN FINANCIERO" style="-fx-font-weight: bold; -fx-font-size: 13;"/>
+                                                                <GridPane vgap="8" hgap="15">
+                                                                    <columnConstraints>
+                                                                        <ColumnConstraints minWidth="150"/>
+                                                                        <ColumnConstraints hgrow="ALWAYS" halignment="RIGHT"/>
+                                                                    </columnConstraints>
+                                                                    <children>
+                                                                        <Label text="Fondo Inicial:" styleClass="label-muted" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                                                                        <Label fx:id="lblAuditInitial" text="0,00 €" styleClass="info-value" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+                                                                        
+                                                                        <Label text="Efectivo Esperado:" styleClass="label-muted" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                                                                        <Label fx:id="lblAuditExpected" text="0,00 €" styleClass="info-value" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+                                                                        
+                                                                        <Label text="Efectivo Contado:" styleClass="label-muted" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                                                                        <Label fx:id="lblAuditCounted" text="0,00 €" styleClass="info-value" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+                                                                        
+                                                                        <Label text="Descuadre:" styleClass="label-muted" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+                                                                        <Label fx:id="lblAuditDiff" text="0,00 €" styleClass="info-value, text-danger" GridPane.rowIndex="3" GridPane.columnIndex="1" style="-fx-font-weight: bold;"/>
+                                                                    </children>
+                                                                </GridPane>
+                                                            </children>
+                                                        </VBox>
+
+                                                        <!-- Movements List -->
+                                                        <VBox spacing="10" VBox.vgrow="ALWAYS">
+                                                            <children>
+                                                                <Label text="DETALLE DE MOVIMIENTOS" style="-fx-font-weight: bold; -fx-font-size: 13;"/>
+                                                                <TableView fx:id="tableAuditMovements" prefHeight="300" styleClass="modern-table-view-compact">
+                                                                    <columns>
+                                                                        <TableColumn fx:id="colMovTime" prefWidth="70" text="HORA" />
+                                                                        <TableColumn fx:id="colMovType" prefWidth="100" text="TIPO" />
+                                                                        <TableColumn fx:id="colMovUser" prefWidth="120" text="USUARIO" />
+                                                                        <TableColumn fx:id="colMovAmount" prefWidth="90" text="IMPORTE" />
+                                                                    </columns>
+                                                                </TableView>
+                                                            </children>
+                                                        </VBox>
+                                                    </children>
+                                                </VBox>
+                                            </content>
+                                        </ScrollPane>
+                                    </children>
+                                </VBox>
                             </children>
-                        </VBox>
+                        </HBox>
                     </children>
                 </VBox>
             </children>

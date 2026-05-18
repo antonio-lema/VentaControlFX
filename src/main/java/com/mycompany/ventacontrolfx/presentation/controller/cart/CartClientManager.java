@@ -33,7 +33,7 @@ public class CartClientManager {
             lblClient.setStyle("-fx-text-fill: #1e88e5; -fx-font-weight: bold;");
         } else {
             lblClient.setText(container.getBundle().getString("cart.client.none"));
-            lblClient.setStyle("");
+            lblClient.setStyle("-fx-text-fill: -fx-text-custom-muted; -fx-font-style: italic; -fx-opacity: 0.8;");
         }
         btnRemoveClient.setVisible(client != null);
         btnRemoveClient.setManaged(client != null);

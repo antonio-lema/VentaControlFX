@@ -12,40 +12,50 @@ public class SkeletonProductBox extends StackPane {
 
     public SkeletonProductBox() {
         this.getStyleClass().add("skeleton-box");
-        this.setPrefWidth(200);
+        this.setPrefWidth(200); 
         this.setMaxWidth(200);
         this.setMinWidth(200);
-        this.setPrefHeight(260); // Adjusted for content
-        this.setMaxHeight(260);
-        this.setMinHeight(260);
-
+        
         VBox content = new VBox();
         content.setSpacing(0);
         content.setAlignment(Pos.TOP_LEFT);
 
         // 1. Image Placeholder Section
         StackPane imageContainer = new StackPane();
+        imageContainer.getStyleClass().add("skeleton-image-container");
         imageContainer.setPrefHeight(150);
         imageContainer.setMinHeight(150);
         imageContainer.setMaxHeight(150);
-        imageContainer.getStyleClass().add("skeleton-image-container");
+        imageContainer.setAlignment(Pos.CENTER);
 
+        // Clip estático como en ProductBox real
+        Rectangle clipImage = new Rectangle(200, 180);
+        clipImage.setArcWidth(28);
+        clipImage.setArcHeight(28);
+        imageContainer.setClip(clipImage);
+
+        // Display container for the margin, just like real ProductBox uses for its image
+        StackPane imageDisplayContainer = new StackPane();
+        StackPane.setMargin(imageDisplayContainer, new Insets(8));
+        
         Region imageFiller = new Region();
         imageFiller.getStyleClass().add("skeleton-image-filler");
-        imageFiller.setPrefSize(185, 110);
-        imageFiller.setMaxSize(185, 110);
-        StackPane.setAlignment(imageFiller, Pos.CENTER);
+        imageFiller.setPrefSize(184, 134);
+        imageFiller.setMaxSize(184, 134);
+        
+        imageDisplayContainer.getChildren().add(imageFiller);
 
         Region priceBadge = new Region();
         priceBadge.getStyleClass().add("skeleton-price-badge");
         StackPane.setAlignment(priceBadge, Pos.TOP_RIGHT);
         StackPane.setMargin(priceBadge, new Insets(10, 10, 0, 0));
 
-        imageContainer.getChildren().addAll(imageFiller, priceBadge);
+        imageContainer.getChildren().addAll(imageDisplayContainer, priceBadge);
 
         // 2. Info Section
         VBox infoSkeleton = new VBox(8);
-        infoSkeleton.setPadding(new Insets(12));
+        infoSkeleton.getStyleClass().add("product-info"); // Reusing exactly the same padding class
+        infoSkeleton.setAlignment(Pos.TOP_LEFT);
 
         Region titleSkeleton = new Region();
         titleSkeleton.getStyleClass().addAll("skeleton-text", "skeleton-title");
@@ -68,8 +78,7 @@ public class SkeletonProductBox extends StackPane {
 
         content.getChildren().addAll(imageContainer, infoSkeleton, buttonSkeleton);
 
-        // --- EFECTO DE BRILLO (SHIMMER) ---
-        // Optimización: Rectángulo más pequeño y cache para evitar lag
+        // --- SHIMMER EFFECT ---
         Rectangle shimmerLine = new Rectangle(60, 300);
         shimmerLine.setFill(
                 new javafx.scene.paint.LinearGradient(0, 0, 1, 0, true, javafx.scene.paint.CycleMethod.NO_CYCLE,
@@ -79,20 +88,20 @@ public class SkeletonProductBox extends StackPane {
         shimmerLine.setRotate(15);
         shimmerLine.setMouseTransparent(true);
         shimmerLine.setCache(true);
-        shimmerLine.setManaged(false); // IMPORTANTE: Que no afecte al layout del StackPane
+        shimmerLine.setManaged(false); 
         shimmerLine.setCacheHint(javafx.scene.CacheHint.SPEED);
 
         this.getChildren().addAll(content, shimmerLine);
 
-        // Clip
-        Rectangle clip = new Rectangle();
+        // Card clip
+        Rectangle clip = new Rectangle(200, 300);
         clip.widthProperty().bind(this.widthProperty());
         clip.heightProperty().bind(this.heightProperty());
         clip.setArcWidth(28);
         clip.setArcHeight(28);
         this.setClip(clip);
 
-        // Iniciar animaciones con un pequeño delay seguro
+        // Animations
         javafx.application.Platform.runLater(() -> {
             javafx.animation.TranslateTransition tt = new javafx.animation.TranslateTransition(
                     javafx.util.Duration.seconds(3.0), shimmerLine);
@@ -113,5 +122,3 @@ public class SkeletonProductBox extends StackPane {
         });
     }
 }
-
-

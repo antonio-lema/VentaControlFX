@@ -131,12 +131,10 @@
 
 .estetica-icon-green {
     -fx-background-color: rgba(34, 197, 94, 0.12);
-}
     -fx-padding: 10;
     -fx-background-radius: 10;
 }
 
-.estetica-icon-blue { -fx-background-color: rgba(30, 136, 229, 0.1); }
 .estetica-icon-amber { -fx-background-color: rgba(245, 158, 11, 0.1); }
 .estetica-icon-purple { -fx-background-color: rgba(124, 58, 237, 0.1); }
 .estetica-icon-rose { -fx-background-color: rgba(244, 63, 94, 0.1); }
@@ -643,3 +641,60 @@
     -fx-font-size: 13px;
     -fx-padding: 2 0;
 }
+
+/* ==========================================================================
+   BOTÓN DE INICIO DE JORNADA (FICHAR) EN HEADER
+   ========================================================================== */
+
+.header-work-session-button {
+    -fx-padding: 6 16;
+    -fx-background-radius: 12;
+    -fx-cursor: hand;
+    -fx-transition: all 0.2s ease-in-out;
+    -fx-border-width: 1px;
+}
+
+.header-work-session-button:hover {
+    -fx-scale-x: 1.02;
+    -fx-scale-y: 1.02;
+}
+
+/* Estado: Fuera de turno (Inactivo) */
+.header-work-session-button.status-inactive {
+    -fx-background-color: rgba(59, 130, 246, 0.08);
+    -fx-border-color: rgba(59, 130, 246, 0.2);
+}
+.header-work-session-button.status-inactive:hover {
+    -fx-background-color: rgba(59, 130, 246, 0.15);
+}
+
+/* Estado: En Turno (Activo) */
+.header-work-session-button.status-active {
+    -fx-background-color: rgba(16, 185, 129, 0.1);
+    -fx-border-color: rgba(16, 185, 129, 0.3);
+}
+.header-work-session-button.status-active:hover {
+    -fx-background-color: rgba(16, 185, 129, 0.2);
+}
+
+/* Estado: En Descanso */
+.header-work-session-button.status-break {
+    -fx-background-color: rgba(245, 158, 11, 0.1);
+    -fx-border-color: rgba(245, 158, 11, 0.3);
+}
+.header-work-session-button.status-break:hover {
+    -fx-background-color: rgba(245, 158, 11, 0.2);
+}
+
+.header-work-label-status {
+    -fx-font-size: 11px;
+    -fx-font-weight: 900;
+    -fx-text-fill: -fx-text-custom-main;
+    -fx-opacity: 0.9;
+}
+
+.header-work-label-time {
+    -fx-font-size: 10px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -fx-text-custom-muted;
+}

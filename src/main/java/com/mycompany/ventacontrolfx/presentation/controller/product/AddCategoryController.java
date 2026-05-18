@@ -26,6 +26,9 @@ public class AddCategoryController implements Injectable {
     @FXML
     private ComboBox<TaxGroup> cmbTaxGroup;
     @FXML
+    private ComboBox<Integer> cmbDecimals;
+
+    @FXML
     private Label lblTitle, lblSubtitle;
     @FXML
     private StackPane rootStackPane;
@@ -43,7 +46,9 @@ public class AddCategoryController implements Injectable {
         this.categoryUseCase = container.getCategoryUseCase();
         this.taxEngineService = container.getTaxEngineService();
         setupTaxGroupComboBox();
+        setupDecimalsComboBox();
         loadTaxGroups();
+
 
         // Listener para exclusi\u00f3n mutua y sincronizaci\u00f3n espejo
         cmbTaxGroup.valueProperty().addListener((obs, oldVal, newVal) -> {
@@ -85,6 +90,9 @@ public class AddCategoryController implements Injectable {
             } else {
                 cmbTaxGroup.setValue(null);
             }
+            
+            cmbDecimals.setValue(category.getDecimals());
+
 
             // Forzar actualizaci\u00f3n de estado y sincronizaci\u00f3n del campo IVA
             if (category.getTaxGroupId() != null) {
@@ -103,7 +111,9 @@ public class AddCategoryController implements Injectable {
             lblSubtitle.setText(container.getBundle().getString("category.form.new_subtitle"));
             txtIva.setText("21.0");
             cmbTaxGroup.setValue(null);
+            cmbDecimals.setValue(null);
         }
+
     }
 
     @FXML
@@ -135,13 +145,16 @@ public class AddCategoryController implements Injectable {
                 Category newCat = new Category(name);
                 newCat.setDefaultIva(iva);
                 newCat.setTaxGroupId(taxGroupId);
+                newCat.setDecimals(cmbDecimals.getValue());
                 categoryUseCase.addCategory(newCat);
             } else {
                 categoryToEdit.setName(name);
                 categoryToEdit.setDefaultIva(iva);
                 categoryToEdit.setTaxGroupId(taxGroupId);
+                categoryToEdit.setDecimals(cmbDecimals.getValue());
                 categoryUseCase.updateCategory(categoryToEdit);
             }
+
             handleCancel();
         } catch (SQLException e) {
             AlertUtil.showError(container.getBundle().getString("alert.error"),
@@ -149,7 +162,24 @@ public class AddCategoryController implements Injectable {
         }
     }
 
+    private void setupDecimalsComboBox() {
+        cmbDecimals.setItems(FXCollections.observableArrayList(null, 0, 1, 2, 3, 4, 5));
+        cmbDecimals.setConverter(new StringConverter<Integer>() {
+            @Override
+            public String toString(Integer value) {
+                if (value == null) return container.getBundle().getString("category.form.decimals.none");
+                return String.valueOf(value);
+            }
+
+            @Override
+            public Integer fromString(String string) {
+                return null;
+            }
+        });
+    }
+
     private void setupTaxGroupComboBox() {
+
         cmbTaxGroup.setConverter(new StringConverter<>() {
             @Override
             public String toString(TaxGroup t) {

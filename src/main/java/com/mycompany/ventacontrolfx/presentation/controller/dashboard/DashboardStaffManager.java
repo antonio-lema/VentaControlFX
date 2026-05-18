@@ -89,9 +89,15 @@ public class DashboardStaffManager {
             this.start = firstStart.format(DateTimeFormatter.ofPattern("HH:mm"));
             this.shift = (scheduledRange != null) ? (scheduledRange.getOpen() + " - " + scheduledRange.getClose()) : bundle.getString("dashboard.staff.no_assigned");
 
+            // Calcular tiempo total (historial de hoy + sesión activa si no está en el historial)
+            java.util.Set<Integer> sessionIdsInHistory = userSessionsToday.stream().map(WorkSession::getSessionId).collect(Collectors.toSet());
             long totalSeconds = userSessionsToday.stream()
                     .filter(s -> s.getType() == WorkSession.SessionType.SHIFT)
                     .mapToLong(s -> Duration.between(s.getStartTime(), s.getEndTime() != null ? s.getEndTime() : LocalDateTime.now()).getSeconds()).sum();
+            
+            if (session.getType() == WorkSession.SessionType.SHIFT && !sessionIdsInHistory.contains(session.getSessionId())) {
+                totalSeconds += Duration.between(session.getStartTime(), LocalDateTime.now()).getSeconds();
+            }
 
             this.duration = String.format(bundle.getString("dashboard.staff.duration.format"), totalSeconds / 3600, (totalSeconds % 3600) / 60);
 

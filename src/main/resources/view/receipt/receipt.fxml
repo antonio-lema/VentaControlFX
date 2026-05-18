@@ -16,7 +16,7 @@
 <HBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="900.0" spacing="0.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mycompany.ventacontrolfx.presentation.controller.receipt.ReceiptController">
    <children>
       <!-- LEFT SIDE: The Receipt Preview -->
-      <VBox prefWidth="380.0" style="-fx-background-color: -bg-subtle; -fx-padding: 20px;">
+      <VBox prefWidth="380.0" style="-fx-background-color: -fx-bg-subtle; -fx-padding: 20px;">
          <children>
             <ScrollPane fitToWidth="true" style="-fx-background-color: transparent; -fx-background: transparent;" VBox.vgrow="ALWAYS">
                <content>
@@ -160,7 +160,7 @@
       </VBox>
       
       <!-- RIGHT SIDE: Status and Actions -->
-      <VBox HBox.hgrow="ALWAYS" style="-fx-background-color: -bg-main; -fx-padding: 30px;" spacing="20.0" alignment="TOP_CENTER">
+      <VBox HBox.hgrow="ALWAYS" style="-fx-background-color: -fx-bg-main; -fx-padding: 30px;" spacing="20.0" alignment="TOP_CENTER">
          <children>
             <!-- Success Icon/Message -->
             <VBox alignment="CENTER" spacing="10.0">

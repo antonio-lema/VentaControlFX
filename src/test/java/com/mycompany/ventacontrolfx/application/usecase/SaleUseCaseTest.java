@@ -5,6 +5,8 @@ import com.mycompany.ventacontrolfx.domain.model.Sale;
 import com.mycompany.ventacontrolfx.domain.model.Product;
 import com.mycompany.ventacontrolfx.domain.repository.ISaleRepository;
 import com.mycompany.ventacontrolfx.domain.repository.ICompanyConfigRepository;
+import com.mycompany.ventacontrolfx.domain.repository.IDocumentSeriesRepository;
+import com.mycompany.ventacontrolfx.shared.bus.GlobalEventBus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -46,8 +48,9 @@ public class SaleUseCaseTest {
                 100.0, 121.0, new ArrayList<>());
         when(taxEngineService.calculateLine(any(), any(), anyDouble(), anyInt(), anyBoolean())).thenReturn(mockResult);
 
-        com.mycompany.ventacontrolfx.util.AuthorizationService dummyAuth = new com.mycompany.ventacontrolfx.util.AuthorizationService(
-                new com.mycompany.ventacontrolfx.util.UserSession()) {
+        com.mycompany.ventacontrolfx.domain.model.UserSession dummySession = mock(com.mycompany.ventacontrolfx.domain.model.UserSession.class);
+        com.mycompany.ventacontrolfx.infrastructure.security.AuthorizationService dummyAuth = new com.mycompany.ventacontrolfx.infrastructure.security.AuthorizationService(
+                dummySession) {
             @Override
             public void checkPermission(String code) {
             }
@@ -58,7 +61,7 @@ public class SaleUseCaseTest {
             }
         };
         saleUseCase = new SaleUseCase(saleRepository, configRepository, dummyAuth, taxEngineService, clientRepository,
-                promotionService, promotionEngine, productRepository, null);
+                promotionEngine, productRepository, mock(IDocumentSeriesRepository.class), mock(GlobalEventBus.class));
     }
 
     @Test

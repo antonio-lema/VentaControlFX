@@ -31,7 +31,7 @@ public class HistoryController implements Injectable, Searchable {
     @FXML private ComboBox<Integer> cmbRowLimit;
     @FXML private VBox detailsPanel, detailsItemsContainer, skeletonTableContainer;
     @FXML private Label lblSaleId, lblSaleFullDate, lblPaymentMethod, lblTotalAmountDetail, lblReturnBadge;
-    @FXML private Button btnReturn, btnPrint, btnCorrection, btnResendAeat;
+    @FXML private Button btnReturn, btnPrint, btnResendAeat;
     @FXML private HBox quickFilterContainer;
 
     private ServiceContainer container;
@@ -39,6 +39,7 @@ public class HistoryController implements Injectable, Searchable {
     private HistoryDetailsManager detailsManager;
     private HistoryActionManager actionManager;
     private HistoryDataManager dataManager;
+    private com.mycompany.ventacontrolfx.application.usecase.ReturnUseCase returnUseCase;
 
     @Override
     public void inject(ServiceContainer container) {
@@ -50,7 +51,8 @@ public class HistoryController implements Injectable, Searchable {
         this.tableManager.init();
 
         this.detailsManager = new HistoryDetailsManager(container, saleUseCase, detailsPanel, detailsItemsContainer, lblSaleId, lblSaleFullDate, lblPaymentMethod, lblTotalAmountDetail, lblReturnBadge, btnReturn, btnResendAeat);
-        this.actionManager = new HistoryActionManager(container, saleUseCase);
+        this.returnUseCase = container.getReturnUseCase();
+        this.actionManager = new HistoryActionManager(container, saleUseCase, returnUseCase);
         
         this.dataManager = new HistoryDataManager(container, skeletonTableContainer, salesTable, Arrays.asList(lblTotalSalesCount, lblTotalAmount, lblTotalCash, lblTotalCard));
 
@@ -66,8 +68,6 @@ public class HistoryController implements Injectable, Searchable {
     private void setupPermissions() {
         boolean canReturn = container.getUserSession().hasPermission("venta.devolucion");
         btnReturn.setVisible(canReturn); btnReturn.setManaged(canReturn);
-        boolean canCorrect = container.getUserSession().hasPermission("venta.subsanar");
-        btnCorrection.setVisible(canCorrect); btnCorrection.setManaged(canCorrect);
         boolean canResend = container.getUserSession().hasPermission("fiscal.reenviar");
         if (btnResendAeat != null) { btnResendAeat.setVisible(canResend); btnResendAeat.setManaged(canResend); }
     }
@@ -147,7 +147,6 @@ public class HistoryController implements Injectable, Searchable {
     @FXML private void handleCloseDetails() { detailsManager.hide(); tableManager.clearSelection(); }
     @FXML private void handlePrintTicket() { actionManager.handlePrintTicket(tableManager.getSelection()); }
     @FXML private void handleRegisterReturn() { actionManager.handleRegisterReturn(tableManager.getSelection(), this::loadSalesDirect); }
-    @FXML private void handleCorrection() { actionManager.handleCorrection(tableManager.getSelection(), this::loadSalesDirect); }
     
     @FXML private void handleResendAeat() {
         btnResendAeat.setDisable(true);

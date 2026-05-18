@@ -44,7 +44,16 @@ public class DBConnection {
                 // Connection invalid, silently ignore and create new
             }
         }
-        return new PooledConnection(DriverManager.getConnection(URL, USER, PASS));
+        Connection connRaw = DriverManager.getConnection(URL, USER, PASS);
+        try (java.sql.Statement stmt = connRaw.createStatement()) {
+            stmt.execute("SET time_zone = 'Europe/Madrid'");
+        } catch (SQLException e) {
+            // Fallback if named timezone is not populated in MySQL
+            try (java.sql.Statement stmt = connRaw.createStatement()) {
+                stmt.execute("SET time_zone = '+02:00'");
+            } catch (SQLException ignored) {}
+        }
+        return new PooledConnection(connRaw);
     }
 
     private static void releaseConnection(Connection conn) {

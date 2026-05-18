@@ -12,6 +12,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
@@ -32,6 +33,14 @@ public class BusinessHoursController implements Injectable {
     @FXML
     private TextField txtGracePeriod;
 
+    @FXML private DatePicker pickerDate;
+    @FXML private TextField txtReason;
+    @FXML private CheckBox chkClosed;
+    @FXML private TableView<SaleConfig.SpecialDay> tableSpecials;
+    @FXML private TableColumn<SaleConfig.SpecialDay, LocalDate> colDate;
+    @FXML private TableColumn<SaleConfig.SpecialDay, String> colReason;
+    @FXML private TableColumn<SaleConfig.SpecialDay, Boolean> colStatus;
+
     private ServiceContainer container;
     private ConfigUseCase configUseCase;
     private UserUseCase userUseCase;
@@ -42,19 +51,105 @@ public class BusinessHoursController implements Injectable {
     // Tracks the container and components for each day (1-7)
     private final Map<Integer, VBox> shiftContainers = new HashMap<>();
     private final CheckBox[] closedChecks = new CheckBox[8];
+    private final String[] dayNames = {"", "Lunes", "Martes", "Mi\u00e9rcoles", "Jueves", "Viernes", "S\u00e1bado", "Domingo"};
+
+    private final javafx.collections.ObservableList<SaleConfig.SpecialDay> specialDaysList = javafx.collections.FXCollections.observableArrayList();
 
     @Override
     public void inject(ServiceContainer container) {
         this.container = container;
         this.configUseCase = container.getConfigUseCase();
         this.userUseCase = container.getUserUseCase();
+        this.currentConfig = configUseCase.getConfig();
+        
         try {
             this.allUsers = userUseCase.getAllUsers();
         } catch (Exception e) {
             e.printStackTrace();
         }
-        this.currentConfig = configUseCase.getConfig();
+
         setupUI();
+        setupSpecialDaysTable();
+    }
+
+    private void setupSpecialDaysTable() {
+        colDate.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("date"));
+        colReason.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("reason"));
+        colStatus.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("closed"));
+
+        colDate.setCellFactory(column -> new TableCell<>() {
+            @Override
+            protected void updateItem(LocalDate item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                } else {
+                    String month = item.getMonth().getDisplayName(java.time.format.TextStyle.SHORT, container.getBundle().getLocale());
+                    setText(item.getDayOfMonth() + " " + month.toUpperCase() + " " + item.getYear());
+                    setStyle("-fx-font-weight: bold; -fx-text-fill: #1e293b;");
+                }
+            }
+        });
+
+        colReason.setCellFactory(column -> new TableCell<>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty) {
+                    setText(null);
+                } else {
+                    setText(item == null || item.trim().isEmpty() ? "Sin descripci\u00f3n" : item);
+                    setStyle("-fx-text-fill: #64748b;");
+                }
+            }
+        });
+
+        colStatus.setCellFactory(column -> new TableCell<>() {
+            @Override
+            protected void updateItem(Boolean item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setGraphic(null);
+                } else {
+                    Label badge = new Label(item ? "CERRADO" : "ABIERTO");
+                    badge.setPadding(new javafx.geometry.Insets(4, 10, 4, 10));
+                    badge.setMinWidth(80);
+                    badge.setAlignment(javafx.geometry.Pos.CENTER);
+                    if (item) {
+                        badge.setStyle("-fx-background-color: #fef2f2; -fx-text-fill: #ef4444; -fx-background-radius: 12; -fx-font-size: 10px; -fx-font-weight: 900; -fx-border-color: #fee2e2; -fx-border-radius: 12;");
+                    } else {
+                        badge.setStyle("-fx-background-color: #ecfdf5; -fx-text-fill: #10b981; -fx-background-radius: 12; -fx-font-size: 10px; -fx-font-weight: 900; -fx-border-color: #d1fae5; -fx-border-radius: 12;");
+                    }
+                    setGraphic(badge);
+                }
+            }
+        });
+
+        specialDaysList.setAll(currentConfig.getSpecialDays());
+        tableSpecials.setItems(specialDaysList);
+        tableSpecials.setPlaceholder(new Label("No hay d\u00edas especiales introducidos"));
+    }
+
+    @FXML
+    private void handleAddSpecialDay() {
+        LocalDate date = pickerDate.getValue();
+        if (date == null) return;
+
+        SaleConfig.SpecialDay sd = new SaleConfig.SpecialDay(date, chkClosed.isSelected(), txtReason.getText());
+        if (!chkClosed.isSelected()) {
+            sd.getShifts().add(new BusinessDay.TimeRange(LocalTime.of(9, 0), LocalTime.of(14, 0)));
+        }
+        specialDaysList.add(sd);
+        txtReason.clear();
+        pickerDate.setValue(null);
+    }
+
+    @FXML
+    private void handleRemoveSpecialDay() {
+        SaleConfig.SpecialDay selected = tableSpecials.getSelectionModel().getSelectedItem();
+        if (selected != null) {
+            specialDaysList.remove(selected);
+        }
     }
 
     private void setupUI() {
@@ -69,13 +164,20 @@ public class BusinessHoursController implements Injectable {
                     .findFirst()
                     .orElse(new BusinessDay(i, false));
 
-            // Shift container (FlowPane is better for multiple shifts)
+            // Row Background for alternating colors and professional look
+            Region rowBg = new Region();
+            rowBg.setStyle("-fx-background-color: " + (i % 2 == 0 ? "#f8fafc" : "white") + "; " +
+                           "-fx-background-radius: 8; -fx-border-color: #f1f5f9; -fx-border-width: 0 0 1 0;");
+            gridSchedule.add(rowBg, 0, i - 1, 3, 1);
+
+            // Shift container
             VBox vBoxShifts = new VBox(6);
-            vBoxShifts.setPadding(new javafx.geometry.Insets(5, 0, 5, 0));
+            vBoxShifts.setPadding(new javafx.geometry.Insets(12, 0, 12, 0));
             shiftContainers.put(dayIdx, vBoxShifts);
 
             closedChecks[i] = new CheckBox("D\u00eda Cerrado");
             closedChecks[i].setSelected(dayData.isClosed());
+            closedChecks[i].getStyleClass().add("modern-checkbox");
             vBoxShifts.disableProperty().bind(closedChecks[i].selectedProperty());
 
             // Load shifts
@@ -104,17 +206,15 @@ public class BusinessHoursController implements Injectable {
 
             // Labels and styling
             Label lblDay = new Label(dayNames[i].toUpperCase());
-            lblDay.setStyle("-fx-font-weight: bold; -fx-font-size: 13px; -fx-text-fill: #1e293b;");
+            lblDay.setStyle("-fx-font-weight: 800; -fx-font-size: 13px; -fx-text-fill: #1e293b; -fx-padding: 0 0 0 15;");
 
-            HBox dayRow = new HBox(15, lblDay);
-            dayRow.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
-            dayRow.setPadding(new javafx.geometry.Insets(10, 15, 10, 15));
-            dayRow.setStyle(
-                    "-fx-background-color: " + (i % 2 == 0 ? "#f8fafc" : "white") + "; -fx-background-radius: 8;");
+            HBox actions = new HBox(12, closedChecks[i], btnAdd, btnCopy);
+            actions.setAlignment(javafx.geometry.Pos.CENTER_RIGHT);
+            actions.setPadding(new javafx.geometry.Insets(0, 15, 0, 0));
 
             gridSchedule.add(lblDay, 0, i - 1);
             gridSchedule.add(vBoxShifts, 1, i - 1);
-            gridSchedule.add(new HBox(10, closedChecks[i], btnAdd, btnCopy), 2, i - 1);
+            gridSchedule.add(actions, 2, i - 1);
         }
 
         if (txtGracePeriod != null) {
@@ -214,52 +314,6 @@ public class BusinessHoursController implements Injectable {
     }
 
     @FXML
-    private void handleManageSpecialDays() {
-        try {
-            javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(
-                    getClass().getResource("/view/user/special_days.fxml"),
-                    container != null ? container.getBundle() : null);
-            javafx.scene.Parent root = loader.load();
-            SpecialDaysController controller = loader.getController();
-
-            if (controller instanceof Injectable && container != null) {
-                ((Injectable) controller).inject(container);
-            }
-
-            Stage stage = new Stage();
-            stage.setTitle("Festivos y Excepciones");
-            stage.initModality(javafx.stage.Modality.APPLICATION_MODAL);
-            stage.initStyle(javafx.stage.StageStyle.TRANSPARENT);
-
-            javafx.scene.Scene scene = new javafx.scene.Scene(root);
-            scene.setFill(javafx.scene.paint.Color.TRANSPARENT);
-            if (container != null) {
-                container.getThemeManager().applyFullTheme(scene);
-            }
-            stage.setScene(scene);
-
-            controller.initData(currentConfig.getSpecialDays(), () -> {
-                currentConfig.setSpecialDays(controller.getResult());
-                // This save is already triggered when the special days controller confirms
-                // changes.
-                // If we want to ensure a save happens even if the modal is just closed without
-                // changes,
-                // we could move configUseCase.saveConfig(currentConfig) after
-                // stage.showAndWait().
-                // For now, keeping it here as it's tied to the result being set.
-            });
-
-            stage.showAndWait();
-            // Call saveConfig immediately after the special days modal closes,
-            // to ensure any changes (or even just opening/closing) are persisted.
-            configUseCase.saveConfig(currentConfig);
-        } catch (Exception e) {
-            e.printStackTrace();
-            AlertUtil.showError("Error", "No se pudo abrir el gestor de festivos.");
-        }
-    }
-
-    @FXML
     private void handleSave() {
         List<BusinessDay> newSchedule = new ArrayList<>();
         try {
@@ -272,6 +326,7 @@ public class BusinessHoursController implements Injectable {
                         HBox row = (HBox) node;
                         TextField tOp = (TextField) row.getChildren().get(1);
                         TextField tCl = (TextField) row.getChildren().get(3);
+                        @SuppressWarnings("unchecked")
                         List<Integer> userIds = (List<Integer>) row.getUserData();
 
                         day.getShifts().add(new BusinessDay.TimeRange(
@@ -283,24 +338,29 @@ public class BusinessHoursController implements Injectable {
                 newSchedule.add(day);
             }
             currentConfig.setSchedule(newSchedule);
+            
+            // Sync special days from our unified table
+            currentConfig.setSpecialDays(new ArrayList<>(specialDaysList));
+            
             if (txtGracePeriod != null) {
-                currentConfig.setScheduleGracePeriodMins(Integer.parseInt(txtGracePeriod.getText()));
+                try {
+                    currentConfig.setScheduleGracePeriodMins(Integer.parseInt(txtGracePeriod.getText()));
+                } catch (Exception e) {}
             }
+            
             configUseCase.saveConfig(currentConfig);
-            closeWindow();
+            AlertUtil.showInfo("Éxito", "Los horarios y días especiales se han guardados correctamente.");
         } catch (Exception e) {
-            AlertUtil.showError("Error", "Formato de hora inv\u00e1lido (HH:mm) en alg\u00fan campo.");
+            e.printStackTrace();
+            AlertUtil.showError("Error", "Formato de hora inválido (HH:mm) en algún campo.");
         }
     }
 
     @FXML
     private void handleCancel() {
-        closeWindow();
-    }
-
-    private void closeWindow() {
-        Stage stage = (Stage) gridSchedule.getScene().getWindow();
-        stage.close();
+        // En modo incrustado, cancelar podría simplemente recargar la vista.
+        // Por ahora lo dejamos vacío o podemos recargar los datos.
+        inject(container);
     }
 }
 

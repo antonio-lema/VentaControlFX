@@ -82,6 +82,9 @@
     -fx-text-custom-muted: #94a3b8;
     -fx-text-custom-on-primary: #ffffff;
 
+    /* --- ALIASES --- */
+    -text-muted: -fx-text-custom-muted;
+
     /* Bordes */
     -fx-color-border-main: #e2e8f0;
     -fx-color-border-light: #f1f5f9;

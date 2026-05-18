@@ -103,12 +103,18 @@ public class VerifactuOutboxManager {
                     // Hacienda ha podido actualizar reqSegundosEspera en actualizarPoliticasDeFlujo
                     delaySiguienteVuelta = reqSegundosEspera;
                 } catch (Exception ex) {
+                    String errMsg = ex.getMessage();
+                    if (errMsg == null || errMsg.isEmpty()) errMsg = "Error de red o certificado SSL (NIF/Certificado no coinciden)";
+                    
+                    // Actualizar con un mensaje claro y forzar el estado para que se vea el cambio
+                    outboxRepository.updateBatchStatus(batch, "PENDING", "FALLO COMUNICACIÓN: " + errMsg);
+                    
                     if (eventBus != null) {
-                        String errMsg = ex.getMessage();
-                        javafx.application.Platform.runLater(() -> eventBus.publishVerifactuSyncFinished(errMsg));
+                        final String finalMsg = errMsg;
+                        javafx.application.Platform.runLater(() -> eventBus.publishVerifactuSyncFinished(finalMsg));
                     }
                     consecutiveFailures++;
-                    LOGGER.log(Level.WARNING, "[VeriFactu] Error de comunicación: {0}", ex.getMessage());
+                    LOGGER.log(Level.WARNING, "[VeriFactu] Error de comunicación: {0}", errMsg);
                     if (consecutiveFailures >= 3 && !isInternetDownDetected) {
                         isInternetDownDetected = true;
                     }
@@ -168,14 +174,18 @@ public class VerifactuOutboxManager {
     }
 
     private void procesarEstadosResponse(List<VerifactuPayload> batchEnviado, String response) {
-        // Splitting robusto: buscamos la etiqueta RespuestaLinea ignorando el prefijo
-        // Usamos una expresión regular para que funcione con <tik:RespuestaLinea>, <tikR:RespuestaLinea>, etc.
         String[] lineas = response.split("<[^>]*RespuestaLinea>");
         
-        // System.out.println("[VeriFactu] Analizando " + (lineas.length - 1) + " líneas de respuesta de Hacienda...");
-        
         if (lineas.length <= 1) {
-            System.err.println("[VeriFactu] ADVERTENCIA: No se han encontrado líneas de respuesta formateadas. Respuesta RAW: " + response);
+            // Verificamos si es un error global (Fault) de Hacienda
+            if (response.contains("<faultstring>")) {
+                String faultMsg = extractTag(response, "faultstring");
+                if (faultMsg != null) {
+                    outboxRepository.updateBatchStatus(batchEnviado, "REJECTED", "RECHAZO GLOBAL AEAT: " + faultMsg);
+                    return;
+                }
+            }
+            // System.err.println("[VeriFactu] ADVERTENCIA: No se han encontrado líneas de respuesta formateadas. Respuesta RAW: " + response);
         }
 
         for (VerifactuPayload record : batchEnviado) {

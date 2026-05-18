@@ -42,6 +42,7 @@ public class ReceiptController implements Injectable {
     private double rewardAmount;
     private LocalDateTime rewardExpiryDate;
     private Runnable onNewSaleAction, onBackAction;
+    private boolean isInvoiceModeManual = false;
 
     @Override
     public void inject(ServiceContainer container) {
@@ -52,22 +53,26 @@ public class ReceiptController implements Injectable {
         this.mailManager = new ReceiptMailManager(container);
     }
 
-    public void setReceiptData(List<CartItem> items, double total, double paid, double change, String paymentMethod, int saleId, Runnable onNewSale, Runnable onBack, String observations, String rewardCode, double rewardAmount, LocalDateTime expiryDate) {
+    public void setReceiptData(List<CartItem> items, double total, double paid, double change, String paymentMethod, int saleId, Runnable onNewSale, Runnable onBack, String observations, String rewardCode, double rewardAmount, LocalDateTime expiryDate, Client client, boolean isInvoiceMode) {
         this.currentItems = items; this.currentTotal = total; this.currentPaid = paid; this.currentChange = change;
         this.currentPaymentMethod = paymentMethod; this.currentSaleId = saleId; this.onNewSaleAction = onNewSale; this.onBackAction = onBack;
         this.rewardPromoCode = rewardCode; this.rewardAmount = rewardAmount; this.rewardExpiryDate = expiryDate;
+        this.currentClient = client;
+        this.isInvoiceModeManual = isInvoiceMode;
 
         renderHeader(saleId);
         renderItems(items);
         renderTotals(paid, change, paymentMethod, observations);
         renderReward(rewardCode, rewardAmount, expiryDate);
+        setClientInfo(client);
         fiscalManager.renderVerifactuSection(receiptContent, saleId, cfg);
         applyPaperFormat();
     }
 
     private void renderHeader(int saleId) {
         lblDate.setText(container.getBundle().getString("receipt.info.date") + ": " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd MMM, yyyy 'Hora:' HH:mm:ss")));
-        String title = isGiftMode ? container.getBundle().getString("receipt.title.gift") : container.getBundle().getString("receipt.title.invoice");
+        String titleKey = isGiftMode ? "receipt.title.gift" : (isInvoiceModeManual ? "receipt.title.invoice" : "receipt.title.simplified");
+        String title = container.getBundle().getString(titleKey);
         if (currentTotal < 0) title = "FACTURA RECTIFICATIVA";
         lblTicketTitle.setText(title + " N\u00ba: " + String.format("%03d", saleId));
         if (lblSuccessMessage != null) lblSuccessMessage.setText(isGiftMode ? container.getBundle().getString("receipt.success.gift_title") : container.getBundle().getString("receipt.success.title"));
@@ -173,14 +178,14 @@ public class ReceiptController implements Injectable {
 
     @FXML private void handleBack() { ((Stage) receiptContent.getScene().getWindow()).close(); if (onBackAction != null) onBackAction.run(); }
     @FXML private void handleNewSale() { ((Stage) receiptContent.getScene().getWindow()).close(); if (onNewSaleAction != null) onNewSaleAction.run(); }
-    @FXML private void handleGiftTicket() { this.isGiftMode = !this.isGiftMode; setReceiptData(currentItems, currentTotal, currentPaid, currentChange, currentPaymentMethod, currentSaleId, onNewSaleAction, onBackAction, null, rewardPromoCode, rewardAmount, rewardExpiryDate); }
+    @FXML private void handleGiftTicket() { this.isGiftMode = !this.isGiftMode; setReceiptData(currentItems, currentTotal, currentPaid, currentChange, currentPaymentMethod, currentSaleId, onNewSaleAction, onBackAction, null, rewardPromoCode, rewardAmount, rewardExpiryDate, currentClient, isInvoiceModeManual); }
 
     private void setLabel(Label lbl, String text) { if (lbl != null) { lbl.setText(text != null ? text : ""); lbl.setVisible(text != null && !text.isEmpty()); lbl.setManaged(lbl.isVisible()); } }
     private void applyPaperFormat() { receiptContent.setPrefWidth(currentClient != null ? 700 : 300); }
 
     // Fallback methods for older calls
-    public void setReceiptData(List<CartItem> items, double total, double paid, double change, String paymentMethod, int saleId, Runnable onNewSale, Runnable onBack) { setReceiptData(items, total, paid, change, paymentMethod, saleId, onNewSale, onBack, null, null, 0, null); }
-    public void setReceiptData(List<CartItem> items, double total, double paid, double change, String paymentMethod, int saleId, Runnable onNewSale, Runnable onBack, String observations) { setReceiptData(items, total, paid, change, paymentMethod, saleId, onNewSale, onBack, observations, null, 0, null); }
+    public void setReceiptData(List<CartItem> items, double total, double paid, double change, String paymentMethod, int saleId, Runnable onNewSale, Runnable onBack) { setReceiptData(items, total, paid, change, paymentMethod, saleId, onNewSale, onBack, null, null, 0, null, null, false); }
+    public void setReceiptData(List<CartItem> items, double total, double paid, double change, String paymentMethod, int saleId, Runnable onNewSale, Runnable onBack, String observations) { setReceiptData(items, total, paid, change, paymentMethod, saleId, onNewSale, onBack, observations, null, 0, null, null, false); }
 }
 
 

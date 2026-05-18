@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
+<?import java.net.URL?>
+
+<VBox spacing="0" styleClass="main-content-area" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" 
+      fx:controller="com.mycompany.ventacontrolfx.presentation.controller.user.StaffManagementHubController">
+    
+    <stylesheets>
+        <URL value="@/styles/main.css" />
+        <URL value="@/styles/components/estetica.css" />
+        <URL value="@/styles/components/hubs.css" />
+    </stylesheets>
+
+    <children>
+        <!-- Common Header for the Hub -->
+        <VBox styleClass="view-header" spacing="0">
+            <children>
+                <HBox spacing="16" alignment="CENTER_LEFT">
+                    <children>
+                        <StackPane styleClass="view-header-icon-wrap">
+                            <children><FontAwesomeIconView glyphName="USERS" size="24" fill="white"/></children>
+                        </StackPane>
+                        <VBox spacing="2">
+                            <children>
+                                <Label text="%staff.hub.title" styleClass="view-title"/>
+                                <Label text="%staff.hub.subtitle" styleClass="view-subtitle"/>
+                            </children>
+                        </VBox>
+                        <Region HBox.hgrow="ALWAYS" />
+                    </children>
+                </HBox>
+            </children>
+        </VBox>
+
+        <!-- Custom Navigation Bar -->
+        <HBox styleClass="hub-nav-container">
+            <children>
+                <HBox styleClass="hub-nav-bar">
+                    <children>
+                        <Button fx:id="btnTabMyShift" onAction="#showMyShift" styleClass="hub-nav-button, hub-nav-button-active" text="%staff.hub.tab.myshift">
+                            <graphic><FontAwesomeIconView glyphName="CLOCK_ALT" size="14"/></graphic>
+                        </Button>
+                        <Button fx:id="btnTabMonitor" onAction="#showMonitor" styleClass="hub-nav-button" text="%staff.hub.tab.monitor">
+                            <graphic><FontAwesomeIconView glyphName="TV" size="14"/></graphic>
+                        </Button>
+                        <Button fx:id="btnTabAudit" onAction="#showAudit" styleClass="hub-nav-button" text="%staff.hub.tab.audit">
+                            <graphic><FontAwesomeIconView glyphName="CHECK_SQUARE" size="14"/></graphic>
+                        </Button>
+                    </children>
+                </HBox>
+            </children>
+        </HBox>
+
+        <!-- Content Container (StackPane to switch views) -->
+        <StackPane fx:id="contentArea" VBox.vgrow="ALWAYS" styleClass="hub-content-area">
+            <children>
+                <fx:include fx:id="shiftManagement" source="shift_management.fxml" />
+                <fx:include fx:id="operativeDashboard" source="/view/dashboard/operative_dashboard.fxml" visible="false" />
+                <fx:include fx:id="punctualityAudit" source="/view/reports/punctuality_audit.fxml" visible="false" />
+            </children>
+        </StackPane>
+    </children>
+</VBox>

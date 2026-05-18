@@ -20,54 +20,37 @@
    <children>
       <VBox spacing="0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
-            <!-- Header Section -->
-            <VBox styleClass="view-header" spacing="0">
-                <children>
-                    <HBox spacing="16" alignment="CENTER_LEFT">
-                        <children>
-                            <StackPane styleClass="view-header-icon-wrap">
-                                <children><FontAwesomeIconView glyphName="CUBES" size="24" fill="white"/></children>
-                            </StackPane>
-                            <VBox spacing="2">
-                                <children>
-                                    <Label text="%products.title" styleClass="view-title"/>
-                                    <Label text="%products.subtitle" styleClass="view-subtitle"/>
-                                </children>
-                            </VBox>
-                            <Region HBox.hgrow="ALWAYS" />
-                            <Button fx:id="btnAdd" onAction="#handleAddProduct" styleClass="modern-btn-primary" text="%products.btn.new">
-                                <graphic><FontAwesomeIconView glyphName="PLUS" size="14" fill="WHITE"/></graphic>
-                            </Button>
-                            <Button text="%products.btn.import" onAction="#handleImportExcel" styleClass="modern-btn-secondary">
-                                <graphic><FontAwesomeIconView glyphName="UPLOAD" size="14" fill="#334155"/></graphic>
-                            </Button>
-                        </children>
-                    </HBox>
-                </children>
-            </VBox>
-            
-            <VBox spacing="20.0" VBox.vgrow="ALWAYS" style="-fx-padding: 25;">
+            <VBox spacing="20.0" VBox.vgrow="ALWAYS" style="-fx-padding: 20 25 25 25;">
                 <children>
 
             <!-- Table Card -->
             <VBox spacing="0" styleClass="table-card" VBox.vgrow="ALWAYS">
                <children>
-                  <!-- Filter Section -->
-                  <HBox alignment="CENTER_LEFT" styleClass="modern-filter-bar">
+                  <HBox alignment="CENTER_LEFT" styleClass="modern-filter-bar" spacing="15">
                      <children>
                         <Label text="%products.filter.label" styleClass="label-muted" />
-                        <HBox alignment="CENTER_LEFT" styleClass="search-bar" HBox.hgrow="ALWAYS" maxWidth="400">
+                        <HBox alignment="CENTER_LEFT" styleClass="search-bar" HBox.hgrow="ALWAYS" maxWidth="300">
                            <children>
                               <FontAwesomeIconView glyphName="SEARCH" size="14" styleClass="sidebar-icon" />
                                <TextField fx:id="searchField" promptText="%products.filter.prompt" styleClass="search-field" HBox.hgrow="ALWAYS" />
                             </children>
                          </HBox>
-                         <HBox spacing="8" alignment="CENTER_LEFT" styleClass="filter-buttons-container" style="-fx-padding: 0 0 0 15;">
+                         <HBox spacing="8" alignment="CENTER_LEFT" styleClass="filter-buttons-container">
                              <ToggleButton fx:id="btnFilterAll" text="%products.filter.all" styleClass="date-filter-chip" />
                              <ToggleButton fx:id="btnFilterVisible" text="%products.filter.visible" styleClass="date-filter-chip" selected="true" />
                              <ToggleButton fx:id="btnFilterDisabled" text="%products.filter.disabled" styleClass="date-filter-chip" />
                          </HBox>
                          <Region HBox.hgrow="ALWAYS" />
+                         <HBox spacing="10" alignment="CENTER_LEFT">
+                             <children>
+                                 <Button fx:id="btnAdd" onAction="#handleAddProduct" styleClass="modern-btn-primary" text="%products.btn.new">
+                                     <graphic><FontAwesomeIconView glyphName="PLUS" size="14" fill="WHITE"/></graphic>
+                                 </Button>
+                                 <Button onAction="#handleImportExcel" styleClass="modern-btn-secondary" text="%products.btn.import">
+                                     <graphic><FontAwesomeIconView glyphName="UPLOAD" size="14" fill="#334155"/></graphic>
+                                 </Button>
+                             </children>
+                         </HBox>
                         <HBox alignment="CENTER_LEFT" spacing="10" styleClass="row-limit-container">
                            <children>
                               <Label text="%products.show_limit" styleClass="label-limit" />

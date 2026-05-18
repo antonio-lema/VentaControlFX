@@ -7,6 +7,7 @@ import com.mycompany.ventacontrolfx.domain.model.SaleDetail;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface ISaleRepository {
@@ -34,33 +35,13 @@ public interface ISaleRepository {
         List<Sale> getByRange(LocalDate start, LocalDate end) throws SQLException;
 
         List<Sale> getByRange(LocalDate start, LocalDate end, int limit) throws SQLException;
+        
+        List<Sale> getByClosureId(int closureId) throws SQLException;
+        
+        List<Sale> getByUserAndRange(int userId, LocalDateTime start, LocalDateTime end) throws SQLException;
 
         com.mycompany.ventacontrolfx.domain.model.HistoryStats getStatsByRange(LocalDate start, LocalDate end)
                         throws SQLException;
-
-        int saveReturn(Return returnRecord) throws SQLException;
-
-        int saveReturn(Return returnRecord, Connection conn) throws SQLException;
-
-        void saveReturnDetails(List<ReturnDetail> details, int returnId) throws SQLException;
-
-        void saveReturnDetails(List<ReturnDetail> details, int returnId, Connection conn) throws SQLException;
-
-        void updateSaleReturnStatus(int saleId, boolean isReturn, String reason, double returnedAmount)
-                        throws SQLException;
-
-        void updateSaleReturnStatus(int saleId, boolean isReturn, String reason, double returnedAmount, Connection conn)
-                        throws SQLException;
-
-        void updateDetailReturnedQuantity(int detailId, int quantity) throws SQLException;
-
-        void updateDetailReturnedQuantity(int detailId, int quantity, Connection conn) throws SQLException;
-
-        List<Return> getReturnsByRange(LocalDate start, LocalDate end) throws SQLException;
-
-        List<Return> getReturnsBySaleId(int saleId) throws SQLException;
-
-        List<ReturnDetail> getReturnDetailsByReturnId(int returnId) throws SQLException;
 
         int count() throws SQLException;
 

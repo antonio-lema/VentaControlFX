@@ -1,6 +1,7 @@
 package com.mycompany.ventacontrolfx.presentation.controller.dialog;
 
 import com.mycompany.ventacontrolfx.application.usecase.SaleUseCase;
+import com.mycompany.ventacontrolfx.application.usecase.ReturnUseCase;
 import com.mycompany.ventacontrolfx.domain.model.Return;
 import com.mycompany.ventacontrolfx.infrastructure.config.Injectable;
 import com.mycompany.ventacontrolfx.infrastructure.config.ServiceContainer;
@@ -54,6 +55,7 @@ public class ReturnListController implements Injectable {
     private Label lblDetailReturnId, lblDetailSaleId, lblDetailDate, lblDetailReason, lblDetailUser, lblDetailTotal;
 
     private SaleUseCase saleUseCase;
+    private ReturnUseCase returnUseCase;
     private ServiceContainer container;
     private ObservableList<Return> masterData = FXCollections.observableArrayList();
     private final DateTimeFormatter kpiFormatter = DateTimeFormatter.ofPattern("dd/MM/yy HH:mm");
@@ -66,6 +68,7 @@ public class ReturnListController implements Injectable {
     public void inject(ServiceContainer container) {
         this.container = container;
         this.saleUseCase = container.getSaleUseCase();
+        this.returnUseCase = container.getReturnUseCase();
 
         // 1. Inicializar Managers
         this.tableManager = new ReturnTableManager(
@@ -78,11 +81,11 @@ public class ReturnListController implements Injectable {
         );
 
         this.detailsManager = new ReturnDetailsManager(
-            container, saleUseCase, detailsPanel, detailsItemsContainer, lblDetailReturnId, 
+            container, returnUseCase, detailsPanel, detailsItemsContainer, lblDetailReturnId, 
             lblDetailSaleId, lblDetailDate, lblDetailReason, lblDetailUser, lblDetailTotal
         );
 
-        this.actionManager = new ReturnActionManager(container, saleUseCase, container.getGetSaleTicketUseCase());
+        this.actionManager = new ReturnActionManager(container, saleUseCase, returnUseCase, container.getGetSaleTicketUseCase());
 
         // 2. Setup Filtros UI
         if (cmbPaymentMethod != null) {
@@ -114,7 +117,7 @@ public class ReturnListController implements Injectable {
                 start = LocalDate.of(2000, 1, 1);
                 end = LocalDate.of(2100, 1, 1);
             }
-            masterData.setAll(saleUseCase.getReturnsHistory(start, end));
+            masterData.setAll(returnUseCase.getReturnsHistory(start, end));
             applyFilters();
         } catch (SQLException e) {
             AlertUtil.showError(container.getBundle().getString("alert.error"),

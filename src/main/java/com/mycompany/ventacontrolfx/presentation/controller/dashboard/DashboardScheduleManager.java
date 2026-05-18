@@ -45,17 +45,23 @@ public class DashboardScheduleManager {
             alertsContainer.getChildren().clear();
 
             if (schedule == null || schedule.isClosed() || schedule.getShifts().isEmpty()) {
-                lblStatus.setText(container.getBundle().getString("dashboard.status." + (schedule != null && schedule.isClosed() ? "closed" : "no_schedule")));
-                lblStatus.setStyle("-fx-background-color: #f1f5f9; -fx-text-fill: #475569;");
-                lblCompliance.setText(container.getBundle().getString("NA"));
+                if (lblStatus != null) {
+                    lblStatus.setText(container.getBundle().getString("dashboard.status." + (schedule != null && schedule.isClosed() ? "closed" : "no_schedule")));
+                    lblStatus.setStyle("-fx-background-color: #f1f5f9; -fx-text-fill: #475569;");
+                }
+                if (lblCompliance != null) {
+                    lblCompliance.setText(container.getBundle().getString("NA"));
+                }
                 scheduleContainer.getChildren().add(new Label(container.getBundle().getString("dashboard.shifts.none")));
                 return;
             }
 
             LocalTime now = LocalTime.now();
             boolean isOpen = schedule.getShifts().stream().anyMatch(s -> now.isAfter(s.getOpen()) && now.isBefore(s.getClose()));
-            lblStatus.setText(container.getBundle().getString("dashboard.status." + (isOpen ? "open" : "out_of_hours")));
-            lblStatus.setStyle(isOpen ? "-fx-background-color: #dcfce7; -fx-text-fill: #16a34a;" : "-fx-background-color: #fef3c7; -fx-text-fill: #d97706;");
+            if (lblStatus != null) {
+                lblStatus.setText(container.getBundle().getString("dashboard.status." + (isOpen ? "open" : "out_of_hours")));
+                lblStatus.setStyle(isOpen ? "-fx-background-color: #dcfce7; -fx-text-fill: #16a34a;" : "-fx-background-color: #fef3c7; -fx-text-fill: #d97706;");
+            }
 
             checkCompliance(schedule, actualStart);
             renderShifts(schedule, allUsers, activeSessions, now);
@@ -69,16 +75,22 @@ public class DashboardScheduleManager {
         if (actualStart != null && !schedule.getShifts().isEmpty()) {
             LocalTime expected = schedule.getShifts().get(0).getOpen();
             if (actualStart.toLocalTime().isAfter(expected.plusMinutes(10))) {
-                lblCompliance.setText(container.getBundle().getString("dashboard.compliance.delay"));
-                lblCompliance.setStyle("-fx-text-fill: #ef4444;");
+                if (lblCompliance != null) {
+                    lblCompliance.setText(container.getBundle().getString("dashboard.compliance.delay"));
+                    lblCompliance.setStyle("-fx-text-fill: #ef4444;");
+                }
                 addAlert(String.format(container.getBundle().getString("dashboard.alert.late_opening"), actualStart.toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm"))), "warning");
             } else {
-                lblCompliance.setText(container.getBundle().getString("dashboard.compliance.optimal"));
-                lblCompliance.setStyle("-fx-text-fill: #16a34a;");
+                if (lblCompliance != null) {
+                    lblCompliance.setText(container.getBundle().getString("dashboard.compliance.optimal"));
+                    lblCompliance.setStyle("-fx-text-fill: #16a34a;");
+                }
             }
         } else {
-            lblCompliance.setText(container.getBundle().getString("dashboard.compliance.pending"));
-            lblCompliance.setStyle("-fx-text-fill: #94a3b8;");
+            if (lblCompliance != null) {
+                lblCompliance.setText(container.getBundle().getString("dashboard.compliance.pending"));
+                lblCompliance.setStyle("-fx-text-fill: #94a3b8;");
+            }
         }
     }
 
@@ -104,7 +116,7 @@ public class DashboardScheduleManager {
 
             if (now.isAfter(r.getOpen()) && now.isBefore(r.getClose())) {
                 for (Integer id : r.getAssignedUserIds()) {
-                    if (activeSessions.stream().noneMatch(s -> s.getUserId() == id)) {
+                    if (activeSessions.stream().noneMatch(s -> s.getUserId().equals(id))) {
                         String name = allUsers.stream().filter(u -> u.getUserId() == id).map(User::getFullName).findFirst()
                                 .orElse(String.format(container.getBundle().getString("dashboard.staff.user"), id));
                         addAlert(String.format(container.getBundle().getString("dashboard.alert.absence_detected"), name), "warning");

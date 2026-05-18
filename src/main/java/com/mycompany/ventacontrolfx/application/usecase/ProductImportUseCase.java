@@ -18,13 +18,16 @@ import java.util.Map;
 public class ProductImportUseCase {
     private final IProductRepository productRepository;
     private final ICategoryRepository categoryRepository;
+    private final com.mycompany.ventacontrolfx.domain.repository.IPriceRepository priceRepository;
     private final AuthorizationService authService;
 
     public ProductImportUseCase(IProductRepository productRepository,
             ICategoryRepository categoryRepository,
+            com.mycompany.ventacontrolfx.domain.repository.IPriceRepository priceRepository,
             AuthorizationService authService) {
         this.productRepository = productRepository;
         this.categoryRepository = categoryRepository;
+        this.priceRepository = priceRepository;
         this.authService = authService;
     }
 
@@ -91,6 +94,21 @@ public class ProductImportUseCase {
 
         if (!productsToImport.isEmpty()) {
             productRepository.saveAll(productsToImport);
+            
+            // Save prices for imported products
+            com.mycompany.ventacontrolfx.domain.model.PriceList defaultList = priceRepository.getDefaultPriceList();
+            int listId = (defaultList != null) ? defaultList.getId() : 1;
+            
+            for (Product p : productsToImport) {
+                if (p.getId() > 0) {
+                    com.mycompany.ventacontrolfx.domain.model.Price price = new com.mycompany.ventacontrolfx.domain.model.Price();
+                    price.setProductId(p.getId());
+                    price.setPriceListId(listId);
+                    price.setValue(p.getPrice());
+                    price.setReason("Importación masiva");
+                    priceRepository.save(price); // Use simple save for bulk import to avoid complexity
+                }
+            }
         }
 
         return productsToImport.size();

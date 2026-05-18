@@ -162,6 +162,32 @@ public class JdbcCashClosureRepository implements ICashClosureRepository {
     }
 
     @Override
+    public double getTodayTotalSales(LocalDate date) throws SQLException {
+        String sqlSales = "SELECT SUM(total) FROM sales WHERE DATE(sale_datetime) = ?";
+        String sqlReturns = "SELECT SUM(total_refunded) FROM returns WHERE DATE(return_datetime) = ?";
+        double totalSales = 0;
+        double totalReturns = 0;
+
+        try (Connection conn = DBConnection.getConnection()) {
+            try (PreparedStatement pstmt = conn.prepareStatement(sqlSales)) {
+                pstmt.setDate(1, Date.valueOf(date));
+                try (ResultSet rs = pstmt.executeQuery()) {
+                    if (rs.next())
+                        totalSales = rs.getDouble(1);
+                }
+            }
+            try (PreparedStatement pstmt = conn.prepareStatement(sqlReturns)) {
+                pstmt.setDate(1, Date.valueOf(date));
+                try (ResultSet rs = pstmt.executeQuery()) {
+                    if (rs.next())
+                        totalReturns = rs.getDouble(1);
+                }
+            }
+        }
+        return totalSales - totalReturns;
+    }
+
+    @Override
     public List<ProductSummary> getProductSummary(int closureId) throws SQLException {
         List<ProductSummary> summary = new ArrayList<>();
         String sql = "SELECT name, SUM(quantity) as total_qty, SUM(amount) as total_amount FROM (" +
@@ -308,8 +334,8 @@ public class JdbcCashClosureRepository implements ICashClosureRepository {
 
     public void registerMovement(MovementType type, double amount, String reason, int userId, Connection connection)
             throws SQLException {
-        String sql = "INSERT INTO cash_movements (session_id, user_id, type, amount, reason, ip_address) " +
-                "VALUES ((SELECT session_id FROM cash_fund_sessions WHERE is_closed = FALSE ORDER BY created_at DESC LIMIT 1), ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO cash_movements (session_id, user_id, type, amount, reason, ip_address, created_at) " +
+                "VALUES ((SELECT session_id FROM cash_fund_sessions WHERE is_closed = FALSE ORDER BY created_at DESC LIMIT 1), ?, ?, ?, ?, ?, ?)";
         String ip = "127.0.0.1";
         try {
             ip = java.net.InetAddress.getLocalHost().getHostAddress();
@@ -321,6 +347,7 @@ public class JdbcCashClosureRepository implements ICashClosureRepository {
             pstmt.setDouble(3, amount);
             pstmt.setString(4, reason != null ? reason : "");
             pstmt.setString(5, ip);
+            pstmt.setTimestamp(6, Timestamp.valueOf(LocalDateTime.now()));
             pstmt.executeUpdate();
             if (type == MovementType.INGRESO || type == MovementType.RETIRADA || type == MovementType.DEVOLUCION) {
                 registerAudit(connection, userId, "CASH_" + type.toString(),
@@ -363,12 +390,14 @@ public class JdbcCashClosureRepository implements ICashClosureRepository {
 
     @Override
     public void openCashFund(double initialAmount, String notes, int userId) throws SQLException {
-        String sql = "INSERT INTO cash_fund_sessions (session_date, user_id, initial_amount, notes, is_closed) VALUES (CURDATE(), ?, ?, ?, FALSE)";
+        String sql = "INSERT INTO cash_fund_sessions (session_date, user_id, initial_amount, notes, is_closed, created_at) VALUES (?, ?, ?, ?, FALSE, ?)";
         try (Connection connection = DBConnection.getConnection();
                 PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setInt(1, userId);
-            pstmt.setDouble(2, initialAmount);
-            pstmt.setString(3, notes != null ? notes : "");
+            pstmt.setDate(1, Date.valueOf(LocalDate.now()));
+            pstmt.setInt(2, userId);
+            pstmt.setDouble(3, initialAmount);
+            pstmt.setString(4, notes != null ? notes : "");
+            pstmt.setTimestamp(5, Timestamp.valueOf(LocalDateTime.now()));
             pstmt.executeUpdate();
 
             String movementReason = (notes != null && !notes.trim().isEmpty())
@@ -448,23 +477,66 @@ public class JdbcCashClosureRepository implements ICashClosureRepository {
     }
 
     @Override
+    public List<CashMovement> getMovementsByRange(LocalDateTime start, LocalDateTime end) throws SQLException {
+        List<CashMovement> movements = new ArrayList<>();
+        String sql = "SELECT m.*, u.username FROM cash_movements m LEFT JOIN users u ON m.user_id = u.user_id " +
+                     "WHERE m.created_at >= ? AND m.created_at <= ? ORDER BY m.created_at ASC";
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setTimestamp(1, Timestamp.valueOf(start));
+            pstmt.setTimestamp(2, Timestamp.valueOf(end));
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    movements.add(new CashMovement(rs.getInt("movement_id"), rs.getString("type"),
+                            rs.getDouble("amount"), rs.getString("reason"),
+                            rs.getTimestamp("created_at").toLocalDateTime(), rs.getString("username")));
+                }
+            }
+        }
+        return movements;
+    }
+
+    @Override
+    public List<CashMovement> getMovementsByUserAndRange(int userId, LocalDateTime start, LocalDateTime end) throws SQLException {
+        List<CashMovement> movements = new ArrayList<>();
+        String sql = "SELECT m.*, u.username FROM cash_movements m LEFT JOIN users u ON m.user_id = u.user_id " +
+                     "WHERE m.user_id = ? AND m.created_at >= ? AND m.created_at <= ? ORDER BY m.created_at ASC";
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, userId);
+            pstmt.setTimestamp(2, Timestamp.valueOf(start));
+            pstmt.setTimestamp(3, Timestamp.valueOf(end));
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    movements.add(new CashMovement(rs.getInt("movement_id"), rs.getString("type"),
+                            rs.getDouble("amount"), rs.getString("reason"),
+                            rs.getTimestamp("created_at").toLocalDateTime(), rs.getString("username")));
+                }
+            }
+        }
+        return movements;
+    }
+
+    @Override
     public void markAsReviewed(int closureId, int reviewerId) throws SQLException {
-        String sql = "UPDATE cash_closures SET status = 'REVIEWED', reviewed_by = ?, reviewed_at = CURRENT_TIMESTAMP WHERE closure_id = ?";
+        String sql = "UPDATE cash_closures SET status = 'REVIEWED', reviewed_by = ?, reviewed_at = ? WHERE closure_id = ?";
         try (Connection conn = DBConnection.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, reviewerId);
-            pstmt.setInt(2, closureId);
+            pstmt.setTimestamp(2, Timestamp.valueOf(LocalDateTime.now()));
+            pstmt.setInt(3, closureId);
             pstmt.executeUpdate();
         }
     }
 
     @Override
     public void markAsExcluded(int closureId, int reviewerId) throws SQLException {
-        String sql = "UPDATE cash_closures SET status = 'EXCLUDED', reviewed_by = ?, reviewed_at = CURRENT_TIMESTAMP WHERE closure_id = ?";
+        String sql = "UPDATE cash_closures SET status = 'EXCLUDED', reviewed_by = ?, reviewed_at = ? WHERE closure_id = ?";
         try (Connection conn = DBConnection.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, reviewerId);
-            pstmt.setInt(2, closureId);
+            pstmt.setTimestamp(2, Timestamp.valueOf(LocalDateTime.now()));
+            pstmt.setInt(3, closureId);
             pstmt.executeUpdate();
         }
     }
@@ -477,7 +549,7 @@ public class JdbcCashClosureRepository implements ICashClosureRepository {
                 "difference = ? - expected_cash, " +
                 "notes = CONCAT(IFNULL(notes, ''), '\n[EDITED: ', ?, ' | PREV: ', ?, ' \u20ac]'), " +
                 "reviewed_by = ?, " +
-                "reviewed_at = CURRENT_TIMESTAMP, " +
+                "reviewed_at = ?, " +
                 "status = CASE WHEN ABS(? - expected_cash) < 0.01 THEN 'BALANCED' ELSE 'DISCREPANCY' END " +
                 "WHERE closure_id = ?";
 
@@ -488,10 +560,10 @@ public class JdbcCashClosureRepository implements ICashClosureRepository {
             pstmt.setString(3, reason);
             pstmt.setDouble(4, previousCash);
             pstmt.setInt(5, reviewerId);
-            pstmt.setDouble(6, actualCash);
-            pstmt.setInt(7, closureId);
+            pstmt.setTimestamp(6, Timestamp.valueOf(LocalDateTime.now()));
+            pstmt.setDouble(7, actualCash);
+            pstmt.setInt(8, closureId);
             pstmt.executeUpdate();
         }
     }
 }
-

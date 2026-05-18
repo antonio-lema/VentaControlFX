@@ -52,9 +52,35 @@ public class MainController implements Injectable,
         container.getEventBus().subscribeVerifactu(this);
         
         shiftMonitor.start();
+        checkInitialShiftStatus();
 
         // 4. Navegación Inicial (Solo al arrancar)
         navService.navigateTo("/view/cart/sell_view.fxml");
+    }
+
+    private void checkInitialShiftStatus() {
+        if (container == null || container.getUserSession().getCurrentUser() == null) return;
+        
+        int userId = container.getUserSession().getCurrentUser().getUserId();
+        container.getAsyncManager().runAsyncTask(() -> {
+            return container.getWorkSessionUseCase().getActiveSession(userId).isPresent();
+        }, (Boolean hasActiveSession) -> {
+            if (!hasActiveSession) {
+                Platform.runLater(() -> {
+                    boolean startNow = com.mycompany.ventacontrolfx.presentation.util.AlertUtil.showConfirmation(
+                        container.getBundle().getString("main.attendance.title"),
+                        "Inicio de Jornada Detectado",
+                        "No tienes una sesi\u00f3n de trabajo activa. \u00bfDeseas iniciar tu turno ahora?"
+                    );
+                    
+                    if (startNow) {
+                        com.mycompany.ventacontrolfx.presentation.navigation.ModalService.showTransparentModal(
+                            "/view/user/shift_compact.fxml", 
+                            "Gesti\u00f3n de Jornada", container, null);
+                    }
+                });
+            }
+        }, null);
     }
 
     @Override

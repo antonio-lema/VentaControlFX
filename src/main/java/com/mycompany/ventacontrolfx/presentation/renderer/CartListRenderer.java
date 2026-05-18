@@ -13,13 +13,15 @@ public class CartListRenderer {
     private final CartUseCase cartUseCase;
     private final double globalTaxRate;
     private final boolean pricesIncludeTax;
+    private final int globalDecimals;
 
-    public CartListRenderer(VBox containerBox, CartUseCase cartUseCase, double globalTaxRate, boolean pricesIncludeTax,
+    public CartListRenderer(VBox containerBox, CartUseCase cartUseCase, double globalTaxRate, boolean pricesIncludeTax, int globalDecimals,
             com.mycompany.ventacontrolfx.infrastructure.config.ServiceContainer container) {
         this.containerBox = containerBox;
         this.cartUseCase = cartUseCase;
         this.globalTaxRate = globalTaxRate;
         this.pricesIncludeTax = pricesIncludeTax;
+        this.globalDecimals = globalDecimals;
         this.container = container;
         renderCurrentItems();
         initListener();
@@ -41,6 +43,7 @@ public class CartListRenderer {
                 item,
                 globalTaxRate,
                 pricesIncludeTax,
+                globalDecimals,
                 container.getBundle(),
                 () -> {
                     try {

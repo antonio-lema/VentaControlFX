@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.*?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.*?>
 <?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
@@ -132,6 +134,21 @@
             <Region HBox.hgrow="ALWAYS"/>
             <Label fx:id="savingsLabel" text="0,00 &#x20ac;" styleClass="summary-value" style="-fx-text-fill: -color-success; -fx-font-weight: bold;"/>
         </HBox>
+        
+        <!-- Document Type Selector -->
+        <VBox spacing="8" style="-fx-padding: 10 0;">
+            <fx:define>
+                <ToggleGroup fx:id="tgDocType"/>
+            </fx:define>
+            <Label text="%cart.doc_type.label" style="-fx-font-size: 10px; -fx-font-weight: bold; -fx-text-fill: -fx-text-custom-muted; -fx-text-alignment: center;" maxWidth="Infinity" alignment="CENTER"/>
+            <HBox alignment="CENTER">
+                <HBox styleClass="segmented-control">
+                    <ToggleButton fx:id="btnTypeTicket" text="%cart.doc_type.ticket" selected="true" minWidth="120" toggleGroup="$tgDocType" />
+                    <ToggleButton fx:id="btnTypeInvoice" text="%cart.doc_type.invoice" minWidth="120" toggleGroup="$tgDocType" />
+                </HBox>
+            </HBox>
+        </VBox>
+
         <Separator/>
         <HBox alignment="CENTER_LEFT">
             <Label text="%cart.summary.total" styleClass="total-label"/>

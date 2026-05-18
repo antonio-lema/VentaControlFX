@@ -25,11 +25,13 @@ public class HeaderController implements Injectable {
     @FXML
     private MenuButton userMenuButton;
     @FXML
-    private HBox searchBarContainer, btnStockAlerts;
+    private MenuItem menuItemCashClosure, menuItemWorkSession;
     @FXML
-    private Label lblHeaderUsername, lblStockAlertCount;
+    private HBox searchBarContainer, btnStockAlerts, btnWorkSession;
     @FXML
-    private MenuItem menuItemCashClosure;
+    private Label lblHeaderUsername, lblStockAlertCount, lblWorkSessionStatus, lblWorkSessionTime;
+    @FXML
+    private de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView iconWorkSession;
 
     private ServiceContainer container;
     private NavigationService navigationService;
@@ -43,6 +45,7 @@ public class HeaderController implements Injectable {
         setupUserMenu();
         setupSearch();
         checkStockAlerts();
+        setupWorkSessionMonitor();
 
         // Suscribirse a cambios globales para refrescar alertas (ej: despu\u00e9s de
         // una
@@ -223,6 +226,56 @@ public class HeaderController implements Injectable {
     private void handleShowStockAlerts() {
         ModalService.showTransparentModal("/view/dialog/low_stock_dialog.fxml",
                 container.getBundle().getString("header.stock_alerts.title"), container, null);
+    }
+
+    private void setupWorkSessionMonitor() {
+        javafx.animation.Timeline timeline = new javafx.animation.Timeline(
+            new javafx.animation.KeyFrame(javafx.util.Duration.seconds(1), e -> refreshWorkSessionStatus())
+        );
+        timeline.setCycleCount(javafx.animation.Animation.INDEFINITE);
+        timeline.play();
+        refreshWorkSessionStatus();
+    }
+
+    private void refreshWorkSessionStatus() {
+        if (container == null || container.getUserSession().getCurrentUser() == null) return;
+        
+        int userId = container.getUserSession().getCurrentUser().getUserId();
+        java.util.Optional<com.mycompany.ventacontrolfx.domain.model.WorkSession> active = 
+                container.getWorkSessionUseCase().getActiveSession(userId);
+        
+        Platform.runLater(() -> {
+            if (active.isPresent()) {
+                com.mycompany.ventacontrolfx.domain.model.WorkSession s = active.get();
+                boolean isBreak = s.getType() == com.mycompany.ventacontrolfx.domain.model.WorkSession.SessionType.BREAK;
+                
+                lblWorkSessionStatus.setText(isBreak ? "EN DESCANSO" : "EN TURNO");
+                iconWorkSession.setGlyphName(isBreak ? "COFFEE" : "USER");
+                iconWorkSession.setFill(isBreak ? javafx.scene.paint.Color.web("#f59e0b") : javafx.scene.paint.Color.web("#10b981"));
+                
+                long seconds = java.time.Duration.between(s.getStartTime(), java.time.LocalDateTime.now()).getSeconds();
+                long h = seconds / 3600;
+                long m = (seconds % 3600) / 60;
+                long sec = seconds % 60;
+                lblWorkSessionTime.setText(String.format("%02d:%02d:%02d", h, m, sec));
+                btnWorkSession.getStyleClass().removeAll("status-inactive", "status-break", "status-active");
+                btnWorkSession.getStyleClass().add(isBreak ? "status-break" : "status-active");
+            } else {
+                lblWorkSessionStatus.setText("FICHAR");
+                lblWorkSessionTime.setText("Fuera de turno");
+                iconWorkSession.setGlyphName("CLOCK_ALT");
+                iconWorkSession.setFill(javafx.scene.paint.Color.web("#3b82f6"));
+                btnWorkSession.getStyleClass().removeAll("status-inactive", "status-break", "status-active");
+                btnWorkSession.getStyleClass().add("status-inactive");
+            }
+        });
+    }
+
+    @FXML
+    private void handleWorkSessionAction() {
+        // Abrir el diálogo compacto para el acceso rápido
+        ModalService.showTransparentModal("/view/user/shift_compact.fxml", 
+                "Gestión de Jornada", container, null);
     }
 }
 

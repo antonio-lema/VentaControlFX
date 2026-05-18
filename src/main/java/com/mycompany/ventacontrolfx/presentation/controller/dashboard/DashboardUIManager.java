@@ -38,25 +38,25 @@ public class DashboardUIManager {
     public void showSkeletons(boolean show) {
         Platform.runLater(() -> {
             if (show) {
-                lblStaffCount.setGraphic(new SkeletonStatCard()); lblStaffCount.setText("");
-                lblCashAmount.setGraphic(new SkeletonStatCard()); lblCashAmount.setText("");
-                lblOpenTime.setGraphic(new SkeletonStatCard()); lblOpenTime.setText("");
-                lblCompliance.setGraphic(new SkeletonStatCard()); lblCompliance.setText("");
+                if (lblStaffCount != null) { lblStaffCount.setGraphic(new SkeletonStatCard()); lblStaffCount.setText(""); }
+                if (lblCashAmount != null) { lblCashAmount.setGraphic(new SkeletonStatCard()); lblCashAmount.setText(""); }
+                if (lblOpenTime != null) { lblOpenTime.setGraphic(new SkeletonStatCard()); lblOpenTime.setText(""); }
+                if (lblCompliance != null) { lblCompliance.setGraphic(new SkeletonStatCard()); lblCompliance.setText(""); }
                 
                 renderStaffSkeletons();
                 renderScheduleSkeletons();
             } else {
-                lblStaffCount.setGraphic(null);
-                lblCashAmount.setGraphic(null);
-                lblOpenTime.setGraphic(null);
-                lblCompliance.setGraphic(null);
+                if (lblStaffCount != null) lblStaffCount.setGraphic(null);
+                if (lblCashAmount != null) lblCashAmount.setGraphic(null);
+                if (lblOpenTime != null) lblOpenTime.setGraphic(null);
+                if (lblCompliance != null) lblCompliance.setGraphic(null);
                 if (skeletonStaffContainer != null) { skeletonStaffContainer.setVisible(false); skeletonStaffContainer.setManaged(false); }
             }
         });
     }
 
     private void renderStaffSkeletons() {
-        if (skeletonStaffContainer == null) return;
+        if (skeletonStaffContainer == null || tableStaff == null) return;
         skeletonStaffContainer.getChildren().clear();
         for (int i = 0; i < 6; i++) {
             skeletonStaffContainer.getChildren().add(new SkeletonStaffRow());
@@ -77,11 +77,13 @@ public class DashboardUIManager {
 
     public void updateKPIs(int activeStaff, boolean isCashOpen, double cashAmount, String openTime) {
         Platform.runLater(() -> {
-            lblStaffCount.setText(String.valueOf(activeStaff));
-            lblCashStatus.setText(container.getBundle().getString("dashboard.cash." + (isCashOpen ? "open" : "closed")));
-            lblCashStatus.setStyle(isCashOpen ? "-fx-text-fill: #16a34a;" : "-fx-text-fill: #ef4444;");
-            lblCashAmount.setText(String.format("%.2f \u20ac", cashAmount));
-            lblOpenTime.setText(openTime != null ? openTime : "--:--");
+            if (lblStaffCount != null) lblStaffCount.setText(String.valueOf(activeStaff));
+            if (lblCashStatus != null) {
+                lblCashStatus.setText(container.getBundle().getString("dashboard.cash." + (isCashOpen ? "open" : "closed")));
+                lblCashStatus.setStyle(isCashOpen ? "-fx-text-fill: #16a34a;" : "-fx-text-fill: #ef4444;");
+            }
+            if (lblCashAmount != null) lblCashAmount.setText(String.format("%.2f \u20ac", cashAmount));
+            if (lblOpenTime != null) lblOpenTime.setText(openTime != null ? openTime : "--:--");
         });
     }
 }

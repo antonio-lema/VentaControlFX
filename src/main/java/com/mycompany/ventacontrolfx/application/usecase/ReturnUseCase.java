@@ -15,6 +15,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +28,7 @@ import java.util.Map;
 public class ReturnUseCase {
 
     private final ISaleRepository saleRepository;
+    private final IReturnRepository returnRepository;
     private final IProductRepository productRepository;
     private final IDocumentSeriesRepository seriesRepository;
     private final ICompanyConfigRepository configRepository;
@@ -35,12 +37,14 @@ public class ReturnUseCase {
     private IFiscalPdfService pdfService;
 
     public ReturnUseCase(ISaleRepository saleRepository,
+            IReturnRepository returnRepository,
             IProductRepository productRepository,
             IDocumentSeriesRepository seriesRepository,
             ICompanyConfigRepository configRepository,
             RefundCalculatorService refundCalculator,
             CashClosureUseCase cashClosureUseCase) {
         this.saleRepository = saleRepository;
+        this.returnRepository = returnRepository;
         this.productRepository = productRepository;
         this.seriesRepository = seriesRepository;
         this.configRepository = configRepository;
@@ -48,11 +52,31 @@ public class ReturnUseCase {
         this.cashClosureUseCase = cashClosureUseCase;
     }
 
+    public Return getReturnDetails(int returnId) throws java.sql.SQLException {
+        return returnRepository.getById(returnId);
+    }
+
+    public void registerCorrection(int returnId, String newName, String newNif) throws java.sql.SQLException {
+        try (Connection conn = DBConnection.getConnection()) {
+            conn.setAutoCommit(false);
+            try {
+                Return ret = returnRepository.getById(returnId);
+                if (ret == null) throw new java.sql.SQLException("Devoluci\u00f3n no encontrada: " + returnId);
+
+                returnRepository.updateCorrectionData(returnId, newName, newNif, true, "ERROR_REGISTRAL", conn);
+                conn.commit();
+            } catch (Exception e) {
+                conn.rollback();
+                throw new java.sql.SQLException("Error al registrar la subsanaci\u00f3n: " + e.getMessage(), e);
+            }
+        }
+    }
+
     public void setPdfService(IFiscalPdfService pdfService) {
         this.pdfService = pdfService;
     }
 
-    public void registerPartialReturn(int saleId, Map<Integer, Integer> quantitiesToReturn,
+    public void registerPartialReturn(int saleId, Map<Integer, Integer> quantitiesToReturnByDetailId,
             String reason, int userId)
             throws SQLException, RefundLimitExceededException, InsufficientCashInDrawerException {
 
@@ -65,9 +89,12 @@ public class ReturnUseCase {
                 BigDecimal totalRefund = BigDecimal.ZERO;
                 boolean allReturned = true;
 
+                BigDecimal totalTax = BigDecimal.ZERO;
+                BigDecimal taxBasis = BigDecimal.ZERO;
+
                 // 1. Validar y Calcular l\u00edneas de devoluci\u00f3n
                 for (SaleDetail d : saleDetails) {
-                    int qtyToReturnNow = quantitiesToReturn.getOrDefault(d.getProductId(), 0);
+                    int qtyToReturnNow = quantitiesToReturnByDetailId.getOrDefault(d.getDetailId(), 0);
                     int totalReturnedOnDetail = d.getReturnedQuantity() + qtyToReturnNow;
 
                     if (qtyToReturnNow > 0) {
@@ -75,19 +102,29 @@ public class ReturnUseCase {
                         BigDecimal lineRefund = unitPrice.multiply(BigDecimal.valueOf(qtyToReturnNow));
                         totalRefund = totalRefund.add(lineRefund);
 
+                        // C\u00e1lculo de impuestos por l\u00ednea
+                        double ivaRate = d.getIvaRate();
+                        BigDecimal lineTaxBasis = lineRefund.divide(BigDecimal.ONE.add(BigDecimal.valueOf(ivaRate / 100.0)), 4, java.math.RoundingMode.HALF_UP);
+                        BigDecimal lineTaxAmount = lineRefund.subtract(lineTaxBasis);
+                        
+                        taxBasis = taxBasis.add(lineTaxBasis);
+                        totalTax = totalTax.add(lineTaxAmount);
+
                         ReturnDetail rd = new ReturnDetail();
                         rd.setProductId(d.getProductId());
                         rd.setProductName(d.getProductName());
                         rd.setQuantity(qtyToReturnNow);
                         rd.setUnitPrice(d.getUnitPrice());
                         rd.setSubtotal(lineRefund.doubleValue());
+                        rd.setTaxAmount(lineTaxAmount.doubleValue());
+                        rd.setNetAmount(lineTaxBasis.doubleValue());
                         newReturnDetails.add(rd);
 
                         // Actualizar Stock de producto
                         productRepository.updateStock(d.getProductId(), qtyToReturnNow, conn);
 
                         // FIX: Actualizar cantidad devuelta en el detalle de la venta original
-                        saleRepository.updateDetailReturnedQuantity(d.getDetailId(), totalReturnedOnDetail, conn);
+                        returnRepository.updateDetailReturnedQuantity(d.getDetailId(), totalReturnedOnDetail, conn);
                     }
 
                     if (totalReturnedOnDetail < d.getQuantity()) {
@@ -115,14 +152,40 @@ public class ReturnUseCase {
                         }
                     }
 
-                    // 4. Generaci\u00f3n de Factura Rectificativa (Documento)
+                    // --- GESTI\u00d3N FISCAL: Encadenamiento VeriFactu ---
                     String seriesCode = "R";
                     int nextNum = seriesRepository.getAndIncrement(seriesCode, conn);
                     SaleConfig company = configRepository.load();
+                    String prevHash = saleRepository.getLastControlHash(seriesCode);
+                    
+                    // Preparar datos para el hash
+                    String nifEmisor = company.getCif();
+                    if (nifEmisor == null || nifEmisor.isEmpty()) nifEmisor = "99999910G";
+                    
+                    LocalDateTime ahora = LocalDateTime.now();
+                    String fechaExp = ahora.format(java.time.format.DateTimeFormatter.ofPattern("dd-MM-yyyy"));
+                    String ahoraIso = ahora.atZone(java.time.ZoneId.of("Europe/Madrid"))
+                            .format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssxxx"));
+                    
+                    String refDoc = ahora.getYear() + "-" + seriesCode + "-" + String.format("%05d", nextNum);
+                    
+                    StringBuilder sbHuella = new StringBuilder();
+                    sbHuella.append("IDEmisorFactura=").append(nifEmisor);
+                    sbHuella.append("&NumSerieFactura=").append(refDoc);
+                    sbHuella.append("&FechaExpedicionFactura=").append(fechaExp);
+                    sbHuella.append("&TipoFactura=").append("R1"); // Por defecto R1 para devoluciones
+                    sbHuella.append("&CuotaTotal=").append(String.format(java.util.Locale.US, "%.2f", 0.0)); // TODO: Desglosar IVA en devoluciones si es necesario
+                    sbHuella.append("&ImporteTotal=").append(String.format(java.util.Locale.US, "%.2f", totalRefund.doubleValue()));
+                    sbHuella.append("&Huella=").append(prevHash != null ? prevHash.toUpperCase() : "");
+                    sbHuella.append("&FechaHoraHusoGenRegistro=").append(ahoraIso);
+
+                    String currentHash = sha256(sbHuella.toString()).toUpperCase();
 
                     Return newReturn = new Return.Builder(saleId)
                             .userId(userId)
                             .totalRefunded(totalRefund.doubleValue())
+                            .taxBasis(taxBasis.doubleValue())
+                            .totalTax(totalTax.doubleValue())
                             .cashAmount(cashToRefund.doubleValue())
                             .cardAmount(cardToRefund.doubleValue())
                             .reason(reason)
@@ -134,14 +197,16 @@ public class ReturnUseCase {
                             .issuerTaxId(company.getCif())
                             .issuerAddress(company.getAddress())
                             .customerNameSnapshot(sale.getCustomerNameSnapshot())
+                            .controlHash(currentHash)
+                            .prevHash(prevHash)
                             .build();
 
-                    int returnId = saleRepository.saveReturn(newReturn, conn);
-                    saleRepository.saveReturnDetails(newReturnDetails, returnId, conn);
+                    int returnId = returnRepository.saveReturn(newReturn, conn);
+                    returnRepository.saveReturnDetails(newReturnDetails, returnId, conn);
 
                     // 5. Actualizar estado de la venta original
                     double newTotalReturned = sale.getReturnedAmount() + totalRefund.doubleValue();
-                    saleRepository.updateSaleReturnStatus(saleId, allReturned,
+                    returnRepository.updateSaleReturnStatus(saleId, allReturned,
                             allReturned ? reason : reason + " (Parcial)", newTotalReturned, conn);
 
                     // 6. Registrar en caja
@@ -210,6 +275,53 @@ public class ReturnUseCase {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+    }
+
+    public List<Return> getReturnsHistory(LocalDate start, LocalDate end) throws SQLException {
+        return returnRepository.getReturnsByRange(start, end);
+    }
+
+    public List<Return> getReturnsByUserAndRange(int userId, LocalDateTime start, LocalDateTime end) throws SQLException {
+        return returnRepository.getReturnsByUserAndRange(userId, start, end);
+    }
+
+    public List<Return> getReturnsByClosureId(int closureId) throws SQLException {
+        return returnRepository.getReturnsByClosureId(closureId);
+    }
+
+    public List<Return> getReturnsBySaleId(int saleId) throws SQLException {
+        return returnRepository.getReturnsBySaleId(saleId);
+    }
+
+    public List<ReturnDetail> getReturnDetailsList(int returnId) throws SQLException {
+        return returnRepository.getReturnDetailsByReturnId(returnId);
+    }
+
+    private String sha256(String input) {
+        try {
+            java.security.MessageDigest digest = java.security.MessageDigest.getInstance("SHA-256");
+            byte[] hash = digest.digest(input.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+            StringBuilder hex = new StringBuilder();
+            for (byte b : hash) {
+                hex.append(String.format("%02x", b));
+            }
+            return hex.toString();
+        } catch (java.security.NoSuchAlgorithmException e) {
+            throw new RuntimeException("SHA-256 algorithm not found", e);
+        }
+    }
+
+    public List<Return> getReturnsByClient(int clientId, LocalDate from, LocalDate to) throws SQLException {
+        return returnRepository.getReturnsByRange(from, to).stream()
+                .filter(r -> {
+                    try {
+                        Sale s = saleRepository.getById(r.getSaleId());
+                        return s != null && s.getClientId() != null && s.getClientId() == clientId;
+                    } catch (SQLException e) {
+                        return false;
+                    }
+                })
+                .collect(java.util.stream.Collectors.toList());
     }
 }
 

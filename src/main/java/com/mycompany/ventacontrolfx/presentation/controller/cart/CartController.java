@@ -12,6 +12,8 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleButton;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.VBox;
 import javafx.scene.layout.HBox;
 
@@ -22,6 +24,8 @@ public class CartController implements Injectable {
     @FXML private HBox hboxSavings;
     @FXML private Button btnClearCart, payButton, btnRemoveClient, showAddClientDialog;
     @FXML private TextField txtPromoCode;
+    @FXML private ToggleButton btnTypeTicket, btnTypeInvoice;
+    @FXML private ToggleGroup tgDocType;
 
     private ServiceContainer container;
     private CartUseCase cartUseCase;
@@ -54,11 +58,23 @@ public class CartController implements Injectable {
         initListeners();
         clientManager.refreshPriceListLabel();
         clientManager.update(cartUseCase.getSelectedClient());
+        
+        // 3. Document Type Sync
+        tgDocType.selectedToggleProperty().addListener((obs, old, nv) -> {
+            boolean isInvoice = (nv == btnTypeInvoice);
+            cartUseCase.setInvoiceMode(isInvoice);
+            if (isInvoice && cartUseCase.getSelectedClient() == null) {
+                AlertUtil.showToast(container.getBundle().getString("cart.doc_type.error_no_client"));
+            }
+        });
+        // Initial state
+        if (cartUseCase.isInvoiceMode()) tgDocType.selectToggle(btnTypeInvoice);
+        else tgDocType.selectToggle(btnTypeTicket);
     }
 
     private void setupRenderer(ServiceContainer container) {
         com.mycompany.ventacontrolfx.domain.model.SaleConfig cfg = container.getICompanyConfigRepository().load();
-        this.cartRenderer = new CartListRenderer(cartItemsContainer, cartUseCase, cfg.getTaxRate(), cfg.isPricesIncludeTax(), container);
+        this.cartRenderer = new CartListRenderer(cartItemsContainer, cartUseCase, cfg.getTaxRate(), cfg.isPricesIncludeTax(), cfg.getDecimalCount(), container);
     }
 
     private void setupViewVisibility() {

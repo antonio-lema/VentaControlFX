@@ -9,13 +9,16 @@ import java.util.List;
 
 public class ProductUseCase {
     private final IProductRepository repository;
+    private final com.mycompany.ventacontrolfx.domain.repository.IPriceRepository priceRepository;
     private final com.mycompany.ventacontrolfx.infrastructure.security.AuthorizationService authService;
     private final GlobalEventBus eventBus;
 
     public ProductUseCase(IProductRepository repository,
+            com.mycompany.ventacontrolfx.domain.repository.IPriceRepository priceRepository,
             com.mycompany.ventacontrolfx.infrastructure.security.AuthorizationService authService,
             GlobalEventBus eventBus) {
         this.repository = repository;
+        this.priceRepository = priceRepository;
         this.authService = authService;
         this.eventBus = eventBus;
     }
@@ -51,6 +54,21 @@ public class ProductUseCase {
         } else {
             repository.update(product);
         }
+        
+        // Handle Price Persistence (Moved from Repository to UseCase)
+        if (product.getId() > 0) {
+            com.mycompany.ventacontrolfx.domain.model.PriceList defaultList = priceRepository.getDefaultPriceList();
+            int listId = (defaultList != null) ? defaultList.getId() : 1;
+            
+            com.mycompany.ventacontrolfx.domain.model.Price price = new com.mycompany.ventacontrolfx.domain.model.Price();
+            price.setProductId(product.getId());
+            price.setPriceListId(listId);
+            price.setValue(product.getPrice());
+            price.setReason(product.getId() == 0 ? "Creación de producto" : "Actualización de producto");
+            
+            priceRepository.updateCurrentAndSave(price);
+        }
+
         if (eventBus != null)
             eventBus.publishDataChange();
     }

@@ -11,44 +11,26 @@
       xmlns:fx="http://javafx.com/fxml/1" 
       fx:controller="com.mycompany.ventacontrolfx.presentation.controller.dashboard.OperativeDashboardController">
     
-    <!--  HEADER  -->
-    <HBox alignment="CENTER_LEFT" spacing="20" styleClass="dashboard-header">
-        <padding><Insets top="25" right="30" bottom="25" left="30"/></padding>
-        <children>
-            <StackPane styleClass="header-icon-container">
-                <children>
-                    <Circle radius="22" fill="#3b82f615" />
-                    <FontAwesomeIconView glyphName="DASHBOARD" size="24" fill="#3b82f6" />
-                </children>
-            </StackPane>
-            <VBox spacing="4" HBox.hgrow="ALWAYS">
-                <children>
-                    <Label text="%dashboard.header.title" styleClass="header-title" />
-                    <HBox alignment="CENTER_LEFT" spacing="12">
-                        <children>
-                            <Label text="%dashboard.header.subtitle" styleClass="header-subtitle" />
-                            <Separator orientation="VERTICAL" prefHeight="12" />
-                            <Label fx:id="lblServerTime" text="13:30:00" styleClass="header-clock" />
-                        </children>
-                    </HBox>
-                </children>
-            </VBox>
-            <HBox spacing="10" alignment="CENTER_RIGHT">
-                <children>
-                    <Button onAction="#refreshData" styleClass="btn-icon-refresh">
-                        <graphic><FontAwesomeIconView glyphName="REFRESH" size="16" /></graphic>
-                    </Button>
-                    <Label fx:id="lblBusinessStatus" text="%dashboard.status.loading" styleClass="status-badge" />
-                </children>
-            </HBox>
-        </children>
-    </HBox>
 
     <ScrollPane fitToWidth="true" style="-fx-background-color: transparent;" VBox.vgrow="ALWAYS" styleClass="dashboard-scroll">
         <content>
             <VBox spacing="30" style="-fx-padding: 30;">
                 <children>
-                    
+                    <!-- Info Bar (Fixed NPE) -->
+                    <HBox alignment="CENTER_LEFT" spacing="15" style="-fx-padding: 0 0 10 0; -fx-border-color: #e2e8f0; -fx-border-width: 0 0 1 0;">
+                        <children>
+                            <Label text="%dashboard.header.title" style="-fx-font-weight: 800; -fx-text-fill: #64748b; -fx-font-size: 11px; -fx-letter-spacing: 1px;" />
+                            <Region HBox.hgrow="ALWAYS" />
+                            <HBox alignment="CENTER" spacing="10" style="-fx-background-color: #f1f5f9; -fx-padding: 5 12; -fx-background-radius: 20;">
+                                <children>
+                                    <FontAwesomeIconView glyphName="CLOCK_ALT" size="12" fill="#64748b" />
+                                    <Label fx:id="lblServerTime" text="--:--:--" style="-fx-font-family: 'Monospaced'; -fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #475569;" />
+                                </children>
+                            </HBox>
+                            <Label fx:id="lblBusinessStatus" text="--" styleClass="status-badge" />
+                        </children>
+                    </HBox>
+
                     <!--  KPI CARDS ROW  -->
                     <HBox spacing="25" alignment="CENTER">
                         <children>

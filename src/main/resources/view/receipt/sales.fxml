@@ -236,25 +236,25 @@
                                          </children>
                                       </VBox>
 
-                                       <HBox spacing="10">
-                                          <children>
-                                              <Button fx:id="btnPrint" text="%history.detail.btn.print" onAction="#handlePrintTicket" HBox.hgrow="ALWAYS" maxWidth="Infinity" styleClass="btn-history-print">
-                                                 <graphic>
-                                                    <FontAwesomeIconView glyphName="PRINT" fill="white" size="16" />
-                                                 </graphic>
-                                              </Button>
-                                               <Button fx:id="btnCorrection" text="%history.btn.correction" onAction="#handleCorrection" HBox.hgrow="ALWAYS" maxWidth="Infinity" styleClass="btn-history-correction">
+                                       <VBox spacing="10">
+                                           <children>
+                                               <HBox spacing="10">
+                                                  <children>
+                                                      <Button fx:id="btnPrint" text="%history.detail.btn.print" onAction="#handlePrintTicket" HBox.hgrow="ALWAYS" maxWidth="Infinity" styleClass="btn-history-print">
+                                                         <graphic>
+                                                            <FontAwesomeIconView glyphName="PRINT" fill="white" size="16" />
+                                                         </graphic>
+                                                      </Button>
+
+                                                  </children>
+                                               </HBox>
+                                               <Button fx:id="btnReturn" text="%history.detail.btn.return" onAction="#handleRegisterReturn" maxWidth="Infinity" styleClass="btn-history-return">
                                                   <graphic>
-                                                     <FontAwesomeIconView glyphName="WRENCH" fill="white" size="16" />
+                                                     <FontAwesomeIconView glyphName="REPLY" fill="white" size="16" />
                                                   </graphic>
                                                </Button>
-                                              <Button fx:id="btnReturn" text="%history.detail.btn.return" onAction="#handleRegisterReturn" HBox.hgrow="ALWAYS" maxWidth="Infinity" styleClass="btn-history-return">
-                                                 <graphic>
-                                                    <FontAwesomeIconView glyphName="REPLY" fill="white" size="16" />
-                                                 </graphic>
-                                              </Button>
-                                          </children>
-                                       </HBox>
+                                           </children>
+                                       </VBox>
                                        <Button fx:id="btnResendAeat" text="%history.btn.resend_aeat" onAction="#handleResendAeat" maxWidth="Infinity" style="-fx-background-color: #f39c12; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10; -fx-background-radius: 8;">
                                           <graphic>
                                              <FontAwesomeIconView glyphName="CLOUD_UPLOAD" fill="white" size="16" />

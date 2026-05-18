@@ -23,7 +23,13 @@ public class SpecialDaysController implements Injectable {
     @FXML
     private CheckBox chkClosed;
     @FXML
-    private ListView<SaleConfig.SpecialDay> listSpecials;
+    private TableView<SaleConfig.SpecialDay> tableSpecials;
+    @FXML
+    private TableColumn<SaleConfig.SpecialDay, java.time.LocalDate> colDate;
+    @FXML
+    private TableColumn<SaleConfig.SpecialDay, String> colReason;
+    @FXML
+    private TableColumn<SaleConfig.SpecialDay, Boolean> colStatus;
 
     private List<SaleConfig.SpecialDay> specialDays;
     private Runnable onSaveCallback;
@@ -32,6 +38,62 @@ public class SpecialDaysController implements Injectable {
     @Override
     public void inject(ServiceContainer container) {
         this.container = container;
+        setupTable();
+    }
+
+    private void setupTable() {
+        tableSpecials.setPlaceholder(new Label(container != null ? container.getBundle().getString("special.days.no_data") : "No hay d\u00edas especiales introducidos"));
+        colDate.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("date"));
+        colReason.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("reason"));
+        colStatus.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("closed"));
+
+        colDate.setCellFactory(column -> new TableCell<>() {
+            @Override
+            protected void updateItem(java.time.LocalDate item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                } else {
+                    String month = item.getMonth().getDisplayName(java.time.format.TextStyle.SHORT, container != null ? container.getBundle().getLocale() : java.util.Locale.getDefault());
+                    setText(item.getDayOfMonth() + " " + month.toUpperCase() + " " + item.getYear());
+                    setStyle("-fx-font-weight: bold; -fx-text-fill: #1e293b;");
+                }
+            }
+        });
+
+        colReason.setCellFactory(column -> new TableCell<>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty) {
+                    setText(null);
+                } else {
+                    setText(item == null || item.trim().isEmpty() ? "Sin descripci\u00f3n" : item);
+                    setStyle("-fx-text-fill: #64748b;");
+                }
+            }
+        });
+
+        colStatus.setCellFactory(column -> new TableCell<>() {
+            @Override
+            protected void updateItem(Boolean item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setGraphic(null);
+                } else {
+                    Label badge = new Label(item ? "CERRADO" : "ABIERTO");
+                    badge.setPadding(new javafx.geometry.Insets(4, 10, 4, 10));
+                    badge.setMinWidth(80);
+                    badge.setAlignment(javafx.geometry.Pos.CENTER);
+                    if (item) {
+                        badge.setStyle("-fx-background-color: #fef2f2; -fx-text-fill: #ef4444; -fx-background-radius: 12; -fx-font-size: 10px; -fx-font-weight: 900; -fx-border-color: #fee2e2; -fx-border-radius: 12;");
+                    } else {
+                        badge.setStyle("-fx-background-color: #ecfdf5; -fx-text-fill: #10b981; -fx-background-radius: 12; -fx-font-size: 10px; -fx-font-weight: 900; -fx-border-color: #d1fae5; -fx-border-radius: 12;");
+                    }
+                    setGraphic(badge);
+                }
+            }
+        });
     }
 
     public void initData(List<SaleConfig.SpecialDay> existing, Runnable onSave) {
@@ -59,7 +121,7 @@ public class SpecialDaysController implements Injectable {
 
     @FXML
     private void handleRemove() {
-        SaleConfig.SpecialDay selected = listSpecials.getSelectionModel().getSelectedItem();
+        SaleConfig.SpecialDay selected = tableSpecials.getSelectionModel().getSelectedItem();
         if (selected != null) {
             specialDays.remove(selected);
             refreshList();
@@ -67,74 +129,18 @@ public class SpecialDaysController implements Injectable {
     }
 
     private void refreshList() {
-        listSpecials.getItems().setAll(specialDays);
-        listSpecials.setCellFactory(lv -> new ListCell<>() {
-            @Override
-            protected void updateItem(SaleConfig.SpecialDay item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty || item == null) {
-                    setGraphic(null);
-                    setText(null);
-                } else {
-                    javafx.scene.layout.HBox row = new javafx.scene.layout.HBox(15);
-                    row.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
-                    row.setPadding(new javafx.geometry.Insets(10));
-                    row.setStyle(
-                            "-fx-background-color: white; -fx-background-radius: 8; -fx-border-color: #f1f5f9; -fx-border-width: 0 0 1 0;");
-
-                    javafx.scene.layout.VBox vDate = new javafx.scene.layout.VBox(2);
-                    vDate.setAlignment(javafx.geometry.Pos.CENTER);
-                    vDate.setPrefWidth(60);
-                    vDate.setPadding(new javafx.geometry.Insets(0, 10, 0, 0));
-                    vDate.setStyle("-fx-border-color: #e2e8f0; -fx-border-width: 0 1 0 0;");
-
-                    Label lblDay = new Label(String.valueOf(item.getDate().getDayOfMonth()));
-                    lblDay.setStyle("-fx-font-weight: bold; -fx-font-size: 18px; -fx-text-fill: #1e293b;");
-                    String monthName = (container != null) 
-                            ? item.getDate().getMonth().getDisplayName(java.time.format.TextStyle.SHORT, container.getBundle().getLocale())
-                            : item.getDate().getMonth().name().substring(0, 3);
-                    Label lblMonth = new Label(monthName);
-                    lblMonth.setStyle("-fx-font-size: 10px; -fx-text-fill: #64748b; -fx-text-transform: uppercase;");
-                    vDate.getChildren().addAll(lblDay, lblMonth);
-
-                    javafx.scene.layout.VBox vInfo = new javafx.scene.layout.VBox(3);
-                    Label lblReason = new Label(item.getReason());
-                    lblReason.setStyle("-fx-font-weight: bold; -fx-text-fill: #334155;");
-                    Label lblSub = new Label(container != null 
-                            ? String.format(container.getBundle().getString("special.days.label.year"), item.getDate().getYear())
-                            : "A\u00f1o " + item.getDate().getYear());
-                    lblSub.setStyle("-fx-font-size: 11px; -fx-text-fill: #94a3b8;");
-                    vInfo.getChildren().addAll(lblReason, lblSub);
-
-                    javafx.scene.layout.Region spacer = new javafx.scene.layout.Region();
-                    javafx.scene.layout.HBox.setHgrow(spacer, javafx.scene.layout.Priority.ALWAYS);
-
-                    Label badge = new Label(item.isClosed() 
-                            ? (container != null ? container.getBundle().getString("special.status.closed") : "CERRADO")
-                            : (container != null ? container.getBundle().getString("special.status.open") : "ABIERTO"));
-                    badge.setPadding(new javafx.geometry.Insets(4, 10, 4, 10));
-                    badge.setMinWidth(75);
-                    badge.setAlignment(javafx.geometry.Pos.CENTER);
-                    if (item.isClosed()) {
-                        badge.setStyle(
-                                "-fx-background-color: #fef2f2; -fx-text-fill: #ef4444; -fx-background-radius: 12; -fx-font-size: 10px; -fx-font-weight: bold; -fx-border-color: #fee2e2; -fx-border-radius: 12;");
-                    } else {
-                        badge.setStyle(
-                                "-fx-background-color: #ecfdf5; -fx-text-fill: #10b981; -fx-background-radius: 12; -fx-font-size: 10px; -fx-font-weight: bold; -fx-border-color: #d1fae5; -fx-border-radius: 12;");
-                    }
-
-                    row.getChildren().addAll(vDate, vInfo, spacer, badge);
-                    setGraphic(row);
-                    setText(null);
-                }
-            }
-        });
+        tableSpecials.setItems(javafx.collections.FXCollections.observableArrayList(specialDays));
     }
 
     @FXML
     private void handleSave() {
         if (onSaveCallback != null)
             onSaveCallback.run();
+        close();
+    }
+
+    @FXML
+    private void handleCancel() {
         close();
     }
 

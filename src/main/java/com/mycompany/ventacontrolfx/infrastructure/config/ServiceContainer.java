@@ -54,6 +54,7 @@ public class ServiceContainer {
     private final ICashClosureRepository cashClosureRepository;
     private final IFiscalDocumentRepository fiscalDocumentRepository;
     private final ISuspendedCartRepository suspendedCartRepository;
+    private final IReturnRepository returnRepository;
 
     // Services
     private final TaxEngineService taxEngineService;
@@ -109,6 +110,9 @@ public class ServiceContainer {
     private final Map<Class<?>, Object> serviceMap = new HashMap<>();
 
     public ServiceContainer() {
+        // 0. Database Migrations
+        DatabaseMigration.ensureSchemaUpdate();
+
         // 1. Foundation & Shared
         this.eventBus = new GlobalEventBus();
         this.asyncManager = new AsyncManager();
@@ -139,6 +143,7 @@ public class ServiceContainer {
         this.cashClosureRepository = new JdbcCashClosureRepository();
         this.fiscalDocumentRepository = new JdbcFiscalDocumentRepository();
         this.suspendedCartRepository = new JdbcSuspendedCartRepository();
+        this.returnRepository = new JdbcReturnRepository();
 
         // Initialize AlertUtil
         com.mycompany.ventacontrolfx.presentation.util.AlertUtil.setBundle(getBundle());
@@ -160,17 +165,17 @@ public class ServiceContainer {
         this.permissionUseCase = new PermissionUseCase(permissionRepository, authService);
         this.roleUseCase = new RoleUseCase(roleRepository, authService);
         
-        this.productUseCase = new ProductUseCase(productRepository, authService, eventBus);
+        this.productUseCase = new ProductUseCase(productRepository, priceRepository, authService, eventBus);
         this.categoryUseCase = new CategoryUseCase(categoryRepository, productRepository, authService);
         this.saleUseCase = new SaleUseCase(saleRepository, configRepository, authService, taxEngineService, clientRepository, promotionEngine, productRepository, seriesRepository, eventBus);
         this.clientUseCase = new ClientUseCase(clientRepository, authService);
         this.userUseCase = new UserUseCase(userRepository, emailSender, authService);
         this.loginUseCase = new LoginUseCase(userRepository, auditRepository, roleUseCase, permissionUseCase);
         this.closureUseCase = new CashClosureUseCase(cashClosureRepository, authService);
-        this.returnUseCase = new ReturnUseCase(saleRepository, productRepository, seriesRepository, configRepository, refundCalculator, closureUseCase);
+        this.returnUseCase = new ReturnUseCase(saleRepository, returnRepository, productRepository, seriesRepository, configRepository, refundCalculator, closureUseCase);
         this.priceListUseCase = new PriceListUseCase(priceListRepository, priceRepository, priceHistoryRepository, massivePriceUpdateRepository);
         this.promotionUseCase = new PromotionUseCase(promotionRepository);
-        this.productImportUseCase = new ProductImportUseCase(productRepository, categoryRepository, authService);
+        this.productImportUseCase = new ProductImportUseCase(productRepository, categoryRepository, priceRepository, authService);
         this.workSessionUseCase = new WorkSessionUseCase(workSessionRepository);
         this.workSessionUseCase.setBackupService(new BackupService());
         
@@ -209,10 +214,12 @@ public class ServiceContainer {
                     "/certs/99999910G_prueba.pfx" : config.getVerifactuCertPath();
             String certPass = config.getVerifactuCertPass().isEmpty() ? 
                     "1234" : config.getVerifactuCertPass();
+            // Usar el NIF de la empresa como fallback si no hay uno específico de Verifactu
             String verifactuNif = config.getVerifactuNif().isEmpty() ? 
-                    "99999910G" : config.getVerifactuNif();
+                    (config.getCif().isEmpty() ? "99999910G" : config.getCif()) : config.getVerifactuNif();
+            
             String certName = config.getVerifactuCertName().isEmpty() ? 
-                    "(VERI*FACTU) CERTIFICADO FISICA PRUEBAS" : config.getVerifactuCertName();
+                    (config.getCompanyName().isEmpty() ? "(VERI*FACTU) CERTIFICADO FISICA PRUEBAS" : config.getCompanyName()) : config.getVerifactuCertName();
 
             AeatHttpClient aeatClient = new AeatHttpClient(aeatUrl, certPath, certPass);
             VerifactuXmlBuilder xmlBuilder = new VerifactuXmlBuilder(verifactuNif, certName);
@@ -256,6 +263,7 @@ public class ServiceContainer {
         serviceMap.put(ICashClosureRepository.class, cashClosureRepository);
         serviceMap.put(IFiscalDocumentRepository.class, fiscalDocumentRepository);
         serviceMap.put(ISuspendedCartRepository.class, suspendedCartRepository);
+        serviceMap.put(IReturnRepository.class, returnRepository);
     }
 
     public void setLanguage(String langCode) {
@@ -338,4 +346,5 @@ public class ServiceContainer {
     public IPriceRepository getPriceRepository() { return priceRepository; }
     public IRoleRepository getRoleRepository() { return roleRepository; }
     public IPermissionRepository getPermissionRepository() { return permissionRepository; }
+    public IReturnRepository getReturnRepository() { return returnRepository; }
 }

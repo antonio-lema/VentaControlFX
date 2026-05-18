@@ -28,8 +28,9 @@ public class ProductUseCaseTest {
     @BeforeEach
     public void setUp() {
         mockRepo = Mockito.mock(IProductRepository.class);
-        com.mycompany.ventacontrolfx.util.AuthorizationService dummyAuth = new com.mycompany.ventacontrolfx.util.AuthorizationService(
-                new com.mycompany.ventacontrolfx.util.UserSession()) {
+        com.mycompany.ventacontrolfx.domain.model.UserSession dummySession = mock(com.mycompany.ventacontrolfx.domain.model.UserSession.class);
+        com.mycompany.ventacontrolfx.infrastructure.security.AuthorizationService dummyAuth = new com.mycompany.ventacontrolfx.infrastructure.security.AuthorizationService(
+                dummySession) {
             @Override
             public void checkPermission(String code) {
             }
@@ -39,7 +40,7 @@ public class ProductUseCaseTest {
                 return true;
             }
         };
-        useCase = new ProductUseCase(mockRepo, dummyAuth, null);
+        useCase = new ProductUseCase(mockRepo, mock(com.mycompany.ventacontrolfx.domain.repository.IPriceRepository.class), dummyAuth, mock(com.mycompany.ventacontrolfx.shared.bus.GlobalEventBus.class));
     }
 
     @Test

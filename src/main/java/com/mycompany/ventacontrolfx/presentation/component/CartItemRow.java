@@ -29,9 +29,10 @@ public class CartItemRow extends HBox {
     private final double globalTaxRate;
     private final boolean pricesIncludeTax;
 
+    private final int globalDecimals;
     private final java.util.ResourceBundle bundle;
 
-    public CartItemRow(CartItem cartItem, double globalTaxRate, boolean pricesIncludeTax,
+    public CartItemRow(CartItem cartItem, double globalTaxRate, boolean pricesIncludeTax, int globalDecimals,
             java.util.ResourceBundle bundle,
             Runnable onIncrement, Runnable onDecrement, Runnable onDelete,
             Consumer<Integer> onSetQuantity, Runnable onEdit) {
@@ -39,6 +40,7 @@ public class CartItemRow extends HBox {
         this.bundle = bundle;
         this.globalTaxRate = globalTaxRate;
         this.pricesIncludeTax = pricesIncludeTax;
+        this.globalDecimals = globalDecimals;
         Product product = cartItem.getProduct();
 
         this.getStyleClass().add("cart-item");
@@ -151,26 +153,30 @@ public class CartItemRow extends HBox {
             double discountValueToSubtract = cartItem.getDiscountAmount() * taxMultiplier;
             double finalLineTotal = Math.max(0, originalLineTotal - discountValueToSubtract);
 
+            int dec = product.resolveEffectiveDecimals(globalDecimals);
+            String format = "%." + dec + "f \u20ac";
+
             if (discountValueToSubtract > 0) {
                 // Show original price small and crossed out (or just muted)
-                priceLabel.setText(String.format("%.2f \u20ac", originalLineTotal));
+                priceLabel.setText(String.format(format, originalLineTotal));
                 priceLabel.setVisible(true);
                 priceLabel.setManaged(true);
                 priceLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: #999;");
 
-                discountLabel.setText(String.format("-%.2f \u20ac", discountValueToSubtract));
+                discountLabel.setText(String.format("-" + format, discountValueToSubtract));
                 discountLabel.setVisible(true);
                 discountLabel.setManaged(true);
 
-                finalPriceLabel.setText(String.format("%.2f \u20ac", finalLineTotal));
+                finalPriceLabel.setText(String.format(format, finalLineTotal));
             } else {
                 priceLabel.setVisible(false);
                 priceLabel.setManaged(false);
                 discountLabel.setVisible(false);
                 discountLabel.setManaged(false);
-                finalPriceLabel.setText(String.format("%.2f \u20ac", originalLineTotal));
+                finalPriceLabel.setText(String.format(format, originalLineTotal));
             }
         };
+
         refreshPrice.run(); // Pintar el valor inicial
 
         // Cuando cambia el precio (por cambio de tarifa)

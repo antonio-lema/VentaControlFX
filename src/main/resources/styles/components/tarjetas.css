@@ -232,21 +232,21 @@
 
 .skeleton-title {
     -fx-min-height: 14px;
-    -fx-pref-width: 185px;
-    -fx-max-width: 185px;
+    -fx-pref-width: 160px;
+    -fx-max-width: 160px;
 }
 
 .skeleton-subtitle {
     -fx-min-height: 10px;
-    -fx-pref-width: 155px;
-    -fx-max-width: 155px;
+    -fx-pref-width: 120px;
+    -fx-max-width: 120px;
     -fx-background-color: #e2e8f0;
 }
 
 .skeleton-stock {
     -fx-min-height: 10px;
-    -fx-pref-width: 110px;
-    -fx-max-width: 110px;
+    -fx-pref-width: 80px;
+    -fx-max-width: 80px;
     -fx-background-color: #e2e8f0;
 }
 

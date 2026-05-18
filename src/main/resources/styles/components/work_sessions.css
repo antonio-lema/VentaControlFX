@@ -82,6 +82,14 @@
     -fx-font-weight: bold;
 }
 
+.text-success {
+    -fx-text-fill: -fx-custom-color-success !important;
+}
+
+.text-danger {
+    -fx-text-fill: -fx-custom-color-danger !important;
+}
+
 /* Botones con degradados del sistema */
 .btn-action {
     -fx-background-radius: -fx-radius-md;
@@ -164,4 +172,133 @@
 
 .modern-table-view .table-row-cell:selected {
     -fx-background-color: -fx-custom-color-primary-bg;
+}
+
+/* Etiquetas de estado de caja */
+.status-label-open {
+    -fx-font-size: 11;
+    -fx-padding: 2 8;
+    -fx-background-radius: 10;
+    -fx-background-color: -fx-custom-color-success;
+    -fx-text-fill: white;
+}
+
+.status-label-closed {
+    -fx-font-size: 11;
+    -fx-padding: 2 8;
+    -fx-background-radius: 10;
+    -fx-background-color: -fx-custom-color-danger-muted;
+    -fx-text-fill: white;
+}
+
+.btn-info-muted {
+    -fx-background-color: -fx-custom-color-primary-bg;
+    -fx-text-fill: -fx-custom-color-primary;
+    -fx-border-color: -fx-custom-color-primary;
+    -fx-border-radius: -fx-radius-md;
+}
+.btn-close-header {
+    -fx-background-color: rgba(255, 255, 255, 0.1);
+    -fx-background-radius: 8;
+    -fx-padding: 8;
+    -fx-cursor: hand;
+}
+
+.btn-close-header:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.2);
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
+}
+
+/* --- COMPACT MODAL STYLES --- */
+.compact-modal-root {
+    -fx-background-color: -fx-bg-main;
+    -fx-background-radius: 20;
+    -fx-border-radius: 20;
+    -fx-border-color: -fx-color-border-subtle;
+    -fx-border-width: 1;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 20, 0, 0, 10);
+}
+
+.view-header-compact {
+    -fx-background-color: -fx-grad-primary;
+    -fx-padding: 15 20;
+    -fx-background-radius: 20 20 0 0;
+}
+
+.view-title-compact {
+    -fx-text-fill: white;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+}
+
+.status-icon-container-compact {
+    -fx-min-width: 100;
+    -fx-min-height: 100;
+    -fx-max-width: 100;
+    -fx-max-height: 100;
+    -fx-background-radius: 50;
+    -fx-alignment: center;
+}
+
+.status-title-compact {
+    -fx-font-size: 20px;
+    -fx-font-weight: 900;
+    -fx-text-fill: -fx-text-custom-main;
+    -fx-letter-spacing: 1px;
+}
+
+.timer-label-compact {
+    -fx-font-family: 'JetBrains Mono', monospace;
+    -fx-font-size: 42px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -fx-custom-color-primary;
+}
+
+.label-muted-compact {
+    -fx-font-size: 13px;
+    -fx-text-fill: -fx-text-custom-muted;
+    -fx-font-weight: bold;
+}
+
+/* --- AUDIT PANEL STYLES --- */
+.audit-summary-box {
+    -fx-background-color: -fx-bg-subtle;
+    -fx-background-radius: -fx-radius-md;
+    -fx-padding: 15;
+    -fx-border-color: -fx-color-border-subtle;
+    -fx-border-width: 1;
+    -fx-border-radius: -fx-radius-md;
+}
+
+.modern-table-view-compact {
+    -fx-background-color: transparent;
+    -fx-font-size: 12px;
+}
+
+.modern-table-view-compact .column-header {
+    -fx-background-color: -fx-bg-subtle;
+    -fx-pref-height: 35;
+}
+
+.modern-table-view-compact .column-header .label {
+    -fx-text-fill: -fx-text-custom-muted;
+    -fx-font-weight: bold;
+    -fx-font-size: 11px;
+}
+
+.modern-table-view-compact .table-row-cell {
+    -fx-cell-size: 35;
+}
+
+.text-danger {
+    -fx-text-fill: -fx-custom-color-danger !important;
+}
+
+.text-success {
+    -fx-text-fill: -fx-custom-color-success !important;
+}
+
+.label-muted {
+    -fx-text-fill: -fx-text-custom-muted;
 }

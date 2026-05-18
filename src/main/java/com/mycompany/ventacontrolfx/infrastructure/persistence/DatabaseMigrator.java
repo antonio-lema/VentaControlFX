@@ -39,7 +39,10 @@ public class DatabaseMigrator {
         addColumn(conn, columnCache, "products", "stock_quantity", "INT DEFAULT 0");
         addColumn(conn, columnCache, "products", "min_stock", "INT DEFAULT 0");
         addColumn(conn, columnCache, "products", "manage_stock", "BOOLEAN DEFAULT FALSE");
+        addColumn(conn, columnCache, "products", "decimals", "INT DEFAULT NULL");
         addColumn(conn, columnCache, "categories", "is_favorite", "BOOLEAN DEFAULT 0");
+        addColumn(conn, columnCache, "categories", "decimals", "INT DEFAULT NULL");
+
 
         // --- SALES ---
         addColumn(conn, columnCache, "sales", "closure_id", "INT DEFAULT NULL");

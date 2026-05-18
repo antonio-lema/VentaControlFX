@@ -77,16 +77,19 @@ public class ProductTableManager {
         col.setCellFactory(column -> new TableCell<>() {
             @Override protected void updateItem(Double price, boolean empty) {
                 super.updateItem(price, empty);
-                if (empty || price == null) {
+                if (empty || price == null || getTableRow() == null || getTableRow().getItem() == null) {
                     setText(null);
                     setStyle("");
                 } else {
-                    setText(String.format("%.2f \u20ac", price));
+                    Product p = getTableRow().getItem();
+                    int dec = p.resolveEffectiveDecimals();
+                    setText(String.format("%." + dec + "f \u20ac", price));
                     setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #10b981;");
                     setAlignment(Pos.CENTER_RIGHT);
                 }
             }
         });
+
     }
 
     private void setupIvaColumn(TableColumn<Product, Double> col) {

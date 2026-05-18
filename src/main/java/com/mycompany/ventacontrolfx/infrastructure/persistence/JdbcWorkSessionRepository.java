@@ -47,7 +47,7 @@ public class JdbcWorkSessionRepository implements IWorkSessionRepository {
 
     @Override
     public Optional<WorkSession> getActiveSession(Integer userId) {
-        String sql = "SELECT * FROM work_sessions WHERE user_id = ? AND status = 'ACTIVE' LIMIT 1";
+        String sql = "SELECT * FROM work_sessions WHERE user_id = ? AND status = 'ACTIVE' AND DATE(start_time) = CURRENT_DATE LIMIT 1";
         try (Connection connection = DBConnection.getConnection();
                 PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setInt(1, userId);
@@ -86,7 +86,7 @@ public class JdbcWorkSessionRepository implements IWorkSessionRepository {
         // Unimos con usuarios para tener el nombre en el panel de control
         String sql = "SELECT s.*, u.full_name as user_name FROM work_sessions s " +
                 "JOIN users u ON s.user_id = u.user_id " +
-                "WHERE s.status = 'ACTIVE'";
+                "WHERE s.status = 'ACTIVE' AND DATE(s.start_time) = CURRENT_DATE";
         try (Connection connection = DBConnection.getConnection();
                 PreparedStatement pstmt = connection.prepareStatement(sql);
                 ResultSet rs = pstmt.executeQuery()) {

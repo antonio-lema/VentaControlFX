@@ -19,8 +19,11 @@ import java.util.ResourceBundle;
 public class ProductBox extends VBox {
     private final ResourceBundle bundle;
 
-    public ProductBox(Product product, double globalTaxRate, boolean pricesIncludeTax, String discountDesc,
+    private final int globalDecimals;
+
+    public ProductBox(Product product, double globalTaxRate, boolean pricesIncludeTax, int globalDecimals, String discountDesc,
             ResourceBundle bundle, Consumer<Product> onAddToCart) {
+        this.globalDecimals = globalDecimals;
         this.bundle = bundle;
         this.getStyleClass().add("product-box");
         this.setPrefWidth(200);
@@ -77,7 +80,8 @@ public class ProductBox extends VBox {
             displayPrice = product.getCurrentPrice() * (1 + (rate / 100.0));
         }
 
-        Label priceBadge = new Label(String.format("%.2f\u20ac", displayPrice));
+        Label priceBadge = new Label(String.format("%." + product.resolveEffectiveDecimals(globalDecimals) + "f\u20ac", displayPrice));
+
         priceBadge.getStyleClass().add("product-price-badge");
         StackPane.setAlignment(priceBadge, Pos.TOP_RIGHT);
         StackPane.setMargin(priceBadge, new Insets(10, 10, 0, 0));
@@ -162,7 +166,7 @@ public class ProductBox extends VBox {
     }
 
     public ProductBox(Product product, Consumer<Product> onAddToCart, ResourceBundle bundle) {
-        this(product, 21.0, true, null, bundle, onAddToCart);
+        this(product, 21.0, true, 2, null, bundle, onAddToCart);
     }
 
     private File resolveFile(String path) {

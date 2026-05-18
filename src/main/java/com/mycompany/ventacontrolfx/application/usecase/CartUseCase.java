@@ -42,6 +42,7 @@ public class CartUseCase {
     private final StringProperty generalObservation = new SimpleStringProperty("");
     private final StringProperty appliedPromoCode = new SimpleStringProperty("");
     private final BooleanProperty locked = new SimpleBooleanProperty(false);
+    private final BooleanProperty invoiceMode = new SimpleBooleanProperty(false); // false=Ticket, true=Factura
 
     private final ICompanyConfigRepository configRepository;
     private final com.mycompany.ventacontrolfx.domain.service.PriceResolutionService priceResolutionService;
@@ -226,14 +227,17 @@ public class CartUseCase {
             grossSavingsTotal += globalDiscount;
         }
 
-        double finalTotal = Math.max(0, Math.round(totalInclusive * 100.0) / 100.0);
-        double roundedSubtotal = Math.round(totalBase * 100.0) / 100.0;
+        int decimals = config.getDecimalCount();
+        double multiplier = Math.pow(10, decimals);
+
+        double finalTotal = Math.max(0, Math.round(totalInclusive * multiplier) / multiplier);
+        double roundedSubtotal = Math.round(totalBase * multiplier) / multiplier;
 
         grandTotal.set(finalTotal);
         subtotal.set(roundedSubtotal);
         // El IVA es la diferencia exacta para evitar errores de 1 c\u00e9ntimo en UI
-        tax.set(Math.round((finalTotal - roundedSubtotal) * 100.0) / 100.0);
-        totalSavings.set(Math.round(grossSavingsTotal * 100.0) / 100.0);
+        tax.set(Math.round((finalTotal - roundedSubtotal) * multiplier) / multiplier);
+        totalSavings.set(Math.round(grossSavingsTotal * multiplier) / multiplier);
 
         itemCount.set(cartItems.stream().mapToInt(CartItem::getQuantity).sum());
     }
@@ -371,7 +375,8 @@ public class CartUseCase {
                         true,
                         0,
                         0,
-                        false);
+                        false,
+                        null);
                 customProduct.setCurrentPrice(price);
 
                 // Agrupamos solo si el nombre y el precio coinciden exactamente
@@ -477,5 +482,9 @@ public class CartUseCase {
     public boolean isLocked() {
         return locked.get();
     }
+
+    public BooleanProperty invoiceModeProperty() { return invoiceMode; }
+    public boolean isInvoiceMode() { return invoiceMode.get(); }
+    public void setInvoiceMode(boolean value) { this.invoiceMode.set(value); }
 }
 

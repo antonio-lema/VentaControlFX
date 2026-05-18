@@ -1,6 +1,7 @@
 package com.mycompany.ventacontrolfx.presentation.controller.receipt;
 
 import com.mycompany.ventacontrolfx.application.usecase.SaleUseCase;
+import com.mycompany.ventacontrolfx.application.usecase.ReturnUseCase;
 import com.mycompany.ventacontrolfx.application.usecase.GetSaleTicketUseCase;
 import com.mycompany.ventacontrolfx.domain.model.Return;
 import com.mycompany.ventacontrolfx.domain.model.Sale;
@@ -18,11 +19,13 @@ public class ReturnActionManager {
 
     private final ServiceContainer container;
     private final SaleUseCase saleUseCase;
+    private final ReturnUseCase returnUseCase;
     private final GetSaleTicketUseCase getSaleTicketUseCase;
 
-    public ReturnActionManager(ServiceContainer container, SaleUseCase saleUseCase, GetSaleTicketUseCase getSaleTicketUseCase) {
+    public ReturnActionManager(ServiceContainer container, SaleUseCase saleUseCase, ReturnUseCase returnUseCase, GetSaleTicketUseCase getSaleTicketUseCase) {
         this.container = container;
         this.saleUseCase = saleUseCase;
+        this.returnUseCase = returnUseCase;
         this.getSaleTicketUseCase = getSaleTicketUseCase;
     }
 
@@ -34,7 +37,10 @@ public class ReturnActionManager {
 
         try {
             if (current.getDetails() == null || current.getDetails().isEmpty()) {
-                current.setDetails(saleUseCase.getReturnDetails(current.getReturnId()));
+                Return fullReturn = returnUseCase.getReturnDetails(current.getReturnId());
+                if (fullReturn != null) {
+                    current.setDetails(fullReturn.getDetails());
+                }
             }
 
             Sale originalSale = saleUseCase.getSaleDetails(current.getSaleId());

@@ -102,6 +102,10 @@ public class CashClosureUseCase {
         return repository.getPendingTotals();
     }
 
+    public double getTodayTotalSales() throws SQLException {
+        return repository.getTodayTotalSales(LocalDate.now());
+    }
+
     public int getTodayTransactionCount() throws SQLException {
         return repository.getPendingTransactionCount();
     }
@@ -245,6 +249,14 @@ public class CashClosureUseCase {
         return repository.getMovementsByClosure(closureId);
     }
 
+    public List<ICashClosureRepository.CashMovement> getMovementsByRange(LocalDateTime start, LocalDateTime end) throws SQLException {
+        return repository.getMovementsByRange(start, end);
+    }
+
+    public List<ICashClosureRepository.CashMovement> getMovementsByUserAndRange(int userId, LocalDateTime start, LocalDateTime end) throws SQLException {
+        return repository.getMovementsByUserAndRange(userId, start, end);
+    }
+
     public void markAsReviewed(int closureId, int reviewerId) throws SQLException {
         authService.checkPermission("CIERRES");
         repository.markAsReviewed(closureId, reviewerId);
@@ -261,5 +273,3 @@ public class CashClosureUseCase {
         repository.updateClosure(closureId, actualCash, reason, reviewerId, previousCash);
     }
 }
-
-

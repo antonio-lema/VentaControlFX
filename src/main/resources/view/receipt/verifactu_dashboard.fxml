@@ -12,6 +12,7 @@
     
     <stylesheets>
         <URL value="@/styles/components/informes.css"/>
+        <URL value="@/styles/components/hubs.css"/>
     </stylesheets>
 
     <VBox spacing="0">
@@ -42,6 +43,54 @@
                 </HBox>
             </children>
         </VBox>
+        
+        <!-- KPI CARDS SECTION -->
+        <VBox spacing="20" style="-fx-padding: 20 20 0 20;">
+            <StackPane>
+                <!-- REAL CARDS -->
+                <HBox fx:id="kpiContainer" spacing="20" alignment="CENTER">
+                    <VBox styleClass="kpi-card-saas, kpi-card-blue" HBox.hgrow="ALWAYS">
+                        <HBox alignment="CENTER_LEFT" spacing="10">
+                            <StackPane styleClass="icon-bg-blue">
+                                <FontAwesomeIconView glyphName="LIST_ALT" size="16" fill="#1e88e5" />
+                            </StackPane>
+                            <Label text="Total Operaciones" styleClass="kpi-label-saas" />
+                        </HBox>
+                        <Label fx:id="lblTotalOps" text="0" styleClass="kpi-value-saas" />
+                        <Label text="Registros totales" styleClass="trend-text" />
+                    </VBox>
+
+                    <VBox styleClass="kpi-card-saas, kpi-card-green" HBox.hgrow="ALWAYS">
+                        <HBox alignment="CENTER_LEFT" spacing="10">
+                            <StackPane styleClass="icon-bg-green">
+                                <FontAwesomeIconView glyphName="CHECK_CIRCLE" size="16" fill="#10b981" />
+                            </StackPane>
+                            <Label text="Aceptadas" styleClass="kpi-label-saas" />
+                        </HBox>
+                        <Label fx:id="lblTotalAccepted" text="0" styleClass="kpi-value-saas" />
+                        <Label text="Sincronizadas OK" styleClass="trend-text" />
+                    </VBox>
+
+                    <VBox styleClass="kpi-card-saas, kpi-card-red" HBox.hgrow="ALWAYS">
+                        <HBox alignment="CENTER_LEFT" spacing="10">
+                            <StackPane styleClass="icon-bg-red">
+                                <FontAwesomeIconView glyphName="EXCLAMATION_TRIANGLE" size="16" fill="#ef4444" />
+                            </StackPane>
+                            <Label text="Rechazadas" styleClass="kpi-label-saas" />
+                        </HBox>
+                        <Label fx:id="lblTotalRejected" text="0" styleClass="kpi-value-saas" />
+                        <Label text="Requieren atención" styleClass="trend-text" />
+                    </VBox>
+                </HBox>
+
+                <!-- SKELETON LOADING -->
+                <HBox fx:id="skeletonKpi" spacing="20" alignment="CENTER" visible="false" managed="false">
+                    <VBox styleClass="kpi-card-saas" style="-fx-background-color: #f1f5f9; -fx-opacity: 0.6;" HBox.hgrow="ALWAYS" prefHeight="100" />
+                    <VBox styleClass="kpi-card-saas" style="-fx-background-color: #f1f5f9; -fx-opacity: 0.6;" HBox.hgrow="ALWAYS" prefHeight="100" />
+                    <VBox styleClass="kpi-card-saas" style="-fx-background-color: #f1f5f9; -fx-opacity: 0.6;" HBox.hgrow="ALWAYS" prefHeight="100" />
+                </HBox>
+            </StackPane>
+        </VBox>
 
         <SplitPane dividerPositions="0.4" VBox.vgrow="ALWAYS" style="-fx-background-color: transparent;">
             <!-- LEFT PANEL: TABLE -->
@@ -71,6 +120,12 @@
                             <Label fx:id="lblDetailStatus" text="ACCEPTED" style="-fx-font-weight: bold;"/>
                         </HBox>
                     </VBox>
+                    <Button fx:id="btnRetry" onAction="#handleRetry" text="Reenviar" visible="false" styleClass="btn-primary" style="-fx-background-color: #4f46e5;">
+                        <graphic><FontAwesomeIconView glyphName="REFRESH" size="14" fill="white"/></graphic>
+                    </Button>
+                    <Button fx:id="btnSubsanar" onAction="#handleSubsanar" text="Subsanar" visible="false" styleClass="btn-primary" style="-fx-background-color: #f59e0b;">
+                        <graphic><FontAwesomeIconView glyphName="WRENCH" size="14" fill="white"/></graphic>
+                    </Button>
                 </HBox>
 
                 <VBox spacing="8" styleClass="stat-card" style="-fx-background-color: #fee2e2; -fx-border-color: #fecaca;" fx:id="errorBox">
@@ -78,20 +133,49 @@
                     <Label fx:id="lblDetailError" text="-" wrapText="true" style="-fx-text-fill: #b91c1c;"/>
                 </VBox>
 
-                <TabPane VBox.vgrow="ALWAYS" tabClosingPolicy="UNAVAILABLE" styleClass="modern-tab-pane">
-                    <Tab text="XML Enviado">
-                        <VBox spacing="10" style="-fx-padding: 15;">
-                            <TextArea fx:id="txtXmlSent" VBox.vgrow="ALWAYS" editable="false" 
-                                      style="-fx-font-family: 'Consolas', 'Monospace'; -fx-font-size: 12px; -fx-background-color: #1e293b; -fx-text-fill: #e2e8f0;"/>
+                <!-- Hub-style Navigation Bar -->
+                <HBox styleClass="hub-nav-bar" style="-fx-padding: 0 5; -fx-border-color: #e2e8f0; -fx-border-width: 0 0 1 0; -fx-background-color: white;">
+                    <children>
+                        <Button fx:id="btnTabSent" onAction="#handleShowSent" styleClass="hub-nav-button, hub-nav-button-active" text="XML Enviado">
+                             <graphic><FontAwesomeIconView glyphName="SEND" size="14"/></graphic>
+                        </Button>
+                        <Button fx:id="btnTabReceived" onAction="#handleShowReceived" styleClass="hub-nav-button" text="XML Recibido">
+                             <graphic><FontAwesomeIconView glyphName="REPLY" size="14"/></graphic>
+                        </Button>
+                        <Button fx:id="btnTabHistory" onAction="#handleShowHistory" styleClass="hub-nav-button" text="Historial">
+                             <graphic><FontAwesomeIconView glyphName="HISTORY" size="14"/></graphic>
+                        </Button>
+                    </children>
+                </HBox>
+
+                <!-- Content Area -->
+                <StackPane VBox.vgrow="ALWAYS" style="-fx-background-color: white;">
+                    <children>
+                        <!-- Tab: Sent -->
+                        <VBox fx:id="paneXmlSent" spacing="10" style="-fx-padding: 10;">
+                            <javafx.scene.web.WebView fx:id="webXmlSent" VBox.vgrow="ALWAYS" />
                         </VBox>
-                    </Tab>
-                    <Tab text="XML Recibido (AEAT)">
-                        <VBox spacing="10" style="-fx-padding: 15;">
-                            <TextArea fx:id="txtXmlReceived" VBox.vgrow="ALWAYS" editable="false" 
-                                      style="-fx-font-family: 'Consolas', 'Monospace'; -fx-font-size: 12px; -fx-background-color: #1e293b; -fx-text-fill: #e2e8f0;"/>
+                        
+                        <!-- Tab: Received -->
+                        <VBox fx:id="paneXmlReceived" spacing="10" style="-fx-padding: 10;" visible="false">
+                            <javafx.scene.web.WebView fx:id="webXmlReceived" VBox.vgrow="ALWAYS" />
                         </VBox>
-                    </Tab>
-                </TabPane>
+                        
+                        <!-- Tab: History -->
+                        <VBox fx:id="paneHistory" spacing="10" style="-fx-padding: 10;" visible="false">
+                            <TableView fx:id="historyTable" VBox.vgrow="ALWAYS" styleClass="modern-table">
+                                <columns>
+                                    <TableColumn fx:id="colHistDate" text="Fecha/Hora" prefWidth="160"/>
+                                    <TableColumn fx:id="colHistStatus" text="Estado" prefWidth="120"/>
+                                    <TableColumn fx:id="colHistMsg" text="Mensaje / ID AEAT" prefWidth="300"/>
+                                </columns>
+                                <columnResizePolicy>
+                                    <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+                                </columnResizePolicy>
+                            </TableView>
+                        </VBox>
+                    </children>
+                </StackPane>
             </VBox>
         </SplitPane>
     </VBox>

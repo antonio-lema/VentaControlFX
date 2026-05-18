@@ -65,7 +65,7 @@ public class SellProductManager {
         this.selectedPriceListId = priceListId;
         this.currentOffset = 0;
         productsScrollPane.setVvalue(0);
-        productRenderer.showSkeleton(12);
+        productRenderer.showSkeleton(20);
         loadingOverlay.setVisible(true);
         loadingOverlay.setStyle("-fx-background-color: transparent;");
 

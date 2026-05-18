@@ -33,6 +33,7 @@ public class DashboardDataManager {
         // Reloj (1s)
         refreshTimer.scheduleAtFixedRate(new TimerTask() {
             @Override public void run() {
+                if (lblTime == null) return;
                 String time = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
                 Platform.runLater(() -> lblTime.setText(time));
             }

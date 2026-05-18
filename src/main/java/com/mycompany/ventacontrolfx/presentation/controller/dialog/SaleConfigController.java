@@ -141,6 +141,12 @@ public class SaleConfigController implements Injectable {
             return;
         SaleConfig cfg = buildConfig();
         configUseCase.saveConfig(cfg);
+        
+        // Sincronizar con el motor de Verifactu en tiempo real
+        if (container != null && container.getVerifactuOutboxManager() != null) {
+            container.getVerifactuOutboxManager().updateCredentials(cfg.getCif(), cfg.getCompanyName());
+        }
+        
         showBanner();
     }
 
@@ -259,16 +265,6 @@ public class SaleConfigController implements Injectable {
         }
     }
 
-    @FXML
-    private void handleShowBusinessHours() {
-        if (container != null) {
-            com.mycompany.ventacontrolfx.presentation.navigation.ModalService.showFullScreenModal(
-                    "/view/user/business_hours.fxml",
-                    container.getBundle().getString("config.title.business_hours"),
-                    container,
-                    null);
-        }
-    }
 }
 
 

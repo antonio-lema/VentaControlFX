@@ -9,22 +9,26 @@ public class Category {
     private Integer taxGroupId; // Tax Engine V2
     private String taxGroupName;
     private Integer parentCategoryId; // Jerarqu\u00edas (Subcategor\u00edas)
+    private Integer decimals;
+
 
     public Category() {
         this.visible = true;
         this.favorite = false;
     }
 
-    public Category(int id, String name, boolean visible, boolean favorite, double defaultIva) {
+    public Category(int id, String name, boolean visible, boolean favorite, double defaultIva, Integer decimals) {
         this.id = id;
         this.name = name;
         this.visible = visible;
         this.favorite = favorite;
         this.defaultIva = defaultIva;
+        this.decimals = decimals;
     }
 
+
     public Category(int id, String name, boolean visible, boolean favorite) {
-        this(id, name, visible, favorite, 21.0);
+        this(id, name, visible, favorite, 21.0, null);
     }
 
     public Category(int id, String name, boolean visible) {
@@ -108,6 +112,15 @@ public class Category {
     public void setParentCategoryId(Integer parentCategoryId) {
         this.parentCategoryId = parentCategoryId;
     }
+
+    public Integer getDecimals() {
+        return decimals;
+    }
+
+    public void setDecimals(Integer decimals) {
+        this.decimals = decimals;
+    }
+
 
     @Override
     public boolean equals(Object o) {

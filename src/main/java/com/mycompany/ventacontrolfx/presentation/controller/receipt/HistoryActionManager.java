@@ -21,10 +21,12 @@ public class HistoryActionManager {
 
     private final ServiceContainer container;
     private final SaleUseCase saleUseCase;
+    private final com.mycompany.ventacontrolfx.application.usecase.ReturnUseCase returnUseCase;
 
-    public HistoryActionManager(ServiceContainer container, SaleUseCase saleUseCase) {
+    public HistoryActionManager(ServiceContainer container, SaleUseCase saleUseCase, com.mycompany.ventacontrolfx.application.usecase.ReturnUseCase returnUseCase) {
         this.container = container;
         this.saleUseCase = saleUseCase;
+        this.returnUseCase = returnUseCase;
     }
 
     public void handlePrintTicket(Sale selected) {
@@ -142,12 +144,12 @@ public class HistoryActionManager {
                         controller.init(selected, container);
                         controller.setOnSuccess((reason, items) -> {
                             try {
-                                int userId = container.getUserSession().getCurrentUser().getUserId();
-                                saleUseCase.registerPartialReturn(selected.getSaleId(), items, reason, userId);
+                                 int userId = container.getUserSession().getCurrentUser().getUserId();
+                                returnUseCase.registerPartialReturn(selected.getSaleId(), items, reason, userId);
                                 AlertUtil.showInfo(container.getBundle().getString("alert.success"),
                                         container.getBundle().getString("history.success.return"));
                                 onSuccess.run();
-                            } catch (SQLException e) {
+                            } catch (Exception e) {
                                 AlertUtil.showError("Error", "No se pudo procesar la devoluci\u00f3n: " + e.getMessage());
                             }
                         });

@@ -1,0 +1,53 @@
+/* ─── Unified Hub Navigation Bar Styling ─── */
+
+.hub-nav-container {
+    -fx-background-color: white;
+    -fx-padding: 0 30;
+    -fx-border-color: #e2e8f0;
+    -fx-border-width: 0 0 1 0;
+}
+
+.hub-nav-bar {
+    -fx-spacing: 10;
+}
+
+.hub-nav-button {
+    -fx-background-color: transparent;
+    -fx-padding: 15 20;
+    -fx-cursor: hand;
+    -fx-border-color: transparent;
+    -fx-border-width: 0 0 3 0;
+    -fx-text-fill: #64748b;
+    -fx-font-weight: bold;
+    -fx-font-size: 13px;
+    -fx-transition: all 0.3s ease;
+}
+
+.hub-nav-button:hover {
+    -fx-text-fill: #1e293b;
+    -fx-background-color: #f8fafc;
+}
+
+.hub-nav-button .glyph-icon {
+    -fx-fill: #94a3b8;
+}
+
+.hub-nav-button:hover .glyph-icon {
+    -fx-fill: #64748b;
+}
+
+/* Active State */
+.hub-nav-button-active {
+    -fx-text-fill: #3b82f6;
+    -fx-border-color: #3b82f6;
+    -fx-background-color: #3b82f608;
+}
+
+.hub-nav-button-active .glyph-icon {
+    -fx-fill: #3b82f6;
+}
+
+/* Content Container */
+.hub-content-area {
+    -fx-background-color: #f8fafc;
+}

@@ -9,7 +9,9 @@ CREATE TABLE IF NOT EXISTS categories (
     parent_category_id INT DEFAULT NULL,
     is_favorite BOOLEAN DEFAULT 0,
     visible BOOLEAN DEFAULT TRUE,
+    decimals INT DEFAULT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+
 );
 
 -- 1. Productos
@@ -30,7 +32,9 @@ CREATE TABLE IF NOT EXISTS products (
     is_active BOOLEAN DEFAULT TRUE,
     visible BOOLEAN DEFAULT TRUE,
     image_path VARCHAR(255),
+    decimals INT DEFAULT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
     FOREIGN KEY (category_id) REFERENCES categories(category_id)
 );
 

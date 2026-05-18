@@ -40,6 +40,17 @@
             <Label text="Stock Bajo" style="-fx-text-fill: #e53935; -fx-font-weight: 800; -fx-font-size: 11px;"/>
         </HBox>
 
+        <!-- Botón de Inicio de Jornada (Fichar) -->
+        <HBox fx:id="btnWorkSession" alignment="CENTER" onMouseClicked="#handleWorkSessionAction" styleClass="header-work-session-button" spacing="8">
+            <StackPane>
+                <FontAwesomeIconView fx:id="iconWorkSession" glyphName="CLOCK_ALT" size="16" fill="#3b82f6"/>
+            </StackPane>
+            <VBox alignment="CENTER_LEFT" spacing="0">
+                <Label fx:id="lblWorkSessionStatus" text="Fichar" styleClass="header-work-label-status"/>
+                <Label fx:id="lblWorkSessionTime" text="Fuera de turno" styleClass="header-work-label-time"/>
+            </VBox>
+        </HBox>
+
         <!-- Men&#x00fa; de usuario -->
         <MenuButton fx:id="userMenuButton" styleClass="user-menu-button">
             <graphic>
@@ -55,6 +66,9 @@
                 </HBox>
             </graphic>
             <items>
+                <MenuItem fx:id="menuItemWorkSession" text="Gestionar Turno" onAction="#handleWorkSessionAction">
+                    <graphic><FontAwesomeIconView glyphName="CALENDAR_CHECK_ALT" size="14"/></graphic>
+                </MenuItem>
                 <MenuItem fx:id="menuItemCashClosure" text="%header.user.close_cash" onAction="#handleCashClosure">
                     <graphic><FontAwesomeIconView glyphName="MONEY" size="14"/></graphic>
                 </MenuItem>

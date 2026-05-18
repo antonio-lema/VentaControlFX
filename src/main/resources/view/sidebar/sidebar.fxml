@@ -45,34 +45,22 @@
             <!-- SECCI&#x00d3;N: CAT&#x00c1;LOGO -->
             <Button fx:id="sectionCatalogo" styleClass="sidebar-section-header" onAction="#toggleCatalogo" text="%sidebar.section.catalog" maxWidth="Infinity" />
             <VBox fx:id="contentCatalogo" styleClass="sidebar-section-content" spacing="0" visible="false" managed="false">
-                <Button fx:id="btnProducts" styleClass="sidebar-button" onAction="#showProductsView" contentDisplay="TOP" maxWidth="Infinity" text="%sidebar.item.products">
-                    <graphic><FontAwesomeIconView glyphName="TAGS" size="22" styleClass="sidebar-icon"/></graphic>
+                <Button fx:id="btnProducts" styleClass="sidebar-button" onAction="#showProductsView" contentDisplay="TOP" maxWidth="Infinity" text="%catalog.hub.title">
+                    <graphic><FontAwesomeIconView glyphName="BOOK" size="22" styleClass="sidebar-icon"/></graphic>
                 </Button>
-                <Button fx:id="btnCategories" styleClass="sidebar-button" onAction="#handleShowCategories" contentDisplay="TOP" maxWidth="Infinity" text="%sidebar.item.categories">
-                    <graphic><FontAwesomeIconView glyphName="FOLDER_OPEN" size="22" styleClass="sidebar-icon"/></graphic>
-                </Button>
-                <Button fx:id="btnPriceLists" styleClass="sidebar-button" onAction="#handleShowPriceLists" contentDisplay="TOP" maxWidth="Infinity" text="%sidebar.item.pricelists">
+                <Button fx:id="btnPriceLists" styleClass="sidebar-button" onAction="#handleShowPriceLists" contentDisplay="TOP" maxWidth="Infinity" text="%pricing.hub.title">
                     <graphic><FontAwesomeIconView glyphName="MONEY" size="22" styleClass="sidebar-icon"/></graphic>
-                </Button>
-                <Button fx:id="btnPromotions" styleClass="sidebar-button" onAction="#handleShowPromotions" contentDisplay="TOP" maxWidth="Infinity" text="%sidebar.item.promotions">
-                    <graphic><FontAwesomeIconView glyphName="PERCENT" size="22" styleClass="sidebar-icon"/></graphic>
                 </Button>
             </VBox>
 
             <!-- SECCI&#x00d3;N: PERSONAL -->
             <Button fx:id="sectionPersonal" styleClass="sidebar-section-header" onAction="#togglePersonal" text="%sidebar.section.staff" maxWidth="Infinity" />
             <VBox fx:id="contentPersonal" styleClass="sidebar-section-content" spacing="0" visible="false" managed="false">
-                <Button fx:id="btnWorkSessions" styleClass="sidebar-button" onAction="#handleShowWorkSessions" contentDisplay="TOP" maxWidth="Infinity" text="%sidebar.item.work_sessions">
+                <Button fx:id="btnWorkSessions" styleClass="sidebar-button" onAction="#handleShowWorkSessions" contentDisplay="TOP" maxWidth="Infinity" text="%staff.hub.title">
                     <graphic><FontAwesomeIconView glyphName="CLOCK_ALT" size="22" styleClass="sidebar-icon"/></graphic>
                 </Button>
-                <Button fx:id="btnOperativeControl" styleClass="sidebar-button" onAction="#handleShowOperativeDashboard" contentDisplay="TOP" maxWidth="Infinity" text="%sidebar.item.monitor">
-                    <graphic><FontAwesomeIconView glyphName="DASHBOARD" size="22" styleClass="sidebar-icon"/></graphic>
-                </Button>
-                <Button fx:id="btnStaffCalendar" styleClass="sidebar-button" onAction="#handleShowStaffCalendar" contentDisplay="TOP" maxWidth="Infinity" text="%sidebar.item.planner">
+                <Button fx:id="btnStaffCalendar" styleClass="sidebar-button" onAction="#handleShowStaffPlanning" contentDisplay="TOP" maxWidth="Infinity" text="%staff.planning.title">
                     <graphic><FontAwesomeIconView glyphName="CALENDAR" size="22" styleClass="sidebar-icon"/></graphic>
-                </Button>
-                <Button fx:id="btnPunctualityAudit" styleClass="sidebar-button" onAction="#handleShowPunctualityAudit" contentDisplay="TOP" maxWidth="Infinity" text="%sidebar.item.audit">
-                    <graphic><FontAwesomeIconView glyphName="CHECK_SQUARE" size="22" styleClass="sidebar-icon"/></graphic>
                 </Button>
             </VBox>
 

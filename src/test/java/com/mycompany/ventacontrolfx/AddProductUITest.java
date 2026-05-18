@@ -5,7 +5,7 @@ import com.mycompany.ventacontrolfx.domain.model.Product;
 import com.mycompany.ventacontrolfx.application.usecase.ProductUseCase;
 import com.mycompany.ventacontrolfx.application.usecase.CategoryUseCase;
 import com.mycompany.ventacontrolfx.infrastructure.config.ServiceContainer;
-import com.mycompany.ventacontrolfx.presentation.controller.AddProductController;
+import com.mycompany.ventacontrolfx.presentation.controller.product.AddProductController;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;

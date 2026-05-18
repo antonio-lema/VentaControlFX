@@ -17,28 +17,6 @@
     </stylesheets>
 
     <children>
-        <!-- Header Section (Returns Style) -->
-        <VBox styleClass="view-header" spacing="0">
-            <children>
-                <HBox spacing="16" alignment="CENTER_LEFT">
-                    <children>
-                        <StackPane styleClass="view-header-icon-wrap">
-                            <children><FontAwesomeIconView glyphName="CHECK_SQUARE" size="22" fill="white"/></children>
-                        </StackPane>
-                        <VBox spacing="2">
-                            <children>
-                                <Label text="%audit.punctuality.title" styleClass="view-title"/>
-                                <Label text="%audit.punctuality.subtitle" styleClass="view-subtitle"/>
-                            </children>
-                        </VBox>
-                        <Region HBox.hgrow="ALWAYS" />
-                        <Button onAction="#refresh" styleClass="btn-secondary" text="%returns.btn.refresh">
-                            <graphic><FontAwesomeIconView glyphName="REFRESH" size="14"/></graphic>
-                        </Button>
-                    </children>
-                </HBox>
-            </children>
-        </VBox>
 
         <VBox spacing="30" VBox.vgrow="ALWAYS" style="-fx-padding: 30;">
             <children>

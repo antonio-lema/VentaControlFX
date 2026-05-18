@@ -46,16 +46,19 @@ public class StaffCalendarController implements Injectable {
         this.configUseCase = container.getConfigUseCase();
         this.userUseCase = container.getUserUseCase();
         this.staffRepo = new JdbcStaffRepository();
-        this.currentConfig = configUseCase.getConfig();
         this.container = container;
 
+        refresh();
+    }
+
+    public void refresh() {
+        this.currentConfig = configUseCase.getConfig();
         try {
             this.allUsers = userUseCase.getAllUsers();
             this.allVacations = staffRepo.getAllVacations();
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         renderCalendar();
     }
 

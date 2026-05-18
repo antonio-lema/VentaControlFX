@@ -36,10 +36,12 @@ public class CartPaymentManager {
         Client selectedClient = cartUseCase.getSelectedClient();
 
         // 1. Validación Legal (Anti-Blanqueo / Facturación)
-        if (grandTotal > 1000) {
+        boolean isInvoiceManual = cartUseCase.isInvoiceMode();
+        if (grandTotal > 1000 || isInvoiceManual) {
             if (selectedClient == null || selectedClient.getTaxId() == null || selectedClient.getTaxId().trim().isEmpty()) {
+                String errorKey = grandTotal > 1000 ? "payment.error.id_required.msg" : "cart.doc_type.error_no_client";
                 AlertUtil.showError(container.getBundle().getString("payment.error.id_required.title"),
-                        container.getBundle().getString("payment.error.id_required.msg"));
+                        container.getBundle().getString(errorKey));
                 return;
             }
         }
@@ -88,9 +90,12 @@ public class CartPaymentManager {
 
     private void emitFiscalDocument(int saleId, Client client) {
         try {
-            if (client != null && client.getTaxId() != null && !client.getTaxId().trim().isEmpty()) {
+            boolean forceInvoice = container.getCartUseCase().isInvoiceMode();
+            if (forceInvoice || (client != null && client.getTaxId() != null && !client.getTaxId().trim().isEmpty())) {
                 String address = formatClientAddress(client);
-                container.getEmitFiscalDocumentUseCase().emitInvoice(saleId, client.getName(), client.getTaxId(), address);
+                String name = client != null ? client.getName() : "Consumidor Final";
+                String taxId = client != null ? client.getTaxId() : "";
+                container.getEmitFiscalDocumentUseCase().emitInvoice(saleId, name, taxId, address);
             } else {
                 container.getEmitFiscalDocumentUseCase().emitTicket(saleId);
             }
@@ -118,7 +123,7 @@ public class CartPaymentManager {
                 container, (ReceiptController rc) -> {
                     if (client != null) rc.setClientInfo(client);
                     rc.setReceiptData(items, total, paid, change, method, result.saleId, null, null, 
-                            obs, result.rewardPromoCode, result.rewardAmount, result.rewardExpiryDate);
+                            obs, result.rewardPromoCode, result.rewardAmount, result.rewardExpiryDate, client, cartUseCase.isInvoiceMode());
                 });
     }
 

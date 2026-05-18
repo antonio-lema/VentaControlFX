@@ -79,14 +79,20 @@ public class VerifactuXmlBuilder {
 
             // IDFactura
             xml.append("          <sf:IDFactura>\n");
-            xml.append("            <sf:").append(isAnulacion ? "IDEmisorFacturaAnulada" : "IDEmisorFactura").append(">").append(escapeXml(payload.getNifEmisor()))
+            xml.append("            <sf:").append(isAnulacion ? "IDEmisorFacturaAnulada" : "IDEmisorFactura")
+                    .append(">").append(escapeXml(payload.getNifEmisor()))
                     .append("</sf:").append(isAnulacion ? "IDEmisorFacturaAnulada" : "IDEmisorFactura").append(">\n");
-            xml.append("            <sf:").append(isAnulacion ? "NumSerieFacturaAnulada" : "NumSerieFactura").append(">").append(escapeXml(payload.getNumSerieFactura()))
+            xml.append("            <sf:").append(isAnulacion ? "NumSerieFacturaAnulada" : "NumSerieFactura")
+                    .append(">").append(escapeXml(payload.getNumSerieFactura()))
                     .append("</sf:").append(isAnulacion ? "NumSerieFacturaAnulada" : "NumSerieFactura").append(">\n");
-            xml.append("            <sf:").append(isAnulacion ? "FechaExpedicionFacturaAnulada" : "FechaExpedicionFactura").append(">").append(escapeXml(payload.getFechaExpedicion()))
-                    .append("</sf:").append(isAnulacion ? "FechaExpedicionFacturaAnulada" : "FechaExpedicionFactura").append(">\n");
+            xml.append("            <sf:")
+                    .append(isAnulacion ? "FechaExpedicionFacturaAnulada" : "FechaExpedicionFactura").append(">")
+                    .append(escapeXml(payload.getFechaExpedicion()))
+                    .append("</sf:").append(isAnulacion ? "FechaExpedicionFacturaAnulada" : "FechaExpedicionFactura")
+                    .append(">\n");
             xml.append("          </sf:IDFactura>\n");
-
+            
+            
             if (!isAnulacion) {
                 xml.append("          <sf:NombreRazonEmisor>").append(escapeXml(razonSocialObligado))
                         .append("</sf:NombreRazonEmisor>\n");
@@ -103,7 +109,8 @@ public class VerifactuXmlBuilder {
                             .append("</sf:IDEmisorFactura>\n");
                     xml.append("              <sf:NumSerieFactura>").append(escapeXml(payload.getOriginalNumSerie()))
                             .append("</sf:NumSerieFactura>\n");
-                    xml.append("              <sf:FechaExpedicionFactura>").append(escapeXml(payload.getOriginalFechaExp()))
+                    xml.append("              <sf:FechaExpedicionFactura>")
+                            .append(escapeXml(payload.getOriginalFechaExp()))
                             .append("</sf:FechaExpedicionFactura>\n");
                     xml.append("            </sf:IDFacturaRectificada>\n");
                     xml.append("          </sf:FacturasRectificadas>\n");
@@ -111,15 +118,18 @@ public class VerifactuXmlBuilder {
 
                 xml.append("          <sf:DescripcionOperacion>Ventas de mostrador TPV</sf:DescripcionOperacion>\n");
                 xml.append("          <sf:FacturaSimplificadaArt7273>N</sf:FacturaSimplificadaArt7273>\n");
-                
+
                 boolean noCustomer = payload.getCustomerNif() == null || payload.getCustomerNif().isEmpty();
-                xml.append("          <sf:FacturaSinIdentifDestinatarioArt61d>").append(noCustomer ? "S" : "N").append("</sf:FacturaSinIdentifDestinatarioArt61d>\n");
+                xml.append("          <sf:FacturaSinIdentifDestinatarioArt61d>").append(noCustomer ? "S" : "N")
+                        .append("</sf:FacturaSinIdentifDestinatarioArt61d>\n");
 
                 if (!noCustomer) {
                     xml.append("          <sf:Destinatarios>\n");
                     xml.append("            <sf:IDDestinatario>\n");
-                    xml.append("              <sf:NombreRazon>").append(escapeXml(payload.getCustomerName())).append("</sf:NombreRazon>\n");
-                    xml.append("              <sf:NIF>").append(escapeXml(payload.getCustomerNif())).append("</sf:NIF>\n");
+                    xml.append("              <sf:NombreRazon>").append(escapeXml(payload.getCustomerName()))
+                            .append("</sf:NombreRazon>\n");
+                    xml.append("              <sf:NIF>").append(escapeXml(payload.getCustomerNif()))
+                            .append("</sf:NIF>\n");
                     xml.append("            </sf:IDDestinatario>\n");
                     xml.append("          </sf:Destinatarios>\n");
                 }
@@ -135,9 +145,15 @@ public class VerifactuXmlBuilder {
                         xml.append("              <sf:Impuesto>01</sf:Impuesto>\n");
                         xml.append("              <sf:ClaveRegimen>01</sf:ClaveRegimen>\n");
                         xml.append("              <sf:CalificacionOperacion>S1</sf:CalificacionOperacion>\n");
-                        xml.append("              <sf:TipoImpositivo>").append(String.format(java.util.Locale.US, "%.2f", rate)).append("</sf:TipoImpositivo>\n");
-                        xml.append("              <sf:BaseImponibleOimporteNoSujeto>").append(String.format(java.util.Locale.US, "%.2f", Math.abs(lineBase))).append("</sf:BaseImponibleOimporteNoSujeto>\n");
-                        xml.append("              <sf:CuotaRepercutida>").append(String.format(java.util.Locale.US, "%.2f", Math.abs(lineCuota))).append("</sf:CuotaRepercutida>\n");
+                        xml.append("              <sf:TipoImpositivo>")
+                                .append(String.format(java.util.Locale.US, "%.2f", rate))
+                                .append("</sf:TipoImpositivo>\n");
+                        xml.append("              <sf:BaseImponibleOimporteNoSujeto>")
+                                .append(String.format(java.util.Locale.US, "%.2f", Math.abs(lineBase)))
+                                .append("</sf:BaseImponibleOimporteNoSujeto>\n");
+                        xml.append("              <sf:CuotaRepercutida>")
+                                .append(String.format(java.util.Locale.US, "%.2f", Math.abs(lineCuota)))
+                                .append("</sf:CuotaRepercutida>\n");
                         xml.append("            </sf:DetalleDesglose>\n");
                     }
                 } else {
@@ -148,19 +164,31 @@ public class VerifactuXmlBuilder {
                     xml.append("              <sf:Impuesto>01</sf:Impuesto>\n");
                     xml.append("              <sf:ClaveRegimen>01</sf:ClaveRegimen>\n");
                     xml.append("              <sf:CalificacionOperacion>S1</sf:CalificacionOperacion>\n");
-                    xml.append("              <sf:TipoImpositivo>").append(String.format(java.util.Locale.US, "%.2f", rate)).append("</sf:TipoImpositivo>\n");
-                    xml.append("              <sf:BaseImponibleOimporteNoSujeto>").append(String.format(java.util.Locale.US, "%.2f", Math.abs(base))).append("</sf:BaseImponibleOimporteNoSujeto>\n");
-                    xml.append("              <sf:CuotaRepercutida>").append(String.format(java.util.Locale.US, "%.2f", Math.abs(cuota))).append("</sf:CuotaRepercutida>\n");
+                    xml.append("              <sf:TipoImpositivo>")
+                            .append(String.format(java.util.Locale.US, "%.2f", rate)).append("</sf:TipoImpositivo>\n");
+                    xml.append("              <sf:BaseImponibleOimporteNoSujeto>")
+                            .append(String.format(java.util.Locale.US, "%.2f", Math.abs(base)))
+                            .append("</sf:BaseImponibleOimporteNoSujeto>\n");
+                    xml.append("              <sf:CuotaRepercutida>")
+                            .append(String.format(java.util.Locale.US, "%.2f", Math.abs(cuota)))
+                            .append("</sf:CuotaRepercutida>\n");
                     xml.append("            </sf:DetalleDesglose>\n");
                 }
                 xml.append("          </sf:Desglose>\n");
-                xml.append("          <sf:CuotaTotal>").append(String.format(java.util.Locale.US, "%.2f", Math.abs(payload.getTotalTax()))).append("</sf:CuotaTotal>\n");
-                xml.append("          <sf:ImporteTotal>").append(String.format(java.util.Locale.US, "%.2f", Math.abs(payload.getImporteTotal()))).append("</sf:ImporteTotal>\n");
+                xml.append("          <sf:CuotaTotal>")
+                        .append(String.format(java.util.Locale.US, "%.2f", Math.abs(payload.getTotalTax())))
+                        .append("</sf:CuotaTotal>\n");
+                xml.append("          <sf:ImporteTotal>")
+                        .append(String.format(java.util.Locale.US, "%.2f", Math.abs(payload.getImporteTotal())))
+                        .append("</sf:ImporteTotal>\n");
+                
             }
 
-            // Encadenamiento
+
+
+            // Encadenamiento (OBLIGATORIO para todos los registros)
+            xml.append("          <sf:Encadenamiento>\n");
             if (payload.getPrevHash() != null && !payload.getPrevHash().isEmpty()) {
-                xml.append("          <sf:Encadenamiento>\n");
                 xml.append("            <sf:RegistroAnterior>\n");
                 xml.append("              <sf:IDEmisorFactura>").append(escapeXml(payload.getNifEmisor()))
                         .append("</sf:IDEmisorFactura>\n");
@@ -171,12 +199,11 @@ public class VerifactuXmlBuilder {
                 xml.append("              <sf:Huella>").append(escapeXml(payload.getPrevHash()).toUpperCase())
                         .append("</sf:Huella>\n");
                 xml.append("            </sf:RegistroAnterior>\n");
-                xml.append("          </sf:Encadenamiento>\n");
             } else {
-                xml.append("          <sf:Encadenamiento>\n");
                 xml.append("            <sf:PrimerRegistro>S</sf:PrimerRegistro>\n");
-                xml.append("          </sf:Encadenamiento>\n");
             }
+            xml.append("          </sf:Encadenamiento>\n");
+
 
             // Sistema Informático
             xml.append("          <sf:SistemaInformatico>\n");
@@ -191,20 +218,24 @@ public class VerifactuXmlBuilder {
             xml.append("            <sf:TipoUsoPosibleMultiOT>S</sf:TipoUsoPosibleMultiOT>\n");
             xml.append("            <sf:IndicadorMultiplesOT>N</sf:IndicadorMultiplesOT>\n");
             xml.append("          </sf:SistemaInformatico>\n");
-            
-            String ahoraIso = payload.getGenTimestamp() != null && !payload.getGenTimestamp().isEmpty() 
-                ? payload.getGenTimestamp() 
-                : java.time.ZonedDateTime.now(java.time.ZoneId.of("Europe/Madrid")).minusMinutes(1).format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssxxx"));
-            
-            xml.append("          <sf:FechaHoraHusoGenRegistro>").append(ahoraIso).append("</sf:FechaHoraHusoGenRegistro>\n");
+
+            String ahoraIso = payload.getGenTimestamp() != null && !payload.getGenTimestamp().isEmpty()
+                    ? payload.getGenTimestamp()
+                    : java.time.ZonedDateTime.now(java.time.ZoneId.of("Europe/Madrid")).minusMinutes(1)
+                            .format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssxxx"));
+
+            xml.append("          <sf:FechaHoraHusoGenRegistro>").append(ahoraIso)
+                    .append("</sf:FechaHoraHusoGenRegistro>\n");
 
             // Huella
             String cuotaStr = String.format(java.util.Locale.US, "%.2f", Math.abs(payload.getTotalTax()));
             String totalStr = String.format(java.util.Locale.US, "%.2f", Math.abs(payload.getImporteTotal()));
             StringBuilder sb = new StringBuilder();
             sb.append(isAnulacion ? "IDEmisorFacturaAnulada=" : "IDEmisorFactura=").append(payload.getNifEmisor());
-            sb.append(isAnulacion ? "&NumSerieFacturaAnulada=" : "&NumSerieFactura=").append(payload.getNumSerieFactura());
-            sb.append(isAnulacion ? "&FechaExpedicionFacturaAnulada=" : "&FechaExpedicionFactura=").append(payload.getFechaExpedicion());
+            sb.append(isAnulacion ? "&NumSerieFacturaAnulada=" : "&NumSerieFactura=")
+                    .append(payload.getNumSerieFactura());
+            sb.append(isAnulacion ? "&FechaExpedicionFacturaAnulada=" : "&FechaExpedicionFactura=")
+                    .append(payload.getFechaExpedicion());
             if (!isAnulacion) {
                 sb.append("&TipoFactura=").append(payload.getTipoFactura());
                 sb.append("&CuotaTotal=").append(cuotaStr);
@@ -251,5 +282,3 @@ public class VerifactuXmlBuilder {
         }
     }
 }
-
-

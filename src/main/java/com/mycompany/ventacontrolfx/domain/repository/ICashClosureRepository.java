@@ -24,6 +24,8 @@ public interface ICashClosureRepository {
     java.util.Map<String, Double> getPendingTotals() throws SQLException;
 
     int getPendingTransactionCount() throws SQLException;
+    
+    double getTodayTotalSales(LocalDate date) throws SQLException;
 
     // \u00e2\u201d\u20ac\u00e2\u201d\u20ac Gesti\u00f3n de fondo de caja \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac
     /** Abre una sesi\u00f3n de caja con el fondo inicial indicado. */
@@ -72,6 +74,8 @@ public interface ICashClosureRepository {
      * Obtiene los movimientos (ingresos/retiradas) asociados a un cierre concreto.
      */
     List<CashMovement> getMovementsByClosure(int closureId) throws SQLException;
+    List<CashMovement> getMovementsByRange(LocalDateTime start, LocalDateTime end) throws SQLException;
+    List<CashMovement> getMovementsByUserAndRange(int userId, LocalDateTime start, LocalDateTime end) throws SQLException;
 
     /** Marca un cierre como revisado por un administrador. */
     void markAsReviewed(int closureId, int reviewerId) throws SQLException;

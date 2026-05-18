@@ -45,6 +45,7 @@ public class SellViewController implements Injectable, CategoryMenuRenderer.Cate
         com.mycompany.ventacontrolfx.domain.model.SaleConfig config = container.getICompanyConfigRepository().load();
         ProductGridRenderer productRenderer = new ProductGridRenderer(
                 productsPane, null, config.getTaxRate(), config.isPricesIncludeTax(),
+                config.getDecimalCount(),
                 p -> productManager.getDiscountDescription(p), container.getBundle(),
                 p -> {
                     try { container.getCartUseCase().addItem(p); }

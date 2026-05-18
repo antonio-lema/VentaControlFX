@@ -320,6 +320,8 @@ public class Return {
         private String reason;
         private double cashAmount;
         private double cardAmount;
+        private double taxBasis;
+        private double totalTax;
         private String docType;
         private String docSeries;
         private Integer docNumber;
@@ -331,6 +333,13 @@ public class Return {
         private String issuerAddress;
         private boolean isCorrection;
         private String correctionType;
+        private String controlHash;
+        private String prevHash;
+        private String signature;
+        private String fiscalStatus;
+        private String fiscalMsg;
+        private String aeatSubmissionId;
+        private String genTimestamp;
 
         public Builder(int saleId) {
             this.saleId = saleId;
@@ -363,6 +372,16 @@ public class Return {
 
         public Builder cardAmount(double amount) {
             this.cardAmount = amount;
+            return this;
+        }
+
+        public Builder taxBasis(double amount) {
+            this.taxBasis = amount;
+            return this;
+        }
+
+        public Builder totalTax(double amount) {
+            this.totalTax = amount;
             return this;
         }
 
@@ -421,6 +440,41 @@ public class Return {
             return this;
         }
 
+        public Builder controlHash(String val) {
+            this.controlHash = val;
+            return this;
+        }
+
+        public Builder prevHash(String val) {
+            this.prevHash = val;
+            return this;
+        }
+
+        public Builder signature(String val) {
+            this.signature = val;
+            return this;
+        }
+
+        public Builder fiscalStatus(String val) {
+            this.fiscalStatus = val;
+            return this;
+        }
+
+        public Builder fiscalMsg(String val) {
+            this.fiscalMsg = val;
+            return this;
+        }
+
+        public Builder aeatSubmissionId(String val) {
+            this.aeatSubmissionId = val;
+            return this;
+        }
+
+        public Builder genTimestamp(String val) {
+            this.genTimestamp = val;
+            return this;
+        }
+
         public Return build() {
             Return r = new Return();
             r.saleId = this.saleId;
@@ -430,6 +484,8 @@ public class Return {
             r.reason = this.reason;
             r.cashAmount = this.cashAmount;
             r.cardAmount = this.cardAmount;
+            r.taxBasis = this.taxBasis;
+            r.totalTax = this.totalTax;
             r.docType = this.docType;
             r.docSeries = this.docSeries;
             r.docNumber = this.docNumber;
@@ -441,6 +497,13 @@ public class Return {
             r.issuerAddress = this.issuerAddress;
             r.isCorrection = this.isCorrection;
             r.correctionType = this.correctionType;
+            r.controlHash = this.controlHash;
+            r.prevHash = this.prevHash;
+            r.signature = this.signature;
+            r.fiscalStatus = this.fiscalStatus;
+            r.fiscalMsg = this.fiscalMsg;
+            r.aeatSubmissionId = this.aeatSubmissionId;
+            r.genTimestamp = this.genTimestamp;
             return r;
         }
     }

@@ -9,33 +9,19 @@
       fx:controller="com.mycompany.ventacontrolfx.presentation.controller.dialog.PromotionsController"
       spacing="0" styleClass="main-content-area" stylesheets="@/styles/main.css">
     
-    <!-- Header -->
-    <VBox styleClass="view-header" spacing="0">
+    <VBox spacing="20" VBox.vgrow="ALWAYS" style="-fx-padding: 25;">
         <children>
-            <HBox spacing="16" alignment="CENTER_LEFT">
+            <!-- Sub-header Bar -->
+            <HBox alignment="CENTER_LEFT" spacing="15" style="-fx-padding: 0 0 15 0; -fx-border-color: #e2e8f0; -fx-border-width: 0 0 1 0;">
                 <children>
-                    <StackPane styleClass="view-header-icon-wrap" style="-fx-background-color: -color-primary;">
-                        <children><FontAwesomeIconView glyphName="TAG" size="24" fill="white"/></children>
-                    </StackPane>
-                    <VBox spacing="2">
-                        <children>
-                            <Label text="%promotions.title" styleClass="view-title"/>
-                            <Label text="%promotions.subtitle" styleClass="view-subtitle"/>
-                        </children>
-                    </VBox>
+                    <Label text="PROMOCIONES Y OFERTAS" style="-fx-font-weight: 800; -fx-text-fill: #64748b; -fx-font-size: 11px; -fx-letter-spacing: 1px;" />
                     <Region HBox.hgrow="ALWAYS" />
                     <Button onAction="#handleNewPromotion" styleClass="btn-primary" text="%promotions.btn.new">
-                        <graphic>
-                            <FontAwesomeIconView glyphName="PLUS" size="14" fill="WHITE"/>
-                        </graphic>
+                        <graphic><FontAwesomeIconView glyphName="PLUS" size="14" fill="WHITE"/></graphic>
                     </Button>
                 </children>
             </HBox>
-        </children>
-    </VBox>
 
-    <VBox spacing="20" VBox.vgrow="ALWAYS" style="-fx-padding: 25;">
-        <children>
             <!-- Filter Bar -->
             <HBox spacing="15" alignment="CENTER_LEFT" styleClass="modern-filter-bar">
                 <children>

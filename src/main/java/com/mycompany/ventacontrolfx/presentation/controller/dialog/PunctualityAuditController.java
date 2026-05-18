@@ -84,6 +84,15 @@ public class PunctualityAuditController implements Injectable {
         }
 
         List<WorkSession> sessions = container.getWorkSessionUseCase().getHistoryByDate(date);
+        List<WorkSession> activeSessions = (date.equals(LocalDate.now())) ? container.getWorkSessionUseCase().getAllActiveSessions() : new java.util.ArrayList<>();
+        
+        // Unificar listas evitando duplicados (priorizar la de historial si existe)
+        for (WorkSession active : activeSessions) {
+            if (sessions.stream().noneMatch(s -> s.getSessionId().equals(active.getSessionId()))) {
+                sessions.add(active);
+            }
+        }
+
         Map<Integer, List<WorkSession>> userSessions = sessions.stream()
                 .collect(Collectors.groupingBy(WorkSession::getUserId));
 
@@ -105,8 +114,10 @@ public class PunctualityAuditController implements Injectable {
                         + range.getClose().format(timeFormatter);
 
                 List<WorkSession> mySessions = userSessions.getOrDefault(userId, new java.util.ArrayList<>());
+                // Buscamos la sesión de turno (la más reciente)
                 WorkSession shiftSession = mySessions.stream()
                         .filter(s -> s.getType() == WorkSession.SessionType.SHIFT)
+                        .sorted((s1, s2) -> s2.getStartTime().compareTo(s1.getStartTime()))
                         .findFirst().orElse(null);
 
                 if (shiftSession == null) {
@@ -115,8 +126,24 @@ public class PunctualityAuditController implements Injectable {
                     record.status = "FALTA";
                     totalNoShows++;
                     records.add(record);
+                } else if (shiftSession.getEndTime() == null && shiftSession.getStatus() == WorkSession.SessionStatus.ACTIVE) {
+                    // SI ESTÁ ACTIVA (Monitor dice que sí)
+                    LocalTime realStart = shiftSession.getStartTime().toLocalTime();
+                    record.realStart = realStart.format(timeFormatter);
+                    
+                    long delayMinutes = java.time.Duration.between(range.getOpen(), realStart).toMinutes();
+                    if (delayMinutes > 5) {
+                        record.delay = delayMinutes + " min";
+                        record.status = "PENDIENTE (R)"; // Pendiente pero con retraso detectado
+                        totalLates++;
+                    } else {
+                        record.delay = "Puntual";
+                        record.status = "PENDIENTE";
+                    }
+                    record.closingStatus = "En curso";
+                    records.add(record);
                 } else if (shiftSession.getEndTime() == null) {
-                    // SI NO FINALIZA, NO SE TIENE EN CUENTA SEGÚN REQUERIMIENTO
+                    // Caso de sesión huérfana o no finalizada correctamente
                     record.realStart = "En curso";
                     record.delay = "N/A";
                     record.status = "PENDIENTE";
@@ -136,7 +163,7 @@ public class PunctualityAuditController implements Injectable {
                         record.status = "OK";
                     }
 
-                    // Closing check: ya sabemos que endTime != null aquí
+                    // Closing check
                     LocalTime realEnd = shiftSession.getEndTime().toLocalTime();
                     long endDiff = java.time.Duration.between(range.getClose(), realEnd).toMinutes();
                     if (endDiff > 10)
@@ -155,19 +182,16 @@ public class PunctualityAuditController implements Injectable {
         lblLateCount.setText(String.valueOf(totalLates));
         lblNoShowCount.setText(String.valueOf(totalNoShows));
 
-        // Filtrar solo los registros que están finalizados o son faltas para el cálculo
-        // global
-        List<AuditRecord> countableRecords = records.stream()
-                .filter(r -> !r.status.equals("PENDIENTE"))
-                .collect(Collectors.toList());
-
-        if (countableRecords.isEmpty())
+        // Cálculo global de puntualidad (incluyendo turnos en curso)
+        if (records.isEmpty()) {
             lblGeneralPunctuality.setText("N/A");
-        else {
-            int countableLates = (int) countableRecords.stream().filter(r -> r.status.equals("RETRASO")).count();
-            int countableFaltas = (int) countableRecords.stream().filter(r -> r.status.equals("FALTA")).count();
-            double punctuality = ((double) (countableRecords.size() - countableLates - countableFaltas)
-                    / countableRecords.size()) * 100;
+        } else {
+            long totalCount = records.size();
+            long fails = records.stream()
+                    .filter(r -> r.status.equals("RETRASO") || r.status.equals("FALTA") || r.status.equals("PENDIENTE (R)"))
+                    .count();
+            
+            double punctuality = ((double) (totalCount - fails) / totalCount) * 100;
             lblGeneralPunctuality.setText(String.format("%.0f%%", punctuality));
         }
     }

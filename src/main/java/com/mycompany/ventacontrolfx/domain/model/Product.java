@@ -29,6 +29,10 @@ public class Product {
     private int stockQuantity;
     private int minStock;
     private boolean manageStock = false;
+    private Integer decimals;
+    private Integer categoryDecimals;
+
+
 
     public Product() {
         this.visible = true;
@@ -37,7 +41,8 @@ public class Product {
     // Master constructor for all fields
     public Product(int id, int categoryId, String name, double price, boolean isFavorite, boolean visible,
             String imagePath, String categoryName, Double iva, Double categoryIva, String sku, double costPrice,
-            boolean isActive, int stockQuantity, int minStock, boolean manageStock) {
+            boolean isActive, int stockQuantity, int minStock, boolean manageStock, Integer decimals) {
+
         this.id = id;
         this.categoryId = categoryId;
         this.name = name;
@@ -54,13 +59,16 @@ public class Product {
         this.stockQuantity = stockQuantity;
         this.minStock = minStock;
         this.manageStock = manageStock;
+        this.decimals = decimals;
     }
+
 
     // Overload for specific features
     public Product(int id, int categoryId, String name, double price, boolean isFavorite, boolean visible,
             String imagePath, String categoryName, Double iva, Double categoryIva) {
         this(id, categoryId, name, price, isFavorite, visible, imagePath, categoryName, iva, categoryIva, null, 0.0,
-                true, 0, 0, false);
+                true, 0, 0, false, null);
+
     }
 
     public Product(int id, int categoryId, String name, double price, boolean isFavorite, boolean visible,
@@ -245,6 +253,15 @@ public class Product {
         this.manageStock = manageStock;
     }
 
+    public Integer getDecimals() {
+        return decimals;
+    }
+
+    public void setDecimals(Integer decimals) {
+        this.decimals = decimals;
+    }
+
+
     /**
      * Resolves the effective IVA for this product based on the priority:
      * 1. Product IVA (if set)
@@ -259,8 +276,33 @@ public class Product {
         return globalIva;
     }
 
+    public int resolveEffectiveDecimals(int globalDecimals) {
+        if (this.decimals != null) return this.decimals;
+        if (this.categoryDecimals != null) return this.categoryDecimals;
+        
+        // Si el producto no tiene categor\u00eda asignada (<= 0), lo "l\u00f3gico" es usar 0 decimales
+        if (this.categoryId <= 0) return 0;
+        
+        // Si tiene categor\u00eda pero no tiene configuraci\u00f3n propia, heredamos del global (ej: 2)
+        return globalDecimals;
+    }
+
+    public int resolveEffectiveDecimals() {
+        return resolveEffectiveDecimals(2); // Fallback por defecto del sistema
+    }
+
+    public Integer getCategoryDecimals() {
+        return categoryDecimals;
+    }
+
+    public void setCategoryDecimals(Integer categoryDecimals) {
+        this.categoryDecimals = categoryDecimals;
+    }
+
+
     @Override
     public String toString() {
+
         return name;
     }
 }

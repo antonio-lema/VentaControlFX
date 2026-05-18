@@ -77,9 +77,13 @@ public class ClosureActionManager {
         if (file != null) {
             container.getAsyncManager().runAsyncTask(() -> {
                 try {
-                    // Fetch movements for the audit
+                    // Fetch movements, sales and returns for the audit
                     List<com.mycompany.ventacontrolfx.domain.repository.ICashClosureRepository.CashMovement> movements = 
                         container.getClosureUseCase().getMovementsByClosure(closure.getClosureId());
+                    List<com.mycompany.ventacontrolfx.domain.model.Sale> sales = 
+                        container.getSaleUseCase().getSalesByClosureId(closure.getClosureId());
+                    List<com.mycompany.ventacontrolfx.domain.model.Return> returns = 
+                        container.getReturnUseCase().getReturnsByClosureId(closure.getClosureId());
 
                     com.lowagie.text.Document document = new com.lowagie.text.Document(com.lowagie.text.PageSize.A4);
                     com.lowagie.text.pdf.PdfWriter.getInstance(document, new java.io.FileOutputStream(file));
@@ -105,16 +109,47 @@ public class ClosureActionManager {
                     document.add(new com.lowagie.text.Paragraph("Descuadre: " + String.format("%.2f \u20ac", closure.getDifference()), normalFont));
                     document.add(new com.lowagie.text.Paragraph("\n"));
 
+                    // Prepare unified movement list
+                    class UnifiedMovement {
+                        java.time.LocalDateTime time;
+                        String type;
+                        String user;
+                        String detail;
+                        double amount;
+                        UnifiedMovement(java.time.LocalDateTime time, String type, String user, String detail, double amount) {
+                            this.time = time; this.type = type; this.user = user; this.detail = detail; this.amount = amount;
+                        }
+                    }
+                    List<UnifiedMovement> allMovements = new java.util.ArrayList<>();
+                    
+                    if (movements != null) {
+                        for (com.mycompany.ventacontrolfx.domain.repository.ICashClosureRepository.CashMovement m : movements) {
+                            allMovements.add(new UnifiedMovement(m.getCreatedAt(), m.getType(), m.getUsername() != null ? m.getUsername() : "--", m.getReason() != null ? m.getReason() : "", m.getAmount()));
+                        }
+                    }
+                    if (sales != null) {
+                        for (com.mycompany.ventacontrolfx.domain.model.Sale s : sales) {
+                            allMovements.add(new UnifiedMovement(s.getSaleDateTime(), "VENTA", s.getUserName() != null ? s.getUserName() : "--", s.getDocSeries() + "-" + s.getDocNumber(), s.getTotal()));
+                        }
+                    }
+                    if (returns != null) {
+                        for (com.mycompany.ventacontrolfx.domain.model.Return r : returns) {
+                            allMovements.add(new UnifiedMovement(r.getReturnDatetime(), "DEVOLUCION", r.getUserName() != null ? r.getUserName() : "--", r.getDocSeries() + "-" + r.getDocNumber() + (r.getReason() != null ? " (" + r.getReason() + ")" : ""), -r.getTotalRefunded()));
+                        }
+                    }
+                    
+                    allMovements.sort((a, b) -> a.time.compareTo(b.time));
+
                     // Tabla Movimientos
                     document.add(new com.lowagie.text.Paragraph("DETALLE DE MOVIMIENTOS", subtitleFont));
                     document.add(new com.lowagie.text.Paragraph("\n"));
 
-                    if (movements != null && !movements.isEmpty()) {
-                        com.lowagie.text.pdf.PdfPTable table = new com.lowagie.text.pdf.PdfPTable(4);
+                    if (!allMovements.isEmpty()) {
+                        com.lowagie.text.pdf.PdfPTable table = new com.lowagie.text.pdf.PdfPTable(5);
                         table.setWidthPercentage(100);
-                        table.setWidths(new float[]{1.5f, 1f, 3f, 1f});
+                        table.setWidths(new float[]{1.5f, 1.5f, 2f, 3f, 1.5f});
 
-                        String[] headers = {"Hora", "Tipo", "Motivo", "Importe"};
+                        String[] headers = {"Hora", "Tipo", "Usuario", "Detalle", "Importe"};
                         for (String h : headers) {
                             com.lowagie.text.pdf.PdfPCell cell = new com.lowagie.text.pdf.PdfPCell(new com.lowagie.text.Phrase(h, boldFont));
                             cell.setBackgroundColor(new java.awt.Color(230, 230, 230));
@@ -122,12 +157,13 @@ public class ClosureActionManager {
                             table.addCell(cell);
                         }
 
-                        for (com.mycompany.ventacontrolfx.domain.repository.ICashClosureRepository.CashMovement mov : movements) {
-                            table.addCell(new com.lowagie.text.pdf.PdfPCell(new com.lowagie.text.Phrase(mov.getCreatedAt().format(java.time.format.DateTimeFormatter.ofPattern("HH:mm")), normalFont)));
-                            table.addCell(new com.lowagie.text.pdf.PdfPCell(new com.lowagie.text.Phrase(mov.getType(), normalFont)));
-                            table.addCell(new com.lowagie.text.pdf.PdfPCell(new com.lowagie.text.Phrase(mov.getReason() != null ? mov.getReason() : "", normalFont)));
+                        for (UnifiedMovement mov : allMovements) {
+                            table.addCell(new com.lowagie.text.pdf.PdfPCell(new com.lowagie.text.Phrase(mov.time.format(java.time.format.DateTimeFormatter.ofPattern("HH:mm")), normalFont)));
+                            table.addCell(new com.lowagie.text.pdf.PdfPCell(new com.lowagie.text.Phrase(mov.type, normalFont)));
+                            table.addCell(new com.lowagie.text.pdf.PdfPCell(new com.lowagie.text.Phrase(mov.user, normalFont)));
+                            table.addCell(new com.lowagie.text.pdf.PdfPCell(new com.lowagie.text.Phrase(mov.detail, normalFont)));
                             
-                            com.lowagie.text.pdf.PdfPCell amountCell = new com.lowagie.text.pdf.PdfPCell(new com.lowagie.text.Phrase(String.format("%.2f \u20ac", mov.getAmount()), normalFont));
+                            com.lowagie.text.pdf.PdfPCell amountCell = new com.lowagie.text.pdf.PdfPCell(new com.lowagie.text.Phrase(String.format("%.2f \u20ac", mov.amount), normalFont));
                             amountCell.setHorizontalAlignment(com.lowagie.text.Element.ALIGN_RIGHT);
                             table.addCell(amountCell);
                         }
