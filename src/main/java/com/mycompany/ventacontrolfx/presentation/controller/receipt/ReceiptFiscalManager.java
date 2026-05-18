@@ -55,6 +55,16 @@ public class ReceiptFiscalManager {
             if (qrBytes != null) {
                 ImageView imgView = new ImageView(new Image(new ByteArrayInputStream(qrBytes)));
                 imgView.setFitWidth(140); imgView.setFitHeight(140);
+                imgView.setCursor(javafx.scene.Cursor.HAND);
+                imgView.setOnMouseClicked(event -> {
+                    try {
+                        if (java.awt.Desktop.isDesktopSupported()) {
+                            java.awt.Desktop.getDesktop().browse(new java.net.URI(aeatUrl));
+                        }
+                    } catch (Exception ex) {
+                        System.err.println("Error al abrir URL de AEAT: " + ex.getMessage());
+                    }
+                });
                 VBox qrFrame = new VBox(imgView);
                 qrFrame.setAlignment(Pos.CENTER);
                 qrFrame.setStyle("-fx-padding: 8; -fx-border-color: #EEEEEE; -fx-border-width: 1; -fx-background-color: white;");

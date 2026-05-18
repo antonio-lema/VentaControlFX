@@ -47,6 +47,16 @@ public class FiscalRenderer {
         if (qr != null) {
             ImageView img = new ImageView(new Image(new ByteArrayInputStream(qr)));
             img.setFitWidth(100); img.setFitHeight(100);
+            img.setCursor(javafx.scene.Cursor.HAND);
+            img.setOnMouseClicked(event -> {
+                try {
+                    if (java.awt.Desktop.isDesktopSupported()) {
+                        java.awt.Desktop.getDesktop().browse(new java.net.URI(url));
+                    }
+                } catch (Exception ex) {
+                    System.err.println("Error al abrir URL de AEAT: " + ex.getMessage());
+                }
+            });
             box.getChildren().addAll(brand, img);
         }
         
