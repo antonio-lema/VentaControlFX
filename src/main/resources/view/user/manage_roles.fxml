@@ -12,31 +12,8 @@
 <?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
 <?import javafx.scene.layout.StackPane?>
 
-<VBox spacing="0" styleClass="main-content-area" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mycompany.ventacontrolfx.presentation.controller.dialog.ManageRolesController">
-    <!-- Header Section -->
-    <VBox styleClass="view-header" spacing="0">
-        <children>
-            <HBox spacing="16" alignment="CENTER_LEFT">
-                <children>
-                    <StackPane styleClass="view-header-icon-wrap">
-                        <children><FontAwesomeIconView glyphName="ID_BADGE" size="22" fill="white"/></children>
-                    </StackPane>
-                    <VBox spacing="2">
-                        <children>
-                            <Label text="Gesti&#x00f3;n de Roles" styleClass="view-title"/>
-                            <Label text="Administra los roles del sistema y sus permisos asociados" styleClass="view-subtitle"/>
-                        </children>
-                    </VBox>
-                    <Region HBox.hgrow="ALWAYS" />
-                    <Button onAction="#handleNewRole" styleClass="btn-primary" text=" Nuevo Rol">
-                        <graphic><FontAwesomeIconView glyphName="PLUS" size="14" fill="white" /></graphic>
-                    </Button>
-                </children>
-            </HBox>
-        </children>
-    </VBox>
-
-    <VBox spacing="20.0" VBox.vgrow="ALWAYS" style="-fx-padding: 30 30 20 30;">
+<VBox spacing="0" styleClass="main-content-area" style="-fx-padding: 0;" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mycompany.ventacontrolfx.presentation.controller.dialog.ManageRolesController">
+    <VBox spacing="20.0" VBox.vgrow="ALWAYS" style="-fx-padding: 25 35;">
 
     <!-- Filter Section -->
     <HBox alignment="CENTER_LEFT" spacing="15" styleClass="modern-filter-bar">
@@ -48,6 +25,9 @@
                 </children>
             </HBox>
             <Region HBox.hgrow="ALWAYS" />
+            <Button onAction="#handleNewRole" styleClass="btn-primary" text=" Nuevo Rol">
+                <graphic><FontAwesomeIconView glyphName="PLUS" size="14" fill="white" /></graphic>
+            </Button>
         </children>
     </HBox>
 

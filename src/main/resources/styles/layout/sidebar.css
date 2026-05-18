@@ -78,6 +78,31 @@
     -fx-border-width: 0 0 0 4;
 }
 
+/* ─── Anulación de Foco de JavaFX (Evita resaltado azul o blanco persistente) ─── */
+.sidebar-section-header:focused {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-effect: null;
+}
+
+.sidebar-section-header-active:focused {
+    -fx-background-color: -fx-custom-color-primary-alpha40;
+    -fx-background-insets: 0;
+    -fx-effect: null;
+}
+
+.sidebar-button:focused {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-effect: null;
+}
+
+.active-sidebar-button:focused {
+    -fx-background-color: -fx-grad-sidebar-active;
+    -fx-background-insets: 0;
+    -fx-effect: dropshadow(three-pass-box, -fx-shadow-color-primary, 15, 0, 0, 0);
+}
+
 /* ─── Botones de navegación ──────────────────────────────────────── */
 .sidebar-button {
     -fx-background-color: transparent;

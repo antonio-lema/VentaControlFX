@@ -26,88 +26,85 @@
         <VBox spacing="0" style="-fx-background-color: transparent;" alignment="TOP_CENTER">
             
             <!-- SECCI&#x00d3;N: VENTAS -->
-            <Button fx:id="sectionVentas" styleClass="sidebar-section-header" onAction="#toggleVentas" text="%sidebar.section.sales" maxWidth="Infinity" />
+            <Button fx:id="sectionVentas" styleClass="sidebar-section-header" onAction="#toggleVentas" text="%sidebar.section.sales" maxWidth="Infinity" focusTraversable="false" />
             <VBox fx:id="contentVentas" styleClass="sidebar-section-content" spacing="0" visible="false" managed="false">
-                <Button fx:id="btnSell" styleClass="sidebar-button" onAction="#showSellView" contentDisplay="TOP" maxWidth="Infinity" text="%sidebar.item.sell">
+                <Button fx:id="btnSell" styleClass="sidebar-button" onAction="#showSellView" contentDisplay="TOP" maxWidth="Infinity" text="%sidebar.item.sell" focusTraversable="false">
                     <graphic><FontAwesomeIconView glyphName="SHOPPING_CART" size="22" styleClass="sidebar-icon"/></graphic>
                 </Button>
-                <Button fx:id="btnHistory" styleClass="sidebar-button" onAction="#showHistoryView" contentDisplay="TOP" maxWidth="Infinity" text="%sidebar.item.history">
+                <Button fx:id="btnHistory" styleClass="sidebar-button" onAction="#showHistoryView" contentDisplay="TOP" maxWidth="Infinity" text="%sidebar.item.history" focusTraversable="false">
                     <graphic><FontAwesomeIconView glyphName="HISTORY" size="22" styleClass="sidebar-icon"/></graphic>
                 </Button>
-                <Button fx:id="btnReturns" styleClass="sidebar-button" onAction="#handleShowReturns" contentDisplay="TOP" maxWidth="Infinity" text="%sidebar.item.returns">
+                <Button fx:id="btnReturns" styleClass="sidebar-button" onAction="#handleShowReturns" contentDisplay="TOP" maxWidth="Infinity" text="%sidebar.item.returns" focusTraversable="false">
                     <graphic><FontAwesomeIconView glyphName="REPLY" size="22" styleClass="sidebar-icon"/></graphic>
                 </Button>
-                <Button fx:id="btnClosures" styleClass="sidebar-button" onAction="#handleShowClosures" contentDisplay="TOP" maxWidth="Infinity" text="%sidebar.item.closures">
+                <Button fx:id="btnClosures" styleClass="sidebar-button" onAction="#handleShowClosures" contentDisplay="TOP" maxWidth="Infinity" text="%sidebar.item.closures" focusTraversable="false">
                     <graphic><FontAwesomeIconView glyphName="CALCULATOR" size="22" styleClass="sidebar-icon"/></graphic>
                 </Button>
             </VBox>
 
             <!-- SECCI&#x00d3;N: CAT&#x00c1;LOGO -->
-            <Button fx:id="sectionCatalogo" styleClass="sidebar-section-header" onAction="#toggleCatalogo" text="%sidebar.section.catalog" maxWidth="Infinity" />
+            <Button fx:id="sectionCatalogo" styleClass="sidebar-section-header" onAction="#toggleCatalogo" text="%sidebar.section.catalog" maxWidth="Infinity" focusTraversable="false" />
             <VBox fx:id="contentCatalogo" styleClass="sidebar-section-content" spacing="0" visible="false" managed="false">
-                <Button fx:id="btnProducts" styleClass="sidebar-button" onAction="#showProductsView" contentDisplay="TOP" maxWidth="Infinity" text="%catalog.hub.title">
+                <Button fx:id="btnProducts" styleClass="sidebar-button" onAction="#showProductsView" contentDisplay="TOP" maxWidth="Infinity" text="%catalog.hub.title" focusTraversable="false">
                     <graphic><FontAwesomeIconView glyphName="BOOK" size="22" styleClass="sidebar-icon"/></graphic>
                 </Button>
-                <Button fx:id="btnPriceLists" styleClass="sidebar-button" onAction="#handleShowPriceLists" contentDisplay="TOP" maxWidth="Infinity" text="%pricing.hub.title">
+                <Button fx:id="btnPriceLists" styleClass="sidebar-button" onAction="#handleShowPriceLists" contentDisplay="TOP" maxWidth="Infinity" text="%pricing.hub.title" focusTraversable="false">
                     <graphic><FontAwesomeIconView glyphName="MONEY" size="22" styleClass="sidebar-icon"/></graphic>
                 </Button>
             </VBox>
 
             <!-- SECCI&#x00d3;N: PERSONAL -->
-            <Button fx:id="sectionPersonal" styleClass="sidebar-section-header" onAction="#togglePersonal" text="%sidebar.section.staff" maxWidth="Infinity" />
+            <Button fx:id="sectionPersonal" styleClass="sidebar-section-header" onAction="#togglePersonal" text="%sidebar.section.staff" maxWidth="Infinity" focusTraversable="false" />
             <VBox fx:id="contentPersonal" styleClass="sidebar-section-content" spacing="0" visible="false" managed="false">
-                <Button fx:id="btnWorkSessions" styleClass="sidebar-button" onAction="#handleShowWorkSessions" contentDisplay="TOP" maxWidth="Infinity" text="%staff.hub.title">
+                <Button fx:id="btnWorkSessions" styleClass="sidebar-button" onAction="#handleShowWorkSessions" contentDisplay="TOP" maxWidth="Infinity" text="%staff.hub.title" focusTraversable="false">
                     <graphic><FontAwesomeIconView glyphName="CLOCK_ALT" size="22" styleClass="sidebar-icon"/></graphic>
                 </Button>
-                <Button fx:id="btnStaffCalendar" styleClass="sidebar-button" onAction="#handleShowStaffPlanning" contentDisplay="TOP" maxWidth="Infinity" text="%staff.planning.title">
+                <Button fx:id="btnStaffCalendar" styleClass="sidebar-button" onAction="#handleShowStaffPlanning" contentDisplay="TOP" maxWidth="Infinity" text="%staff.planning.title" focusTraversable="false">
                     <graphic><FontAwesomeIconView glyphName="CALENDAR" size="22" styleClass="sidebar-icon"/></graphic>
                 </Button>
             </VBox>
 
             <!-- SECCI&#x00d3;N: CLIENTES -->
-            <Button fx:id="sectionClientes" styleClass="sidebar-section-header" onAction="#toggleClientes" text="%sidebar.section.clients" maxWidth="Infinity" />
+            <Button fx:id="sectionClientes" styleClass="sidebar-section-header" onAction="#toggleClientes" text="%sidebar.section.clients" maxWidth="Infinity" focusTraversable="false" />
             <VBox fx:id="contentClientes" styleClass="sidebar-section-content" spacing="0" visible="false" managed="false">
-                <Button fx:id="btnClients" styleClass="sidebar-button" onAction="#handleShowClients" contentDisplay="TOP" maxWidth="Infinity" text="%sidebar.item.directory">
+                <Button fx:id="btnClients" styleClass="sidebar-button" onAction="#handleShowClients" contentDisplay="TOP" maxWidth="Infinity" text="%sidebar.item.directory" focusTraversable="false">
                     <graphic><FontAwesomeIconView glyphName="ADDRESS_BOOK" size="22" styleClass="sidebar-icon"/></graphic>
                 </Button>
-                <Button fx:id="btnClientReport" styleClass="sidebar-button" onAction="#handleShowClientReport" contentDisplay="TOP" maxWidth="Infinity" text="%sidebar.item.client_sales">
+                <Button fx:id="btnClientReport" styleClass="sidebar-button" onAction="#handleShowClientReport" contentDisplay="TOP" maxWidth="Infinity" text="%sidebar.item.client_sales" focusTraversable="false">
                     <graphic><FontAwesomeIconView glyphName="USER" size="22" styleClass="sidebar-icon"/></graphic>
                 </Button>
             </VBox>
 
             <!-- SECCI&#x00d3;N: GESTI&#x00d3;N -->
-            <Button fx:id="sectionGestion" styleClass="sidebar-section-header" onAction="#toggleGestion" text="%sidebar.section.management" maxWidth="Infinity" />
+            <Button fx:id="sectionGestion" styleClass="sidebar-section-header" onAction="#toggleGestion" text="%sidebar.section.management" maxWidth="Infinity" focusTraversable="false" />
             <VBox fx:id="contentGestion" styleClass="sidebar-section-content" spacing="0" visible="false" managed="false">
-                <Button fx:id="btnReports" styleClass="sidebar-button" onAction="#handleShowReports" contentDisplay="TOP" maxWidth="Infinity" text="%sidebar.item.reports">
+                <Button fx:id="btnReports" styleClass="sidebar-button" onAction="#handleShowReports" contentDisplay="TOP" maxWidth="Infinity" text="%sidebar.item.reports" focusTraversable="false">
                     <graphic><FontAwesomeIconView glyphName="BAR_CHART" size="22" styleClass="sidebar-icon"/></graphic>
                 </Button>
-                <Button fx:id="btnBilling" styleClass="sidebar-button" onAction="#handleShowBilling" contentDisplay="TOP" maxWidth="Infinity" text="%sidebar.item.billing">
+                <Button fx:id="btnBilling" styleClass="sidebar-button" onAction="#handleShowBilling" contentDisplay="TOP" maxWidth="Infinity" text="%sidebar.item.billing" focusTraversable="false">
                     <graphic><FontAwesomeIconView glyphName="FILE_TEXT_ALT" size="22" styleClass="sidebar-icon"/></graphic>
                 </Button>
-                <Button fx:id="btnVerifactu" styleClass="sidebar-button" onAction="#handleShowVerifactu" contentDisplay="TOP" maxWidth="Infinity" text="%sidebar.item.verifactu">
+                <Button fx:id="btnVerifactu" styleClass="sidebar-button" onAction="#handleShowVerifactu" contentDisplay="TOP" maxWidth="Infinity" text="%sidebar.item.verifactu" focusTraversable="false">
                     <graphic><FontAwesomeIconView glyphName="SHIELD" size="22" styleClass="sidebar-icon"/></graphic>
                 </Button>
-                <Button fx:id="btnVat" styleClass="sidebar-button" onAction="#handleShowVat" contentDisplay="TOP" maxWidth="Infinity" text="%sidebar.item.vat">
+                <Button fx:id="btnVat" styleClass="sidebar-button" onAction="#handleShowVat" contentDisplay="TOP" maxWidth="Infinity" text="%sidebar.item.vat" focusTraversable="false">
                     <graphic><FontAwesomeIconView glyphName="PERCENT" size="22" styleClass="sidebar-icon"/></graphic>
                 </Button>
-                <Button fx:id="btnUsers" styleClass="sidebar-button" onAction="#handleShowUsers" contentDisplay="TOP" maxWidth="Infinity" text="%sidebar.item.users">
-                    <graphic><FontAwesomeIconView glyphName="USER_PLUS" size="22" styleClass="sidebar-icon"/></graphic>
-                </Button>
-                <Button fx:id="btnRoles" styleClass="sidebar-button" onAction="#handleShowRoles" contentDisplay="TOP" maxWidth="Infinity" text="%sidebar.item.roles">
+                <Button fx:id="btnUsers" styleClass="sidebar-button" onAction="#handleShowUsers" contentDisplay="TOP" maxWidth="Infinity" text="%sidebar.item.security_hub" focusTraversable="false">
                     <graphic><FontAwesomeIconView glyphName="SHIELD" size="22" styleClass="sidebar-icon"/></graphic>
                 </Button>
             </VBox>
 
             <!-- SECCI&#x00d3;N: SISTEMA -->
-            <Button fx:id="sectionSistema" styleClass="sidebar-section-header" onAction="#toggleSistema" text="%sidebar.section.system" maxWidth="Infinity" />
+            <Button fx:id="sectionSistema" styleClass="sidebar-section-header" onAction="#toggleSistema" text="%sidebar.section.system" maxWidth="Infinity" focusTraversable="false" />
             <VBox fx:id="contentSistema" styleClass="sidebar-section-content" spacing="0" visible="false" managed="false">
-                <Button fx:id="btnConfig" styleClass="sidebar-button" onAction="#handleShowConfig" contentDisplay="TOP" maxWidth="Infinity" text="%sidebar.item.config">
+                <Button fx:id="btnConfig" styleClass="sidebar-button" onAction="#handleShowConfig" contentDisplay="TOP" maxWidth="Infinity" text="%sidebar.item.config" focusTraversable="false">
                     <graphic><FontAwesomeIconView glyphName="COG" size="22" styleClass="sidebar-icon"/></graphic>
                 </Button>
-                <Button fx:id="btnThemeSettings" styleClass="sidebar-button" onAction="#handleShowCustomization" contentDisplay="TOP" maxWidth="Infinity" text="%sidebar.item.aesthetics">
+                <Button fx:id="btnThemeSettings" styleClass="sidebar-button" onAction="#handleShowCustomization" contentDisplay="TOP" maxWidth="Infinity" text="%sidebar.item.aesthetics" focusTraversable="false">
                     <graphic><FontAwesomeIconView glyphName="PAINT_BRUSH" size="22" styleClass="sidebar-icon"/></graphic>
                 </Button>
-                <Button fx:id="btnBackup" styleClass="sidebar-button" onAction="#handleShowBackup" contentDisplay="TOP" maxWidth="Infinity" text="%sidebar.item.backup">
+                <Button fx:id="btnBackup" styleClass="sidebar-button" onAction="#handleShowBackup" contentDisplay="TOP" maxWidth="Infinity" text="%sidebar.item.backup" focusTraversable="false">
                     <graphic><FontAwesomeIconView glyphName="DATABASE" size="22" styleClass="sidebar-icon"/></graphic>
                 </Button>
             </VBox>
@@ -124,7 +121,7 @@
     </HBox>
 
     <!-- FOOTER FIJO -->
-    <Button fx:id="btnLock" styleClass="sidebar-button" onAction="#handleLock" contentDisplay="TOP" maxWidth="Infinity" text="%sidebar.item.lock">
+    <Button fx:id="btnLock" styleClass="sidebar-button" onAction="#handleLock" contentDisplay="TOP" maxWidth="Infinity" text="%sidebar.item.lock" focusTraversable="false">
         <graphic><FontAwesomeIconView glyphName="LOCK" size="22" styleClass="sidebar-icon"/></graphic>
     </Button>
 </VBox>

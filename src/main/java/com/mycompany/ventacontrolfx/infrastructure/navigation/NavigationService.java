@@ -61,6 +61,7 @@ public class NavigationService {
         ACCESS_RULES.put("/view/dialog/clients.fxml", "CLIENTES");
         ACCESS_RULES.put("/view/user/manage_users.fxml", "usuario.crear");
         ACCESS_RULES.put("/view/user/manage_roles.fxml", "rol.editar");
+        ACCESS_RULES.put("/view/user/users_roles_hub.fxml", "usuario.crear|rol.editar");
         ACCESS_RULES.put("/view/config/sale_config.fxml", "CONFIGURACION");
         ACCESS_RULES.put("/view/customization/customization_panel.fxml", "CONFIGURACION");
         ACCESS_RULES.put("/view/reports/seller_report.fxml", "reporte.venta|reporte.vendedores");

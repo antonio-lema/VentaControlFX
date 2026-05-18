@@ -14,6 +14,38 @@ public class DatabaseMigration {
 
     public static void ensureSchemaUpdate() {
         try (Connection conn = DBConnection.getConnection()) {
+            // Asegurar que exista al menos un SUPERADMIN en la base de datos (se ejecuta siempre en el arranque)
+            try (Statement stmt = conn.createStatement()) {
+                try (ResultSet rs = stmt.executeQuery("SELECT COUNT(*) FROM users WHERE UPPER(role) = 'SUPERADMIN'")) {
+                    if (rs.next() && rs.getInt(1) == 0) {
+                        System.out.println("[Migration] No se detecta ningun SUPERADMIN. Promocionando primer administrador...");
+                        int adminId = -1;
+                        try (ResultSet rsAdmin = stmt.executeQuery("SELECT user_id FROM users WHERE UPPER(role) = 'ADMIN' OR UPPER(role) = 'ADMINISTRADOR' ORDER BY user_id ASC LIMIT 1")) {
+                            if (rsAdmin.next()) {
+                                adminId = rsAdmin.getInt(1);
+                            }
+                        }
+                        if (adminId != -1) {
+                            stmt.executeUpdate("UPDATE users SET role = 'SUPERADMIN' WHERE user_id = " + adminId);
+                            System.out.println("[Migration] Usuario con ID " + adminId + " promovido con exito a SUPERADMIN.");
+                        } else {
+                            int firstUserId = -1;
+                            try (ResultSet rsFirst = stmt.executeQuery("SELECT user_id FROM users ORDER BY user_id ASC LIMIT 1")) {
+                                if (rsFirst.next()) {
+                                    firstUserId = rsFirst.getInt(1);
+                                }
+                            }
+                            if (firstUserId != -1) {
+                                stmt.executeUpdate("UPDATE users SET role = 'SUPERADMIN' WHERE user_id = " + firstUserId);
+                                System.out.println("[Migration] Primer usuario de la BD (ID " + firstUserId + ") promovido con exito a SUPERADMIN.");
+                            }
+                        }
+                    }
+                }
+            } catch (Exception ex) {
+                System.err.println("[Migration] Error al verificar/promover SUPERADMIN: " + ex.getMessage());
+            }
+
             int installedVersion = getDatabaseVersion(conn);
             if (installedVersion >= CURRENT_VERSION) {
                 return; // Schema is up to date, skip checks
