@@ -35,6 +35,12 @@ public class PromotionFormController implements Injectable {
     @FXML
     private TextField txtCode;
     @FXML
+    private ComboBox<String> cmbApplyMethod;
+    @FXML
+    private HBox panelCodeContainer;
+    @FXML
+    private Label lblValueDescription;
+    @FXML
     private ComboBox<PromotionType> cmbType;
     @FXML
     private TextField txtValue;
@@ -83,6 +89,21 @@ public class PromotionFormController implements Injectable {
     }
 
     private void setupForm() {
+        if (cmbApplyMethod != null) {
+            cmbApplyMethod.setItems(FXCollections.observableArrayList("Aplicaci\u00f3n Autom\u00e1tica", "C\u00f3digo de Cup\u00f3n (Manual)"));
+            cmbApplyMethod.valueProperty().addListener((obs, oldVal, newVal) -> {
+                boolean isCoupon = "C\u00f3digo de Cup\u00f3n (Manual)".equals(newVal);
+                if (panelCodeContainer != null) {
+                    panelCodeContainer.setVisible(isCoupon);
+                    panelCodeContainer.setManaged(isCoupon);
+                }
+                if (!isCoupon && txtCode != null) {
+                    txtCode.clear();
+                }
+            });
+            cmbApplyMethod.setValue("Aplicaci\u00f3n Autom\u00e1tica");
+        }
+
         cmbType.setItems(FXCollections.observableArrayList(PromotionType.values()));
         cmbType.setConverter(new StringConverter<PromotionType>() {
             @Override
@@ -110,8 +131,17 @@ public class PromotionFormController implements Injectable {
         });
 
         cmbScope.valueProperty().addListener((obs, oldVal, newVal) -> {
-            panelAffected.setVisible(newVal != PromotionScope.GLOBAL);
-            panelAffected.setManaged(newVal != PromotionScope.GLOBAL);
+            boolean isNotGlobal = newVal != PromotionScope.GLOBAL;
+            panelAffected.setVisible(isNotGlobal);
+            panelAffected.setManaged(isNotGlobal);
+
+            if (txtAffectedSearch != null) {
+                if (newVal == PromotionScope.PRODUCT) {
+                    txtAffectedSearch.setPromptText("Buscar producto por nombre o ID y pulsar A\u00f1adir...");
+                } else if (newVal == PromotionScope.CATEGORY) {
+                    txtAffectedSearch.setPromptText("Buscar categor\u00eda por nombre o ID y pulsar A\u00f1adir...");
+                }
+            }
         });
 
         cmbType.valueProperty().addListener((obs, oldVal, newVal) -> {
@@ -122,6 +152,14 @@ public class PromotionFormController implements Injectable {
             if (panelValue != null) {
                 panelValue.setVisible(!isVolume);
                 panelValue.setManaged(!isVolume);
+            }
+
+            if (lblValueDescription != null) {
+                if (newVal == PromotionType.PERCENTAGE) {
+                    lblValueDescription.setText("Porcentaje de Descuento (%) - Ej: 10 para 10%");
+                } else if (newVal == PromotionType.FIXED_DISCOUNT) {
+                    lblValueDescription.setText("Importe Descontado (\u20ac) - Ej: 5,00 para 5\u20ac");
+                }
             }
         });
 
@@ -181,6 +219,11 @@ public class PromotionFormController implements Injectable {
             lblTitle.setText("Editar Promoci\u00f3n");
             txtName.setText(p.getName());
             txtCode.setText(p.getCode() != null ? p.getCode() : "");
+            if (cmbApplyMethod != null) {
+                cmbApplyMethod.setValue(p.getCode() != null && !p.getCode().trim().isEmpty() 
+                    ? "C\u00f3digo de Cup\u00f3n (Manual)" 
+                    : "Aplicaci\u00f3n Autom\u00e1tica");
+            }
             cmbType.setValue(p.getType());
             txtValue.setText(String.valueOf(p.getValue()));
             cmbScope.setValue(p.getScope());
@@ -266,8 +309,11 @@ public class PromotionFormController implements Injectable {
             if (promotion == null)
                 promotion = new Promotion();
             promotion.setName(txtName.getText());
-            promotion.setCode(
-                    txtCode.getText() != null && !txtCode.getText().trim().isEmpty() ? txtCode.getText().trim() : null);
+            if (cmbApplyMethod != null && "Aplicaci\u00f3n Autom\u00e1tica".equals(cmbApplyMethod.getValue())) {
+                promotion.setCode(null);
+            } else {
+                promotion.setCode(txtCode.getText() != null && !txtCode.getText().trim().isEmpty() ? txtCode.getText().trim() : null);
+            }
             promotion.setType(cmbType.getValue());
             double val = 0.0;
             if (cmbType.getValue() != PromotionType.VOLUME_DISCOUNT) {
@@ -346,6 +392,16 @@ public class PromotionFormController implements Injectable {
             try {
                 Double.parseDouble(txtValue.getText().replace(',', '.'));
             } catch (Exception e) {
+                return false;
+            }
+        }
+        if (cmbApplyMethod != null && "C\u00f3digo de Cup\u00f3n (Manual)".equals(cmbApplyMethod.getValue())) {
+            if (txtCode.getText() == null || txtCode.getText().trim().isEmpty()) {
+                Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.setTitle("Validaci\u00f3n");
+                alert.setHeaderText("C\u00f3digo de Cup\u00f3n Requerido");
+                alert.setContentText("Por favor, introduce o genera un c\u00f3digo de cup\u00f3n.");
+                alert.showAndWait();
                 return false;
             }
         }
