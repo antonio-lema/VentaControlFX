@@ -79,8 +79,18 @@ public class ReceiptFiscalManager {
             
             fiscalBox.getChildren().addAll(lblHash, separator);
             
-            // Añadir al inicio del ticket (arriba del todo)
-            receiptContent.getChildren().add(0, fiscalBox);
+            // Encontrar la sección de información del ticket para posicionar el bloque Verifactu justo arriba de ella
+            // (quedando de forma elegante debajo del logotipo, datos de empresa y datos del cliente si existen)
+            javafx.scene.Node ticketInfo = receiptContent.lookup("#ticketInfoSection");
+            int index = -1;
+            if (ticketInfo != null) {
+                index = receiptContent.getChildren().indexOf(ticketInfo);
+            }
+            if (index >= 0) {
+                receiptContent.getChildren().add(index, fiscalBox);
+            } else {
+                receiptContent.getChildren().add(fiscalBox);
+            }
             
         } catch (Exception ex) {
             System.err.println("Error renderizando Verifactu: " + ex.getMessage());

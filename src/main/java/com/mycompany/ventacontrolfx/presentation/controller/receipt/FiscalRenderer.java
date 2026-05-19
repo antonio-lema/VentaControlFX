@@ -69,8 +69,18 @@ public class FiscalRenderer {
         separator.getStrokeDashArray().addAll(2.0, 2.0);
         box.getChildren().add(separator);
         
-        // Añadir al inicio de la factura/ticket impreso (arriba del todo)
-        vBox.getChildren().add(0, box);
+        // Encontrar la sección de información del ticket para posicionar el bloque Verifactu justo arriba de ella
+        // (quedando de forma elegante debajo del logotipo, datos de empresa y datos del cliente si existen)
+        javafx.scene.Node ticketInfo = vBox.lookup("#ticketInfoSection");
+        int index = -1;
+        if (ticketInfo != null) {
+            index = vBox.getChildren().indexOf(ticketInfo);
+        }
+        if (index >= 0) {
+            vBox.getChildren().add(index, box);
+        } else {
+            vBox.getChildren().add(box);
+        }
     }
 }
 
