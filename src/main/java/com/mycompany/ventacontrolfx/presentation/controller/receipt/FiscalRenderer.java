@@ -36,7 +36,7 @@ public class FiscalRenderer {
 
     public void renderFiscalBlock(VBox vBox, String cif, String ref, LocalDateTime date, double total, String hash) {
         if (hash == null) return;
-        VBox box = new VBox(5); box.setAlignment(Pos.CENTER); box.setStyle("-fx-padding: 10 0;");
+        VBox box = new VBox(5); box.setAlignment(Pos.CENTER); box.setStyle("-fx-padding: 5 0 10 0;");
         
         Label brand = new Label("SISTEMA VERI*FACTU"); brand.setStyle("-fx-font-weight: bold; -fx-font-size: 10px;");
         
@@ -62,7 +62,15 @@ public class FiscalRenderer {
         
         Label lblHash = new Label("Huella: " + hash); lblHash.setStyle("-fx-font-size: 7px;"); lblHash.setWrapText(true);
         box.getChildren().add(lblHash);
-        vBox.getChildren().add(box);
+        
+        // Separador para dividir la sección Verifactu del resto de la cabecera
+        javafx.scene.shape.Line separator = new javafx.scene.shape.Line(0, 0, 180, 0);
+        separator.setStroke(javafx.scene.paint.Color.web("#DDDDDD"));
+        separator.getStrokeDashArray().addAll(2.0, 2.0);
+        box.getChildren().add(separator);
+        
+        // Añadir al inicio de la factura/ticket impreso (arriba del todo)
+        vBox.getChildren().add(0, box);
     }
 }
 

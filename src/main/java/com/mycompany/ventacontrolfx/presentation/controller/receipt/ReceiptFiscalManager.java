@@ -36,7 +36,7 @@ public class ReceiptFiscalManager {
 
             VBox fiscalBox = new VBox(5);
             fiscalBox.setAlignment(Pos.CENTER);
-            fiscalBox.setStyle("-fx-padding: 25 0 10 0; -fx-background-color: white;");
+            fiscalBox.setStyle("-fx-padding: 5 0 15 0; -fx-background-color: white;");
             
             Line separator = new Line(0, 0, 180, 0);
             separator.setStroke(Color.web("#DDDDDD"));
@@ -68,7 +68,7 @@ public class ReceiptFiscalManager {
                 VBox qrFrame = new VBox(imgView);
                 qrFrame.setAlignment(Pos.CENTER);
                 qrFrame.setStyle("-fx-padding: 8; -fx-border-color: #EEEEEE; -fx-border-width: 1; -fx-background-color: white;");
-                fiscalBox.getChildren().addAll(separator, lblBrand, lblLegal, qrFrame);
+                fiscalBox.getChildren().addAll(lblBrand, lblLegal, qrFrame);
             }
             
             String h = data.document.getControlHash();
@@ -77,8 +77,10 @@ public class ReceiptFiscalManager {
             lblHash.setStyle("-fx-font-size: 7px; -fx-text-fill: #999999; -fx-alignment: center; -fx-font-family: monospace;");
             lblHash.setWrapText(true); lblHash.setTextAlignment(TextAlignment.CENTER); lblHash.setMaxWidth(260);
             
-            fiscalBox.getChildren().add(lblHash);
-            receiptContent.getChildren().add(fiscalBox);
+            fiscalBox.getChildren().addAll(lblHash, separator);
+            
+            // Añadir al inicio del ticket (arriba del todo)
+            receiptContent.getChildren().add(0, fiscalBox);
             
         } catch (Exception ex) {
             System.err.println("Error renderizando Verifactu: " + ex.getMessage());
