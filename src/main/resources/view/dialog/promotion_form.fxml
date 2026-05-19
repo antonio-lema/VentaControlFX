@@ -14,15 +14,15 @@
 
     <!-- Header Section -->
     <HBox alignment="CENTER_LEFT" spacing="15">
-        <StackPane styleClass="icon-container-blue" maxWidth="45" maxHeight="45" style="-fx-background-color: rgba(99, 102, 241, 0.1); -fx-background-radius: 8px; -fx-padding: 10px;">
-            <FontAwesomeIconView glyphName="TAG" size="20" fill="#6366f1"/>
+        <StackPane styleClass="icon-container-blue" maxWidth="45" maxHeight="45">
+            <FontAwesomeIconView glyphName="TAG" size="20" fill="#1e88e5"/>
         </StackPane>
         <VBox spacing="2">
-            <Label fx:id="lblTitle" text="%promotion.btn.new" styleClass="modal-title" style="-fx-font-size: 18px; -fx-font-weight: bold;"/>
-            <Label text="%promotion.form.subtitle" styleClass="modal-subtitle" style="-fx-font-size: 12px; -fx-text-fill: #666;"/>
+            <Label fx:id="lblTitle" text="%promotion.btn.new" styleClass="modal-title"/>
+            <Label text="%promotion.form.subtitle" styleClass="modal-subtitle"/>
         </VBox>
         <Region HBox.hgrow="ALWAYS"/>
-        <Button onAction="#handleCancel" styleClass="button-ghost" text="&#x2715;" style="-fx-font-size: 16px; -fx-background-color: transparent; -fx-cursor: hand;"/>
+        <Button onAction="#handleCancel" styleClass="button-ghost" text="&#x2715;" style="-fx-font-size: 16px;"/>
     </HBox>
 
     <Separator/>
