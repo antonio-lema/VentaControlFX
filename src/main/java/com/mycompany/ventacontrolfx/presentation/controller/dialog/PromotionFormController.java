@@ -37,7 +37,7 @@ public class PromotionFormController implements Injectable {
     @FXML
     private ComboBox<String> cmbApplyMethod;
     @FXML
-    private HBox panelCodeContainer;
+    private VBox panelCodeContainer;
     @FXML
     private Label lblValueDescription;
     @FXML
