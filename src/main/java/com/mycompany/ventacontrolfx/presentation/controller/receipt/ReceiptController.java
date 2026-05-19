@@ -155,6 +155,30 @@ public class ReceiptController implements Injectable {
         if (has) {
             lblRewardCode.setText(code);
             lblRewardMsg.setText(String.format("Cup\u00f3n de %.0f\u20ac para pr\u00f3xima compra\nV\u00e1lido hasta: %s", amount, expiry.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))));
+            
+            // Hacer el código de cupón copiable al portapapeles al hacer clic
+            lblRewardCode.setCursor(javafx.scene.Cursor.HAND);
+            String tooltipText = container != null ? container.getBundle().getString("receipt.reward.copy_tooltip") : "Hacer clic para copiar código";
+            lblRewardCode.setTooltip(new Tooltip(tooltipText));
+            
+            lblRewardCode.setOnMouseClicked(event -> {
+                javafx.scene.input.Clipboard clipboard = javafx.scene.input.Clipboard.getSystemClipboard();
+                javafx.scene.input.ClipboardContent content = new javafx.scene.input.ClipboardContent();
+                content.putString(code);
+                clipboard.setContent(content);
+                
+                // Efecto de feedback visual temporal
+                String copiedText = container != null ? container.getBundle().getString("receipt.reward.copied_text") : "¡COPIADO!";
+                lblRewardCode.setText(copiedText);
+                lblRewardCode.setStyle("-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: white; -fx-background-color: #2e7d32; -fx-padding: 5px; -fx-background-radius: 3px;");
+                
+                javafx.animation.PauseTransition pause = new javafx.animation.PauseTransition(javafx.util.Duration.seconds(1.2));
+                pause.setOnFinished(e -> {
+                    lblRewardCode.setText(code);
+                    lblRewardCode.setStyle("-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #2e7d32; -fx-background-color: white; -fx-padding: 5px; -fx-background-radius: 3px;");
+                });
+                pause.play();
+            });
         }
     }
 
