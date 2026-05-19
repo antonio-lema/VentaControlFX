@@ -5,7 +5,7 @@
 <?import javafx.geometry.Insets?>
 <?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
 
-<VBox spacing="15" styleClass="modal-container" prefWidth="600" prefHeight="620" stylesheets="@/styles/variables.css" 
+<VBox spacing="15" styleClass="modal-container" prefWidth="600" prefHeight="650" stylesheets="@/styles/variables.css" 
       xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" 
       fx:controller="com.mycompany.ventacontrolfx.presentation.controller.dialog.PromotionFormController">
     <padding>
@@ -35,24 +35,19 @@
                 <content>
                     <VBox spacing="15" style="-fx-padding: 15 5 10 5;">
                         <!-- Glassmorphic Form Card -->
-                        <VBox spacing="15" style="-fx-background-color: rgba(255, 255, 255, 0.02); -fx-background-radius: 10px; -fx-border-color: rgba(0, 0, 0, 0.08); -fx-border-width: 1px; -fx-padding: 20px;">
-                            <VBox spacing="8">
-                                <Label text="%promotion.form.name" styleClass="text-sm, font-medium, text-gray-700" style="-fx-font-weight: bold;"/>
+                        <VBox spacing="12" style="-fx-background-color: rgba(255, 255, 255, 0.02); -fx-background-radius: 10px; -fx-border-color: rgba(0, 0, 0, 0.08); -fx-border-width: 1px; -fx-padding: 20px;">
+                            <VBox spacing="6">
+                                <Label text="Nombre de la Promoción" styleClass="text-sm, font-medium" style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: -fx-text-custom-main;"/>
                                 <TextField fx:id="txtName" promptText="Ej: Rebajas de Verano" styleClass="form-control"/>
                             </VBox>
                             
-                            <HBox spacing="15" alignment="CENTER_LEFT">
-                                <VBox spacing="8" HBox.hgrow="ALWAYS">
-                                    <Label text="Método de Aplicación" styleClass="text-sm, font-medium, text-gray-700" style="-fx-font-weight: bold;"/>
-                                    <ComboBox fx:id="cmbApplyMethod" maxWidth="Infinity" styleClass="form-control"/>
-                                </VBox>
-                                <VBox spacing="8" HBox.hgrow="ALWAYS" alignment="CENTER_LEFT" style="-fx-padding: 24 0 0 10;">
-                                    <CheckBox fx:id="chkActive" text="%promotion.form.active" selected="true" styleClass="text-sm, font-medium, text-gray-800" style="-fx-font-weight: bold; -fx-cursor: hand;"/>
-                                </VBox>
-                            </HBox>
+                            <VBox spacing="6">
+                                <Label text="Método de Aplicación" styleClass="text-sm, font-medium" style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: -fx-text-custom-main;"/>
+                                <ComboBox fx:id="cmbApplyMethod" maxWidth="Infinity" styleClass="form-control"/>
+                            </VBox>
                             
-                            <VBox fx:id="panelCodeContainer" spacing="8" managed="false" visible="false">
-                                <Label text="%promotion.form.code" styleClass="text-sm, font-medium, text-gray-700" style="-fx-font-weight: bold;"/>
+                            <VBox fx:id="panelCodeContainer" spacing="6" managed="false" visible="false">
+                                <Label text="Código de Cupón" styleClass="text-sm, font-medium" style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: -fx-text-custom-main;"/>
                                 <HBox spacing="10">
                                     <TextField fx:id="txtCode" promptText="Código (Ej: VERANO2024)" HBox.hgrow="ALWAYS" styleClass="form-control"/>
                                     <Button onAction="#handleGenerateCode" styleClass="btn-secondary" text="Generar" style="-fx-cursor: hand;">
@@ -62,23 +57,27 @@
                             </VBox>
 
                             <HBox spacing="15">
-                                <VBox spacing="8" HBox.hgrow="ALWAYS">
-                                    <Label text="%promotion.form.start_date" styleClass="text-sm, font-medium, text-gray-700" style="-fx-font-weight: bold;"/>
+                                <VBox spacing="6" HBox.hgrow="ALWAYS">
+                                    <Label text="Válida Desde" styleClass="text-sm, font-medium" style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: -fx-text-custom-main;"/>
                                     <DatePicker fx:id="dpStartDate" maxWidth="Infinity" styleClass="form-control"/>
                                 </VBox>
-                                <VBox spacing="8" HBox.hgrow="ALWAYS">
-                                    <Label text="%promotion.form.end_date" styleClass="text-sm, font-medium, text-gray-700" style="-fx-font-weight: bold;"/>
+                                <VBox spacing="6" HBox.hgrow="ALWAYS">
+                                    <Label text="Válida Hasta" styleClass="text-sm, font-medium" style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: -fx-text-custom-main;"/>
                                     <DatePicker fx:id="dpEndDate" maxWidth="Infinity" styleClass="form-control"/>
                                 </VBox>
+                            </HBox>
+
+                            <HBox alignment="CENTER_LEFT" style="-fx-padding: 8 0 0 0;">
+                                <CheckBox fx:id="chkActive" text="Activar promoción inmediatamente" selected="true" styleClass="text-sm, font-medium" style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: -fx-text-custom-main; -fx-cursor: hand;"/>
                             </HBox>
                         </VBox>
 
                         <Region VBox.vgrow="ALWAYS"/>
 
                         <!-- SaaS Tip Banner -->
-                        <HBox spacing="10" style="-fx-padding: 10 15; -fx-background-color: rgba(99, 102, 241, 0.05); -fx-background-radius: 8px; -fx-border-color: rgba(99, 102, 241, 0.15); -fx-border-width: 1px;">
-                            <FontAwesomeIconView glyphName="INFO_CIRCLE" size="14" fill="#6366f1" style="-fx-translate-y: 1;"/>
-                            <Label text="Las promociones se activarán de forma automática dentro del rango de fechas definido, siempre y cuando el estado esté marcado como activo." wrapText="true" style="-fx-text-fill: -fx-text-custom-light; -fx-font-size: 11px;"/>
+                        <HBox spacing="10" alignment="CENTER_LEFT" style="-fx-padding: 12 16; -fx-background-color: rgba(99, 102, 241, 0.05); -fx-background-radius: 8px; -fx-border-color: rgba(99, 102, 241, 0.15); -fx-border-width: 1px;">
+                            <FontAwesomeIconView glyphName="INFO_CIRCLE" size="16" fill="#6366f1"/>
+                            <Label text="Las promociones se activarán de forma automática dentro del rango de fechas definido, siempre y cuando el estado esté marcado como activo." wrapText="true" HBox.hgrow="ALWAYS" minWidth="0" style="-fx-text-fill: -fx-text-custom-light; -fx-font-size: 12px; -fx-line-spacing: 1.2;"/>
                         </HBox>
                     </VBox>
                 </content>
@@ -88,46 +87,44 @@
             <Tab text="🎯 Alcance">
                 <content>
                     <VBox spacing="15" style="-fx-padding: 15 5 10 5;">
-                        <!-- Glassmorphic Form Card -->
-                        <VBox spacing="15" style="-fx-background-color: rgba(255, 255, 255, 0.02); -fx-background-radius: 10px; -fx-border-color: rgba(0, 0, 0, 0.08); -fx-border-width: 1px; -fx-padding: 20px;">
-                            <HBox spacing="15">
-                                <VBox spacing="8" HBox.hgrow="ALWAYS">
-                                    <Label text="Compra Mínima Requerida (Subtotal > X)" styleClass="text-sm, font-medium, text-gray-700" style="-fx-font-weight: bold;"/>
+                        <ScrollPane fitToWidth="true" style="-fx-background-color: transparent; -fx-background: transparent; -fx-border-width: 0;" VBox.vgrow="ALWAYS">
+                            <!-- Glassmorphic Form Card (stacked vertically for absolute clarity) -->
+                            <VBox spacing="14" style="-fx-background-color: rgba(255, 255, 255, 0.02); -fx-background-radius: 10px; -fx-border-color: rgba(0, 0, 0, 0.08); -fx-border-width: 1px; -fx-padding: 20px;">
+                                <VBox spacing="6">
+                                    <Label text="Compra Mínima Requerida (Subtotal del carrito)" styleClass="text-sm, font-medium" style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: -fx-text-custom-main;"/>
                                     <TextField fx:id="txtMinOrderValue" promptText="0,00" styleClass="form-control"/>
                                 </VBox>
-                                <VBox spacing="8" HBox.hgrow="ALWAYS">
-                                    <Label text="Límite de Usos Totales (0 = Sin Límite)" styleClass="text-sm, font-medium, text-gray-700" style="-fx-font-weight: bold;"/>
+
+                                <VBox spacing="6">
+                                    <Label text="Límite de Usos Totales (0 = Sin límite)" styleClass="text-sm, font-medium" style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: -fx-text-custom-main;"/>
                                     <TextField fx:id="txtMaxUses" promptText="0" styleClass="form-control"/>
                                 </VBox>
-                            </HBox>
 
-                            <HBox spacing="15">
-                                <VBox spacing="8" HBox.hgrow="ALWAYS">
-                                    <Label text="Alcance / Ámbito de Aplicación" styleClass="text-sm, font-medium, text-gray-700" style="-fx-font-weight: bold;"/>
+                                <VBox spacing="6">
+                                    <Label text="Alcance / Ámbito de Aplicación" styleClass="text-sm, font-medium" style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: -fx-text-custom-main;"/>
                                     <ComboBox fx:id="cmbScope" maxWidth="Infinity" styleClass="form-control"/>
                                 </VBox>
-                                <VBox spacing="8" HBox.hgrow="ALWAYS">
-                                    <Label text="ID Cliente Específico (Opcional)" styleClass="text-sm, font-medium, text-gray-700" style="-fx-font-weight: bold;"/>
-                                    <TextField fx:id="txtBoundClientId" promptText="Dejar vacío para todos" styleClass="form-control"/>
+
+                                <VBox spacing="6">
+                                    <Label text="Restringir a ID de Cliente Específico (Opcional)" styleClass="text-sm, font-medium" style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: -fx-text-custom-main;"/>
+                                    <TextField fx:id="txtBoundClientId" promptText="Dejar vacío para todos los clientes" styleClass="form-control"/>
                                 </VBox>
-                            </HBox>
 
-                            <VBox fx:id="panelAffected" spacing="8">
-                                <Label fx:id="lblAffected" text="%promotion.form.affected" styleClass="text-sm, font-medium, text-gray-700" style="-fx-font-weight: bold;"/>
-                                <HBox spacing="10">
-                                    <TextField fx:id="txtAffectedSearch" promptText="Buscar ID o nombre..." HBox.hgrow="ALWAYS" styleClass="form-control"/>
-                                    <Button onAction="#handleAddAffected" styleClass="btn-secondary" text="%promotion.form.btn.add" style="-fx-cursor: hand;" />
-                                </HBox>
-                                <ListView fx:id="listAffected" prefHeight="100" styleClass="form-control" style="-fx-padding: 0;"/>
+                                <VBox fx:id="panelAffected" spacing="8">
+                                    <Label fx:id="lblAffected" text="%promotion.form.affected" styleClass="text-sm, font-medium" style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: -fx-text-custom-main;"/>
+                                    <HBox spacing="10">
+                                        <TextField fx:id="txtAffectedSearch" promptText="Buscar por ID o nombre..." HBox.hgrow="ALWAYS" styleClass="form-control"/>
+                                        <Button onAction="#handleAddAffected" styleClass="btn-secondary" text="Añadir" style="-fx-cursor: hand;" />
+                                    </HBox>
+                                    <ListView fx:id="listAffected" prefHeight="100" styleClass="form-control" style="-fx-padding: 0;"/>
+                                </VBox>
                             </VBox>
-                        </VBox>
-
-                        <Region VBox.vgrow="ALWAYS"/>
+                        </ScrollPane>
 
                         <!-- SaaS Tip Banner -->
-                        <HBox spacing="10" style="-fx-padding: 10 15; -fx-background-color: rgba(16, 185, 129, 0.05); -fx-background-radius: 8px; -fx-border-color: rgba(16, 185, 129, 0.15); -fx-border-width: 1px;">
-                            <FontAwesomeIconView glyphName="INFO_CIRCLE" size="14" fill="#10b981" style="-fx-translate-y: 1;"/>
-                            <Label text="Filtra el alcance de tu promoción para aplicarla de forma global, a productos específicos o a categorías enteras." wrapText="true" style="-fx-text-fill: -fx-text-custom-light; -fx-font-size: 11px;"/>
+                        <HBox spacing="10" alignment="CENTER_LEFT" style="-fx-padding: 12 16; -fx-background-color: rgba(16, 185, 129, 0.05); -fx-background-radius: 8px; -fx-border-color: rgba(16, 185, 129, 0.15); -fx-border-width: 1px;">
+                            <FontAwesomeIconView glyphName="INFO_CIRCLE" size="16" fill="#10b981"/>
+                            <Label text="Filtra el alcance de tu promoción para aplicarla de forma global, a productos específicos o a categorías enteras." wrapText="true" HBox.hgrow="ALWAYS" minWidth="0" style="-fx-text-fill: -fx-text-custom-light; -fx-font-size: 12px; -fx-line-spacing: 1.2;"/>
                         </HBox>
                     </VBox>
                 </content>
@@ -138,25 +135,25 @@
                 <content>
                     <VBox spacing="15" style="-fx-padding: 15 5 10 5;">
                         <!-- Glassmorphic Form Card -->
-                        <VBox spacing="15" style="-fx-background-color: rgba(255, 255, 255, 0.02); -fx-background-radius: 10px; -fx-border-color: rgba(0, 0, 0, 0.08); -fx-border-width: 1px; -fx-padding: 20px;">
-                            <VBox spacing="8">
-                                <Label text="%promotion.form.type" styleClass="text-sm, font-medium, text-gray-700" style="-fx-font-weight: bold;"/>
+                        <VBox spacing="12" style="-fx-background-color: rgba(255, 255, 255, 0.02); -fx-background-radius: 10px; -fx-border-color: rgba(0, 0, 0, 0.08); -fx-border-width: 1px; -fx-padding: 20px;">
+                            <VBox spacing="6">
+                                <Label text="Tipo de Beneficio" styleClass="text-sm, font-medium" style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: -fx-text-custom-main;"/>
                                 <ComboBox fx:id="cmbType" maxWidth="Infinity" styleClass="form-control"/>
                             </VBox>
 
-                            <VBox fx:id="panelValue" spacing="8">
-                                <Label fx:id="lblValueDescription" text="%promotion.form.value" styleClass="text-sm, font-medium, text-gray-700" style="-fx-font-weight: bold;"/>
+                            <VBox fx:id="panelValue" spacing="6">
+                                <Label fx:id="lblValueDescription" text="Valor del Descuento" styleClass="text-sm, font-medium" style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: -fx-text-custom-main;"/>
                                 <TextField fx:id="txtValue" promptText="0,00" styleClass="form-control"/>
                             </VBox>
 
                             <VBox fx:id="panelVolume" spacing="8">
                                 <HBox spacing="15">
-                                    <VBox spacing="8" HBox.hgrow="ALWAYS">
-                                        <Label text="%promotion.form.buy_qty" styleClass="text-sm, font-medium, text-gray-700" style="-fx-font-weight: bold;"/>
+                                    <VBox spacing="6" HBox.hgrow="ALWAYS">
+                                        <Label text="Cantidad a Comprar" styleClass="text-sm, font-medium" style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: -fx-text-custom-main;"/>
                                         <TextField fx:id="txtBuyQty" promptText="Ej: 2" styleClass="form-control"/>
                                     </VBox>
-                                    <VBox spacing="8" HBox.hgrow="ALWAYS">
-                                        <Label text="%promotion.form.free_qty" styleClass="text-sm, font-medium, text-gray-700" style="-fx-font-weight: bold;"/>
+                                    <VBox spacing="6" HBox.hgrow="ALWAYS">
+                                        <Label text="Cantidad Gratis" styleClass="text-sm, font-medium" style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: -fx-text-custom-main;"/>
                                         <TextField fx:id="txtFreeQty" promptText="Ej: 1" styleClass="form-control"/>
                                     </VBox>
                                 </HBox>
@@ -166,9 +163,9 @@
                         <Region VBox.vgrow="ALWAYS"/>
 
                         <!-- SaaS Tip Banner -->
-                        <HBox spacing="10" style="-fx-padding: 10 15; -fx-background-color: rgba(245, 158, 11, 0.05); -fx-background-radius: 8px; -fx-border-color: rgba(245, 158, 11, 0.15); -fx-border-width: 1px;">
-                            <FontAwesomeIconView glyphName="INFO_CIRCLE" size="14" fill="#f59e0b" style="-fx-translate-y: 1;"/>
-                            <Label text="Tip: Selecciona 'Por Volumen' para crear ofertas del tipo 3x2 o 2x1 en tus productos seleccionados." wrapText="true" style="-fx-text-fill: -fx-text-custom-light; -fx-font-size: 11px;"/>
+                        <HBox spacing="10" alignment="CENTER_LEFT" style="-fx-padding: 12 16; -fx-background-color: rgba(245, 158, 11, 0.05); -fx-background-radius: 8px; -fx-border-color: rgba(245, 158, 11, 0.15); -fx-border-width: 1px;">
+                            <FontAwesomeIconView glyphName="INFO_CIRCLE" size="16" fill="#f59e0b"/>
+                            <Label text="Tip: Selecciona 'Por Volumen' para crear ofertas del tipo 3x2 o 2x1 en tus productos seleccionados." wrapText="true" HBox.hgrow="ALWAYS" minWidth="0" style="-fx-text-fill: -fx-text-custom-light; -fx-font-size: 12px; -fx-line-spacing: 1.2;"/>
                         </HBox>
                     </VBox>
                 </content>
