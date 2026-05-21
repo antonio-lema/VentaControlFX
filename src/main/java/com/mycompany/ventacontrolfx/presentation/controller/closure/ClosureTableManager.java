@@ -41,6 +41,51 @@ public class ClosureTableManager {
         colActual.setCellValueFactory(new PropertyValueFactory<>("actualCash"));
         colDifference.setCellValueFactory(new PropertyValueFactory<>("difference"));
 
+        boolean canSeeTotals = container.getUserSession().hasPermission("caja.ver_totales")
+                || container.getUserSession().hasPermission("USUARIOS");
+
+        javafx.util.Callback<TableColumn<CashClosure, Double>, TableCell<CashClosure, Double>> doubleCellFactory = column -> new TableCell<>() {
+            @Override protected void updateItem(Double item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                    setStyle("");
+                } else {
+                    if (canSeeTotals) {
+                        setText(String.format("%.2f \u20ac", item));
+                    } else {
+                        setText("**** \u20ac");
+                    }
+                }
+            }
+        };
+
+        colInitialFund.setCellFactory(doubleCellFactory);
+        colExpected.setCellFactory(doubleCellFactory);
+        colActual.setCellFactory(doubleCellFactory);
+
+        colDifference.setCellFactory(column -> new TableCell<>() {
+            @Override protected void updateItem(Double item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                    setStyle("");
+                } else {
+                    if (canSeeTotals) {
+                        setText(String.format("%+.2f \u20ac", item));
+                        if (Math.abs(item) < 0.001) {
+                            setStyle("-fx-text-fill: #16a34a; -fx-font-weight: bold;");
+                        } else {
+                            setStyle("-fx-text-fill: #dc2626; -fx-font-weight: bold;");
+                        }
+                    } else {
+                        setText("**** \u20ac");
+                        setStyle("");
+                    }
+                }
+            }
+        });
+
         // Renderizado de estado con colores y traducción dinámica
         colStatus.setCellFactory(column -> new TableCell<>() {
             @Override protected void updateItem(String item, boolean empty) {
@@ -79,6 +124,9 @@ public class ClosureTableManager {
         colCreated.setCellValueFactory(new PropertyValueFactory<>("createdAt"));
         colAmount.setCellValueFactory(new PropertyValueFactory<>("amount"));
 
+        boolean canSeeTotals = container.getUserSession().hasPermission("caja.ver_totales")
+                || container.getUserSession().hasPermission("USUARIOS");
+
         colCreated.setCellFactory(column -> new TableCell<>() {
             @Override protected void updateItem(LocalDateTime item, boolean empty) {
                 super.updateItem(item, empty);
@@ -91,8 +139,13 @@ public class ClosureTableManager {
                 super.updateItem(item, empty);
                 if (empty || item == null) { setText(null); setStyle(""); }
                 else {
-                    setText(String.format("%.2f \u20ac", item));
-                    setStyle(item < 0 ? "-fx-text-fill: #dc2626; -fx-font-weight: bold;" : "-fx-text-fill: #16a34a; -fx-font-weight: bold;");
+                    if (canSeeTotals) {
+                        setText(String.format("%.2f \u20ac", item));
+                        setStyle(item < 0 ? "-fx-text-fill: #dc2626; -fx-font-weight: bold;" : "-fx-text-fill: #16a34a; -fx-font-weight: bold;");
+                    } else {
+                        setText("**** \u20ac");
+                        setStyle("");
+                    }
                 }
             }
         });

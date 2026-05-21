@@ -69,37 +69,25 @@ public class LoginUseCase {
     }
 
     private void loadExtendedProfile(User user) {
-        List<Permission> effectivePerms = new ArrayList<>();
         try {
             String roleName = user.getRole();
             Role role = roleUseCase.getRoleByName(roleName);
 
             if (role != null) {
                 user.setRoleObject(role);
-                List<Permission> rolePerms = role.getPermissions();
-                List<Permission> userPerms = permissionUseCase.getPermissionsForUser(user.getUserId());
-
-                Set<String> uniqueCodes = new HashSet<>();
-                for (Permission p : rolePerms) {
-                    if (uniqueCodes.add(p.getCode()))
-                        effectivePerms.add(p);
-                }
-                for (Permission p : userPerms) {
-                    if (uniqueCodes.add(p.getCode()))
-                        effectivePerms.add(p);
-                }
-            } else {
-                effectivePerms.addAll(permissionUseCase.getPermissionsForUser(user.getUserId()));
             }
+
+            List<Permission> userPerms = permissionUseCase.getPermissionsForUser(user.getUserId());
 
             // Caso administrador inicial: si no tiene permisos, asignar todos por defecto
-            if (effectivePerms.isEmpty() && isAdministratorRole(user.getRole())) {
-                effectivePerms = permissionUseCase.getAllPermissions();
-                List<String> codes = effectivePerms.stream().map(Permission::getCode).toList();
+            if (userPerms.isEmpty() && (role == null || role.getPermissions().isEmpty()) && isAdministratorRole(user.getRole())) {
+                List<Permission> allPerms = permissionUseCase.getAllPermissions();
+                List<String> codes = allPerms.stream().map(Permission::getCode).toList();
                 permissionUseCase.savePermissionsForUser(user.getUserId(), codes);
+                userPerms.addAll(allPerms);
             }
 
-            user.setPermissions(effectivePerms);
+            user.setPermissions(userPerms);
         } catch (Exception e) {
             System.err.println("Error al cargar perfil de usuario: " + e.getMessage());
         }

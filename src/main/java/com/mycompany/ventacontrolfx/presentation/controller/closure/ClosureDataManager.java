@@ -70,12 +70,27 @@ public class ClosureDataManager {
                 .filter(c -> !"REVISADO".equals(c.getStatus()))
                 .count();
 
+        boolean canSeeTotals = container.getUserSession().hasPermission("caja.ver_totales")
+                || container.getUserSession().hasPermission("USUARIOS");
+
         if (lblTotalCount != null) lblTotalCount.setText(String.valueOf(allClosures.size()));
-        if (lblTotalDiff != null) lblTotalDiff.setText(String.format("%+.2f \u20ac", totalDiff));
+        if (lblTotalDiff != null) {
+            if (canSeeTotals) {
+                lblTotalDiff.setText(String.format("%+.2f \u20ac", totalDiff));
+            } else {
+                lblTotalDiff.setText("**** \u20ac");
+            }
+        }
         if (lblPending != null) lblPending.setText(String.valueOf(pending));
 
         try {
-            if (lblCurrentCash != null) lblCurrentCash.setText(String.format("%.2f \u20ac", closureUseCase.getCurrentCashInDrawer()));
+            if (lblCurrentCash != null) {
+                if (canSeeTotals) {
+                    lblCurrentCash.setText(String.format("%.2f \u20ac", closureUseCase.getCurrentCashInDrawer()));
+                } else {
+                    lblCurrentCash.setText("**** \u20ac");
+                }
+            }
         } catch (Exception e) {
             if (lblCurrentCash != null) lblCurrentCash.setText("---");
         }

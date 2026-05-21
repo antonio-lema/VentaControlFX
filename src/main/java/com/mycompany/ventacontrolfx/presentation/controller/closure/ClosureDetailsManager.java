@@ -43,12 +43,23 @@ public class ClosureDetailsManager {
         detailsPanel.setManaged(true);
 
         lblId.setText("#" + closure.getClosureId());
-        lblInitial.setText(String.format("%.2f €", closure.getInitialFund()));
-        lblSales.setText(String.format("%.2f €", closure.getTotalCash()));
-        lblIn.setText(String.format("%.2f €", closure.getCashIn()));
-        lblOut.setText(String.format("%.2f €", closure.getCashOut()));
-        lblExpected.setText(String.format("%.2f €", closure.getExpectedCash()));
-        lblActual.setText(String.format("%.2f €", closure.getActualCash()));
+        
+        boolean canSeeTotals = userSession.hasPermission("caja.ver_totales") || userSession.hasPermission("USUARIOS");
+        if (canSeeTotals) {
+            lblInitial.setText(String.format("%.2f €", closure.getInitialFund()));
+            lblSales.setText(String.format("%.2f €", closure.getTotalCash()));
+            lblIn.setText(String.format("%.2f €", closure.getCashIn()));
+            lblOut.setText(String.format("%.2f €", closure.getCashOut()));
+            lblExpected.setText(String.format("%.2f €", closure.getExpectedCash()));
+            lblActual.setText(String.format("%.2f €", closure.getActualCash()));
+        } else {
+            lblInitial.setText("**** €");
+            lblSales.setText("**** €");
+            lblIn.setText("**** €");
+            lblOut.setText("**** €");
+            lblExpected.setText("**** €");
+            lblActual.setText("**** €");
+        }
         lblNotes.setText(closure.getNotes() != null ? closure.getNotes() : "—");
 
         boolean canReview = userSession.hasPermission("caja.revisar") && closure.getReviewedBy() == null;
